@@ -1,16 +1,36 @@
-# React + Vite
+# SmartShelf AI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+واجهة Hackathon لبناء طبقة قرار ذكية فوق بيانات متجر/كازية من أجل:
 
-Currently, two official plugins are available:
+- اقتراح طلبات شراء ذكية.
+- تحليل المخزون والمخاطر.
+- تنظيم الرفوف بصرياً عبر `Planogram`.
+- شرح التوصيات بصيغة `Mock AI`.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Project Docs
 
-## React Compiler
+- الخطة الأصلية: [SmartShelf_AI_Hackathon_Plan.md](/C:/Users/mshar/Desktop/hackathonsj/SmartShelf_AI_Hackathon_Plan.md)
+- خطة السبرنتات: [SPRINTS.md](/C:/Users/mshar/Desktop/hackathonsj/SPRINTS.md)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Current Stack
 
-## Expanding the ESLint configuration
+- React
+- Vite
+- JavaScript
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Run Locally
+
+```bash
+npm install
+npm run dev
+```
+
+## Current Goal
+
+تحويل هذا الريبو من قالب Vite افتراضي إلى MVP قابل للعرض باسم `SmartShelf AI` يحتوي على:
+
+- Dashboard
+- Products view
+- Reorder recommendations
+- Planogram view
+- Approved orders flow

@@ -7,7 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "normalize:data": "node scripts/normalize-datasets.mjs",
+    "sprint2": "npm run normalize:data",
+    "sprint3": "npm run normalize:data",
+    "sprint4": "npm run normalize:data && npm run lint && npm run build",
+    "sprint7": "npm run normalize:data && npm run lint && npm run build"
   },
   "dependencies": {
     "firebase": "^12.13.0",

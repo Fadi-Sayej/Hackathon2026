@@ -1,0 +1,78 @@
+{
+  "totalProducts": 30,
+  "estimatedStockValue": 2487.92,
+  "categories": [
+    {
+      "category": "Cold Drinks",
+      "products": 5,
+      "salesLast30Days": 257,
+      "currentStock": 89
+    },
+    {
+      "category": "Water",
+      "products": 2,
+      "salesLast30Days": 147,
+      "currentStock": 51
+    },
+    {
+      "category": "Snacks",
+      "products": 5,
+      "salesLast30Days": 142,
+      "currentStock": 62
+    },
+    {
+      "category": "Chocolate",
+      "products": 4,
+      "salesLast30Days": 116,
+      "currentStock": 62
+    },
+    {
+      "category": "Dairy",
+      "products": 3,
+      "salesLast30Days": 114,
+      "currentStock": 16
+    },
+    {
+      "category": "Bakery",
+      "products": 3,
+      "salesLast30Days": 98,
+      "currentStock": 7
+    },
+    {
+      "category": "Energy Drinks",
+      "products": 2,
+      "salesLast30Days": 93,
+      "currentStock": 32
+    },
+    {
+      "category": "Coffee",
+      "products": 2,
+      "salesLast30Days": 52,
+      "currentStock": 25
+    },
+    {
+      "category": "Cigarettes",
+      "products": 1,
+      "salesLast30Days": 46,
+      "currentStock": 49
+    },
+    {
+      "category": "Gum & Candy",
+      "products": 1,
+      "salesLast30Days": 34,
+      "currentStock": 23
+    },
+    {
+      "category": "Ice Cream",
+      "products": 1,
+      "salesLast30Days": 30,
+      "currentStock": 11
+    },
+    {
+      "category": "Car Accessories",
+      "products": 1,
+      "salesLast30Days": 18,
+      "currentStock": 8
+    }
+  ]
+}
