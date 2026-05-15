@@ -1,5 +1,21 @@
 import { useEffect, useMemo, useState } from 'react'
 import './App.css'
+import {
+  generateCrossMerchandisingSuggestions,
+  summarizeAffinity,
+} from './lib/analytics/affinityEngine.js'
+import {
+  analyzeLocalMarket,
+  buildCompetitorBoostMap,
+  buildPriceAdvantageSet,
+  selectPriceLeaders,
+  selectPriceProtectionAlerts,
+  selectStockoutOpportunities,
+  summarizeCompetitorIntelligence,
+} from './lib/analytics/competitorEngine.js'
+import { buildLocalMarketSnapshot } from './lib/dataAdapters/multiCompetitorAdapter.js'
+import { filterStoresByRadius } from './lib/utils/geoUtils.js'
+import { COMPETITOR_STORES, OUR_STORE } from './data/mockMarketData.js'
 import { analyzeProducts, summarizeInventory } from './lib/analytics/inventoryEngine.js'
 import {
   generatePlanogram,
@@ -15,6 +31,12 @@ import { buildMarketContext } from './lib/context/marketContextAdapter.js'
 import { fallbackMarketContext } from './lib/context/fallbackMarketContext.js'
 import { loadDemoStoreData } from './lib/dataAdapters/loadDemoStoreData.js'
 import {
+  CONNECTOR_MODES,
+  createComaxConnectorStub,
+  createCsvConnector,
+  createDemoDataConnector,
+} from './lib/posConnectors/index.js'
+import {
   loadRecommendationDecisions,
   resetDemoState,
   saveApprovedOrder,
@@ -23,6 +45,7 @@ import {
 import { AppShell } from './components/layout/AppShell.jsx'
 import { ApprovedOrdersPage } from './pages/ApprovedOrdersPage.jsx'
 import { DashboardPage } from './pages/DashboardPage.jsx'
+import { DataSourcePage } from './pages/DataSourcePage.jsx'
 import { PlanogramPage } from './pages/PlanogramPage.jsx'
 import { ProductsPage } from './pages/ProductsPage.jsx'
 import { RecommendationsPage } from './pages/RecommendationsPage.jsx'
@@ -48,6 +71,22 @@ const pageMeta = {
     title: 'Approved Orders',
     description: 'Purchase-order style summary for approved replenishment actions.',
   },
+  'data-source': {
+    title: 'Data Source',
+    description: 'Choose between bundled demo data, a CSV export, or a future Comax POS feed.',
+  },
+}
+
+function initialStoreData() {
+  const data = loadDemoStoreData()
+  return {
+    products: data.products,
+    validationIssues: data.validationIssues,
+    source: data.source,
+    connectorMode: CONNECTOR_MODES.DEMO,
+    fileName: null,
+    loadedAt: new Date().toISOString(),
+  }
 }
 
 function App() {
@@ -56,6 +95,11 @@ function App() {
   const [recommendationOverrides, setRecommendationOverrides] = useState(() =>
     loadRecommendationDecisions(),
   )
+  const [storeData, setStoreData] = useState(initialStoreData)
+  const [connectorStatus, setConnectorStatus] = useState({
+    state: 'ready',
+    message: 'Demo dataset loaded.',
+  })
 
   useEffect(() => {
     let cancelled = false
@@ -79,11 +123,66 @@ function App() {
     }
   }, [])
 
-  const storeData = useMemo(() => loadDemoStoreData(), [])
   const products = storeData.products
+
+  // ── Hyper-Local Competitor Intelligence (plugin) ───────────────────
+  // Mock-only during the hackathon demo. Filters competitor stores to the
+  // 1 km radius first, pivots them into a barcode-keyed market snapshot,
+  // then enriches our catalog with price + stock intelligence flags.
+  const nearbyCompetitors = useMemo(
+    () => filterStoresByRadius(COMPETITOR_STORES, OUR_STORE.coords, 1000),
+    [],
+  )
+  const localMarketSnapshot = useMemo(
+    () => buildLocalMarketSnapshot(nearbyCompetitors),
+    [nearbyCompetitors],
+  )
+  const enrichedProducts = useMemo(
+    () => analyzeLocalMarket(products, localMarketSnapshot),
+    [products, localMarketSnapshot],
+  )
+  const competitorBoosts = useMemo(
+    () => buildCompetitorBoostMap(enrichedProducts),
+    [enrichedProducts],
+  )
+  const competitorPriceAdvantage = useMemo(
+    () => buildPriceAdvantageSet(enrichedProducts),
+    [enrichedProducts],
+  )
+
+  // Merge competitor signals into marketContext so the existing engines
+  // pick them up through their optional context fields. Default behavior
+  // (no boost map → no advantage set) keeps every engine output identical
+  // to before this feature when the maps are empty.
+  const enrichedMarketContext = useMemo(
+    () => ({
+      ...marketContext,
+      competitorBoosts,
+      competitorPriceAdvantage,
+    }),
+    [marketContext, competitorBoosts, competitorPriceAdvantage],
+  )
+
   const analyzedProducts = useMemo(
-    () => analyzeProducts(products, marketContext),
-    [products, marketContext],
+    () => analyzeProducts(enrichedProducts, enrichedMarketContext),
+    [enrichedProducts, enrichedMarketContext],
+  )
+
+  const competitorSummary = useMemo(
+    () => summarizeCompetitorIntelligence(analyzedProducts),
+    [analyzedProducts],
+  )
+  const priceLeaderProducts = useMemo(
+    () => selectPriceLeaders(analyzedProducts),
+    [analyzedProducts],
+  )
+  const stockoutOpportunities = useMemo(
+    () => selectStockoutOpportunities(analyzedProducts),
+    [analyzedProducts],
+  )
+  const priceProtectionAlerts = useMemo(
+    () => selectPriceProtectionAlerts(analyzedProducts),
+    [analyzedProducts],
   )
   const inventorySummary = useMemo(() => summarizeInventory(analyzedProducts), [analyzedProducts])
   const productIndex = useMemo(
@@ -94,9 +193,9 @@ function App() {
   const recommendations = useMemo(() => {
     const baseRecommendations = annotateRecommendationsWithExplanations({
       provider: getDefaultExplanationProvider(),
-      products,
-      recommendations: generateReorderRecommendations(products, marketContext),
-      marketContext,
+      products: analyzedProducts,
+      recommendations: generateReorderRecommendations(analyzedProducts, enrichedMarketContext),
+      marketContext: enrichedMarketContext,
     })
 
     return baseRecommendations.map((recommendation) => {
@@ -109,14 +208,19 @@ function App() {
           override.recommendedOrderQuantity ?? recommendation.recommendedOrderQuantity,
       }
     })
-  }, [marketContext, products, recommendationOverrides])
+  }, [analyzedProducts, enrichedMarketContext, recommendationOverrides])
 
   const planogramItems = useMemo(
-    () => generatePlanogram(analyzedProducts, marketContext),
-    [analyzedProducts, marketContext],
+    () => generatePlanogram(analyzedProducts, enrichedMarketContext),
+    [analyzedProducts, enrichedMarketContext],
   )
   const shelfGroups = useMemo(() => groupPlanogramByShelf(planogramItems), [planogramItems])
   const planogramSummary = useMemo(() => summarizePlanogram(planogramItems), [planogramItems])
+  const affinitySuggestions = useMemo(
+    () => generateCrossMerchandisingSuggestions(analyzedProducts, planogramItems),
+    [analyzedProducts, planogramItems],
+  )
+  const affinitySummary = useMemo(() => summarizeAffinity(affinitySuggestions), [affinitySuggestions])
 
   const approvedOrders = useMemo(
     () => recommendations.filter((recommendation) => recommendation.status === 'APPROVED'),
@@ -161,20 +265,84 @@ function App() {
   function handleResetDemoState() {
     resetDemoState()
     setRecommendationOverrides({})
+    setStoreData(initialStoreData())
+    setConnectorStatus({ state: 'ready', message: 'Demo dataset loaded.' })
     setActivePage('dashboard')
+  }
+
+  async function applyConnector(connector, { fileName = null } = {}) {
+    setConnectorStatus({ state: 'loading', message: `Connecting to ${connector.label}...` })
+    try {
+      const probe = await connector.connect()
+      if (!probe.ok) {
+        setConnectorStatus({
+          state: 'error',
+          message: probe.message,
+          hint: probe.hint,
+          mode: connector.mode,
+        })
+        return false
+      }
+      const next = await connector.load()
+      setStoreData({
+        products: next.products,
+        validationIssues: next.validationIssues,
+        source: next.source,
+        connectorMode: connector.mode,
+        fileName: fileName ?? next.source?.fileName ?? null,
+        loadedAt: new Date().toISOString(),
+      })
+      setRecommendationOverrides({})
+      setConnectorStatus({
+        state: 'ready',
+        message: probe.message,
+        mode: connector.mode,
+      })
+      return true
+    } catch (error) {
+      setConnectorStatus({
+        state: 'error',
+        message: error?.message ?? 'Failed to load data source.',
+        hint: error?.hint,
+        mode: connector.mode,
+      })
+      return false
+    }
+  }
+
+  async function handleSelectDemoSource() {
+    await applyConnector(createDemoDataConnector())
+  }
+
+  async function handleSelectCsvSource(file) {
+    if (!file) return false
+    const connector = createCsvConnector({ file })
+    return applyConnector(connector, { fileName: file.name })
+  }
+
+  async function handleSelectComaxSource() {
+    await applyConnector(createComaxConnectorStub())
   }
 
   const pageProps = {
     approvedOrders,
+    affinitySuggestions,
+    affinitySummary,
     analyzedProducts,
+    competitorSummary,
     dashboardStats,
     inventorySummary,
     marketContext,
     planogramItems,
     planogramSummary,
+    priceLeaderProducts,
+    priceProtectionAlerts,
     productIndex,
     recommendations,
     shelfGroups,
+    stockoutOpportunities,
+    storeData,
+    connectorStatus,
     onApprove: (recommendation) =>
       updateRecommendation(recommendation, {
         status: 'APPROVED',
@@ -188,6 +356,9 @@ function App() {
         recommendedOrderQuantity: normalizeOrderQuantity(recommendedOrderQuantity),
       }),
     onReject: (recommendation) => updateRecommendation(recommendation, { status: 'REJECTED' }),
+    onSelectDemoSource: handleSelectDemoSource,
+    onSelectCsvSource: handleSelectCsvSource,
+    onSelectComaxSource: handleSelectComaxSource,
   }
 
   return (
@@ -203,6 +374,7 @@ function App() {
       {activePage === 'recommendations' && <RecommendationsPage {...pageProps} />}
       {activePage === 'planogram' && <PlanogramPage {...pageProps} />}
       {activePage === 'orders' && <ApprovedOrdersPage {...pageProps} />}
+      {activePage === 'data-source' && <DataSourcePage {...pageProps} />}
     </AppShell>
   )
 }

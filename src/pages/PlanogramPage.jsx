@@ -1,10 +1,18 @@
 import { useMemo, useState } from 'react'
+import { CrossMerchandisingPanel } from '../components/planogram/CrossMerchandisingPanel.jsx'
 import { ShelfLayout } from '../components/planogram/ShelfLayout.jsx'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
 import { MetricCard } from '../components/shared/MetricCard.jsx'
 import { formatCurrency, formatDays } from '../components/shared/formatters.js'
 
-export function PlanogramPage({ analyzedProducts, planogramItems, planogramSummary, shelfGroups }) {
+export function PlanogramPage({
+  affinitySuggestions,
+  affinitySummary,
+  analyzedProducts,
+  planogramItems,
+  planogramSummary,
+  shelfGroups,
+}) {
   const [selectedProductId, setSelectedProductId] = useState(planogramItems[0]?.productId)
   const selectedItem = useMemo(
     () =>
@@ -72,6 +80,8 @@ export function PlanogramPage({ analyzedProducts, planogramItems, planogramSumma
           )}
         </aside>
       </section>
+
+      <CrossMerchandisingPanel suggestions={affinitySuggestions} summary={affinitySummary} />
     </>
   )
 }

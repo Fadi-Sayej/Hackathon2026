@@ -1,7 +1,16 @@
+const VISUAL_SHELF_ORDER = ['TOP', 'EYE_LEVEL', 'MIDDLE', 'BOTTOM']
+
 export function ShelfLayout({ activeItem, onSelectItem, shelfGroups }) {
+  const orderedGroups = shelfGroups
+    .slice()
+    .sort(
+      (a, b) =>
+        VISUAL_SHELF_ORDER.indexOf(a.shelfLevel) - VISUAL_SHELF_ORDER.indexOf(b.shelfLevel),
+    )
+
   return (
     <div className="retail-fixture">
-      {shelfGroups.map((group) => (
+      {orderedGroups.map((group) => (
         <section
           className={`fixture-shelf ${group.shelfLevel === 'EYE_LEVEL' ? 'fixture-shelf-premium' : ''}`}
           key={group.shelfLevel}

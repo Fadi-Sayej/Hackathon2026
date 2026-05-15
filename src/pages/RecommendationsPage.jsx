@@ -85,7 +85,7 @@ export function RecommendationsPage({
                 </div>
 
                 <div className="ai-explanation">
-                  <p>Mock AI explanation</p>
+                  <p>AI explanation</p>
                   <span>{recommendation.explanation}</span>
                 </div>
 

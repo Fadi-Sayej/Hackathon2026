@@ -20,9 +20,17 @@ export function generatePlanogram(products, marketContext = {}) {
   const analyzedProducts = products[0]?.analytics ? products : analyzeProducts(products, marketContext)
   const stats = buildStats(analyzedProducts)
 
+  // Optional plugin hook: marketContext.competitorPriceAdvantage may be a
+  // Set, array, or plain object of product ids that earn a shelf-priority
+  // bump because we are the local price leader on those items. When the
+  // field is missing the engine behaves exactly as before.
+  const priceAdvantageSet = toIdSet(marketContext.competitorPriceAdvantage)
+
   return analyzedProducts
     .map((product) => {
-      const scoring = scoreProduct(product, stats)
+      const scoring = scoreProduct(product, stats, {
+        competitorPriceAdvantage: priceAdvantageSet.has(product.id),
+      })
       const shelfLevel = chooseShelfLevel(product, scoring.score)
       const facings = calculateFacings(product, shelfLevel)
 
@@ -69,20 +77,24 @@ function buildStats(products) {
   }
 }
 
-function scoreProduct(product, stats) {
+function scoreProduct(product, stats, options = {}) {
   const salesScore = normalize(product.analytics.weightedAvgDailySales, stats.maxDailySales)
   const marginScore = normalize(product.analytics.margin, stats.maxMargin)
   const expiryRiskScore = product.analytics.statuses.includes('Near expiry') ? 1 : 0
   const stockRiskScore = product.analytics.daysUntilStockout !== null && product.analytics.daysUntilStockout < 3 ? 1 : 0
   const impulseScore = impulseCategories.has(product.category) ? 0.2 : 0
   const penaltyScore = product.analytics.statuses.includes('Slow moving') ? 0.18 : 0
+  // Hyper-local pricing edge: if we're the cheapest within 1km, give this
+  // product a shelf-priority bump so customers notice the value first.
+  const competitorPriceBonus = options.competitorPriceAdvantage ? 0.15 : 0
 
   const score = clamp(
     salesScore * 0.45 +
       marginScore * 0.25 +
       stockRiskScore * 0.2 +
       expiryRiskScore * 0.1 +
-      impulseScore -
+      impulseScore +
+      competitorPriceBonus -
       penaltyScore,
     0,
     1,
@@ -97,8 +109,17 @@ function scoreProduct(product, stats) {
       expiryRiskScore,
       impulseScore,
       penaltyScore,
+      competitorPriceBonus,
     },
   }
+}
+
+function toIdSet(input) {
+  if (!input) return new Set()
+  if (input instanceof Set) return input
+  if (Array.isArray(input)) return new Set(input)
+  if (typeof input === 'object') return new Set(Object.keys(input))
+  return new Set()
 }
 
 function chooseShelfLevel(product, score) {

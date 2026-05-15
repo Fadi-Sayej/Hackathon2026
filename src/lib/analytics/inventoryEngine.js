@@ -16,7 +16,12 @@ export function analyzeProduct(product, context = {}) {
   const avgDailySales7 = safeDivide(product.salesLast7Days, 7)
   const avgDailySales30 = safeDivide(product.salesLast30Days, 30)
   const demandMultiplier = context.demandSignals?.[product.category] ?? 1
-  const weightedAvgDailySales = (avgDailySales7 * 0.7 + avgDailySales30 * 0.3) * demandMultiplier
+  // Optional hyper-local competitor intelligence hook. Defaults to 1.0
+  // (no-op) so the engine's existing behavior is preserved when callers
+  // do not provide a competitor boost map.
+  const competitorBoost = context.competitorBoosts?.[product.id] ?? 1
+  const weightedAvgDailySales =
+    (avgDailySales7 * 0.7 + avgDailySales30 * 0.3) * demandMultiplier * competitorBoost
   const daysUntilStockout =
     weightedAvgDailySales > 0 ? product.currentStock / weightedAvgDailySales : Number.POSITIVE_INFINITY
   const nearExpiry = isNearExpiry(product.expiryDate, context.currentDate)
@@ -46,12 +51,14 @@ export function analyzeProduct(product, context = {}) {
       marginRate: product.price > 0 ? round((product.price - product.cost) / product.price) : 0,
       primaryStatus: pickPrimaryStatus(statuses),
       statuses,
+      competitorBoost,
       riskScore: calculateRiskScore({
         daysUntilStockout,
         leadTimeDays: product.leadTimeDays,
         nearExpiry,
         slowMoving,
         overstocked,
+        competitorBoost,
       }),
     },
   }
@@ -113,7 +120,14 @@ function pickPrimaryStatus(statuses) {
   return order.find((status) => statuses.includes(status)) ?? statusLabels.healthy
 }
 
-function calculateRiskScore({ daysUntilStockout, leadTimeDays, nearExpiry, slowMoving, overstocked }) {
+function calculateRiskScore({
+  daysUntilStockout,
+  leadTimeDays,
+  nearExpiry,
+  slowMoving,
+  overstocked,
+  competitorBoost = 1,
+}) {
   let score = 0
 
   if (!Number.isFinite(daysUntilStockout)) score += 8
@@ -123,6 +137,12 @@ function calculateRiskScore({ daysUntilStockout, leadTimeDays, nearExpiry, slowM
   if (nearExpiry) score += 25
   if (slowMoving) score += 10
   if (overstocked) score += 12
+
+  // Competitor-driven demand pressure nudges the risk score upward
+  // proportionally to the boost (max +12 at a 1.25× boost).
+  if (competitorBoost > 1) {
+    score += Math.round((competitorBoost - 1) * 48)
+  }
 
   return Math.min(100, score)
 }
