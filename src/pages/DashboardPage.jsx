@@ -1,5 +1,6 @@
 import { CategoryBars } from '../components/dashboard/CategoryBars.jsx'
 import { MarketContextPanel } from '../components/dashboard/MarketContextPanel.jsx'
+import { MarketIntelligencePanel } from '../components/MarketIntelligencePanel.jsx'
 import { MetricCard } from '../components/shared/MetricCard.jsx'
 import { StatusBadge } from '../components/shared/StatusBadge.jsx'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
@@ -7,9 +8,13 @@ import { formatCurrency, formatDays, percent, statusTone } from '../components/s
 
 export function DashboardPage({
   analyzedProducts,
+  competitorSummary,
   dashboardStats,
   marketContext,
+  priceLeaderProducts,
+  priceProtectionAlerts,
   recommendations,
+  stockoutOpportunities,
 }) {
   const urgentRecommendations = recommendations
     .filter((recommendation) => recommendation.urgency === 'HIGH')
@@ -65,6 +70,13 @@ export function DashboardPage({
 
         <MarketContextPanel marketContext={marketContext} />
       </section>
+
+      <MarketIntelligencePanel
+        competitorSummary={competitorSummary}
+        priceLeaders={priceLeaderProducts}
+        stockoutOpportunities={stockoutOpportunities}
+        priceProtectionAlerts={priceProtectionAlerts}
+      />
 
       <section className="content-grid">
         <article className="panel">

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { CompetitorBadge } from '../components/shared/CompetitorBadge.jsx'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
 import { StatusBadge } from '../components/shared/StatusBadge.jsx'
 import { formatCurrency, formatDays, statusTone } from '../components/shared/formatters.js'
@@ -83,7 +84,10 @@ export function ProductsPage({ analyzedProducts }) {
                   <td className="number-cell">{product.currentStock}</td>
                   <td className="number-cell">{product.salesLast7Days}</td>
                   <td className="number-cell">{product.salesLast30Days}</td>
-                  <td className="number-cell">{formatCurrency(product.price)}</td>
+                  <td className="number-cell price-cell">
+                    <span className="price-value">{formatCurrency(product.price)}</span>
+                    <CompetitorBadge competitor={product.competitor} />
+                  </td>
                   <td>{formatDays(product.analytics.daysUntilStockout)}</td>
                   <td>
                     <StatusBadge tone={statusTone(product.analytics.primaryStatus)}>

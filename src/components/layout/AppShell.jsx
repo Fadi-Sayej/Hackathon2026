@@ -7,6 +7,7 @@ const navItems = [
   { id: 'recommendations', label: 'Recommendations', icon: 'R' },
   { id: 'planogram', label: 'Planogram', icon: 'S' },
   { id: 'orders', label: 'Approved Orders', icon: 'O' },
+  { id: 'data-source', label: 'Data Source', icon: 'C' },
 ]
 
 export function AppShell({
@@ -51,7 +52,7 @@ export function AppShell({
         <div className="sidebar-card">
           <p className="sidebar-card-eyebrow">Demo mode</p>
           <h2>POC Demo</h2>
-          <p>Local-first data, mock AI explanations, and deterministic retail logic.</p>
+          <p>Local-first data and deterministic retail logic.</p>
           {hasDemoState && (
             <Button className="sidebar-reset-btn" onClick={onResetDemoState} tone="ghost">
               Reset demo state
@@ -71,7 +72,7 @@ export function AppShell({
           <div className="topbar-meta" aria-label="Demo status">
             <span className="pill pill-success">POC Demo</span>
             <span className="pill">Local-first</span>
-            <span className="pill">Mock AI</span>
+            <span className="pill">AI-Assisted</span>
           </div>
         </header>
 
