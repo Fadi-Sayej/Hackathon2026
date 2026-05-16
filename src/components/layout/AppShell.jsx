@@ -6,6 +6,7 @@ const navItems = [
   { id: 'products', label: 'Products', icon: 'P' },
   { id: 'recommendations', label: 'Recommendations', icon: 'R' },
   { id: 'planogram', label: 'Planogram', icon: 'S' },
+  { id: 'report', label: 'AI Report', icon: 'A' },
   { id: 'orders', label: 'Approved Orders', icon: 'O' },
   { id: 'data-source', label: 'Data Source', icon: 'C' },
 ]

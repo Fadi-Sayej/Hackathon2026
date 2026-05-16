@@ -1,9 +1,15 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { CrossMerchandisingPanel } from '../components/planogram/CrossMerchandisingPanel.jsx'
 import { ShelfLayout } from '../components/planogram/ShelfLayout.jsx'
+import { ShelfImageUpload } from '../components/planogram/ShelfImageUpload.jsx'
+import { ComplianceReport } from '../components/planogram/ComplianceReport.jsx'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
 import { MetricCard } from '../components/shared/MetricCard.jsx'
 import { formatCurrency, formatDays } from '../components/shared/formatters.js'
+import {
+  analyzeCompliance,
+  generateMockDetectedShelf,
+} from '../lib/analytics/complianceEngine.js'
 
 export function PlanogramPage({
   affinitySuggestions,
@@ -14,6 +20,9 @@ export function PlanogramPage({
   shelfGroups,
 }) {
   const [selectedProductId, setSelectedProductId] = useState(planogramItems[0]?.productId)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [complianceReport, setComplianceReport] = useState(null)
+
   const selectedItem = useMemo(
     () =>
       planogramItems.find((item) => item.productId === selectedProductId) ??
@@ -21,6 +30,25 @@ export function PlanogramPage({
     [planogramItems, selectedProductId],
   )
   const product = analyzedProducts.find((item) => item.id === selectedItem?.productId)
+
+  const complianceMap = useMemo(() => {
+    if (!complianceReport) return null
+    const map = new Map()
+    for (const item of complianceReport.items) {
+      map.set(item.productId, item.state)
+    }
+    return map
+  }, [complianceReport])
+
+  const handleAnalyze = useCallback(() => {
+    setIsAnalyzing(true)
+    setTimeout(() => {
+      const detected = generateMockDetectedShelf(planogramItems)
+      const report = analyzeCompliance(planogramItems, detected)
+      setComplianceReport(report)
+      setIsAnalyzing(false)
+    }, 1800)
+  }, [planogramItems])
 
   if (planogramItems.length === 0) {
     return (
@@ -49,6 +77,7 @@ export function PlanogramPage({
           </div>
           <ShelfLayout
             activeItem={selectedItem}
+            complianceMap={complianceMap}
             onSelectItem={(item) => setSelectedProductId(item.productId)}
             shelfGroups={shelfGroups}
           />
@@ -80,6 +109,24 @@ export function PlanogramPage({
           )}
         </aside>
       </section>
+
+      <section className="shelf-analysis-section">
+        <article className="panel">
+          <div className="panel-heading">
+            <div>
+              <p className="eyebrow">AI Vision</p>
+              <h2>Shelf Compliance Analysis</h2>
+              <p className="page-description">
+                Upload a photo of your physical shelf to compare it against the AI-optimized planogram.
+                The vision model detects product placement, facings, and gaps.
+              </p>
+            </div>
+          </div>
+          <ShelfImageUpload onAnalyze={handleAnalyze} isAnalyzing={isAnalyzing} />
+        </article>
+      </section>
+
+      {complianceReport && <ComplianceReport report={complianceReport} />}
 
       <CrossMerchandisingPanel suggestions={affinitySuggestions} summary={affinitySummary} />
     </>

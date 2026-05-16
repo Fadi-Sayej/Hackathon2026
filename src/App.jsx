@@ -49,6 +49,7 @@ import { DataSourcePage } from './pages/DataSourcePage.jsx'
 import { PlanogramPage } from './pages/PlanogramPage.jsx'
 import { ProductsPage } from './pages/ProductsPage.jsx'
 import { RecommendationsPage } from './pages/RecommendationsPage.jsx'
+import { ReportPage } from './pages/ReportPage.jsx'
 
 const pageMeta = {
   dashboard: {
@@ -66,6 +67,10 @@ const pageMeta = {
   planogram: {
     title: 'Shelf Optimization',
     description: 'A visual planogram generated from sales velocity, margin, risk, and shelf capacity.',
+  },
+  report: {
+    title: 'AI Report',
+    description: 'Generate a comprehensive AI-powered optimization report with actionable insights.',
   },
   orders: {
     title: 'Approved Orders',
@@ -373,6 +378,7 @@ function App() {
       {activePage === 'products' && <ProductsPage {...pageProps} />}
       {activePage === 'recommendations' && <RecommendationsPage {...pageProps} />}
       {activePage === 'planogram' && <PlanogramPage {...pageProps} />}
+      {activePage === 'report' && <ReportPage {...pageProps} />}
       {activePage === 'orders' && <ApprovedOrdersPage {...pageProps} />}
       {activePage === 'data-source' && <DataSourcePage {...pageProps} />}
     </AppShell>
