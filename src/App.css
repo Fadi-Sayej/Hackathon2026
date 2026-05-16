@@ -2058,3 +2058,271 @@ button {
   }
 }
 
+/* ── Planogram visualization upgrade ──────────────────────────────────
+ * Overrides the earlier grid-based product row with a flex layout where
+ * each card's flex-grow equals its `facings` count — turning the uniform
+ * grid into a proportional planogram.
+ * ------------------------------------------------------------------ */
+
+.retail-fixture {
+  gap: 16px;
+}
+
+.fixture-shelf {
+  position: relative;
+  grid-template-columns: 140px 1fr;
+  padding-left: 22px;
+}
+
+/* Left accent strip — colored per tier */
+.fixture-tier-accent {
+  position: absolute;
+  top: 14px;
+  bottom: 14px;
+  left: 8px;
+  width: 4px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.18);
+  pointer-events: none;
+}
+
+.fixture-shelf-premium .fixture-tier-accent {
+  background: linear-gradient(180deg, #d7ff9d, #5dd3a5);
+  box-shadow: 0 0 18px rgba(215, 255, 157, 0.45);
+}
+
+.fixture-shelf-top .fixture-tier-accent {
+  background: rgba(125, 207, 224, 0.55);
+}
+
+.fixture-shelf-mid .fixture-tier-accent {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.fixture-shelf-base .fixture-tier-accent {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Eye Level premium emphasis */
+.fixture-shelf-premium {
+  padding: 18px 18px 18px 22px;
+  box-shadow:
+    inset 0 0 0 1px rgba(215, 255, 157, 0.28),
+    0 22px 42px rgba(0, 0, 0, 0.14);
+}
+
+/* Bottom tier de-emphasis */
+.fixture-shelf-base {
+  background: rgba(255, 255, 255, 0.045);
+  opacity: 0.94;
+}
+
+.fixture-tier-priority {
+  margin-top: 6px;
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  color: rgba(238, 247, 240, 0.78);
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fixture-shelf-premium .fixture-tier-priority {
+  color: #d7ff9d;
+  background: rgba(215, 255, 157, 0.16);
+}
+
+/* Convert product row to a proportional flex strip */
+.fixture-products {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 10px;
+  grid-template-columns: none !important;
+}
+
+.fixture-shelf-premium .fixture-products {
+  gap: 12px;
+}
+
+/* Individual product card — width scales with flex-grow set inline */
+.fixture-product {
+  position: relative;
+  flex: 1 1 90px;
+  min-width: 90px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 14px 12px;
+  text-align: left;
+  overflow: hidden;
+}
+
+/* Top accent bar — colored from the per-card --cat-color custom property */
+.fixture-product-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--cat-color, rgba(255, 255, 255, 0.4));
+  border-radius: 18px 18px 0 0;
+  pointer-events: none;
+}
+
+.fixture-product-name {
+  display: block;
+  margin-top: 4px;
+  color: #fffefa;
+  font-weight: 800;
+  font-size: 0.92rem;
+  line-height: 1.25;
+}
+
+.fixture-product-category {
+  display: block;
+  color: rgba(238, 247, 240, 0.7);
+  font-size: 0.74rem;
+  letter-spacing: 0.02em;
+}
+
+.fixture-product-facings {
+  display: block;
+  margin-top: 4px;
+  color: #fffefa;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+/* Facing-slot indicator — one pill per facing */
+.fixture-product-slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-top: 2px;
+  max-height: 16px;
+  overflow: hidden;
+}
+
+.fixture-slot {
+  flex: 0 0 10px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--cat-color, rgba(255, 255, 255, 0.45));
+  opacity: 0.78;
+}
+
+.fixture-shelf-premium .fixture-slot {
+  height: 7px;
+  opacity: 0.9;
+}
+
+.fixture-shelf-base .fixture-slot {
+  opacity: 0.55;
+}
+
+/* Selected affordance — brighter category-colored border + lift */
+.fixture-product:hover {
+  transform: translateY(-2px) scale(1.01);
+  border-color: rgba(215, 255, 157, 0.5);
+  background: rgba(255, 255, 255, 0.17);
+}
+
+.fixture-product-active {
+  transform: scale(1.02);
+  border: 2px solid var(--cat-color, rgba(215, 255, 157, 0.7));
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22), 0 0 0 1px var(--cat-color, transparent);
+}
+
+/* ── Placement reason panel — default state ────────────────────────── */
+
+.insight-section {
+  margin-top: 4px;
+}
+
+.insight-tip {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.top-movers-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.top-movers-row {
+  display: grid;
+  grid-template-columns: 22px 10px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(245, 248, 250, 0.86);
+  border: 1px solid var(--line);
+}
+
+.top-movers-rank {
+  color: var(--forest);
+  font-weight: 900;
+  font-size: 0.86rem;
+}
+
+.top-movers-swatch {
+  width: 10px;
+  height: 28px;
+  border-radius: 4px;
+}
+
+.top-movers-name {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.top-movers-name strong {
+  color: var(--ink);
+  font-size: 0.92rem;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.top-movers-name small {
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+.top-movers-velocity {
+  color: var(--ink);
+  font-weight: 800;
+  font-size: 0.86rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.top-movers-empty {
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: var(--muted);
+  background: rgba(245, 248, 250, 0.7);
+  font-size: 0.86rem;
+}
+
+@media (max-width: 900px) {
+  .fixture-shelf {
+    grid-template-columns: 1fr !important;
+  }
+  .fixture-product {
+    flex-basis: 120px;
+  }
+}
