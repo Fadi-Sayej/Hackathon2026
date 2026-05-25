@@ -1,0 +1,35 @@
+{
+  "source_id": "alonit",
+  "observed_at": "2026-05-25T12:26:17.265479+00:00",
+  "row_count": 10615,
+  "stores_found": [
+    {
+      "store_id": "666",
+      "store_name": "עינת מ.ס",
+      "city": "871"
+    },
+    {
+      "store_id": "657",
+      "store_name": "עינת",
+      "city": "871"
+    },
+    {
+      "store_id": "649",
+      "store_name": "עינת -ב מרכולית",
+      "city": "871"
+    }
+  ],
+  "unique_stores_in_obs": 3,
+  "unique_products": 8109,
+  "products_per_store": {
+    "666": 1424,
+    "657": 7602,
+    "649": 1589
+  },
+  "promo_count": 0,
+  "with_promo_price": 0,
+  "missing_barcode_count": 0,
+  "missing_barcode_pct": 0.0,
+  "missing_price_count": 0,
+  "missing_price_pct": 0.0
+}

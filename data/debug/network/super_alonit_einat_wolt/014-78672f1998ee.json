@@ -1,0 +1,2464 @@
+[
+  {
+    "country": "DNK",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "EST",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "FIN",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "SWE",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "GBR",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "LTU",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "LVA",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "NOR",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "HUN",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "GEO",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "CZE",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "POL",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "GRC",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "ISR",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "HRV",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "SRB",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "AZE",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "SVK",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "KAZ",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "SVN",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "CYP",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "JPN",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "FRA",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "MLT",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "NLD",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "ISL",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "AUT",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "LUX",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "ALB",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "UZB",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "XKX",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "MKD",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "ROU",
+    "default": false,
+    "id": "5dfb4476d9ce7937f22ac055",
+    "required": true,
+    "slug": "consumerconsents-woltwide-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service. I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement.",
+    "url": "https://explore.wolt.com/terms",
+    "url_text": "Read more",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "AZE",
+    "default": false,
+    "id": "5dfb4490d9ce7937f22ba5a2",
+    "required": true,
+    "slug": "consumerconsents-azerbaijan-dataprocessing",
+    "title": "Wolt can transfer my personal data that Wolt has collected and processed to countries outside Azerbaijan. ",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "AZE",
+    "default": false,
+    "id": "5ecfa482ae2597d11d250ccb",
+    "required": false,
+    "slug": "consumerconsents-georgia-azerbaijan-purchase-yum-1-service-improvements",
+    "title": "I consent to my email, phone number, delivery address and ordered products to be shared with YUM for storage and use for the purpose of service improvement relating to food supply, placement and delivery of orders and responding to customer queries.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "AZE",
+    "default": false,
+    "id": "5ecfa4b9372d41f2b9a21efd",
+    "required": false,
+    "slug": "consumerconsents-georgia-azerbaijan-purchase-yum-2-complaints",
+    "title": "In case I have a complaint relating to my order from this restaurant, I consent to YUM receiving my name, phone number, email, reason and outcome of complaint for purposes of understanding service issues and improving customer satisfaction.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "AZE",
+    "default": false,
+    "id": "5ecfa4d3ae2597d11d250d56",
+    "required": false,
+    "slug": "consumerconsents-georgia-azerbaijan-purchase-yum-3-marketing",
+    "title": "I consent to my email, phone number, delivery address and ordered products to be shared for storage and use for the purpose of YUM contacting me about their products, offers, and news via email and mobile messages.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "GEO",
+    "default": false,
+    "id": "5ecfa56f3faafc53cbcc3c65",
+    "required": false,
+    "slug": "consumerconsents-georgia-azerbaijan-purchase-yum-3-marketing",
+    "title": "I consent to my email, phone number, delivery address and ordered products to be shared for storage and use for the purpose of YUM contacting me about their products, offers, and news via email and mobile messages.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "GEO",
+    "default": false,
+    "id": "5ecfa5a0372d41f2b9a220d4",
+    "required": false,
+    "slug": "consumerconsents-georgia-azerbaijan-purchase-yum-2-complaints",
+    "title": "In case I have a complaint relating to my order from this restaurant, I consent to YUM receiving my name, phone number, email, reason and outcome of complaint for purposes of understanding service issues and improving customer satisfaction.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "GEO",
+    "default": false,
+    "id": "5ecfa5b92839a29af94898bc",
+    "required": false,
+    "slug": "consumerconsents-georgia-azerbaijan-purchase-yum-3-marketing",
+    "title": "I consent to my email, phone number, delivery address and ordered products to be shared for storage and use for the purpose of YUM contacting me about their products, offers, and news via email and mobile messages.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "KAZ",
+    "default": false,
+    "id": "5ef20eab0ce6e6218079db78",
+    "required": false,
+    "slug": "consumerconsents-kazakhstan-purchase-yum-1-service-improvements",
+    "title": "I consent to my email, phone number, delivery address and ordered products to be shared with YUM for storage and use for the purpose of service improvement relating to food supply, placement and delivery of orders and responding to customer queries, as described in the YUM Privacy Policy.",
+    "url": "https://statickfc.cdnvideo.ru/Legal_KFC.pdf",
+    "url_text": "Read more",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "KAZ",
+    "default": false,
+    "id": "5ef20eafa27b9ce61edb3975",
+    "required": false,
+    "slug": "consumerconsents-kazakhstan-purchase-yum-2-marketing",
+    "title": "I consent to my email, phone number, delivery address and ordered products to be shared for storage and use for the purpose of YUM contacting me about their products, offers, and news via email and mobile messages, as described in the YUM Privacy Policy.",
+    "url": "https://statickfc.cdnvideo.ru/Legal_KFC.pdf",
+    "url_text": "Read more",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "KAZ",
+    "default": false,
+    "id": "5ef20eb2a27b9ce61edb3977",
+    "required": false,
+    "slug": "consumerconsents-kazakhstan-purchase-americana-1-service-improvements",
+    "title": "I consent to my name, address, phone number and email address to be shared with Americana Group for purposes of providing and improving the service relating to food supply, placement and delivery of orders and responding to customer queries.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "KAZ",
+    "default": false,
+    "id": "5ef20eb5e4dfb3ebe2688917",
+    "required": false,
+    "slug": "consumerconsents-kazakhstan-purchase-americana-2-marketing",
+    "title": "I consent to my name, address, phone number and email address to be shared with Americana Group for purposes of it complying with obligations under the license agreements for the brands under which Americana restaurants operate.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "DEU",
+    "default": false,
+    "id": "5f16a9deddb15546808726e2",
+    "required": true,
+    "slug": "consumerconsents-germany-accepttermsandconditions",
+    "title": "I've read and agree with the User Terms of Service.",
+    "url": "https://wolt.com/pages/deu/terms",
+    "url_text": "Terms of Service and Purchase",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "DEU",
+    "default": false,
+    "id": "5f16a9e1819b625111c3fc33",
+    "required": true,
+    "slug": "consumerconsents-germany-privacypolicy",
+    "title": "I understand that my personal data will be processed in accordance with Wolt’s Privacy Statement",
+    "url": "https://wolt.com/pages/deu/privacy",
+    "url_text": "Privacy Statement",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "GRC",
+    "default": false,
+    "id": "5ffeadaad947c4c69c6acc8f",
+    "required": false,
+    "slug": "consumerconsents-greece-purchase-yum-1-service-improvements",
+    "title": "I consent to my email, phone number, delivery address and ordered products to be shared with Yum! Restaurants Europe Limited for storage and use for the purpose of service improvement relating to food supply, placement and delivery of orders and responding to customer queries.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "GRC",
+    "default": false,
+    "id": "5ffeadcc79ccc864126afac7",
+    "required": false,
+    "slug": "consumerconsents-greece-purchase-yum-2-complaints",
+    "title": "In case I have a complaint relating to my order from this restaurant, I consent to Yum! Restaurants Europe Limited receiving my name, phone number, email, reason and outcome of complaint for purposes of understanding service issues and improving customer satisfaction.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "GRC",
+    "default": false,
+    "id": "5ffeadf6700ffc0a5b6afac1",
+    "required": false,
+    "slug": "consumerconsents-greece-purchase-yum-3-marketing",
+    "title": "I consent to my email, phone number, delivery address and ordered products to be shared for storage and use for the purpose of Yum! Restaurants Europe Limited contacting me about their products, offers, and news via email and mobile messages.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "FIN",
+    "default": false,
+    "id": "61b87df92516bf5c7ce175fe",
+    "required": false,
+    "slug": "consumerconsents-fin-isr-pol-purchase-yum-1-service-improvements",
+    "title": "I consent to my email, phone number, delivery address, device characteristics and ordered products to be shared with KFC for storage and use for the purpose of service improvement relating to food \nsupply, placement and delivery of orders and responding to customer queries.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "ISR",
+    "default": false,
+    "id": "61b87df92516bf5c7ce175fe",
+    "required": false,
+    "slug": "consumerconsents-fin-isr-pol-purchase-yum-1-service-improvements",
+    "title": "I consent to my email, phone number, delivery address, device characteristics and ordered products to be shared with KFC for storage and use for the purpose of service improvement relating to food \nsupply, placement and delivery of orders and responding to customer queries.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "POL",
+    "default": false,
+    "id": "61b87df92516bf5c7ce175fe",
+    "required": false,
+    "slug": "consumerconsents-fin-isr-pol-purchase-yum-1-service-improvements",
+    "title": "I consent to my email, phone number, delivery address, device characteristics and ordered products to be shared with KFC for storage and use for the purpose of service improvement relating to food \nsupply, placement and delivery of orders and responding to customer queries.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "SVN",
+    "default": false,
+    "id": "61b87df92516bf5c7ce175fe",
+    "required": false,
+    "slug": "consumerconsents-fin-isr-pol-purchase-yum-1-service-improvements",
+    "title": "I consent to my email, phone number, delivery address, device characteristics and ordered products to be shared with KFC for storage and use for the purpose of service improvement relating to food \nsupply, placement and delivery of orders and responding to customer queries.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "ALB",
+    "default": false,
+    "id": "61b87df92516bf5c7ce175fe",
+    "required": false,
+    "slug": "consumerconsents-fin-isr-pol-purchase-yum-1-service-improvements",
+    "title": "I consent to my email, phone number, delivery address, device characteristics and ordered products to be shared with KFC for storage and use for the purpose of service improvement relating to food \nsupply, placement and delivery of orders and responding to customer queries.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "FIN",
+    "default": false,
+    "id": "61b87e7b773c8bf8a6bc4b0c",
+    "required": false,
+    "slug": "consumerconsents-fin-isr-pol-purchase-yum-2-complaints",
+    "title": "In case I have a complaint relating to my order from this restaurant, I consent to KFC receiving my name, phone number, email, reason and outcome of complaint for purposes of understanding service issues and improving customer satisfaction.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "ISR",
+    "default": false,
+    "id": "61b87e7b773c8bf8a6bc4b0c",
+    "required": false,
+    "slug": "consumerconsents-fin-isr-pol-purchase-yum-2-complaints",
+    "title": "In case I have a complaint relating to my order from this restaurant, I consent to KFC receiving my name, phone number, email, reason and outcome of complaint for purposes of understanding service issues and improving customer satisfaction.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "POL",
+    "default": false,
+    "id": "61b87e7b773c8bf8a6bc4b0c",
+    "required": false,
+    "slug": "consumerconsents-fin-isr-pol-purchase-yum-2-complaints",
+    "title": "In case I have a complaint relating to my order from this restaurant, I consent to KFC receiving my name, phone number, email, reason and outcome of complaint for purposes of understanding service issues and improving customer satisfaction.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "SVN",
+    "default": false,
+    "id": "61b87e7b773c8bf8a6bc4b0c",
+    "required": false,
+    "slug": "consumerconsents-fin-isr-pol-purchase-yum-2-complaints",
+    "title": "In case I have a complaint relating to my order from this restaurant, I consent to KFC receiving my name, phone number, email, reason and outcome of complaint for purposes of understanding service issues and improving customer satisfaction.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "ALB",
+    "default": false,
+    "id": "61b87e7b773c8bf8a6bc4b0c",
+    "required": false,
+    "slug": "consumerconsents-fin-isr-pol-purchase-yum-2-complaints",
+    "title": "In case I have a complaint relating to my order from this restaurant, I consent to KFC receiving my name, phone number, email, reason and outcome of complaint for purposes of understanding service issues and improving customer satisfaction.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "FIN",
+    "default": false,
+    "id": "61b87ea52516bf5c7ce177cd",
+    "required": false,
+    "slug": "consumerconsents-fin-isr-pol-purchase-yum-3-marketing",
+    "title": "I consent to my email, phone number, delivery address and items ordered from KFC to be shared with KFC for storage and use for the purpose of KFC contacting me on the basis of such data about their products, offers, and news via email and mobile messages.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "ISR",
+    "default": false,
+    "id": "61b87ea52516bf5c7ce177cd",
+    "required": false,
+    "slug": "consumerconsents-fin-isr-pol-purchase-yum-3-marketing",
+    "title": "I consent to my email, phone number, delivery address and items ordered from KFC to be shared with KFC for storage and use for the purpose of KFC contacting me on the basis of such data about their products, offers, and news via email and mobile messages.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "POL",
+    "default": false,
+    "id": "61b87ea52516bf5c7ce177cd",
+    "required": false,
+    "slug": "consumerconsents-fin-isr-pol-purchase-yum-3-marketing",
+    "title": "I consent to my email, phone number, delivery address and items ordered from KFC to be shared with KFC for storage and use for the purpose of KFC contacting me on the basis of such data about their products, offers, and news via email and mobile messages.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "SVN",
+    "default": false,
+    "id": "61b87ea52516bf5c7ce177cd",
+    "required": false,
+    "slug": "consumerconsents-fin-isr-pol-purchase-yum-3-marketing",
+    "title": "I consent to my email, phone number, delivery address and items ordered from KFC to be shared with KFC for storage and use for the purpose of KFC contacting me on the basis of such data about their products, offers, and news via email and mobile messages.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "ALB",
+    "default": false,
+    "id": "61b87ea52516bf5c7ce177cd",
+    "required": false,
+    "slug": "consumerconsents-fin-isr-pol-purchase-yum-3-marketing",
+    "title": "I consent to my email, phone number, delivery address and items ordered from KFC to be shared with KFC for storage and use for the purpose of KFC contacting me on the basis of such data about their products, offers, and news via email and mobile messages.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "LTU",
+    "default": false,
+    "id": "61d2f53cabed2173e1ec5de7",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-1-service-improvements",
+    "title": "I consent to my email, phone number, delivery address, device characteristics and ordered products to be shared with Yum for storage and use for the purpose of service improvement relating to food supply, placement and delivery of orders and responding to customer queries.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "EST",
+    "default": false,
+    "id": "61d2f53cabed2173e1ec5de7",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-1-service-improvements",
+    "title": "I consent to my email, phone number, delivery address, device characteristics and ordered products to be shared with Yum for storage and use for the purpose of service improvement relating to food supply, placement and delivery of orders and responding to customer queries.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "LVA",
+    "default": false,
+    "id": "61d2f53cabed2173e1ec5de7",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-1-service-improvements",
+    "title": "I consent to my email, phone number, delivery address, device characteristics and ordered products to be shared with Yum for storage and use for the purpose of service improvement relating to food supply, placement and delivery of orders and responding to customer queries.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "CZE",
+    "default": false,
+    "id": "61d2f53cabed2173e1ec5de7",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-1-service-improvements",
+    "title": "I consent to my email, phone number, delivery address, device characteristics and ordered products to be shared with Yum for storage and use for the purpose of service improvement relating to food supply, placement and delivery of orders and responding to customer queries.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "SRB",
+    "default": false,
+    "id": "61d2f53cabed2173e1ec5de7",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-1-service-improvements",
+    "title": "I consent to my email, phone number, delivery address, device characteristics and ordered products to be shared with Yum for storage and use for the purpose of service improvement relating to food supply, placement and delivery of orders and responding to customer queries.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "HUN",
+    "default": false,
+    "id": "61d2f53cabed2173e1ec5de7",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-1-service-improvements",
+    "title": "I consent to my email, phone number, delivery address, device characteristics and ordered products to be shared with Yum for storage and use for the purpose of service improvement relating to food supply, placement and delivery of orders and responding to customer queries.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "HRV",
+    "default": false,
+    "id": "61d2f53cabed2173e1ec5de7",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-1-service-improvements",
+    "title": "I consent to my email, phone number, delivery address, device characteristics and ordered products to be shared with Yum for storage and use for the purpose of service improvement relating to food supply, placement and delivery of orders and responding to customer queries.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "MLT",
+    "default": false,
+    "id": "61d2f53cabed2173e1ec5de7",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-1-service-improvements",
+    "title": "I consent to my email, phone number, delivery address, device characteristics and ordered products to be shared with Yum for storage and use for the purpose of service improvement relating to food supply, placement and delivery of orders and responding to customer queries.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "LTU",
+    "default": false,
+    "id": "61d2f5529beb62ae6060c665",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-2-complaints",
+    "title": "In case I have a complaint relating to my order from this restaurant, I consent to Yum receiving my name, phone number, email, reason and outcome of complaint for purposes of understanding service issues and improving customer satisfaction.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "EST",
+    "default": false,
+    "id": "61d2f5529beb62ae6060c665",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-2-complaints",
+    "title": "In case I have a complaint relating to my order from this restaurant, I consent to Yum receiving my name, phone number, email, reason and outcome of complaint for purposes of understanding service issues and improving customer satisfaction.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "LVA",
+    "default": false,
+    "id": "61d2f5529beb62ae6060c665",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-2-complaints",
+    "title": "In case I have a complaint relating to my order from this restaurant, I consent to Yum receiving my name, phone number, email, reason and outcome of complaint for purposes of understanding service issues and improving customer satisfaction.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "CZE",
+    "default": false,
+    "id": "61d2f5529beb62ae6060c665",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-2-complaints",
+    "title": "In case I have a complaint relating to my order from this restaurant, I consent to Yum receiving my name, phone number, email, reason and outcome of complaint for purposes of understanding service issues and improving customer satisfaction.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "SRB",
+    "default": false,
+    "id": "61d2f5529beb62ae6060c665",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-2-complaints",
+    "title": "In case I have a complaint relating to my order from this restaurant, I consent to Yum receiving my name, phone number, email, reason and outcome of complaint for purposes of understanding service issues and improving customer satisfaction.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "HUN",
+    "default": false,
+    "id": "61d2f5529beb62ae6060c665",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-2-complaints",
+    "title": "In case I have a complaint relating to my order from this restaurant, I consent to Yum receiving my name, phone number, email, reason and outcome of complaint for purposes of understanding service issues and improving customer satisfaction.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "HRV",
+    "default": false,
+    "id": "61d2f5529beb62ae6060c665",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-2-complaints",
+    "title": "In case I have a complaint relating to my order from this restaurant, I consent to Yum receiving my name, phone number, email, reason and outcome of complaint for purposes of understanding service issues and improving customer satisfaction.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "MLT",
+    "default": false,
+    "id": "61d2f5529beb62ae6060c665",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-2-complaints",
+    "title": "In case I have a complaint relating to my order from this restaurant, I consent to Yum receiving my name, phone number, email, reason and outcome of complaint for purposes of understanding service issues and improving customer satisfaction.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "LTU",
+    "default": false,
+    "id": "61d2f563b12559cf1e998af7",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-3-marketing",
+    "title": "I consent to my email, phone number, delivery address and items ordered from Yum to be shared with Yum for storage and use for the purpose of Yum contacting me on the basis of such data about their products, offers, and news via email and mobile messages.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "EST",
+    "default": false,
+    "id": "61d2f563b12559cf1e998af7",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-3-marketing",
+    "title": "I consent to my email, phone number, delivery address and items ordered from Yum to be shared with Yum for storage and use for the purpose of Yum contacting me on the basis of such data about their products, offers, and news via email and mobile messages.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "LVA",
+    "default": false,
+    "id": "61d2f563b12559cf1e998af7",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-3-marketing",
+    "title": "I consent to my email, phone number, delivery address and items ordered from Yum to be shared with Yum for storage and use for the purpose of Yum contacting me on the basis of such data about their products, offers, and news via email and mobile messages.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "CZE",
+    "default": false,
+    "id": "61d2f563b12559cf1e998af7",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-3-marketing",
+    "title": "I consent to my email, phone number, delivery address and items ordered from Yum to be shared with Yum for storage and use for the purpose of Yum contacting me on the basis of such data about their products, offers, and news via email and mobile messages.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "SRB",
+    "default": false,
+    "id": "61d2f563b12559cf1e998af7",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-3-marketing",
+    "title": "I consent to my email, phone number, delivery address and items ordered from Yum to be shared with Yum for storage and use for the purpose of Yum contacting me on the basis of such data about their products, offers, and news via email and mobile messages.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "HUN",
+    "default": false,
+    "id": "61d2f563b12559cf1e998af7",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-3-marketing",
+    "title": "I consent to my email, phone number, delivery address and items ordered from Yum to be shared with Yum for storage and use for the purpose of Yum contacting me on the basis of such data about their products, offers, and news via email and mobile messages.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "HRV",
+    "default": false,
+    "id": "61d2f563b12559cf1e998af7",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-3-marketing",
+    "title": "I consent to my email, phone number, delivery address and items ordered from Yum to be shared with Yum for storage and use for the purpose of Yum contacting me on the basis of such data about their products, offers, and news via email and mobile messages.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "MLT",
+    "default": false,
+    "id": "61d2f563b12559cf1e998af7",
+    "required": false,
+    "slug": "consumerconsents-ltu-est-lva-cze-srb-hun-cro-mlt-purchase-yum-3-marketing",
+    "title": "I consent to my email, phone number, delivery address and items ordered from Yum to be shared with Yum for storage and use for the purpose of Yum contacting me on the basis of such data about their products, offers, and news via email and mobile messages.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "AZE",
+    "default": false,
+    "id": "6216466a5ceee5a6a2deef13",
+    "required": false,
+    "slug": "health_data_tracking_permission",
+    "title": "I consent to Wolt processing health data related to my purchase of medicine or medical items (required to buy such items). I understand that I can withdraw my consent for future purchases at any time by unticking this box.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "CYP",
+    "default": false,
+    "id": "6216466a5ceee5a6a2deef13",
+    "required": false,
+    "slug": "health_data_tracking_permission",
+    "title": "I consent to Wolt processing health data related to my purchase of medicine or medical items (required to buy such items). I understand that I can withdraw my consent for future purchases at any time by unticking this box.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "CZE",
+    "default": false,
+    "id": "6216466a5ceee5a6a2deef13",
+    "required": false,
+    "slug": "health_data_tracking_permission",
+    "title": "I consent to Wolt processing health data related to my purchase of medicine or medical items (required to buy such items). I understand that I can withdraw my consent for future purchases at any time by unticking this box.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "DEU",
+    "default": false,
+    "id": "6216466a5ceee5a6a2deef13",
+    "required": false,
+    "slug": "health_data_tracking_permission",
+    "title": "I consent to Wolt processing health data related to my purchase of medicine or medical items (required to buy such items). I understand that I can withdraw my consent for future purchases at any time by unticking this box.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "DNK",
+    "default": false,
+    "id": "6216466a5ceee5a6a2deef13",
+    "required": false,
+    "slug": "health_data_tracking_permission",
+    "title": "I consent to Wolt processing health data related to my purchase of medicine or medical items (required to buy such items). I understand that I can withdraw my consent for future purchases at any time by unticking this box.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "EST",
+    "default": false,
+    "id": "6216466a5ceee5a6a2deef13",
+    "required": false,
+    "slug": "health_data_tracking_permission",
+    "title": "I consent to Wolt processing health data related to my purchase of medicine or medical items (required to buy such items). I understand that I can withdraw my consent for future purchases at any time by unticking this box.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "FIN",
+    "default": false,
+    "id": "6216466a5ceee5a6a2deef13",
+    "required": false,
+    "slug": "health_data_tracking_permission",
+    "title": "I consent to Wolt processing health data related to my purchase of medicine or medical items (required to buy such items). I understand that I can withdraw my consent for future purchases at any time by unticking this box.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "GEO",
+    "default": false,
+    "id": "6216466a5ceee5a6a2deef13",
+    "required": false,
+    "slug": "health_data_tracking_permission",
+    "title": "I consent to Wolt processing health data related to my purchase of medicine or medical items (required to buy such items). I understand that I can withdraw my consent for future purchases at any time by unticking this box.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "GRC",
+    "default": false,
+    "id": "6216466a5ceee5a6a2deef13",
+    "required": false,
+    "slug": "health_data_tracking_permission",
+    "title": "I consent to Wolt processing health data related to my purchase of medicine or medical items (required to buy such items). I understand that I can withdraw my consent for future purchases at any time by unticking this box.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "HRV",
+    "default": false,
+    "id": "6216466a5ceee5a6a2deef13",
+    "required": false,
+    "slug": "health_data_tracking_permission",
+    "title": "I consent to Wolt processing health data related to my purchase of medicine or medical items (required to buy such items). I understand that I can withdraw my consent for future purchases at any time by unticking this box.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "HUN",
+    "default": false,
+    "id": "6216466a5ceee5a6a2deef13",
+    "required": false,
+    "slug": "health_data_tracking_permission",
+    "title": "I consent to Wolt processing health data related to my purchase of medicine or medical items (required to buy such items). I understand that I can withdraw my consent for future purchases at any time by unticking this box.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "ISR",
+    "default": false,
+    "id": "6216466a5ceee5a6a2deef13",
+    "required": false,
+    "slug": "health_data_tracking_permission",
+    "title": "I consent to Wolt processing health data related to my purchase of medicine or medical items (required to buy such items). I understand that I can withdraw my consent for future purchases at any time by unticking this box.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "JPN",
+    "default": false,
+    "id": "6216466a5ceee5a6a2deef13",
+    "required": false,
+    "slug": "health_data_tracking_permission",
+    "title": "I consent to Wolt processing health data related to my purchase of medicine or medical items (required to buy such items). I understand that I can withdraw my consent for future purchases at any time by unticking this box.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "KAZ",
+    "default": false,
+    "id": "6216466a5ceee5a6a2deef13",
+    "required": false,
+    "slug": "health_data_tracking_permission",
+    "title": "I consent to Wolt processing health data related to my purchase of medicine or medical items (required to buy such items). I understand that I can withdraw my consent for future purchases at any time by unticking this box.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "LTU",
+    "default": false,
+    "id": "6216466a5ceee5a6a2deef13",
+    "required": false,
+    "slug": "health_data_tracking_permission",
+    "title": "I consent to Wolt processing health data related to my purchase of medicine or medical items (required to buy such items). I understand that I can withdraw my consent for future purchases at any time by unticking this box.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "LVA",
+    "default": false,
+    "id": "6216466a5ceee5a6a2deef13",
+    "required": false,
+    "slug": "health_data_tracking_permission",
+    "title": "I consent to Wolt processing health data related to my purchase of medicine or medical items (required to buy such items). I understand that I can withdraw my consent for future purchases at any time by unticking this box.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "MLT",
+    "default": false,
+    "id": "6216466a5ceee5a6a2deef13",
+    "required": false,
+    "slug": "health_data_tracking_permission",
+    "title": "I consent to Wolt processing health data related to my purchase of medicine or medical items (required to buy such items). I understand that I can withdraw my consent for future purchases at any time by unticking this box.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "NOR",
+    "default": false,
+    "id": "6216466a5ceee5a6a2deef13",
+    "required": false,
+    "slug": "health_data_tracking_permission",
+    "title": "I consent to Wolt processing health data related to my purchase of medicine or medical items (required to buy such items). I understand that I can withdraw my consent for future purchases at any time by unticking this box.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "POL",
+    "default": false,
+    "id": "6216466a5ceee5a6a2deef13",
+    "required": false,
+    "slug": "health_data_tracking_permission",
+    "title": "I consent to Wolt processing health data related to my purchase of medicine or medical items (required to buy such items). I understand that I can withdraw my consent for future purchases at any time by unticking this box.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "SRB",
+    "default": false,
+    "id": "6216466a5ceee5a6a2deef13",
+    "required": false,
+    "slug": "health_data_tracking_permission",
+    "title": "I consent to Wolt processing health data related to my purchase of medicine or medical items (required to buy such items). I understand that I can withdraw my consent for future purchases at any time by unticking this box.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "SVK",
+    "default": false,
+    "id": "6216466a5ceee5a6a2deef13",
+    "required": false,
+    "slug": "health_data_tracking_permission",
+    "title": "I consent to Wolt processing health data related to my purchase of medicine or medical items (required to buy such items). I understand that I can withdraw my consent for future purchases at any time by unticking this box.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "SVN",
+    "default": false,
+    "id": "6216466a5ceee5a6a2deef13",
+    "required": false,
+    "slug": "health_data_tracking_permission",
+    "title": "I consent to Wolt processing health data related to my purchase of medicine or medical items (required to buy such items). I understand that I can withdraw my consent for future purchases at any time by unticking this box.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "SWE",
+    "default": false,
+    "id": "6216466a5ceee5a6a2deef13",
+    "required": false,
+    "slug": "health_data_tracking_permission",
+    "title": "I consent to Wolt processing health data related to my purchase of medicine or medical items (required to buy such items). I understand that I can withdraw my consent for future purchases at any time by unticking this box.",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "MLT",
+    "default": false,
+    "id": "647de9d89ab83f8953f0dc58",
+    "required": false,
+    "slug": "personalized-ads-title",
+    "title": "Ads personalization",
+    "url": "https://www.wolt.com",
+    "url_text": "Personalized Ads",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "DEU",
+    "default": false,
+    "id": "647de9d89ab83f8953f0dc58",
+    "required": false,
+    "slug": "personalized-ads-title",
+    "title": "Ads personalization",
+    "url": "https://www.wolt.com",
+    "url_text": "Personalized Ads",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "UZB",
+    "default": false,
+    "id": "66586f1b292aedd914c83c33",
+    "required": true,
+    "slug": "consumerconsents-uzbekistan-dataprocessing",
+    "title": "Wolt can transfer my personal data that Wolt has collected and processed to countries outside Uzbekistan. ",
+    "visibility": [
+      "app_start",
+      "signup"
+    ]
+  },
+  {
+    "country": "DEU",
+    "default": true,
+    "id": "7e6759ed-ae7e-42c0-a19f-f2120eaf3be1",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Recommendations and discounts",
+    "slug": "consumer-consents-soft-opt-in-email",
+    "title": "Emails with recommendations and discounts based on your Wolt activity.",
+    "url": "",
+    "visibility": [
+      "settings",
+      "soft_opt_in"
+    ]
+  },
+  {
+    "country": "ROU",
+    "default": false,
+    "id": "e3a0215c-cc3d-4499-8fee-5ced551feb15",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Personalised Offers",
+    "slug": "consumer-consents-messages",
+    "title": "You'll be able to receive discounts & free shipping via email/push/pop-up or directly in the app, depending on how you use Wolt",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": []
+  },
+  {
+    "country": "ROU",
+    "default": false,
+    "id": "b9f36d9e-f0dc-4567-906d-c1c58041b5ce",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Messages",
+    "slug": "consumer-consents-messages",
+    "title": "I’d like to receive special offers and promotions from Wolt via MESSAGES (e.g. SMS, WhatsApp, Telegram). I can unsubscribe from these notifications at any time in the account settings and by following the instructions in each message.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": []
+  },
+  {
+    "country": "EST",
+    "default": true,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup"
+    ]
+  },
+  {
+    "country": "MLT",
+    "default": true,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup"
+    ]
+  },
+  {
+    "country": "SVK",
+    "default": true,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup"
+    ]
+  },
+  {
+    "country": "SVN",
+    "default": true,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup"
+    ]
+  },
+  {
+    "country": "CYP",
+    "default": true,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup"
+    ]
+  },
+  {
+    "country": "CZE",
+    "default": true,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup"
+    ]
+  },
+  {
+    "country": "GRC",
+    "default": true,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup"
+    ]
+  },
+  {
+    "country": "HRV",
+    "default": true,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup"
+    ]
+  },
+  {
+    "country": "UZB",
+    "default": true,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup"
+    ]
+  },
+  {
+    "country": "XKX",
+    "default": true,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup"
+    ]
+  },
+  {
+    "country": "WOLT",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "DEU",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "FIN",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "HUN",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "SRB",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "POL",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "LTU",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "ALB",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "JPN",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "LUX",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "SWE",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "ISR",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "LVA",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "AUT",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "MKD",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "NOR",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "DNK",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "ISL",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "ROU",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "BGR",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "Push notifications about discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "KAZ",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": false,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "As our customer, Wolt can send me special offers and promotions via Marketing Notifications. I can unsubscribe from these notifications at any time in the app settings and by ticking this box",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "AZE",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": false,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "As our customer, Wolt can send me special offers and promotions via Marketing Notifications. I can unsubscribe from these notifications at any time in the app settings and by ticking this box",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "GEO",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": false,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "As our customer, Wolt can send me special offers and promotions via Marketing Notifications. I can unsubscribe from these notifications at any time in the app settings and by ticking this box",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "",
+    "default": false,
+    "id": "f1d78613-8368-49d5-afb8-487684e4fc33",
+    "required": false,
+    "signup_default": false,
+    "signup_title": "Push notifications",
+    "slug": "consumer-consents-notifications",
+    "title": "As our customer, Wolt can send me special offers and promotions via Marketing Notifications. I can unsubscribe from these notifications at any time in the app settings and by ticking this box",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup"
+    ]
+  },
+  {
+    "country": "KAZ",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": false,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "As our customer, Wolt can send you special offers and promotions via EMAIL NEWSLETTER. You can unsubscribe in each message and by ticking this box",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "AZE",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": false,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "As our customer, Wolt can send you special offers and promotions via EMAIL NEWSLETTER. You can unsubscribe in each message and by ticking this box",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "GEO",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": false,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "As our customer, Wolt can send you special offers and promotions via EMAIL NEWSLETTER. You can unsubscribe in each message and by ticking this box",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings"
+    ]
+  },
+  {
+    "country": "",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": false,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "As our customer, Wolt can send you special offers and promotions via EMAIL NEWSLETTER. You can unsubscribe in each message and by ticking this box",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup"
+    ]
+  },
+  {
+    "country": "EST",
+    "default": true,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup"
+    ]
+  },
+  {
+    "country": "MLT",
+    "default": true,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup"
+    ]
+  },
+  {
+    "country": "SVK",
+    "default": true,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup"
+    ]
+  },
+  {
+    "country": "SVN",
+    "default": true,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup"
+    ]
+  },
+  {
+    "country": "CYP",
+    "default": true,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup"
+    ]
+  },
+  {
+    "country": "CZE",
+    "default": true,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup"
+    ]
+  },
+  {
+    "country": "GRC",
+    "default": true,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup"
+    ]
+  },
+  {
+    "country": "HRV",
+    "default": true,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup"
+    ]
+  },
+  {
+    "country": "UZB",
+    "default": true,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup"
+    ]
+  },
+  {
+    "country": "XKX",
+    "default": true,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup"
+    ]
+  },
+  {
+    "country": "WOLT",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "FIN",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "HUN",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "SRB",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "POL",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "LTU",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "ALB",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "JPN",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "LUX",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "SWE",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "ISR",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "LVA",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "AUT",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "MKD",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "NOR",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "DNK",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "ISL",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "ROU",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "BGR",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  },
+  {
+    "country": "DEU",
+    "default": false,
+    "id": "0461305a-49e4-4e7b-9d1d-06d0b931fed7",
+    "required": false,
+    "signup_default": true,
+    "signup_title": "Special offers",
+    "slug": "consumer-consents-email",
+    "title": "Promotional emails with discounts and offers from Wolt and its partners.",
+    "url": "https://explore.wolt.com/privacy",
+    "visibility": [
+      "settings",
+      "signup",
+      "signup_v2"
+    ]
+  }
+]

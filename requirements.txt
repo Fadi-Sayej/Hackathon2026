@@ -14,4 +14,10 @@ pyyaml>=6.0
 # Logging
 loguru>=0.7
 
-# (Future collectors will add: httpx, selectolax, lxml, etc.)
+# HTTP client (used by future collectors; Alonit connector uses ftplib from stdlib)
+httpx>=0.27
+
+# MCP server (Model Context Protocol — expose price-lookup tools to Claude)
+mcp>=1.0
+
+# (Future collectors will add: selectolax, lxml, etc.)

@@ -1,0 +1,12 @@
+{
+  "url": "https://wolt.com/en/isr/petah-tikva/venue/super-alonit-kibbutz-einat/items/menucategory-47#query-state",
+  "method": "GET",
+  "status_code": 200,
+  "content_type": "application/json; charset=utf-8",
+  "observed_at": "2026-05-25T12:00:42.643944+00:00",
+  "file_path": "C:\\Users\\mshar\\Desktop\\hackathonsj\\data\\external\\raw\\delivery_catalog\\2026\\05\\25\\delivery_catalog_20260525T120042_84005c2d.json",
+  "sha256": "84005c2dc2823f70a553f8bb1967f5c548482991de4308807fd16e22a4649702",
+  "headers": {
+    "content-type": "application/json; charset=utf-8"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "url": "https://url.retail.publishedprices.co.il/file/d/PromoFull7290492000005-003-657-20260525-002605.gz",
+  "method": "GET",
+  "status_code": 200,
+  "content_type": "application/x-gzip",
+  "observed_at": "2026-05-25T12:22:52.079199+00:00",
+  "file_path": "C:\\Users\\mshar\\Desktop\\hackathonsj\\data\\external\\raw\\alonit\\2026\\05\\25\\alonit_20260525T122252_5f9288b5.gz",
+  "sha256": "5f9288b562beb30238294b7978ea4886df7907568b36897cba5919bdefbb3274",
+  "headers": {
+    "server": "CerberusFTPServer/12.0",
+    "x-content-type-options": "nosniff",
+    "x-xss-protection": "1; mode=block",
+    "content-security-policy": "default-src 'self' 'unsafe-inline' 'unsafe-eval'; frame-ancestors 'self'; frame-src 'self' https://www.google.com/recaptcha/ *.duosecurity.com *.duofederal.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; img-src 'self' data: blob:; media-src 'self' blob:",
+    "referrer-policy": "same-origin",
+    "content-type": "application/x-gzip",
+    "cache-control": "no-store, no-cache, must-revalidate",
+    "pragma": "no-cache",
+    "expires": "0",
+    "accept-ranges": "bytes",
+    "last-modified": "Sun, 24 May 2026 21:25:48 GMT",
+    "content-disposition": "filename=\"PromoFull7290492000005-003-657-20260525-002605.gz\";filename*=UTF-8''PromoFull7290492000005-003-657-20260525-002605.gz;creation-date=\"Sun, 24 May 2026 21:25:48 GMT\";modification-date=\"Sun, 24 May 2026 21:25:48 GMT\";size=93797",
+    "etag": "\"EFE0753EE0B47E4381D0849AC00AEBDCFC2E9998\"",
+    "set-cookie": "cftpSID=dpdwMTEG6BvPTCbJVOjR0JN1YcMucdO92NUWXlQsibE; Path=/; Secure; HttpOnly; SameSite=Lax;",
+    "date": "Mon, 25 May 2026 12:22:25 GMT",
+    "content-length": "93797"
+  }
+}

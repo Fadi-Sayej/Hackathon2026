@@ -159,9 +159,7 @@ def save_raw_response(
     data_path = _safe_write(target_path, body, sha)
 
     # Derive the metadata path relative to the actual written data path
-    metadata_path = data_path.parent / (
-        data_path.stem + "_metadata.json"
-    )
+    metadata_path = data_path.parent / f"{data_path.name}_metadata.json"
     _write_metadata(
         metadata_path,
         url=url,
@@ -213,7 +211,7 @@ def save_raw_file(
 
     data_path = _safe_write(target_path, file_bytes, sha)
 
-    metadata_path = data_path.parent / (data_path.stem + "_metadata.json")
+    metadata_path = data_path.parent / f"{data_path.name}_metadata.json"
     _write_metadata(
         metadata_path,
         url=source_url,

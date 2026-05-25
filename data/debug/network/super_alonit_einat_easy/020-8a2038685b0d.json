@@ -1,0 +1,1015 @@
+{
+  "uid": "8A5025DD-5D4E-4CC9-A909-33D700DB6F7E",
+  "userprefs": null,
+  "bizlist": {
+    "bdid": "2817445069",
+    "allbizim": "9238350|26797254|26305054|20622076|20625991|26313598|20622114|20115514|26875637|26959482|26347419|7614382",
+    "catparams": "c=21410&c2=26023",
+    "numofresults": 12,
+    "countbiz": "12 results",
+    "aroundlocation": "around you",
+    "fav": false,
+    "list": [
+      {
+        "id": "9238350",
+        "bizname": "Super Alonit",
+        "logo": "https://media.easy.co.il/images/StaticLogo/26288055_1.jpg",
+        "url": "/en/page/9238350",
+        "linktype": "bizpage",
+        "lat": 32.0012511,
+        "lng": 34.8211525,
+        "pointradius": 10,
+        "address": "Beit Dagan Junction Ramla area",
+        "city": "Beit Dagan Junction",
+        "distancenumeric": 7.355,
+        "actions": [
+          {
+            "title": "Online Order",
+            "type": "external",
+            "yetzia": "orderfood",
+            "link": "https://wolt.com/he/isr/rishon-lezion-hashfela-area/venue/mini-super-alonit-beit-dagan",
+            "openinbrowser": true
+          }
+        ],
+        "bestsubcat": "Supermarkets Chain",
+        "bestsubcatid": 21410,
+        "phone": "0543232704",
+        "picscount": 1,
+        "numofreviews": 22,
+        "popularity": 1,
+        "hasorderonline": "https://wolt.com/he/isr/rishon-lezion-hashfela-area/venue/mini-super-alonit-beit-dagan",
+        "category": "Supermarkets Chain",
+        "badges": [
+          {
+            "title": "22 Reviews",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/i-reviews.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/i-reviews.png"
+            },
+            "type": "reviews"
+          },
+          {
+            "title": "Non Bank ATMs",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30638.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30638.png"
+            },
+            "catid": 30638,
+            "type": "cat"
+          },
+          {
+            "title": "24/7",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30538.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30538.png"
+            },
+            "catid": 30538,
+            "type": "cat"
+          },
+          {
+            "title": "$$",
+            "catid": 23569,
+            "type": "cat"
+          },
+          {
+            "title": "Deliveries",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30537.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30537.png"
+            },
+            "catid": 30537,
+            "type": "cat"
+          }
+        ],
+        "hasdiscounts": false,
+        "distance": "7.3 Km",
+        "openhours": "Open",
+        "prop": [
+          {
+            "title": "22 reviews"
+          }
+        ],
+        "pricelevel": {
+          "symbol": "$",
+          "level": 2,
+          "max": 3
+        }
+      },
+      {
+        "id": "26797254",
+        "bizname": "Super Alonit",
+        "logo": "https://media.easy.co.il/images/StaticLogo/26288055_1.jpg",
+        "url": "/en/page/26797254",
+        "linktype": "bizpage",
+        "lat": 32.0892045,
+        "lng": 34.9436097,
+        "pointradius": 10,
+        "address": "Einat",
+        "zipcode": "48805",
+        "city": "Einat",
+        "distancenumeric": 15.283,
+        "actions": [
+          {
+            "title": "Online Order",
+            "type": "external",
+            "yetzia": "orderfood",
+            "link": "https://wolt.com/he/isr/petah-tikva/venue/super-alonit-kibbutz-einat",
+            "openinbrowser": true
+          }
+        ],
+        "bestsubcat": "Supermarkets Chain",
+        "bestsubcatid": 21410,
+        "phone": "039385191",
+        "picscount": 2,
+        "numofreviews": 1239,
+        "popularity": 3,
+        "hasorderonline": "https://wolt.com/he/isr/petah-tikva/venue/super-alonit-kibbutz-einat",
+        "category": "Supermarkets Chain",
+        "badges": [
+          {
+            "title": "1239 Reviews",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/i-reviews.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/i-reviews.png"
+            },
+            "type": "reviews"
+          },
+          {
+            "title": "$$",
+            "catid": 23569,
+            "type": "cat"
+          },
+          {
+            "title": "Deliveries",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30537.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30537.png"
+            },
+            "catid": 30537,
+            "type": "cat"
+          }
+        ],
+        "hasdiscounts": true,
+        "distance": "15 Km",
+        "openhours": "Open",
+        "prop": [
+          {
+            "title": "1000+ reviews"
+          }
+        ],
+        "pricelevel": {
+          "symbol": "$",
+          "level": 2,
+          "max": 3
+        },
+        "easyrating": 8.2
+      },
+      {
+        "id": "26305054",
+        "bizname": "Super Alonit",
+        "logo": "https://media.easy.co.il/images/StaticLogo/26288055_1.jpg",
+        "url": "/en/page/26305054",
+        "linktype": "bizpage",
+        "lat": 32.0892,
+        "lng": 34.9437,
+        "pointradius": 10,
+        "address": "Dor Alon Einat Einat",
+        "zipcode": "48805",
+        "city": "Einat",
+        "distancenumeric": 15.292,
+        "actions": [
+          {
+            "title": "Online Order",
+            "type": "external",
+            "yetzia": "orderfood",
+            "link": "https://wolt.com/he/isr/rosh-pinna---zefat-area/venue/mini-super-alonit-amiad",
+            "openinbrowser": true
+          }
+        ],
+        "bestsubcat": "Supermarkets Chain",
+        "bestsubcatid": 21410,
+        "phone": "0545438479",
+        "picscount": 1,
+        "numofreviews": 24,
+        "popularity": 4,
+        "hasorderonline": "https://wolt.com/he/isr/rosh-pinna---zefat-area/venue/mini-super-alonit-amiad",
+        "category": "Supermarkets Chain",
+        "badges": [
+          {
+            "title": "24 Reviews",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/i-reviews.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/i-reviews.png"
+            },
+            "type": "reviews"
+          },
+          {
+            "title": "24/7",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30538.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30538.png"
+            },
+            "catid": 30538,
+            "type": "cat"
+          },
+          {
+            "title": "$$",
+            "catid": 23569,
+            "type": "cat"
+          },
+          {
+            "title": "Deliveries",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30537.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30537.png"
+            },
+            "catid": 30537,
+            "type": "cat"
+          }
+        ],
+        "hasdiscounts": false,
+        "distance": "15 Km",
+        "openhours": "Open",
+        "prop": [
+          {
+            "title": "24 reviews"
+          }
+        ],
+        "pricelevel": {
+          "symbol": "$",
+          "level": 2,
+          "max": 3
+        },
+        "easyrating": 7.9
+      },
+      {
+        "id": "20622076",
+        "bizname": "Super Alonit",
+        "logo": "https://media.easy.co.il/images/StaticLogo/26288055_1.jpg",
+        "url": "/en/page/20622076",
+        "linktype": "bizpage",
+        "lat": 32.1716482,
+        "lng": 34.9241987,
+        "pointradius": 10,
+        "address": "Hata'as Street 1 Kfar Saba",
+        "zipcode": "4442501",
+        "city": "Kfar Saba",
+        "distancenumeric": 18.052,
+        "actions": [
+          {
+            "title": "Online Order",
+            "type": "external",
+            "yetzia": "orderfood",
+            "link": "https://wolt.com/he/isr/hasharon/venue/mini-super-alonit-kefar-sava",
+            "openinbrowser": true
+          }
+        ],
+        "bestsubcat": "Supermarkets Chain",
+        "bestsubcatid": 21410,
+        "phone": "0545438732",
+        "picscount": 1,
+        "numofreviews": 37,
+        "popularity": 2,
+        "hasorderonline": "https://wolt.com/he/isr/hasharon/venue/mini-super-alonit-kefar-sava",
+        "category": "Supermarkets Chain",
+        "badges": [
+          {
+            "title": "37 Reviews",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/i-reviews.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/i-reviews.png"
+            },
+            "type": "reviews"
+          },
+          {
+            "title": "Non Bank ATMs",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30638.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30638.png"
+            },
+            "catid": 30638,
+            "type": "cat"
+          },
+          {
+            "title": "10bis",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/31713.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/31713.png"
+            },
+            "catid": 31713,
+            "type": "cat"
+          },
+          {
+            "title": "24/7",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30538.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30538.png"
+            },
+            "catid": 30538,
+            "type": "cat"
+          },
+          {
+            "title": "$$",
+            "catid": 23569,
+            "type": "cat"
+          },
+          {
+            "title": "Deliveries",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30537.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30537.png"
+            },
+            "catid": 30537,
+            "type": "cat"
+          }
+        ],
+        "hasdiscounts": true,
+        "distance": "18 Km",
+        "openhours": "Open",
+        "prop": [
+          {
+            "title": "37 reviews"
+          }
+        ],
+        "pricelevel": {
+          "symbol": "$",
+          "level": 2,
+          "max": 3
+        },
+        "easyrating": 7.8
+      },
+      {
+        "id": "20625991",
+        "bizname": "Super Alonit",
+        "logo": "https://media.easy.co.il/images/StaticLogo/26288055_1.jpg",
+        "url": "/en/page/20625991",
+        "linktype": "bizpage",
+        "lat": 31.787001,
+        "lng": 34.676855,
+        "pointradius": 10,
+        "address": "Exit from Gas Station Gan Yavne",
+        "city": "Gan Yavne",
+        "distancenumeric": 32.022,
+        "actions": [
+          {
+            "title": "Online Order",
+            "type": "external",
+            "yetzia": "orderfood",
+            "link": "https://wolt.com/he/isr/rishon-lezion-hashfela-area/venue/mini-super-alonit-gan-yavne",
+            "openinbrowser": true
+          }
+        ],
+        "bestsubcat": "Supermarkets Chain",
+        "bestsubcatid": 21410,
+        "phone": "0545438760",
+        "picscount": 1,
+        "numofreviews": 71,
+        "popularity": 3,
+        "hasorderonline": "https://wolt.com/he/isr/rishon-lezion-hashfela-area/venue/mini-super-alonit-gan-yavne",
+        "category": "Supermarkets Chain",
+        "badges": [
+          {
+            "title": "71 Reviews",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/i-reviews.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/i-reviews.png"
+            },
+            "type": "reviews"
+          },
+          {
+            "title": "Non Bank ATMs",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30638.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30638.png"
+            },
+            "catid": 30638,
+            "type": "cat"
+          },
+          {
+            "title": "24/7",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30538.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30538.png"
+            },
+            "catid": 30538,
+            "type": "cat"
+          },
+          {
+            "title": "$$",
+            "catid": 23569,
+            "type": "cat"
+          },
+          {
+            "title": "Deliveries",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30537.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30537.png"
+            },
+            "catid": 30537,
+            "type": "cat"
+          }
+        ],
+        "hasdiscounts": false,
+        "distance": "32 Km",
+        "openhours": "Open",
+        "prop": [
+          {
+            "title": "71 reviews"
+          }
+        ],
+        "pricelevel": {
+          "symbol": "$",
+          "level": 2,
+          "max": 3
+        },
+        "easyrating": 8.1
+      },
+      {
+        "id": "26313598",
+        "bizname": "Mini Super Alonit",
+        "logo": "https://media.easy.co.il/images/StaticLogo/26958107_1.jpg",
+        "url": "/en/page/26313598",
+        "linktype": "bizpage",
+        "lat": 32.395216,
+        "lng": 35.01179,
+        "pointradius": 10,
+        "address": "Lehavot Haviva",
+        "zipcode": "38835",
+        "city": "Lehavot Haviva",
+        "distancenumeric": 42.949,
+        "actions": [
+          {
+            "title": "Online Order",
+            "type": "external",
+            "yetzia": "orderfood",
+            "link": "https://wolt.com/he/isr/pardes-hanna/venue/super-alonit-lehavot-haviva",
+            "openinbrowser": true
+          }
+        ],
+        "bestsubcat": "Supermarkets Chain",
+        "bestsubcatid": 28976,
+        "phone": "0545438066",
+        "picscount": 1,
+        "numofreviews": 10,
+        "popularity": 1,
+        "hasorderonline": "https://wolt.com/he/isr/pardes-hanna/venue/super-alonit-lehavot-haviva",
+        "category": "Supermarkets Chain",
+        "badges": [
+          {
+            "title": "10 Reviews",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/i-reviews.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/i-reviews.png"
+            },
+            "type": "reviews"
+          },
+          {
+            "title": "24/7",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30538.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30538.png"
+            },
+            "catid": 30538,
+            "type": "cat"
+          },
+          {
+            "title": "$$",
+            "catid": 23569,
+            "type": "cat"
+          },
+          {
+            "title": "Deliveries",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30537.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30537.png"
+            },
+            "catid": 30537,
+            "type": "cat"
+          }
+        ],
+        "hasdiscounts": true,
+        "distance": "43 Km",
+        "openhours": "Open",
+        "prop": [
+          {
+            "title": "10 reviews"
+          }
+        ],
+        "pricelevel": {
+          "symbol": "$",
+          "level": 2,
+          "max": 3
+        }
+      },
+      {
+        "id": "20622114",
+        "bizname": "Super Alonit",
+        "logo": "https://media.easy.co.il/images/StaticLogo/26288055_1.jpg",
+        "url": "/en/page/20622114",
+        "linktype": "bizpage",
+        "lat": 31.66335,
+        "lng": 34.62431,
+        "pointradius": 10,
+        "address": "Kiryat Gat",
+        "city": "Kiryat Gat",
+        "distancenumeric": 46.639,
+        "actions": [
+          {
+            "title": "Online Order",
+            "type": "external",
+            "yetzia": "orderfood",
+            "link": "https://wolt.com/he/isr/ashdod-and-lachish-area/venue/mini-super-alonit-mashen",
+            "openinbrowser": true
+          }
+        ],
+        "bestsubcat": "Supermarkets Chain",
+        "bestsubcatid": 21410,
+        "phone": "0545438758",
+        "picscount": 1,
+        "numofreviews": 10,
+        "popularity": 2,
+        "hasorderonline": "https://wolt.com/he/isr/ashdod-and-lachish-area/venue/mini-super-alonit-mashen",
+        "category": "Supermarkets Chain",
+        "badges": [
+          {
+            "title": "10 Reviews",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/i-reviews.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/i-reviews.png"
+            },
+            "type": "reviews"
+          },
+          {
+            "title": "24/7",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30538.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30538.png"
+            },
+            "catid": 30538,
+            "type": "cat"
+          },
+          {
+            "title": "$$",
+            "catid": 23569,
+            "type": "cat"
+          },
+          {
+            "title": "Deliveries",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30537.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30537.png"
+            },
+            "catid": 30537,
+            "type": "cat"
+          }
+        ],
+        "hasdiscounts": true,
+        "distance": "47 Km",
+        "openhours": "Open",
+        "prop": [
+          {
+            "title": "10 reviews"
+          }
+        ],
+        "pricelevel": {
+          "symbol": "$",
+          "level": 2,
+          "max": 3
+        }
+      },
+      {
+        "id": "20115514",
+        "bizname": "Super Alonit",
+        "logo": "https://media.easy.co.il/images/StaticLogo/26288055_1.jpg",
+        "url": "/en/page/20115514",
+        "linktype": "bizpage",
+        "lat": 32.465003,
+        "lng": 34.9923195,
+        "pointradius": 10,
+        "address": "Ein Shemer Carcur Hadera area",
+        "city": "Karkur Junction",
+        "distancenumeric": 49.075,
+        "actions": [
+          {
+            "title": "Online Order",
+            "type": "external",
+            "yetzia": "orderfood",
+            "link": "https://wolt.com/he/isr/pardes-hanna/venue/super-alonit-ein-shemer",
+            "openinbrowser": true
+          }
+        ],
+        "bestsubcat": "Supermarkets & Grocery Stores",
+        "bestsubcatid": 17755,
+        "phone": "046270704",
+        "picscount": 3,
+        "numofreviews": 1817,
+        "popularity": 3,
+        "hasorderonline": "https://wolt.com/he/isr/pardes-hanna/venue/super-alonit-ein-shemer",
+        "category": "Supermarkets & Grocery Stores",
+        "badges": [
+          {
+            "title": "1817 Reviews",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/i-reviews.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/i-reviews.png"
+            },
+            "type": "reviews"
+          },
+          {
+            "title": "4 votes",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/i-top3.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/i-top3.png"
+            },
+            "type": "top5"
+          },
+          {
+            "title": "$$",
+            "catid": 23569,
+            "type": "cat"
+          },
+          {
+            "title": "Deliveries",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30537.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30537.png"
+            },
+            "catid": 30537,
+            "type": "cat"
+          }
+        ],
+        "hasdiscounts": true,
+        "distance": "49 Km",
+        "openhours": "Open",
+        "prop": [
+          {
+            "title": "1000+ reviews"
+          }
+        ],
+        "pricelevel": {
+          "symbol": "$",
+          "level": 2,
+          "max": 3
+        },
+        "easyrating": 8.6
+      },
+      {
+        "id": "26875637",
+        "bizname": "Mini Super Alonit",
+        "logo": "https://media.easy.co.il/images/StaticLogo/26958107_1.jpg",
+        "url": "/en/page/26875637",
+        "linktype": "bizpage",
+        "lat": 32.5082069,
+        "lng": 34.9321823,
+        "pointradius": 10,
+        "address": "Or Akiva",
+        "zipcode": "30600",
+        "city": "Or Akiva",
+        "distancenumeric": 51.728,
+        "actions": [
+          {
+            "title": "Online Order",
+            "type": "external",
+            "yetzia": "orderfood",
+            "link": "https://wolt.com/he/isr/pardes-hanna/venue/mini-super-alonit-binyamina-west",
+            "openinbrowser": true
+          }
+        ],
+        "bestsubcat": "Supermarkets Chain",
+        "bestsubcatid": 28976,
+        "phone": "0558808153",
+        "picscount": 1,
+        "numofreviews": 20,
+        "popularity": 3,
+        "hasorderonline": "https://wolt.com/he/isr/pardes-hanna/venue/mini-super-alonit-binyamina-west",
+        "category": "Supermarkets Chain",
+        "badges": [
+          {
+            "title": "20 Reviews",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/i-reviews.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/i-reviews.png"
+            },
+            "type": "reviews"
+          },
+          {
+            "title": "$$",
+            "catid": 23569,
+            "type": "cat"
+          },
+          {
+            "title": "Deliveries",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30537.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30537.png"
+            },
+            "catid": 30537,
+            "type": "cat"
+          }
+        ],
+        "hasdiscounts": false,
+        "distance": "52 Km",
+        "openhours": "Open",
+        "prop": [
+          {
+            "title": "20 reviews"
+          }
+        ],
+        "pricelevel": {
+          "symbol": "$",
+          "level": 2,
+          "max": 3
+        }
+      },
+      {
+        "id": "26959482",
+        "bizname": "Mini Super Alonit",
+        "logo": "https://media.easy.co.il/images/StaticLogo/26958107_1.jpg",
+        "url": "/en/page/26959482",
+        "linktype": "bizpage",
+        "lat": 32.644516,
+        "lng": 35.11918,
+        "pointradius": 10,
+        "address": "HaZore'a",
+        "zipcode": "36581",
+        "city": "HaZore'a",
+        "distancenumeric": 72.181,
+        "actions": [
+          {
+            "title": "Online Order",
+            "type": "external",
+            "yetzia": "orderfood",
+            "link": "https://wolt.com/he/isr/yokneam/venue/mini-super-alonit-hazorea",
+            "openinbrowser": true
+          }
+        ],
+        "bestsubcat": "Supermarkets Chain",
+        "bestsubcatid": 28976,
+        "phone": "0545438490",
+        "picscount": 1,
+        "numofreviews": 22,
+        "popularity": 3,
+        "hasorderonline": "https://wolt.com/he/isr/yokneam/venue/mini-super-alonit-hazorea",
+        "category": "Supermarkets Chain",
+        "badges": [
+          {
+            "title": "22 Reviews",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/i-reviews.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/i-reviews.png"
+            },
+            "type": "reviews"
+          },
+          {
+            "title": "Non Bank ATMs",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30638.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30638.png"
+            },
+            "catid": 30638,
+            "type": "cat"
+          },
+          {
+            "title": "24/7",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30538.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30538.png"
+            },
+            "catid": 30538,
+            "type": "cat"
+          },
+          {
+            "title": "$$",
+            "catid": 23569,
+            "type": "cat"
+          },
+          {
+            "title": "Deliveries",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30537.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30537.png"
+            },
+            "catid": 30537,
+            "type": "cat"
+          }
+        ],
+        "hasdiscounts": false,
+        "distance": "72 Km",
+        "openhours": "Open",
+        "prop": [
+          {
+            "title": "22 reviews"
+          }
+        ],
+        "pricelevel": {
+          "symbol": "$",
+          "level": 2,
+          "max": 3
+        }
+      },
+      {
+        "id": "26347419",
+        "bizname": "Super Alonit",
+        "logo": "https://media.easy.co.il/images/StaticLogo/26288055_1.jpg",
+        "url": "/en/page/26347419",
+        "linktype": "bizpage",
+        "lat": 32.8034536,
+        "lng": 35.0169392,
+        "pointradius": 10,
+        "address": "Hamelacha Street 2 Haifa",
+        "zipcode": "3223597",
+        "city": "Haifa",
+        "distancenumeric": 85.491,
+        "actions": [
+          {
+            "title": "Online Order",
+            "type": "external",
+            "yetzia": "orderfood",
+            "link": "https://wolt.com/he/isr/haifa/venue/mini-super-alonit-krayot",
+            "openinbrowser": true
+          }
+        ],
+        "bestsubcat": "Supermarkets Chain",
+        "bestsubcatid": 21410,
+        "phone": "0558808067",
+        "picscount": 1,
+        "numofreviews": 68,
+        "popularity": 1,
+        "hasorderonline": "https://wolt.com/he/isr/haifa/venue/mini-super-alonit-krayot",
+        "category": "Supermarkets Chain",
+        "badges": [
+          {
+            "title": "68 Reviews",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/i-reviews.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/i-reviews.png"
+            },
+            "type": "reviews"
+          },
+          {
+            "title": "Non Bank ATMs",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30638.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30638.png"
+            },
+            "catid": 30638,
+            "type": "cat"
+          },
+          {
+            "title": "10bis",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/31713.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/31713.png"
+            },
+            "catid": 31713,
+            "type": "cat"
+          },
+          {
+            "title": "24/7",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30538.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30538.png"
+            },
+            "catid": 30538,
+            "type": "cat"
+          },
+          {
+            "title": "$$",
+            "catid": 23569,
+            "type": "cat"
+          },
+          {
+            "title": "Deliveries",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30537.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30537.png"
+            },
+            "catid": 30537,
+            "type": "cat"
+          }
+        ],
+        "hasdiscounts": true,
+        "distance": "85 Km",
+        "openhours": "Open",
+        "prop": [
+          {
+            "title": "68 reviews"
+          }
+        ],
+        "pricelevel": {
+          "symbol": "$",
+          "level": 2,
+          "max": 3
+        },
+        "easyrating": 7.6
+      },
+      {
+        "id": "7614382",
+        "bizname": "Mini Super Alonit",
+        "logo": "https://media.easy.co.il/images/StaticLogo/26958107_1.jpg",
+        "url": "/en/page/7614382",
+        "linktype": "bizpage",
+        "lat": 33.2235,
+        "lng": 35.6159,
+        "pointradius": 10,
+        "address": "Gan Hatzafon Emek Hulah area",
+        "city": "Ma'ayan Baruch Junction",
+        "distancenumeric": 150.965,
+        "actions": [
+          {
+            "title": "Online Order",
+            "type": "external",
+            "yetzia": "orderfood",
+            "link": "https://wolt.com/he/isr/kiryat-shmona-area/venue/mini-super-alonit-gan-hatzafon",
+            "openinbrowser": true
+          }
+        ],
+        "bestsubcat": "Supermarkets Chain",
+        "bestsubcatid": 28976,
+        "phone": "0545438472",
+        "picscount": 1,
+        "numofreviews": 21,
+        "popularity": 2,
+        "hasorderonline": "https://wolt.com/he/isr/kiryat-shmona-area/venue/mini-super-alonit-gan-hatzafon",
+        "category": "Supermarkets Chain",
+        "badges": [
+          {
+            "title": "21 Reviews",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/i-reviews.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/i-reviews.png"
+            },
+            "type": "reviews"
+          },
+          {
+            "title": "Non Bank ATMs",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30638.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30638.png"
+            },
+            "catid": 30638,
+            "type": "cat"
+          },
+          {
+            "title": "24/7",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30538.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30538.png"
+            },
+            "catid": 30538,
+            "type": "cat"
+          },
+          {
+            "title": "$$",
+            "catid": 23569,
+            "type": "cat"
+          },
+          {
+            "title": "Deliveries",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30537.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30537.png"
+            },
+            "catid": 30537,
+            "type": "cat"
+          },
+          {
+            "title": "Accessible Entrance",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/21916.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/21916.png"
+            },
+            "catid": 21916,
+            "type": "cat"
+          },
+          {
+            "title": "Car Park Nearby",
+            "icons": {
+              "light": "https://media.easy.co.il/images/icons/badges/light/30561.png",
+              "dark": "https://media.easy.co.il/images/icons/badges/dark/30561.png"
+            },
+            "catid": 30561,
+            "type": "cat"
+          }
+        ],
+        "hasdiscounts": false,
+        "distance": "151 Km",
+        "openhours": "Open",
+        "prop": [
+          {
+            "title": "21 reviews"
+          }
+        ],
+        "pricelevel": {
+          "symbol": "$",
+          "level": 2,
+          "max": 3
+        },
+        "easyrating": 8.2
+      }
+    ],
+    "hasdiscounts": true,
+    "hidediscountsbanner": true,
+    "service_decleration_link": "https://easy.co.il/pros-team-decleration"
+  }
+}

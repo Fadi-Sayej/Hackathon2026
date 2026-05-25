@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "yomyom-prices": {
+      "command": "python",
+      "args": ["src/mcp_server/price_server.py"],
+      "description": "YomYom price-lookup MCP server. Queries latest Alonit / Dor Alon price-transparency data for barcodes or product names.",
+      "env": {}
+    }
+  }
+}

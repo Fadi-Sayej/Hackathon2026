@@ -1,0 +1,23 @@
+{
+  "source_id": "alonit",
+  "observed_at": "2025-05-25T10:00:00+00:00",
+  "row_count": 3,
+  "stores_found": [
+    {
+      "store_id": "001",
+      "store_name": "Alonit Kafr Qasim",
+      "city": "Kafr Qasim"
+    }
+  ],
+  "unique_stores_in_obs": 1,
+  "unique_products": 2,
+  "products_per_store": {
+    "001": 3
+  },
+  "promo_count": 1,
+  "with_promo_price": 1,
+  "missing_barcode_count": 1,
+  "missing_barcode_pct": 33.33,
+  "missing_price_count": 1,
+  "missing_price_pct": 33.33
+}

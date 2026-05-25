@@ -1,0 +1,2933 @@
+{
+  "ab_assignments": {
+    "adjust-pin-checkout": "treatment",
+    "confirm_alternative_delivery_methods": "variant",
+    "deal-end-date-in-venue-web": "treatment",
+    "deliveroo_out_of_range_bottom_sheet_android": "treatment",
+    "discovery-window-shopping": "treatment",
+    "doordash_out_of_range_bottom_sheet": "treatment",
+    "fewer-required-address-fields-version2": "treatment",
+    "fewer-required-address-fields-version2-ios": "treatment",
+    "fire-deals-new-layout": "treatment",
+    "ivs-retail-search-bar-revamp": "treatment",
+    "location-notification-per-country-ios": "treatment",
+    "no-location-version2-ios": "treatment",
+    "offer-assistant-v2-web": "treatment",
+    "one_click_consents_timing_android": "on",
+    "out-of-reach-deliveroo-ios": "treatment",
+    "out-of-reach-doordash-ios": "treatment",
+    "phone-first-web": "treatment",
+    "prioritize-login-options-for-welcome-back-ios": "treatment",
+    "promo-feedback-bogo-auto-increment": "control",
+    "starbucks-new-address-flow": "treatment",
+    "use-backend-driven-promotions-during-checkout-android": "control",
+    "use-backend-driven-promotions-during-checkout-ios": "control",
+    "whatsapp_otc_android": "treatment",
+    "window-shopping-v2-ios-limited-tabs": "treatment",
+    "wolt-plus-rebranding-enabled": "treatment",
+    "wolt-plus-signup-benefits-web-icons": "treatment",
+    "woltcom-landing-page-ftu-promo": "treatment",
+    "woltcom-venue-location-prompt": "treatment-2",
+    "woltcom-whatsapp-verification": "treatment"
+  },
+  "ab_assignments_v2": {
+    "adjust-pin-checkout": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 3
+      },
+      "variant": "treatment"
+    },
+    "confirm_alternative_delivery_methods": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 1
+      },
+      "variant": "variant"
+    },
+    "deal-end-date-in-venue-web": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 2
+      },
+      "variant": "treatment"
+    },
+    "deliveroo_out_of_range_bottom_sheet_android": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 1
+      },
+      "variant": "treatment"
+    },
+    "discovery-window-shopping": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 2
+      },
+      "variant": "treatment"
+    },
+    "doordash_out_of_range_bottom_sheet": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 1
+      },
+      "variant": "treatment"
+    },
+    "fewer-required-address-fields-version2": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 2
+      },
+      "variant": "treatment"
+    },
+    "fewer-required-address-fields-version2-ios": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 2
+      },
+      "variant": "treatment"
+    },
+    "fire-deals-new-layout": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 2
+      },
+      "variant": "treatment"
+    },
+    "ivs-retail-search-bar-revamp": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "experiment visitors",
+        "version": 5
+      },
+      "variant": "treatment"
+    },
+    "location-notification-per-country-ios": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 2
+      },
+      "variant": "treatment"
+    },
+    "no-location-version2-ios": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 2
+      },
+      "variant": "treatment"
+    },
+    "offer-assistant-v2-web": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 4
+      },
+      "variant": "treatment"
+    },
+    "one_click_consents_timing_android": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 1
+      },
+      "variant": "on"
+    },
+    "out-of-reach-deliveroo-ios": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 1
+      },
+      "variant": "treatment"
+    },
+    "out-of-reach-doordash-ios": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 1
+      },
+      "variant": "treatment"
+    },
+    "phone-first-web": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 2
+      },
+      "variant": "treatment"
+    },
+    "prioritize-login-options-for-welcome-back-ios": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 3
+      },
+      "variant": "treatment"
+    },
+    "promo-feedback-bogo-auto-increment": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 3
+      },
+      "variant": "control"
+    },
+    "starbucks-new-address-flow": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 3
+      },
+      "variant": "treatment"
+    },
+    "use-backend-driven-promotions-during-checkout-android": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "catch-all",
+        "version": 2
+      },
+      "variant": "control"
+    },
+    "use-backend-driven-promotions-during-checkout-ios": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "catch-all",
+        "version": 2
+      },
+      "variant": "control"
+    },
+    "whatsapp_otc_android": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 4
+      },
+      "variant": "treatment"
+    },
+    "window-shopping-v2-ios-limited-tabs": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 1
+      },
+      "variant": "treatment"
+    },
+    "wolt-plus-rebranding-enabled": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "All Countries Except Romania",
+        "version": 14
+      },
+      "variant": "treatment"
+    },
+    "wolt-plus-signup-benefits-web-icons": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 2
+      },
+      "variant": "treatment"
+    },
+    "woltcom-landing-page-ftu-promo": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 6
+      },
+      "variant": "treatment"
+    },
+    "woltcom-venue-location-prompt": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 2
+      },
+      "variant": "treatment-2"
+    },
+    "woltcom-whatsapp-verification": {
+      "assignment_context": {
+        "reason_for_assignment": "eligibility",
+        "targeting_condition": "initial-condition",
+        "version": 4
+      },
+      "variant": "treatment"
+    }
+  },
+  "address_picker": {
+    "country_address_thresholds": {
+      "ARE": {
+        "out_of_bounds": 5000000,
+        "reject": 500,
+        "warn": 150
+      },
+      "CZE": {
+        "out_of_bounds": 20000,
+        "reject": 300,
+        "warn": 150
+      },
+      "DNK": {
+        "out_of_bounds": 15000,
+        "reject": 500,
+        "warn": 150
+      },
+      "EST": {
+        "out_of_bounds": 20000,
+        "reject": 500,
+        "warn": 150
+      },
+      "FIN": {
+        "out_of_bounds": 8000,
+        "reject": 500,
+        "warn": 150
+      },
+      "FRA": {
+        "out_of_bounds": 8000,
+        "reject": 500,
+        "warn": 150
+      },
+      "GEO": {
+        "out_of_bounds": 5000000,
+        "reject": 500,
+        "warn": 150
+      },
+      "GRC": {
+        "out_of_bounds": 8000,
+        "reject": 300,
+        "warn": 150
+      },
+      "HUN": {
+        "out_of_bounds": 5000000,
+        "reject": 500,
+        "warn": 150
+      },
+      "ISL": {
+        "out_of_bounds": 5000,
+        "reject": 500,
+        "warn": 150
+      },
+      "ISR": {
+        "out_of_bounds": 5000000,
+        "reject": 300,
+        "warn": 150
+      },
+      "ITA": {
+        "out_of_bounds": 8000,
+        "reject": 500,
+        "warn": 150
+      },
+      "LTU": {
+        "out_of_bounds": 20000,
+        "reject": 500,
+        "warn": 150
+      },
+      "LVA": {
+        "out_of_bounds": 20000,
+        "reject": 500,
+        "warn": 150
+      },
+      "POL": {
+        "out_of_bounds": 5000,
+        "reject": 500,
+        "warn": 150
+      },
+      "UZB": {
+        "out_of_bounds": 5000000,
+        "reject": 500,
+        "warn": 150
+      }
+    },
+    "use_address_picker_v2": true
+  },
+  "ads_dsa_applied_countries": [
+    "AUT",
+    "BGR",
+    "CYP",
+    "CZE",
+    "DEU",
+    "DNK",
+    "EST",
+    "FIN",
+    "GRC",
+    "HRV",
+    "HUN",
+    "ISL",
+    "LTU",
+    "LUX",
+    "LVA",
+    "MLT",
+    "NOR",
+    "POL",
+    "ROU",
+    "SVK",
+    "SVN",
+    "SWE"
+  ],
+  "attestation": {
+    "add_new_signals_to_device_info": true,
+    "android_attestation_interceptor_refactor": true,
+    "attestation_android_excluded_endpoints": "",
+    "attestation_android_return_from_background": true,
+    "attestation_on_demand_endpoints": [
+      {
+        "event_type": "POST /v1/strong_authentication/enrollment/device_key",
+        "http_method": "POST",
+        "path": "/v1/strong_authentication/enrollment/device_key"
+      }
+    ],
+    "cloud_project_number": 1074640641849,
+    "integrity_api_retry_delay_seconds": -1,
+    "integrity_standard_api_enabled": true,
+    "max_attempts": 3,
+    "play_integrity_rate_limit_per_hour": 50,
+    "should_verify_mdm_install": false,
+    "time_between_integrity_calls_seconds": 5,
+    "unified_gateway_enabled": true,
+    "use_base64_util_encoding_for_nonce": false
+  },
+  "auth": {
+    "recover_login": false
+  },
+  "checkout": {
+    "additional_checkout_options": {
+      "ALB": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "AUT": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "AZE": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "CYP": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "CZE": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "DEU": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "DNK": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "EST": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "FIN": [
+        {
+          "default": true,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "GEO": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "GRC": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "HRV": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "HUN": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "ISL": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "ISR": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "JPN": [
+        {
+          "default": true,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "KAZ": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "LTU": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "LUX": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "LVA": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "MLT": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "NOR": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "POL": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "SRB": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "SVK": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "SVN": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ],
+      "SWE": [
+        {
+          "default": false,
+          "delivery_methods": [
+            "homedelivery"
+          ],
+          "name": "no_contact_delivery",
+          "text": "השאירו ליד הדלת",
+          "title": "השאירו ליד הדלת"
+        }
+      ]
+    },
+    "no_contact_delivery_confirm": {
+      "FIN": {
+        "check_no_contact_toggle": true,
+        "text": "השליח יודיע לך באפליקציה כאשר הוא מסר את ההזמנה שלך. באפשרותך לשנות העדפה זו במסך התשלום.",
+        "title": "להשאיר את ההזמנה בדלת?"
+      },
+      "JPN": {
+        "check_no_contact_toggle": true,
+        "text": "השליח יודיע לך באפליקציה כאשר הוא מסר את ההזמנה שלך. באפשרותך לשנות העדפה זו במסך התשלום.",
+        "title": "להשאיר את ההזמנה בדלת?"
+      }
+    }
+  },
+  "double_order": {
+    "country_forbid_double_order_to_unverified_address": {
+      "ALB": [],
+      "ARE": [],
+      "AUT": [],
+      "AZE": [],
+      "BGR": [],
+      "CYP": [],
+      "CZE": [],
+      "DEU": [],
+      "DNK": [],
+      "EST": [],
+      "FIN": [],
+      "FRA": [],
+      "GBR": [],
+      "GEO": [],
+      "GRC": [],
+      "HRV": [],
+      "HUN": [],
+      "IRL": [],
+      "ISL": [],
+      "ISR": [],
+      "ITA": [],
+      "JPN": [
+        "tobacco"
+      ],
+      "KAZ": [],
+      "LTU": [],
+      "LUX": [],
+      "LVA": [],
+      "MKD": [],
+      "MLT": [],
+      "NLD": [],
+      "NOR": [],
+      "POL": [],
+      "ROU": [],
+      "SRB": [],
+      "SVK": [],
+      "SVN": [],
+      "SWE": [],
+      "UZB": [],
+      "XKX": []
+    }
+  },
+  "easter_egg": {
+    "easter_egg_length": 5,
+    "easter_egg_token_code": "egghuntunlocked_FIN",
+    "easter_egg_wolt_record": 65
+  },
+  "experiments": {},
+  "expires_in_seconds": 1800,
+  "feature_flags": {
+    "aqs-tracking": "on",
+    "att_backend_sync_ios": "on",
+    "auto_trigger_location_permission_dialog": "true",
+    "bgr-dual-currency": "on",
+    "cart-recommendations-grid": "on",
+    "compose-viewholder-reuse-composition-android": "on",
+    "consumer-search-in-venue-results-display-revamp": "control",
+    "consumer-search-web-items-in-search-phase-two": "experimental",
+    "consumer_search-global-items-in-search": "experimental",
+    "consumer_search-web-items-in-discovery": "control",
+    "default_ordertracking_mode": "3D",
+    "delivery_within_x_range": "on",
+    "dynamic_service_fee_on_venue_screen": "on",
+    "enable-in-store-dining": "on",
+    "enable-promo-code": "on",
+    "enable-promo-feedback": "on",
+    "enable-starbucks-star-program": "off",
+    "enable-starbucks-welcome-modal-v2": "on",
+    "enable-storefront-loyalty-program": "on",
+    "enable-unverified-phone-number-checkout-flow-for-storefront": "on",
+    "enable_avo_inspector": "false",
+    "enable_gift_card_shop_web": "on",
+    "enable_liveactivity": "true",
+    "enable_substitution_comment": "on",
+    "enable_telemetry_recursive_split_android": "on",
+    "enable_wolt_plus_campaign_visibility": "on",
+    "extract-payment-method-loading-from-venue": "on",
+    "gdpr-special-data-handling": "on",
+    "google-geo-proxy-geocode-address-ios": "on",
+    "google_consents_mode_v2_on_web": "on",
+    "hash-map-menu": "on",
+    "hyperbundle_delivery_estimate_android": "on",
+    "hyperbundle_delivery_estimate_ios": "on",
+    "ios-use-perlin-transition-a12": "on",
+    "item_discount": "true",
+    "iterable-jwt-enabled-api-key-ios": "on",
+    "list-everything-enabled": "off",
+    "mosaic-login": "off",
+    "multi-payments-in-ongoing-order": "true",
+    "new-app-navigation-user-education": "on",
+    "new-wolt-for-work-policy-location-validation": "on",
+    "page-view-telemetry-sending-frequency-update-ios": "on",
+    "postal_code_address_search_jpn": "treatment",
+    "project-code-ios": "on",
+    "saved-addresses-for-packages": "true",
+    "self_delivery_order_tracking": "true",
+    "show_cutlery": "on",
+    "show_cutlery_web": "on-bottom",
+    "show_promofield_in_checkout": "true",
+    "show_promotions_in_carousel": "on",
+    "show_strikethrough_prices": "test",
+    "show_venue_carousel_in_map": "true",
+    "skip-map-pin-adjusting-for-rooftop-addresses": "on",
+    "srb-pib-on-checkout": "false",
+    "storefront_raw_card_payments": "on",
+    "time-slotted-orders-tso": "on",
+    "tracking_consents_functionality_ios": "on",
+    "tso-from-delivery-config": "on",
+    "universal-link-fallback-ios": "on",
+    "use-backend-driven-promotions-during-checkout": "on",
+    "use-country-detection-with-geoip-ios": "on",
+    "use-postal-town-field-in-sweden-norway": "on",
+    "use-sentry-to-collect-crashes": "off",
+    "use-sublocality-for-address-parsing": "true",
+    "use-web-items-in-search-with-blender": "experimental",
+    "use_manual_facebook_auth": "off",
+    "use_new_order_history_endpoint": "true",
+    "venue-card-footer-fix-ios": "treatment",
+    "vertical-venue-grid-performance-fix-ios": "treatment",
+    "vertical-venue-grid-swipe-navigation-ios": "treatment",
+    "wolt-com-use-search-category-order-in-in-venue-search": "experimental",
+    "wolt-com-waf-client-integration": "control",
+    "woltcom-app-open-holdout": "sandbox",
+    "woltcom-app-open-v3-android-rerun": "treatment1",
+    "woltcom-auth-continue-with-email-text": "on",
+    "woltcom-fix-account-linking": "on",
+    "woltcom-google-two-tap-non-client-driven": "on",
+    "woltcom-phone-number-conflict": "on",
+    "woltwide-1-click-consents-for-sign-up-on-web": "on"
+  },
+  "gift_card_shop": {
+    "search_venue_ids": {
+      "ALB": "65ef44cb1dbbb4db3a1e50ab",
+      "AUT": "64d1e3937ed1a38c7df6cd06",
+      "AZE": "5dee2ceaa7f1b72013fd92cf",
+      "CYP": "60fe8968bbbbe98f28a86983",
+      "CZE": "5c051809e14d70000b528e1f",
+      "DEU": "5fda12d8d229107bf81f5157",
+      "DNK": "609cd72a95d2e0e883f7089e",
+      "EST": "5fc6023cc138a7d4dd0af6c7",
+      "FIN": "584ec11a24d4660d6806f550",
+      "GEO": "6193e2d86f657db8a3aa91b4",
+      "GRC": "5dfa1d0869fab300ad2f5a52",
+      "HRV": "603cf1c11514b843a19d37d5",
+      "HUN": "60b5d5a87f2270347b07144c",
+      "ISL": "67eba2780312f31fd339a493",
+      "ISR": "5c614ab8bec456000a3b2a4c",
+      "JPN": "5e634e6ba0dc8f36dbbb5703",
+      "KAZ": "5e5e16ec6624a91609e7d3cc",
+      "LTU": "5fb4ef8ef8b86d3e257385ac",
+      "LUX": "66c7265039582c28ac98a804",
+      "LVA": "5fb4e9d2867cf0dd0da0d70e",
+      "MKD": "68960244b4e6f93625d759c0",
+      "MLT": "5ea72b0758d3128964feebf4",
+      "NOR": "5bf566c47cf8e5000c68ec9e",
+      "POL": "5c5d49bd79d5df000a098d16",
+      "ROU": "68342d4b800c015ccf0b9501",
+      "SRB": "5cbf234b75bb23000ff5d5f2",
+      "SVK": "5f60e3ae36bae2290c1d637e",
+      "SVN": "5e7b3e14681db342604ba25b",
+      "SWE": "61a6264579897a3fe442c60a",
+      "UZB": "68960db4457f2e2bfb31f545",
+      "XKX": "67d2ed417f363ff1eb15520f"
+    }
+  },
+  "gifting": {
+    "allowed_restricted_item_types": {
+      "ALB": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "ARE": [],
+      "AUT": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "AZE": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "BGR": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "CYP": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "CZE": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "DEU": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "DNK": [],
+      "EST": [
+        "age_restricted",
+        "delivery_handshake"
+      ],
+      "FIN": [
+        "age_restricted",
+        "delivery_handshake"
+      ],
+      "FRA": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "GBR": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "GEO": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "GRC": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "HRV": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "HUN": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "IRL": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "ISL": [
+        "age_restricted",
+        "delivery_handshake"
+      ],
+      "ISR": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "ITA": [],
+      "JPN": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "KAZ": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "LTU": [
+        "age_restricted",
+        "delivery_handshake"
+      ],
+      "LUX": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "LVA": [
+        "age_restricted",
+        "delivery_handshake"
+      ],
+      "MKD": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "MLT": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "NLD": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "NOR": [],
+      "POL": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "ROU": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "SRB": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "SVK": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "SVN": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "SWE": [],
+      "UZB": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ],
+      "XKX": [
+        "age_restricted",
+        "alcohol",
+        "delivery_handshake"
+      ]
+    }
+  },
+  "group_order": {
+    "country_forbid_group_orders": {
+      "ALB": [],
+      "ARE": [],
+      "AUT": [],
+      "AZE": [],
+      "BGR": [],
+      "CYP": [],
+      "CZE": [],
+      "DEU": [],
+      "DNK": [],
+      "EST": [],
+      "FIN": [
+        "alcohol"
+      ],
+      "FRA": [],
+      "GBR": [],
+      "GEO": [],
+      "GRC": [],
+      "HRV": [],
+      "HUN": [],
+      "IRL": [],
+      "ISL": [],
+      "ISR": [],
+      "ITA": [],
+      "JPN": [
+        "tobacco"
+      ],
+      "KAZ": [],
+      "LTU": [],
+      "LUX": [],
+      "LVA": [],
+      "MKD": [],
+      "MLT": [],
+      "NLD": [],
+      "NOR": [],
+      "POL": [],
+      "ROU": [],
+      "SRB": [],
+      "SVK": [],
+      "SVN": [],
+      "SWE": [],
+      "UZB": [],
+      "XKX": []
+    },
+    "enabled": false,
+    "show_ftu_banner": false
+  },
+  "links": {
+    "sustainability": {
+      "notice_visible": false
+    }
+  },
+  "localization": {
+    "cookie_consent_required": {
+      "ALB": false,
+      "ARE": false,
+      "AUT": false,
+      "AZE": false,
+      "BGR": false,
+      "CYP": false,
+      "CZE": false,
+      "DEU": false,
+      "DNK": false,
+      "EST": false,
+      "FIN": false,
+      "FRA": false,
+      "GBR": false,
+      "GEO": false,
+      "GRC": false,
+      "HRV": false,
+      "HUN": false,
+      "IRL": false,
+      "ISL": false,
+      "ISR": false,
+      "ITA": false,
+      "JPN": false,
+      "KAZ": false,
+      "LTU": false,
+      "LUX": true,
+      "LVA": false,
+      "MKD": false,
+      "MLT": false,
+      "NLD": false,
+      "NOR": false,
+      "POL": false,
+      "ROU": false,
+      "SRB": true,
+      "SVK": false,
+      "SVN": false,
+      "SWE": false,
+      "UZB": false,
+      "XKX": true
+    },
+    "primary_languages": {
+      "ALB": "sq",
+      "ARE": "ar",
+      "AUT": "de",
+      "AZE": "az",
+      "BGR": "bg",
+      "CYP": "el",
+      "CZE": "cs",
+      "DEU": "de",
+      "DNK": "da",
+      "EST": "et",
+      "FIN": "fi",
+      "FRA": "fr",
+      "GBR": "en",
+      "GEO": "ka",
+      "GRC": "el",
+      "HRV": "hr",
+      "HUN": "hu",
+      "IRL": "en",
+      "ISL": "is",
+      "ISR": "he",
+      "ITA": "en",
+      "JPN": "ja",
+      "KAZ": "ru",
+      "LTU": "lt",
+      "LUX": "fr",
+      "LVA": "lv",
+      "MKD": "mk",
+      "MLT": "en",
+      "NLD": "en",
+      "NOR": "nb",
+      "POL": "pl",
+      "ROU": "ro",
+      "SRB": "sr",
+      "SVK": "sk",
+      "SVN": "sl",
+      "SWE": "sv",
+      "UZB": "uz",
+      "XKX": "sq"
+    },
+    "supported_countries": {
+      "ALB": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_ALB.png",
+        "name": "אלבניה"
+      },
+      "AUT": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_AUT.png",
+        "name": "אוסטריה"
+      },
+      "AZE": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_AZE.png",
+        "name": "אזרביג׳אן"
+      },
+      "BGR": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_BGR.png",
+        "name": "Bulgaria"
+      },
+      "CYP": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_CYP.png",
+        "name": "קפריסין"
+      },
+      "CZE": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_CZE.png",
+        "name": "צ'כיה"
+      },
+      "DEU": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_DEU.png",
+        "name": "גרמניה"
+      },
+      "DNK": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_DNK.png",
+        "name": "דנמרק"
+      },
+      "EST": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_EST.png",
+        "name": "אסטוניה"
+      },
+      "FIN": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_FIN.png",
+        "name": "פינלנד"
+      },
+      "GEO": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_GEO.png",
+        "name": "גאורגיה"
+      },
+      "GRC": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_GRC.png",
+        "name": "יוון"
+      },
+      "HRV": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_HRV.png",
+        "name": "קרואטיה"
+      },
+      "HUN": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_HUN.png",
+        "name": "הונגריה"
+      },
+      "ISL": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_ISL.png",
+        "name": "איסלנד"
+      },
+      "ISR": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_ISR.png",
+        "name": "ישראל"
+      },
+      "JPN": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_JPN.png",
+        "name": "יפן"
+      },
+      "KAZ": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_KAZ.png",
+        "name": "קזחסטן"
+      },
+      "LTU": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_LTU.png",
+        "name": "ליטא"
+      },
+      "LUX": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_LUX.png",
+        "name": "לוקסמבורג"
+      },
+      "LVA": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_LVA.png",
+        "name": "לטביה"
+      },
+      "MKD": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_MKD.png",
+        "name": "צפון מקדוניה"
+      },
+      "MLT": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_MLT.png",
+        "name": "מלטה"
+      },
+      "NOR": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_NOR.png",
+        "name": "נורבגיה"
+      },
+      "POL": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_POL.png",
+        "name": "פולין"
+      },
+      "ROU": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_ROU.png",
+        "name": "רומניה"
+      },
+      "SRB": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_SRB.png",
+        "name": "סרביה"
+      },
+      "SVK": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_SVK.png",
+        "name": "סלובקיה"
+      },
+      "SVN": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_SVN.png",
+        "name": "סלובניה"
+      },
+      "SWE": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_SWE.png",
+        "name": "שוודיה"
+      },
+      "UZB": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_UZB.png",
+        "name": "אוזבקיסטן"
+      },
+      "XKX": {
+        "flag_url": "https://consumer-static-assets.wolt.com/flags/flag_XKX.png",
+        "name": "קוסובו"
+      }
+    }
+  },
+  "menu": {
+    "alcohol_prompt": {
+      "ALB": {
+        "permille_limit": 12,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "always"
+      },
+      "ARE": {
+        "permille_limit": 12,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      },
+      "AUT": {
+        "permille_limit": 12,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      },
+      "AZE": {
+        "permille_limit": 5,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      },
+      "BGR": {
+        "permille_limit": 12,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      },
+      "CYP": {
+        "permille_limit": 5,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      },
+      "CZE": {
+        "permille_limit": 5,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      },
+      "DEU": {
+        "permille_limit": 12,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "always"
+      },
+      "DNK": {
+        "permille_limit": 12,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "always"
+      },
+      "EST": {
+        "permille_limit": 5,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "always"
+      },
+      "FIN": {
+        "permille_limit": 12,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "always"
+      },
+      "FRA": {
+        "permille_limit": 12,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      },
+      "GBR": {
+        "permille_limit": 12,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      },
+      "GEO": {
+        "permille_limit": 5,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      },
+      "GRC": {
+        "permille_limit": 5,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      },
+      "HRV": {
+        "permille_limit": 5,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "always"
+      },
+      "HUN": {
+        "permille_limit": 5,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      },
+      "IRL": {
+        "permille_limit": 5,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "always"
+      },
+      "ISL": {
+        "permille_limit": 12,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "always"
+      },
+      "ISR": {
+        "permille_limit": 5,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "always"
+      },
+      "ITA": {
+        "permille_limit": 12,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      },
+      "JPN": {
+        "permille_limit": 10,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "always"
+      },
+      "KAZ": {
+        "permille_limit": 5,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      },
+      "LTU": {
+        "permille_limit": 1,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "always"
+      },
+      "LUX": {
+        "permille_limit": 12,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      },
+      "LVA": {
+        "permille_limit": 1,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "always"
+      },
+      "MKD": {
+        "permille_limit": 12,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      },
+      "MLT": {
+        "permille_limit": 2,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      },
+      "NLD": {
+        "permille_limit": 12,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      },
+      "NOR": {
+        "permille_limit": 7,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "always"
+      },
+      "POL": {
+        "permille_limit": 5,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. צריך להוכיח את גילך החוקי עם קבלת המוצרים בהצגת תעודה מזהה תקפה עם תמונה. אם ההזמנה היא אינה הזמנת איסוף עצמי , בזאת מאושר לשליחים השותפים של Wolt לאסוף בשמך מוצרי משקאות אלכוהוליים בנקודת המכירה ולמסור אותם אליך. מכירת משקאות אלכוהוליים כפופה לתנאים וההגבלות של מוכר מוצרי האלכוהול, אותם ניתן למצוא בסעיף מידע נוסף של החנות באפליקציה.",
+        "show_prompt": "always"
+      },
+      "ROU": {
+        "permille_limit": 12,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      },
+      "SRB": {
+        "permille_limit": 12,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      },
+      "SVK": {
+        "permille_limit": 12,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      },
+      "SVN": {
+        "permille_limit": 5,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      },
+      "SWE": {
+        "permille_limit": 12,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      },
+      "UZB": {
+        "permille_limit": 12,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      },
+      "XKX": {
+        "permille_limit": 12,
+        "prompt_message": "כדי שנוכל להמשיך בהזמנה, נבקש ממך לאשר בלחיצה על הכפתור שעברת את גיל 18. יש להציג תעודה מזהה בקבלת המשלוח, כדי שהמשלוח ימסר במלואו",
+        "show_prompt": "once"
+      }
+    },
+    "endpoint_version": "v4",
+    "menu": "v4"
+  },
+  "payment_methods": {
+    "allowed_payment_methods": {
+      "ALB": [
+        "card",
+        "cash"
+      ],
+      "ARE": [
+        "card"
+      ],
+      "AUT": [
+        "card",
+        "klarna"
+      ],
+      "AZE": [
+        "card",
+        "cash"
+      ],
+      "BGR": [
+        "card",
+        "cash"
+      ],
+      "CYP": [
+        "card",
+        "cash"
+      ],
+      "CZE": [
+        "card",
+        "cash"
+      ],
+      "DEU": [
+        "card",
+        "paypal",
+        "klarna"
+      ],
+      "DNK": [
+        "card",
+        "mobilepay"
+      ],
+      "EST": [
+        "card",
+        "cash"
+      ],
+      "FIN": [
+        "card",
+        "edenred",
+        "mobilepay",
+        "klarna"
+      ],
+      "FRA": [
+        "card"
+      ],
+      "GBR": [
+        "card"
+      ],
+      "GEO": [
+        "card",
+        "cash"
+      ],
+      "GRC": [
+        "card",
+        "cash"
+      ],
+      "HRV": [
+        "card",
+        "cash"
+      ],
+      "HUN": [
+        "card",
+        "szep_kh",
+        "szep_otp",
+        "szep_mkb"
+      ],
+      "IRL": [
+        "card"
+      ],
+      "ISL": [
+        "card"
+      ],
+      "ISR": [
+        "card",
+        "cibus"
+      ],
+      "ITA": [
+        "card"
+      ],
+      "JPN": [
+        "card",
+        "paypay"
+      ],
+      "KAZ": [
+        "card",
+        "cash"
+      ],
+      "LTU": [
+        "card",
+        "cash"
+      ],
+      "LUX": [
+        "card"
+      ],
+      "LVA": [
+        "card"
+      ],
+      "MKD": [
+        "card"
+      ],
+      "MLT": [
+        "card",
+        "cash"
+      ],
+      "NLD": [
+        "card"
+      ],
+      "NOR": [
+        "card",
+        "vipps",
+        "klarna"
+      ],
+      "POL": [
+        "blik",
+        "card",
+        "cash"
+      ],
+      "ROU": [
+        "card",
+        "cash"
+      ],
+      "SRB": [
+        "card",
+        "cash"
+      ],
+      "SVK": [
+        "card",
+        "cash",
+        "updejeuner"
+      ],
+      "SVN": [
+        "card",
+        "cash"
+      ],
+      "SWE": [
+        "card",
+        "swish",
+        "klarna"
+      ],
+      "UZB": [
+        "card"
+      ],
+      "XKX": [
+        "card",
+        "cash"
+      ]
+    },
+    "applepay_enabled_countries": {
+      "ALB": false,
+      "AUT": true,
+      "AZE": true,
+      "BGR": false,
+      "CYP": true,
+      "CZE": true,
+      "DEU": true,
+      "DNK": true,
+      "EST": true,
+      "FIN": true,
+      "GEO": true,
+      "GRC": true,
+      "HRV": true,
+      "HUN": true,
+      "ISL": true,
+      "ISR": true,
+      "JPN": true,
+      "KAZ": true,
+      "LTU": true,
+      "LUX": true,
+      "LVA": true,
+      "MKD": false,
+      "MLT": true,
+      "NOR": true,
+      "POL": true,
+      "ROU": false,
+      "SRB": false,
+      "SVK": true,
+      "SVN": true,
+      "SWE": true,
+      "UZB": true,
+      "XKX": true
+    },
+    "business_info_enabled": {
+      "ALB": false,
+      "ARE": false,
+      "AUT": false,
+      "AZE": false,
+      "BGR": false,
+      "CYP": false,
+      "CZE": true,
+      "DEU": false,
+      "DNK": false,
+      "EST": false,
+      "FIN": false,
+      "FRA": false,
+      "GBR": false,
+      "GEO": true,
+      "GRC": false,
+      "HRV": true,
+      "HUN": true,
+      "IRL": false,
+      "ISL": false,
+      "ISR": false,
+      "ITA": false,
+      "JPN": false,
+      "KAZ": false,
+      "LTU": true,
+      "LUX": false,
+      "LVA": true,
+      "MKD": false,
+      "MLT": false,
+      "NLD": false,
+      "NOR": false,
+      "POL": true,
+      "ROU": false,
+      "SRB": true,
+      "SVK": false,
+      "SVN": false,
+      "SWE": false,
+      "UZB": false,
+      "XKX": false
+    },
+    "card_subtype_regexes": [
+      {
+        "pattern": "^534287.*",
+        "type": "edenred"
+      }
+    ],
+    "cash": {
+      "ALB": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 1000000
+      },
+      "AUT": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 7000
+      },
+      "AZE": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 10000
+      },
+      "BGR": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 6033
+      },
+      "CYP": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 10000
+      },
+      "CZE": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 150000
+      },
+      "DEU": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 11000
+      },
+      "EST": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 5000
+      },
+      "FIN": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 100000
+      },
+      "GEO": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 15000
+      },
+      "GRC": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 35000
+      },
+      "HRV": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 5999
+      },
+      "HUN": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 3500000
+      },
+      "ISL": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 15000
+      },
+      "JPN": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 11000
+      },
+      "KAZ": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 1500000
+      },
+      "LTU": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 5000
+      },
+      "MKD": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 310000
+      },
+      "MLT": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 20000
+      },
+      "POL": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 30000
+      },
+      "ROU": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 20000
+      },
+      "SRB": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 1000000
+      },
+      "SVK": {
+        "cash_rounding_enabled": true,
+        "max_cash_amount": 10000
+      },
+      "SVN": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 10000
+      },
+      "UZB": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 41315700
+      },
+      "XKX": {
+        "cash_rounding_enabled": false,
+        "max_cash_amount": 10000
+      }
+    },
+    "cibus_enabled_countries": [
+      "ISR"
+    ],
+    "enabled_cards": [
+      "visa",
+      "master-card",
+      "amex",
+      "diners",
+      "discover"
+    ],
+    "googlepay_enabled": true,
+    "googlepay_enabled_countries": {
+      "ALB": true,
+      "AUT": true,
+      "AZE": true,
+      "BGR": true,
+      "CYP": true,
+      "CZE": true,
+      "DEU": true,
+      "DNK": true,
+      "EST": true,
+      "FIN": true,
+      "GEO": true,
+      "GRC": true,
+      "HRV": true,
+      "HUN": true,
+      "ISL": true,
+      "ISR": true,
+      "JPN": true,
+      "KAZ": true,
+      "LTU": true,
+      "LUX": true,
+      "LVA": true,
+      "MKD": true,
+      "MLT": true,
+      "NOR": true,
+      "POL": true,
+      "ROU": true,
+      "SRB": false,
+      "SVK": true,
+      "SVN": true,
+      "SWE": true,
+      "UZB": true,
+      "XKX": true
+    },
+    "lunch_benefits": [
+      {
+        "budget": {
+          "max_amount": 1400,
+          "min_amount": 880
+        },
+        "country_code": "FIN",
+        "currency": "EUR",
+        "is_courier_tipping_allowed": false,
+        "provider": "edenred_card",
+        "show_marketing_banner": false
+      },
+      {
+        "country_code": "FIN",
+        "currency": "EUR",
+        "is_courier_tipping_allowed": false,
+        "provider": "epassi",
+        "show_marketing_banner": false
+      },
+      {
+        "country_code": "FIN",
+        "currency": "EUR",
+        "is_courier_tipping_allowed": false,
+        "provider": "smartum",
+        "show_marketing_banner": false
+      },
+      {
+        "country_code": "SVK",
+        "currency": "EUR",
+        "is_courier_tipping_allowed": true,
+        "provider": "updejeuner",
+        "show_marketing_banner": false
+      }
+    ],
+    "mobilepay_enabled": true,
+    "one_time_token_url": "https://restaurant-api.wolt.com/v1/payments/one-time-token",
+    "payment_service_providers": {
+      "ALB": [
+        "cash"
+      ],
+      "ARE": [],
+      "AUT": [],
+      "AZE": [
+        "cash"
+      ],
+      "BGR": [
+        "cash"
+      ],
+      "CYP": [
+        "cash"
+      ],
+      "CZE": [
+        "cash"
+      ],
+      "DEU": [],
+      "DNK": [],
+      "EST": [
+        "cash"
+      ],
+      "FIN": [],
+      "FRA": [],
+      "GBR": [],
+      "GEO": [
+        "cash"
+      ],
+      "GRC": [
+        "cash"
+      ],
+      "HRV": [
+        "cash"
+      ],
+      "HUN": [],
+      "IRL": [],
+      "ISL": [],
+      "ISR": [],
+      "ITA": [],
+      "JPN": [],
+      "KAZ": [
+        "cash"
+      ],
+      "LTU": [
+        "cash"
+      ],
+      "LUX": [],
+      "LVA": [],
+      "MKD": [],
+      "MLT": [
+        "cash"
+      ],
+      "NLD": [],
+      "NOR": [],
+      "POL": [
+        "cash"
+      ],
+      "ROU": [
+        "cash"
+      ],
+      "SRB": [
+        "cash"
+      ],
+      "SVK": [
+        "cash"
+      ],
+      "SVN": [
+        "cash"
+      ],
+      "SWE": [],
+      "UZB": [],
+      "XKX": [
+        "cash"
+      ]
+    },
+    "post_order_tipping": {
+      "inflight_enabled": false,
+      "tipping_enabled": false
+    },
+    "ravelin_enabled": true,
+    "riskified_enabled_countries": {
+      "ALB": true,
+      "AUT": true,
+      "AZE": true,
+      "BGR": true,
+      "CYP": true,
+      "CZE": true,
+      "DEU": true,
+      "DNK": true,
+      "EST": true,
+      "FIN": true,
+      "GEO": true,
+      "GRC": true,
+      "HRV": true,
+      "HUN": true,
+      "ISL": true,
+      "ISR": true,
+      "JPN": true,
+      "KAZ": true,
+      "LTU": true,
+      "LUX": true,
+      "LVA": true,
+      "MKD": true,
+      "MLT": true,
+      "NOR": true,
+      "POL": true,
+      "ROU": true,
+      "SRB": true,
+      "SVK": true,
+      "SVN": true,
+      "SWE": true,
+      "UZB": true,
+      "XKX": true
+    },
+    "subscription_allowed_payment_methods": {
+      "ALB": [
+        "card"
+      ],
+      "ARE": [
+        "card"
+      ],
+      "AUT": [
+        "card"
+      ],
+      "AZE": [
+        "card"
+      ],
+      "BGR": [
+        "card"
+      ],
+      "CYP": [
+        "card"
+      ],
+      "CZE": [
+        "card"
+      ],
+      "DEU": [
+        "card",
+        "paypal"
+      ],
+      "DNK": [
+        "card"
+      ],
+      "EST": [
+        "card"
+      ],
+      "FIN": [
+        "card"
+      ],
+      "FRA": [
+        "card"
+      ],
+      "GBR": [
+        "card"
+      ],
+      "GEO": [
+        "card"
+      ],
+      "GRC": [
+        "card"
+      ],
+      "HRV": [
+        "card"
+      ],
+      "HUN": [
+        "card"
+      ],
+      "IRL": [
+        "card"
+      ],
+      "ISL": [
+        "card"
+      ],
+      "ISR": [
+        "card"
+      ],
+      "ITA": [
+        "card"
+      ],
+      "JPN": [
+        "card"
+      ],
+      "KAZ": [
+        "card"
+      ],
+      "LTU": [
+        "card"
+      ],
+      "LUX": [
+        "card"
+      ],
+      "LVA": [
+        "card"
+      ],
+      "MKD": [
+        "card"
+      ],
+      "MLT": [
+        "card"
+      ],
+      "NLD": [
+        "card"
+      ],
+      "NOR": [
+        "card"
+      ],
+      "POL": [
+        "card"
+      ],
+      "ROU": [
+        "card"
+      ],
+      "SRB": [
+        "card"
+      ],
+      "SVK": [
+        "card"
+      ],
+      "SVN": [
+        "card"
+      ],
+      "SWE": [
+        "card"
+      ],
+      "UZB": [
+        "card"
+      ],
+      "XKX": [
+        "card"
+      ]
+    },
+    "subscription_applepay_callback_flow_enabled_countries": {
+      "ALB": true,
+      "AUT": true,
+      "AZE": true,
+      "BGR": true,
+      "CYP": true,
+      "CZE": true,
+      "DEU": true,
+      "DNK": true,
+      "EST": true,
+      "FIN": true,
+      "GEO": true,
+      "GRC": true,
+      "HRV": true,
+      "HUN": true,
+      "ISL": true,
+      "ISR": true,
+      "JPN": true,
+      "KAZ": true,
+      "LTU": true,
+      "LUX": true,
+      "LVA": true,
+      "MKD": true,
+      "MLT": true,
+      "NOR": true,
+      "POL": true,
+      "ROU": true,
+      "SRB": true,
+      "SVK": true,
+      "SVN": true,
+      "SWE": true,
+      "UZB": true,
+      "XKX": true
+    },
+    "subscription_googlepay_callback_flow_enabled_countries": {
+      "ALB": true,
+      "AUT": true,
+      "AZE": true,
+      "BGR": true,
+      "CYP": true,
+      "CZE": true,
+      "DEU": true,
+      "DNK": true,
+      "EST": true,
+      "FIN": true,
+      "GEO": true,
+      "GRC": true,
+      "HRV": true,
+      "HUN": true,
+      "ISL": true,
+      "ISR": true,
+      "JPN": true,
+      "KAZ": true,
+      "LTU": true,
+      "LUX": true,
+      "LVA": true,
+      "MKD": true,
+      "MLT": true,
+      "NOR": true,
+      "POL": true,
+      "ROU": true,
+      "SRB": true,
+      "SVK": true,
+      "SVN": true,
+      "SWE": true,
+      "UZB": true,
+      "XKX": true
+    },
+    "tipping": {
+      "ALB": {
+        "currency": "ALL",
+        "max_adjustments": 2,
+        "max_amount": 100000,
+        "max_amount_factor": 2,
+        "min_amount": 1000,
+        "tip_amounts": [
+          5000,
+          10000,
+          20000
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "ARE": {
+        "currency": "AED",
+        "max_adjustments": 0,
+        "max_amount": 10000,
+        "max_amount_factor": 1,
+        "min_amount": 500,
+        "tip_amounts": [
+          500,
+          1000,
+          2000
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "AUT": {
+        "currency": "EUR",
+        "max_adjustments": 0,
+        "max_amount": 10000,
+        "max_amount_factor": 1,
+        "min_amount": 50,
+        "tip_amounts": [
+          100,
+          200,
+          500
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "AZE": {
+        "currency": "AZN",
+        "max_adjustments": 0,
+        "max_amount": 2000,
+        "max_amount_factor": 1,
+        "min_amount": 100,
+        "tip_amounts": [
+          100,
+          200,
+          300
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "BGR": {
+        "currency": "BGN",
+        "max_adjustments": 2,
+        "max_amount": 3000,
+        "max_amount_factor": 2,
+        "min_amount": 100,
+        "tip_amounts": [
+          150,
+          300,
+          1000
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "CYP": {
+        "currency": "EUR",
+        "max_adjustments": 0,
+        "max_amount": 1000,
+        "max_amount_factor": 1,
+        "min_amount": 50,
+        "tip_amounts": [
+          100,
+          150,
+          250
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "CZE": {
+        "currency": "CZK",
+        "max_adjustments": 0,
+        "max_amount": 50000,
+        "max_amount_factor": 1,
+        "min_amount": 100,
+        "tip_amounts": [
+          1500,
+          3000,
+          4000
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "DEU": {
+        "currency": "EUR",
+        "max_adjustments": 2,
+        "max_amount": 10000,
+        "max_amount_factor": 2,
+        "min_amount": 50,
+        "tip_amounts": [
+          100,
+          200,
+          500
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "DNK": {
+        "currency": "DKK",
+        "max_adjustments": 0,
+        "max_amount": 25000,
+        "max_amount_factor": 1,
+        "min_amount": 500,
+        "tip_amounts": [
+          1000,
+          2000,
+          4000
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "EST": {
+        "currency": "EUR",
+        "max_adjustments": 0,
+        "max_amount": 2500,
+        "max_amount_factor": 1,
+        "min_amount": 10,
+        "tip_amounts": [
+          100,
+          200,
+          400
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "FIN": {
+        "currency": "EUR",
+        "max_adjustments": 0,
+        "max_amount": 2000,
+        "max_amount_factor": 1,
+        "min_amount": 50,
+        "tip_amounts": [
+          100,
+          200,
+          500
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "FRA": {
+        "currency": "EUR",
+        "max_adjustments": 0,
+        "max_amount": 10000,
+        "max_amount_factor": 1,
+        "min_amount": 50,
+        "tip_amounts": [
+          100,
+          200,
+          500
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "GEO": {
+        "currency": "GEL",
+        "max_adjustments": 0,
+        "max_amount": 2000,
+        "max_amount_factor": 1,
+        "min_amount": 100,
+        "tip_amounts": [
+          100,
+          300,
+          500
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "GRC": {
+        "currency": "EUR",
+        "max_adjustments": 0,
+        "max_amount": 2000,
+        "max_amount_factor": 1,
+        "min_amount": 20,
+        "tip_amounts": [
+          75,
+          100,
+          200
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "HRV": {
+        "currency": "EUR",
+        "max_adjustments": 0,
+        "max_amount": 2500,
+        "max_amount_factor": 1,
+        "min_amount": 10,
+        "tip_amounts": [
+          50,
+          100,
+          200
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "HUN": {
+        "currency": "HUF",
+        "max_adjustments": 0,
+        "max_amount": 300000,
+        "max_amount_factor": 1,
+        "min_amount": 10000,
+        "tip_amounts": [
+          25000,
+          40000,
+          60000
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "IRL": {
+        "currency": "EUR",
+        "max_adjustments": 0,
+        "max_amount": 2500,
+        "max_amount_factor": 1,
+        "min_amount": 10,
+        "tip_amounts": [
+          100,
+          200,
+          400
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "ISL": {
+        "currency": "ISK",
+        "max_adjustments": 0,
+        "max_amount": 1000,
+        "max_amount_factor": 1,
+        "min_amount": 100,
+        "tip_amounts": [
+          150,
+          300,
+          600
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "ISR": {
+        "currency": "ILS",
+        "max_adjustments": 0,
+        "max_amount": 10000,
+        "max_amount_factor": 1,
+        "min_amount": 500,
+        "tip_amounts": [
+          500,
+          1000,
+          1500
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "ITA": {
+        "currency": "EUR",
+        "max_adjustments": 0,
+        "max_amount": 10000,
+        "max_amount_factor": 1,
+        "min_amount": 50,
+        "tip_amounts": [
+          100,
+          200,
+          500
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "JPN": {
+        "currency": "JPY",
+        "max_adjustments": 0,
+        "max_amount": 2000,
+        "max_amount_factor": 1,
+        "min_amount": 10,
+        "tip_amounts": [
+          50,
+          100,
+          200
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "KAZ": {
+        "currency": "KZT",
+        "max_adjustments": 0,
+        "max_amount": 500000,
+        "max_amount_factor": 1,
+        "min_amount": 25000,
+        "tip_amounts": [
+          25000,
+          50000,
+          75000
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "LTU": {
+        "currency": "EUR",
+        "max_adjustments": 0,
+        "max_amount": 2500,
+        "max_amount_factor": 1,
+        "min_amount": 10,
+        "tip_amounts": [
+          100,
+          200,
+          500
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "LUX": {
+        "currency": "EUR",
+        "max_adjustments": 2,
+        "max_amount": 5000,
+        "max_amount_factor": 2,
+        "min_amount": 50,
+        "tip_amounts": [
+          100,
+          200,
+          500
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "LVA": {
+        "currency": "EUR",
+        "max_adjustments": 0,
+        "max_amount": 2500,
+        "max_amount_factor": 1,
+        "min_amount": 10,
+        "tip_amounts": [
+          100,
+          200,
+          400
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "MKD": {
+        "currency": "MKD",
+        "max_adjustments": 2,
+        "max_amount": 100000,
+        "max_amount_factor": 2,
+        "min_amount": 2000,
+        "tip_amounts": [
+          5000,
+          10000,
+          30000
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "MLT": {
+        "currency": "EUR",
+        "max_adjustments": 0,
+        "max_amount": 1000,
+        "max_amount_factor": 1,
+        "min_amount": 50,
+        "tip_amounts": [
+          100,
+          200,
+          300
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "NOR": {
+        "currency": "NOK",
+        "max_adjustments": 0,
+        "max_amount": 15000,
+        "max_amount_factor": 1,
+        "min_amount": 1000,
+        "tip_amounts": [
+          1000,
+          2000,
+          3000
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "POL": {
+        "currency": "PLN",
+        "max_adjustments": 0,
+        "max_amount": 5000,
+        "max_amount_factor": 1,
+        "min_amount": 50,
+        "tip_amounts": [
+          200,
+          500,
+          800
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "ROU": {
+        "currency": "ROU",
+        "max_adjustments": 2,
+        "max_amount": 8000,
+        "max_amount_factor": 2,
+        "min_amount": 200,
+        "tip_amounts": [
+          400,
+          800,
+          2500
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "SRB": {
+        "currency": "RSD",
+        "max_adjustments": 0,
+        "max_amount": 100000,
+        "max_amount_factor": 1,
+        "min_amount": 1000,
+        "tip_amounts": [
+          5000,
+          10000,
+          20000
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "SVK": {
+        "currency": "EUR",
+        "max_adjustments": 0,
+        "max_amount": 2000,
+        "max_amount_factor": 1,
+        "min_amount": 10,
+        "tip_amounts": [
+          50,
+          100,
+          200
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "SVN": {
+        "currency": "EUR",
+        "max_adjustments": 0,
+        "max_amount": 1500,
+        "max_amount_factor": 1,
+        "min_amount": 50,
+        "tip_amounts": [
+          50,
+          100,
+          200
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "SWE": {
+        "currency": "SEK",
+        "max_adjustments": 0,
+        "max_amount": 20000,
+        "max_amount_factor": 1,
+        "min_amount": 100,
+        "tip_amounts": [
+          1000,
+          2000,
+          3000
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "UZB": {
+        "currency": "UZS",
+        "max_adjustments": 2,
+        "max_amount": 10000000,
+        "max_amount_factor": 2,
+        "min_amount": 150000,
+        "tip_amounts": [
+          300000,
+          1000000,
+          2000000
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      },
+      "XKX": {
+        "currency": "EUR",
+        "max_adjustments": 0,
+        "max_amount": 2500,
+        "max_amount_factor": 1,
+        "min_amount": 10,
+        "tip_amounts": [
+          100,
+          200,
+          400
+        ],
+        "tip_amounts_percentage": [
+          5,
+          10,
+          15
+        ],
+        "type": "pre_tipping_amount"
+      }
+    },
+    "vgs_enabled": true,
+    "waw_credits_toggle_enabled_countries": [
+      "ISR",
+      "LTU",
+      "EST",
+      "LVA",
+      "SWE",
+      "DNK"
+    ]
+  },
+  "restriction_consent_popup": {
+    "JPN": {
+      "tobacco": {
+        "body": "כדי לרכוש סיגריות, תידרש/י לאמת את זהותך בהתאם  להנחיה ממשרד האוצר.",
+        "cancel_label": "לא",
+        "confirm_label": "כן",
+        "priority": 1,
+        "title": "האם את/ה בן/בת 20 ומעלה?"
+      }
+    }
+  },
+  "search": {
+    "search_tags": [
+      "sushi",
+      "thai",
+      "pizza",
+      "tortilla",
+      "burger",
+      "indian",
+      "chinese",
+      "wings",
+      "mexican",
+      "vegetarian",
+      "salad",
+      "nepalese",
+      "smoothie",
+      "steak",
+      "kebab",
+      "italian",
+      "coffee",
+      "taco",
+      "sandwich",
+      "falafel",
+      "kosher"
+    ]
+  },
+  "terms": {
+    "url": "https://explore.wolt.com/terms"
+  },
+  "venue": {
+    "gift_card_shops": []
+  }
+}

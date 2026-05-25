@@ -69,6 +69,56 @@ class ExternalProductObservation(BaseModel):
         None, description="Path to the raw file this record was extracted from."
     )
 
+    # Online catalog context
+    source_type: Optional[str] = Field(
+        None,
+        description=(
+            "How / from where this observation was obtained. "
+            "Known values: 'price_file' (FTP XML price-transparency), "
+            "'mcp_price_lookup' (MCP adapter batch query), "
+            "'delivery_catalog' (Wolt/TenBis/Cibus), "
+            "'web_scrape', 'manual'."
+        ),
+    )
+    branch_confidence: Literal["high", "medium", "low", "unknown"] = Field(
+        "unknown",
+        description=(
+            "Confidence that the price is branch-level (not just chain-level). "
+            "'high'   = store_id + store_name + city all present; "
+            "'medium' = store_id or store_name present; "
+            "'low'    = chain name only; "
+            "'unknown'= not assessed."
+        ),
+    )
+    rank_in_category: Optional[int] = Field(
+        None,
+        ge=1,
+        description="1-based display rank within the delivery catalog category, when visible.",
+    )
+    most_ordered: Optional[bool] = Field(
+        None,
+        description="True only when the source explicitly marks the item in a Most ordered collection.",
+    )
+    source_product_url: Optional[str] = Field(
+        None,
+        description="Product or category URL where the observation was collected.",
+    )
+
+    # Source classification flags (set by each collector)
+    appears_in_price_file: bool = Field(
+        True,
+        description="True when this observation came from an official price-transparency file.",
+    )
+    is_online_available: Optional[bool] = Field(
+        None,
+        description="True = definitely orderable online; False = not available online; "
+                    "None = unknown (price-transparency files carry no availability signal).",
+    )
+    is_in_catalog: bool = Field(
+        True,
+        description="True when the product appears in the retailer's active catalogue.",
+    )
+
     @field_validator("barcode", "sku", "product_name", "brand", "category",
                      "subcategory", "unit", "store_name", "store_id",
                      "store_chain", "city", mode="before")

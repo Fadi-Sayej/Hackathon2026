@@ -1,0 +1,14 @@
+{
+  "source_id": "delivery_catalog",
+  "observed_at": "2026-05-25T12:00:26.468257+00:00",
+  "generated_at": "2026-05-25T12:00:27.659892+00:00",
+  "metrics": {
+    "row_count": 0,
+    "missing_barcode_pct": 0.0,
+    "missing_price_pct": 0.0,
+    "missing_category_pct": 0.0,
+    "duplicate_count": 0,
+    "unique_products": 0,
+    "unique_stores": 0
+  }
+}

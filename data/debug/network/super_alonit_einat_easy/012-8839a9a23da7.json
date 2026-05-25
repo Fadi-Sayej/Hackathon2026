@@ -1,0 +1,22 @@
+{
+  "estimated_dynamic_fees": {
+    "text": "דמי תפעול ודמי משלוח משוערים",
+    "amount": {
+      "amount": 2900,
+      "formatted_amount": "‏29.00 ‏₪",
+      "reason": null
+    }
+  },
+  "delivery_fee": {
+    "fee_title": "סה\"כ דמי משלוח",
+    "description": "דמי המשלוח מחושבים בין היתר על בסיס המרחק בינך לבין בית העסק ממנו הזמנת.",
+    "amount": {
+      "amount": 2800,
+      "formatted_amount": "‏28.00 ‏₪",
+      "reason": null
+    },
+    "original_amount": null,
+    "icon": null
+  },
+  "promotions": []
+}

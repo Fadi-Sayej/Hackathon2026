@@ -1,0 +1,27 @@
+{
+  "url": "https://url.retail.publishedprices.co.il/file/d/Stores7290492000005-000-20260525-020001.xml",
+  "method": "GET",
+  "status_code": 200,
+  "content_type": "text/xml",
+  "observed_at": "2026-05-25T12:24:54.753085+00:00",
+  "file_path": "C:\\Users\\mshar\\Desktop\\hackathonsj\\data\\external\\raw\\alonit\\2026\\05\\25\\alonit_20260525T122454.xml",
+  "sha256": "8f05a44addfbce136d768c6ad4c24ab3ee06eb9185a98f0a0184e7f51da21f63",
+  "headers": {
+    "server": "CerberusFTPServer/12.0",
+    "x-content-type-options": "nosniff",
+    "x-xss-protection": "1; mode=block",
+    "content-security-policy": "default-src 'self' 'unsafe-inline' 'unsafe-eval'; frame-ancestors 'self'; frame-src 'self' https://www.google.com/recaptcha/ *.duosecurity.com *.duofederal.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; img-src 'self' data: blob:; media-src 'self' blob:",
+    "referrer-policy": "same-origin",
+    "content-type": "text/xml",
+    "cache-control": "no-store, no-cache, must-revalidate",
+    "pragma": "no-cache",
+    "expires": "0",
+    "accept-ranges": "bytes",
+    "last-modified": "Sun, 24 May 2026 22:59:37 GMT",
+    "content-disposition": "filename=\"Stores7290492000005-000-20260525-020001.xml\";filename*=UTF-8''Stores7290492000005-000-20260525-020001.xml;creation-date=\"Sun, 24 May 2026 22:59:37 GMT\";modification-date=\"Sun, 24 May 2026 22:59:37 GMT\";size=63990",
+    "etag": "\"2CF9E10883052BA0E39EAE8C6B8B460D707DAF3F\"",
+    "set-cookie": "cftpSID=WkWIwzohgmH1x2xQQIDRZnNy_V0T-27SDR50ZIOxLKE; Path=/; Secure; HttpOnly; SameSite=Lax;",
+    "date": "Mon, 25 May 2026 12:24:26 GMT",
+    "content-length": "63990"
+  }
+}
