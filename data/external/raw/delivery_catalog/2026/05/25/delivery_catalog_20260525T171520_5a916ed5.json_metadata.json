@@ -1,0 +1,12 @@
+{
+  "url": "https://wolt.com/en/isr/petah-tikva/venue/rami-levy-in-the-neighborhood-rosh-haayin#query-state",
+  "method": "GET",
+  "status_code": 200,
+  "content_type": "application/json; charset=utf-8",
+  "observed_at": "2026-05-25T17:15:20.705816+00:00",
+  "file_path": "/Users/fadisayej/Desktop/Hackathon26/Hackathon2026/data/external/raw/delivery_catalog/2026/05/25/delivery_catalog_20260525T171520_5a916ed5.json",
+  "sha256": "5a916ed5006909cf9f5065e72e185eb428ca074b53fa22b308ab772bdd15ba75",
+  "headers": {
+    "content-type": "application/json; charset=utf-8"
+  }
+}

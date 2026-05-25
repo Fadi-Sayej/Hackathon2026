@@ -1,0 +1,26 @@
+[
+  {
+    "provider": "tenbis",
+    "source_url": "https://www.10bis.co.il/next/en/restaurants/menu/delivery/36296/shufersal-sheli",
+    "store_name": "shufersal Sheli",
+    "store_id": "36296",
+    "store_chain": "shufersal Sheli",
+    "city": "ראש העין",
+    "address": "ברקן, 1 ראש העין",
+    "phone": "0",
+    "latitude": 32.0935174,
+    "longitude": 34.9736568,
+    "currency": "ILS",
+    "raw": {
+      "restaurant_id": "36296",
+      "store_name_he": "שופרסל שלי",
+      "delivery_fee": null,
+      "min_order": null,
+      "is_open_now": true,
+      "collection_status": "metadata_only",
+      "collection_notes": [
+        "TENBIS_BEARER_TOKEN not set — skipping menu fetch. Store metadata captured; no item-level observations."
+      ]
+    }
+  }
+]

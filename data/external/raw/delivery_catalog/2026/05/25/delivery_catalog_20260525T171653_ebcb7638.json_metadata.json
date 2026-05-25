@@ -1,0 +1,12 @@
+{
+  "url": "https://wolt.com/en/isr/petah-tikva/venue/victory-rosh-haayin-park-afek/items/menucategory-18#query-state",
+  "method": "GET",
+  "status_code": 200,
+  "content_type": "application/json; charset=utf-8",
+  "observed_at": "2026-05-25T17:16:53.372904+00:00",
+  "file_path": "/Users/fadisayej/Desktop/Hackathon26/Hackathon2026/data/external/raw/delivery_catalog/2026/05/25/delivery_catalog_20260525T171653_ebcb7638.json",
+  "sha256": "ebcb7638a2b205be66de271fa113d6bc61aea6498e011e4ec9990d245afcd6df",
+  "headers": {
+    "content-type": "application/json; charset=utf-8"
+  }
+}

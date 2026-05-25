@@ -1,0 +1,12 @@
+{
+  "url": "https://wolt.com/en/isr/petah-tikva/venue/yom-yom/items/menucategory-4#query-state",
+  "method": "GET",
+  "status_code": 200,
+  "content_type": "application/json; charset=utf-8",
+  "observed_at": "2026-05-25T14:47:10.534871+00:00",
+  "file_path": "/Users/fadisayej/Desktop/Hackathon26/Hackathon2026/data/external/raw/delivery_catalog/2026/05/25/delivery_catalog_20260525T144710_a30680a7.json",
+  "sha256": "a30680a73d0394008a003908e8819ff6d3c2d700e6b02d36b9e23087ae517b2a",
+  "headers": {
+    "content-type": "application/json; charset=utf-8"
+  }
+}
