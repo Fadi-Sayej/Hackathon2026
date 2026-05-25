@@ -12,6 +12,10 @@
 - الخطة الأصلية: [SmartShelf_AI_Hackathon_Plan.md](/C:/Users/mshar/Desktop/hackathonsj/SmartShelf_AI_Hackathon_Plan.md)
 - خطة السبرنتات: [SPRINTS.md](/C:/Users/mshar/Desktop/hackathonsj/SPRINTS.md)
 
+### Source Semantics
+
+- [Alonit / Super Alonit signal source](docs/sources/alonit_signal_source.md) — what the Dor Alon price-transparency and Wolt delivery catalog sources provide, what they cannot prove, confirmed store IDs, and recommended field semantics
+
 ## Current Stack
 
 - React

@@ -7,6 +7,20 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Generated data artifacts
+data/external/raw/
+data/external/bronze/
+data/external/silver/
+data/internal/raw_pos/
+data/internal/silver_pos/
+data/matching/
+data/signals/
+data/recommendations/
+data/debug/
+reports/quality/
+*.parquet
+*.duckdb
+
 node_modules
 dist
 dist-ssr
