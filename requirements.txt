@@ -1,0 +1,14 @@
+# YomYom market-intelligence — Python backend dependencies
+# Install with: pip install -r requirements.txt
+
+# Data serialisation
+pyarrow>=14.0
+polars>=0.20
+
+# Schema validation
+pydantic>=2.0
+
+# Logging
+loguru>=0.7
+
+# (Future collectors will add: httpx, selectolax, lxml, etc.)

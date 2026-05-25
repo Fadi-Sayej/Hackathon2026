@@ -1,0 +1,37 @@
+{
+  "source": "smoke_test",
+  "products": [
+    {
+      "barcode": "7290000000001",
+      "product_name": "Tnuva Full-Fat Milk 3% 1L",
+      "category": "dairy",
+      "price": 6.9,
+      "store_id": "wolt_kafr_qasim_001",
+      "store_name": "YomYom"
+    },
+    {
+      "barcode": "7290000000002",
+      "product_name": "Elite Instant Coffee 200g",
+      "category": "beverages",
+      "price": 24.5,
+      "store_id": "wolt_kafr_qasim_001",
+      "store_name": "YomYom"
+    },
+    {
+      "barcode": null,
+      "product_name": "Mystery Snack",
+      "category": "snacks",
+      "price": null,
+      "store_id": "wolt_kafr_qasim_001",
+      "store_name": "YomYom"
+    },
+    {
+      "barcode": "7290000000001",
+      "product_name": "Tnuva Full-Fat Milk 3% 1L",
+      "category": "dairy",
+      "price": 6.9,
+      "store_id": "wolt_kafr_qasim_001",
+      "store_name": "YomYom"
+    }
+  ]
+}
