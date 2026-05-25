@@ -8,6 +8,9 @@ polars>=0.20
 # Schema validation
 pydantic>=2.0
 
+# Config / serialisation
+pyyaml>=6.0
+
 # Logging
 loguru>=0.7
 

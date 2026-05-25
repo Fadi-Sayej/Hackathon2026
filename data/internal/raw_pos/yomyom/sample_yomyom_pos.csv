@@ -1,0 +1,122 @@
+﻿barcode,product_name,category,brand,supplier,selling_price,cost_price,current_stock,units_sold_7d,units_sold_30d,sales_amount_30d,gross_profit_30d,margin_pct,last_sale_date,last_purchase_date
+7290001040012,Corn Chips Chili 100g,snacks,Osem,Osem Nestlé,8.90,5.00,37,13,59,525.10,230.10,43.82,2025-05-21,2025-05-02
+7290001060009,Strauss Milky Pudding Chocolate 170g,dairy,Strauss,Strauss-Elite,5.90,3.80,37,5,18,106.20,37.80,35.59,2025-05-22,2025-05-13
+7290001050009,Mars Bar 51g,chocolate,Mars,Diplomat Distribution,9.90,5.90,42,3,18,178.20,72.00,40.40,2025-05-23,2025-04-17
+7290001060010,Yotvata Chocolate Milk 500ml,dairy,Yotvata,Tnuva,8.90,5.60,30,25,91,809.90,300.30,37.08,2025-05-23,2025-05-12
+7290001090009,Paz Sunflower Oil 1L,household,Paz,Paz Oils,14.90,11.20,33,15,56,834.40,207.20,24.83,2025-05-20,2025-05-09
+7290001030001,Neviot Mineral Water 0.5L,water,Neviot,Tempo Beverages,3.90,2.00,16,49,174,678.60,330.60,48.72,2025-05-24,2025-05-21
+7290001050010,Elite Milk Chocolate 100g,chocolate,Elite,Strauss-Elite,11.90,7.10,43,8,30,357.00,144.00,40.34,2025-05-22,2025-05-05
+7290001010007,Power Horse Energy 250ml,energy_drinks,Power Horse,Sakal,7.50,4.00,39,1,8,60.00,28.00,46.67,2025-05-22,2025-05-06
+,Ferrero Rocher 3-Pack 37.5g,chocolate,Ferrero,Diplomat Distribution,14.90,9.80,65,3,15,223.50,76.50,34.23,2025-05-18,2025-05-08
+7290001040011,Mixed Nuts Premium 150g,snacks,Kayla,Kayla,14.90,8.00,64,4,18,268.20,124.20,46.31,2025-05-12,2025-04-29
+7290001050006,Snickers 50g,chocolate,Mars,Diplomat Distribution,9.90,5.90,35,24,91,900.90,364.00,40.40,2025-05-25,2025-05-21
+7290001110006,Minute Maid Apple Juice 330ml,juice,Minute Maid,Coca-Cola Israel,6.90,3.90,51,3,16,110.40,48.00,43.48,2025-05-15,2025-04-21
+7290001050004,Lion Bar 42g,chocolate,Nestlé,Osem Nestlé,8.90,5.30,48,6,29,258.10,104.40,40.45,2025-05-21,2025-05-14
+7290001080004,Pita Bread 5-Pack 800g,bakery,Local Bakery,Local Supplier,8.90,5.50,4,31,110,979.00,374.00,38.20,2025-05-25,2025-05-19
+7290001070002,Elite Classic Instant Coffee 200g,coffee_tea,Elite,Strauss-Elite,24.90,14.90,30,7,27,672.30,270.00,40.16,2025-05-20,2025-05-03
+7290001040001,Bamba Peanut Snack 80g,snacks,Osem,Osem Nestlé,5.90,3.20,13,12,49,289.10,132.30,45.76,2025-05-22,2025-05-21
+7290001050003,Milka Oreo Chocolate 100g,chocolate,Milka,Diplomat Distribution,11.90,7.20,35,4,17,202.30,79.90,39.50,2025-05-18,2025-05-15
+7290001020009,7UP 330ml Can,soft_drinks,7UP,Strauss-Elite,5.90,2.80,17,9,34,200.60,105.40,52.54,2025-05-23,2025-05-17
+7290001020002,Coca-Cola 1.5L,soft_drinks,Coca-Cola,,8.90,4.80,15,22,85,756.50,348.50,46.07,2025-05-23,2025-05-21
+7290001060003,Tnuva Cottage Cheese 5% 250g,dairy,Tnuva,,8.90,5.90,5,34,128,1139.20,384.00,33.71,2025-05-23,2025-05-23
+7290001020099,Coca-Cola 330ml Can,soft_drinks,Coca-Cola,Coca-Cola Israel,5.90,2.90,10,14,54,318.60,162.00,50.85,2025-05-22,2025-05-15
+7290001120003,Haribo Gold Bears 100g,candy_gum,Haribo,Diplomat Distribution,12.90,7.80,31,8,30,387.00,153.00,39.53,2025-05-18,2025-05-02
+7290001030004,Mei Eden Natural Water 1.5L,water,Mei Eden,Eden Springs,6.20,3.30,18,41,163,1010.60,472.70,46.77,2025-05-23,2025-05-20
+7290001090010,Yad Mordechai Extra Virgin Olive Oil 750ml,household,Yad Mordechai,Yad Mordechai,34.90,25.00,43,3,14,488.60,138.60,28.37,2025-05-12,2025-04-23
+7290001040017,Rugelach Chocolate Filled 100g,snacks,Osem,Osem Nestlé,8.90,5.00,48,13,56,498.40,218.40,43.82,2025-05-23,2025-04-30
+7290001050001,Kinder Bueno Milk Chocolate 43g,chocolate,Kinder,Diplomat Distribution,8.90,5.50,29,13,59,525.10,200.60,38.20,2025-05-22,2025-05-16
+7290001100004,Del Monte Corn Kernels 340g,ready_to_eat,Del Monte,Diplomat Distribution,9.90,6.20,47,3,13,128.70,48.10,37.37,2025-05-16,2025-04-13
+7290001060001,Tnuva Full-Fat Milk 3% 1L,dairy,Tnuva,Tnuva,6.90,5.10,6,23,79,545.10,142.20,26.09,2025-05-25,2025-05-23
+7290001040004,Doritos Nacho Cheese 75g,snacks,Doritos,Strauss-Elite,8.90,5.20,32,14,60,534.00,222.00,41.57,2025-05-24,2025-05-13
+7290001090004,Elite Garbage Bags 30L 30-Pack,household,Elite,Strauss-Elite,18.90,11.50,30,14,51,963.90,377.40,39.15,2025-05-24,2025-05-15
+7290001040099,Bamba Peanut Snack 80g,snacks,Osem,Osem Nestlé,6.20,3.20,21,19,77,477.40,231.00,48.39,2025-05-25,2025-05-18
+7290001020012,Canada Dry Ginger Ale 330ml,soft_drinks,Canada Dry,Coca-Cola Israel,5.90,3.10,59,2,10,59.00,28.00,47.46,2025-05-16,2025-05-02
+7290001120004,Mentos Fruit Roll 38g,candy_gum,Mentos,Diplomat Distribution,5.90,3.20,16,25,97,572.30,261.90,45.76,2025-05-22,2025-05-20
+7290001020008,Sprite 330ml Can,soft_drinks,Sprite,Coca-Cola Israel,5.90,2.80,28,19,69,407.10,213.90,52.54,2025-05-24,2025-05-11
+7290001010002,Monster Energy Original 500ml,energy_drinks,Monster,Diplomat Distribution,11.90,6.80,29,14,52,618.80,265.20,42.86,2025-05-25,2025-05-12
+7290001010008,XL Energy Drink 500ml,energy_drinks,XL,,9.90,5.50,36,8,38,376.20,167.20,44.44,2025-05-20,2025-05-10
+7290001050002,Kinder Bueno White 43g,chocolate,Kinder,Diplomat Distribution,8.90,5.50,17,9,41,364.90,139.40,38.20,2025-05-19,2025-05-15
+7290001080007,Ka'ak Anise Cookies 400g,bakery,Local Bakery,Local Supplier,12.90,7.50,43,6,28,361.20,151.20,41.86,2025-05-22,2025-05-09
+,Mirinda Orange 330ml Can,soft_drinks,Mirinda,Strauss-Elite,5.50,2.70,31,4,18,99.00,50.40,50.91,2025-05-13,2025-04-10
+7290001020001,Coca-Cola 330ml Can,soft_drinks,Coca-Cola,,5.90,2.90,25,11,40,236.00,120.00,50.85,2025-05-25,2025-05-15
+7290001090003,Sano Toilet Cleaner Gel 750ml,household,Sano,Sano,12.90,7.80,25,2,9,116.10,45.90,39.53,2025-05-19,2025-04-30
+7290001020010,Schweppes Soda Water 1.5L,soft_drinks,Schweppes,,7.90,4.20,18,8,34,268.60,125.80,46.84,2025-05-23,2025-04-30
+7290001110004,Cappy Orange Juice 330ml Can,juice,Cappy,Coca-Cola Israel,6.90,3.80,47,9,41,282.90,127.10,44.93,2025-05-21,2025-05-17
+7290001070001,Elite Gold Instant Coffee 200g,coffee_tea,Elite,Strauss-Elite,28.90,17.50,52,5,23,664.70,262.20,39.45,2025-05-23,2025-05-08
+7290001040002,Bisli BBQ 70g,snacks,Osem,Osem Nestlé,5.90,3.10,32,19,68,401.20,190.40,47.46,2025-05-24,2025-05-13
+,Hogla Paper Towels 3-Roll,household,Hogla,Hogla Kimberly,14.90,9.20,26,10,38,566.20,216.60,38.26,2025-05-22,2025-05-17
+7290001040005,Lay's Classic Salted 75g,snacks,Lay's,,8.90,5.20,27,28,102,907.80,377.40,41.57,2025-05-23,2025-05-14
+,Sesame Snaps 40g,snacks,Carmit,Carmit Candy,4.90,2.60,32,2,11,53.90,25.30,46.94,2025-05-22,2025-04-20
+7290001090002,Sano Bleach 1L,household,Sano,,10.90,6.50,39,9,36,392.40,158.40,40.37,2025-05-19,2025-05-01
+7290001040007,Tapuchips Ketchup 75g,snacks,Osem,Osem Nestlé,7.90,4.40,36,15,65,513.50,227.50,44.30,2025-05-25,2025-05-20
+7290001020005,Pepsi Cola 330ml Can,soft_drinks,Pepsi,Strauss-Elite,5.90,2.80,19,19,81,477.90,251.10,52.54,2025-05-24,2025-05-11
+,Tapuzina Orange Nectar 1L,juice,Tapuzina,,9.90,6.00,38,13,54,534.60,210.60,39.39,2025-05-21,2025-05-06
+7290001030006,Gan Shmuel Mineral Water 1.5L,water,Gan Shmuel,Gan Shmuel Foods,5.50,2.90,31,15,57,313.50,148.20,47.27,2025-05-18,2025-05-08
+,Sardines in Tomato Sauce 125g,ready_to_eat,Generic,,8.90,5.50,53,0,1,8.90,3.40,38.20,2025-05-17,2025-04-23
+7290001100003,Starkist Tuna in Oil 160g,ready_to_eat,Starkist,Diplomat Distribution,12.90,7.80,27,3,14,180.60,71.40,39.53,2025-05-21,2025-04-30
+7290001100005,Sabra Hummus Ready-to-Eat 400g,ready_to_eat,Sabra,Sabra,14.90,9.50,44,12,57,849.30,307.80,36.24,2025-05-18,2025-05-13
+7290001010001,Red Bull Energy Drink 250ml,energy_drinks,Red Bull,Diplomat Distribution,8.90,5.20,16,11,49,436.10,181.30,41.57,2025-05-24,2025-05-18
+7290001090001,Fairy Dish Soap Lemon 500ml,household,Fairy,Procter & Gamble Israel,16.90,10.20,18,8,35,591.50,234.50,39.64,2025-05-18,2025-05-10
+7290001060007,Strauss Cream Cheese 200g,dairy,Strauss,,11.90,7.60,50,4,18,214.20,77.40,36.13,2025-05-24,2025-05-16
+7290001100002,Telma Instant Soup Mushroom 3-Pack,ready_to_eat,Telma,Strauss-Elite,8.90,5.20,33,6,25,222.50,92.50,41.57,2025-05-21,2025-05-01
+,Soda Water Generic 1.5L,water,Generic,,4.90,2.80,14,13,49,240.10,102.90,42.86,2025-05-19,2025-05-15
+7290001050005,KitKat 4-Finger 41.5g,chocolate,Nestlé,Osem Nestlé,7.90,4.80,22,21,89,703.10,275.90,39.24,2025-05-24,2025-05-20
+7290001080006,Sesame Lavash Flatbread 300g,bakery,Local Bakery,Local Supplier,8.90,5.20,16,12,58,516.20,214.60,41.57,2025-05-18,2025-05-03
+7290001020007,Fanta Orange 330ml Can,soft_drinks,Fanta,Coca-Cola Israel,5.90,2.80,13,27,103,607.70,319.30,52.54,2025-05-22,2025-05-15
+,Afternoon Earl Grey Tea 20 bags,coffee_tea,Afternoon,,18.90,11.50,53,0,2,37.80,14.80,39.15,2025-05-04,2025-04-17
+7290001110003,Yad Mordechai Pomegranate Juice 1L,juice,Yad Mordechai,Yad Mordechai,18.90,13.20,62,1,7,132.30,39.90,30.16,2025-05-23,2025-05-05
+7290001040014,Popcorn Butter Flavour 80g,snacks,Amiran,,6.90,3.80,28,4,15,103.50,46.50,44.93,2025-05-20,2025-05-11
+,Hogla Toilet Paper 4-Roll,household,Hogla,Hogla Kimberly,12.90,7.90,14,44,176,2270.40,880.00,38.76,2025-05-24,2025-05-23
+7290001050014,After Eight Mint Chocolate 200g,chocolate,Nestlé,Osem Nestlé,24.90,15.50,99,0,0,0.00,0.00,37.75,2025-05-01,2025-04-15
+7290001010005,Hell Energy Classic 250ml,energy_drinks,Hell,Sakal,7.90,4.10,51,9,40,316.00,152.00,48.10,2025-05-22,2025-05-18
+7290001060012,Cornetto Vanilla Ice Cream 120ml,dairy,Algida,Strauss-Elite,9.90,5.80,36,12,52,514.80,213.20,41.41,2025-05-25,2025-05-13
+7290001050007,Twix Twin Bar 50g,chocolate,Mars,Diplomat Distribution,9.90,5.90,14,15,55,544.50,220.00,40.40,2025-05-24,2025-05-11
+7290001040010,Pumpkin Seeds Salted 100g,snacks,Kayla,Kayla,6.90,3.50,56,2,8,55.20,27.20,49.28,2025-05-17,2025-04-28
+,Skittles Original 45g,candy_gum,Skittles,Diplomat Distribution,8.90,5.20,23,10,48,427.20,177.60,41.57,2025-05-23,2025-05-06
+7290001080002,Berman Sliced Toast Bread 750g,bakery,Berman,Berman Bakers,11.90,7.90,15,35,128,1523.20,512.00,33.61,2025-05-23,2025-05-18
+7290001080001,Russ Sliced White Bread 750g,bakery,Russ,Russ Bakers,10.90,7.20,5,19,75,817.50,277.50,33.94,2025-05-24,2025-05-21
+7290001020013,Mountain Dew 500ml,soft_drinks,Mountain Dew,Strauss-Elite,7.90,4.30,49,6,30,237.00,108.00,45.57,2025-05-20,2025-05-10
+,Pepsi Cola 1.5L,soft_drinks,Pepsi,Strauss-Elite,8.50,4.50,18,8,31,263.50,124.00,47.06,2025-05-20,2025-05-13
+7290001110005,Jaffa Citrus Juice 1.5L,juice,Jaffa,Tempo Beverages,12.90,7.80,21,11,49,632.10,249.90,39.53,2025-05-21,2025-05-14
+7290001040016,Krembo Marshmallow Chocolate 33g,snacks,Strauss,Strauss-Elite,4.90,2.50,10,11,39,191.10,93.60,48.98,2025-05-24,2025-05-17
+7290001050008,Bounty Coconut Bar 57g,chocolate,Mars,,9.90,5.80,48,1,6,59.40,24.60,41.41,2025-05-20,2025-04-16
+7290001040018,Potato Chips Jalapeño 80g,snacks,Lay's,Strauss-Elite,9.90,5.80,48,3,13,128.70,53.30,41.41,2025-05-11,2025-04-15
+7290001090007,Crystal White Sugar 1kg,household,Crystal,Sugar Industry,8.90,5.80,21,40,176,1566.40,545.60,34.83,2025-05-23,2025-05-21
+7290001110001,Primor Orange Juice 1L,juice,Primor,Tempo Beverages,10.90,6.80,18,8,29,316.10,118.90,37.61,2025-05-21,2025-05-05
+7290001060004,Yoplait Vanilla Yogurt 150g,dairy,Yoplait,Strauss-Elite,5.90,3.60,50,10,40,236.00,92.00,38.98,2025-05-20,2025-05-08
+,Whole Wheat Sliced Bread 600g,bakery,Berman,Berman Bakers,12.90,8.50,29,13,53,683.70,233.20,34.11,2025-05-18,2025-05-13
+7290001120001,Extra Spearmint Gum 10-stick,candy_gum,Wrigley,Diplomat Distribution,3.90,2.10,31,23,91,354.90,163.80,46.15,2025-05-22,2025-05-13
+7290001070004,Nescafe Gold Blend 200g,coffee_tea,Nescafe,Osem Nestlé,34.90,21.00,18,3,17,593.30,236.30,39.83,2025-05-18,2025-05-03
+,Mei Eden Natural Water 0.5L,water,Mei Eden,Eden Springs,4.20,2.20,17,28,104,436.80,208.00,47.62,2025-05-23,2025-05-23
+7290001040009,Kayla Sunflower Seeds 100g,snacks,Kayla,Kayla,5.90,3.00,44,5,22,129.80,63.80,49.15,2025-05-20,2025-05-13
+7290001120005,Halls Mentho-Lyptus 9-Pack,candy_gum,Halls,Diplomat Distribution,5.90,3.30,31,13,59,348.10,153.40,44.07,2025-05-22,2025-05-08
+7290001080005,Challah Bread 500g,bakery,Local Bakery,Local Supplier,12.90,7.80,29,10,40,516.00,204.00,39.53,2025-05-22,2025-05-13
+7290001060008,Tnuva Yellow Hard Cheese 200g,dairy,Tnuva,Tnuva,16.90,11.50,30,10,48,811.20,259.20,31.95,2025-05-23,2025-05-07
+7290001060002,Tnuva Reduced-Fat Milk 1.5% 1L,dairy,Tnuva,,6.90,5.00,11,22,82,565.80,155.80,27.54,2025-05-24,2025-05-23
+7290001030002,Neviot Mineral Water 1.5L,water,Neviot,Tempo Beverages,5.90,3.10,6,26,100,590.00,280.00,47.46,2025-05-25,2025-05-23
+7290001120002,Orbit Peppermint Gum 14-stick,candy_gum,Orbit,Diplomat Distribution,4.90,2.60,31,25,92,450.80,211.60,46.94,2025-05-22,2025-05-14
+7290001100006,Al-Arz Tahini Premium 500g,ready_to_eat,Al-Arz,Al-Arz,18.90,12.80,46,12,56,1058.40,341.60,32.28,2025-05-19,2025-05-08
+7290001060099,Tnuva Full-Fat Milk 3% 1L,dairy,Tnuva,,6.90,5.10,22,44,172,1186.80,309.60,26.09,2025-05-23,2025-05-24
+7290001100007,Za'atar Spice Mix 100g,ready_to_eat,Local Brand,Local Supplier,9.90,5.60,33,1,5,49.50,21.50,43.43,2025-05-13,2025-04-22
+7290001100001,Osem Instant Noodles Chicken 85g,ready_to_eat,Osem,Osem Nestlé,4.90,2.60,21,24,105,514.50,241.50,46.94,2025-05-22,2025-05-11
+7290001010003,Burn Energy Drink 500ml,energy_drinks,Burn,Diplomat Distribution,10.90,6.20,19,8,41,446.90,192.70,43.12,2025-05-23,2025-05-11
+7290001070005,Jacobs Kronung Ground Coffee 250g,coffee_tea,Jacobs,Diplomat Distribution,28.90,17.50,28,3,14,404.60,159.60,39.45,2025-05-12,2025-04-13
+7290001070003,Nescafe Classic Instant Coffee 200g,coffee_tea,Nescafe,Osem Nestlé,27.90,17.00,17,8,30,837.00,327.00,39.07,2025-05-24,2025-05-05
+7290001080008,Butter Croissant 100g,bakery,Alon,,7.90,4.50,29,15,64,505.60,217.60,43.04,2025-05-24,2025-05-15
+7290001040003,Bisli Falafel 70g,snacks,Osem,,5.90,3.10,33,5,20,118.00,56.00,47.46,2025-05-18,2025-05-02
+,Coca-Cola Zero 330ml Can,soft_drinks,Coca-Cola,Coca-Cola Israel,5.90,2.90,20,17,64,377.60,192.00,50.85,2025-05-23,2025-05-14
+7290001010004,Tiger Energy Drink 250ml,energy_drinks,Tiger,Sakal,7.90,4.30,49,11,46,363.40,165.60,45.57,2025-05-23,2025-05-01
+7290001040006,Pringles Original 165g,snacks,Pringles,Diplomat Distribution,14.90,8.50,37,3,15,223.50,96.00,42.95,2025-05-18,2025-05-09
+7290001070007,Lipton Yellow Label Tea 25 bags,coffee_tea,Lipton,Strauss-Elite,14.90,8.80,23,5,18,268.20,109.80,40.94,2025-05-20,2025-05-17
+7290001040015,Chocolate Wafers 100g,snacks,Osem,Osem Nestlé,7.90,4.20,17,3,14,110.60,51.80,46.84,2025-05-23,2025-05-16
+7290001090008,Fine Table Salt 1kg,household,Generic,,4.90,2.80,14,40,158,774.20,331.80,42.86,2025-05-23,2025-05-19
+7290001050011,Elite Dark Chocolate 70% 100g,chocolate,Elite,,13.90,8.50,53,4,15,208.50,81.00,38.85,2025-05-13,2025-04-10
+,Rockstar Original 500ml,energy_drinks,Rockstar,Diplomat Distribution,11.90,6.90,62,4,16,190.40,80.00,42.02,2025-05-17,2025-04-20
+7290001070006,Wissotzky Green Tea 25 bags,coffee_tea,Wissotzky,Wissotzky Tea,16.90,10.20,49,12,49,828.10,328.30,39.64,2025-05-24,2025-05-15
+7290001020003,Coca-Cola 500ml Bottle,soft_drinks,Coca-Cola,Coca-Cola Israel,6.90,3.50,15,10,43,296.70,146.20,49.28,2025-05-23,2025-05-20
+7290001050012,Pesek Zman Chocolate Bar 50g,chocolate,Strauss,Strauss-Elite,7.90,4.60,27,5,23,181.70,75.90,41.77,2025-05-24,2025-04-30
+7290001060005,Danone Strawberry Yogurt 125g,dairy,Danone,Danone Israel,5.90,3.50,34,6,30,177.00,72.00,40.68,2025-05-23,2025-05-10
+7290001060011,Tnuva Labaneh Soft Cheese 500g,dairy,Tnuva,Tnuva,14.90,9.80,49,13,55,819.50,280.50,34.23,2025-05-22,2025-05-15
+7290001060006,Tnuva Unsalted Butter 100g,dairy,Tnuva,Tnuva,7.90,5.20,33,8,39,308.10,105.30,34.18,2025-05-21,2025-05-08
+7290001040008,Pretzel Sticks Salted 150g,snacks,Osem,,6.90,3.80,18,14,60,414.00,186.00,44.93,2025-05-18,2025-05-01
+7290001070003,Nescafe Classic Instant Coffee 200g,coffee_tea,Nescafe,Osem Nestlé,27.90,17.00,14,11,50,1395.00,545.00,39.07,2025-05-22,2025-05-09

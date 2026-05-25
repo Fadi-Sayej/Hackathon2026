@@ -67,9 +67,28 @@ src/
     parquet_writer.py ← write_bronze_parquet() / write_silver_parquet()
     schema.py         ← Pydantic models (ExternalProductObservation, …)
     quality.py        ← generate_basic_quality_report()
+  internal/
+    pos_importer.py   ← full POS import pipeline (schema-map → validate → Parquet → signals)
+configs/
+  pos_schema_mapping.yaml  ← column mapping, types, validation rules, signal thresholds
 scripts/
-  init_storage.py     ← one-time folder bootstrap
-  smoke_test_storage.py ← end-to-end pipeline smoke test
+  init_storage.py             ← one-time folder bootstrap
+  smoke_test_storage.py       ← end-to-end storage smoke test
+  generate_fake_yomyom_pos.py ← generate realistic fake POS CSV (seed=42, reproducible)
+  import_yomyom_pos.py        ← CLI: import a POS CSV into silver Parquet + signals
+data/
+  internal/
+    raw_pos/yomyom/sample_yomyom_pos.csv  ← 121-row fake POS dataset
+    silver_pos/
+      yomyom_products.parquet   ← master product catalog (barcode, name, category, price…)
+      yomyom_sales.parquet      ← sales data (units_sold_7d/30d, revenue)
+      yomyom_inventory.parquet  ← stock levels + last purchase date
+      yomyom_margins.parquet    ← margin analysis (selling, cost, profit, margin_pct)
+  signals/yomyom/
+    pos_signals_latest.json     ← always the most recent signal snapshot
+    pos_signals_<timestamp>.json← timestamped archive
+reports/quality/yomyom_pos/
+    yomyom_pos_<timestamp>_quality.json ← per-run quality report
 ```
 
 ### Quick start (Python backend)
@@ -81,9 +100,74 @@ pip install -r requirements.txt
 # 2. Create all storage folders (idempotent — safe to re-run)
 python scripts/init_storage.py
 
-# 3. Verify the full pipeline end-to-end
+# 3. Verify the storage layer end-to-end
 python scripts/smoke_test_storage.py
+
+# 4. (Re-)generate the fake YomYom POS CSV
+python scripts/generate_fake_yomyom_pos.py
+
+# 5. Import the POS CSV → silver Parquet + signals
+python scripts/import_yomyom_pos.py \
+    --input data/internal/raw_pos/yomyom/sample_yomyom_pos.csv
+
+# with a custom config or fixed timestamp:
+python scripts/import_yomyom_pos.py \
+    --input       data/internal/raw_pos/yomyom/sample_yomyom_pos.csv \
+    --config      configs/pos_schema_mapping.yaml \
+    --imported-at 2025-05-25T08:00:00+00:00
 ```
+
+### POS Import Pipeline — `src/internal/pos_importer.py`
+
+```
+CSV
+ │
+ ├─[1] load_csv()              raw string rows
+ │
+ ├─[2] apply_schema_mapping()  rename + normalise + type-cast  (driven by YAML)
+ │
+ ├─[3] validate_rows()         hard rejects + soft warnings
+ │       ├─ required fields present
+ │       ├─ positive prices / non-negative stock
+ │       ├─ margin_pct range [0,100]
+ │       └─ cross-field warnings (7d ≤ 30d, cost < sell, margin consistency)
+ │
+ ├─[4] write_silver_tables()   4 × Parquet (products / sales / inventory / margins)
+ │
+ ├─[5] generate_pos_quality_report()   enriched JSON quality snapshot
+ │       completeness, duplicate names, price stats, margin stats, category dist.
+ │
+ └─[6] generate_signals()      6 × business signals → JSON
+         top_sellers              (top N by units_sold_30d)
+         top_profit_products      (top N by gross_profit_30d)
+         low_stock_fast_movers    (stock ≤ 15 AND sold_30d ≥ 30)
+         slow_movers              (sold_30d ≤ 10)
+         high_margin_impulse      (margin ≥ 35% AND impulse category)
+         category_sales_summary   (SUM revenue / profit / units per category)
+```
+
+All thresholds are in `configs/pos_schema_mapping.yaml` under `signals:`.  
+To adapt for the real Comax/Priority CSV: update only the `columns[].raw_name` fields in the YAML.
+
+### Fake POS CSV — `data/internal/raw_pos/yomyom/sample_yomyom_pos.csv`
+
+121 rows across 12 product categories for a neighbourhood market in Kafr Qasim.
+Generated with a fixed seed (42) — output is fully reproducible.
+
+| Metric | Value |
+|---|---|
+| Total rows | 121 |
+| Categories | energy_drinks, soft_drinks, water, snacks, chocolate, dairy, coffee_tea, bakery, household, ready_to_eat, juice, candy_gum |
+| Missing barcode | ~12 % of rows |
+| Missing supplier | ~17 % of rows |
+| Duplicate product names | 4 name pairs (data-entry error simulation) |
+| Low-stock fast-movers | 5 products (reorder alert candidates) |
+| Dead-stock rows | 4 products (0–5 units sold in 30 days) |
+
+Columns: `barcode`, `product_name`, `category`, `brand`, `supplier`,
+`selling_price`, `cost_price`, `current_stock`, `units_sold_7d`,
+`units_sold_30d`, `sales_amount_30d`, `gross_profit_30d`, `margin_pct`,
+`last_sale_date`, `last_purchase_date`
 
 ### How a future collector uses this layer
 
