@@ -38,6 +38,10 @@ from src.common.paths import EXTERNAL_SILVER_ROOT
 from src.common.quality import generate_basic_quality_report
 from src.common.raw_storage import save_raw_response
 from src.common.schema import ExternalProductObservation
+from src.external.tenbis_connector import (
+    TenBisCollectionResult,
+    collect_tenbis_venue,
+)
 
 
 SOURCE_ID = "delivery_catalog"
@@ -411,6 +415,14 @@ class DeliveryVenueConnector:
                     venue_urls.append(canonical)
                 continue
 
+            if provider == "tenbis":
+                # 10bis URLs are passed through verbatim — the tenbis_connector
+                # talks directly to /NextApi and does its own warm-up fetch.
+                if url not in seen:
+                    seen.add(url)
+                    venue_urls.append(url)
+                continue
+
             response, _ = self._fetch_and_save(url, observed_at, raise_for_status=False)
             if response.status_code >= 400:
                 logger.warning(
@@ -518,18 +530,56 @@ def run_delivery_venue_collection(
 
         for resolved_url in resolved_urls:
             provider = _provider_for_url(resolved_url)
-            if provider != "wolt":
+            if provider == "wolt":
+                logger.info("Collecting Wolt delivery catalog: {}", resolved_url)
+                store_info, observations, bronze_records = connector.collect_wolt_venue(
+                    resolved_url,
+                    observed_at,
+                    max_categories=max_categories,
+                )
+                all_store_infos.append(store_info)
+                all_observations.extend(observations)
+                all_bronze_records.extend(bronze_records)
+            elif provider == "tenbis":
+                logger.info("Collecting TenBis delivery catalog: {}", resolved_url)
+                tenbis_result: TenBisCollectionResult = collect_tenbis_venue(
+                    resolved_url, observed_at
+                )
+                # Adapt the TenBisStoreInfo into the shared StoreInfo shape so
+                # the downstream JSON dump stays uniform across providers.
+                tb_info = tenbis_result.store_info
+                adapted = StoreInfo(
+                    provider=tb_info.provider,
+                    source_url=tb_info.source_url,
+                    store_name=tb_info.store_name,
+                    store_id=tb_info.store_id,
+                    store_chain=tb_info.store_chain,
+                    city=tb_info.city,
+                    address=tb_info.address,
+                    phone=tb_info.phone,
+                    latitude=tb_info.latitude,
+                    longitude=tb_info.longitude,
+                    currency=tb_info.currency,
+                    raw={
+                        "restaurant_id": tb_info.restaurant_id,
+                        "store_name_he": tb_info.store_name_he,
+                        "delivery_fee": (
+                            str(tb_info.delivery_fee) if tb_info.delivery_fee else None
+                        ),
+                        "min_order": (
+                            str(tb_info.min_order) if tb_info.min_order else None
+                        ),
+                        "is_open_now": tb_info.is_open_now,
+                        "collection_status": tenbis_result.status,
+                        "collection_notes": tenbis_result.notes,
+                    },
+                )
+                all_store_infos.append(adapted)
+                all_observations.extend(tenbis_result.observations)
+                all_bronze_records.extend(tenbis_result.bronze_records)
+            else:
                 connector.unsupported_urls.append(resolved_url)
                 continue
-            logger.info("Collecting Wolt delivery catalog: {}", resolved_url)
-            store_info, observations, bronze_records = connector.collect_wolt_venue(
-                resolved_url,
-                observed_at,
-                max_categories=max_categories,
-            )
-            all_store_infos.append(store_info)
-            all_observations.extend(observations)
-            all_bronze_records.extend(bronze_records)
 
         all_observations = _dedupe_observations(all_observations)
         silver_records = [
