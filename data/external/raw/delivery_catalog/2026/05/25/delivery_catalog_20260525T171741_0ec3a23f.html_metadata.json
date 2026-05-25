@@ -1,0 +1,33 @@
+{
+  "url": "https://wolt.com/en/isr/petah-tikva/venue/wolt-market-lev-haaretz",
+  "method": "GET",
+  "status_code": 200,
+  "content_type": "text/html; charset=utf-8",
+  "observed_at": "2026-05-25T17:17:41.981183+00:00",
+  "file_path": "/Users/fadisayej/Desktop/Hackathon26/Hackathon2026/data/external/raw/delivery_catalog/2026/05/25/delivery_catalog_20260525T171741_0ec3a23f.html",
+  "sha256": "0ec3a23fe73dd71a3cbeb592f7bfb80a7c3a01cfc5fd400e6724abfa661b5797",
+  "headers": {
+    "server": "CloudFront",
+    "content-type": "text/html; charset=utf-8",
+    "transfer-encoding": "chunked",
+    "connection": "keep-alive",
+    "date": "Mon, 25 May 2026 17:17:50 GMT",
+    "content-encoding": "gzip",
+    "content-security-policy": "upgrade-insecure-requests;frame-ancestors 'self' https://merchant.wolt.com;object-src 'none';base-uri 'self';script-src 'report-sample' https: 'unsafe-inline' 'wasm-unsafe-eval' 'strict-dynamic' 'sha256-9I1iElVxqijdJ1B4ocoXRDmhjnNWJjmiE1vRVps2TYM=' 'sha256-dFa+q77Tg2nnESN7YebbFNubAFC8FU7uAOwzV0BrnLQ=' 'sha256-Y4MbHjcH1NSWc7vI/EKYhmmTS1GWpym1LMK3AsbLURg=' 'sha256-YiMgw0ugp9YT/xZX+NoukOjGpaQy91gKsHyivgjdVmU=' 'sha256-S+soqo+jmG4NjoKmk7y8DCzGbaEmo4wJxJ8jnUrLEmY=' 'sha256-PaR6oJ2n+UpzCqC6j1csUxRxllmwqlv13DixGF2Qbdw=' 'sha256-huZ997oTUSHTFEtiPSJ1B4dfPWAqfg3DwxoiqgGJyDw=' 'sha256-yr2EHpU9K1uZHJDZrVtpjNKKTDdXv3mwSwCe1cazAec=' 'sha256-jhVsD1RWRV2UU4kD84mpGRAS3tHK4VvH55VlOrimxXE=' 'sha256-Zv1moCZRTSwhyONtb5OWOyUAVFjkFOfRJQzHci+5xsw=' 'sha256-FsA94TsAbNwO66ti6Ox9ir1lqxUk44SsafWeapt2ICc=' 'sha256-ldlClTmR+7t5fnCRfQcTLAUaBELuNpoX1nb8REotkGQ=' 'sha256-LvVK/kYHUrHMoRPF7EUCphJcsgjwY9hUgRtYby0ICMU=' 'sha256-YWygbJVXRUsDnFvrCUUg1jvtt2PasWAOibPQoZunWI0=' 'sha256-3CKtJXNvpfUdjpJ8V8hF1ns7C1GBzVyFQZqtBajScjY=' 'sha256-P1krNK20d4rk6ZJ9A7ZT4OS9O7v4AGDhinNvLuPpHUE=' 'sha256-2C2693nR6oz8D2Vq208gVG91IddvI6+Nnxskfvm1+1c=' 'sha256-L++R0ossJLUrvTdylEb6tT18ciTcjTBFLzO4g9xbMDA=' 'sha256-hRtNuNFYgJBveK9eXIVOHIn0ruc5RiTdvDIAGuKrVk0=' 'sha256-HAK/3zDbFmlur6nFkKGM9ugn5H+qs3iiIFUzZ/mRxWc=' 'sha256-wbAVNe3dP5M0J8s3OLz1Uh8E4PQc+dJEEKD3WcgqY4E=' 'sha256-bSMvGSt/HiYJnwNZjZ6Z8ntPyk3PrDag+NlaeQoHYQ0=' 'sha256-tQ9ESmts14ulh3DyXO0gUyoq9ri+wIO0AYcyTfBGwwg=' 'sha256-smlw5JG1NU0T2bWresR8XsCmKmsNht0pHCz4HvipZC4=' 'sha256-M/oWtZxeqzDmMCGQ0AwoQ6NWs0TVzOhj1foaAfahG6M=' 'sha256-hXCeY3sFQENtv9winzYeBEn2F5nTpCWB0Qs2d4SrTeI=' 'sha256-CMpb1vR62oIo8WdfKx5jz9vNweZXEmXCXU7/gRYJwDo=' 'sha256-L1iIwhNBfcacCCzCq25u27X+MInr38aMkMqN/DhOf9c=' 'sha256-6bFVP09uTySn17ieczktMEa59CzgABk6T+ih1Pd10zE=' 'sha256-birIiDBuBEZjKxsgjxUESumHeb8qchz2vZFPYA5WU8g=' 'sha256-RTsKlVwAD3xGgWZ54Ml9/tLZ2tBtySBWP78omsTKrz8=' 'sha256-g/+APdZc6V8ZRYnBapUnsop66NoiVsFhMnAGar2R0kk=' 'sha256-9iAg2alexcXcwKmdLEVmO/ykNlSTo5KKYCCQLqwfRpA=' 'sha256-hwNI7RChNXpekPHee7GKJFElf3DXQLDAzFDtwVfjhIM=' 'sha256-Le2kVqILwsCE2yawmtV2lUazqzNWOmFTbdldGGzFBFc=' 'sha256-V+bDWd8wySv+ZY8BWJAgxXXFB3q19otsOp2aIePjgBU=' 'sha256-zkOMohGXseEPiUEZLJC+Ibiu+vmSWHwuzHycS0lTxss=' 'sha256-YR2rfmILCbwIWwC5XOr5bJuBZZbVSxzmJn8eOu5h3X4=' 'sha256-dKftuqZaKGkDABkZQZA/y0C7FW8DWG+7FeBySVMZBGc=' 'sha256-WiZz6Lr/ijUnL/qB3rIdvJjDuGXZOiqAvf6KIeXQm4k=' 'sha256-FIjJHZGdOyc3C+73WnP0j0TDdp+n5P2HGhFDlKlc7MI=' 'sha256-hFy0lKIdqTOyH0eXTU2fGAeGKgWYUhnEAKrzpE5DdGc=' 'sha256-xO4vn8ObXYfhbeGQaOOo3gBrgftrgmP+WKoh+UqBtpA=' 'sha256-HuajvVfLn3ivqksWcHXgt3Jpv0K8qiP70fiArQ8QZPQ=' 'sha256-DPY4xOrKXRMdE3yNFw5qeiDhgEKUEzhWsJ1la0HRgSc=' 'sha256-RmqXPBc7pipy68Q+8BM9sA1XfrZMajpHPTNsGqb+4Ms=' 'sha256-tKmuEiVGNKUDhC2eGxRGFn7C1GDxqqfSNsSd8hngfEg=' 'sha256-sylVjNj6PFy470dsvfXmVNoASM4RTMCTCVGYuFZc6oQ=' 'sha256-CjE0GsbxIxtgBDhc3eue96bJ97AzY1/qCCu/E+bzCxA=' 'sha256-FQ7ITaKyaelfvQ+7snjJMX91CdJ8mUCi2M1w7vBxcuU=' 'sha256-YpubV2EGX26ABS8IYx7hJDCvkrRvtaVqbw16LSVJUuE=' 'sha256-4ez2CVkOfNHWxQJgjB79Ta81KxsE1aCYrHBth7W40L4=' 'sha256-XbUnCIIJXqW+ZrQeabbza9DABk/hFOKnmGjexGLVSzc=' 'sha256-LBrXa2rdBEqBKvprvFW5eIyfkYMfptHkdXqwJyj0WRw=' 'sha256-PMcXj8ueC1RAqaiUlgBHDJd1kq/ks3I+rhhiohI40cg=' 'sha256-gYDAD80zbquOzaAHGUL5xyoopkqiwSv0IEVYAk+lN30=' 'sha256-6tAt3uSMeMoSGN60+Ouck8381jHWJ37GbepzmJvqJK4=' 'sha256-NKsSHwXcIZXNMNpY3mKQZ5uuDhpsndfNKNv/siddW1Q=' 'sha256-Ynm7UNbNzmbI9E3zjucm5oYoeLRdOvJzXs36QgzdzhU=' 'sha256-cKvjv48DR+wd5RlcwjFCMOhPC6nbucvim06rRbzFjDk=' 'sha256-UNYIgTxO/IiE2yLzIW4RZZoYVXSDakMl1mtHKSk/Gxg=' 'sha256-OOt0+Bkzy5bOfvg4iIfBV6XK5Yu3+XiRVwzbczzcngM=' 'sha256-9JY1i9hWy6CrbyII58BboNTnSMfqPCFfuIYrx8HIXek=' 'sha256-ZRAJnC3YOLTxu2NIYcYE/3k7STd1KrLyHvIzhB7iVnA=' 'sha256-6cqdbWkEmFtfoQ9J1v0LnbAtqchzMWhaeNnvr2pMVu0=' 'sha256-Ab+rdfAR4i73UG4TbOo/Nc5hO1boZIZw3KH8mIJXBtw=' 'sha256-FT/1MlqSjUt9Y9HQcE3FVSAfE8iF0P9rp/M0gi8QF8U=' 'sha256-/MOZZvgcuHwOcvC927UtUxLDkPG0l2gq1OuriTaKTe4=' 'sha256-QxrsXzcidcPPN6O1MKdvl+fyL2rL0ll1PeLugLjuNjY=' 'sha256-L/DdCyUpXR71PNlaW6TwYSirYBI507wXRqGFB8ZjNGA=' 'sha256-DtQqflT93VEFdYL1UXLqx6TaBA/ajoeXIN/cdVyEFiA=' 'sha256-GqZ/9rYCx7UD4EL2kXjHwhYC9Zl4HA0TjafX8vDtQbo=' 'sha256-qGYNI1MOioL71Q5OttNtCVO6UQ3Xe7N2+z/nteaurIM=' 'sha256-ILJAXGkhrQ8i+6RbuJ0PjLh7N1fsZYjnuYhK0SPRWNc=';worker-src blob: 'self';report-to csp;report-uri https://browser-intake-datadoghq.eu/api/v2/logs?dd-api-key=pubc504e1394818288959b4d64fb38efebe&dd-evp-origin=content-security-policy&ddsource=csp-report&ddtags=service%3Awolt.com%2Cversion%3A1.16.106-PR22095",
+    "x-frame-options": "SAMEORIGIN",
+    "x-content-type-options": "nosniff",
+    "x-xss-protection": "1",
+    "upgrade-insecure-requests": "1",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "feature-policy": "camera 'none';microphone 'none';",
+    "strict-transport-security": "max-age=15768000",
+    "reporting-endpoints": "csp=\"https://browser-intake-datadoghq.eu/api/v2/logs?dd-api-key=pubc504e1394818288959b4d64fb38efebe&dd-evp-origin=content-security-policy&ddsource=csp-report&ddtags=service%3Awolt.com%2Cversion%3A1.16.106-PR22095\"",
+    "cache-control": "no-cache, max-age=0",
+    "access-control-allow-credentials": "true",
+    "vary": "Origin,Accept-Encoding",
+    "via": "1.1 b6f43470f71be755d78da082494ef65a.cloudfront.net (CloudFront)",
+    "x-cache": "Miss from cloudfront",
+    "x-amz-cf-pop": "TLV55-P2",
+    "x-amz-cf-id": "MoQQ_KQzjTcEHWePzDNxSvjnh0PjkrfPVgsRZMg6u55WWOLG2uUzeA=="
+  }
+}

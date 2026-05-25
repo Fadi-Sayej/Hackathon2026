@@ -1,0 +1,12 @@
+{
+  "url": "https://wolt.com/en/isr/petah-tikva/venue/shufersal-rosh-haayin#query-state",
+  "method": "GET",
+  "status_code": 200,
+  "content_type": "application/json; charset=utf-8",
+  "observed_at": "2026-05-25T17:15:20.705816+00:00",
+  "file_path": "/Users/fadisayej/Desktop/Hackathon26/Hackathon2026/data/external/raw/delivery_catalog/2026/05/25/delivery_catalog_20260525T171520_edab4bc8.json",
+  "sha256": "edab4bc8fe87dfe8e590bd54dad752fd5111d5d193207c4bcb8c11e4c51f5907",
+  "headers": {
+    "content-type": "application/json; charset=utf-8"
+  }
+}

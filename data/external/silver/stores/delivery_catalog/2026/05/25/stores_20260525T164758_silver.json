@@ -1,0 +1,469 @@
+[
+  {
+    "provider": "wolt",
+    "source_url": "https://wolt.com/en/isr/petah-tikva/venue/shufersal-rosh-haayin",
+    "store_name": "Shufersal | Rosh Ha’ayin",
+    "store_id": "6475f16879b711f39a180292",
+    "store_chain": "Shufersal",
+    "city": "Petah Tikva - Bik’at Ono",
+    "address": "שבזי 187 ראש העין",
+    "phone": "+97235755273",
+    "latitude": 32.08459558,
+    "longitude": 34.96668784,
+    "currency": "ILS",
+    "raw": {
+      "json_ld_store": {
+        "@context": "https://schema.org",
+        "@type": "Store",
+        "openingHours": [
+          "Mo 07:30-20:00",
+          "Tu 07:30-20:00",
+          "We 07:30-20:00",
+          "Th 07:30-20:00",
+          "Fr 07:30-15:00",
+          "Su 07:30-20:00"
+        ],
+        "image": [
+          "https://imageproxy.wolt.com/assets/673206d6308c8149ae82d3c1"
+        ],
+        "name": "Shufersal | Rosh Ha’ayin",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "שבזי 187 ראש העין",
+          "addressLocality": "Petah Tikva - Bik’at Ono",
+          "postalCode": "4815206",
+          "addressCountry": "IL"
+        },
+        "priceRange": "$$",
+        "telephone": "+97235755273",
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "8.2",
+          "ratingCount": 200,
+          "bestRating": 10,
+          "worstRating": 1
+        },
+        "sameAs": "https://www.facebook.com/profile.php?id=100027308782715&locale=he_IL",
+        "potentialAction": {
+          "@type": "OrderAction",
+          "deliveryMethod": [
+            "http://purl.org/goodrelations/v1#DeliveryModeOwnFleet",
+            "http://purl.org/goodrelations/v1#DeliveryModePickUp"
+          ]
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 32.08459558,
+          "longitude": 34.96668784
+        },
+        "areaServed": {
+          "@type": "GeoCircle",
+          "geoMidpoint": {
+            "@type": "GeoCoordinates",
+            "latitude": 32.08459558,
+            "longitude": 34.96668784
+          },
+          "geoRadius": "3000"
+        }
+      },
+      "static_venue": {
+        "id": "6475f16879b711f39a180292",
+        "image_url": "https://imageproxy.wolt.com/assets/673206d6308c8149ae82d3c1",
+        "image_blurhash": "j3FSVq0j2y;K00Tr;;;2L;8y8O8A",
+        "brand_logo_image_url": "https://imageproxy.wolt.com/mes-image/c9829418-252d-4196-b750-1fc7903a3054/b37a9a3c-dffd-46fd-a0ca-d3d6bd6bd3f8",
+        "brand_logo_image_blurhash": "j7;fvUKXPKFDGGtCplCpX;pCgzGG",
+        "brand_slug": "shufersal",
+        "brand_name": "Shufersal",
+        "name": "Shufersal | Rosh Ha’ayin",
+        "description": " בכל הנוגע למכירות חנות שופרסל וולט, המחיר הקובע הוא המחיר המופיע באתר/יישומון וולט, אף אם מוטבע או מודבק על המוצר תו מחיר אחר. תיתכן שונות בין המחירים באתר שופרסל וולט לבין המחירים בחנויות שופרסל, לרבות החנות בה מבוצע ליקוט המוצרים למשלוח. ידוע ללקוח כי מחירי המוצרים בוולט עשויים אף להיות אף גבוהים יותר ממחירי המוצרים בחנויות שופרסל.  שופרסל בע״מ, ח.פ 520022732",
+        "rating": {
+          "rating": 3,
+          "score": "8.2",
+          "score_raw": 8.2,
+          "volume": 200
+        },
+        "opening_times_schedule": [
+          {
+            "day": "Monday",
+            "formatted_times": "07:30–20:00"
+          },
+          {
+            "day": "Tuesday",
+            "formatted_times": "07:30–20:00"
+          },
+          {
+            "day": "Wednesday",
+            "formatted_times": "07:30–20:00"
+          },
+          {
+            "day": "Thursday",
+            "formatted_times": "07:30–20:00"
+          },
+          {
+            "day": "Friday",
+            "formatted_times": "07:30–15:00"
+          },
+          {
+            "day": "Saturday",
+            "formatted_times": "Closed"
+          },
+          {
+            "day": "Sunday",
+            "formatted_times": "07:30–20:00"
+          }
+        ],
+        "delivery_times_schedule": [
+          {
+            "day": "Monday",
+            "formatted_times": "07:30–20:00"
+          },
+          {
+            "day": "Tuesday",
+            "formatted_times": "07:30–20:00"
+          },
+          {
+            "day": "Wednesday",
+            "formatted_times": "07:30–20:00"
+          },
+          {
+            "day": "Thursday",
+            "formatted_times": "07:30–20:00"
+          },
+          {
+            "day": "Friday",
+            "formatted_times": "07:30–15:00"
+          },
+          {
+            "day": "Saturday",
+            "formatted_times": "Closed"
+          },
+          {
+            "day": "Sunday",
+            "formatted_times": "07:30–20:00"
+          }
+        ],
+        "group_order_enabled": true,
+        "share_url": "https://wolt.com/he/isr/petah-tikva/venue/shufersal-rosh-haayin",
+        "delivery_methods": [
+          "homedelivery",
+          "takeaway"
+        ],
+        "currency": "ILS",
+        "active_menu": "6476026e4646a4fe962ce5ae",
+        "address": "שבזי 187 ראש העין",
+        "city": "Petah Tikva - Bik’at Ono",
+        "country": "ISR",
+        "type": "purchase",
+        "website": "https://www.facebook.com/profile.php?id=100027308782715&locale=he_IL",
+        "substitutions_enabled": true,
+        "post_code": "4815206",
+        "product_line": "grocery",
+        "secondary_product_line": "supermarket",
+        "phone": "+97235755273",
+        "self_delivery": false,
+        "timezone": "Asia/Jerusalem",
+        "delivery_base_price": 1000,
+        "delivery_geo_range": {
+          "bbox": null,
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                34.966687840000006,
+                32.008153243496906
+              ],
+              [
+                34.94910072311098,
+                32.00962084664947
+              ],
+              [
+                34.932187831584024,
+                32.01396739480088
+              ],
+              [
+                34.91659772894949,
+                32.02102624524924
+              ],
+              [
+                34.90292860380033,
+                32.03052671840117
+              ],
+              [
+                34.89170542326055,
+                32.04210441070088
+              ],
+              [
+                34.88335980950037,
+                32.055315093102124
+              ],
+              [
+                34.87821340473983,
+                32.06965167689433
+              ],
+              [
+                34.876465370996904,
+                32.08456361091619
+              ],
+              [
+                34.87818452586063,
+                32.09947797843448
+              ],
+              [
+                34.883306448271206,
+                32.11382149224046
+              ],
+              [
+                34.884831667867715,
+                32.11624247828862
+              ],
+              [
+                34.88990815546185,
+                32.11458306562646
+              ],
+              [
+                34.89678023592222,
+                32.12225923367713
+              ],
+              [
+                34.902755002743305,
+                32.12254814946067
+              ],
+              [
+                34.90712596247505,
+                32.12133133298596
+              ],
+              [
+                34.90856575729052,
+                32.12088080272271
+              ],
+              [
+                34.906170600433796,
+                32.113302557940784
+              ],
+              [
+                34.91119628935985,
+                32.105954800077384
+              ],
+              [
+                34.91368372323515,
+                32.102525844160624
+              ],
+              [
+                34.92132885702148,
+                32.105813401863855
+              ],
+              [
+                34.92418675839559,
+                32.10524814874607
+              ],
+              [
+                34.92564807403056,
+                32.10465736447135
+              ],
+              [
+                34.92717697642166,
+                32.1030537717449
+              ],
+              [
+                34.92970545261017,
+                32.10154980124464
+              ],
+              [
+                34.93513128271674,
+                32.10117727039885
+              ],
+              [
+                34.935487398146755,
+                32.10715100804239
+              ],
+              [
+                34.93706673327617,
+                32.1122909547021
+              ],
+              [
+                34.938654110664054,
+                32.11609556028401
+              ],
+              [
+                34.941260325960926,
+                32.12025344192367
+              ],
+              [
+                34.951025398127854,
+                32.130402823217224
+              ],
+              [
+                34.958521655221254,
+                32.13838240341285
+              ],
+              [
+                34.96038207638627,
+                32.14072512659291
+              ],
+              [
+                34.97120104508618,
+                32.13375461786506
+              ],
+              [
+                34.98195905423462,
+                32.13584735106484
+              ],
+              [
+                34.98238239764987,
+                32.12679115517151
+              ],
+              [
+                34.98874457029001,
+                32.1196454821072
+              ],
+              [
+                34.98883926221373,
+                32.115199939596636
+              ],
+              [
+                34.99279785547759,
+                32.11279620933626
+              ],
+              [
+                34.993776355768425,
+                32.10893862601016
+              ],
+              [
+                34.99279525950371,
+                32.10616124780347
+              ],
+              [
+                34.99131388887399,
+                32.104386585435655
+              ],
+              [
+                34.98562391982739,
+                32.10163616653685
+              ],
+              [
+                34.991447299098866,
+                32.07350624611935
+              ],
+              [
+                34.96545849506511,
+                32.07533261524037
+              ],
+              [
+                34.94657105417891,
+                32.07583815518185
+              ],
+              [
+                34.932975321665225,
+                32.07450936078895
+              ],
+              [
+                34.93453119805247,
+                32.06961068707355
+              ],
+              [
+                34.93459623680738,
+                32.068259247617945
+              ],
+              [
+                34.93513905276407,
+                32.06753123699765
+              ],
+              [
+                34.93610844396471,
+                32.06623141765962
+              ],
+              [
+                34.93651077099187,
+                32.064339282531606
+              ],
+              [
+                34.936937685145836,
+                32.06196393468319
+              ],
+              [
+                34.93911054963209,
+                32.05487854529325
+              ],
+              [
+                34.94409329771,
+                32.04720620914706
+              ],
+              [
+                34.94508379168471,
+                32.04426911667579
+              ],
+              [
+                34.94903896355786,
+                32.03655730869698
+              ],
+              [
+                34.94165526643603,
+                32.02430044352147
+              ],
+              [
+                34.94927930801349,
+                32.02597598447241
+              ],
+              [
+                34.97304433107453,
+                32.023869715196
+              ],
+              [
+                34.97808097122996,
+                32.019784018037136
+              ],
+              [
+                34.975393367322894,
+                32.00887969908508
+              ],
+              [
+                34.966687840000006,
+                32.008153243496906
+              ]
+            ]
+          ]
+        },
+        "service_fee_short_description": "Service fee up to 5%, ₪1.00-₪5.90",
+        "service_fee_estimate": {
+          "min": 100,
+          "max": 590,
+          "percentage": 5
+        },
+        "feature_croatia_currency_selection_enabled": false,
+        "show_eco_packaging": false,
+        "is_pickup_friendly": false,
+        "age_verification_method": "consent_only",
+        "trader_information": null,
+        "show_delivery_preestimate_by_time": false,
+        "merchant": {
+          "id": "63b67d2ded55a1e1ff50e237",
+          "name": "שופרסל בע״מ",
+          "business_id": "520022732",
+          "street_address": "בנימין שמוטקין 30",
+          "city": "ראשון לציון",
+          "post_code": "7536333",
+          "country": "Israel"
+        },
+        "digital_services_act_information": {
+          "name": "שופרסל בע״מ",
+          "business_id": "520022732",
+          "address": null,
+          "self_certification": null,
+          "report_item_url": null
+        },
+        "slug": "shufersal-rosh-haayin",
+        "venue_supports_wolt_pay": false,
+        "group_order_id": null,
+        "info": {
+          "venue_info_service_fee_description": "The service fee is 5% of item subtotal based on the order as originally placed, maximum ₪5.90. A reduced service fee of ₪1.00 applies when the item subtotal of such order is less than ₪60.00.",
+          "venue_info_order_minimum": "₪70.00",
+          "venue_info_base_delivery_price": "₪10.00"
+        },
+        "zero_distance_fees": {
+          "delivery_price": 1000
+        },
+        "return_policy_display": null
+      }
+    }
+  }
+]

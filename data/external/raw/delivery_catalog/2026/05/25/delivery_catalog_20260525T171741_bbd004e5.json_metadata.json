@@ -1,0 +1,12 @@
+{
+  "url": "https://wolt.com/en/isr/petah-tikva/venue/king-store-rosh-haayin/items/menucategory-9#query-state",
+  "method": "GET",
+  "status_code": 200,
+  "content_type": "application/json; charset=utf-8",
+  "observed_at": "2026-05-25T17:17:41.981183+00:00",
+  "file_path": "/Users/fadisayej/Desktop/Hackathon26/Hackathon2026/data/external/raw/delivery_catalog/2026/05/25/delivery_catalog_20260525T171741_bbd004e5.json",
+  "sha256": "bbd004e5a391fb059ec034d3b3e8244c22e436c555c0e80510b5d73f49ca5faa",
+  "headers": {
+    "content-type": "application/json; charset=utf-8"
+  }
+}

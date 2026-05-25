@@ -1,0 +1,12 @@
+{
+  "url": "https://wolt.com/en/isr/petah-tikva/venue/wolt-market-lev-haaretz/items/menucategory-1#query-state",
+  "method": "GET",
+  "status_code": 200,
+  "content_type": "application/json; charset=utf-8",
+  "observed_at": "2026-05-25T16:47:58.116011+00:00",
+  "file_path": "/Users/fadisayej/Desktop/Hackathon26/Hackathon2026/data/external/raw/delivery_catalog/2026/05/25/delivery_catalog_20260525T164758_41ff1ed7.json",
+  "sha256": "41ff1ed72b08fcda723a8b8b0b8ed94474ff54baae520e3d830ddd6030afef15",
+  "headers": {
+    "content-type": "application/json; charset=utf-8"
+  }
+}

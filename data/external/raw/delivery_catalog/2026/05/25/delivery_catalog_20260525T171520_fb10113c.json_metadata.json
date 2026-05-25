@@ -1,0 +1,12 @@
+{
+  "url": "https://wolt.com/en/isr/petah-tikva/venue/victory-rosh-haayin/items/menucategory-12#query-state",
+  "method": "GET",
+  "status_code": 200,
+  "content_type": "application/json; charset=utf-8",
+  "observed_at": "2026-05-25T17:15:20.705816+00:00",
+  "file_path": "/Users/fadisayej/Desktop/Hackathon26/Hackathon2026/data/external/raw/delivery_catalog/2026/05/25/delivery_catalog_20260525T171520_fb10113c.json",
+  "sha256": "fb10113cc6eed8e65063ebdc03c925ff1f07fa25508257d6dfbe5c07641804a1",
+  "headers": {
+    "content-type": "application/json; charset=utf-8"
+  }
+}

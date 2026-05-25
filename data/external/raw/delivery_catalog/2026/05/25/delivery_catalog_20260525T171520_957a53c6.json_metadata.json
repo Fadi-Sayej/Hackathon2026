@@ -1,0 +1,12 @@
+{
+  "url": "https://wolt.com/en/isr/petah-tikva/venue/shuk-bair-rosh-haain/items/menucategory-3#query-state",
+  "method": "GET",
+  "status_code": 200,
+  "content_type": "application/json; charset=utf-8",
+  "observed_at": "2026-05-25T17:15:20.705816+00:00",
+  "file_path": "/Users/fadisayej/Desktop/Hackathon26/Hackathon2026/data/external/raw/delivery_catalog/2026/05/25/delivery_catalog_20260525T171520_957a53c6.json",
+  "sha256": "957a53c6634a39c4b46acd18f166eb29f54b6f1ae185009bd15e813e497e78e1",
+  "headers": {
+    "content-type": "application/json; charset=utf-8"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "url": "https://wolt.com/en/isr/petah-tikva/venue/bingo1/items/menucategory-1#query-state",
+  "method": "GET",
+  "status_code": 200,
+  "content_type": "application/json; charset=utf-8",
+  "observed_at": "2026-05-25T17:17:41.981183+00:00",
+  "file_path": "/Users/fadisayej/Desktop/Hackathon26/Hackathon2026/data/external/raw/delivery_catalog/2026/05/25/delivery_catalog_20260525T171741_ff33c2d8.json",
+  "sha256": "ff33c2d852a7c38f6d867127943d8ae33a4a8d722a6b842e0cf2ccd37df40cb9",
+  "headers": {
+    "content-type": "application/json; charset=utf-8"
+  }
+}

@@ -14,10 +14,16 @@ pyyaml>=6.0
 # Logging
 loguru>=0.7
 
-# HTTP client (used by future collectors; Alonit connector uses ftplib from stdlib)
+# HTTP client (used by delivery scrapers; Alonit connector uses ftplib from stdlib)
 httpx>=0.27
+
+# HTML parsing for delivery-catalog scrapers (Wolt query-state, 10bis __NEXT_DATA__)
+beautifulsoup4>=4.12
+lxml>=5.0
+
+# Firestore writer (Python admin SDK) + .env loader
+firebase-admin>=6.5
+python-dotenv>=1.0
 
 # MCP server (Model Context Protocol — expose price-lookup tools to Claude)
 mcp>=1.0
-
-# (Future collectors will add: selectolax, lxml, etc.)

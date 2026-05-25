@@ -26,3 +26,9 @@ dist-ssr
 # Firebase configuration
 src/firebase.js
 .vercel
+
+# Secrets (Firebase service-account JSON, .env)
+.env
+.env.local
+secrets/
+*service-account*.json
