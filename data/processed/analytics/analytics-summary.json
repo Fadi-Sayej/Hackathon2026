@@ -1,78 +1,324 @@
 {
-  "totalProducts": 30,
-  "estimatedStockValue": 2487.92,
+  "totalProducts": 7451,
+  "estimatedStockValue": 0,
   "categories": [
     {
-      "category": "Cold Drinks",
-      "products": 5,
-      "salesLast30Days": 257,
-      "currentStock": 89
+      "category": "בדיקה",
+      "products": 7,
+      "salesLast30Days": 0,
+      "currentStock": 0
     },
     {
-      "category": "Water",
+      "category": "קופה שטיפה (הכל )",
+      "products": 93,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "מחלקת -barista",
+      "products": 104,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "קפה נהג משאית",
+      "products": 1,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "עובדים",
+      "products": 29,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "קפה גמיל ומשפחה",
+      "products": 1,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "עיתון",
       "products": 2,
-      "salesLast30Days": 147,
-      "currentStock": 51
+      "salesLast30Days": 0,
+      "currentStock": 0
     },
     {
-      "category": "Snacks",
-      "products": 5,
-      "salesLast30Days": 142,
-      "currentStock": 62
+      "category": "משקאות",
+      "products": 500,
+      "salesLast30Days": 0,
+      "currentStock": 0
     },
     {
-      "category": "Chocolate",
+      "category": "מוצרי מאפים",
+      "products": 22,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "מוצרי שימוש מטבח -חנות",
+      "products": 126,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "תפוז טרי ( שימוש עצמי )",
+      "products": 1,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "פירות וירקות",
+      "products": 115,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "מחלקת drive",
+      "products": 51,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "חטיפים מתוקים",
+      "products": 848,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "אריזות ו מוצרי  ניקוי לסופר",
+      "products": 38,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "כל הסיגריות",
+      "products": 113,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "מוצרי בצק ( معجنات )",
+      "products": 6,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "אבזרי עישון",
+      "products": 101,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "מחלקת yomyom - event",
+      "products": 12,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "מוצרי מכולת",
+      "products": 2472,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "מתנה ארוזה",
       "products": 4,
-      "salesLast30Days": 116,
-      "currentStock": 62
+      "salesLast30Days": 0,
+      "currentStock": 0
     },
     {
-      "category": "Dairy",
-      "products": 3,
-      "salesLast30Days": 114,
-      "currentStock": 16
+      "category": "לחם",
+      "products": 20,
+      "salesLast30Days": 0,
+      "currentStock": 0
     },
     {
-      "category": "Bakery",
-      "products": 3,
-      "salesLast30Days": 98,
-      "currentStock": 7
-    },
-    {
-      "category": "Energy Drinks",
+      "category": "פרח",
       "products": 2,
-      "salesLast30Days": 93,
-      "currentStock": 32
+      "salesLast30Days": 0,
+      "currentStock": 0
     },
     {
-      "category": "Coffee",
+      "category": "מאפים (גדרון - שמרים )",
+      "products": 13,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "ממתקים",
+      "products": 37,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "תכשיטים לילדות קטנות",
+      "products": 131,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "ממתקי בסקוטי",
+      "products": 25,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "חטיפים מלוחים",
+      "products": 347,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "מוצרי קפה (סאשה )",
+      "products": 18,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "פיקדון  ו משטחים - ארגזים",
+      "products": 3,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "מוצרי עונתי חורף",
+      "products": 32,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "אבזרי סלולר ו חשמל",
+      "products": 278,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "מוצרי מקרר",
+      "products": 457,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "מוצרי בית",
+      "products": 329,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "מוצרי  אלקטרונים",
+      "products": 23,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "קפואים מצוננים",
+      "products": 68,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "מוצרי חצר תחנה",
+      "products": 144,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "משקפים",
       "products": 2,
-      "salesLast30Days": 52,
-      "currentStock": 25
+      "salesLast30Days": 0,
+      "currentStock": 0
     },
     {
-      "category": "Cigarettes",
-      "products": 1,
-      "salesLast30Days": 46,
-      "currentStock": 49
+      "category": "גלידות",
+      "products": 205,
+      "salesLast30Days": 0,
+      "currentStock": 0
     },
     {
-      "category": "Gum & Candy",
-      "products": 1,
-      "salesLast30Days": 34,
-      "currentStock": 23
+      "category": "פיצוחים",
+      "products": 94,
+      "salesLast30Days": 0,
+      "currentStock": 0
     },
     {
-      "category": "Ice Cream",
-      "products": 1,
-      "salesLast30Days": 30,
-      "currentStock": 11
+      "category": "מוצרי ניקיון ו טיפוח אישי",
+      "products": 185,
+      "salesLast30Days": 0,
+      "currentStock": 0
     },
     {
-      "category": "Car Accessories",
+      "category": "חד פעמי",
+      "products": 15,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "נקיניקיות",
+      "products": 38,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "בעלי חיים",
+      "products": 29,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "בשרים",
+      "products": 25,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "משקאות טבעיות",
+      "products": 9,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "מוצרי יום הולדת ו מתנות",
+      "products": 171,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "מוצרי ריח - לרכב",
+      "products": 52,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "שמנים",
+      "products": 36,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "מוצרי פיקוח",
+      "products": 3,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "מגבים",
+      "products": 12,
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "מחלקה לא פעילה",
       "products": 1,
-      "salesLast30Days": 18,
-      "currentStock": 8
+      "salesLast30Days": 0,
+      "currentStock": 0
+    },
+    {
+      "category": "יח'",
+      "products": 1,
+      "salesLast30Days": 0,
+      "currentStock": 0
     }
   ]
 }

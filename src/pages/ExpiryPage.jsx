@@ -131,9 +131,14 @@ export function ExpiryPage({ operationalData }) {
       <section className="panel">
         <div className="panel-heading">
           <div>
-            <p className="eyebrow">Live alerts</p>
+            <p className="eyebrow">Expiry alerts</p>
             <h2>Items nearing or past expiry</h2>
           </div>
+          <span className="metric-chip">
+            {operationalData?.meta?.generatedAt
+              ? `From pipeline export · ${new Date(operationalData.meta.generatedAt).toLocaleString()}`
+              : 'From last pipeline export'}
+          </span>
         </div>
         {alerts.length === 0 ? (
           <EmptyState

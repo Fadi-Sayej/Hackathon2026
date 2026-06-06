@@ -4,12 +4,14 @@ import { MarketIntelligencePanel } from '../components/MarketIntelligencePanel.j
 import { MetricCard } from '../components/shared/MetricCard.jsx'
 import { StatusBadge } from '../components/shared/StatusBadge.jsx'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
+import { DataProvenanceBanner } from '../components/shared/DataProvenanceBanner.jsx'
 import { formatCurrency, formatDays, percent, statusTone } from '../components/shared/formatters.js'
 
 export function DashboardPage({
   analyzedProducts,
   competitorSummary,
   dashboardStats,
+  dataProvenance,
   marketContext,
   priceLeaderProducts,
   priceProtectionAlerts,
@@ -20,20 +22,31 @@ export function DashboardPage({
     .filter((recommendation) => recommendation.urgency === 'HIGH')
     .slice(0, 4)
 
+  const catalogDetail =
+    dataProvenance?.catalog === 'real'
+      ? 'Real YomYom POS SKUs'
+      : dataProvenance?.catalog === 'uploaded'
+        ? 'Uploaded CSV SKUs'
+        : 'Demo sample SKUs'
+  // Sales history is absent in the YomYom inventory snapshot, so stockout /
+  // reorder figures are model estimates, not observed demand. Say so.
+  const velocityDetail = dataProvenance?.hasSalesHistory ? null : 'Estimated — no sales history in POS export'
+
   return (
     <>
+      <DataProvenanceBanner dataProvenance={dataProvenance} />
       <section className="metric-grid">
-        <MetricCard label="Total Products" value={dashboardStats.totalProducts} detail="Active demo SKUs" />
+        <MetricCard label="Total Products" value={dashboardStats.totalProducts} detail={catalogDetail} />
         <MetricCard
           label="High Risk Stockouts"
           value={dashboardStats.highRiskStockouts}
-          detail={`${dashboardStats.highPriority} high priority items`}
+          detail={velocityDetail ?? `${dashboardStats.highPriority} high priority items`}
           tone="danger"
         />
         <MetricCard
           label="Reorder Suggestions"
           value={dashboardStats.reorderSuggestions}
-          detail="Pending purchase decisions"
+          detail={velocityDetail ?? 'Pending purchase decisions'}
           tone="success"
         />
         <MetricCard

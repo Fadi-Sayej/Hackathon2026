@@ -69,7 +69,7 @@ const pageMeta = {
   },
   operational: {
     title: 'Operational Risks',
-    description: 'Live POS-derived risks: expiry, WOLT price gaps, margins, negative stock, and unknown barcodes.',
+    description: 'POS-derived risks from the latest pipeline export: expiry, WOLT price gaps, margins, negative stock, and unknown barcodes.',
   },
   expiry: {
     title: 'Expiry Tracking',
@@ -106,7 +106,7 @@ function initialStoreData() {
 }
 
 function App() {
-  const [activePage, setActivePage] = useState('dashboard')
+  const [activePage, setActivePage] = useState('operational')
   const [marketContext, setMarketContext] = useState(fallbackMarketContext)
   const [recommendationOverrides, setRecommendationOverrides] = useState(() =>
     loadRecommendationDecisions(),
@@ -155,12 +155,42 @@ function App() {
 
   const products = storeData.products
 
+  // ── Data provenance (honest real-vs-demo signal for the UI) ────────
+  // The catalog is "real" when it comes from the YomYom POS silver export
+  // (products carry `ym-<barcode>` ids). Sales history is absent in the
+  // current YomYom inventory snapshot, so velocity-derived metrics are
+  // flagged rather than presented as observed demand.
+  const dataProvenance = useMemo(() => {
+    const isRealCatalog =
+      storeData.connectorMode === CONNECTOR_MODES.DEMO &&
+      products.some((product) => typeof product.id === 'string' && product.id.startsWith('ym-'))
+    const hasSalesHistory = products.some(
+      (product) => (product.salesLast30Days ?? 0) > 0 || (product.salesLast7Days ?? 0) > 0,
+    )
+    const competitorStoreCount = Array.isArray(COMPETITOR_STORES) ? COMPETITOR_STORES.length : 0
+    return {
+      catalog: isRealCatalog ? 'real' : storeData.connectorMode === CONNECTOR_MODES.CSV ? 'uploaded' : 'demo',
+      catalogCount: products.length,
+      catalogLabel: isRealCatalog
+        ? 'Real YomYom POS catalog'
+        : storeData.connectorMode === CONNECTOR_MODES.CSV
+          ? `Uploaded CSV${storeData.fileName ? ` (${storeData.fileName})` : ''}`
+          : 'Bundled demo sample',
+      hasSalesHistory,
+      competitor: competitorStoreCount > 0 ? 'real' : 'none',
+      competitorStoreCount,
+      liveMarketContext: marketContext.sourceLabel === 'live',
+    }
+  }, [products, storeData.connectorMode, storeData.fileName, marketContext.sourceLabel])
+
   // ── Hyper-Local Competitor Intelligence (plugin) ───────────────────
-  // Mock-only during the hackathon demo. Filters competitor stores to the
-  // 1 km radius first, pivots them into a barcode-keyed market snapshot,
-  // then enriches our catalog with price + stock intelligence flags.
+  // Real competitor data from Kaggle (Dor Alon, Rami Levy, Shufersal).
+  // Filters competitor stores to a 3 km radius first (real stores are
+  // 1.4–2.1 km from our Kafr Qasim location), pivots them into a
+  // barcode-keyed market snapshot, then enriches our catalog with
+  // price + stock intelligence flags.
   const nearbyCompetitors = useMemo(
-    () => filterStoresByRadius(COMPETITOR_STORES, OUR_STORE.coords, 1000),
+    () => filterStoresByRadius(COMPETITOR_STORES, OUR_STORE.coords, 3000),
     [],
   )
   const localMarketSnapshot = useMemo(
@@ -373,6 +403,7 @@ function App() {
     stockoutOpportunities,
     storeData,
     connectorStatus,
+    dataProvenance,
     operationalData,
     operationalStatus,
     onApprove: (recommendation) =>
@@ -396,6 +427,7 @@ function App() {
   return (
     <AppShell
       activePage={activePage}
+      dataProvenance={dataProvenance}
       hasDemoState={Object.keys(recommendationOverrides).length > 0}
       onResetDemoState={handleResetDemoState}
       pageMeta={pageMeta[activePage]}
