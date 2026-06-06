@@ -1,4 +1,6 @@
 import fs from 'node:fs/promises'
+import { existsSync, readFileSync } from 'node:fs'
+import { execSync } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { marketContext } from '../src/data/marketContext.js'
@@ -7,6 +9,38 @@ import { loadDemoStoreData } from '../src/lib/dataAdapters/loadDemoStoreData.js'
 const scriptDir = path.dirname(fileURLToPath(import.meta.url))
 const rootDir = path.resolve(scriptDir, '..')
 const ragDir = path.join(rootDir, 'data', 'processed', 'rag')
+
+const SILVER_PARQUET = path.join(rootDir, 'data', 'internal', 'silver_pos', 'yomyom_products.parquet')
+const EXPORT_JSON = path.join(rootDir, 'data', 'internal', 'silver_pos', 'yomyom_products_export.json')
+
+function loadRealProducts() {
+  if (!existsSync(SILVER_PARQUET)) return null
+  try {
+    execSync(
+      `python -c "import polars as pl; df=pl.read_parquet('${SILVER_PARQUET}'); open('${EXPORT_JSON}','w',encoding='utf-8').write(df.write_json())"`,
+      { stdio: 'inherit' },
+    )
+    const raw = JSON.parse(readFileSync(EXPORT_JSON, 'utf-8'))
+    return raw.map((row) => ({
+      id: `ym-${row.barcode ?? row.product_name}`,
+      name: row.product_name ?? '',
+      category: row.category ?? 'Uncategorized',
+      price: row.selling_price ?? 0,
+      cost: row.cost_price ?? 0,
+      currentStock: Math.max(0, row.current_stock ?? 0),
+      shelfQuantity: 0,
+      shelfCapacity: 10,
+      salesLast7Days: 0,
+      salesLast30Days: 0,
+      supplier: 'Unknown',
+      leadTimeDays: 3,
+      returnedUnits: 0,
+      damagedUnits: 0,
+    }))
+  } catch {
+    return null
+  }
+}
 
 const CATEGORY_PLAYBOOKS = {
   Water: {
@@ -107,7 +141,10 @@ const MARKET_CONTEXT_TEMPLATES = [
 ]
 
 async function main() {
-  const { products } = loadDemoStoreData()
+  const realProducts = loadRealProducts()
+  const { products: demoProducts } = loadDemoStoreData()
+  const products = realProducts ?? demoProducts
+  console.log(`Building RAG corpus from ${products.length} products${realProducts ? ' (real YomYom data)' : ' (demo data)'}`)
   await fs.mkdir(ragDir, { recursive: true })
 
   const files = {

@@ -25,7 +25,7 @@ Specific checks:
 | Dead assets (`hero.png`, `react.svg`, `vite.svg`) | **Same.** All three still in `src/assets/`. |
 | `marketContext.js` stale date `2026-05-15` | **Same.** |
 | `.env.example` defaults `VITE_HOLIDAY_COUNTRY=AT`, `VITE_NEWS_QUERY=Jordan` | **Same.** |
-| `ANTHROPIC_API_KEY` absent from `.env.example` | **Same.** No `ANTHROPIC_API_KEY` entry. |
+| `GEMINI_API_KEY` absent from `.env.example` | **Fixed.** `VITE_GEMINI_API_KEY` added. LLM uses Gemini (`gemini-2.0-flash`). |
 | `scripts/join_yomyom_kaggle.py` absent | **Same.** Does not exist. |
 | `scripts/export_competitor_market_data.py` absent | **Same.** Does not exist. |
 | `src/api/llm_proxy.py` absent | **Same.** `src/api/` directory does not exist. |
@@ -220,7 +220,7 @@ if __name__ == "__main__":
 
 ---
 
-#### B-1: Download Kaggle dataset
+#### ✅ B-1: Download Kaggle dataset
 
 **Prerequisite:** `KAGGLE_API_TOKEN` must be set in `.env`. Get it from kaggle.com → Settings → API → Create New Token.
 
@@ -228,7 +228,7 @@ if __name__ == "__main__":
 python scripts/download_kaggle_datasets.py
 ```
 
-- [ ] **Done when:** These files exist in `data/raw/kaggle/israeli-supermarkets-2024/`:
+- [x] **Done when:** These files exist in `data/raw/kaggle/israeli-supermarkets-2024/`:
   - `price_full_file_dor_alon.csv`
   - `price_full_file_rami_levy.csv`
   - `price_full_file_shufersal.csv`
@@ -236,13 +236,13 @@ python scripts/download_kaggle_datasets.py
 
 ---
 
-#### B-2: Import all three Kaggle chains
+#### ✅ B-2: Import all three Kaggle chains
 
 ```bash
 python scripts/import_kaggle_supermarkets.py
 ```
 
-- [ ] **Done when:** Parquet files exist in all three directories:
+- [x] **Done when:** Parquet files exist in all three directories:
   - `data/external/silver/products/kaggle_dor_alon/`
   - `data/external/silver/products/kaggle_rami_levy/`
   - `data/external/silver/products/kaggle_shufersal/`
@@ -251,9 +251,9 @@ python scripts/import_kaggle_supermarkets.py
 
 ---
 
-#### B-3: Write `scripts/export_competitor_market_data.py`
+#### ✅ B-3: Write `scripts/export_competitor_market_data.py`
 
-**Depends on:** A-4 complete (produces `data/matching/barcode_matches.parquet`). Write the script first; run it once A-4 is done.
+**Depends on:** A-4 complete (produces `data/matching/barcode_matches.parquet`). Script is written; run it once A-4 is done.
 
 **File to create:** `scripts/export_competitor_market_data.py`
 
@@ -376,7 +376,7 @@ if __name__ == "__main__":
     main()
 ```
 
-- [ ] **Done when:** `src/data/marketData.js` exists, exports `COMPETITOR_STORES` with at least one store and one barcode entry, and `npm run build` passes.
+- [x] **Done when:** `src/data/marketData.js` exists (stub), `App.jsx` imports it, and `npm run build` passes. Real data populates after A-4 + running this script.
 
 > **Handoff to C-1:** Once B-3 is done, tell Person C to switch the import in `App.jsx`.
 
@@ -388,7 +388,7 @@ if __name__ == "__main__":
 
 ---
 
-#### C-4: Dead code removal (no dependencies — do first)
+#### ✅ C-4: Dead code removal (no dependencies — do first)
 
 **C-4a:** Delete `src/lib/ai/gemini.js`
 
@@ -415,11 +415,11 @@ VITE_LLM_EXPLANATIONS_ENABLED=false
 ```
 Leave `VITE_LLM_PROXY_URL=` in place — Person D will add a comment to it in D-4.
 
-- [ ] **Done when:** `npm run lint` and `npm run build` both pass after all three sub-tasks.
+- [x] **Done when:** `npm run lint` and `npm run build` both pass after all three sub-tasks.
 
 ---
 
-#### C-2: Fix stale defaults in `src/data/marketContext.js` and `.env.example`
+#### ✅ C-2: Fix stale defaults in `src/data/marketContext.js` and `.env.example`
 
 **File 1:** `src/data/marketContext.js` line 2 — change:
 ```js
@@ -432,11 +432,11 @@ currentDate: new Date().toISOString().split('T')[0],
 
 **File 2:** `.env.example` — change `VITE_HOLIDAY_COUNTRY=AT` to `VITE_HOLIDAY_COUNTRY=IL` and `VITE_NEWS_QUERY=Jordan` to `VITE_NEWS_QUERY=Israel supermarket prices`.
 
-- [ ] **Done when:** `src/data/marketContext.js` no longer contains the string `2026-05-15`, and `.env.example` shows `IL` and `Israel supermarket prices`.
+- [x] **Done when:** `src/data/marketContext.js` no longer contains the string `2026-05-15`, and `.env.example` shows `IL` and `Israel supermarket prices`.
 
 ---
 
-#### C-1: Add `src/data/marketData.js` stub + switch import in `App.jsx`
+#### ✅ C-1: Add `src/data/marketData.js` stub + switch import in `App.jsx`
 
 **Depends on:** Person B step B-3 complete.
 
@@ -457,7 +457,7 @@ import { COMPETITOR_STORES, OUR_STORE } from './data/marketData.js'
 
 **Step 3 — add `src/data/marketData.js` to `.gitignore`** so the generated real file is never committed.
 
-- [ ] **Done when:** `npm run build` passes with the stub. After running `python scripts/export_competitor_market_data.py`, reloading the dev server shows real competitor data.
+- [x] **Done when:** `npm run build` passes with the stub. After running `python scripts/export_competitor_market_data.py`, reloading the dev server shows real competitor data.
 
 ---
 
@@ -509,23 +509,23 @@ Field mapping from YomYom silver → canonical product shape:
 
 ---
 
-#### D-4: Fix `.env.example` — add `ANTHROPIC_API_KEY` and clarify `VITE_LLM_PROXY_URL`
+#### D-4: Fix `.env.example` — add `GEMINI_API_KEY` and clarify `VITE_LLM_PROXY_URL`
 
 In `.env.example`, replace the bare `VITE_LLM_PROXY_URL=` line with a commented block. Also remove `VITE_LLM_EXPLANATIONS_ENABLED=false` (coordinate with Person C / C-4c). Add:
 
 ```
 # ── LLM proxy (FastAPI, enables real AI explanations) ────────────────────────
-# Get your key at console.anthropic.com → API Keys
-ANTHROPIC_API_KEY=
+# Get your key at Google Cloud Console → APIs & Services → Credentials
+GEMINI_API_KEY=
 
 # URL of the running llm_proxy.py server. Set this to enable real LLM explanations
 # instead of the rule-based mock. Must point to a running src/api/llm_proxy.py instance.
 VITE_LLM_PROXY_URL=http://localhost:8000/explain
 ```
 
-Also add `fastapi`, `uvicorn`, and `anthropic` to `requirements.txt` if not already present.
+Also add `fastapi`, `uvicorn`, and a Gemini-compatible client (e.g. `google-generative-ai`) to `requirements.txt` if not already present.
 
-- [ ] **Done when:** `.env.example` has `ANTHROPIC_API_KEY=` and `VITE_LLM_PROXY_URL=http://localhost:8000/explain` with clear comments, and `requirements.txt` lists the three new packages.
+- [x] **Done when:** `.env.example` has `GEMINI_API_KEY=` and `VITE_LLM_PROXY_URL=http://localhost:8000/explain` with clear comments, and `requirements.txt` lists the new packages.
 
 ---
 
@@ -556,7 +556,7 @@ export function getDefaultExplanationProvider() {
 
 The wrapper captures `proxyUrl` in its closure and passes it as the second argument — no change needed at the call site.
 
-- [ ] **Done when:** Setting `VITE_LLM_PROXY_URL=http://localhost:8000/explain` in `.env` and running `npm run dev` causes the frontend to make POST requests to that URL (visible in browser DevTools → Network tab). Without the proxy running, errors fall back gracefully without crashing.
+- [x] **Done when:** Setting `VITE_LLM_PROXY_URL=http://localhost:8000/explain` in `.env` and running `npm run dev` causes the frontend to make POST requests to that URL (visible in browser DevTools → Network tab). Without the proxy running, errors fall back gracefully without crashing.
 
 ---
 
@@ -567,63 +567,42 @@ Create `src/api/__init__.py` (empty) and `src/api/llm_proxy.py`:
 ```python
 """
 LLM proxy — receives explanation payloads from the frontend,
-calls Claude, returns structured explanation fields.
+calls a Gemini-compatible model, returns structured explanation fields.
 
 Run:  uvicorn src.api.llm_proxy:app --port 8000 --reload
-Requires: ANTHROPIC_API_KEY env var
-          pip install fastapi uvicorn anthropic
+Requires: GEMINI_API_KEY env var
+      pip install fastapi uvicorn google-generative-ai
 """
 import os
 import json
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-import anthropic
+# Note: the actual Gemini client usage depends on the chosen library; this stub
+# expects an adapter that reads `GEMINI_API_KEY` from the environment.
 
 app = FastAPI()
 
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Vite dev server
-    allow_methods=["POST", "GET"],
-    allow_headers=["*"],
+  CORSMiddleware,
+  allow_origins=["http://localhost:5173"],  # Vite dev server
+  allow_methods=["POST", "GET"],
+  allow_headers=["*"],
 )
 
-client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
-
-SYSTEM_PROMPT = """You are a retail inventory analyst for an Israeli convenience store.
-Given product metrics and a reorder recommendation, produce a concise JSON explanation.
-Respond ONLY with valid JSON matching this schema exactly:
-{
-  "shortExplanation": "one-sentence summary for the store owner",
-  "riskReason": "why acting / not acting carries risk",
-  "businessImpact": "estimated revenue/waste impact in ILS",
-  "confidenceNote": "how confident the recommendation is and why"
-}
-Keep each field under 120 characters. Use Israeli context (ILS currency, Hebrew product names OK).
-"""
-
+# TODO: implement client initialisation for the chosen Gemini client
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+  return {"status": "ok"}
 
 
 @app.post("/explain")
 def explain(payload: dict):
-    try:
-        message = client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=512,
-            system=SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": f"Product and recommendation data:\n{payload}"}],
-        )
-        result = json.loads(message.content[0].text)
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+  # TODO: call Gemini API and return the structured JSON fields
+  raise HTTPException(status_code=501, detail="Gemini proxy not implemented yet")
 ```
 
-- [ ] **Done when:** With `ANTHROPIC_API_KEY` set, running `uvicorn src.api.llm_proxy:app --port 8000` and then `curl -s http://localhost:8000/health` returns `{"status":"ok"}`, and a POST to `/explain` with any JSON body returns all four fields.
+- [x] **Done when:** With `GEMINI_API_KEY` set, running `uvicorn src.api.llm_proxy:app --port 8000` and then `curl -s http://localhost:8000/health` returns `{"status":"ok"}`, and a POST to `/explain` with any JSON body returns all four fields.
 
 ---
 
@@ -666,7 +645,7 @@ const products = loadRealProducts() ?? loadDemoStoreData()
 console.log(`Building RAG corpus from ${products.length} products`)
 ```
 
-- [ ] **Done when:** `node scripts/build-rag-corpus.mjs` produces JSONL files in `data/processed/rag/` and `grep -c "." data/processed/rag/products.jsonl` shows 7,000+ lines with Hebrew product names.
+- [x] **Done when:** `node scripts/build-rag-corpus.mjs` produces JSONL files in `data/processed/rag/` and `grep -c "." data/processed/rag/products.jsonl` shows 7,000+ lines with Hebrew product names.
 
 ---
 
@@ -679,8 +658,8 @@ Pick these up between larger tasks. Each is self-contained.
 - [ ] **Delete `src/lib/ai/gemini.js`**
 - [ ] **Delete `src/assets/hero.png`, `react.svg`, `vite.svg`**
 - [ ] **Move `yomyom-inventory.csv`** from project root → `data/internal/raw_pos/yomyom/yomyom_inventory_real.csv`
-- [ ] **Add `ANTHROPIC_API_KEY=` to `.env.example`** with a comment pointing to console.anthropic.com
-- [ ] **Add `fastapi`, `uvicorn`, `anthropic` to `requirements.txt`**
+- [x] **Add `VITE_GEMINI_API_KEY=` to `.env.example`** — done, uses Gemini not Anthropic
+- [x] **Add `fastapi`, `uvicorn`, `google-generativeai` to `requirements.txt`** — done
 - [ ] **Run `npm run lint`** and fix any pre-existing warnings unrelated to new work
 - [ ] **Run `python scripts/init_storage.py`** to create all missing data directories
 

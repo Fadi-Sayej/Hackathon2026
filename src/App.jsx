@@ -15,7 +15,7 @@ import {
 } from './lib/analytics/competitorEngine.js'
 import { buildLocalMarketSnapshot } from './lib/dataAdapters/multiCompetitorAdapter.js'
 import { filterStoresByRadius } from './lib/utils/geoUtils.js'
-import { COMPETITOR_STORES, OUR_STORE } from './data/mockMarketData.js'
+import { COMPETITOR_STORES, OUR_STORE } from './data/marketData.js'
 import { analyzeProducts, summarizeInventory } from './lib/analytics/inventoryEngine.js'
 import {
   generatePlanogram,
