@@ -54,7 +54,8 @@ def load_wolt_availability() -> set:
     valid = [pl.read_parquet(f) for f in parquet_files if len(pl.read_parquet(f).columns) > 1]
     if not valid:
         return available
-    df = pl.concat(valid)
+    # Use diagonal_relaxed to handle column type mismatches across scrape batches
+    df = pl.concat(valid, how="diagonal_relaxed")
     if "barcode" in df.columns and "is_online_available" in df.columns:
         online = df.filter(
             pl.col("is_online_available") == True,

@@ -22,7 +22,7 @@ def load_kaggle_chain(chain_dir: Path, chain_name: str) -> pl.DataFrame:
     return df.select([
         pl.col("barcode").pipe(normalize_barcode).alias("barcode_norm"),
         pl.col("product_name").alias("kaggle_product_name"),
-        pl.col("price").alias("kaggle_price"),
+        pl.col("price").cast(pl.Float64, strict=False).alias("kaggle_price"),
         pl.lit(chain_name).alias("chain"),
     ]).drop_nulls("barcode_norm")
 
