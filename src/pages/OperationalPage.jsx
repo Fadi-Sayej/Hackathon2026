@@ -56,6 +56,9 @@ export function OperationalPage({ operationalData, operationalStatus }) {
   const { meta, posHealth, byFamily, sources, recommendations } = operationalData
   const [activeFamily, setActiveFamily] = useState('ALL')
   const [activeType, setActiveType] = useState('ALL')
+  const [search, setSearch] = useState('')
+
+  const query = search.trim().toLowerCase()
 
   const familyFiltered = useMemo(
     () =>
@@ -65,11 +68,20 @@ export function OperationalPage({ operationalData, operationalStatus }) {
     [recommendations, activeFamily],
   )
 
+  const searchFiltered = useMemo(() => {
+    if (!query) return familyFiltered
+    return familyFiltered.filter((rec) =>
+      [rec.productName, rec.barcode, rec.category]
+        .filter(Boolean)
+        .some((field) => String(field).toLowerCase().includes(query)),
+    )
+  }, [familyFiltered, query])
+
   const typeCounts = useMemo(() => {
     const counts = {}
-    for (const rec of familyFiltered) counts[rec.type] = (counts[rec.type] ?? 0) + 1
+    for (const rec of searchFiltered) counts[rec.type] = (counts[rec.type] ?? 0) + 1
     return counts
-  }, [familyFiltered])
+  }, [searchFiltered])
 
   const types = useMemo(
     () => Object.keys(typeCounts).sort((a, b) => typeCounts[b] - typeCounts[a]),
@@ -79,13 +91,13 @@ export function OperationalPage({ operationalData, operationalStatus }) {
   const visible = useMemo(() => {
     const filtered =
       activeType === 'ALL'
-        ? familyFiltered
-        : familyFiltered.filter((rec) => rec.type === activeType)
+        ? searchFiltered
+        : searchFiltered.filter((rec) => rec.type === activeType)
     return filtered.slice(0, MAX_ROWS)
-  }, [familyFiltered, activeType])
+  }, [searchFiltered, activeType])
 
   const total = recommendations.length
-  const filteredTotal = familyFiltered.length
+  const filteredTotal = searchFiltered.length
   const families = Object.keys(byFamily ?? {})
 
   if (operationalStatus === 'loading') {
@@ -136,7 +148,20 @@ export function OperationalPage({ operationalData, operationalStatus }) {
           <div>
             <p className="eyebrow">Pipeline output</p>
             <h2>Recommendations</h2>
+            <p className="page-description" style={{ marginTop: '0.25rem' }}>
+              <strong>Operational</strong> actions come from our POS (expiry, stock, margin).
+              <strong> Competitor</strong> actions come from matched Kaggle prices. Use the
+              family filter to separate them.
+            </p>
           </div>
+          <input
+            className="operational-search"
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search product, barcode, or category…"
+            aria-label="Search recommendations"
+          />
         </div>
 
         {families.length > 1 && (
@@ -171,22 +196,29 @@ export function OperationalPage({ operationalData, operationalStatus }) {
           ))}
         </div>
 
-        <div className="compact-list">
-          {visible.map((rec) => (
-            <div className="compact-row" key={rec.id}>
-              <div>
-                <strong>{rec.productName || rec.barcode || 'Unknown item'}</strong>
-                <span>{rec.category || recDetail(rec)}</span>
+        {visible.length === 0 ? (
+          <EmptyState
+            title="No matching actions"
+            description={query ? `Nothing matches “${search.trim()}”. Clear the search to see all actions.` : 'No actions for this filter.'}
+          />
+        ) : (
+          <div className="compact-list">
+            {visible.map((rec) => (
+              <div className="compact-row" key={rec.id}>
+                <div>
+                  <strong>{rec.productName || rec.barcode || 'Unknown item'}</strong>
+                  <span>{rec.category || recDetail(rec)}</span>
+                </div>
+                <div className="compact-row-end">
+                  <StatusBadge tone={TYPE_META[rec.type]?.tone ?? 'neutral'}>
+                    {TYPE_META[rec.type]?.label ?? rec.type}
+                  </StatusBadge>
+                  <small>{Math.round((rec.confidence ?? 0) * 100)}% · {recDetail(rec)}</small>
+                </div>
               </div>
-              <div className="compact-row-end">
-                <StatusBadge tone={TYPE_META[rec.type]?.tone ?? 'neutral'}>
-                  {TYPE_META[rec.type]?.label ?? rec.type}
-                </StatusBadge>
-                <small>{Math.round((rec.confidence ?? 0) * 100)}% · {recDetail(rec)}</small>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
         {filteredTotal > visible.length && (
           <p className="page-description">
             Showing {visible.length} of {activeType === 'ALL' ? filteredTotal : typeCounts[activeType]} — refine by type above.
