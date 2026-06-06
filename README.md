@@ -16,6 +16,84 @@
 
 - [Alonit / Super Alonit signal source](docs/sources/alonit_signal_source.md) — what the Dor Alon price-transparency and Wolt delivery catalog sources provide, what they cannot prove, confirmed store IDs, and recommended field semantics
 
+### Competitor Signal Layer
+
+```bash
+# Build unified competitor-product signals (Alonit price file + Wolt delivery catalog)
+python scripts/build_competitor_product_signals.py
+
+# Print quality metrics after building
+python scripts/build_competitor_product_signals.py --print-quality
+
+# Backfill with a fixed timestamp
+python scripts/build_competitor_product_signals.py --run-at 2025-05-25T10:00:00+00:00
+```
+
+Output: `data/signals/competitor_product_signals/competitor_product_signals_<ts>.parquet`
+
+### YomYom POS Readiness
+
+```bash
+# Inspect an incoming YomYom POS CSV before import
+python scripts/inspect_yomyom_pos_file.py --input <path-to-pos.csv>
+
+# Import a YomYom POS CSV into internal silver tables
+python scripts/import_yomyom_pos.py --input <path-to-pos.csv>
+
+# Generate product recommendations when real POS + matching + competitor signals exist
+python scripts/generate_product_recommendations.py
+
+# One command after every new POS export or scrape:
+# import (optional) → expiry report → operational recs → dashboard JSON + sources.json
+npm run data:refresh                 # or: python scripts/refresh_pipeline.py
+npm run data:refresh -- --input data/internal/raw_pos/yomyom/all4shop_Mlai.csv
+
+# Export only the dashboard JSON (public/data/operational.json + sources.json)
+npm run data:dashboard               # or: python scripts/export_dashboard_data.py
+```
+
+Import outputs:
+
+- `data/internal/silver_pos/yomyom_products.parquet`
+- `data/internal/silver_pos/yomyom_sales.parquet`
+- `data/internal/silver_pos/yomyom_inventory.parquet`
+- `data/internal/silver_pos/yomyom_margins.parquet`
+- `reports/quality/yomyom_pos_quality_<timestamp>.json`
+
+Recommendation outputs:
+
+- `data/recommendations/product_recommendations/product_recommendations_<timestamp>.parquet`
+- `reports/recommendations/product_recommendations_<timestamp>.md`
+
+### Expiry Tracking at Receiving
+
+The POS inventory export does not include product expiry dates, so expiry is
+tracked as a tiny manual layer during receiving. The operator only needs to
+record barcode + expiry date; the system joins product name, category, stock,
+and prices from the latest POS silver tables.
+
+```bash
+# Record one received product expiry
+python scripts/record_expiry_scan.py \
+  --barcode 7290000041445 \
+  --expiry-date 2026-07-20
+
+# Or import a CSV with barcode,expiry_date rows
+python scripts/record_expiry_scan.py --input-csv path/to/expiry_scans.csv
+
+# Build expiry alerts and a Markdown report
+python scripts/build_expiry_report.py
+```
+
+Inputs:
+
+- `data/internal/expiry/expiry_scans.csv`
+
+Outputs:
+
+- `data/signals/expiry/expiry_alerts_<timestamp>.parquet`
+- `reports/expiry/expiry_report_<timestamp>.md`
+
 ## Current Stack
 
 - React

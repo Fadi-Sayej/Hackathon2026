@@ -64,6 +64,7 @@ columns:
       - תאור פריט        # Hebrew: item description (yomyom-inventory.csv)
       - שם מוצר          # Hebrew: product name
       - שם פריט          # Hebrew: item name
+      - תאור פריט        # Hebrew: item description (All4Shop export)
       - description
       - item_name
       - item_description
@@ -79,6 +80,7 @@ columns:
       - שם מחלקה         # Hebrew: department name (yomyom-inventory.csv)
       - קטגוריה          # Hebrew: category
       - מחלקה            # Hebrew: department
+      - שם מחלקה         # Hebrew: department name (All4Shop export)
       - קבוצה            # Hebrew: group
       - department
       - group
@@ -123,6 +125,17 @@ columns:
       - sale_price
       - price_ils
 
+  - raw_name:       WOLT
+    canonical_name: wolt_price
+    dtype:          decimal
+    required:       false
+    normalizers:    [strip_whitespace, null_if_empty]
+    candidate_names:
+      - Wolt
+      - wolt
+      - wolt_price
+      - delivery_price
+
   - raw_name:       cost_price
     canonical_name: cost_price
     dtype:          decimal
@@ -144,6 +157,7 @@ columns:
     candidate_names:
       - מלאי נוכחי       # Hebrew: current stock (yomyom-inventory.csv)
       - מלאי             # Hebrew: inventory / stock
+      - מלאי נוכחי       # Hebrew: current inventory (All4Shop export)
       - כמות במלאי       # Hebrew: quantity in stock
       - stock
       - quantity_on_hand
@@ -248,12 +262,12 @@ validation:
     - selling_price
 
   # Numeric fields that must be > 0 when present
-  positive_fields:
-    - selling_price
-    - cost_price
+  positive_fields: []
 
   # Numeric fields that must be >= 0 when present
   non_negative_fields:
+    - selling_price
+    - cost_price
     - units_sold_7d
     - units_sold_30d
     - sales_amount_30d
@@ -292,6 +306,7 @@ silver_tables:
       - brand
       - supplier
       - selling_price
+      - wolt_price
       - cost_price
 
   sales:
@@ -321,6 +336,7 @@ silver_tables:
       - product_name
       - category
       - selling_price
+      - wolt_price
       - cost_price
       - gross_profit_30d
       - margin_pct

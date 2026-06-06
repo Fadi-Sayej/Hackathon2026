@@ -27,3 +27,8 @@ python-dotenv>=1.0
 
 # MCP server (Model Context Protocol — expose price-lookup tools to Claude)
 mcp>=1.0
+
+# Fuzzy string matching (product-matching layer — Pass 3 WRatio scorer)
+rapidfuzz>=3.0
+
+# (Future collectors will add: selectolax, lxml, etc.)

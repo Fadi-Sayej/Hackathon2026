@@ -28,10 +28,13 @@ EXTERNAL_ROOT     = DATA_ROOT / "external"
 MATCHING_ROOT     = DATA_ROOT / "matching"
 SIGNALS_ROOT      = DATA_ROOT / "signals"
 RECOMMENDATIONS_ROOT = DATA_ROOT / "recommendations"
+EXPIRY_ROOT       = INTERNAL_ROOT / "expiry"
 
 # ── Internal sub-folders ───────────────────────────────────────────────────────
 RAW_POS_ROOT      = INTERNAL_ROOT / "raw_pos"
 SILVER_POS_ROOT   = INTERNAL_ROOT / "silver_pos"
+SNAPSHOTS_ROOT    = INTERNAL_ROOT / "snapshots"
+EXPIRY_SCANS_CSV  = EXPIRY_ROOT / "expiry_scans.csv"
 
 # ── External sub-folders ──────────────────────────────────────────────────────
 EXTERNAL_RAW_ROOT    = EXTERNAL_ROOT / "raw"
