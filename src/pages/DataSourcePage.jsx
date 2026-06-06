@@ -34,9 +34,9 @@ export function DataSourcePage({
   const sourceCards = [
     {
       mode: CONNECTOR_MODES.DEMO,
-      label: 'Demo Dataset',
+      label: 'Bundled Catalog',
       description:
-        'The bundled 40+ SKU sample. Always available, no upload required. Use this for the live demo.',
+        'The real YomYom POS catalog exported to the app (falls back to a small demo sample if the export is absent). Always available, no upload required.',
       action: (
         <Button
           disabled={isLoading || activeMode === CONNECTOR_MODES.DEMO}

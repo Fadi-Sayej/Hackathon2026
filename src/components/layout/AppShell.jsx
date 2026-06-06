@@ -16,11 +16,14 @@ const navItems = [
 export function AppShell({
   activePage,
   children,
+  dataProvenance,
   hasDemoState = false,
   onNavigate,
   onResetDemoState,
   pageMeta,
 }) {
+  const catalogIsReal = dataProvenance?.catalog === 'real'
+  const competitorIsReal = dataProvenance?.competitor === 'real'
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -72,10 +75,14 @@ export function AppShell({
             <p className="page-description">{pageMeta.description}</p>
           </div>
 
-          <div className="topbar-meta" aria-label="Demo status">
-            <span className="pill pill-success">POC Demo</span>
-            <span className="pill">Local-first</span>
-            <span className="pill">AI-Assisted</span>
+          <div className="topbar-meta" aria-label="Data status">
+            <span className={`pill ${catalogIsReal ? 'pill-success' : ''}`}>
+              {catalogIsReal ? 'Real POS data' : 'Demo data'}
+            </span>
+            <span className={`pill ${competitorIsReal ? 'pill-success' : ''}`}>
+              {competitorIsReal ? 'Real competitor prices' : 'No competitor data'}
+            </span>
+            <span className="pill">POC</span>
           </div>
         </header>
 
