@@ -156,11 +156,13 @@ function App() {
   const products = storeData.products
 
   // ── Hyper-Local Competitor Intelligence (plugin) ───────────────────
-  // Mock-only during the hackathon demo. Filters competitor stores to the
-  // 1 km radius first, pivots them into a barcode-keyed market snapshot,
-  // then enriches our catalog with price + stock intelligence flags.
+  // Real competitor data from Kaggle (Dor Alon, Rami Levy, Shufersal).
+  // Filters competitor stores to a 3 km radius first (real stores are
+  // 1.4–2.1 km from our Kafr Qasim location), pivots them into a
+  // barcode-keyed market snapshot, then enriches our catalog with
+  // price + stock intelligence flags.
   const nearbyCompetitors = useMemo(
-    () => filterStoresByRadius(COMPETITOR_STORES, OUR_STORE.coords, 1000),
+    () => filterStoresByRadius(COMPETITOR_STORES, OUR_STORE.coords, 3000),
     [],
   )
   const localMarketSnapshot = useMemo(
