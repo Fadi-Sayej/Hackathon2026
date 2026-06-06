@@ -32,3 +32,14 @@ src/firebase.js
 .env.local
 secrets/
 *service-account*.json
+
+# Raw data — downloaded by scripts, never committed
+data/raw/
+data/external/
+data/internal/silver_pos/
+data/signals/
+data/processed/
+data/exports/
+data/matching/
+data/recommendations/
+reports/
