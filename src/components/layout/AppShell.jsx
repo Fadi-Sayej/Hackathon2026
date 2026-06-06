@@ -5,6 +5,8 @@ const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: 'D' },
   { id: 'products', label: 'Products', icon: 'P' },
   { id: 'recommendations', label: 'Recommendations', icon: 'R' },
+  { id: 'operational', label: 'Operational Risks', icon: '!' },
+  { id: 'expiry', label: 'Expiry Tracking', icon: 'E' },
   { id: 'planogram', label: 'Planogram', icon: 'S' },
   { id: 'report', label: 'AI Report', icon: 'A' },
   { id: 'orders', label: 'Approved Orders', icon: 'O' },

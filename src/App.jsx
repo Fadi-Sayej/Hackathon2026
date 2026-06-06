@@ -42,9 +42,12 @@ import {
   saveApprovedOrder,
   saveRecommendationDecision,
 } from './lib/persistence/persistence.js'
+import { loadOperationalData, EMPTY_OPERATIONAL_DATA } from './lib/dataAdapters/loadOperationalData.js'
 import { AppShell } from './components/layout/AppShell.jsx'
 import { ApprovedOrdersPage } from './pages/ApprovedOrdersPage.jsx'
 import { DashboardPage } from './pages/DashboardPage.jsx'
+import { OperationalPage } from './pages/OperationalPage.jsx'
+import { ExpiryPage } from './pages/ExpiryPage.jsx'
 import { DataSourcePage } from './pages/DataSourcePage.jsx'
 import { PlanogramPage } from './pages/PlanogramPage.jsx'
 import { ProductsPage } from './pages/ProductsPage.jsx'
@@ -63,6 +66,14 @@ const pageMeta = {
   recommendations: {
     title: 'Smart Reorder',
     description: 'Manager approval workflow for AI-assisted purchasing recommendations.',
+  },
+  operational: {
+    title: 'Operational Risks',
+    description: 'Live POS-derived risks: expiry, WOLT price gaps, margins, negative stock, and unknown barcodes.',
+  },
+  expiry: {
+    title: 'Expiry Tracking',
+    description: 'Record barcode + expiry date at receiving and monitor items nearing or past expiry.',
   },
   planogram: {
     title: 'Shelf Optimization',
@@ -105,6 +116,20 @@ function App() {
     state: 'ready',
     message: 'Demo dataset loaded.',
   })
+  const [operationalData, setOperationalData] = useState(EMPTY_OPERATIONAL_DATA)
+  const [operationalStatus, setOperationalStatus] = useState('loading')
+
+  useEffect(() => {
+    let cancelled = false
+    loadOperationalData().then((data) => {
+      if (cancelled) return
+      setOperationalData(data)
+      setOperationalStatus('ready')
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -348,6 +373,8 @@ function App() {
     stockoutOpportunities,
     storeData,
     connectorStatus,
+    operationalData,
+    operationalStatus,
     onApprove: (recommendation) =>
       updateRecommendation(recommendation, {
         status: 'APPROVED',
@@ -377,6 +404,8 @@ function App() {
       {activePage === 'dashboard' && <DashboardPage {...pageProps} />}
       {activePage === 'products' && <ProductsPage {...pageProps} />}
       {activePage === 'recommendations' && <RecommendationsPage {...pageProps} />}
+      {activePage === 'operational' && <OperationalPage {...pageProps} />}
+      {activePage === 'expiry' && <ExpiryPage {...pageProps} />}
       {activePage === 'planogram' && <PlanogramPage {...pageProps} />}
       {activePage === 'report' && <ReportPage {...pageProps} />}
       {activePage === 'orders' && <ApprovedOrdersPage {...pageProps} />}

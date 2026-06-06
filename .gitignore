@@ -1,3 +1,7 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+
 # Logs
 logs
 *.log
@@ -14,11 +18,13 @@ data/external/bronze/
 data/external/silver/
 data/internal/raw_pos/
 data/internal/silver_pos/
+data/internal/expiry/
 data/matching/
 data/signals/
 data/recommendations/
 data/debug/
 reports/quality/
+reports/expiry/
 *.parquet
 *.duckdb
 
