@@ -13,7 +13,7 @@
 
 import { PRODUCT_ID_TO_BARCODE } from '../../data/marketData.js'
 
-const PROXIMITY_RADIUS_M = 1000
+const PROXIMITY_RADIUS_M = 3000
 const PRICE_PROTECTION_THRESHOLD = 0.15 // competitor must be ≥15% cheaper
 
 /**
