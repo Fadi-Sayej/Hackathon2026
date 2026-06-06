@@ -12,7 +12,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # Generated data artifacts
-src/data/marketData.js
+# src/data/marketData.js is committed as a stub — do not re-add here
 data/external/raw/
 data/external/bronze/
 data/external/silver/
@@ -32,6 +32,10 @@ node_modules
 dist
 dist-ssr
 *.local
+
+# Generated at runtime by Python scripts — keep on disk, do not commit
+public/data/operational.json
+public/data/sources.json
 
 # Editor directories and files
 .vscode/*

@@ -18,24 +18,62 @@ export function ReportPage({
   const [report, setReport] = useState(null)
   const [isGenerating, setIsGenerating] = useState(false)
 
-  const handleGenerate = useCallback(() => {
+  const handleGenerate = useCallback(async () => {
+    const proxyUrl = import.meta.env.VITE_LLM_PROXY_URL
     setIsGenerating(true)
-    setTimeout(() => {
-      const md = buildOptimizationReport({
-        analyzedProducts,
-        competitorSummary,
-        dashboardStats,
-        inventorySummary,
-        marketContext,
-        planogramItems,
-        planogramSummary,
-        recommendations,
-        affinitySuggestions,
+    setReport(null)
+
+    if (!proxyUrl) {
+      setTimeout(() => {
+        setReport(buildOptimizationReport({
+          analyzedProducts, competitorSummary, dashboardStats, inventorySummary,
+          marketContext, planogramItems, planogramSummary, recommendations, affinitySuggestions,
+        }))
+        setIsGenerating(false)
+      }, 2200)
+      return
+    }
+
+    try {
+      const payload = {
+        productCount: analyzedProducts?.length ?? 0,
+        reorderAlerts: recommendations?.filter(r => r.type === 'REORDER').length ?? 0,
+        topReorders: recommendations?.filter(r => r.type === 'REORDER').slice(0, 5).map(r => ({
+          name: r.productName,
+          urgency: r.urgencyScore,
+          reason: r.reason,
+        })) ?? [],
+        lowStockCount: analyzedProducts?.filter(p => p.inventoryStatus === 'critical').length ?? 0,
+        competitorSignals: competitorSummary?.priceLeaderCount ?? 0,
+        wasteAlerts: dashboardStats?.wasteAlerts ?? 0,
+        categories: [...new Set(analyzedProducts?.map(p => p.category).filter(Boolean))].slice(0, 8),
+        topAffinities: affinitySuggestions?.slice(0, 3).map(s => s.label) ?? [],
+      }
+
+      const response = await fetch(proxyUrl.replace('/explain', '/report'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       })
-      setReport(md)
+
+      if (!response.ok) throw new Error(`Proxy error: ${response.status}`)
+      const result = await response.json()
+
+      setReport(result.report ?? buildOptimizationReport({
+        analyzedProducts, competitorSummary, dashboardStats, inventorySummary,
+        marketContext, planogramItems, planogramSummary, recommendations, affinitySuggestions,
+      }))
+    } catch (err) {
+      console.warn('LLM report failed, falling back to rule-based:', err)
+      setReport(buildOptimizationReport({
+        analyzedProducts, competitorSummary, dashboardStats, inventorySummary,
+        marketContext, planogramItems, planogramSummary, recommendations, affinitySuggestions,
+      }))
+    } finally {
       setIsGenerating(false)
-    }, 2200)
-  }, [analyzedProducts, competitorSummary, dashboardStats, inventorySummary, marketContext, planogramItems, planogramSummary, recommendations, affinitySuggestions])
+    }
+  }, [analyzedProducts, competitorSummary, dashboardStats, inventorySummary, marketContext,
+      planogramItems, planogramSummary, recommendations, affinitySuggestions])
 
   return (
     <>

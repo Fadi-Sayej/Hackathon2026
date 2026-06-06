@@ -72,3 +72,23 @@ def explain(payload: dict):
         raise HTTPException(status_code=502, detail=f"Gemini response missing fields: {missing}")
 
     return result
+
+
+REPORT_SYSTEM_PROMPT = textwrap.dedent("""\
+    You are a retail analyst for an Israeli convenience store.
+    Given a summary of the store's inventory, alerts, and competitor signals, write a concise
+    executive report in markdown (use ## headers, bullet points, bold for key numbers).
+    Cover: inventory health, top reorder priorities, competitor positioning, and 3 actionable
+    recommendations. Keep it under 400 words. Use ILS (₪) for currency.
+""")
+
+
+@app.post("/report")
+def generate_report(payload: dict):
+    try:
+        prompt = REPORT_SYSTEM_PROMPT + "\n\nStore data summary:\n" + json.dumps(payload, ensure_ascii=False, indent=2)
+        response = model.generate_content(prompt)
+        text = response.text.strip()
+        return {"report": text}
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc

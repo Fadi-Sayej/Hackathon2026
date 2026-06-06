@@ -53,7 +53,7 @@ function recDetail(rec) {
 }
 
 export function OperationalPage({ operationalData, operationalStatus }) {
-  const { meta, posHealth, byType, byFamily, sources, recommendations } = operationalData
+  const { meta, posHealth, byFamily, sources, recommendations } = operationalData
   const [activeFamily, setActiveFamily] = useState('ALL')
   const [activeType, setActiveType] = useState('ALL')
 
