@@ -1,6 +1,6 @@
 # SmartShelf AI — Current Status
 
-_Last updated: June 6, 2026_  
+_Last updated: June 6, 2026 (Person B+C sprint)_  
 _Competitor data sources reviewed: June 6, 2026_
 
 ---
@@ -45,8 +45,11 @@ SmartShelf AI is a smart inventory and shelf management tool for convenience sto
 | Quality report per import | ✅ Works | Tells you how clean the data was |
 | Competitor price scraper (Alonit) | ✅ Works | Fetches prices from Alonit FTP — data in silver Parquet |
 | Wolt delivery catalog | ✅ Works | 9 venues, 366 SKUs scraped — data in silver Parquet |
-| Kaggle download script | ✅ Script ready | `scripts/download_kaggle_datasets.py` — needs `KAGGLE_API_TOKEN` in `.env` to run |
-| Kaggle import script | ✅ Script ready | `scripts/import_kaggle_supermarkets.py` — needs Kaggle data downloaded first |
+| Kaggle download script | ✅ Done | Data in `data/raw/kaggle/israeli-supermarkets-2024/` |
+| Kaggle import (Dor Alon) | ✅ Done | 16,547 products in `data/external/silver/products/kaggle_dor_alon/` |
+| Kaggle import (Rami Levy) | ✅ Done | 21,849 products in `data/external/silver/products/kaggle_rami_levy/` |
+| Kaggle import (Shufersal) | ✅ Done | 22,759 products in `data/external/silver/products/kaggle_shufersal/` |
+| Competitor export script | ✅ Script ready | `scripts/export_competitor_market_data.py` — run after barcode join |
 | 10bis catalog collector | ❌ Disabled | Requires bearer token; violates ToS to automate — kept for reference only |
 
 ---
@@ -60,9 +63,9 @@ This is the most important gap — data has been collected but none of it reache
 | Real YomYom inventory (7,678 products, Hebrew) | `yomyom-inventory.csv` at project root | Not imported into the pipeline yet |
 | Wolt competitor prices (366 SKUs, 9 venues) | `data/external/silver/products/delivery_catalog/` | No script exports it to the frontend |
 | Alonit competitor prices (FTP XML) | `data/external/silver/alonit_prices/` | No script exports it to the frontend |
-| Kaggle supermarket prices (Shufersal, Rami Levy, Dor Alon) | Not downloaded yet | Need `KAGGLE_API_TOKEN` + run two scripts |
+| Kaggle supermarket prices (61,155 SKUs across 3 chains) | `data/external/silver/products/kaggle_*/` | Needs barcode join (`join_yomyom_kaggle.py`) then export script |
 
-The frontend still shows the 40-product hardcoded demo from `src/data/demoProducts.js` and mock competitor prices from `src/data/mockMarketData.js`.
+The frontend imports from `src/data/marketData.js` (stub re-exports mock data). Once `barcode_matches.parquet` is produced and `export_competitor_market_data.py` is run, real competitor prices will replace the mock automatically.
 
 ---
 
@@ -180,7 +183,7 @@ The `VITE_GEMINI_API_KEY` is already set in `.env`.
 | CSV data upload | ✅ Yes | — |
 | Reorder recommendations | ✅ Yes | — |
 | Planogram generation | ✅ Yes | — |
-| Competitor price comparison | ✅ Mock only | Real data available — see OpenIsraeliSupermarkets below |
+| Competitor price comparison | ⚠️ Mock stub (real data queued) | 61,155 Kaggle SKUs in silver — needs barcode join + export to go live |
 | AI explanations | ⚠️ Ready to activate | Set `VITE_LLM_PROXY_URL=http://localhost:8000/explain` in `.env` and run the proxy |
 | AI report writing | ❌ No | Proxy built — report UI not yet wired to it |
 | Comax live POS sync | ❌ No | Need backend proxy + Comax credentials |
@@ -196,7 +199,7 @@ The `VITE_GEMINI_API_KEY` is already set in `.env`.
 In order of priority:
 
 1. **Activate LLM proxy** — set `VITE_LLM_PROXY_URL=http://localhost:8000/explain` in `.env` and run `uvicorn src.api.llm_proxy:app --port 8000`. `VITE_GEMINI_API_KEY` is already set. *(Person D — 5 minutes)*
-2. **Real competitor prices** — run Kaggle download + import, then barcode join + export to `marketData.js` *(Persons A+B)*
+2. **Real competitor prices** — ✅ Kaggle downloaded + imported (61,155 SKUs). Remaining: Person A imports YomYom → run `join_yomyom_kaggle.py` → run `export_competitor_market_data.py`
 3. **Wire AI report** — connect "Generate Report" button to the Gemini proxy instead of the timer template *(Person D)*
 4. **Supabase database** — makes saved state persist across devices
 5. **Comax credentials** — enables live store data

@@ -194,14 +194,14 @@ Copy `.env.example` to `.env` before running locally.
 |---|---|---|---|
 | Wolt (9 venues, 366 SKUs) | `scripts/run_delivery_venue_connector.py` | `data/external/bronze/delivery_catalog/` + `data/external/silver/products/delivery_catalog/` | ✅ Collected |
 | Alonit / Dor Alon FTP XML | `scripts/run_alonit_collector.py` | `data/external/bronze/alonit/` + `data/external/silver/alonit_prices/` | ✅ Collected |
-| Kaggle: Israeli Supermarkets 2024 | `scripts/download_kaggle_datasets.py` then `scripts/import_kaggle_supermarkets.py` | `data/raw/kaggle/israeli-supermarkets-2024/` → `data/external/silver/products/kaggle_*/` | ⚠️ Script ready, data not yet downloaded |
+| Kaggle: Israeli Supermarkets 2024 | `scripts/download_kaggle_datasets.py` then `scripts/import_kaggle_supermarkets.py` | `data/raw/kaggle/israeli-supermarkets-2024/` → `data/external/silver/products/kaggle_*/` | ✅ Imported — 16,547 Dor Alon / 21,849 Rami Levy / 22,759 Shufersal |
 
 **Kaggle pipeline detail:**
 - `download_kaggle_datasets.py` — downloads from Kaggle API using `KAGGLE_API_TOKEN`. Saves raw CSVs to `data/raw/kaggle/israeli-supermarkets-2024/`. Requires `KAGGLE_API_TOKEN` in `.env`. Run once, re-run with `--force` to refresh.
 - `import_kaggle_supermarkets.py` — reads those CSVs, maps to `ExternalProductObservation`, writes bronze + silver Parquet. Supports `dor_alon`, `rami_levy`, `shufersal`. Expects price CSV + store CSV per chain from `src/external/kaggle_supermarket_importer.py`.
 - **`data/raw/` is in `.gitignore`** — raw data is never committed. Run the download script after cloning.
 
-**None of this external data is connected to the frontend yet.** The frontend still reads hardcoded mock data from `src/data/mockMarketData.js`.
+**Kaggle silver is now in the pipeline.** `src/data/marketData.js` stub exists and `App.jsx` imports it — once `barcode_matches.parquet` is produced and `export_competitor_market_data.py` is run, real prices will appear in the frontend automatically. The frontend currently falls back to mock data via the stub.
 
 #### Internal POS pipeline (fake data)
 
@@ -224,21 +224,22 @@ Business signals: top sellers, low-stock fast-movers, slow movers, high-margin i
 - Column mapping needed: `ברקוד` → barcode, `תאור פריט` → product_name, `מלאי נוכחי` → current_stock, `מחיר קניה` → cost_price, `מחיר מכירה` → selling_price, `שם מחלקה` → category
 - Note: stock values can be negative (POS artifact — treat negative as 0 or flag for review)
 
-#### 2. Download and import Kaggle competitor prices
-```bash
-# Set KAGGLE_API_TOKEN in .env first
-python scripts/download_kaggle_datasets.py
-python scripts/import_kaggle_supermarkets.py
-```
-Output lands in `data/external/silver/products/kaggle_dor_alon/`, `kaggle_rami_levy/`, `kaggle_shufersal/`.
+#### ✅ 2. Download and import Kaggle competitor prices — DONE
+Silver Parquets written:
+- `data/external/silver/products/kaggle_dor_alon/` — 16,547 products
+- `data/external/silver/products/kaggle_rami_levy/` — 21,849 products
+- `data/external/silver/products/kaggle_shufersal/` — 22,759 products
 
 #### 3. Barcode match: YomYom ↔ Kaggle
 **Output:** `data/matching/barcode_matches.parquet`
 
 Join `yomyom-inventory.csv` barcodes against Kaggle silver barcodes. This produces the competitor price-gap table (e.g. "YomYom sells Coca-Cola at 8₪, Shufersal sells it at 6.90₪").
 
-#### 4. Export real competitor data to frontend
-Write `scripts/export_competitor_market_data.py` that reads the barcode match table and outputs `src/data/marketData.js` in the same shape as `mockMarketData.js`. Update `App.jsx` to import it.
+#### ✅ 4. Export real competitor data to frontend — Script ready
+`scripts/export_competitor_market_data.py` is written. `src/data/marketData.js` stub created, `App.jsx` already imports it. Run the script once step 3 (`barcode_matches.parquet`) is available:
+```bash
+python3 scripts/export_competitor_market_data.py
+```
 
 #### 5. ✅ LLM proxy built (enable real AI explanations)
 **Status:** Done. `src/api/llm_proxy.py` uses Gemini (`gemini-2.0-flash`). `explanationProvider.js` bugs fixed.

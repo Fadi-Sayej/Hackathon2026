@@ -8,6 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # Generated data artifacts
+src/data/marketData.js
 data/external/raw/
 data/external/bronze/
 data/external/silver/
