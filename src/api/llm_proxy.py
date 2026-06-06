@@ -21,7 +21,12 @@ if not GEMINI_API_KEY:
     raise RuntimeError("VITE_GEMINI_API_KEY (or GEMINI_API_KEY) is not set in the environment.")
 
 genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel("gemini-1.5-flash")
+GEMINI_MODEL = (
+    os.environ.get("VITE_GEMINI_MODEL")
+    or os.environ.get("GEMINI_MODEL")
+    or "gemini-2.0-flash"
+)
+model = genai.GenerativeModel(GEMINI_MODEL)
 
 app = FastAPI(title="SmartShelf LLM Proxy")
 
