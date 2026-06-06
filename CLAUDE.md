@@ -175,65 +175,77 @@ Copy `.env.example` to `.env` before running locally.
 
 ## Data Pipeline Status
 
-### What's done
+### Real data collected
 
-#### Raw → Bronze → Silver (external competitor prices)
+#### Internal — YomYom inventory (REAL, not fake)
+
+`yomyom-inventory.csv` (project root) — real inventory export from YomYom's POS system.
+- **7,678 products**, Hebrew names, real prices
+- Columns: `קוד פריט` (item code), `ברקוד` (barcode), `תאור פריט` (name), `סוג פריט` (type), `מלאי נוכחי` (current stock), `מחיר קניה` (purchase price), `מחיר מכירה` (selling price), `WOLT` (Wolt price), `שם מחלקה` (department), `יחידת מידה` (unit)
+- ~6,902 rows have barcodes — matchable against Kaggle competitor data
+- Departments include: מוצרי מכולת (grocery), חטיפים מתוקים (sweet snacks), משקאות (beverages), מוצרי מקרר (refrigerated), חטיפים מלוחים (salty snacks), and ~20 others
+- **Not yet imported** into the pipeline — needs `import_yomyom_pos.py` adapted for this schema, or a new importer
+
+> The old fake 121-row `data/internal/raw_pos/yomyom/sample_yomyom_pos.csv` should be replaced by this real file.
+
+#### External — Competitor prices (collected, not yet wired to frontend)
 
 | Source | Script | Output | Status |
 |---|---|---|---|
-| Wolt (9 venues, 366 SKUs) | `scripts/run_delivery_venue_connector.py` | `data/external/bronze/delivery_catalog/` + `data/external/silver/products/` | ✅ Done |
-| Alonit / Dor Alon FTP XML | `scripts/run_alonit_collector.py` | `data/external/bronze/alonit/` + `data/external/silver/alonit_prices/` | ✅ Done |
-| Kaggle: Israeli Supermarkets 2024 | `scripts/download_kaggle_datasets.py` then `scripts/import_kaggle_supermarkets.py` | `data/external/bronze/kaggle_*/` + `data/external/silver/products/kaggle_*/` | ✅ Done |
+| Wolt (9 venues, 366 SKUs) | `scripts/run_delivery_venue_connector.py` | `data/external/bronze/delivery_catalog/` + `data/external/silver/products/delivery_catalog/` | ✅ Collected |
+| Alonit / Dor Alon FTP XML | `scripts/run_alonit_collector.py` | `data/external/bronze/alonit/` + `data/external/silver/alonit_prices/` | ✅ Collected |
+| Kaggle: Israeli Supermarkets 2024 | `scripts/download_kaggle_datasets.py` then `scripts/import_kaggle_supermarkets.py` | `data/raw/kaggle/israeli-supermarkets-2024/` → `data/external/silver/products/kaggle_*/` | ⚠️ Script ready, data not yet downloaded |
 
-**Kaggle import results:** 61,155 unique competitor price observations (Dor Alon 16,547 · Rami Levy 21,849 · Shufersal 22,759). Each record has barcode, Hebrew product name, price in ILS, store name, city.
+**Kaggle pipeline detail:**
+- `download_kaggle_datasets.py` — downloads from Kaggle API using `KAGGLE_API_TOKEN`. Saves raw CSVs to `data/raw/kaggle/israeli-supermarkets-2024/`. Requires `KAGGLE_API_TOKEN` in `.env`. Run once, re-run with `--force` to refresh.
+- `import_kaggle_supermarkets.py` — reads those CSVs, maps to `ExternalProductObservation`, writes bronze + silver Parquet. Supports `dor_alon`, `rami_levy`, `shufersal`. Expects price CSV + store CSV per chain from `src/external/kaggle_supermarket_importer.py`.
+- **`data/raw/` is in `.gitignore`** — raw data is never committed. Run the download script after cloning.
 
-#### Internal POS pipeline
+**None of this external data is connected to the frontend yet.** The frontend still reads hardcoded mock data from `src/data/mockMarketData.js`.
+
+#### Internal POS pipeline (fake data)
 
 | Source | Script | Output | Status |
 |---|---|---|---|
-| YomYom POS CSV (fake, seed=42) | `scripts/import_yomyom_pos.py` | `data/internal/silver_pos/*.parquet` + `data/signals/yomyom/` | ✅ Done |
+| YomYom POS CSV (fake, seed=42) | `scripts/import_yomyom_pos.py` | `data/internal/silver_pos/*.parquet` + `data/signals/yomyom/` | ✅ Done (fake data) |
 
 Silver tables: `yomyom_products`, `yomyom_sales`, `yomyom_inventory`, `yomyom_margins`.
 Business signals: top sellers, low-stock fast-movers, slow movers, high-margin impulse, category summary.
-
-#### Kaggle download automation
-
-`scripts/download_kaggle_datasets.py` — downloads `erlichsefi/israeli-supermarkets-2024` (2.1 GB, 351 files) via `KAGGLE_API_TOKEN` Bearer auth. Run once; re-run with `--force` to refresh.
-
-> **Important:** `data/raw/` is in `.gitignore`. Raw data is never committed. Anyone cloning the repo runs the download script to get the data.
 
 ---
 
 ### What's next (in priority order)
 
-#### 1. Wire real competitor prices into the frontend
-**Files to change:** `src/data/mockMarketData.js` (replace mock with real data)
+#### 1. Import real YomYom inventory
+**File:** `yomyom-inventory.csv` (project root, 7,678 rows, Hebrew)
 
-The frontend competitor engine (`src/lib/analytics/competitorEngine.js`) already works — it just reads from the hardcoded mock. We have 61K real barcode+price records in silver. The missing piece:
+- Move to `data/internal/raw_pos/yomyom/yomyom_inventory_real.csv`
+- Adapt `import_yomyom_pos.py` (or write a new importer) for this schema — columns are Hebrew, schema differs from the fake CSV
+- Column mapping needed: `ברקוד` → barcode, `תאור פריט` → product_name, `מלאי נוכחי` → current_stock, `מחיר קניה` → cost_price, `מחיר מכירה` → selling_price, `שם מחלקה` → category
+- Note: stock values can be negative (POS artifact — treat negative as 0 or flag for review)
 
-- Write a Python script (`scripts/export_competitor_market_data.py`) that:
-  - Reads `data/external/silver/products/kaggle_dor_alon/` + other chains
-  - Matches barcodes to YomYom's product catalog (`data/internal/silver_pos/yomyom_products.parquet`)
-  - Outputs `src/data/marketData.js` in the same shape as `mockMarketData.js`
-- Update `App.jsx` to import the new `marketData.js` instead of `mockMarketData.js`
+#### 2. Download and import Kaggle competitor prices
+```bash
+# Set KAGGLE_API_TOKEN in .env first
+python scripts/download_kaggle_datasets.py
+python scripts/import_kaggle_supermarkets.py
+```
+Output lands in `data/external/silver/products/kaggle_dor_alon/`, `kaggle_rami_levy/`, `kaggle_shufersal/`.
 
-#### 2. Build the LLM proxy (enable real AI explanations)
-**Files to change:** `src/lib/ai/llmExplanationProvider.js` (set `enabled: true`), `.env` (`VITE_LLM_PROXY_URL`)
-
-The frontend `llmExplanationProvider` is fully built and just needs a proxy endpoint. The payload format is already defined in `buildLLMExplanationPayload()`. Expected response: `{ shortExplanation, riskReason, businessImpact, confidenceNote }`.
-
-- Write `src/api/llm_proxy.py` — a small Flask/FastAPI endpoint that:
-  - Receives the `buildLLMExplanationPayload` JSON
-  - Calls Claude API (`claude-sonnet-4-6`) with the product metrics + RAG chunks as context
-  - Returns the four explanation fields
-- Set `VITE_LLM_PROXY_URL=http://localhost:8000/explain` and `VITE_LLM_EXPLANATIONS_ENABLED=true` in `.env`
-
-#### 3. Rebuild RAG corpus from real silver data
-**Files to change:** `scripts/build-rag-corpus.mjs`
-
-Currently reads `loadDemoStoreData()` (hardcoded JS). Should read the actual silver Parquets so RAG chunks reflect real inventory + real competitor prices. Then embed with Claude or a local model → vector store → feed into step 2.
-
-#### 4. Product matching (cross-source barcode join)
+#### 3. Barcode match: YomYom ↔ Kaggle
 **Output:** `data/matching/barcode_matches.parquet`
 
-Join `yomyom_products.parquet` barcodes against Kaggle silver barcodes to identify which products appear in both datasets. This powers competitor price-gap signals (e.g. "YomYom sells Coca-Cola at 8₪, Dor Alon sells it at 7₪").
+Join `yomyom-inventory.csv` barcodes against Kaggle silver barcodes. This produces the competitor price-gap table (e.g. "YomYom sells Coca-Cola at 8₪, Shufersal sells it at 6.90₪").
+
+#### 4. Export real competitor data to frontend
+Write `scripts/export_competitor_market_data.py` that reads the barcode match table and outputs `src/data/marketData.js` in the same shape as `mockMarketData.js`. Update `App.jsx` to import it.
+
+#### 5. Build the LLM proxy (enable real AI explanations)
+**Files to change:** `src/lib/ai/llmExplanationProvider.js` (set `enabled: true`), `.env` (`VITE_LLM_PROXY_URL`)
+
+Write `src/api/llm_proxy.py` — FastAPI endpoint receiving `buildLLMExplanationPayload` JSON, calls Claude API (`claude-sonnet-4-6`), returns `{ shortExplanation, riskReason, businessImpact, confidenceNote }`.
+
+#### 6. Rebuild RAG corpus from real data
+**File:** `scripts/build-rag-corpus.mjs`
+
+Currently reads `loadDemoStoreData()` (hardcoded JS). Should read real silver Parquets once step 1–3 are done.

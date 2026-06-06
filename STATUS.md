@@ -38,12 +38,31 @@ SmartShelf AI is a smart inventory and shelf management tool for convenience sto
 
 | Feature | Status | Notes |
 |---|---|---|
-| POS CSV import | ✅ Works | Reads a store's CSV export, validates it, and saves clean data files |
-| Inventory / sales / margin analysis | ✅ Works | Outputs structured Parquet files |
+| POS CSV import (fake data) | ✅ Works | 121-row fake dataset imported into Parquet + signals |
+| Real YomYom inventory CSV | ⚠️ Not imported | `yomyom-inventory.csv` exists at project root — 7,678 real products, not yet wired in |
+| Inventory / sales / margin analysis | ✅ Works | Outputs structured Parquet files (on fake data) |
 | Business signals (low stock, top sellers, etc.) | ✅ Works | Saved as JSON after each import |
 | Quality report per import | ✅ Works | Tells you how clean the data was |
-| Competitor price scraper (Alonit) | ✅ Works | Fetches prices from the Alonit network |
-| 10bis catalog collector | ✅ Partial | Gets store info; product menu requires a login token (see below) |
+| Competitor price scraper (Alonit) | ✅ Works | Fetches prices from Alonit FTP — data in silver Parquet |
+| Wolt delivery catalog | ✅ Works | 9 venues, 366 SKUs scraped — data in silver Parquet |
+| Kaggle download script | ✅ Script ready | `scripts/download_kaggle_datasets.py` — needs `KAGGLE_API_TOKEN` in `.env` to run |
+| Kaggle import script | ✅ Script ready | `scripts/import_kaggle_supermarkets.py` — needs Kaggle data downloaded first |
+| 10bis catalog collector | ❌ Disabled | Requires bearer token; violates ToS to automate — kept for reference only |
+
+---
+
+## ⚠️ Real Data That Exists But Isn't Connected Yet
+
+This is the most important gap — data has been collected but none of it reaches the frontend.
+
+| Data | Where it lives | What's blocking it |
+|---|---|---|
+| Real YomYom inventory (7,678 products, Hebrew) | `yomyom-inventory.csv` at project root | Not imported into the pipeline yet |
+| Wolt competitor prices (366 SKUs, 9 venues) | `data/external/silver/products/delivery_catalog/` | No script exports it to the frontend |
+| Alonit competitor prices (FTP XML) | `data/external/silver/alonit_prices/` | No script exports it to the frontend |
+| Kaggle supermarket prices (Shufersal, Rami Levy, Dor Alon) | Not downloaded yet | Need `KAGGLE_API_TOKEN` + run two scripts |
+
+The frontend still shows the 40-product hardcoded demo from `src/data/demoProducts.js` and mock competitor prices from `src/data/mockMarketData.js`.
 
 ---
 
