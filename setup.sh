@@ -37,8 +37,9 @@ echo "  ✔ Python packages installed"
 # ── 4. Extra Python packages needed for new features ─────────────────────────
 echo ""
 echo "▶ Installing extra Python packages (LLM proxy + Kaggle)..."
-pip install anthropic fastapi uvicorn kaggle --break-system-packages -q
-echo "  ✔ anthropic, fastapi, uvicorn, kaggle installed"
+# Prefer Google's Gemini client for LLM integration
+pip install google-generative-ai fastapi uvicorn kaggle --break-system-packages -q
+echo "  ✔ google-generative-ai, fastapi, uvicorn, kaggle installed"
 
 # ── 5. Playwright (used by Wolt scraper) ─────────────────────────────────────
 echo ""
@@ -50,7 +51,8 @@ echo "  ✔ Playwright + Chromium ready"
 # ── 6. Data directory structure ───────────────────────────────────────────────
 echo ""
 echo "▶ Creating data directory structure..."
-python scripts/init_storage.py
+# Use python3 for macOS systems where `python` may be absent
+python3 scripts/init_storage.py
 echo "  ✔ Data directories initialised"
 
 # ── 7. Verify frontend builds ─────────────────────────────────────────────────
@@ -77,10 +79,10 @@ echo "  Download Kaggle competitor prices (needs KAGGLE_API_TOKEN in .env):"
 echo "    python scripts/download_kaggle_datasets.py"
 echo "    python scripts/import_kaggle_supermarkets.py"
 echo ""
-echo "  Start the LLM proxy (needs ANTHROPIC_API_KEY in .env):"
+echo "  Start the LLM proxy (needs GEMINI_API_KEY in .env):"
 echo "    uvicorn src.api.llm_proxy:app --port 8000 --reload"
 echo ""
 echo "  Keys needed in .env:"
 echo "    KAGGLE_API_TOKEN     → kaggle.com → Settings → API → Create New Token"
-echo "    ANTHROPIC_API_KEY    → console.anthropic.com → API Keys"
+echo "    GEMINI_API_KEY       → Google Cloud Console → APIs & Services → Credentials"
 echo ""

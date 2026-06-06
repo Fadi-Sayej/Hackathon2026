@@ -509,23 +509,23 @@ Field mapping from YomYom silver → canonical product shape:
 
 ---
 
-#### D-4: Fix `.env.example` — add `ANTHROPIC_API_KEY` and clarify `VITE_LLM_PROXY_URL`
+#### D-4: Fix `.env.example` — add `GEMINI_API_KEY` and clarify `VITE_LLM_PROXY_URL`
 
 In `.env.example`, replace the bare `VITE_LLM_PROXY_URL=` line with a commented block. Also remove `VITE_LLM_EXPLANATIONS_ENABLED=false` (coordinate with Person C / C-4c). Add:
 
 ```
 # ── LLM proxy (FastAPI, enables real AI explanations) ────────────────────────
-# Get your key at console.anthropic.com → API Keys
-ANTHROPIC_API_KEY=
+# Get your key at Google Cloud Console → APIs & Services → Credentials
+GEMINI_API_KEY=
 
 # URL of the running llm_proxy.py server. Set this to enable real LLM explanations
 # instead of the rule-based mock. Must point to a running src/api/llm_proxy.py instance.
 VITE_LLM_PROXY_URL=http://localhost:8000/explain
 ```
 
-Also add `fastapi`, `uvicorn`, and `anthropic` to `requirements.txt` if not already present.
+Also add `fastapi`, `uvicorn`, and a Gemini-compatible client (e.g. `google-generative-ai`) to `requirements.txt` if not already present.
 
-- [ ] **Done when:** `.env.example` has `ANTHROPIC_API_KEY=` and `VITE_LLM_PROXY_URL=http://localhost:8000/explain` with clear comments, and `requirements.txt` lists the three new packages.
+- [ ] **Done when:** `.env.example` has `GEMINI_API_KEY=` and `VITE_LLM_PROXY_URL=http://localhost:8000/explain` with clear comments, and `requirements.txt` lists the new packages.
 
 ---
 
@@ -567,63 +567,42 @@ Create `src/api/__init__.py` (empty) and `src/api/llm_proxy.py`:
 ```python
 """
 LLM proxy — receives explanation payloads from the frontend,
-calls Claude, returns structured explanation fields.
+calls a Gemini-compatible model, returns structured explanation fields.
 
 Run:  uvicorn src.api.llm_proxy:app --port 8000 --reload
-Requires: ANTHROPIC_API_KEY env var
-          pip install fastapi uvicorn anthropic
+Requires: GEMINI_API_KEY env var
+      pip install fastapi uvicorn google-generative-ai
 """
 import os
 import json
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-import anthropic
+# Note: the actual Gemini client usage depends on the chosen library; this stub
+# expects an adapter that reads `GEMINI_API_KEY` from the environment.
 
 app = FastAPI()
 
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Vite dev server
-    allow_methods=["POST", "GET"],
-    allow_headers=["*"],
+  CORSMiddleware,
+  allow_origins=["http://localhost:5173"],  # Vite dev server
+  allow_methods=["POST", "GET"],
+  allow_headers=["*"],
 )
 
-client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
-
-SYSTEM_PROMPT = """You are a retail inventory analyst for an Israeli convenience store.
-Given product metrics and a reorder recommendation, produce a concise JSON explanation.
-Respond ONLY with valid JSON matching this schema exactly:
-{
-  "shortExplanation": "one-sentence summary for the store owner",
-  "riskReason": "why acting / not acting carries risk",
-  "businessImpact": "estimated revenue/waste impact in ILS",
-  "confidenceNote": "how confident the recommendation is and why"
-}
-Keep each field under 120 characters. Use Israeli context (ILS currency, Hebrew product names OK).
-"""
-
+# TODO: implement client initialisation for the chosen Gemini client
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+  return {"status": "ok"}
 
 
 @app.post("/explain")
 def explain(payload: dict):
-    try:
-        message = client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=512,
-            system=SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": f"Product and recommendation data:\n{payload}"}],
-        )
-        result = json.loads(message.content[0].text)
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+  # TODO: call Gemini API and return the structured JSON fields
+  raise HTTPException(status_code=501, detail="Gemini proxy not implemented yet")
 ```
 
-- [ ] **Done when:** With `ANTHROPIC_API_KEY` set, running `uvicorn src.api.llm_proxy:app --port 8000` and then `curl -s http://localhost:8000/health` returns `{"status":"ok"}`, and a POST to `/explain` with any JSON body returns all four fields.
+- [ ] **Done when:** With `GEMINI_API_KEY` set, running `uvicorn src.api.llm_proxy:app --port 8000` and then `curl -s http://localhost:8000/health` returns `{"status":"ok"}`, and a POST to `/explain` with any JSON body returns all four fields.
 
 ---
 

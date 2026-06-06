@@ -13,8 +13,8 @@ You are working on Person D's tasks from sprint_plan.md: making real LLM explana
 YOUR TASKS IN ORDER:
 
 D-4 (no dependencies):
-In .env.example, add this block (coordinate with Person C who is removing VITE_LLM_EXPLANATIONS_ENABLED=false): # ── LLM proxy (FastAPI, enables real AI explanations) ──────────────────────── # Get your key at console.anthropic.com → API Keys
-ANTHROPIC_API_KEY=
+In .env.example, add this block (coordinate with Person C who is removing VITE_LLM_EXPLANATIONS_ENABLED=false): # ── LLM proxy (FastAPI, enables real AI explanations) ──────────────────────── # Get your key at Google Cloud Console → APIs & Services → Credentials
+GEMINI_API_KEY=
 
     # URL of the running llm_proxy.py server
     VITE_LLM_PROXY_URL=http://localhost:8000/explain
@@ -42,7 +42,7 @@ return mockExplanationProvider
 Done when: setting VITE_LLM_PROXY_URL in .env causes the frontend to POST to that URL (visible in browser DevTools → Network). Without the proxy running, it should fall back gracefully without crashing.
 
 D-3 (no dependencies):
-Create src/api/**init**.py (empty file) and src/api/llm_proxy.py exactly as specified in sprint_plan.md (the full script is already written there — copy it verbatim). It uses claude-sonnet-4-6, requires ANTHROPIC_API_KEY env var, runs on port 8000.
+Create src/api/**init**.py (empty file) and src/api/llm_proxy.py as specified in sprint_plan.md (adapted for Gemini). It requires `GEMINI_API_KEY` env var and runs on port 8000.
 Start it with: uvicorn src.api.llm_proxy:app --port 8000 --reload
 Test with: curl -s http://localhost:8000/health → should return {"status":"ok"}
 Test explain: curl -s -X POST http://localhost:8000/explain -H "Content-Type: application/json" -d '{"product":"test"}' → should return all four fields (shortExplanation, riskReason, businessImpact, confidenceNote).
