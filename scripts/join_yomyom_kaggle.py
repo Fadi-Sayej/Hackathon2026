@@ -10,10 +10,12 @@ YOMYOM_SILVER = Path("data/internal/silver_pos/yomyom_products.parquet")
 OUTPUT = Path("data/matching/barcode_matches.parquet")
 
 def normalize_barcode(series: pl.Series) -> pl.Series:
-    return series.cast(pl.Utf8).str.strip_chars().str.lstrip_chars("0")
+    return (series.cast(pl.Utf8)
+            .str.strip_chars()
+            .str.replace_all(r"^0+", ""))
 
 def load_kaggle_chain(chain_dir: Path, chain_name: str) -> pl.DataFrame:
-    files = list(chain_dir.glob("*.parquet"))
+    files = list(chain_dir.rglob("*.parquet"))
     if not files:
         return pl.DataFrame()
     df = pl.concat([pl.read_parquet(f) for f in files])
