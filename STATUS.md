@@ -69,14 +69,15 @@ The frontend still shows the 40-product hardcoded demo from `src/data/demoProduc
 ## ❌ What Is NOT Implemented (and What's Missing to Make It Work)
 
 ### 1. Real AI / LLM Explanations
-**What you see:** The app shows explanations like _"High velocity + low stock → reorder now."_ These look like AI wrote them, but they are hand-written rules, not a language model.
+**Status as of June 6, 2026: ⚠️ Backend built — needs one env var to activate.**
 
-**What's missing:** A backend server that calls a real LLM (like Gemini or Claude). The code for this already exists in `src/lib/ai/llmExplanationProvider.js` and is ready to be switched on — it just needs a server to talk to.
+The proxy server (`src/api/llm_proxy.py`) is written and uses Gemini (`gemini-2.0-flash`). The frontend bug that prevented `VITE_LLM_PROXY_URL` from being read is fixed. The two-argument bug in `llmExplanationProvider.js` is fixed.
 
-**What's needed to fix it:**
-- Deploy a small backend API (Node.js or Python)
-- Add a Gemini or Claude API key on that server
-- Set the `VITE_LLM_PROXY_URL` environment variable to point the app at it
+**To activate:** Add `VITE_LLM_PROXY_URL=http://localhost:8000/explain` to `.env`, then run:
+```bash
+uvicorn src.api.llm_proxy:app --port 8000 --reload
+```
+The `VITE_GEMINI_API_KEY` is already set in `.env`.
 
 ---
 
@@ -85,7 +86,7 @@ The frontend still shows the 40-product hardcoded demo from `src/data/demoProduc
 
 **What's actually happening:** A timer fires and fills in a pre-written template with numbers from your data. No AI is involved.
 
-**What's needed to fix it:** Same backend server as above — the report builder just needs to POST the data to an LLM and stream back the response.
+**What's needed to fix it:** The LLM proxy from item 1 above — the report builder needs to POST data to it and stream back the response. Proxy is now built; report wiring is not done yet.
 
 ---
 
@@ -180,8 +181,8 @@ The frontend still shows the 40-product hardcoded demo from `src/data/demoProduc
 | Reorder recommendations | ✅ Yes | — |
 | Planogram generation | ✅ Yes | — |
 | Competitor price comparison | ✅ Mock only | Real data available — see OpenIsraeliSupermarkets below |
-| AI explanations | ❌ No | Need backend + LLM API key |
-| AI report writing | ❌ No | Need backend + LLM API key |
+| AI explanations | ⚠️ Ready to activate | Set `VITE_LLM_PROXY_URL=http://localhost:8000/explain` in `.env` and run the proxy |
+| AI report writing | ❌ No | Proxy built — report UI not yet wired to it |
 | Comax live POS sync | ❌ No | Need backend proxy + Comax credentials |
 | Shelf image analysis | ❌ No | Need vision AI + backend endpoint |
 | Multi-device saved state | ❌ No | Need Supabase adapter |
@@ -194,10 +195,10 @@ The frontend still shows the 40-product hardcoded demo from `src/data/demoProduc
 
 In order of priority:
 
-1. **Real competitor prices** (OpenIsraeliSupermarkets) — free, no backend needed, biggest visible impact
-2. **A backend server** (Node.js or Python/FastAPI) — unlocks Comax, LLM, and image analysis all at once
-3. **LLM API key** on that server — makes explanations and reports real
-4. **Supabase database** — makes saved state persist properly
+1. **Activate LLM proxy** — set `VITE_LLM_PROXY_URL=http://localhost:8000/explain` in `.env` and run `uvicorn src.api.llm_proxy:app --port 8000`. `VITE_GEMINI_API_KEY` is already set. *(Person D — 5 minutes)*
+2. **Real competitor prices** — run Kaggle download + import, then barcode join + export to `marketData.js` *(Persons A+B)*
+3. **Wire AI report** — connect "Generate Report" button to the Gemini proxy instead of the timer template *(Person D)*
+4. **Supabase database** — makes saved state persist across devices
 5. **Comax credentials** — enables live store data
 6. **Vision AI** for shelf photo analysis
 7. **10bis token + Wolt connector** — enriches competitor pricing data

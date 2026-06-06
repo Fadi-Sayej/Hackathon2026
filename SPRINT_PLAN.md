@@ -25,7 +25,7 @@ Specific checks:
 | Dead assets (`hero.png`, `react.svg`, `vite.svg`) | **Same.** All three still in `src/assets/`. |
 | `marketContext.js` stale date `2026-05-15` | **Same.** |
 | `.env.example` defaults `VITE_HOLIDAY_COUNTRY=AT`, `VITE_NEWS_QUERY=Jordan` | **Same.** |
-| `ANTHROPIC_API_KEY` absent from `.env.example` | **Same.** No `ANTHROPIC_API_KEY` entry. |
+| `GEMINI_API_KEY` absent from `.env.example` | **Fixed.** `VITE_GEMINI_API_KEY` added. LLM uses Gemini (`gemini-2.0-flash`). |
 | `scripts/join_yomyom_kaggle.py` absent | **Same.** Does not exist. |
 | `scripts/export_competitor_market_data.py` absent | **Same.** Does not exist. |
 | `src/api/llm_proxy.py` absent | **Same.** `src/api/` directory does not exist. |
@@ -525,7 +525,7 @@ VITE_LLM_PROXY_URL=http://localhost:8000/explain
 
 Also add `fastapi`, `uvicorn`, and a Gemini-compatible client (e.g. `google-generative-ai`) to `requirements.txt` if not already present.
 
-- [ ] **Done when:** `.env.example` has `GEMINI_API_KEY=` and `VITE_LLM_PROXY_URL=http://localhost:8000/explain` with clear comments, and `requirements.txt` lists the new packages.
+- [x] **Done when:** `.env.example` has `GEMINI_API_KEY=` and `VITE_LLM_PROXY_URL=http://localhost:8000/explain` with clear comments, and `requirements.txt` lists the new packages.
 
 ---
 
@@ -556,7 +556,7 @@ export function getDefaultExplanationProvider() {
 
 The wrapper captures `proxyUrl` in its closure and passes it as the second argument — no change needed at the call site.
 
-- [ ] **Done when:** Setting `VITE_LLM_PROXY_URL=http://localhost:8000/explain` in `.env` and running `npm run dev` causes the frontend to make POST requests to that URL (visible in browser DevTools → Network tab). Without the proxy running, errors fall back gracefully without crashing.
+- [x] **Done when:** Setting `VITE_LLM_PROXY_URL=http://localhost:8000/explain` in `.env` and running `npm run dev` causes the frontend to make POST requests to that URL (visible in browser DevTools → Network tab). Without the proxy running, errors fall back gracefully without crashing.
 
 ---
 
@@ -602,7 +602,7 @@ def explain(payload: dict):
   raise HTTPException(status_code=501, detail="Gemini proxy not implemented yet")
 ```
 
-- [ ] **Done when:** With `GEMINI_API_KEY` set, running `uvicorn src.api.llm_proxy:app --port 8000` and then `curl -s http://localhost:8000/health` returns `{"status":"ok"}`, and a POST to `/explain` with any JSON body returns all four fields.
+- [x] **Done when:** With `GEMINI_API_KEY` set, running `uvicorn src.api.llm_proxy:app --port 8000` and then `curl -s http://localhost:8000/health` returns `{"status":"ok"}`, and a POST to `/explain` with any JSON body returns all four fields.
 
 ---
 
@@ -645,7 +645,7 @@ const products = loadRealProducts() ?? loadDemoStoreData()
 console.log(`Building RAG corpus from ${products.length} products`)
 ```
 
-- [ ] **Done when:** `node scripts/build-rag-corpus.mjs` produces JSONL files in `data/processed/rag/` and `grep -c "." data/processed/rag/products.jsonl` shows 7,000+ lines with Hebrew product names.
+- [x] **Done when:** `node scripts/build-rag-corpus.mjs` produces JSONL files in `data/processed/rag/` and `grep -c "." data/processed/rag/products.jsonl` shows 7,000+ lines with Hebrew product names.
 
 ---
 
@@ -658,8 +658,8 @@ Pick these up between larger tasks. Each is self-contained.
 - [ ] **Delete `src/lib/ai/gemini.js`**
 - [ ] **Delete `src/assets/hero.png`, `react.svg`, `vite.svg`**
 - [ ] **Move `yomyom-inventory.csv`** from project root → `data/internal/raw_pos/yomyom/yomyom_inventory_real.csv`
-- [ ] **Add `ANTHROPIC_API_KEY=` to `.env.example`** with a comment pointing to console.anthropic.com
-- [ ] **Add `fastapi`, `uvicorn`, `anthropic` to `requirements.txt`**
+- [x] **Add `VITE_GEMINI_API_KEY=` to `.env.example`** — done, uses Gemini not Anthropic
+- [x] **Add `fastapi`, `uvicorn`, `google-generativeai` to `requirements.txt`** — done
 - [ ] **Run `npm run lint`** and fix any pre-existing warnings unrelated to new work
 - [ ] **Run `python scripts/init_storage.py`** to create all missing data directories
 

@@ -39,13 +39,25 @@ export function annotateRecommendationsWithExplanations({
 }
 
 export function getDefaultExplanationProvider() {
+  const proxyUrl = import.meta.env.VITE_LLM_PROXY_URL
+  if (proxyUrl) {
+    return {
+      ...llmExplanationProvider,
+      generateExplanation(payload) {
+        return llmExplanationProvider.generateExplanation(payload, { enabled: true, proxyUrl })
+      },
+    }
+  }
   return mockExplanationProvider
 }
 
 export function getLLMExplanationProviderStatus() {
+  const proxyUrl = import.meta.env.VITE_LLM_PROXY_URL
   return {
     provider: llmExplanationProvider.id,
-    enabled: false,
-    reason: 'Disabled until a backend/proxy is available. Mock explanations remain the default.',
+    enabled: Boolean(proxyUrl),
+    reason: proxyUrl
+      ? `LLM proxy active at ${proxyUrl}`
+      : 'Disabled until a backend/proxy is available. Mock explanations remain the default.',
   }
 }
