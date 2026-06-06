@@ -1,23 +1,10 @@
 {
-  "mode": "fallback",
-  "sourceLabel": "built-in-retail-store-inventory-forecasting-sample",
-  "sourcePath": null,
-  "sourceRowCount": 150,
-  "normalizedProductCount": 30,
+  "mode": "real-silver",
+  "sourceLabel": "YomYom silver Parquet (7451 products)",
+  "sourcePath": "/Users/nagham/Documents/Hackathon2026/data/internal/silver_pos/yomyom_products.parquet",
+  "sourceRowCount": 7451,
+  "normalizedProductCount": 7451,
   "latestObservedDate": "2026-05-15",
-  "generatedFields": [
-    "cost",
-    "expiryDate",
-    "leadTimeDays",
-    "shelfCapacity",
-    "shelfQuantity",
-    "supplier"
-  ],
-  "notes": [
-    "No raw dataset file was found, so the Sprint 2 fallback retail sample was used.",
-    "No explicit cost column detected, so cost was estimated from price.",
-    "Lead times were inferred from product category defaults.",
-    "Shelf capacity was generated heuristically from stock and weekly sales.",
-    "Shelf quantity was generated heuristically from stock and weekly sales."
-  ]
+  "generatedFields": [],
+  "notes": []
 }
