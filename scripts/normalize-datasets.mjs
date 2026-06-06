@@ -1,4 +1,6 @@
 import fs from 'node:fs/promises'
+import { existsSync, readFileSync } from 'node:fs'
+import { execSync } from 'node:child_process'
 import path from 'node:path'
 
 const rootDir = process.cwd()
@@ -7,6 +9,42 @@ const processedDemoDir = path.join(rootDir, 'data', 'processed', 'demo')
 const processedAnalyticsDir = path.join(rootDir, 'data', 'processed', 'analytics')
 const exportsDir = path.join(rootDir, 'data', 'exports', 'sample-app-data')
 const appDataDir = path.join(rootDir, 'src', 'data')
+
+const SILVER_PARQUET = path.join(rootDir, 'data', 'internal', 'silver_pos', 'yomyom_products.parquet')
+const SILVER_JSON_CACHE = path.join(rootDir, 'data', 'internal', 'silver_pos', 'yomyom_products_export.json')
+
+function loadYomYomSilver() {
+  if (!existsSync(SILVER_PARQUET)) return null
+  try {
+    execSync(
+      `python3 -c "import polars as pl, json; df=pl.read_parquet('${SILVER_PARQUET}'); open('${SILVER_JSON_CACHE}','w',encoding='utf-8').write(df.write_json())"`,
+      { stdio: 'pipe', cwd: rootDir }
+    )
+    const raw = JSON.parse(readFileSync(SILVER_JSON_CACHE, 'utf-8'))
+    return raw
+      .filter(row => row.selling_price && row.selling_price > 0 && row.product_name)
+      .map(row => ({
+        id: row.barcode ? `ym-${String(row.barcode).replace(/^0+/, '')}` : `ym-${row.product_name}`,
+        name: row.product_name,
+        category: row.category ?? 'Uncategorized',
+        price: Number(row.selling_price) || 0,
+        cost: Number(row.cost_price) || 0,
+        currentStock: Math.max(0, Number(row.current_stock) || 0),
+        shelfQuantity: 0,
+        shelfCapacity: 10,
+        salesLast7Days: 0,
+        salesLast30Days: 0,
+        supplier: 'YomYom',
+        leadTimeDays: 3,
+        returnedUnits: 0,
+        damagedUnits: 0,
+        expiryDate: undefined,
+      }))
+  } catch (err) {
+    process.stderr.write(`Warning: could not load YomYom silver Parquet: ${err.message}\n`)
+    return null
+  }
+}
 
 const aliases = {
   productId: ['product id', 'product_id', 'sku', 'sku id', 'item id', 'item_id'],
@@ -63,12 +101,33 @@ const perishableCategories = new Set(['Dairy', 'Bakery', 'Ice Cream'])
 async function main() {
   await ensureDirectories()
 
-  const discovered = await discoverDataFiles(rawDir)
-  const source = discovered.length > 0 ? await chooseBestSource(discovered) : buildFallbackSource()
-  const normalized = normalizeSource(source)
-  const demoProducts = buildDemoSlice(normalized.products)
+  const yomyomProducts = loadYomYomSilver()
+
+  let demoProducts
+  let normalized
+  let source
+
+  if (yomyomProducts && yomyomProducts.length > 0) {
+    demoProducts = yomyomProducts
+    normalized = { products: yomyomProducts, generatedFields: [], notes: [] }
+    source = {
+      mode: 'real-silver',
+      label: `YomYom silver Parquet (${yomyomProducts.length} products)`,
+      rowCount: yomyomProducts.length,
+      rows: Array.from({ length: yomyomProducts.length }),
+      path: SILVER_PARQUET,
+    }
+    process.stdout.write(`Using real YomYom inventory: ${yomyomProducts.length} products\n`)
+  } else {
+    const discovered = await discoverDataFiles(rawDir)
+    source = discovered.length > 0 ? await chooseBestSource(discovered) : buildFallbackSource()
+    normalized = normalizeSource(source)
+    demoProducts = buildDemoSlice(normalized.products)
+    process.stdout.write(`Falling back to demo data: ${demoProducts.length} products\n`)
+  }
+
   const analyticsSummary = buildAnalyticsSummary(normalized.products)
-  const report = buildReport(source, normalized.products, normalized.generatedFields, normalized.notes)
+  const report = buildReport(source, normalized.products, normalized.generatedFields ?? [], normalized.notes ?? [])
 
   await fs.writeFile(
     path.join(processedDemoDir, 'demo-products.json'),
