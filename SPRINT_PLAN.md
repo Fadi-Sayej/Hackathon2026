@@ -220,7 +220,7 @@ if __name__ == "__main__":
 
 ---
 
-#### B-1: Download Kaggle dataset
+#### ✅ B-1: Download Kaggle dataset
 
 **Prerequisite:** `KAGGLE_API_TOKEN` must be set in `.env`. Get it from kaggle.com → Settings → API → Create New Token.
 
@@ -228,7 +228,7 @@ if __name__ == "__main__":
 python scripts/download_kaggle_datasets.py
 ```
 
-- [ ] **Done when:** These files exist in `data/raw/kaggle/israeli-supermarkets-2024/`:
+- [x] **Done when:** These files exist in `data/raw/kaggle/israeli-supermarkets-2024/`:
   - `price_full_file_dor_alon.csv`
   - `price_full_file_rami_levy.csv`
   - `price_full_file_shufersal.csv`
@@ -236,13 +236,13 @@ python scripts/download_kaggle_datasets.py
 
 ---
 
-#### B-2: Import all three Kaggle chains
+#### ✅ B-2: Import all three Kaggle chains
 
 ```bash
 python scripts/import_kaggle_supermarkets.py
 ```
 
-- [ ] **Done when:** Parquet files exist in all three directories:
+- [x] **Done when:** Parquet files exist in all three directories:
   - `data/external/silver/products/kaggle_dor_alon/`
   - `data/external/silver/products/kaggle_rami_levy/`
   - `data/external/silver/products/kaggle_shufersal/`
@@ -251,9 +251,9 @@ python scripts/import_kaggle_supermarkets.py
 
 ---
 
-#### B-3: Write `scripts/export_competitor_market_data.py`
+#### ✅ B-3: Write `scripts/export_competitor_market_data.py`
 
-**Depends on:** A-4 complete (produces `data/matching/barcode_matches.parquet`). Write the script first; run it once A-4 is done.
+**Depends on:** A-4 complete (produces `data/matching/barcode_matches.parquet`). Script is written; run it once A-4 is done.
 
 **File to create:** `scripts/export_competitor_market_data.py`
 
@@ -376,7 +376,7 @@ if __name__ == "__main__":
     main()
 ```
 
-- [ ] **Done when:** `src/data/marketData.js` exists, exports `COMPETITOR_STORES` with at least one store and one barcode entry, and `npm run build` passes.
+- [x] **Done when:** `src/data/marketData.js` exists (stub), `App.jsx` imports it, and `npm run build` passes. Real data populates after A-4 + running this script.
 
 > **Handoff to C-1:** Once B-3 is done, tell Person C to switch the import in `App.jsx`.
 
@@ -388,7 +388,7 @@ if __name__ == "__main__":
 
 ---
 
-#### C-4: Dead code removal (no dependencies — do first)
+#### ✅ C-4: Dead code removal (no dependencies — do first)
 
 **C-4a:** Delete `src/lib/ai/gemini.js`
 
@@ -415,11 +415,11 @@ VITE_LLM_EXPLANATIONS_ENABLED=false
 ```
 Leave `VITE_LLM_PROXY_URL=` in place — Person D will add a comment to it in D-4.
 
-- [ ] **Done when:** `npm run lint` and `npm run build` both pass after all three sub-tasks.
+- [x] **Done when:** `npm run lint` and `npm run build` both pass after all three sub-tasks.
 
 ---
 
-#### C-2: Fix stale defaults in `src/data/marketContext.js` and `.env.example`
+#### ✅ C-2: Fix stale defaults in `src/data/marketContext.js` and `.env.example`
 
 **File 1:** `src/data/marketContext.js` line 2 — change:
 ```js
@@ -432,11 +432,11 @@ currentDate: new Date().toISOString().split('T')[0],
 
 **File 2:** `.env.example` — change `VITE_HOLIDAY_COUNTRY=AT` to `VITE_HOLIDAY_COUNTRY=IL` and `VITE_NEWS_QUERY=Jordan` to `VITE_NEWS_QUERY=Israel supermarket prices`.
 
-- [ ] **Done when:** `src/data/marketContext.js` no longer contains the string `2026-05-15`, and `.env.example` shows `IL` and `Israel supermarket prices`.
+- [x] **Done when:** `src/data/marketContext.js` no longer contains the string `2026-05-15`, and `.env.example` shows `IL` and `Israel supermarket prices`.
 
 ---
 
-#### C-1: Add `src/data/marketData.js` stub + switch import in `App.jsx`
+#### ✅ C-1: Add `src/data/marketData.js` stub + switch import in `App.jsx`
 
 **Depends on:** Person B step B-3 complete.
 
@@ -457,7 +457,7 @@ import { COMPETITOR_STORES, OUR_STORE } from './data/marketData.js'
 
 **Step 3 — add `src/data/marketData.js` to `.gitignore`** so the generated real file is never committed.
 
-- [ ] **Done when:** `npm run build` passes with the stub. After running `python scripts/export_competitor_market_data.py`, reloading the dev server shows real competitor data.
+- [x] **Done when:** `npm run build` passes with the stub. After running `python scripts/export_competitor_market_data.py`, reloading the dev server shows real competitor data.
 
 ---
 

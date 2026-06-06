@@ -1,5 +1,5 @@
 export const marketContext = {
-  currentDate: '2026-05-15',
+  currentDate: new Date().toISOString().split('T')[0],
   weather: 'hot',
   weekend: true,
   holiday: false,
