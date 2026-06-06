@@ -24,7 +24,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 source_name: yomyom_pos
-description: "YomYom market, Kafr Qasim — POS CSV export (fake/sample)"
+description: "YomYom market, Kafr Qasim — POS CSV export (real inventory, 7,678 products)"
 encoding: utf-8-sig          # BOM-aware; Excel exports often add BOM
 
 # ── Column mapping ─────────────────────────────────────────────────────────────
@@ -61,6 +61,7 @@ columns:
     required:       true
     normalizers:    [strip_whitespace, null_if_empty]
     candidate_names:
+      - תאור פריט        # Hebrew: item description (yomyom-inventory.csv)
       - שם מוצר          # Hebrew: product name
       - שם פריט          # Hebrew: item name
       - description
@@ -75,6 +76,7 @@ columns:
     required:       false
     normalizers:    [strip_whitespace, lowercase, null_if_empty]
     candidate_names:
+      - שם מחלקה         # Hebrew: department name (yomyom-inventory.csv)
       - קטגוריה          # Hebrew: category
       - מחלקה            # Hebrew: department
       - קבוצה            # Hebrew: group
@@ -140,6 +142,7 @@ columns:
     required:       false
     normalizers:    [strip_whitespace, null_if_empty]
     candidate_names:
+      - מלאי נוכחי       # Hebrew: current stock (yomyom-inventory.csv)
       - מלאי             # Hebrew: inventory / stock
       - כמות במלאי       # Hebrew: quantity in stock
       - stock
@@ -251,11 +254,13 @@ validation:
 
   # Numeric fields that must be >= 0 when present
   non_negative_fields:
-    - current_stock
     - units_sold_7d
     - units_sold_30d
     - sales_amount_30d
     - gross_profit_30d
+    # NOTE: current_stock intentionally excluded — yomyom-inventory.csv has 627
+    # rows with negative stock values (POS artifact). These are clamped to 0
+    # during import rather than rejected.
 
   # Field-level range checks
   range_checks:

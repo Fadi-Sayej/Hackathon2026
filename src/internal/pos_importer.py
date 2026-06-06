@@ -305,6 +305,8 @@ def apply_schema_mapping(
     col_specs = config["columns"]
 
     # ── 1. resolve columns once against the first row's headers ───────────────
+    # Strip whitespace from all headers — Excel/POS exports often add trailing spaces
+    raw_rows     = [{k.strip(): v for k, v in row.items() if k is not None} for row in raw_rows]
     csv_headers  = list(raw_rows[0].keys()) if raw_rows else []
     csv_filename = config.get("source_name", "unknown")
 
@@ -333,6 +335,10 @@ def apply_schema_mapping(
         # Ensure every canonical column is present (None if unmapped)
         for spec in col_specs:
             canonical.setdefault(spec["canonical_name"], None)
+
+        # Clamp negative stock to 0 — POS artifact in yomyom-inventory.csv
+        if canonical.get("current_stock") is not None and canonical["current_stock"] < 0:
+            canonical["current_stock"] = 0
 
         canonical_rows.append(canonical)
 
