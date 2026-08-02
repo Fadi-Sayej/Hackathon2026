@@ -1,3 +1,5 @@
+import { hasUsableVelocity, resolveVelocityConfidence } from './velocityConfidence.js'
+
 const statusLabels = {
   healthy: 'Healthy',
   lowStock: 'Low stock',
@@ -6,6 +8,7 @@ const statusLabels = {
   slowMoving: 'Slow moving',
   nearExpiry: 'Near expiry',
   highPriority: 'High priority',
+  noVelocityData: 'Not enough sales history yet',
 }
 
 export function analyzeProducts(products, context = {}) {
@@ -13,6 +16,8 @@ export function analyzeProducts(products, context = {}) {
 }
 
 export function analyzeProduct(product, context = {}) {
+  const velocityConfidence = resolveVelocityConfidence(product)
+  const hasVelocity = hasUsableVelocity(velocityConfidence)
   const avgDailySales7 = safeDivide(product.salesLast7Days, 7)
   const avgDailySales30 = safeDivide(product.salesLast30Days, 30)
   const demandMultiplier = context.demandSignals?.[product.category] ?? 1
@@ -25,19 +30,25 @@ export function analyzeProduct(product, context = {}) {
   const daysUntilStockout =
     weightedAvgDailySales > 0 ? product.currentStock / weightedAvgDailySales : Number.POSITIVE_INFINITY
   const nearExpiry = isNearExpiry(product.expiryDate, context.currentDate)
-  const slowMoving = product.salesLast30Days < 5 || weightedAvgDailySales < 0.3
-  const stockoutRisk = daysUntilStockout <= product.leadTimeDays
-  const lowStock = !stockoutRisk && daysUntilStockout <= product.leadTimeDays + 2
-  const overstocked = !slowMoving && product.currentStock > weightedAvgDailySales * 30
+  // Without sales history every velocity-derived verdict is unknowable, not
+  // false. Gating them here keeps "no history" from masquerading as "sold
+  // nothing" (slowMoving) or, worse, as "nothing to see here" (healthy).
+  const slowMoving = hasVelocity && (product.salesLast30Days < 5 || weightedAvgDailySales < 0.3)
+  const stockoutRisk = hasVelocity && daysUntilStockout <= product.leadTimeDays
+  const lowStock = hasVelocity && !stockoutRisk && daysUntilStockout <= product.leadTimeDays + 2
+  const overstocked = hasVelocity && !slowMoving && product.currentStock > weightedAvgDailySales * 30
   const highPriority = stockoutRisk || (nearExpiry && product.currentStock > product.shelfQuantity)
   const statuses = collectStatuses({
-    healthy: !stockoutRisk && !lowStock && !overstocked && !slowMoving && !nearExpiry,
+    healthy:
+      hasVelocity && !stockoutRisk && !lowStock && !overstocked && !slowMoving && !nearExpiry,
     lowStock,
     stockoutRisk,
     overstocked,
     slowMoving,
     nearExpiry,
     highPriority,
+    // Listed last so the status order of velocity-backed products is unchanged.
+    noVelocityData: !hasVelocity,
   })
 
   return {
@@ -46,7 +57,8 @@ export function analyzeProduct(product, context = {}) {
       avgDailySales7: round(avgDailySales7),
       avgDailySales30: round(avgDailySales30),
       weightedAvgDailySales: round(weightedAvgDailySales),
-      daysUntilStockout: Number.isFinite(daysUntilStockout) ? round(daysUntilStockout) : null,
+      daysUntilStockout:
+        hasVelocity && Number.isFinite(daysUntilStockout) ? round(daysUntilStockout) : null,
       margin: round(product.price - product.cost),
       marginRate: product.price > 0 ? round((product.price - product.cost) / product.price) : 0,
       primaryStatus: pickPrimaryStatus(statuses),
@@ -59,7 +71,10 @@ export function analyzeProduct(product, context = {}) {
         slowMoving,
         overstocked,
         competitorBoost,
+        hasVelocity,
       }),
+      velocityConfidence,
+      hasVelocity,
     },
   }
 }
@@ -77,6 +92,7 @@ export function summarizeInventory(analyzedProducts) {
       if (statuses.has(statusLabels.overstocked)) summary.overstocked += 1
       if (statuses.has(statusLabels.nearExpiry)) summary.wasteRisk += 1
       if (statuses.has(statusLabels.highPriority)) summary.highPriority += 1
+      if (statuses.has(statusLabels.noVelocityData)) summary.noVelocityData += 1
 
       return summary
     },
@@ -87,6 +103,7 @@ export function summarizeInventory(analyzedProducts) {
       overstocked: 0,
       wasteRisk: 0,
       highPriority: 0,
+      noVelocityData: 0,
       totalSalesLast30Days: 0,
       estimatedInventoryValue: 0,
     },
@@ -114,6 +131,9 @@ function pickPrimaryStatus(statuses) {
     statusLabels.lowStock,
     statusLabels.overstocked,
     statusLabels.slowMoving,
+    // Ranks below genuine risk signals (expiry does not need sales history to
+    // be real) but above 'Healthy', which we cannot claim without velocity.
+    statusLabels.noVelocityData,
     statusLabels.healthy,
   ]
 
@@ -127,12 +147,18 @@ function calculateRiskScore({
   slowMoving,
   overstocked,
   competitorBoost = 1,
+  hasVelocity = true,
 }) {
   let score = 0
 
-  if (!Number.isFinite(daysUntilStockout)) score += 8
-  else if (daysUntilStockout <= leadTimeDays) score += 55
-  else if (daysUntilStockout <= leadTimeDays + 2) score += 35
+  // An unknown is not a risk signal: with no sales history there is no
+  // stockout horizon to score, so the non-finite penalty is not earned.
+  // `slowMoving` is already false on that path, so its +10 cannot apply.
+  if (hasVelocity) {
+    if (!Number.isFinite(daysUntilStockout)) score += 8
+    else if (daysUntilStockout <= leadTimeDays) score += 55
+    else if (daysUntilStockout <= leadTimeDays + 2) score += 35
+  }
 
   if (nearExpiry) score += 25
   if (slowMoving) score += 10
