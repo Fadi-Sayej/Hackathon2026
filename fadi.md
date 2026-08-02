@@ -1,4 +1,4 @@
-# Person A — Data Pipeline & Velocity Engine
+# Fadi — Track A: Data Pipeline & Velocity Engine
 
 > 📋 **Read `PLAN.md` first** — phases, integration gates, go/no-go criteria, and the cut line.
 > This file is only your slice of it.
@@ -59,7 +59,7 @@ deltas". Promote that proxy into real velocity columns.
 - Aggregate into `units_sold_7d`, `units_sold_30d`, `last_sale_date`; write them into
   `data/internal/silver_pos/yomyom_sales.parquet`, replacing the null columns.
 - Emit `velocity_confidence` per product: `none` (<2 snapshots), `low` (2–6), `medium` (7–29),
-  `high` (30+ days). **Person C renders this in the UI — do not skip it.**
+  `high` (30+ days). **Anas renders this in the UI — do not skip it.**
 - `units_sold_30d = 0` and `velocity_confidence = 'none'` are **different facts**. A product that
   genuinely didn't sell is not the same as one we have no history for. Never conflate them; the
   whole credibility of the pilot rests on this distinction.
@@ -76,11 +76,11 @@ Velocity only exists if a snapshot is captured **every single day** of the pilot
 - Write `scripts/pilot_daily.sh`: import → snapshot → velocity → expiry → operational recs →
   `public/data/operational.json`. One command, exit 0/1, human-readable summary at the end.
 - Document the exact 30-second routine YomYom staff follow each morning to export and drop the CSV.
-  Hand this to Person D for the training material.
+  Hand this to Malik for the training material.
 
 ### A-0 (P0 — DAY 1) — Chase the two answers you depend on
 
-**Person D owns asking YomYom (task D-0); you own making sure it actually happens.** Two answers
+**Malik owns asking YomYom (task D-0); you own making sure it actually happens.** Two answers
 change your work:
 
 1. **Does the POS export sales/transactions?** If yes, A-3 outranks A-1 and the reorder engine
@@ -89,7 +89,7 @@ change your work:
    `velocity_confidence` bands carry the entire accuracy story.
 
 **Do not wait for either.** A-1 is deliberately designed to work without both answers — build it
-against irregular intervals from day one. But ask Person D on day 1 whether the message went out,
+against irregular intervals from day one. But ask Malik on day 1 whether the message went out,
 and check back until the answers are recorded in `PLAN.md` §7.
 
 ### A-3 (P1) — Real sales export adapter
@@ -116,11 +116,11 @@ tell YomYom they're overpriced versus a 2024 Shufersal price, we lose their trus
 
 ## Contract you must not break
 
-Person C consumes your Parquet through `scripts/normalize-datasets.mjs`. **Do not rename these
+Anas consumes your Parquet through `scripts/normalize-datasets.mjs`. **Do not rename these
 columns:** `barcode`, `product_name`, `category`, `selling_price`, `cost_price`, `current_stock`,
 `units_sold_7d`, `units_sold_30d`, `velocity_confidence`. Additions are fine; renames break the app.
 
-Announce in the team channel the moment `velocity_confidence` first lands — Person C is blocked on
+Announce in the team channel the moment `velocity_confidence` first lands — Anas is blocked on
 its existence (not its correctness) for the UI states.
 
 ## Done when

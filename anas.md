@@ -1,4 +1,4 @@
-# Person C — Frontend Core: Hebrew/RTL + Honest Analytics
+# Anas — Track C: Frontend Core & Honest Analytics
 
 > 📋 **Read `PLAN.md` first** — phases, integration gates, go/no-go criteria, and the cut line.
 > This file is only your slice of it.
@@ -9,8 +9,8 @@
 
 > **You own (nobody else edits):** `src/App.jsx`, `src/lib/` (all JS engines), `index.html`,
 > `src/index.css`, `src/App.css`, `scripts/normalize-datasets.mjs`, `scripts/build-rag-corpus.mjs`
-> **Never touch:** `src/pages/`, `src/components/` (Person D), `scripts/*.py` (Person A),
-> `src/api/` (Person B)
+> **Never touch:** `src/pages/`, `src/components/` (Malik), `scripts/*.py` (Fadi),
+> `src/api/` (Nagham)
 
 Read first: `CLAUDE.md`, `src/App.jsx`, `src/lib/analytics/inventoryEngine.js`,
 `src/lib/analytics/reorderEngine.js`, `src/lib/ai/explanationProvider.js`
@@ -34,7 +34,7 @@ against the real data — here is exactly what a customer would see:
 | Stockout risk / low stock / overstocked / waste risk | **all 0** |
 | Reorder recommendations | 2,742 — **all type `PROMOTION`**, identical text |
 
-All of it traces to `salesLast30Days = 0` everywhere. Person A is deriving real velocity from
+All of it traces to `salesLast30Days = 0` everywhere. Fadi is deriving real velocity from
 snapshot deltas, but **that will take days of pilot data to become meaningful** — so the UI must
 behave honestly in the meantime, and forever after for products with thin history.
 
@@ -42,7 +42,7 @@ behave honestly in the meantime, and forever after for products with thin histor
 
 ### C-0 (P0 — DAY 1, DO THIS BEFORE ANY CODE) — Write the UI data contract
 
-**You own this.** You compute the data in `App.jsx`; Person D renders it in `src/pages/`. That
+**You own this.** You compute the data in `App.jsx`; Malik renders it in `src/pages/`. That
 boundary is the only real coupling in the whole four-way split, and it is where you two will
 collide if it isn't written down first.
 
@@ -57,9 +57,9 @@ Create **`docs/UI_DATA_CONTRACT.md`** defining exactly what `App.jsx` passes int
 - Which fields can be `null`, and what the page must render when they are. **This is the part that
   matters most** — `daysUntilStockout` is null for every product today, and a page that assumes a
   number will show `null` to a store manager.
-- The accept/dismiss callback signatures Person D wires to Person B's persistence.
+- The accept/dismiss callback signatures Malik wires to Nagham's persistence.
 
-**Done when:** the file is committed and Person D has explicitly agreed to it (D-0b). Get their
+**Done when:** the file is committed and Malik has explicitly agreed to it (D-0b). Get their
 sign-off in writing — a "yeah looks fine" in chat counts, silence does not.
 
 Keep it short. This is a one-page agreement, not a spec — an hour's work that saves both of you a
@@ -88,7 +88,7 @@ becomes the top adoption risk. Raise it at the pilot review — it is a real fin
 Never show a computed number we cannot stand behind.
 
 - `inventoryEngine` must treat "no velocity history" as a **distinct state** from "zero sales".
-  Person A ships `velocity_confidence` (`none` / `low` / `medium` / `high`) — consume it.
+  Fadi ships `velocity_confidence` (`none` / `low` / `medium` / `high`) — consume it.
 - When confidence is `none`, do not classify the product as "Slow moving". Show
   **"Not enough sales history yet"** and suppress `daysUntilStockout` rather than rendering null.
 - `reorderEngine` must stop emitting 2,742 identical PROMOTION cards. When velocity is unavailable,
@@ -112,7 +112,7 @@ Fix: make the function async and move the recommendations `useMemo` in `App.jsx`
 `useEffect` + state. Keep the mock provider as a **graceful fallback** — if the proxy is slow, down,
 or out of credits, the store manager still sees rule-based text, never a spinner or a blank card.
 
-`VITE_LLM_PROXY_URL` is commented out in `.env` on purpose until this is fixed. Person B owns the
+`VITE_LLM_PROXY_URL` is commented out in `.env` on purpose until this is fixed. Nagham owns the
 billing and the deployed proxy — **coordinate, don't both edit this file.**
 
 ### C-4 (P1) — Store-floor layout
@@ -125,17 +125,17 @@ make sure tables of 7,451 Hebrew product rows don't blow out horizontally.
 
 The bundle is **2.65 MB** (335 KB gzipped) because `demoProducts.js` is a 2.8 MB JS module compiled
 into it. On a store's mobile connection that is a slow first load, and every data refresh means a
-full redeploy. Move product data to a fetched JSON file — same pattern Person B uses for
+full redeploy. Move product data to a fetched JSON file — same pattern Nagham uses for
 `operational.json`.
 
 ---
 
 ## Contract with the rest of the team
 
-- **Person D owns `src/pages/` and `src/components/`; you own `App.jsx` and everything under
-  `src/lib/`.** You compute and pass data down; Person D renders it. Agree the prop shape with them
+- **Malik owns `src/pages/` and `src/components/`; you own `App.jsx` and everything under
+  `src/lib/`.** You compute and pass data down; Malik renders it. Agree the prop shape with them
   **before** either of you starts, or you will collide in `App.jsx`.
-- Person A guarantees these column names through `normalize-datasets.mjs`: `barcode`,
+- Fadi guarantees these column names through `normalize-datasets.mjs`: `barcode`,
   `product_name`, `category`, `selling_price`, `cost_price`, `current_stock`, `units_sold_7d`,
   `units_sold_30d`, `velocity_confidence`.
 - Do not start C-2 by waiting on real velocity data. Build against `velocity_confidence: 'none'` —

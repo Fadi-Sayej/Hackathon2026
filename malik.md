@@ -1,4 +1,4 @@
-# Person D — In-Store Workflows & Customer Handover
+# Malik — Track D: In-Store Workflows & Customer Handover
 
 > 📋 **Read `PLAN.md` first** — phases, integration gates, go/no-go criteria, and the cut line.
 > This file is only your slice of it. **You also own the manual QA pass before every gate:
@@ -6,8 +6,8 @@
 
 > **You own (nobody else edits):** `src/pages/`, `src/components/`, `docs/`, `DEMO_SCRIPT.md`,
 > customer-facing training material
-> **Never touch:** `src/App.jsx` or `src/lib/` (Person C), `scripts/*.py` (Person A),
-> `src/api/` (Person B)
+> **Never touch:** `src/App.jsx` or `src/lib/` (Anas), `scripts/*.py` (Fadi),
+> `src/api/` (Nagham)
 
 Read first: `CLAUDE.md`, `README.md` (§Expiry Tracking at Receiving), `src/pages/OperationalPage.jsx`,
 `src/pages/ExpiryPage.jsx`, `public/data/operational.json`
@@ -33,7 +33,7 @@ from a terminal. That is not a product. It is your job to turn workflows like th
 
 ### D-0 (P0 — DAY 1, DO THIS BEFORE ANY CODE) — Get two answers from YomYom
 
-**You own this.** Person A's velocity engine is designed to work without these answers, but its
+**You own this.** Fadi's velocity engine is designed to work without these answers, but its
 accuracy depends on them, and the sooner they land the less rework everyone does.
 
 Send the manager **one** message containing both asks. Two small requests in one note — don't spend
@@ -50,16 +50,16 @@ two separate favours:
    benefit in their terms: *the more often you send it, the more accurate the recommendations get.*
 
 **Done when:** both answers are written into `PLAN.md` §7 (replace the 🔴 Blocking block with the
-real answers and the date received), and **Person A is told directly** — they are the consumer.
+real answers and the date received), and **Fadi is told directly** — they are the consumer.
 
 If the answer to #2 is "no, only weekly", say so immediately and loudly. It does not stop the pilot,
-but Person A must widen the confidence bands and we must lower what we promise the customer.
+but Fadi must widen the confidence bands and we must lower what we promise the customer.
 
 ### D-0b (P0 — DAY 1) — Co-sign the UI data contract
 
-Person C is drafting `docs/UI_DATA_CONTRACT.md` — the exact prop shape `App.jsx` passes into your
+Anas is drafting `docs/UI_DATA_CONTRACT.md` — the exact prop shape `App.jsx` passes into your
 pages. **Review and agree it before you write a single component.** This is the only real coupling
-between your work and Person C's, and it is where the two of you will collide if you skip it.
+between your work and Anas's, and it is where the two of you will collide if you skip it.
 
 You are the consumer: if a field you need for a screen isn't in the contract, say so **now**, not
 after C has built the chain.
@@ -79,7 +79,7 @@ Turn `OperationalPage` into the app's home screen:
 - Dismissal must capture *why* (wrong data / not worth it / already handled). **That feedback is the
   most valuable output of the entire pilot** — it tells us which recommendation types to keep.
 - 2,183 items is overwhelming. Show the top ~20 by value, with the rest behind a filter.
-- Wire the buttons through Person B's persistence layer so decisions survive and are measurable.
+- Wire the buttons through Nagham's persistence layer so decisions survive and are measurable.
 
 ### D-2 (P0) — In-app expiry capture
 
@@ -93,7 +93,7 @@ just has no human interface.
 - After a barcode is entered, show the product name from the POS data immediately so staff can
   confirm they scanned the right thing.
 - Expiry alerts then feed the daily action list: "3 units expiring in 2 days — discount or pull."
-- Coordinate with Person B — this writes to the backend, not a CSV on someone's laptop.
+- Coordinate with Nagham — this writes to the backend, not a CSV on someone's laptop.
 
 ### D-3 (P1) — The price-gap screen
 
@@ -105,7 +105,7 @@ Sort by units held × gap — the products where being mispriced costs the most.
 products currently selling below cost**; that is money leaving the till on every scan, and it is
 the finding most likely to make YomYom trust the tool.
 
-⚠️ Flag the data's age honestly. The Kaggle competitor prices are from 2024 (Person A is refreshing
+⚠️ Flag the data's age honestly. The Kaggle competitor prices are from 2024 (Fadi is refreshing
 them). **Never present a stale price as today's price** — one wrong claim about a competitor and we
 lose the customer's confidence permanently.
 
@@ -121,7 +121,7 @@ We are handing this to a real business. Written in **Hebrew or Arabic**, not Eng
 
 1. **One-page quick start** — how to open it, what the daily 10 minutes looks like.
 2. **The morning routine** — exporting the POS CSV and where it goes. Get the exact steps from
-   Person A; without a daily export, velocity never accrues and the product degrades over the pilot.
+   Fadi; without a daily export, velocity never accrues and the product degrades over the pilot.
 3. **A one-page "what this is / what it isn't"** — state plainly that competitor prices are
    reference data, that early recommendations have limited sales history, and what the tool does
    *not* do. Setting expectations honestly at handover is what buys us a second meeting.
@@ -148,16 +148,16 @@ clearest example of the honesty bar in `PLAN.md` §4.
 
 ## Contract with the rest of the team
 
-- **Person C owns `App.jsx` and all the engines; you own the pages and components.** C computes and
+- **Anas owns `App.jsx` and all the engines; you own the pages and components.** C computes and
   passes data down, you render it. **Agree the prop shape with C before either of you starts** —
   this is the most likely place for the two of you to collide.
-- Persistence and telemetry come from Person B. Don't invent your own storage.
-- The 2,183 recommendations in `operational.json` come from Person A's pipeline. If you need a new
+- Persistence and telemetry come from Nagham. Don't invent your own storage.
+- The 2,183 recommendations in `operational.json` come from Fadi's pipeline. If you need a new
   field, ask — don't compute it in the component.
 
 ## Done when
 
 - A person who has never seen the app can open it on a phone and know what to do first.
 - Recording an expiry date takes under 15 seconds and no terminal.
-- Every action a manager takes is captured, so Person B can report acceptance rates at pilot's end.
+- Every action a manager takes is captured, so Nagham can report acceptance rates at pilot's end.
 - The handover doc is in the customer's language and a non-technical reader can follow it.

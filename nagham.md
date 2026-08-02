@@ -1,4 +1,4 @@
-# Person B — Deployment, Persistence & Pilot Instrumentation
+# Nagham — Track B: Deployment, Persistence & Pilot Instrumentation
 
 > 📋 **Read `PLAN.md` first** — phases, integration gates, go/no-go criteria, and the cut line.
 > This file is only your slice of it. **You also own release: nothing deploys that fails
@@ -35,7 +35,7 @@ There is no deployment config in the repo at all.
 - **Password-protect it** — this is a real store's cost and margin data. Basic auth or a simple
   gate is enough for a pilot, but it must not be publicly indexable.
 - Custom subdomain, HTTPS, and a build that runs from a clean clone.
-- `public/data/operational.json` is a build artifact. Decide with Person A whether the deploy
+- `public/data/operational.json` is a build artifact. Decide with Fadi whether the deploy
   regenerates it or ships a committed copy — **the pilot cannot depend on someone's laptop.**
 - Verify on an actual phone and an actual tablet before calling this done. Store staff will not be
   at a desk.
@@ -69,7 +69,7 @@ This is what you present to YomYom at the end of the pilot. Without it we hand b
 
 1. **The Gemini key has no prepayment credits** — the API returns 429. Fix billing, or swap to a
    funded provider. Nothing else about the LLM matters until this is resolved.
-2. Person C owns the frontend async bug in `explanationProvider.js`. **Coordinate — don't both fix it.**
+2. Anas owns the frontend async bug in `explanationProvider.js`. **Coordinate — don't both fix it.**
 3. The proxy must be deployed too. `localhost:8000` is useless to a deployed frontend. Deploy it and
    update `VITE_LLM_PROXY_URL`, then tighten the CORS `allow_origins` off `localhost:5173`.
 4. Add a server-side timeout and a **cache** — do not re-bill a Gemini call for the same product on

@@ -3,14 +3,23 @@
 **Goal:** hand YomYom a working product they run in a real store, and measure whether it makes them
 money.
 
-This is the master plan. Individual task lists live in `personA.md`–`personD.md`. This file owns the
-things that belong to **nobody in particular and therefore get forgotten**: sequencing, integration,
-release criteria, QA, and the cut line.
+This is the master plan. This file owns the things that belong to **nobody in particular and
+therefore get forgotten**: sequencing, integration, release criteria, QA, and the cut line.
 
-> ⚠️ **Set real dates before starting.** Phases below are relative. Fill in the actual handover date
-> at the top of this file and work backwards — everything else depends on it.
->
-> **Handover date: 13/08/2026**
+## Who owns what
+
+| Track | Person | File | Scope |
+|:---:|---|---|---|
+| **A** | **Fadi** | `fadi.md` | Data pipeline & velocity engine (Python) |
+| **B** | **Nagham** | `nagham.md` | Deployment, persistence, pilot telemetry |
+| **C** | **Anas** | `anas.md` | Frontend core — `App.jsx`, engines, styling |
+| **D** | **Malik** | `malik.md` | Pages, in-store workflows, customer handover |
+
+> ⚠️ **Task IDs are track letters, not initials.** `A-1` is **Fadi's** task, not Anas's — Anas owns
+> the **C-** tasks. Read the letter as the track, then check this table for the person.
+
+> 🗓️ **Handover date: Thu 13/08/2026.** The calendar in §2 is built backwards from it.
+> If a gate slips, say so the same day — do not silently absorb it into the next phase.
 
 ---
 
@@ -21,12 +30,12 @@ Only four things genuinely block handing this to a customer. Everything else is 
 ```
 B-1 deploy to a URL ──┐
 B-2 real persistence ─┼──► HANDOVER POSSIBLE
-C-1 Hebrew/RTL UI ────┤
+C-1 Hebrew data render ┤
 D-5 handover docs ────┘
 ```
 
-If these four are not done, there is nothing to hand over — the app runs on one laptop, in English,
-losing data on cache clear, with no instructions. **Protect these four above all else.**
+If these four are not done, there is nothing to hand over — the app runs on one laptop, loses every
+decision on a cache clear, and comes with no instructions. **Protect these four above all else.**
 
 Everything else (velocity, LLM explanations, price-gap screen, expiry capture) makes the product
 *better*. These four make it *exist*.
@@ -62,40 +71,41 @@ Two things must happen on day one. Both have a named owner and produce a **writt
 
 | Owner | Task | Deliverable |
 |---|---|---|
-| **D** | **D-0** — send YomYom the two questions (sales export? daily CSV?) | Answers recorded in §7 below |
-| **C** | **C-0** — write `docs/UI_DATA_CONTRACT.md` | Committed + Person D's sign-off (D-0b) |
-| A | **A-0** — chase D until the answers land; build A-1 without waiting | — |
+| **Malik** | **D-0** — send YomYom the two questions (sales export? daily CSV?) | Answers recorded in §7 below |
+| **Anas** | **C-0** — write `docs/UI_DATA_CONTRACT.md` | Committed + Malik's sign-off (D-0b) |
+| Fadi | **A-0** — chase Malik until the answers land; build A-1 without waiting | — |
 
 Neither blocks the start of coding: A-1 is designed to work without YomYom's answers, and C-0 is an
-hour's work. But **C and D must not write code against different assumptions** — that is the one
+hour's work. But **Anas and Malik must not write code against different assumptions** — that is the one
 collision the file split cannot prevent on its own.
 
 ### Phase 1 — Foundations (parallel, no dependencies)
 
 | Who | Task |
 |---|---|
-| A | A-1 velocity engine, A-2 daily snapshot |
-| B | B-1 deploy, B-5 env hygiene |
-| C | C-1 Hebrew data rendering, C-2 honest analytics |
-| D | D-1 daily action list, D-2 expiry capture |
+| Fadi | A-1 velocity engine, A-2 daily snapshot |
+| Nagham | B-1 deploy, B-5 env hygiene |
+| Anas | C-1 Hebrew data rendering, C-2 honest analytics |
+| Malik | D-1 daily action list, D-2 expiry capture |
 
 Nobody is blocked. Everybody starts immediately.
 
 ### 🚦 GATE 1 — First integration
 
-**Everyone merges to `main`. Deployed URL shows real YomYom data in Hebrew, end to end.**
+**Everyone merges to `main`. Deployed URL shows real YomYom data, end to end.**
 
-Do not proceed until a teammate can open the URL on their phone and see real Hebrew product data.
+Do not proceed until a teammate can open the URL on their phone and see real Hebrew product data
+rendering correctly.
 If this slips, the handover slips — say so out loud rather than hoping to catch up.
 
 ### Phase 2 — Make it real
 
 | Who | Task |
 |---|---|
-| A | A-3 sales adapter, A-4 quality gate |
-| B | B-2 persistence, B-3 telemetry |
-| C | C-3 LLM async fix, C-4 store-floor layout |
-| D | D-3 price-gap screen, D-4 daily summary |
+| Fadi | A-3 sales adapter, A-4 quality gate |
+| Nagham | B-2 persistence, B-3 telemetry |
+| Anas | C-3 LLM async fix, C-4 store-floor layout |
+| Malik | D-3 price-gap screen, D-4 daily summary |
 
 ### 🚦 GATE 2 — Dry run
 
@@ -109,10 +119,10 @@ amount of code review, and it is the only way to know whether the daily loop act
 
 | Who | Task |
 |---|---|
-| A | A-5 refresh competitor data (**stale prices are worse than none**) |
-| B | Telemetry dashboard, monitoring |
-| C | C-5 performance |
-| D | D-5 handover package, training session |
+| Fadi | A-5 refresh competitor data (**stale prices are worse than none**) |
+| Nagham | Telemetry dashboard, monitoring |
+| Anas | C-5 performance |
+| Malik | D-5 handover package, training session |
 
 ### 🚦 GATE 3 — Go / no-go
 
@@ -129,14 +139,14 @@ run ordering decisions on untested software.
 
 **Minimum bar before handover** — this is not optional:
 
-- **Person A:** pytest over the velocity engine. A stock increase must never register as sales; a
+- **Fadi:** pytest over the velocity engine. A stock increase must never register as sales; a
   20% row-count drop must fail the import. These two bugs would silently corrupt every number the
   customer sees.
-- **Person C:** vitest over `inventoryEngine` and `reorderEngine`, specifically the
+- **Anas:** vitest over `inventoryEngine` and `reorderEngine`, specifically the
   `velocity_confidence: 'none'` path. Nothing may classify as "Slow moving" without history.
-- **Person B:** owns release. Nothing deploys that fails `npm run lint && npm run build`.
-- **Person D:** owns the manual pass — every screen at 390px on a real phone, in Hebrew, before
-  each gate.
+- **Nagham:** owns release. Nothing deploys that fails `npm run lint && npm run build`.
+- **Malik:** owns the manual pass — every screen at 390px on a real phone, with real Hebrew
+  product data, before each gate.
 
 Full coverage is not the goal. Cover the paths where a silent wrong number reaches the customer.
 
@@ -145,11 +155,12 @@ Full coverage is not the goal. Cover the paths where a silent wrong number reach
 9 local branches and a history of long-lived person branches. Four parallel tracks on that will
 collide.
 
-- Branch from `main`, small and short-lived: `a/velocity-engine`, `c/rtl-layout`.
+- Branch from `main`, small and short-lived: `fadi/velocity-engine`, `anas/honest-analytics`.
 - **Merge to `main` daily.** A branch alive longer than two days is a merge conflict forming.
 - `main` must always build. If you break it, fixing it is your only job.
-- Delete the stale branches (`personBandC-latest`, `nagham`, `new`, `kaggle`, …) before Phase 1 so
-  nobody branches off a dead one by accident.
+- Delete the stale branches (`personBandC-latest`, `new`, `kaggle`, `fadi's`, and the old branch
+  literally named `nagham` — the branch, not the person) before Phase 1, so nobody accidentally
+  branches off a dead one.
 
 ### Support during the pilot
 
@@ -180,7 +191,7 @@ Every line must be true before YomYom uses this unsupervised.
 - [ ] No screen displays a number we cannot explain to the customer on the spot
 
 **Usable**
-- [ ] Full Hebrew/RTL, correct ₪ and date formatting
+- [ ] Hebrew product names render correctly in the English UI; ₪ and dates formatted right
 - [ ] Works one-handed on a phone
 - [ ] Recording an expiry date takes under 15 seconds and no terminal
 - [ ] A non-technical person completes the morning routine from the written guide alone
@@ -231,7 +242,7 @@ something small and true beats shipping something broad we cannot defend.
 
 ### If the deadline is very short
 
-Ship **one screen**: the daily action list, in Hebrew, deployed, with real price-gap and below-cost
+Ship **one screen**: the daily action list, deployed, with real price-gap and below-cost
 alerts and working accept/dismiss. That alone is a real product built on real data — 14,406 matched
 barcodes and 60 products provably selling below cost. It is defensible, valuable, and honest.
 
@@ -243,7 +254,7 @@ A narrow tool that works earns the second meeting. A broad one that shows made-u
 
 ### ✅ Resolved
 
-1. **UI language — English for the pilot.** No RTL flip, no i18n. Person C's C-1 shrinks to
+1. **UI language — English for the pilot.** No RTL flip, no i18n. Anas's C-1 shrinks to
    rendering Hebrew *data* correctly inside an English layout (`dir="auto"`, column alignment,
    Hebrew-aware sorting). **Revisit if floor staff — not just the manager — are expected to use it.**
 
@@ -254,14 +265,14 @@ A narrow tool that works earns the second meeting. A broad one that shows made-u
    **0 of 7,451 match**, and a "Slow moving" early-return sends every product to the bottom.
    It also needs real `shelfCapacity`, which exists in **no** data source we have — currently
    hardcoded to `10` for every product. Fixing it is a shelf-survey project, not a code task.
-   → Person D removes it from navigation. Person C leaves the engine in place, unwired.
+   → Malik removes it from navigation. Anas leaves the engine in place, unwired.
 
 3. **Customer relationship — owned by the team.** Still name **one person** for outbound messages
    so YomYom hears a single voice; internally decide together.
 
-### 🔴 Open — owner: Person D, due Mon 03/08 (task D-0)
+### 🔴 Open — owner: Malik, due Mon 03/08 (task D-0)
 
-**Person D sends one message containing both. Person A chases until answered (A-0) and is told
+**Malik sends one message containing both. Fadi chases until answered (A-0) and is told
 directly. Write the answers in below, with the date received.**
 
 4. **Does the POS export sales/transactions, or only inventory?**
@@ -277,16 +288,16 @@ directly. Write the answers in below, with the date received.**
 
    > **ANSWER:** ______________________  _(date: ____)_
 
-   If the answer is weekly, not daily: Person A widens the `velocity_confidence` bands and we lower
+   If the answer is weekly, not daily: Fadi widens the `velocity_confidence` bands and we lower
    what we promise the customer. It does not stop the pilot — but it must not be discovered late.
 
 > One message, two asks. Don't spend two separate favours. A-1 is designed to work without either
 > answer, so **nothing waits on this** — but the sooner it lands, the less rework.
 
-### 🟡 Agreed on day 1 — owner: Person C, due Mon 03/08 (task C-0)
+### 🟡 Agreed on day 1 — owner: Anas, due Mon 03/08 (task C-0)
 
-6. **The `App.jsx` ↔ `src/pages/` prop contract.** Person C drafts `docs/UI_DATA_CONTRACT.md`,
-   Person D signs off (D-0b). This is the only real coupling in the four-way split and the one
+6. **The `App.jsx` ↔ `src/pages/` prop contract.** Anas drafts `docs/UI_DATA_CONTRACT.md`,
+   Malik signs off (D-0b). This is the only real coupling in the four-way split and the one
    collision the file-ownership split cannot prevent by itself. Neither writes code until it's agreed.
 
    > **SIGNED OFF:** ☐ C drafted  ☐ D agreed  _(date: ____)_
