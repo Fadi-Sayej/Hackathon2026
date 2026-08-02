@@ -1,42 +1,124 @@
-Read these files before doing anything:
-- CLAUDE.md
-- STATUS.md
-- sprint_plan.md
-- src/App.jsx
-- src/data/mockMarketData.js
-- src/data/marketContext.js
-- src/lib/ai/gemini.js
-- .env.example
+# Person C — Frontend Core: Hebrew/RTL + Honest Analytics
 
-You are working on Person C's tasks from sprint_plan.md: frontend wiring, dead code removal, and stale defaults. C-4 and C-2 have zero dependencies — start there immediately.
+> 📋 **Read `PLAN.md` first** — phases, integration gates, go/no-go criteria, and the cut line.
+> This file is only your slice of it.
+>
+> ✅ **DECIDED: the UI stays English for the pilot.** C-1 is therefore much smaller than originally
+> scoped — no full i18n, no RTL layout flip. But Hebrew *data* still has to render correctly inside
+> an English layout. See C-1 below.
 
-YOUR TASKS IN ORDER:
+> **You own (nobody else edits):** `src/App.jsx`, `src/lib/` (all JS engines), `index.html`,
+> `src/index.css`, `src/App.css`, `scripts/normalize-datasets.mjs`, `scripts/build-rag-corpus.mjs`
+> **Never touch:** `src/pages/`, `src/components/` (Person D), `scripts/*.py` (Person A),
+> `src/api/` (Person B)
 
-C-4 (do first — no dependencies):
-  C-4a: Verify gemini.js is not imported anywhere: grep -r "gemini" src/ --include="*.js" --include="*.jsx"
-        Expected: zero results. Then delete src/lib/ai/gemini.js.
-  C-4b: Verify these assets are not referenced anywhere: grep -r "hero.png\|react.svg\|vite.svg" src/
-        Expected: zero results. Then delete src/assets/hero.png, src/assets/react.svg, src/assets/vite.svg.
-  C-4c: Remove the line VITE_LLM_EXPLANATIONS_ENABLED=false from .env.example (Person D is adding a proper block for it).
-  After all three: run npm run lint and npm run build — both must pass.
+Read first: `CLAUDE.md`, `src/App.jsx`, `src/lib/analytics/inventoryEngine.js`,
+`src/lib/analytics/reorderEngine.js`, `src/lib/ai/explanationProvider.js`
 
-C-2 (no dependencies):
-  In src/data/marketContext.js, find the line with currentDate: '2026-05-15' and change it to:
-    currentDate: new Date().toISOString().split('T')[0],
-  In .env.example, change VITE_HOLIDAY_COUNTRY=AT to VITE_HOLIDAY_COUNTRY=IL
-  and VITE_NEWS_QUERY=Jordan to VITE_NEWS_QUERY=Israel supermarket prices
+---
 
-C-1 (wait for Person B to finish B-3 before running this):
-  Step 1: Create src/data/marketData.js as a stub right now so builds never break:
-    // Stub — overwritten by scripts/export_competitor_market_data.py when real data is available
-    export { COMPETITOR_STORES, OUR_STORE, BARCODE_TO_PRODUCT_ID, PRODUCT_ID_TO_BARCODE } from './mockMarketData.js'
-  Step 2: In src/App.jsx line 18, change the import from './data/mockMarketData.js' to './data/marketData.js'
-  Step 3: Add src/data/marketData.js to .gitignore so the generated file is never committed.
-  Run npm run build to confirm it passes.
-  Once Person B says B-3 is done and src/data/marketData.js has real data, reload the dev server and verify real competitor prices appear in the UI.
+## What we are handing YomYom
 
-C-3 (wait for Person A to finish A-2 — already done, so you can start this now):
-  Read scripts/normalize-datasets.mjs first, then add the YomYom Parquet loader as described in sprint_plan.md. The silver Parquet is at data/internal/silver_pos/yomyom_products.parquet. Map fields as: barcode→id, product_name→name, category→category, selling_price→price, cost_price→cost, current_stock→currentStock (clamp to 0). Use defaults for missing fields (shelfQuantity:0, shelfCapacity:10, salesLast7Days:0, salesLast30Days:0, supplier:'Unknown', leadTimeDays:3, returnedUnits:0, damagedUnits:0).
-  Done when: npm run sprint7 completes and src/data/demoProducts.js contains 7,000+ products with Hebrew names.
+A deployed web app a store manager opens each morning that says **what to act on today**, computed
+from their own real data. The pilot measures whether acting on those alerts makes money.
 
-Only work on frontend files and the files mentioned here. Do not touch Python pipeline scripts.
+## Your mission
+
+**The analytics currently produce output that looks broken.** I ran the engine chain
+against the real data — here is exactly what a customer would see:
+
+| What the UI shows | Reality |
+|---|---|
+| "Slow moving" | **7,451 of 7,451 products (100%)** |
+| `daysUntilStockout` | computed for **0** products |
+| Stockout risk / low stock / overstocked / waste risk | **all 0** |
+| Reorder recommendations | 2,742 — **all type `PROMOTION`**, identical text |
+
+All of it traces to `salesLast30Days = 0` everywhere. Person A is deriving real velocity from
+snapshot deltas, but **that will take days of pilot data to become meaningful** — so the UI must
+behave honestly in the meantime, and forever after for products with thin history.
+
+---
+
+### C-1 (P0) — Hebrew data inside an English UI
+
+The UI stays English (team decision). **This does not mean there is no work here** — all 7,451
+product names are Hebrew and will render badly by default inside an LTR layout.
+
+- Keep `<html lang="en">`. No RTL flip, no i18n module. Scope is small — do it fast.
+- Put `dir="auto"` on **every element that renders product data** — names, categories, supplier.
+  Without it, a Hebrew name next to a number renders in a confusing order (the `1.5` in
+  `פריגת בטעם טרופי 1.5 ליטר` will jump to the wrong end of the string).
+- Test with real values: `פריגת בטעם טרופי 1.5 ליטר`, `אבזרי סלולר ו חשמל`, `מוצרי מכולת`.
+- Right-align Hebrew text columns in tables; keep ₪ amounts, %, dates and barcodes left-aligned
+  and LTR. Mixed-direction table cells are the thing that will look broken if you skip it.
+- Sorting and search must work on Hebrew strings — check `localeCompare('he')`.
+
+⚠️ **Flag for the team, don't solve alone:** an English UI is fine if the *manager* is the only
+user, since they're the one exporting the CSV. The moment floor staff are expected to use it, this
+becomes the top adoption risk. Raise it at the pilot review — it is a real finding, not a nitpick.
+
+### C-2 (P0) — Make the analytics honest
+
+Never show a computed number we cannot stand behind.
+
+- `inventoryEngine` must treat "no velocity history" as a **distinct state** from "zero sales".
+  Person A ships `velocity_confidence` (`none` / `low` / `medium` / `high`) — consume it.
+- When confidence is `none`, do not classify the product as "Slow moving". Show
+  **"Not enough sales history yet"** and suppress `daysUntilStockout` rather than rendering null.
+- `reorderEngine` must stop emitting 2,742 identical PROMOTION cards. When velocity is unavailable,
+  fall back to recommendation types we have **real** data for:
+  - **Selling below cost** — 60 products, genuinely losing money on every unit
+  - **Priced above competitor** — backed by 14,406 real barcode matches
+  - **Negative stock** — 625 products, a data-integrity action for staff
+  - **Thin margin** — 232 products under 20%
+- Surface confidence in the UI. A recommendation from 2 days of history and one from 30 must not
+  look equally certain.
+
+### C-3 (P1) — Fix the LLM async bug
+
+`annotateRecommendationsWithExplanations()` in `explanationProvider.js:22` calls
+`provider.generateExplanation()` **synchronously**, but `llmExplanationProvider`'s version is
+`async`. The Promise is never awaited, so `result.explanation` is always `undefined` and proxy
+errors surface as unhandled rejections. The mock provider is sync, which is why it has always
+appeared to work.
+
+Fix: make the function async and move the recommendations `useMemo` in `App.jsx` to
+`useEffect` + state. Keep the mock provider as a **graceful fallback** — if the proxy is slow, down,
+or out of credits, the store manager still sees rule-based text, never a spinner or a blank card.
+
+`VITE_LLM_PROXY_URL` is commented out in `.env` on purpose until this is fixed. Person B owns the
+billing and the deployed proxy — **coordinate, don't both edit this file.**
+
+### C-4 (P1) — Store-floor layout
+
+Responsive CSS exists (`@media` at 1220/860/560px) but was never tested for real use. Staff will
+hold a phone in one hand. Verify every page at 390px wide, ensure tap targets are finger-sized, and
+make sure tables of 7,451 Hebrew product rows don't blow out horizontally.
+
+### C-5 (P2) — Performance
+
+The bundle is **2.65 MB** (335 KB gzipped) because `demoProducts.js` is a 2.8 MB JS module compiled
+into it. On a store's mobile connection that is a slow first load, and every data refresh means a
+full redeploy. Move product data to a fetched JSON file — same pattern Person B uses for
+`operational.json`.
+
+---
+
+## Contract with the rest of the team
+
+- **Person D owns `src/pages/` and `src/components/`; you own `App.jsx` and everything under
+  `src/lib/`.** You compute and pass data down; Person D renders it. Agree the prop shape with them
+  **before** either of you starts, or you will collide in `App.jsx`.
+- Person A guarantees these column names through `normalize-datasets.mjs`: `barcode`,
+  `product_name`, `category`, `selling_price`, `cost_price`, `current_stock`, `units_sold_7d`,
+  `units_sold_30d`, `velocity_confidence`.
+- Do not start C-2 by waiting on real velocity data. Build against `velocity_confidence: 'none'` —
+  that is the state the pilot begins in anyway.
+
+## Done when
+
+- The app reads naturally right-to-left with Hebrew product names and correct ₪ formatting.
+- No screen shows "Slow moving" for a product we have no sales history for.
+- Recommendation types reflect real signals (below-cost, price gap, negative stock, thin margin),
+  not one repeated placeholder.

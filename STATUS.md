@@ -1,5 +1,12 @@
 # SmartShelf AI — Current Status
 
+> ⛔ **SUPERSEDED — do not plan work from this file.** It describes the June 6 hackathon sprint.
+> **`PLAN.md` + `personA–D.md` are the current source of truth** for the YomYom pilot.
+>
+> Specifically wrong below: the shelf/planogram feature has been **cut** (it assigns all 7,451
+> products to the bottom shelf), and stockout prediction **does not work** — there is no sales
+> velocity in the POS export. See `CLAUDE.md` §Key Constraints.
+
 _Last updated: June 6, 2026 (Person B+C sprint)_  
 _Competitor data sources reviewed: June 6, 2026_
 

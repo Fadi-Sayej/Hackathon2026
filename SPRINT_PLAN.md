@@ -1,5 +1,10 @@
 # SmartShelf AI — State Update + Team Sprint Plan
 
+> ⛔ **SUPERSEDED — this sprint is complete.** Its A/B/C/D tasks (Kaggle import, barcode matching,
+> competitor export, LLM proxy) are **done**. Kept for reference only.
+>
+> **For the YomYom pilot, work from `PLAN.md` + `personA–D.md` instead.**
+
 *Generated June 6, 2026. Based on TECHNICAL_AUDIT.md, CLAUDE.md, STATUS.md, and live codebase inspection.*
 
 ---
