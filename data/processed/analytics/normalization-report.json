@@ -1,7 +1,7 @@
 {
   "mode": "real-silver",
   "sourceLabel": "YomYom silver Parquet (7451 products)",
-  "sourcePath": "/Users/nagham/Documents/Hackathon2026/data/internal/silver_pos/yomyom_products.parquet",
+  "sourcePath": "/Users/fadisayej/Desktop/Hackathon26/Hackathon2026/data/internal/silver_pos/yomyom_products.parquet",
   "sourceRowCount": 7451,
   "normalizedProductCount": 7451,
   "latestObservedDate": "2026-05-15",

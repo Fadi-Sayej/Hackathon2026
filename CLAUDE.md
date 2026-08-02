@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+# Codebase Context
+Read this FIRST before exploring the codebase:
+- `.ai-codex/lib.md` -- library exports and core logic
+
 ## Project Overview
 
 SmartShelf AI is a hackathon project: a smart inventory and shelf management tool for convenience stores (targeting the Israeli market). It has two independent parts:
@@ -112,7 +116,14 @@ Each connector implements `{ connect() → {ok, message}, load() → {products, 
 
 ### AI explanations (`src/lib/ai/`)
 
-`getDefaultExplanationProvider()` returns `mockExplanationProvider` (rule-based text). The `llmExplanationProvider` exists but is permanently disabled until a backend proxy is available (`VITE_LLM_PROXY_URL`). Do not enable it without a proxy.
+`getDefaultExplanationProvider()` returns `mockExplanationProvider` (rule-based text) unless `VITE_LLM_PROXY_URL` is set — that variable is the only switch. (`VITE_LLM_EXPLANATIONS_ENABLED` exists in `.env` but nothing in `src/` reads it.)
+
+**The LLM path does not currently work; leave `VITE_LLM_PROXY_URL` commented out.** Two blockers:
+
+1. `annotateRecommendationsWithExplanations()` in `explanationProvider.js` calls `provider.generateExplanation()` **synchronously**, but `llmExplanationProvider.generateExplanation()` is `async`. The Promise is never awaited, so `result.explanation` is always `undefined` and proxy errors become unhandled rejections. Fixing this means making the function async and moving the recommendations `useMemo` in `App.jsx` to `useEffect` + state.
+2. The Gemini key in `.env` has no prepayment credits (API returns 429).
+
+The proxy itself (`src/api/llm_proxy.py`, Gemini via `/explain` and `/report`) is correct and starts cleanly — verified `/health` returns 200.
 
 ### Persistence
 
@@ -166,10 +177,13 @@ Copy `.env.example` to `.env` before running locally.
 
 ## Key Constraints
 
-- Competitor price data on the frontend is **mock-only** (`src/data/mockMarketData.js`). Real data requires the OpenIsraeliSupermarkets Kaggle dataset + a connector in `src/external/`.
+- Competitor price data on the frontend is **real** — `src/data/marketData.js` is generated from `data/matching/barcode_matches.parquet` (14,406 matched barcodes). `src/data/mockMarketData.js` is now **orphaned**; nothing imports it.
+- **There is no sales data anywhere.** The real POS export is an inventory snapshot with no sales history, so `units_sold_7d`/`units_sold_30d`/`last_sale_date` are null in all 7,674 rows of `yomyom_sales.parquet`, and `salesLast7Days`/`salesLast30Days` are hardcoded to `0` in `normalize-datasets.mjs`. Anything velocity-based (days-until-stockout, top sellers, slow movers) is therefore degenerate.
+- `shelfQuantity` (0), `shelfCapacity` (10), `leadTimeDays` (3), `supplier` ("YomYom"), `returnedUnits`/`damagedUnits` (0) are **hardcoded constants** for every product — the planogram runs on these, not real shelf data.
 - All state is **browser localStorage only** — no backend, no database in production.
 - No test suite exists; ESLint is the only automated check.
 - The app targets Israeli convenience stores; product data and UI may contain Hebrew text.
+- Use `python3`, not `python` (npm scripts were updated accordingly).
 
 ---
 
@@ -184,11 +198,11 @@ Copy `.env.example` to `.env` before running locally.
 - Columns: `קוד פריט` (item code), `ברקוד` (barcode), `תאור פריט` (name), `סוג פריט` (type), `מלאי נוכחי` (current stock), `מחיר קניה` (purchase price), `מחיר מכירה` (selling price), `WOLT` (Wolt price), `שם מחלקה` (department), `יחידת מידה` (unit)
 - ~6,902 rows have barcodes — matchable against Kaggle competitor data
 - Departments include: מוצרי מכולת (grocery), חטיפים מתוקים (sweet snacks), משקאות (beverages), מוצרי מקרר (refrigerated), חטיפים מלוחים (salty snacks), and ~20 others
-- **Not yet imported** into the pipeline — needs `import_yomyom_pos.py` adapted for this schema, or a new importer
+- ✅ **Imported.** Lives at `data/internal/raw_pos/yomyom/all4shop_Mlai.csv` (7,674 rows) and is the source of all four `data/internal/silver_pos/*.parquet` tables. The fake seed=42 CSV is no longer used.
+- Stock is **negative for 625 rows** (POS artifact). `normalize-datasets.mjs` clamps these to 0; 2,797 rows have genuine positive stock.
+- The export contains **no sales columns** — see the sales constraint above.
 
-> The old fake 121-row `data/internal/raw_pos/yomyom/sample_yomyom_pos.csv` should be replaced by this real file.
-
-#### External — Competitor prices (collected, not yet wired to frontend)
+#### External — Competitor prices (collected AND wired to frontend)
 
 | Source | Script | Output | Status |
 |---|---|---|---|
@@ -201,28 +215,24 @@ Copy `.env.example` to `.env` before running locally.
 - `import_kaggle_supermarkets.py` — reads those CSVs, maps to `ExternalProductObservation`, writes bronze + silver Parquet. Supports `dor_alon`, `rami_levy`, `shufersal`. Expects price CSV + store CSV per chain from `src/external/kaggle_supermarket_importer.py`.
 - **`data/raw/` is in `.gitignore`** — raw data is never committed. Run the download script after cloning.
 
-**Kaggle silver is now in the pipeline.** `src/data/marketData.js` stub exists and `App.jsx` imports it — once `barcode_matches.parquet` is produced and `export_competitor_market_data.py` is run, real prices will appear in the frontend automatically. The frontend currently falls back to mock data via the stub.
+**Kaggle silver is fully wired through to the frontend.** `barcode_matches.parquet` (14,406 matched rows) has been produced and `export_competitor_market_data.py` has been run — `src/data/marketData.js` is a 707 KB generated file of real competitor prices, and `App.jsx` imports it. This is no longer a stub and there is no mock fallback in play.
 
-#### Internal POS pipeline (fake data)
+#### Internal POS pipeline (real data)
 
 | Source | Script | Output | Status |
 |---|---|---|---|
-| YomYom POS CSV (fake, seed=42) | `scripts/import_yomyom_pos.py` | `data/internal/silver_pos/*.parquet` + `data/signals/yomyom/` | ✅ Done (fake data) |
+| YomYom POS CSV (real, 7,674 rows) | `scripts/import_yomyom_pos.py` | `data/internal/silver_pos/*.parquet` | ✅ Done |
 
-Silver tables: `yomyom_products`, `yomyom_sales`, `yomyom_inventory`, `yomyom_margins`.
-Business signals: top sellers, low-stock fast-movers, slow movers, high-margin impulse, category summary.
+Silver tables: `yomyom_products`, `yomyom_sales`, `yomyom_inventory`, `yomyom_margins` — 7,674 rows each.
+
+⚠️ `yomyom_sales` is **structurally empty** (all velocity columns null) because the source export has no sales history. Consequently `data/signals/` is empty — the five business signals (top sellers, low-stock fast-movers, slow movers, high-margin impulse, category summary) all key off `units_sold_30d` and cannot be generated.
 
 ---
 
 ### What's next (in priority order)
 
-#### 1. Import real YomYom inventory
-**File:** `yomyom-inventory.csv` (project root, 7,678 rows, Hebrew)
-
-- Move to `data/internal/raw_pos/yomyom/yomyom_inventory_real.csv`
-- Adapt `import_yomyom_pos.py` (or write a new importer) for this schema — columns are Hebrew, schema differs from the fake CSV
-- Column mapping needed: `ברקוד` → barcode, `תאור פריט` → product_name, `מלאי נוכחי` → current_stock, `מחיר קניה` → cost_price, `מחיר מכירה` → selling_price, `שם מחלקה` → category
-- Note: stock values can be negative (POS artifact — treat negative as 0 or flag for review)
+#### ✅ 1. Import real YomYom inventory — DONE
+Imported as `data/internal/raw_pos/yomyom/all4shop_Mlai.csv` → 4 silver Parquet tables, 7,674 rows each.
 
 #### ✅ 2. Download and import Kaggle competitor prices — DONE
 Silver Parquets written:
@@ -230,25 +240,33 @@ Silver Parquets written:
 - `data/external/silver/products/kaggle_rami_levy/` — 21,849 products
 - `data/external/silver/products/kaggle_shufersal/` — 22,759 products
 
-#### 3. Barcode match: YomYom ↔ Kaggle
-**Output:** `data/matching/barcode_matches.parquet`
+#### ✅ 3. Barcode match: YomYom ↔ Kaggle — DONE
+`data/matching/barcode_matches.parquet` — 14,406 matched rows with columns `barcode_norm`, `yomyom_product_name`, `yomyom_selling_price`, `yomyom_cost_price`, `kaggle_product_name`, `kaggle_price`, `chain`, `price_gap_ils`.
 
-Join `yomyom-inventory.csv` barcodes against Kaggle silver barcodes. This produces the competitor price-gap table (e.g. "YomYom sells Coca-Cola at 8₪, Shufersal sells it at 6.90₪").
+#### ✅ 4. Export real competitor data to frontend — DONE
+`export_competitor_market_data.py` has been run. `src/data/marketData.js` holds real `OUR_STORE` + `COMPETITOR_STORES` snapshots.
 
-#### ✅ 4. Export real competitor data to frontend — Script ready
-`scripts/export_competitor_market_data.py` is written. `src/data/marketData.js` stub created, `App.jsx` already imports it. Run the script once step 3 (`barcode_matches.parquet`) is available:
-```bash
-python3 scripts/export_competitor_market_data.py
-```
+#### ✅ 5. Wire real stock into the frontend — DONE
+`normalize-datasets.mjs` previously read only `yomyom_products.parquet`, which has **no `current_stock` column** — so every product reached the UI with `currentStock: 0`. It now joins `yomyom_inventory.parquet` on barcode (falling back to product name for the ~300 barcode-less rows). Result: 2,742 products with real stock, 89,119 units total.
 
-#### 5. ✅ LLM proxy built (enable real AI explanations)
-**Status:** Done. `src/api/llm_proxy.py` uses Gemini (`gemini-2.0-flash`). `explanationProvider.js` bugs fixed.
+#### ✅ 6. Operational dashboard data — DONE
+`npm run data:dashboard` generates `public/data/operational.json`. Current output: 2,183 recommendations — 1,147 `CHECK_WOLT_PRICE_GAP`, 625 `CHECK_NEGATIVE_STOCK`, 307 `VERIFY_UNKNOWN_BARCODE`, 104 `CHECK_MARGIN`. **Re-run this after any POS re-import** — it is a build artifact and is not committed.
 
-**To activate:** set `VITE_LLM_PROXY_URL=http://localhost:8000/explain` in `.env`, then:
-```bash
-uvicorn src.api.llm_proxy:app --port 8000 --reload
-```
-`VITE_GEMINI_API_KEY` is already set in `.env`.
+#### ✅ 7. RAG corpus updated
+`scripts/build-rag-corpus.mjs` reads real YomYom silver Parquet, falls back to demo data if Parquet not present.
 
-#### 6. ✅ RAG corpus updated
-**File:** `scripts/build-rag-corpus.mjs` — now reads real YomYom silver Parquet, falls back to demo data if Parquet not present.
+---
+
+### Still open
+
+#### 🔴 1. No sales data (biggest gap)
+The POS export is an inventory snapshot only. Until YomYom provides a sales/transaction export, velocity-based features cannot work. Two options: obtain a real sales export, or reframe recommendations around what does exist — stock levels, margin, and competitor price gaps (the genuinely strong signal, backed by 14,406 barcode matches).
+
+#### 🔴 2. LLM explanations blocked
+See the AI explanations section above — an async/sync bug in `explanationProvider.js` plus a Gemini key with no credits. `VITE_LLM_PROXY_URL` is commented out in `.env` so the app stays on the working mock provider.
+
+#### 🟡 3. Shelf data is synthetic
+`shelfQuantity`/`shelfCapacity`/`leadTimeDays`/`supplier` are hardcoded constants, so the planogram is not driven by real shelf measurements.
+
+#### 🟡 4. Geo/context config points at the wrong country
+`.env` has `VITE_HOLIDAY_COUNTRY=AT` (Austria), `VITE_WEATHER_LAT/LON=31.95/35.93` (Amman, Jordan) and `VITE_NEWS_QUERY=Jordan`, but the store is YomYom Kafr Qasim, Israel (32.114/34.972). Currently harmless because `VITE_ENABLE_LIVE_MARKET_CONTEXT=false`, but it must be corrected before enabling live context.
