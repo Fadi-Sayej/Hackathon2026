@@ -1,12 +1,12 @@
 {
   "totalProducts": 7451,
-  "estimatedStockValue": 0,
+  "estimatedStockValue": 1243481.97,
   "categories": [
     {
       "category": "בדיקה",
       "products": 7,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 14
     },
     {
       "category": "קופה שטיפה (הכל )",
@@ -48,7 +48,7 @@
       "category": "משקאות",
       "products": 500,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 29788
     },
     {
       "category": "מוצרי מאפים",
@@ -60,55 +60,55 @@
       "category": "מוצרי שימוש מטבח -חנות",
       "products": 126,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 2918
     },
     {
       "category": "תפוז טרי ( שימוש עצמי )",
       "products": 1,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 1593
     },
     {
       "category": "פירות וירקות",
       "products": 115,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 1270
     },
     {
       "category": "מחלקת drive",
       "products": 51,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 962
     },
     {
       "category": "חטיפים מתוקים",
       "products": 848,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 7961
     },
     {
       "category": "אריזות ו מוצרי  ניקוי לסופר",
       "products": 38,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 74
     },
     {
       "category": "כל הסיגריות",
       "products": 113,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 3891
     },
     {
       "category": "מוצרי בצק ( معجنات )",
       "products": 6,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 1
     },
     {
       "category": "אבזרי עישון",
       "products": 101,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 7632
     },
     {
       "category": "מחלקת yomyom - event",
@@ -120,7 +120,7 @@
       "category": "מוצרי מכולת",
       "products": 2472,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 5789
     },
     {
       "category": "מתנה ארוזה",
@@ -144,157 +144,157 @@
       "category": "מאפים (גדרון - שמרים )",
       "products": 13,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 1068
     },
     {
       "category": "ממתקים",
       "products": 37,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 586
     },
     {
       "category": "תכשיטים לילדות קטנות",
       "products": 131,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 657
     },
     {
       "category": "ממתקי בסקוטי",
       "products": 25,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 194
     },
     {
       "category": "חטיפים מלוחים",
       "products": 347,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 4144
     },
     {
       "category": "מוצרי קפה (סאשה )",
       "products": 18,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 4225
     },
     {
       "category": "פיקדון  ו משטחים - ארגזים",
       "products": 3,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 842
     },
     {
       "category": "מוצרי עונתי חורף",
       "products": 32,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 125
     },
     {
       "category": "אבזרי סלולר ו חשמל",
       "products": 278,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 472
     },
     {
       "category": "מוצרי מקרר",
       "products": 457,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 3291
     },
     {
       "category": "מוצרי בית",
       "products": 329,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 3128
     },
     {
       "category": "מוצרי  אלקטרונים",
       "products": 23,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 76
     },
     {
       "category": "קפואים מצוננים",
       "products": 68,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 470
     },
     {
       "category": "מוצרי חצר תחנה",
       "products": 144,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 787
     },
     {
       "category": "משקפים",
       "products": 2,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 76
     },
     {
       "category": "גלידות",
       "products": 205,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 1027
     },
     {
       "category": "פיצוחים",
       "products": 94,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 900
     },
     {
       "category": "מוצרי ניקיון ו טיפוח אישי",
       "products": 185,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 1880
     },
     {
       "category": "חד פעמי",
       "products": 15,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 193
     },
     {
       "category": "נקיניקיות",
       "products": 38,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 14
     },
     {
       "category": "בעלי חיים",
       "products": 29,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 304
     },
     {
       "category": "בשרים",
       "products": 25,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 34
     },
     {
       "category": "משקאות טבעיות",
       "products": 9,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 53
     },
     {
       "category": "מוצרי יום הולדת ו מתנות",
       "products": 171,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 1535
     },
     {
       "category": "מוצרי ריח - לרכב",
       "products": 52,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 725
     },
     {
       "category": "שמנים",
       "products": 36,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 222
     },
     {
       "category": "מוצרי פיקוח",
@@ -306,13 +306,13 @@
       "category": "מגבים",
       "products": 12,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 196
     },
     {
       "category": "מחלקה לא פעילה",
       "products": 1,
       "salesLast30Days": 0,
-      "currentStock": 0
+      "currentStock": 2
     },
     {
       "category": "יח'",

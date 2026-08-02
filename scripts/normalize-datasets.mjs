@@ -11,15 +11,43 @@ const exportsDir = path.join(rootDir, 'data', 'exports', 'sample-app-data')
 const appDataDir = path.join(rootDir, 'src', 'data')
 
 const SILVER_PARQUET = path.join(rootDir, 'data', 'internal', 'silver_pos', 'yomyom_products.parquet')
+const SILVER_INVENTORY_PARQUET = path.join(rootDir, 'data', 'internal', 'silver_pos', 'yomyom_inventory.parquet')
 const SILVER_JSON_CACHE = path.join(rootDir, 'data', 'internal', 'silver_pos', 'yomyom_products_export.json')
+
+// current_stock lives in the inventory table, not the products table, so the two
+// silver tables are joined before the rows reach the normalizer. Barcode is the
+// join key; the ~300 rows with no barcode fall back to product name, matching how
+// `id` is derived below.
+const exportSilverPy = `
+import os
+import polars as pl
+
+def keyed(df):
+    return df.with_columns(
+        pl.when(pl.col('barcode').is_null() | (pl.col('barcode') == ''))
+          .then(pl.concat_str([pl.lit('name:'), pl.col('product_name')]))
+          .otherwise(pl.col('barcode'))
+          .alias('_join_key')
+    )
+
+products = keyed(pl.read_parquet('${SILVER_PARQUET}'))
+
+if os.path.exists('${SILVER_INVENTORY_PARQUET}'):
+    inventory = keyed(pl.read_parquet('${SILVER_INVENTORY_PARQUET}')).select(
+        ['_join_key', 'current_stock']
+    ).unique(subset=['_join_key'], keep='first')
+    merged = products.join(inventory, on='_join_key', how='left')
+else:
+    merged = products.with_columns(pl.lit(None).cast(pl.Int64).alias('current_stock'))
+
+merged = merged.drop('_join_key')
+open('${SILVER_JSON_CACHE}', 'w', encoding='utf-8').write(merged.write_json())
+`
 
 function loadYomYomSilver() {
   if (!existsSync(SILVER_PARQUET)) return null
   try {
-    execSync(
-      `python3 -c "import polars as pl, json; df=pl.read_parquet('${SILVER_PARQUET}'); open('${SILVER_JSON_CACHE}','w',encoding='utf-8').write(df.write_json())"`,
-      { stdio: 'pipe', cwd: rootDir }
-    )
+    execSync(`python3 -c "${exportSilverPy}"`, { stdio: 'pipe', cwd: rootDir })
     const raw = JSON.parse(readFileSync(SILVER_JSON_CACHE, 'utf-8'))
     return raw
       .filter(row => row.selling_price && row.selling_price > 0 && row.product_name)
