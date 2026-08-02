@@ -15,6 +15,8 @@
     "data:dashboard": "python3 scripts/export_dashboard_data.py",
     "data:refresh": "python3 scripts/refresh_pipeline.py",
     "data:snapshots": "python3 scripts/compare_pos_snapshots.py",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:pipeline": "python3 scripts/smoke_test_pipeline.py",
     "sprint2": "npm run normalize:data",
     "sprint3": "npm run normalize:data",
@@ -35,6 +37,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.6.0",
-    "vite": "^8.0.12"
+    "vite": "^8.0.12",
+    "vitest": "^4.1.10"
   }
 }
