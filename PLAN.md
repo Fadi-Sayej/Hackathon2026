@@ -300,4 +300,4 @@ directly. Write the answers in below, with the date received.**
    Malik signs off (D-0b). This is the only real coupling in the four-way split and the one
    collision the file-ownership split cannot prevent by itself. Neither writes code until it's agreed.
 
-   > **SIGNED OFF:** ☐ C drafted  ☐ D agreed  _(date: ____)_
+   > **SIGNED OFF:** ☑ C drafted _(2026-08-02 — `docs/UI_DATA_CONTRACT.md`)_  ☐ D agreed  _(date: ____)_
