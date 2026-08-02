@@ -4,17 +4,23 @@
  * Self-contained module. Takes raw Product[] plus optional marketContext
  * and returns Recommendation[] without depending on inventoryEngine.
  *
- * Recommendation type comes from src/lib/types.js:
- *   type: "REORDER" | "REDUCE_STOCK" | "PROMOTION" | "SHELF_INCREASE" | "SHELF_DECREASE"
+ * Recommendation type comes from recommendationTypes.js.
  *   urgency: "LOW" | "MEDIUM" | "HIGH"
  *   status: "PENDING" | "APPROVED" | "REJECTED" | "EDITED"
  */
+
+import {
+  RECOMMENDATION_TYPES,
+  RECOMMENDATION_TYPE_METADATA,
+} from './recommendationTypes.js'
 
 const FAST_MOVER_THRESHOLD = 5
 const SLOW_MOVER_SALES_30D = 5
 const SLOW_MOVER_DAILY = 0.3
 const OVERSTOCK_DAY_COVER = 30
 const NEAR_EXPIRY_DAYS = 7
+const THIN_MARGIN_THRESHOLD = 0.2
+const VELOCITY_CONFIDENCE_LEVELS = new Set(['none', 'low', 'medium', 'high'])
 
 export function generateReorderRecommendations(products, marketContext = {}) {
   if (!Array.isArray(products)) return []
@@ -76,11 +82,13 @@ export function computeMetrics(product, marketContext = {}) {
 
 function buildRecommendationCandidates(product, metrics, marketContext) {
   const recommendations = []
+  const velocityConfidence = readVelocityConfidence(product)
+  const hasVelocityConfidence = velocityConfidence !== 'none'
 
-  if (shouldReorder(metrics)) {
+  if (hasVelocityConfidence && shouldReorder(metrics)) {
     recommendations.push(
       makeRecommendation(product, metrics, marketContext, {
-        type: 'REORDER',
+        type: RECOMMENDATION_TYPES.REORDER,
         recommendedOrderQuantity: metrics.recommendedOrder,
         urgency: classifyReorderUrgency(metrics, product),
         confidence: scoreReorderConfidence(product, metrics),
@@ -89,10 +97,10 @@ function buildRecommendationCandidates(product, metrics, marketContext) {
     )
   }
 
-  if (metrics.overstocked) {
+  if (hasVelocityConfidence && metrics.overstocked) {
     recommendations.push(
       makeRecommendation(product, metrics, marketContext, {
-        type: 'REDUCE_STOCK',
+        type: RECOMMENDATION_TYPES.REDUCE_STOCK,
         urgency: metrics.nearExpiry ? 'HIGH' : 'MEDIUM',
         confidence: scoreOverstockConfidence(metrics),
         reason: buildOverstockReason(product, metrics),
@@ -100,22 +108,67 @@ function buildRecommendationCandidates(product, metrics, marketContext) {
     )
   }
 
-  if (metrics.nearExpiry && product.currentStock > 0) {
+  if (hasVelocityConfidence && metrics.nearExpiry && product.currentStock > 0) {
     recommendations.push(
       makeRecommendation(product, metrics, marketContext, {
-        type: 'PROMOTION',
+        type: RECOMMENDATION_TYPES.PROMOTION,
         urgency: 'HIGH',
         confidence: 0.85,
         reason: buildExpiryReason(product, marketContext),
       }),
     )
-  } else if (metrics.slowMoving && product.currentStock > 0 && !metrics.nearExpiry) {
+  } else if (
+    hasVelocityConfidence &&
+    metrics.slowMoving &&
+    product.currentStock > 0 &&
+    !metrics.nearExpiry
+  ) {
     recommendations.push(
       makeRecommendation(product, metrics, marketContext, {
-        type: 'PROMOTION',
+        type: RECOMMENDATION_TYPES.PROMOTION,
         urgency: 'LOW',
         confidence: 0.6,
         reason: buildSlowMovingReason(product, metrics),
+      }),
+    )
+  }
+
+  if (product.price < product.cost) {
+    recommendations.push(
+      makeRecommendation(product, metrics, marketContext, {
+        type: RECOMMENDATION_TYPES.BELOW_COST,
+        confidence: 0.95,
+        reason: buildBelowCostReason(product, metrics),
+      }),
+    )
+  } else if (calculateMarginRate(product) < THIN_MARGIN_THRESHOLD) {
+    recommendations.push(
+      makeRecommendation(product, metrics, marketContext, {
+        type: RECOMMENDATION_TYPES.THIN_MARGIN,
+        confidence: 0.8,
+        reason: buildThinMarginReason(product, metrics),
+      }),
+    )
+  }
+
+  const competitorPrice = readCompetitorPrice(product, marketContext)
+  if (competitorPrice !== null && product.price > competitorPrice) {
+    recommendations.push(
+      makeRecommendation(product, metrics, marketContext, {
+        type: RECOMMENDATION_TYPES.PRICE_GAP,
+        confidence: 0.9,
+        competitorPrice,
+        reason: buildPriceGapReason(product, competitorPrice),
+      }),
+    )
+  }
+
+  if (product.currentStock < 0) {
+    recommendations.push(
+      makeRecommendation(product, metrics, marketContext, {
+        type: RECOMMENDATION_TYPES.NEGATIVE_STOCK,
+        confidence: 0.95,
+        reason: buildNegativeStockReason(product),
       }),
     )
   }
@@ -155,6 +208,8 @@ function scoreOverstockConfidence(metrics) {
 }
 
 function makeRecommendation(product, metrics, marketContext, extras) {
+  const metadata = RECOMMENDATION_TYPE_METADATA[extras.type]
+  const velocityConfidence = readVelocityConfidence(product)
   return {
     productId: product.id,
     productName: product.name,
@@ -162,8 +217,10 @@ function makeRecommendation(product, metrics, marketContext, extras) {
     type: extras.type,
     recommendedOrderQuantity: extras.recommendedOrderQuantity,
     recommendedShelfQuantity: extras.recommendedShelfQuantity,
-    urgency: extras.urgency,
+    urgency: extras.urgency ?? metadata.defaultUrgency,
     confidence: extras.confidence,
+    velocityConfidence,
+    valueAtStake: calculateValueAtStake(product, metrics, extras),
     reason: extras.reason,
     status: 'PENDING',
     metrics: {
@@ -201,6 +258,7 @@ function buildReorderReason(product, metrics, marketContext) {
     parts.push(`Market signals add roughly ${boost}% expected demand for ${product.category}.`)
   }
   if (marketContext.weekend) parts.push('Weekend traffic is expected to be higher.')
+  parts.push(`Product: ${buildProductReference(product)}.`)
   return parts.join(' ')
 }
 
@@ -215,28 +273,124 @@ function buildOverstockReason(product, metrics) {
   }
   parts.push(`Holding ${product.currentStock} units is well above the ${OVERSTOCK_DAY_COVER}-day cover threshold.`)
   if (metrics.nearExpiry) parts.push('Expiry is approaching, so capital is at risk.')
+  parts.push(`Product: ${buildProductReference(product)}.`)
   return parts.join(' ')
 }
 
 function buildExpiryReason(product, marketContext) {
   const reference = marketContext.currentDate ?? 'today'
-  return `Expiry date ${product.expiryDate ?? 'unknown'} is within the next ${NEAR_EXPIRY_DAYS} days versus ${reference}. Recommend a promotion or discount to clear stock before write-off.`
+  return `Expiry date ${product.expiryDate ?? 'unknown'} is within the next ${NEAR_EXPIRY_DAYS} days versus ${reference}. Recommend a promotion or discount to clear ${buildProductReference(product)} before write-off.`
 }
 
 function buildSlowMovingReason(product, metrics) {
-  return `Only ${product.salesLast30Days} units moved in the last 30 days (≈ ${metrics.weightedAvgDailySales} per day). Consider a promotion before tying up more shelf space.`
+  return `Only ${product.salesLast30Days} units of ${buildProductReference(product)} moved in the last 30 days (≈ ${metrics.weightedAvgDailySales} per day). Consider a promotion before tying up more shelf space.`
+}
+
+function buildBelowCostReason(product, metrics) {
+  const lossPerUnit = Math.abs(metrics.margin)
+  return `${buildProductReference(product)} sells at ${formatCurrency(product.price)}, below its ${formatCurrency(product.cost)} unit cost by ${formatCurrency(lossPerUnit)}. ${formatStock(product.currentStock)} is recorded on hand.`
+}
+
+function buildPriceGapReason(product, competitorPrice) {
+  const gap = product.price - competitorPrice
+  return `${buildProductReference(product)} sells at ${formatCurrency(product.price)}, while the cheapest nearby competitor sells it at ${formatCurrency(competitorPrice)}. The gap is ${formatCurrency(gap)} across ${formatStock(product.currentStock)} on hand.`
+}
+
+function buildNegativeStockReason(product) {
+  return `${buildProductReference(product)} has ${formatStock(product.currentStock)} in the POS. Count the item and correct the stock record before ordering; the discrepancy is worth ${formatCurrency(Math.abs(product.currentStock) * product.cost)} at cost.`
+}
+
+function buildThinMarginReason(product, metrics) {
+  const marginPercent = round(metrics.marginRate * 100)
+  return `${buildProductReference(product)} sells at ${formatCurrency(product.price)} with a ${formatCurrency(product.cost)} unit cost, leaving a ${marginPercent}% margin across ${formatStock(product.currentStock)} on hand.`
 }
 
 function sortRecommendations(recommendations) {
   const urgencyWeight = { HIGH: 3, MEDIUM: 2, LOW: 1 }
-  const typeWeight = { REORDER: 3, PROMOTION: 2, REDUCE_STOCK: 1 }
+  const typeWeight = {
+    [RECOMMENDATION_TYPES.NEGATIVE_STOCK]: 7,
+    [RECOMMENDATION_TYPES.BELOW_COST]: 6,
+    [RECOMMENDATION_TYPES.PRICE_GAP]: 5,
+    [RECOMMENDATION_TYPES.THIN_MARGIN]: 4,
+    [RECOMMENDATION_TYPES.REORDER]: 3,
+    [RECOMMENDATION_TYPES.PROMOTION]: 2,
+    [RECOMMENDATION_TYPES.REDUCE_STOCK]: 1,
+  }
   return [...recommendations].sort((a, b) => {
+    const valueDiff = (b.valueAtStake ?? 0) - (a.valueAtStake ?? 0)
+    if (valueDiff !== 0) return valueDiff
     const urgencyDiff = (urgencyWeight[b.urgency] ?? 0) - (urgencyWeight[a.urgency] ?? 0)
     if (urgencyDiff !== 0) return urgencyDiff
     const typeDiff = (typeWeight[b.type] ?? 0) - (typeWeight[a.type] ?? 0)
     if (typeDiff !== 0) return typeDiff
     return (b.confidence ?? 0) - (a.confidence ?? 0)
   })
+}
+
+function readVelocityConfidence(product) {
+  const confidence = product.velocityConfidence ?? product.analytics?.velocityConfidence ?? 'none'
+  return VELOCITY_CONFIDENCE_LEVELS.has(confidence) ? confidence : 'none'
+}
+
+function calculateMarginRate(product) {
+  return product.price > 0 ? (product.price - product.cost) / product.price : 0
+}
+
+function readCompetitorPrice(product, marketContext) {
+  const productPrice = product.competitor?.cheapestCompetitorPrice
+  if (Number.isFinite(productPrice)) return productPrice
+
+  const source = marketContext.competitorPriceAdvantage
+  const entry = source instanceof Map ? source.get(product.id) : source?.[product.id]
+  if (Number.isFinite(entry)) return entry
+  if (!entry || typeof entry !== 'object') return null
+
+  const contextualPrice =
+    entry.competitorPrice ?? entry.cheapestCompetitorPrice ?? entry.price ?? null
+  return Number.isFinite(contextualPrice) ? contextualPrice : null
+}
+
+function calculateValueAtStake(product, metrics, extras) {
+  const stock = Math.max(0, product.currentStock)
+  let value = 0
+
+  switch (extras.type) {
+    case RECOMMENDATION_TYPES.REORDER:
+      value = (extras.recommendedOrderQuantity ?? 0) * product.cost
+      break
+    case RECOMMENDATION_TYPES.REDUCE_STOCK:
+      value = Math.max(0, stock - metrics.weightedAvgDailySales * OVERSTOCK_DAY_COVER) * product.cost
+      break
+    case RECOMMENDATION_TYPES.PROMOTION:
+      value = stock * product.cost
+      break
+    case RECOMMENDATION_TYPES.BELOW_COST:
+      value = Math.max(0, product.cost - product.price) * stock
+      break
+    case RECOMMENDATION_TYPES.PRICE_GAP:
+      value = Math.max(0, product.price - extras.competitorPrice) * stock
+      break
+    case RECOMMENDATION_TYPES.NEGATIVE_STOCK:
+      value = Math.abs(product.currentStock) * product.cost
+      break
+    case RECOMMENDATION_TYPES.THIN_MARGIN:
+      value = Math.max(0, product.price * THIN_MARGIN_THRESHOLD - metrics.margin) * stock
+      break
+  }
+
+  return round(Number.isFinite(value) ? value : 0)
+}
+
+function buildProductReference(product) {
+  return `“${product.name}” (${product.id})`
+}
+
+function formatCurrency(value) {
+  return `₪${Number(value).toFixed(2)}`
+}
+
+function formatStock(value) {
+  return `${value} ${Math.abs(value) === 1 ? 'unit' : 'units'}`
 }
 
 function isNearExpiry(expiryDate, currentDate) {
