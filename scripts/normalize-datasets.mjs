@@ -11,13 +11,15 @@ const exportsDir = path.join(rootDir, 'data', 'exports', 'sample-app-data')
 const appDataDir = path.join(rootDir, 'src', 'data')
 
 const SILVER_PARQUET = path.join(rootDir, 'data', 'internal', 'silver_pos', 'yomyom_products.parquet')
+const SILVER_SALES_PARQUET = path.join(rootDir, 'data', 'internal', 'silver_pos', 'yomyom_sales.parquet')
 const SILVER_INVENTORY_PARQUET = path.join(rootDir, 'data', 'internal', 'silver_pos', 'yomyom_inventory.parquet')
 const SILVER_JSON_CACHE = path.join(rootDir, 'data', 'internal', 'silver_pos', 'yomyom_products_export.json')
+const VELOCITY_CONFIDENCE_LEVELS = ['none', 'low', 'medium', 'high']
+const validVelocityConfidenceLevels = new Set(VELOCITY_CONFIDENCE_LEVELS)
 
-// current_stock lives in the inventory table, not the products table, so the two
-// silver tables are joined before the rows reach the normalizer. Barcode is the
-// join key; the ~300 rows with no barcode fall back to product name, matching how
-// `id` is derived below.
+// Stock and velocity live outside the products table, so the silver tables are
+// joined before the rows reach the normalizer. Barcode is the join key; the ~300
+// rows with no barcode fall back to product name, matching how `id` is derived below.
 const exportSilverPy = `
 import os
 import polars as pl
@@ -40,9 +42,32 @@ if os.path.exists('${SILVER_INVENTORY_PARQUET}'):
 else:
     merged = products.with_columns(pl.lit(None).cast(pl.Int64).alias('current_stock'))
 
+if os.path.exists('${SILVER_SALES_PARQUET}'):
+    sales = keyed(pl.read_parquet('${SILVER_SALES_PARQUET}'))
+    velocity_columns = [
+        column for column in ['units_sold_7d', 'units_sold_30d', 'velocity_confidence']
+        if column in sales.columns
+    ]
+    sales = sales.select(['_join_key', *velocity_columns]).unique(
+        subset=['_join_key'], keep='first'
+    )
+    merged = merged.join(sales, on='_join_key', how='left')
+
 merged = merged.drop('_join_key')
 open('${SILVER_JSON_CACHE}', 'w', encoding='utf-8').write(merged.write_json())
 `
+
+function normalizeVelocityConfidence(value) {
+  return validVelocityConfidenceLevels.has(value) ? value : 'none'
+}
+
+function parseFiniteNumber(value) {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null
+  if (typeof value !== 'string' || value.trim() === '') return null
+
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : null
+}
 
 function loadYomYomSilver() {
   if (!existsSync(SILVER_PARQUET)) return null
@@ -51,23 +76,33 @@ function loadYomYomSilver() {
     const raw = JSON.parse(readFileSync(SILVER_JSON_CACHE, 'utf-8'))
     return raw
       .filter(row => row.selling_price && row.selling_price > 0 && row.product_name)
-      .map(row => ({
-        id: row.barcode ? `ym-${String(row.barcode).replace(/^0+/, '')}` : `ym-${row.product_name}`,
-        name: row.product_name,
-        category: row.category ?? 'Uncategorized',
-        price: Number(row.selling_price) || 0,
-        cost: Number(row.cost_price) || 0,
-        currentStock: Math.max(0, Number(row.current_stock) || 0),
-        shelfQuantity: 0,
-        shelfCapacity: 10,
-        salesLast7Days: 0,
-        salesLast30Days: 0,
-        supplier: 'YomYom',
-        leadTimeDays: 3,
-        returnedUnits: 0,
-        damagedUnits: 0,
-        expiryDate: undefined,
-      }))
+      .map(row => {
+        const currentStock = parseFiniteNumber(row.current_stock)
+        const salesLast7Days = parseFiniteNumber(row.units_sold_7d)
+        const salesLast30Days = parseFiniteNumber(row.units_sold_30d)
+        const hasVelocityData = salesLast7Days !== null && salesLast30Days !== null
+
+        return {
+          id: row.barcode ? `ym-${String(row.barcode).replace(/^0+/, '')}` : `ym-${row.product_name}`,
+          name: row.product_name,
+          category: row.category ?? 'Uncategorized',
+          price: Number(row.selling_price) || 0,
+          cost: Number(row.cost_price) || 0,
+          currentStock: currentStock ?? 0,
+          shelfQuantity: 0,
+          shelfCapacity: 10,
+          salesLast7Days: salesLast7Days ?? 0,
+          salesLast30Days: salesLast30Days ?? 0,
+          velocityConfidence: hasVelocityData
+            ? normalizeVelocityConfidence(row.velocity_confidence)
+            : 'none',
+          supplier: 'YomYom',
+          leadTimeDays: 3,
+          returnedUnits: 0,
+          damagedUnits: 0,
+          expiryDate: undefined,
+        }
+      })
   } catch (err) {
     process.stderr.write(`Warning: could not load YomYom silver Parquet: ${err.message}\n`)
     return null
@@ -156,6 +191,12 @@ async function main() {
 
   const analyticsSummary = buildAnalyticsSummary(normalized.products)
   const report = buildReport(source, normalized.products, normalized.generatedFields ?? [], normalized.notes ?? [])
+  const velocityConfidenceCounts = Object.fromEntries(
+    VELOCITY_CONFIDENCE_LEVELS.map(level => [level, 0]),
+  )
+  for (const product of normalized.products) {
+    velocityConfidenceCounts[normalizeVelocityConfidence(product.velocityConfidence)] += 1
+  }
 
   await fs.writeFile(
     path.join(processedDemoDir, 'demo-products.json'),
@@ -192,6 +233,7 @@ async function main() {
       `Source: ${report.sourceLabel}`,
       `Rows processed: ${report.sourceRowCount}`,
       `Products normalized: ${report.normalizedProductCount}`,
+      `Velocity confidence: ${VELOCITY_CONFIDENCE_LEVELS.map(level => `${level}=${velocityConfidenceCounts[level]}`).join(', ')}`,
       `Demo export: ${path.relative(rootDir, path.join(exportsDir, 'demo-products.json'))}`,
       `App data export: ${path.relative(rootDir, path.join(appDataDir, 'demoProducts.js'))}`,
     ].join('\n'),
@@ -490,6 +532,7 @@ function normalizeSource(source) {
         shelfCapacity,
         salesLast7Days: roundNumber(salesLast7Days),
         salesLast30Days: roundNumber(Math.max(salesLast30Days, salesLast7Days)),
+        velocityConfidence: 'none',
         price,
         cost,
         expiryDate,
