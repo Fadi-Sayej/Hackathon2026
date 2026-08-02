@@ -31,6 +31,39 @@ from a terminal. That is not a product. It is your job to turn workflows like th
 
 ---
 
+### D-0 (P0 — DAY 1, DO THIS BEFORE ANY CODE) — Get two answers from YomYom
+
+**You own this.** Person A's velocity engine is designed to work without these answers, but its
+accuracy depends on them, and the sooner they land the less rework everyone does.
+
+Send the manager **one** message containing both asks. Two small requests in one note — don't spend
+two separate favours:
+
+1. **"Can your POS export sales or transactions, not just current inventory?"**
+   Ask for a sample of *any* sales report the system can produce, even a rough one. Today we only
+   have an inventory snapshot, so we cannot see what actually sold — this is the single biggest
+   limitation in the product.
+
+2. **"Can you send us the stock export once a day, every morning?"**
+   Today it arrives irregularly. Frame it as **30 seconds a morning**, and offer to automate it
+   (scheduled export, shared folder, WhatsApp) rather than asking them for discipline. Explain the
+   benefit in their terms: *the more often you send it, the more accurate the recommendations get.*
+
+**Done when:** both answers are written into `PLAN.md` §7 (replace the 🔴 Blocking block with the
+real answers and the date received), and **Person A is told directly** — they are the consumer.
+
+If the answer to #2 is "no, only weekly", say so immediately and loudly. It does not stop the pilot,
+but Person A must widen the confidence bands and we must lower what we promise the customer.
+
+### D-0b (P0 — DAY 1) — Co-sign the UI data contract
+
+Person C is drafting `docs/UI_DATA_CONTRACT.md` — the exact prop shape `App.jsx` passes into your
+pages. **Review and agree it before you write a single component.** This is the only real coupling
+between your work and Person C's, and it is where the two of you will collide if you skip it.
+
+You are the consumer: if a field you need for a screen isn't in the contract, say so **now**, not
+after C has built the chain.
+
 ### D-1 (P0) — The daily action list
 
 `public/data/operational.json` already holds **2,183 real recommendations** generated from YomYom's

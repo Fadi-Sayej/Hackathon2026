@@ -40,6 +40,31 @@ behave honestly in the meantime, and forever after for products with thin histor
 
 ---
 
+### C-0 (P0 — DAY 1, DO THIS BEFORE ANY CODE) — Write the UI data contract
+
+**You own this.** You compute the data in `App.jsx`; Person D renders it in `src/pages/`. That
+boundary is the only real coupling in the whole four-way split, and it is where you two will
+collide if it isn't written down first.
+
+Create **`docs/UI_DATA_CONTRACT.md`** defining exactly what `App.jsx` passes into each page:
+
+- The prop shape per page (`OperationalPage`, `ProductsPage`, `RecommendationsPage`, `ExpiryPage`,
+  `DashboardPage`, `ReportPage`, `ApprovedOrdersPage`).
+- The **analyzed product** shape — note it is nested: `product.analytics.primaryStatus`,
+  `.daysUntilStockout`, `.margin`, `.marginRate`, `.riskScore`, not top-level fields.
+- The **recommendation** shape, including the new types replacing `PROMOTION` (below-cost,
+  price-gap, negative-stock, thin-margin) and where `velocity_confidence` surfaces.
+- Which fields can be `null`, and what the page must render when they are. **This is the part that
+  matters most** — `daysUntilStockout` is null for every product today, and a page that assumes a
+  number will show `null` to a store manager.
+- The accept/dismiss callback signatures Person D wires to Person B's persistence.
+
+**Done when:** the file is committed and Person D has explicitly agreed to it (D-0b). Get their
+sign-off in writing — a "yeah looks fine" in chat counts, silence does not.
+
+Keep it short. This is a one-page agreement, not a spec — an hour's work that saves both of you a
+day of rework.
+
 ### C-1 (P0) — Hebrew data inside an English UI
 
 The UI stays English (team decision). **This does not mean there is no work here** — all 7,451

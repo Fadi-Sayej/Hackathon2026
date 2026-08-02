@@ -10,7 +10,7 @@ release criteria, QA, and the cut line.
 > ⚠️ **Set real dates before starting.** Phases below are relative. Fill in the actual handover date
 > at the top of this file and work backwards — everything else depends on it.
 >
-> **Handover date: ______**
+> **Handover date: 13/08/2026**
 
 ---
 
@@ -36,13 +36,47 @@ Everything else (velocity, LLM explanations, price-gap screen, expiry capture) m
 Parallel work that never converges produces four things that don't compose. These gates are
 mandatory — everybody stops and integrates.
 
+### 📅 The calendar — 11 days
+
+| Dates | What |
+|---|---|
+| **Mon 03/08** | **Day 1:** D-0 (ask YomYom), C-0 (data contract). Delete stale branches. |
+| Mon 03 – Thu 06/08 | **Phase 1** — foundations, all four in parallel |
+| **Thu 06/08** | 🚦 **GATE 1** — deployed URL, real data, opens on a phone |
+| Fri 07 – Sun 09/08 | **Phase 2** — persistence, telemetry, price-gap screen |
+| Sun 09 – Tue 11/08 | 🚦 **GATE 2** — the four of you run the daily routine for 3 straight days |
+| Tue 11 – Wed 12/08 | **Phase 3** — fix what the dry run exposed. **Feature freeze Tue 11/08.** |
+| **Wed 12/08** | 🚦 **GATE 3** — go / no-go against §4 |
+| **Thu 13/08** | **HANDOVER** |
+
+**11 days for 4 people means you will not build everything.** Read §6 (the cut line) *now*, not on
+day 9. The planogram is already cut. Assume the LLM goes too — it is blocked on Gemini billing and
+mock explanations are honest and rule-based.
+
+Gate 2 is not padding. It is the only thing standing between you and discovering on 13/08, in front
+of the customer, that the daily loop doesn't hold together. **Do not let Phase 3 eat it.**
+
+### 🔔 Day 1 — before any code is written
+
+Two things must happen on day one. Both have a named owner and produce a **written** answer.
+
+| Owner | Task | Deliverable |
+|---|---|---|
+| **D** | **D-0** — send YomYom the two questions (sales export? daily CSV?) | Answers recorded in §7 below |
+| **C** | **C-0** — write `docs/UI_DATA_CONTRACT.md` | Committed + Person D's sign-off (D-0b) |
+| A | **A-0** — chase D until the answers land; build A-1 without waiting | — |
+
+Neither blocks the start of coding: A-1 is designed to work without YomYom's answers, and C-0 is an
+hour's work. But **C and D must not write code against different assumptions** — that is the one
+collision the file split cannot prevent on its own.
+
 ### Phase 1 — Foundations (parallel, no dependencies)
 
 | Who | Task |
 |---|---|
 | A | A-1 velocity engine, A-2 daily snapshot |
 | B | B-1 deploy, B-5 env hygiene |
-| C | C-1 RTL/Hebrew, C-2 honest analytics |
+| C | C-1 Hebrew data rendering, C-2 honest analytics |
 | D | D-1 daily action list, D-2 expiry capture |
 
 Nobody is blocked. Everybody starts immediately.
@@ -225,16 +259,34 @@ A narrow tool that works earns the second meeting. A broad one that shows made-u
 3. **Customer relationship — owned by the team.** Still name **one person** for outbound messages
    so YomYom hears a single voice; internally decide together.
 
-### 🔴 Blocking — ask YomYom this week
+### 🔴 Open — owner: Person D, due Mon 03/08 (task D-0)
 
-4. **Does the POS export sales/transactions, or only inventory?** Unknown. If yes, the reorder
-   engine works immediately and A-3 outranks A-1. Ask for a sample export of *any* sales report the
-   system can produce.
+**Person D sends one message containing both. Person A chases until answered (A-0) and is told
+directly. Write the answers in below, with the date received.**
+
+4. **Does the POS export sales/transactions, or only inventory?**
+   Ask for a sample of *any* sales report the system can produce.
+   If yes → the reorder engine works immediately and A-3 outranks A-1.
+
+   > **ANSWER:** ______________________  _(date: ____)_
 
 5. **Can the manager send the CSV daily?** Today it arrives irregularly. **Velocity accuracy is a
-   direct function of this cadence** — that makes it the highest-leverage ask in the whole pilot.
-   Frame it as 30 seconds a morning, and offer to automate it (scheduled export, shared folder,
-   WhatsApp) rather than asking for discipline.
+   direct function of this cadence** — the highest-leverage ask in the whole pilot. Frame it as 30
+   seconds a morning and offer to automate it (scheduled export, shared folder, WhatsApp) rather
+   than asking for discipline.
 
-> Combine 4 and 5 into **one** message to the manager. Two small asks in one note; don't spend two
-> separate favours. Person A needs both answers, and A-1 is designed to work without either.
+   > **ANSWER:** ______________________  _(date: ____)_
+
+   If the answer is weekly, not daily: Person A widens the `velocity_confidence` bands and we lower
+   what we promise the customer. It does not stop the pilot — but it must not be discovered late.
+
+> One message, two asks. Don't spend two separate favours. A-1 is designed to work without either
+> answer, so **nothing waits on this** — but the sooner it lands, the less rework.
+
+### 🟡 Agreed on day 1 — owner: Person C, due Mon 03/08 (task C-0)
+
+6. **The `App.jsx` ↔ `src/pages/` prop contract.** Person C drafts `docs/UI_DATA_CONTRACT.md`,
+   Person D signs off (D-0b). This is the only real coupling in the four-way split and the one
+   collision the file-ownership split cannot prevent by itself. Neither writes code until it's agreed.
+
+   > **SIGNED OFF:** ☐ C drafted  ☐ D agreed  _(date: ____)_

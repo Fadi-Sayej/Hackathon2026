@@ -78,6 +78,20 @@ Velocity only exists if a snapshot is captured **every single day** of the pilot
 - Document the exact 30-second routine YomYom staff follow each morning to export and drop the CSV.
   Hand this to Person D for the training material.
 
+### A-0 (P0 — DAY 1) — Chase the two answers you depend on
+
+**Person D owns asking YomYom (task D-0); you own making sure it actually happens.** Two answers
+change your work:
+
+1. **Does the POS export sales/transactions?** If yes, A-3 outranks A-1 and the reorder engine
+   works immediately. If no, the snapshot proxy is the product.
+2. **Will the CSV arrive daily?** If it stays irregular, your interval normalisation (A-1) and the
+   `velocity_confidence` bands carry the entire accuracy story.
+
+**Do not wait for either.** A-1 is deliberately designed to work without both answers — build it
+against irregular intervals from day one. But ask Person D on day 1 whether the message went out,
+and check back until the answers are recorded in `PLAN.md` §7.
+
 ### A-3 (P1) — Real sales export adapter
 
 If YomYom *can* provide a transaction export, it beats the proxy. Build the on-ramp now so adopting
