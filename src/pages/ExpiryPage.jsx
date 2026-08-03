@@ -3,6 +3,8 @@ import { MetricCard } from '../components/shared/MetricCard.jsx'
 import { StatusBadge } from '../components/shared/StatusBadge.jsx'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
 import { Button } from '../components/shared/Button.jsx'
+import { formatBarcode, formatDate } from '../lib/utils/format.js'
+import { dirProps } from '../lib/utils/rtl.js'
 
 const SEVERITY_TONE = {
   expired: 'danger',
@@ -119,8 +121,13 @@ export function ExpiryPage({ operationalData }) {
             <div className="compact-list">
               {queue.slice(0, 10).map((row, idx) => (
                 <div className="compact-row" key={`${row.barcode}:${idx}`}>
-                  <div><strong>{row.barcode}</strong><span>queued</span></div>
-                  <div className="compact-row-end"><small>{row.expiryDate}</small></div>
+                  <div>
+                    <strong className="barcode-cell">{formatBarcode(row.barcode)}</strong>
+                    <span>queued</span>
+                  </div>
+                  <div className="compact-row-end date-cell">
+                    <small>{formatDate(row.expiryDate)}</small>
+                  </div>
                 </div>
               ))}
             </div>
@@ -136,7 +143,7 @@ export function ExpiryPage({ operationalData }) {
           </div>
           <span className="metric-chip">
             {operationalData?.meta?.generatedAt
-              ? `From pipeline export · ${new Date(operationalData.meta.generatedAt).toLocaleString()}`
+              ? `From pipeline export · ${formatDate(operationalData.meta.generatedAt)}`
               : 'From last pipeline export'}
           </span>
         </div>
@@ -150,12 +157,16 @@ export function ExpiryPage({ operationalData }) {
             {alerts.map((row, idx) => (
               <div className="compact-row" key={`${row.barcode}:${idx}`}>
                 <div>
-                  <strong>{row.productName || row.barcode || 'Unknown'}</strong>
-                  <span>{row.knownInPos ? `stock ${row.currentStock}` : 'not in POS'}</span>
+                  <strong {...dirProps(row.productName || row.barcode)}>
+                    {row.productName || (row.barcode ? formatBarcode(row.barcode) : 'Unknown')}
+                  </strong>
+                  <span>{row.knownInPos ? `stock ${row.currentStock ?? '—'}` : 'not in POS'}</span>
                 </div>
                 <div className="compact-row-end">
                   <StatusBadge tone={SEVERITY_TONE[row.severity] ?? 'neutral'}>{row.severity}</StatusBadge>
-                  <small>{row.expiryDate} · {row.daysToExpiry} days</small>
+                  <small className="date-cell">
+                    {formatDate(row.expiryDate)} · {row.daysToExpiry ?? '—'} days
+                  </small>
                 </div>
               </div>
             ))}

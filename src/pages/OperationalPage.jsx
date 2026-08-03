@@ -3,6 +3,8 @@ import { MetricCard } from '../components/shared/MetricCard.jsx'
 import { StatusBadge } from '../components/shared/StatusBadge.jsx'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
 import { Button } from '../components/shared/Button.jsx'
+import { formatBarcode, formatDate, formatPercent, formatShekel } from '../lib/utils/format.js'
+import { dirProps } from '../lib/utils/rtl.js'
 
 const TYPE_META = {
   PROMOTE_EXPIRING_PRODUCT: { label: 'Expiring', tone: 'danger' },
@@ -35,18 +37,18 @@ const MAX_ROWS = 60
 function recDetail(rec) {
   switch (rec.type) {
     case 'CHECK_WOLT_PRICE_GAP':
-      return `Shelf ${rec.sellingPrice} → WOLT ${rec.woltPrice} (gap ${rec.metricValue}%)`
+      return `Shelf ${formatShekel(rec.sellingPrice)} → WOLT ${formatShekel(rec.woltPrice)} (gap ${formatPercentagePoints(rec.metricValue)})`
     case 'CHECK_MARGIN':
-      return `Sell ${rec.sellingPrice} · Cost ${rec.costPrice} · Margin ${rec.metricValue}%`
+      return `Sell ${formatShekel(rec.sellingPrice)} · Cost ${formatShekel(rec.costPrice)} · Margin ${formatPercentagePoints(rec.metricValue)}`
     case 'CHECK_NEGATIVE_STOCK':
-      return `On-hand stock ${rec.currentStock}`
+      return `On-hand stock ${rec.currentStock ?? '—'}`
     case 'PROMOTE_EXPIRING_PRODUCT':
-      return `Expiry ${rec.expiryDate} · ${rec.daysToExpiry} days · stock ${rec.currentStock}`
+      return `Expiry ${formatDate(rec.expiryDate)} · ${rec.daysToExpiry ?? '—'} days · stock ${rec.currentStock ?? '—'}`
     case 'VERIFY_UNKNOWN_BARCODE':
-      return rec.barcode ? `Barcode ${rec.barcode}` : 'No barcode in catalog'
+      return rec.barcode ? `Barcode ${formatBarcode(rec.barcode)}` : 'No barcode in catalog'
     default:
       if (rec.competitorPrice != null) {
-        return `Local ${rec.sellingPrice} vs competitor ${rec.competitorPrice}`
+        return `Local ${formatShekel(rec.sellingPrice)} vs competitor ${formatShekel(rec.competitorPrice)}`
       }
       return rec.reason ?? ''
   }
@@ -131,7 +133,7 @@ export function OperationalPage({ operationalData, operationalStatus }) {
             <h2>{SCRAPING_LABEL[meta.scrapingStatus] ?? 'Source status'}</h2>
           </div>
           <span className="metric-chip">
-            {meta.generatedAt ? `Updated ${new Date(meta.generatedAt).toLocaleString()}` : 'Static export'}
+            {meta.generatedAt ? `Updated ${formatDate(meta.generatedAt)}` : 'Static export'}
           </span>
         </div>
         <div className="recommendation-actions" style={{ flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -206,14 +208,20 @@ export function OperationalPage({ operationalData, operationalStatus }) {
             {visible.map((rec) => (
               <div className="compact-row" key={rec.id}>
                 <div>
-                  <strong>{rec.productName || rec.barcode || 'Unknown item'}</strong>
-                  <span>{rec.category || recDetail(rec)}</span>
+                  <strong {...dirProps(rec.productName || rec.barcode)}>
+                    {rec.productName || (rec.barcode ? formatBarcode(rec.barcode) : 'Unknown item')}
+                  </strong>
+                  <span {...dirProps(rec.category || recDetail(rec))}>
+                    {rec.category || recDetail(rec)}
+                  </span>
                 </div>
                 <div className="compact-row-end">
                   <StatusBadge tone={TYPE_META[rec.type]?.tone ?? 'neutral'}>
                     {TYPE_META[rec.type]?.label ?? rec.type}
                   </StatusBadge>
-                  <small>{Math.round((rec.confidence ?? 0) * 100)}% · {recDetail(rec)}</small>
+                  <small className="percent-cell">
+                    {formatPercent(rec.confidence, 0, true)} · {recDetail(rec)}
+                  </small>
                 </div>
               </div>
             ))}
@@ -227,4 +235,13 @@ export function OperationalPage({ operationalData, operationalStatus }) {
       </section>
     </>
   )
+}
+
+function formatPercentagePoints(value) {
+  if (value === null || value === undefined) return formatPercent(value)
+  if (typeof value === 'string' && !value.trim()) return formatPercent(value)
+  const numericValue = Number(value)
+  if (!Number.isFinite(numericValue)) return formatPercent(value)
+  const decimals = Number.isInteger(numericValue) ? 0 : 2
+  return formatPercent(numericValue / 100, decimals, true)
 }

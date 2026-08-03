@@ -1,5 +1,6 @@
 import { formatCurrency, formatDays } from '../shared/formatters.js'
 import { getCategoryColor } from './categoryColors.js'
+import { compareHebrew, dirProps } from '../../lib/utils/rtl.js'
 
 export function PlacementReasonPanel({
   selectedItem,
@@ -15,21 +16,25 @@ export function PlacementReasonPanel({
     return (
       <aside className="panel insight-panel">
         <p className="eyebrow">Placement reason</p>
-        <h2>{selectedItem.productName}</h2>
-        <p>{selectedItem.reason}</p>
+        <h2 className="text-hebrew-title" {...dirProps(selectedItem.productName)}>
+          {selectedItem.productName ?? '—'}
+        </h2>
+        <p {...dirProps(selectedItem.reason)}>{selectedItem.reason ?? '—'}</p>
         {product && (
           <dl className="insight-list">
             <div>
               <dt>Sales velocity</dt>
-              <dd>{product.analytics.weightedAvgDailySales} units/day</dd>
+              <dd className="numeric-cell">
+                {product.analytics.weightedAvgDailySales ?? '—'} units/day
+              </dd>
             </div>
             <div>
               <dt>Margin</dt>
-              <dd>{formatCurrency(product.analytics.margin)}</dd>
+              <dd className="price-cell">{formatCurrency(product.analytics.margin)}</dd>
             </div>
             <div>
               <dt>Stockout risk</dt>
-              <dd>{formatDays(product.analytics.daysUntilStockout)}</dd>
+              <dd className="numeric-cell">{formatDays(product.analytics.daysUntilStockout)}</dd>
             </div>
             <div>
               <dt>Expiry risk</dt>
@@ -53,7 +58,7 @@ export function PlacementReasonPanel({
 
   const topMovers = itemsWithVelocity
     .slice()
-    .sort((a, b) => b.dailySales - a.dailySales)
+    .sort((a, b) => b.dailySales - a.dailySales || compareHebrew(a.productName, b.productName))
     .slice(0, 3)
 
   const eyeLevelDailySales = round(
@@ -95,10 +100,10 @@ export function PlacementReasonPanel({
                   style={{ background: getCategoryColor(item.category) }}
                 />
                 <span className="top-movers-name">
-                  <strong>{item.productName}</strong>
-                  <small>{item.category}</small>
+                  <strong {...dirProps(item.productName)}>{item.productName ?? '—'}</strong>
+                  <small {...dirProps(item.category)}>{item.category ?? '—'}</small>
                 </span>
-                <span className="top-movers-velocity">{item.dailySales}/day</span>
+                <span className="top-movers-velocity numeric-cell">{item.dailySales}/day</span>
               </li>
             ))
           )}

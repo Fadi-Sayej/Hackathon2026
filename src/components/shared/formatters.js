@@ -1,18 +1,19 @@
+import { formatPercent, formatShekel } from '../../lib/utils/format.js'
+
 export function formatCurrency(value) {
-  return `ILS ${Number(value ?? 0).toLocaleString(undefined, {
-    maximumFractionDigits: 2,
-    minimumFractionDigits: Number.isInteger(Number(value ?? 0)) ? 0 : 2,
-  })}`
+  return formatShekel(value)
 }
 
 export function formatDays(days) {
-  if (days === null || days === undefined) return 'No sales'
-  if (days < 1) return '<1 day'
-  return `${days} days`
+  if (typeof days === 'string' && !days.trim()) return '—'
+  const numericDays = Number(days)
+  if (days === null || days === undefined || !Number.isFinite(numericDays)) return '—'
+  if (numericDays < 1) return '<1 day'
+  return `${numericDays} days`
 }
 
 export function percent(value) {
-  return `${Math.round((value ?? 0) * 100)}%`
+  return formatPercent(value, 0, true)
 }
 
 export function statusTone(status) {
