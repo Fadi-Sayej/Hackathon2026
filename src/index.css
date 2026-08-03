@@ -27,12 +27,17 @@
 }
 
 html {
+  max-width: 100%;
+  overflow-x: hidden;
   background: var(--color-surface);
 }
 
 body {
   margin: 0;
+  width: 100%;
+  max-width: 100%;
   min-width: 320px;
+  overflow-x: hidden;
   font: 400 16px/1.55 var(--font-body);
   background: var(--color-surface);
   color: var(--color-on-surface);
@@ -59,6 +64,9 @@ a {
 }
 
 #root {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   min-height: 100vh;
 }
 
@@ -67,6 +75,8 @@ a {
 bdi,
 .hebrew-text {
   unicode-bidi: isolate;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .hebrew-column,
@@ -89,4 +99,5 @@ bdi,
   direction: ltr;
   text-align: left;
   unicode-bidi: isolate;
+  font-variant-numeric: tabular-nums;
 }

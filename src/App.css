@@ -2457,3 +2457,454 @@ button {
   overflow-wrap: break-word;
   max-width: 300px;
 }
+
+/* ── Store-floor phone layout (Issue #23) ────────────────────────────
+ * The existing 560px rules only stack the desktop layout. At 390px the
+ * navigation, wide data surfaces, action controls, and mixed-direction
+ * product names need explicit containment and touch sizing.
+ * ------------------------------------------------------------------ */
+@media (max-width: 430px) {
+  .app-shell {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  }
+
+  .sidebar {
+    position: relative;
+    height: auto;
+    padding: 14px 12px;
+    gap: 0;
+  }
+
+  .brand-block,
+  .brand-block > div,
+  .main-panel,
+  .topbar,
+  .topbar > div,
+  .page-body,
+  .page-body > *,
+  .panel,
+  .panel-heading > *,
+  .compact-row > *,
+  .recommendation-card,
+  .recommendation-card-header > *,
+  .data-source-card,
+  .supplier-order-block {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .brand-mark {
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+  }
+
+  .brand-title,
+  .brand-subtitle {
+    overflow-wrap: anywhere;
+  }
+
+  .sidebar-card {
+    display: none;
+  }
+
+  .sidebar-nav {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 150;
+    display: flex;
+    grid-template-columns: none;
+    gap: 6px;
+    width: 100%;
+    max-width: 100%;
+    padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    background: rgba(16, 24, 39, 0.98);
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 -10px 30px rgba(19, 32, 52, 0.22);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .nav-item {
+    flex: 0 0 auto;
+    width: auto;
+    min-height: 48px;
+    padding: 6px 10px;
+    border-radius: 14px;
+    white-space: nowrap;
+    scroll-snap-align: start;
+  }
+
+  .nav-item:hover,
+  .nav-item-active {
+    transform: none;
+  }
+
+  .nav-icon {
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+  }
+
+  .main-panel {
+    width: 100%;
+    padding: 12px;
+  }
+
+  .topbar {
+    gap: 14px;
+    margin-bottom: 14px;
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .topbar h1 {
+    max-width: 100%;
+    font-size: clamp(1.8rem, 10vw, 2.25rem);
+    line-height: 1.04;
+    overflow-wrap: anywhere;
+  }
+
+  .topbar-meta {
+    justify-content: flex-start;
+    width: 100%;
+    min-width: 0;
+    gap: 6px;
+  }
+
+  .topbar .pill,
+  .panel-heading .metric-chip,
+  .data-source-summary-meta .metric-chip,
+  .recommendation-actions .status-badge {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .page-body {
+    gap: 14px;
+  }
+
+  .metric-grid,
+  .metric-grid-compact,
+  .recommendation-grid,
+  .signal-grid,
+  .content-grid,
+  .data-source-grid,
+  .report-launch-features,
+  .provenance-banner,
+  .market-intel-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .metric-card {
+    min-height: 0;
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .metric-label {
+    margin-bottom: 10px;
+  }
+
+  .metric-value {
+    font-size: 1.8rem;
+  }
+
+  .panel {
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .panel-large {
+    min-height: 0;
+  }
+
+  .panel-heading {
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .panel-heading h2,
+  .panel-heading h3,
+  .recommendation-card h2,
+  .page-description,
+  .page-description code {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
+  button,
+  input,
+  select,
+  textarea,
+  .btn,
+  .input,
+  .operational-search {
+    min-height: 44px;
+  }
+
+  .btn {
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  .toolbar,
+  .recommendation-actions,
+  .button-row,
+  .report-modal-actions {
+    width: 100%;
+  }
+
+  .toolbar > .input {
+    flex: 1 1 100%;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .recommendation-actions > .btn,
+  .button-row > .btn,
+  .report-modal-actions > .btn {
+    flex: 1 1 120px;
+  }
+
+  .recommendation-actions > label {
+    flex: 1 1 100%;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .recommendation-actions label input,
+  .recommendation-card input {
+    width: 100%;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    color: var(--ink);
+    background: var(--paper-strong);
+  }
+
+  .compact-row {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .compact-row > div,
+  .compact-row strong,
+  .compact-row span,
+  .compact-row small {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
+  .compact-row-end {
+    width: 100%;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .table-wrap,
+  .data-source-table-wrap {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    touch-action: pan-x pan-y;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table-wrap {
+    max-height: min(62vh, 560px);
+    border-radius: 16px;
+  }
+
+  .data-table {
+    width: max-content;
+    min-width: 880px;
+    max-width: none;
+  }
+
+  .supplier-table-wrap .data-table {
+    min-width: 620px;
+  }
+
+  .supplier-table-wrap {
+    max-height: none;
+  }
+
+  .data-source-table {
+    width: max-content;
+    min-width: 600px;
+  }
+
+  .hebrew-table-container .table-cell-hebrew,
+  .hebrew-table-container [dir="auto"] {
+    min-width: 180px;
+    max-width: 220px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
+  .cell-numeric,
+  .cell-price,
+  .cell-percent,
+  .cell-barcode,
+  .cell-date,
+  .number-cell,
+  .percent-cell,
+  .barcode-cell,
+  .date-cell {
+    direction: ltr;
+    unicode-bidi: isolate;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .recommendation-card {
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .recommendation-card-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .recommendation-card-header > div:first-child,
+  .recommendation-qty {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .recommendation-card-header h2,
+  .ai-explanation span {
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
+  .recommendation-qty {
+    align-items: stretch;
+  }
+
+  .recommendation-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .recommendation-stats span {
+    overflow-wrap: anywhere;
+  }
+
+  .recommendation-actions > .cell-price {
+    align-self: center;
+    margin-left: auto;
+  }
+
+  .data-source-card {
+    padding: 16px;
+  }
+
+  .data-source-card-heading,
+  .data-source-summary-meta {
+    flex-wrap: wrap;
+  }
+
+  .data-source-card-footer .btn,
+  .report-launch-content > .btn {
+    width: 100%;
+  }
+
+  .data-source-issues li {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .data-source-issues li > *,
+  .data-source-issues small {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .data-source-issues small {
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+
+  .supplier-order-block {
+    padding: 14px;
+  }
+
+  .supplier-order-header {
+    flex-direction: column;
+  }
+
+  .supplier-order-header > * {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .supplier-order-header h3 {
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
+  .supplier-order-header .btn {
+    width: 100%;
+    min-height: 44px;
+    white-space: normal;
+  }
+
+  .supplier-subtotal {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .report-overlay {
+    place-items: start stretch;
+    padding: 8px;
+  }
+
+  .report-modal {
+    max-height: calc(100dvh - 16px);
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .report-modal-header {
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+  }
+
+  .report-table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .toast {
+    right: 12px;
+    bottom: calc(76px + env(safe-area-inset-bottom));
+    left: 12px;
+    max-width: none;
+  }
+}
