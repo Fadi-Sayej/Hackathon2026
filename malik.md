@@ -105,9 +105,27 @@ Sort by units held × gap — the products where being mispriced costs the most.
 products currently selling below cost**; that is money leaving the till on every scan, and it is
 the finding most likely to make YomYom trust the tool.
 
-⚠️ Flag the data's age honestly. The Kaggle competitor prices are from 2024 (Fadi is refreshing
-them). **Never present a stale price as today's price** — one wrong claim about a competitor and we
-lose the customer's confidence permanently.
+⚠️ **Flag the data's age honestly — Fadi has now made this possible (A-5 done).**
+
+`src/data/marketData.js` now exports `DATA_FRESHNESS`, and every price entry carries `ageDays`
+and `observedAt`:
+
+```js
+import { DATA_FRESHNESS } from '../data/marketData.js'
+// { priceCount: 2824, newestPriceAgeDays: 0, medianPriceAgeDays: 118, oldestPriceAgeDays: 365 }
+```
+
+Every price is now **under a year old** (previously 16.6% were older, some from 2015). But median
+age is ~4 months, so **show `ageDays` next to any competitor price**, e.g. *"Shufersal ₪6.90 —
+seen 3 months ago"*. Never present it as today's shelf price. One wrong claim about a competitor
+costs more trust than every correct one earns.
+
+🔴 **The "competitor out of stock" signal is now always empty — do not build a screen on it.**
+It previously flagged 1,860 products, but every one was fabricated: the export wrote
+`isAvailable: false` for any barcode we simply hadn't checked. We have availability data for 427
+barcodes and **all of them were observed as available** — we have never once observed a competitor
+stockout. It now correctly reports `null` (unknown). If you want a real stockout feature, it needs
+a data source that actually observes absence.
 
 ### D-4 (P1) — Daily summary the manager can keep
 

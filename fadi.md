@@ -42,7 +42,35 @@ day-over-day stock deltas.
 | A-4 quality gate | ✅ done, blocks bad imports | `scripts/check_import_quality.py` (`npm run data:quality`) |
 | A-0 chase Malik | ⬜ open — needs the YomYom answers |
 | A-3 sales adapter | ⬜ open — only if YomYom has a sales export |
-| A-5 refresh competitor data | ⬜ open — Kaggle is from 2024 |
+| A-5 competitor data | ✅ done — rebuilt, dated, de-staled |
+
+**A-5 outcome.** Wolt collector re-ran successfully (285 fresh observations today). The Alonit FTP
+collector authenticates but its data channel is blocked here — passive `NLST` times out and active
+mode returns `500 Port command invalid`, so it returned 0 observations. **Worth retrying from a
+normal network before assuming the code is broken.**
+
+The join and export were rebuilt because they were producing misleading output:
+
+- `observed_at` was **discarded at the join**, so price age was unknowable downstream and could
+  never be labelled in the UI. It now flows through as `price_age_days` / `observedAt`.
+- The join emitted every barcode × store × date combination (~4.7 rows per barcode, 14,406 total
+  from just 3,094 products) and could surface a decade-old price when a current one existed. It now
+  keeps the **most recent** observation per (barcode, chain).
+- Prices older than a year are **excluded by default** (`--max-age-days`, `--include-stale`).
+  16.6% of what we were showing was pre-2025, including observations from 2015.
+- Live Wolt scrapes were being **ignored entirely** by the join. They are now a first-class source,
+  and a live price beats the static dump for the same brand.
+- 🔴 The export wrote `isAvailable: false` for any barcode we simply hadn't checked. We hold
+  availability data for 427 barcodes and **every one was observed as available** — we have never
+  observed a competitor stockout. That fabricated 1,860 "competitor out of stock" flags, granted
+  them a 25% demand boost, and — because `competitorEngine` excludes `isAvailable === false` from
+  price comparison — **suppressed the real price gaps**. Now `null` when unobserved.
+
+Net effect: 2,911 rows across 2,023 products, **100% of prices under a year old**, and real
+comparisons went from 158 to **2,018** (614 where we are cheapest, 1,404 where we are dearer).
+
+⚠️ Chains with no verified branch (Victory, King Store, Wolt Market — 31 rows) are skipped rather
+than given invented coordinates. Add real store metadata to `CHAIN_META` if we want them.
 
 **Current real state:** all 7,674 products report `velocity_confidence: 'none'` with NULL units.
 That is correct and honest — the two snapshots we hold both come from the *same* import, so
