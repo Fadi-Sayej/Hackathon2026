@@ -83,6 +83,30 @@ product names are Hebrew and will render badly by default inside an LTR layout.
 user, since they're the one exporting the CSV. The moment floor staff are expected to use it, this
 becomes the top adoption risk. Raise it at the pilot review — it is a real finding, not a nitpick.
 
+### ⚠️ From Fadi (A-1 is built) — read before writing C-2
+
+The velocity engine now writes these columns into `yomyom_sales.parquet`:
+
+| Column | Meaning |
+|---|---|
+| `units_sold_7d` / `units_sold_30d` | **Observed sums over available history** — NOT full-window totals |
+| `units_per_day` | The authoritative rate, already normalised by `observed_days` |
+| `observed_days` | How much history actually backs the numbers |
+| `max_gap_days` | Largest gap between snapshots |
+| `velocity_confidence` | `none` / `low` / `medium` / `high` |
+
+🔴 **Do not compute a rate as `units_sold_30d / 30`.** Early in the pilot that column may
+cover only 4 days, so dividing by 30 understates velocity ~7x and a product selling 5/day
+reads as dead stock. **Use `units_per_day`.**
+
+🔴 **`null` units and `0` units are different facts.** `null` + `velocity_confidence: 'none'`
+means *we have no history for this product* — that is the state the whole catalog is in today
+(all 7,674 rows). `0` means *we observed it and it genuinely did not move*. Collapsing them is
+exactly what makes 100% of products show "Slow moving".
+
+Build C-2 against `velocity_confidence: 'none'` — that is the state the pilot starts in, and it
+is what the UI will show until YomYom sends a second, genuinely new export.
+
 ### C-2 (P0) — Make the analytics honest
 
 Never show a computed number we cannot stand behind.

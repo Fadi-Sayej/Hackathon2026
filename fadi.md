@@ -31,6 +31,36 @@ day-over-day stock deltas.
 
 ---
 
+---
+
+## ✅ Status — A-1, A-2, A-4 are BUILT
+
+| Task | State | Where |
+|---|---|---|
+| A-1 velocity engine | ✅ done, 22 tests passing | `src/snapshots/velocity.py`, `scripts/build_velocity_from_snapshots.py` |
+| A-2 daily routine | ✅ done, runs clean | `scripts/pilot_daily.sh` (`npm run pilot:daily`) |
+| A-4 quality gate | ✅ done, blocks bad imports | `scripts/check_import_quality.py` (`npm run data:quality`) |
+| A-0 chase Malik | ⬜ open — needs the YomYom answers |
+| A-3 sales adapter | ⬜ open — only if YomYom has a sales export |
+| A-5 refresh competitor data | ⬜ open — Kaggle is from 2024 |
+
+**Current real state:** all 7,674 products report `velocity_confidence: 'none'` with NULL units.
+That is correct and honest — the two snapshots we hold both come from the *same* import, so
+**no velocity can exist yet**. It stays that way until YomYom sends a genuinely new export.
+Everything downstream is built and waiting for that one file.
+
+Run `npm run test:py` before pushing anything in this track.
+
+Guards that are already in place and must not be removed:
+- Interval normalisation by actual elapsed days (a 6-day gap read as 1 day = 6x overstatement)
+- Restocks clamped to zero, never negative sales
+- Snapshots <12h apart rejected as duplicate imports
+- **Snapshots from the same import rejected** — re-running the pipeline must not manufacture
+  fake "zero sales" history or let confidence grow from re-runs alone
+- A run that derives nothing **clears** stale velocity rather than leaving it to age silently
+
+---
+
 ### A-1 (P0) — Snapshot-delta velocity engine
 
 `src/snapshots/pos_snapshots.py` already computes "an inventory movement proxy derived from stock
