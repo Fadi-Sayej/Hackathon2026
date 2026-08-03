@@ -17,6 +17,8 @@ import { buildLocalMarketSnapshot } from './lib/dataAdapters/multiCompetitorAdap
 import { filterStoresByRadius } from './lib/utils/geoUtils.js'
 import { COMPETITOR_STORES, OUR_STORE } from './data/marketData.js'
 import { analyzeProducts, summarizeInventory } from './lib/analytics/inventoryEngine.js'
+import { resolveVelocityConfidence } from './lib/analytics/velocityConfidence.js'
+import { RECOMMENDATION_TYPES } from './lib/analytics/recommendationTypes.js'
 import {
   generatePlanogram,
   groupPlanogramByShelf,
@@ -164,9 +166,19 @@ function App() {
     const isRealCatalog =
       storeData.connectorMode === CONNECTOR_MODES.DEMO &&
       products.some((product) => typeof product.id === 'string' && product.id.startsWith('ym-'))
-    const hasSalesHistory = products.some(
-      (product) => (product.salesLast30Days ?? 0) > 0 || (product.salesLast7Days ?? 0) > 0,
-    )
+    // Sales history is a property of velocity confidence, not of a sales sum.
+    // Inferring it from salesLast30Days > 0 is exactly the "sold zero" vs. "no
+    // history" conflation C-2a exists to remove, so derive it from the
+    // confidence band instead. resolveVelocityConfidence always returns one of
+    // the four levels, so every product lands in exactly one bucket and the
+    // breakdown lets the UI state plainly how much history backs what it shows.
+    const velocityBreakdown = { none: 0, low: 0, medium: 0, high: 0 }
+    for (const product of products) {
+      velocityBreakdown[resolveVelocityConfidence(product)] += 1
+    }
+    const salesHistoryCount =
+      velocityBreakdown.low + velocityBreakdown.medium + velocityBreakdown.high
+    const hasSalesHistory = salesHistoryCount > 0
     const competitorStoreCount = Array.isArray(COMPETITOR_STORES) ? COMPETITOR_STORES.length : 0
     return {
       catalog: isRealCatalog ? 'real' : storeData.connectorMode === CONNECTOR_MODES.CSV ? 'uploaded' : 'demo',
@@ -177,6 +189,8 @@ function App() {
           ? `Uploaded CSV${storeData.fileName ? ` (${storeData.fileName})` : ''}`
           : 'Bundled demo sample',
       hasSalesHistory,
+      salesHistoryCount,
+      velocityBreakdown,
       competitor: competitorStoreCount > 0 ? 'real' : 'none',
       competitorStoreCount,
       liveMarketContext: marketContext.sourceLabel === 'live',
@@ -223,8 +237,20 @@ function App() {
     [marketContext, competitorBoosts, competitorPriceAdvantage],
   )
 
+  // analyzeProducts resolves each product's velocity confidence and records it
+  // under analytics.velocityConfidence. C-6 emits product.velocityConfidence
+  // upstream, but the product adapter does not yet carry it into the runtime
+  // shape, so analytics.velocityConfidence is the reliable source. Mirroring it
+  // back to the top level keeps the C-0 contract's §2 promise true and hands
+  // generateReorderRecommendations the same band the inventory engine used —
+  // this is the single point where velocity confidence is threaded through the
+  // rest of the chain (recommendations, dashboardStats, and the pages).
   const analyzedProducts = useMemo(
-    () => analyzeProducts(enrichedProducts, enrichedMarketContext),
+    () =>
+      analyzeProducts(enrichedProducts, enrichedMarketContext).map((product) => ({
+        ...product,
+        velocityConfidence: product.analytics.velocityConfidence,
+      })),
     [enrichedProducts, enrichedMarketContext],
   )
 
@@ -457,18 +483,46 @@ function normalizeOrderQuantity(quantity) {
 }
 
 function buildDashboardStats({ analyzedProducts, inventorySummary, recommendations }) {
-  const reorderSuggestions = recommendations.filter((recommendation) => recommendation.type === 'REORDER')
-  const estimatedOrderCost = reorderSuggestions.reduce((sum, recommendation) => {
+  // A rejected recommendation is off the table; everything else is a live
+  // opportunity the manager can still act on, which is what the dashboard
+  // summarizes and what PLAN.md §5 measures the pilot on.
+  const live = recommendations.filter((recommendation) => recommendation.status !== 'REJECTED')
+  const countByType = (type) => live.filter((recommendation) => recommendation.type === type).length
+
+  const reorderRecommendations = live.filter(
+    (recommendation) => recommendation.type === RECOMMENDATION_TYPES.REORDER,
+  )
+  const estimatedOrderCost = reorderRecommendations.reduce((sum, recommendation) => {
     const product = analyzedProducts.find((item) => item.id === recommendation.productId)
     return sum + (recommendation.recommendedOrderQuantity ?? 0) * (product?.cost ?? 0)
   }, 0)
 
+  // ₪ at stake is the headline the pilot is graded on (PLAN.md §5): the money
+  // tied up in repriced below-cost items, price gaps, thin margins, and stock
+  // corrections. Each recommendation already carries its own valueAtStake.
+  const valueAtStake = live.reduce(
+    (sum, recommendation) => sum + (recommendation.valueAtStake ?? 0),
+    0,
+  )
+
   return {
     ...inventorySummary,
-    estimatedOrderCost: Math.round(estimatedOrderCost * 100) / 100,
+    estimatedOrderCost: round2(estimatedOrderCost),
     highRiskStockouts: inventorySummary.stockoutRisks,
-    reorderSuggestions: reorderSuggestions.length,
+    // REORDER stays 0 until real velocity exists; the four types below are the
+    // ones actually on screen today, so the dashboard counts must match them.
+    reorderSuggestions: reorderRecommendations.length,
+    belowCostAlerts: countByType(RECOMMENDATION_TYPES.BELOW_COST),
+    priceGapAlerts: countByType(RECOMMENDATION_TYPES.PRICE_GAP),
+    negativeStockAlerts: countByType(RECOMMENDATION_TYPES.NEGATIVE_STOCK),
+    thinMarginAlerts: countByType(RECOMMENDATION_TYPES.THIN_MARGIN),
+    actionableRecommendations: live.length,
+    valueAtStake: round2(valueAtStake),
   }
+}
+
+function round2(value) {
+  return Math.round(value * 100) / 100
 }
 
 export default App

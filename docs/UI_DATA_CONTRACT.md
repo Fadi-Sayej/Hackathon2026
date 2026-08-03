@@ -43,12 +43,12 @@ without changing this file first.
 | `productIndex` | `Map<string, Product>` — raw (pre-analytics) product by `id` | Recommendations, ApprovedOrders |
 | `operationalData` | `OperationalData` (§4) | **Operational (home)**, Expiry |
 | `operationalStatus` | `'loading' \| 'ready'` | Operational, Expiry |
-| `dashboardStats` | `InventorySummary` + `estimatedOrderCost`, `highRiskStockouts`, `reorderSuggestions` | Dashboard, Report |
+| `dashboardStats` | `InventorySummary` + `estimatedOrderCost`, `highRiskStockouts`, `reorderSuggestions`, **+ `belowCostAlerts`, `priceGapAlerts`, `negativeStockAlerts`, `thinMarginAlerts`, `actionableRecommendations`, `valueAtStake` after C-2c** | Dashboard, Report |
 | `inventorySummary` | `{ totalProducts, stockoutRisks, lowStock, overstocked, wasteRisk, highPriority, totalSalesLast30Days, estimatedInventoryValue }` — **+ `noVelocityData` after C-2a** | Dashboard, Report |
 | `competitorSummary` | `{ priceLeaderCount, competitorOOSCount, priceProtectionCount, productsWithCoverage }` | Dashboard, Report |
 | `priceLeaderProducts` / `stockoutOpportunities` / `priceProtectionAlerts` | `AnalyzedProduct[]` | Dashboard, (D-3 price-gap screen) |
 | `marketContext` | `{ weather, weekend, holiday, localEvent, season, sourceLabel, … }` | Dashboard, Report |
-| `dataProvenance` | `{ catalog, catalogCount, catalogLabel, hasSalesHistory, competitor, competitorStoreCount, liveMarketContext }` | Dashboard, AppShell |
+| `dataProvenance` | `{ catalog, catalogCount, catalogLabel, hasSalesHistory, competitor, competitorStoreCount, liveMarketContext }` **+ `salesHistoryCount`, `velocityBreakdown: { none, low, medium, high }` after C-2c** | Dashboard, AppShell |
 | `storeData` | `{ products, validationIssues, source, connectorMode, fileName, loadedAt }` | DataSource |
 | `connectorStatus` | `{ state: 'ready'\|'loading'\|'error', message, hint?, mode? }` | DataSource |
 | `planogramItems`, `shelfGroups`, `planogramSummary`, `affinitySuggestions`, `affinitySummary` | — | **hidden for pilot** (rule 5) |
@@ -217,6 +217,9 @@ measurement when the truth is "we don't know".**
 | `recommendation.metrics.daysUntilStockout` | same as above | same as above |
 | `recommendation.context.*` | `null` when live context is off (default) | omit the chip; no "unknown weather" placeholder |
 | `recommendation.valueAtStake` | `0` when not computable | sort last; show no ₪ figure rather than `₪0` |
+| `dashboardStats.valueAtStake` | never null; `0` on a clean clone | ₪ sum across all live (non-rejected) recommendations — the PLAN.md §5 headline; `0` is an honest empty state |
+| `dashboardStats.*Alerts` / `reorderSuggestions` | never null; `0` when none | counts of live recommendations by type; `reorderSuggestions` stays `0` until real velocity exists |
+| `dataProvenance.salesHistoryCount` / `velocityBreakdown` | `0` / all-`none` today | `salesHistoryCount === 0` → state "no sales history yet"; `velocityBreakdown` is the per-band product count behind that claim |
 | `operationalData.meta.generatedAt` | `null` before first pipeline run | `"Pipeline has not run yet"` |
 | `operationalData.*` counts | `0` on a clean clone | empty state, not a spinner |
 | `operational rec.*` numerics | any may be `null` | omit that detail line; the row still renders on `productName`/`barcode` |
