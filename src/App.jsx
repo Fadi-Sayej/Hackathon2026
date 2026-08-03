@@ -25,6 +25,7 @@ import {
 import { generateReorderRecommendations } from './lib/analytics/reorderEngine.js'
 import {
   annotateRecommendationsWithExplanations,
+  annotateRecommendationsWithMockExplanations,
   getDefaultExplanationProvider,
 } from './lib/ai/explanationProvider.js'
 import { buildMarketContext } from './lib/context/marketContextAdapter.js'
@@ -269,25 +270,82 @@ function App() {
     [products],
   )
 
-  const recommendations = useMemo(() => {
-    const baseRecommendations = annotateRecommendationsWithExplanations({
-      provider: getDefaultExplanationProvider(),
-      products: analyzedProducts,
-      recommendations: generateReorderRecommendations(analyzedProducts, enrichedMarketContext),
-      marketContext: enrichedMarketContext,
-    })
+  const generatedRecommendations = useMemo(
+    () => generateReorderRecommendations(analyzedProducts, enrichedMarketContext),
+    [analyzedProducts, enrichedMarketContext],
+  )
+  const mockRecommendations = useMemo(
+    () =>
+      annotateRecommendationsWithMockExplanations({
+        products: analyzedProducts,
+        recommendations: generatedRecommendations,
+        marketContext: enrichedMarketContext,
+      }),
+    [analyzedProducts, generatedRecommendations, enrichedMarketContext],
+  )
+  const [upgradedRecommendations, setUpgradedRecommendations] = useState(null)
 
-    return baseRecommendations.map((recommendation) => {
-      const key = getRecommendationKey(recommendation)
-      const override = recommendationOverrides[key] ?? {}
-      return {
-        ...recommendation,
-        status: override.status ?? recommendation.status,
-        recommendedOrderQuantity:
-          override.recommendedOrderQuantity ?? recommendation.recommendedOrderQuantity,
+  useEffect(() => {
+    let cancelled = false
+    const controller = new AbortController()
+    const provider = getDefaultExplanationProvider()
+
+    // Mock explanations are already visible from mockRecommendations. When no
+    // remote provider is configured, there is nothing asynchronous to upgrade.
+    if (provider.id === 'mock') {
+      return () => {
+        cancelled = true
+        controller.abort()
       }
-    })
-  }, [analyzedProducts, enrichedMarketContext, recommendationOverrides])
+    }
+
+    async function upgradeExplanations() {
+      try {
+        const nextRecommendations = await annotateRecommendationsWithExplanations({
+          provider,
+          products: analyzedProducts,
+          recommendations: generatedRecommendations,
+          marketContext: enrichedMarketContext,
+          signal: controller.signal,
+        })
+        if (!cancelled) {
+          setUpgradedRecommendations({
+            source: generatedRecommendations,
+            recommendations: nextRecommendations,
+          })
+        }
+      } catch {
+        // The synchronous mock batch remains visible if an unexpected batch-level
+        // failure escapes the provider's per-recommendation fallback.
+      }
+    }
+
+    upgradeExplanations()
+    return () => {
+      cancelled = true
+      controller.abort()
+    }
+  }, [analyzedProducts, generatedRecommendations, enrichedMarketContext])
+
+  const explainedRecommendations =
+    upgradedRecommendations?.source === generatedRecommendations
+      ? upgradedRecommendations.recommendations
+      : mockRecommendations
+
+  const recommendations = useMemo(
+    () =>
+      explainedRecommendations.map((recommendation) => {
+        const key = getRecommendationKey(recommendation)
+        const override = recommendationOverrides[key] ?? {}
+        return {
+          ...recommendation,
+          status: override.status ?? recommendation.status,
+          recommendedOrderQuantity:
+            override.recommendedOrderQuantity ?? recommendation.recommendedOrderQuantity,
+        }
+      }),
+    [explainedRecommendations, recommendationOverrides],
+  )
 
   const planogramItems = useMemo(
     () => generatePlanogram(analyzedProducts, enrichedMarketContext),

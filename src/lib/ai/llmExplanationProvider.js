@@ -82,8 +82,17 @@ export function buildLLMExplanationPayload({
 
 async function postToProxy(payload, options) {
   const controller = new AbortController()
+  const externalSignal = options.signal
+  const abortFromExternalSignal = () => controller.abort(externalSignal.reason)
+
+  if (externalSignal?.aborted) {
+    abortFromExternalSignal()
+  } else {
+    externalSignal?.addEventListener('abort', abortFromExternalSignal, { once: true })
+  }
+
   const timeoutId = globalThis.setTimeout(
-    () => controller.abort(),
+    () => controller.abort(new Error('LLM proxy request timed out')),
     options.timeoutMs ?? DEFAULT_TIMEOUT_MS,
   )
 
@@ -96,11 +105,15 @@ async function postToProxy(payload, options) {
     })
 
     if (!response.ok) {
-      throw new Error(`LLM proxy failed (${response.status})`)
+      const error = new Error(`LLM proxy failed (${response.status})`)
+      error.status = response.status
+      error.retryAfter = response.headers.get('Retry-After')
+      throw error
     }
 
     return response.json()
   } finally {
     globalThis.clearTimeout(timeoutId)
+    externalSignal?.removeEventListener('abort', abortFromExternalSignal)
   }
 }
