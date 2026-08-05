@@ -2412,3 +2412,222 @@ button {
     min-width: 0;
   }
 }
+
+/* ── Daily action list (task D-1) ────────────────────────────────────────────
+   Built for a manager holding a phone on the shop floor: one action per card,
+   what it's worth on the right, and three big buttons that close it. */
+
+.action-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.action-card {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--paper-strong);
+  color: var(--ink);
+  box-shadow: var(--shadow-soft);
+}
+
+.action-card--muted {
+  opacity: 0.72;
+}
+
+.action-card-main {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.action-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.35rem;
+}
+
+.action-card-title strong {
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.action-card-do {
+  margin: 0 0 0.25rem;
+  font-size: 0.95rem;
+}
+
+.action-card-detail {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.action-card-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.6rem;
+  flex: 0 0 auto;
+}
+
+.action-card-impact {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.1;
+}
+
+.action-card-impact-value {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.action-card-impact-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.action-card-buttons,
+.action-card-reasons {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.action-card-reasons {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.action-card-reasons-label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-align: right;
+}
+
+/* ── Expiry capture (task D-2) ───────────────────────────────────────────── */
+
+.expiry-capture {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.expiry-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1 1 12rem;
+}
+
+.expiry-field > span {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* 16px minimum stops iOS Safari zooming the page on focus. */
+.expiry-input {
+  font-size: 1rem;
+  padding: 0.7rem 0.75rem;
+  min-height: 2.9rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+  background: var(--paper-strong);
+  color: var(--ink);
+}
+
+.expiry-quick {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.expiry-match {
+  min-height: 1.4rem;
+  margin: 0.6rem 0 0;
+  font-size: 0.9rem;
+}
+
+.expiry-match-ok { color: var(--forest); font-weight: 600; }
+.expiry-match-warn { color: var(--amber); font-weight: 600; }
+
+/* ── Price comparison (task D-3) ─────────────────────────────────────────── */
+
+.price-table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.data-table td.numeric,
+.data-table th.numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.data-table td.negative { color: var(--rose); font-weight: 600; }
+.data-table td.positive { color: var(--forest); font-weight: 600; }
+
+/* ── Phone layout ────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .action-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .action-card-side {
+    align-items: stretch;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .action-card-buttons {
+    justify-content: flex-start;
+  }
+
+  /* Finger-sized targets — staff are not using a mouse. */
+  .action-card-buttons button,
+  .action-card-reasons button {
+    min-height: 2.75rem;
+    padding-inline: 1rem;
+  }
+
+  .expiry-field {
+    flex: 1 1 100%;
+  }
+}
+
+/* ── Print: the daily summary a manager can keep (task D-4) ──────────────── */
+
+@media print {
+  .sidebar,
+  .topbar,
+  .action-card-side,
+  .operational-search,
+  .recommendation-actions {
+    display: none !important;
+  }
+
+  .action-card {
+    break-inside: avoid;
+    border-color: #999;
+  }
+}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { MetricCard } from '../components/shared/MetricCard.jsx'
 import { StatusBadge } from '../components/shared/StatusBadge.jsx'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
@@ -37,7 +37,13 @@ function toCsv(queue) {
   return [header, ...rows].join('\n') + '\n'
 }
 
-export function ExpiryPage({ operationalData }) {
+function isoInDays(days) {
+  const date = new Date()
+  date.setDate(date.getDate() + days)
+  return date.toISOString().slice(0, 10)
+}
+
+export function ExpiryPage({ operationalData, products = [] }) {
   const { expiry } = operationalData
   const buckets = expiry?.buckets ?? {}
   const alerts = expiry?.alerts ?? []
@@ -45,16 +51,37 @@ export function ExpiryPage({ operationalData }) {
   const [queue, setQueue] = useState(loadQueue)
   const [barcode, setBarcode] = useState('')
   const [expiryDate, setExpiryDate] = useState('')
+  const [justAdded, setJustAdded] = useState(null)
 
   useEffect(() => saveQueue(queue), [queue])
 
+  // Look the product up as soon as a barcode is entered. Staff must be able to confirm
+  // they scanned the right thing before saving — otherwise a mis-scan is invisible.
+  const byBarcode = useMemo(() => {
+    const map = new Map()
+    for (const product of products) {
+      const code = String(product.id ?? '').replace(/^ym-/, '')
+      if (code) map.set(code, product)
+    }
+    return map
+  }, [products])
+
+  const trimmed = barcode.trim()
+  const matchedProduct = trimmed ? byBarcode.get(trimmed.replace(/^0+/, '')) ?? byBarcode.get(trimmed) : null
+
   function addToQueue(event) {
     event.preventDefault()
-    if (!barcode.trim() || !expiryDate) return
+    if (!trimmed || !expiryDate) return
     setQueue((current) => [
-      { barcode: barcode.trim(), expiryDate, addedAt: new Date().toISOString() },
+      {
+        barcode: trimmed,
+        expiryDate,
+        productName: matchedProduct?.name ?? null,
+        addedAt: new Date().toISOString(),
+      },
       ...current,
     ])
+    setJustAdded(matchedProduct?.name ?? trimmed)
     setBarcode('')
     setExpiryDate('')
   }
@@ -87,39 +114,85 @@ export function ExpiryPage({ operationalData }) {
           </div>
         </div>
         <p className="page-description">
-          <strong>Expiry risk, not batch count.</strong> Each scan records one barcode + date.
-          Quantities use current POS stock as an estimate — this is a risk signal, not a
-          batch-accurate inventory.
+          When goods arrive, enter the barcode and the date on the package. Takes a few seconds
+          per item, and it is the only way the system can warn you before something expires —
+          the POS export does not contain expiry dates.
         </p>
 
-        <form className="recommendation-actions" onSubmit={addToQueue} style={{ flexWrap: 'wrap', gap: '0.5rem', alignItems: 'flex-end' }}>
-          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+        <form className="expiry-capture" onSubmit={addToQueue}>
+          <label className="expiry-field">
             <span>Barcode</span>
-            <input value={barcode} onChange={(e) => setBarcode(e.target.value)} placeholder="Scan or type barcode" />
+            <input
+              className="expiry-input"
+              value={barcode}
+              onChange={(e) => { setBarcode(e.target.value); setJustAdded(null) }}
+              placeholder="Scan or type"
+              inputMode="numeric"
+              autoComplete="off"
+              aria-describedby="expiry-match"
+            />
           </label>
-          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+
+          <label className="expiry-field">
             <span>Expiry date</span>
-            <input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} />
+            <input
+              className="expiry-input"
+              type="date"
+              value={expiryDate}
+              onChange={(e) => setExpiryDate(e.target.value)}
+            />
           </label>
-          <Button tone="primary" {...{ type: 'submit' }}>Add to queue</Button>
-          <Button tone="secondary" onClick={downloadCsv} disabled={queue.length === 0}>
-            Download CSV ({queue.length})
+
+          <Button tone="primary" {...{ type: 'submit' }} disabled={!trimmed || !expiryDate}>
+            Save
           </Button>
-          {queue.length > 0 && (
-            <Button tone="ghost" onClick={() => setQueue([])}>Clear queue</Button>
-          )}
         </form>
+
+        <div className="expiry-quick">
+          <span>Quick date:</span>
+          {[
+            ['3 days', 3],
+            ['1 week', 7],
+            ['2 weeks', 14],
+            ['1 month', 30],
+          ].map(([label, days]) => (
+            <Button key={days} tone="ghost" onClick={() => setExpiryDate(isoInDays(days))}>
+              {label}
+            </Button>
+          ))}
+        </div>
+
+        <p id="expiry-match" className="expiry-match" aria-live="polite">
+          {trimmed && matchedProduct && (
+            <span className="expiry-match-ok" dir="auto">✓ {matchedProduct.name}</span>
+          )}
+          {trimmed && !matchedProduct && (
+            <span className="expiry-match-warn">
+              Not found in the catalog — check the barcode. You can still save it.
+            </span>
+          )}
+          {!trimmed && justAdded && <span className="expiry-match-ok" dir="auto">Saved: {justAdded}</span>}
+        </p>
 
         {queue.length > 0 && (
           <>
-            <p className="page-description" style={{ marginTop: '1rem' }}>
-              Then ingest: <code>python scripts/record_expiry_scan.py --input-csv &lt;downloaded.csv&gt;</code> →
-              <code> npm run data:refresh</code>
+            <div className="recommendation-actions" style={{ marginTop: '1rem', gap: '0.5rem' }}>
+              <Button tone="secondary" onClick={downloadCsv}>
+                Download {queue.length} recorded {queue.length === 1 ? 'date' : 'dates'}
+              </Button>
+              <Button tone="ghost" onClick={() => setQueue([])}>Clear list</Button>
+            </div>
+            <p className="page-description" style={{ marginTop: '0.5rem' }}>
+              Dates are saved on this device. Send the downloaded file to the SmartShelf team and
+              they will load it in — after that, expiry warnings appear below automatically.
             </p>
             <div className="compact-list">
               {queue.slice(0, 10).map((row, idx) => (
                 <div className="compact-row" key={`${row.barcode}:${idx}`}>
-                  <div><strong>{row.barcode}</strong><span>queued</span></div>
+                  <div>
+                    <strong dir="auto">{row.productName || row.barcode}</strong>
+                    <span>{row.productName ? row.barcode : 'not in catalog'}</span>
+                  </div>
                   <div className="compact-row-end"><small>{row.expiryDate}</small></div>
                 </div>
               ))}

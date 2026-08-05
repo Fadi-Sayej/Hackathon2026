@@ -1,5 +1,8 @@
+// ₪, not "ILS" — this is an Israeli shop and the manager reads prices in shekels all
+// day. The symbol stays on the left of the number even though the product names beside
+// it are Hebrew; currency is not mirrored by direction.
 export function formatCurrency(value) {
-  return `ILS ${Number(value ?? 0).toLocaleString(undefined, {
+  return `₪${Number(value ?? 0).toLocaleString(undefined, {
     maximumFractionDigits: 2,
     minimumFractionDigits: Number.isInteger(Number(value ?? 0)) ? 0 : 2,
   })}`

@@ -3,13 +3,17 @@ import { MetricCard } from '../components/shared/MetricCard.jsx'
 import { StatusBadge } from '../components/shared/StatusBadge.jsx'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
 import { Button } from '../components/shared/Button.jsx'
+import { ActionCard } from '../components/operational/ActionCard.jsx'
+import { rankActions, totalImpact } from '../lib/analytics/actionPriority.js'
+import { formatCurrency } from '../components/shared/formatters.js'
 
 const TYPE_META = {
   PROMOTE_EXPIRING_PRODUCT: { label: 'Expiring', tone: 'danger' },
-  CHECK_NEGATIVE_STOCK: { label: 'Negative stock', tone: 'danger' },
+  CHECK_NEGATIVE_STOCK: { label: 'Stock count wrong', tone: 'neutral' },
   CHECK_WOLT_PRICE_GAP: { label: 'WOLT price gap', tone: 'warning' },
-  CHECK_MARGIN: { label: 'Margin risk', tone: 'warning' },
-  VERIFY_UNKNOWN_BARCODE: { label: 'Unknown barcode', tone: 'info' },
+  CHECK_MARGIN: { label: 'Selling below cost', tone: 'danger' },
+  CHECK_MARGIN_SUSPECT: { label: 'Cost price looks wrong', tone: 'neutral' },
+  VERIFY_UNKNOWN_BARCODE: { label: 'No barcode', tone: 'info' },
   PRICE_CHECK: { label: 'Price check', tone: 'warning' },
   REORDER: { label: 'Reorder', tone: 'success' },
   WATCH_PRODUCT: { label: 'Watch', tone: 'info' },
@@ -23,92 +27,57 @@ const SOURCE_STATUS_TONE = {
   error: 'danger',
 }
 
-const SCRAPING_LABEL = {
-  complete: 'Scraping complete',
-  partial: 'Scraping partial — some sources pending',
-  running: 'Scraping running…',
-  not_started: 'Scraping not started',
+// A manager has ten minutes. Show the shortlist, keep the rest one click away.
+const TOP_N = 20
+
+function matchesQuery(rec, query) {
+  if (!query) return true
+  return [rec.productName, rec.barcode, rec.category]
+    .filter(Boolean)
+    .some((field) => String(field).toLowerCase().includes(query))
 }
 
-const MAX_ROWS = 60
-
-function recDetail(rec) {
-  switch (rec.type) {
-    case 'CHECK_WOLT_PRICE_GAP':
-      return `Shelf ${rec.sellingPrice} → WOLT ${rec.woltPrice} (gap ${rec.metricValue}%)`
-    case 'CHECK_MARGIN':
-      return `Sell ${rec.sellingPrice} · Cost ${rec.costPrice} · Margin ${rec.metricValue}%`
-    case 'CHECK_NEGATIVE_STOCK':
-      return `On-hand stock ${rec.currentStock}`
-    case 'PROMOTE_EXPIRING_PRODUCT':
-      return `Expiry ${rec.expiryDate} · ${rec.daysToExpiry} days · stock ${rec.currentStock}`
-    case 'VERIFY_UNKNOWN_BARCODE':
-      return rec.barcode ? `Barcode ${rec.barcode}` : 'No barcode in catalog'
-    default:
-      if (rec.competitorPrice != null) {
-        return `Local ${rec.sellingPrice} vs competitor ${rec.competitorPrice}`
-      }
-      return rec.reason ?? ''
-  }
-}
-
-export function OperationalPage({ operationalData, operationalStatus }) {
-  const { meta, posHealth, byFamily, sources, recommendations } = operationalData
-  const [activeFamily, setActiveFamily] = useState('ALL')
-  const [activeType, setActiveType] = useState('ALL')
+export function OperationalPage({
+  operationalData,
+  operationalStatus,
+  decisions = {},
+  onDecide,
+}) {
+  const { meta, posHealth, sources, recommendations } = operationalData
+  const [showAll, setShowAll] = useState(false)
+  const [showData, setShowData] = useState(false)
   const [search, setSearch] = useState('')
 
   const query = search.trim().toLowerCase()
 
-  const familyFiltered = useMemo(
-    () =>
-      activeFamily === 'ALL'
-        ? recommendations
-        : recommendations.filter((rec) => rec.family === activeFamily),
-    [recommendations, activeFamily],
+  const { money, data } = useMemo(() => rankActions(recommendations), [recommendations])
+
+  const openMoney = useMemo(
+    () => money.filter((rec) => matchesQuery(rec, query) && !decisions[rec.id]),
+    [money, decisions, query],
+  )
+  const openData = useMemo(
+    () => data.filter((rec) => matchesQuery(rec, query) && !decisions[rec.id]),
+    [data, decisions, query],
   )
 
-  const searchFiltered = useMemo(() => {
-    if (!query) return familyFiltered
-    return familyFiltered.filter((rec) =>
-      [rec.productName, rec.barcode, rec.category]
-        .filter(Boolean)
-        .some((field) => String(field).toLowerCase().includes(query)),
-    )
-  }, [familyFiltered, query])
-
-  const typeCounts = useMemo(() => {
-    const counts = {}
-    for (const rec of searchFiltered) counts[rec.type] = (counts[rec.type] ?? 0) + 1
-    return counts
-  }, [searchFiltered])
-
-  const types = useMemo(
-    () => Object.keys(typeCounts).sort((a, b) => typeCounts[b] - typeCounts[a]),
-    [typeCounts],
+  const handledCount = useMemo(
+    () => recommendations.filter((rec) => decisions[rec.id]).length,
+    [recommendations, decisions],
   )
 
-  const visible = useMemo(() => {
-    const filtered =
-      activeType === 'ALL'
-        ? searchFiltered
-        : searchFiltered.filter((rec) => rec.type === activeType)
-    return filtered.slice(0, MAX_ROWS)
-  }, [searchFiltered, activeType])
-
-  const total = recommendations.length
-  const filteredTotal = searchFiltered.length
-  const families = Object.keys(byFamily ?? {})
+  const visible = showAll ? openMoney : openMoney.slice(0, TOP_N)
+  const perUnitTotal = totalImpact(openMoney)
 
   if (operationalStatus === 'loading') {
-    return <EmptyState title="Loading operational data" description="Reading the latest pipeline export…" />
+    return <EmptyState title="Loading today's actions" description="Reading the latest pipeline export…" />
   }
 
-  if (total === 0) {
+  if (!recommendations.length) {
     return (
       <EmptyState
-        title="No operational data yet"
-        description="Run `npm run data:refresh` to populate this view. It updates automatically as scraping and imports complete."
+        title="No actions yet"
+        description="Run `npm run pilot:daily` to refresh from the latest POS export."
       />
     )
   }
@@ -116,114 +85,151 @@ export function OperationalPage({ operationalData, operationalStatus }) {
   return (
     <>
       <section className="metric-grid">
-        <MetricCard label="Total Products" value={posHealth.totalProducts} detail={posHealth.sourceFile ?? 'POS catalog'} />
-        <MetricCard label="WOLT Price Gaps" value={posHealth.woltPriceGaps} detail="Shelf vs WOLT > 5%" tone="warning" />
-        <MetricCard label="Negative Stock" value={posHealth.negativeStock} detail="POS data to verify" tone="danger" />
-        <MetricCard label="Margin Risks" value={posHealth.marginRisks} detail="Thin or negative margin" tone="warning" />
-        <MetricCard label="Missing Barcode" value={posHealth.missingBarcode} detail="Can't scan or match" tone="info" />
-        <MetricCard label="Total Actions" value={total} detail="Operational + competitor" tone="success" />
+        <MetricCard
+          label="Actions today"
+          value={openMoney.length}
+          detail="Ranked by money at stake"
+          tone={openMoney.length ? 'warning' : 'success'}
+        />
+        <MetricCard
+          label="Per sale at stake"
+          value={formatCurrency(perUnitTotal)}
+          detail="Summed across open actions"
+          tone="info"
+        />
+        <MetricCard label="Handled" value={handledCount} detail="Done, dismissed or snoozed" tone="success" />
+        <MetricCard label="Data to fix" value={openData.length} detail="No money attached" tone="neutral" />
       </section>
 
       <section className="panel">
         <div className="panel-heading">
           <div>
-            <p className="eyebrow">Data sources</p>
-            <h2>{SCRAPING_LABEL[meta.scrapingStatus] ?? 'Source status'}</h2>
+            <p className="eyebrow">Start here</p>
+            <h2>Today&apos;s actions</h2>
+            <p className="page-description" style={{ marginTop: '0.25rem' }}>
+              Ordered by how much money each one is worth per sale. Work down from the top —
+              the first few are worth more than all the rest together.
+            </p>
+          </div>
+          <div className="recommendation-actions" style={{ gap: '0.5rem' }}>
+            <input
+              className="operational-search"
+              type="search"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search product or barcode…"
+              aria-label="Search actions"
+            />
+            {/* Many small-shop owners want paper or a WhatsApp screenshot, not a login. */}
+            <Button tone="ghost" onClick={() => globalThis.print?.()}>
+              Print list
+            </Button>
+          </div>
+        </div>
+
+        {visible.length === 0 ? (
+          <EmptyState
+            title={query ? 'Nothing matches that search' : 'All clear'}
+            description={
+              query
+                ? 'Clear the search to see the full list.'
+                : 'Every money action has been handled. Anything left is under “Data to fix”.'
+            }
+          />
+        ) : (
+          <div className="action-list">
+            {visible.map((rec) => (
+              <ActionCard
+                key={rec.id}
+                action={rec}
+                meta={TYPE_META[rec.type]}
+                onDecide={onDecide}
+              />
+            ))}
+          </div>
+        )}
+
+        {openMoney.length > TOP_N && (
+          <div className="recommendation-actions" style={{ marginTop: '1rem' }}>
+            <Button tone="ghost" onClick={() => setShowAll((value) => !value)}>
+              {showAll
+                ? `Show top ${TOP_N} only`
+                : `Show all ${openMoney.length} actions`}
+            </Button>
+          </div>
+        )}
+      </section>
+
+      <section className="panel">
+        <div className="panel-heading">
+          <div>
+            <p className="eyebrow">Not urgent</p>
+            <h2>Data to fix ({openData.length})</h2>
+            <p className="page-description" style={{ marginTop: '0.25rem' }}>
+              Catalog issues with no direct money attached — mostly stock counts that need a
+              physical check, and items with no barcode. Worth cleaning up when there is time,
+              but nothing here is losing you money today.
+            </p>
+          </div>
+          <Button tone="ghost" onClick={() => setShowData((value) => !value)}>
+            {showData ? 'Hide' : 'Show'}
+          </Button>
+        </div>
+
+        {showData && (
+          openData.length === 0 ? (
+            <EmptyState title="Nothing to fix" description="No outstanding data issues." />
+          ) : (
+            <div className="action-list">
+              {openData.slice(0, TOP_N).map((rec) => (
+                <ActionCard
+                  key={rec.id}
+                  action={rec}
+                  meta={
+                    // A below-cost alert that reached this group did so because we could
+                    // not state a credible loss — label it as the data problem it is.
+                    rec.type === 'CHECK_MARGIN'
+                      ? TYPE_META.CHECK_MARGIN_SUSPECT
+                      : TYPE_META[rec.type]
+                  }
+                  onDecide={onDecide}
+                  muted
+                />
+              ))}
+              {openData.length > TOP_N && (
+                <p className="page-description">
+                  Showing {TOP_N} of {openData.length}.
+                </p>
+              )}
+            </div>
+          )
+        )}
+      </section>
+
+      <section className="panel">
+        <div className="panel-heading">
+          <div>
+            <p className="eyebrow">Where this comes from</p>
+            <h2>Data sources</h2>
           </div>
           <span className="metric-chip">
-            {meta.generatedAt ? `Updated ${new Date(meta.generatedAt).toLocaleString()}` : 'Static export'}
+            {meta.generatedAt
+              ? `Updated ${new Date(meta.generatedAt).toLocaleString()}`
+              : 'Static export'}
           </span>
         </div>
         <div className="recommendation-actions" style={{ flexWrap: 'wrap', gap: '0.5rem' }}>
           {(sources ?? []).map((src) => (
             <StatusBadge key={src.source_id} tone={SOURCE_STATUS_TONE[src.status] ?? 'neutral'}>
-              {src.label}: {src.status}{src.row_count ? ` (${src.row_count})` : ''}
+              {src.label}: {src.status}
+              {src.row_count ? ` (${src.row_count})` : ''}
             </StatusBadge>
           ))}
         </div>
-      </section>
-
-      <section className="panel">
-        <div className="panel-heading">
-          <div>
-            <p className="eyebrow">Pipeline output</p>
-            <h2>Recommendations</h2>
-            <p className="page-description" style={{ marginTop: '0.25rem' }}>
-              <strong>Operational</strong> actions come from our POS (expiry, stock, margin).
-              <strong> Competitor</strong> actions come from matched Kaggle prices. Use the
-              family filter to separate them.
-            </p>
-          </div>
-          <input
-            className="operational-search"
-            type="search"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search product, barcode, or category…"
-            aria-label="Search recommendations"
-          />
-        </div>
-
-        {families.length > 1 && (
-          <div className="recommendation-actions" style={{ flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.75rem' }}>
-            <Button tone={activeFamily === 'ALL' ? 'primary' : 'ghost'} onClick={() => { setActiveFamily('ALL'); setActiveType('ALL') }}>
-              All families ({total})
-            </Button>
-            {families.map((fam) => (
-              <Button
-                key={fam}
-                tone={activeFamily === fam ? 'primary' : 'ghost'}
-                onClick={() => { setActiveFamily(fam); setActiveType('ALL') }}
-              >
-                {fam} ({byFamily[fam]})
-              </Button>
-            ))}
-          </div>
-        )}
-
-        <div className="recommendation-actions" style={{ flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
-          <Button tone={activeType === 'ALL' ? 'primary' : 'ghost'} onClick={() => setActiveType('ALL')}>
-            All ({filteredTotal})
-          </Button>
-          {types.map((type) => (
-            <Button
-              key={type}
-              tone={activeType === type ? 'primary' : 'ghost'}
-              onClick={() => setActiveType(type)}
-            >
-              {(TYPE_META[type]?.label ?? type)} ({typeCounts[type]})
-            </Button>
-          ))}
-        </div>
-
-        {visible.length === 0 ? (
-          <EmptyState
-            title="No matching actions"
-            description={query ? `Nothing matches “${search.trim()}”. Clear the search to see all actions.` : 'No actions for this filter.'}
-          />
-        ) : (
-          <div className="compact-list">
-            {visible.map((rec) => (
-              <div className="compact-row" key={rec.id}>
-                <div>
-                  <strong>{rec.productName || rec.barcode || 'Unknown item'}</strong>
-                  <span>{rec.category || recDetail(rec)}</span>
-                </div>
-                <div className="compact-row-end">
-                  <StatusBadge tone={TYPE_META[rec.type]?.tone ?? 'neutral'}>
-                    {TYPE_META[rec.type]?.label ?? rec.type}
-                  </StatusBadge>
-                  <small>{Math.round((rec.confidence ?? 0) * 100)}% · {recDetail(rec)}</small>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-        {filteredTotal > visible.length && (
-          <p className="page-description">
-            Showing {visible.length} of {activeType === 'ALL' ? filteredTotal : typeCounts[activeType]} — refine by type above.
-          </p>
-        )}
+        <p className="page-description" style={{ marginTop: '0.75rem' }}>
+          {posHealth.totalProducts} products from the POS export.
+          {' '}Stock counts are known to be unreliable, so nothing here predicts running out.
+        </p>
       </section>
     </>
   )

@@ -64,6 +64,40 @@ between your work and Anas's, and it is where the two of you will collide if you
 You are the consumer: if a field you need for a screen isn't in the contract, say so **now**, not
 after C has built the chain.
 
+---
+
+## 🔄 REVISED after YomYom's reply (05/08)
+
+The manager answered D-0. Two things changed materially:
+
+**1. A sales report exists and is being sent.** *"ببعثلك تقرير المبيعات"*. Fadi's A-3 adapter
+becomes the real velocity source; the snapshot proxy drops to a fallback.
+
+**2. He warned us, unprompted, that stock counts are badly wrong** —
+*"مخزون السوبر ماركت غير صحيح بنسبة كبيرة"*, errors in **both** directions:
+*"ممكن يكون مسجّل بالتقرير انو في 8 حبات شوكلاطة كيندر وبالواقع في فقط 1 وحدة"*.
+
+**What that does to your screens:**
+
+- 🔴 The **625 `CHECK_NEGATIVE_STOCK` alerts must not lead the action list.** They were 29% of it.
+  The manager has already told us the stock numbers are unreliable — showing him 625 rows derived
+  from those numbers tells him nothing he doesn't know and makes us look like we weren't listening.
+  Move them into a separate, collapsed **"Data to fix"** group.
+- 🔴 Nothing may say *"you are about to run out"*. Stock of 8 can mean 1.
+- ✅ **`CHECK_MARGIN` (selling below cost) and `CHECK_WOLT_PRICE_GAP` are unaffected** — they come
+  from prices, not stock counts, and prices are reliable. **These two carry the demo.**
+- ✅ New opportunity — see D-7.
+
+### D-7 (P1, needs the sales report) — Stock accuracy check
+
+Once sales data lands we can compute what stock *should* be and compare it to what the POS claims.
+Sold 20, stock only moved 5 → flag it.
+
+He raised this problem himself, unprompted, which makes it the one feature we know he wants. Build
+it the day Fadi's A-3 adapter lands. Until then, do not stub it with fake numbers.
+
+---
+
 ### D-1 (P0) — The daily action list
 
 `public/data/operational.json` already holds **2,183 real recommendations** generated from YomYom's

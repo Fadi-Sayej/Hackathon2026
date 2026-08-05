@@ -85,6 +85,15 @@ function analyzeProductMarket(product, snapshot, barcodeMap) {
   let isPriceLeader = false
   let priceProtectionAlert = false
 
+  // Age of the specific observation behind cheapestCompetitor. The UI must be able to
+  // say "seen 3 months ago" instead of stating a stale price as current fact.
+  const cheapestEntry =
+    cheapestCompetitor !== null
+      ? available.find((entry) => entry.price === cheapestCompetitor)
+      : null
+  const priceAgeDays = cheapestEntry?.ageDays ?? null
+  const priceObservedAt = cheapestEntry?.observedAt ?? null
+
   if (cheapestCompetitor !== null && Number.isFinite(product.price)) {
     priceDelta = round(product.price - cheapestCompetitor)
     isPriceLeader = available.length > 0 && product.price < cheapestCompetitor + 0.001
@@ -114,6 +123,8 @@ function analyzeProductMarket(product, snapshot, barcodeMap) {
     nearbyCompetitors: nearby.length,
     cheapestCompetitorPrice: cheapestCompetitor,
     priciestCompetitorPrice: priciestCompetitor,
+    priceAgeDays,
+    priceObservedAt,
     priceDelta,
     isPriceSensitive,
     isPriceLeader,
