@@ -17,7 +17,7 @@ Usage
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -48,7 +48,7 @@ def _safe_parquet_write(path: Path, table: pa.Table) -> Path:
         logger.warning(
             "Parquet file already exists, appending timestamp suffix: {}", path
         )
-        ts = datetime.utcnow().strftime("%H%M%S%f")
+        ts = datetime.now(timezone.utc).strftime("%H%M%S%f")
         path = path.with_stem(f"{path.stem}_{ts}")
 
     path.parent.mkdir(parents=True, exist_ok=True)
