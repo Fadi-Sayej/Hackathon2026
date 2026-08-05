@@ -11,7 +11,8 @@
 #   3. archive a snapshot                   — the raw material for velocity
 #   4. derive velocity from snapshot deltas
 #   5. rebuild expiry + operational recommendations
-#   6. export public/data/operational.json  — what the web app reads
+#   6. re-match competitor prices          — keeps price ages honest
+#   7. export public/data/operational.json  — what the web app reads
 #
 # Safe to run twice in one morning: importing the same file is idempotent, and a
 # second snapshot taken minutes later is ignored as a duplicate (see velocity.py).
@@ -29,7 +30,7 @@ FAILED=0
 
 step() {
   STEP=$((STEP + 1))
-  printf '\n[%d/6] %s\n' "$STEP" "$1"
+  printf '\n[%d/7] %s\n' "$STEP" "$1"
 }
 
 warn() { printf '  ! %s\n' "$1"; }
@@ -86,6 +87,15 @@ soft $PY scripts/build_velocity_from_snapshots.py
 step "Rebuild expiry + operational recommendations"
 soft $PY scripts/build_expiry_report.py
 soft $PY scripts/generate_operational_recommendations.py
+
+# Competitor prices age every day even when no new prices arrive. Re-running the
+# match and export keeps the "seen N months ago" labels honest and drops prices
+# that have crossed the staleness cutoff. Without this the UI would freeze at
+# whatever age it was first exported with, and quietly present year-old prices.
+# Neither step needs network — the collectors do, and they are run separately.
+step "Re-match competitor prices (ages them, drops stale)"
+soft $PY scripts/join_yomyom_kaggle.py
+soft $PY scripts/export_competitor_market_data.py
 
 # ---------------------------------------------------------------- 6. publish
 step "Export dashboard JSON"

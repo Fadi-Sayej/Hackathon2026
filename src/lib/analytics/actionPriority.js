@@ -99,12 +99,11 @@ export function estimateImpact(rec) {
       if (gapPct > MAX_CREDIBLE_GAP_PCT) return null
       return gap
     }
-    case 'PROMOTE_EXPIRING_PRODUCT': {
-      if (selling == null) return null
-      const stock = toNumber(rec?.currentStock)
-      // Stock is unreliable, so this is the value of one unit at risk, not the lot.
-      return stock != null && stock > 0 ? selling : selling
-    }
+    case 'PROMOTE_EXPIRING_PRODUCT':
+      // The value of ONE unit at risk, deliberately not multiplied by stock: the
+      // manager told us stock counts are unreliable, so a lot value would be a
+      // guess dressed up as a number.
+      return selling
     default:
       return null
   }
@@ -134,6 +133,11 @@ export function priorityScore(rec) {
 export function rankActions(recommendations = []) {
   const money = []
   const data = []
+
+  // A default parameter only covers `undefined`, so an explicit null would throw.
+  // loadOperationalData() currently guarantees an array, but this function should not
+  // depend on a caller two modules away staying defensive.
+  if (!Array.isArray(recommendations)) return { money, data }
 
   for (const rec of recommendations) {
     const scored = {
