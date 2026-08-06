@@ -102,7 +102,7 @@ problem: two prioritisation models now ship side by side (§9.5).
 | `operationalData` | `OperationalData` (§5) | 🟢 main | **Operational (home)**, Expiry |
 | `operationalStatus` | `'loading' \| 'ready'` | 🟢 main | Operational, Expiry |
 | `decisions` | `Record<operationalRecId, Decision>` | 🟢 main — shape differs from §8.2's original proposal, see §9.2 | Operational |
-| `dashboardStats` | `InventorySummary` + `estimatedOrderCost`, `highRiskStockouts`, `reorderSuggestions`, `belowCostAlerts`, `priceGapAlerts`, `negativeStockAlerts`, `thinMarginAlerts`, `actionableRecommendations`, `valueAtStake` | 🟢 main | Dashboard, Report |
+| `dashboardStats` | `InventorySummary` + `estimatedOrderCost`, `highRiskStockouts`, `reorderSuggestions`, `belowCostAlerts`, `priceGapAlerts`, `negativeStockAlerts`, `thinMarginAlerts`, `actionableRecommendations`, `productValueAtStake` | 🟢 main | Dashboard, Report |
 | `inventorySummary` | `{ totalProducts, stockoutRisks, lowStock, overstocked, wasteRisk, highPriority, totalSalesLast30Days, estimatedInventoryValue, noVelocityData }` | 🟢 main | Dashboard, Report |
 | `competitorSummary` | `{ priceLeaderCount, competitorOOSCount, priceProtectionCount, productsWithCoverage }` | 🟢 main | Dashboard, Report |
 | `priceLeaderProducts` / `stockoutOpportunities` / `priceProtectionAlerts` | `AnalyzedProduct[]` | 🟢 main | Dashboard, PriceGap |
@@ -236,8 +236,18 @@ sales history.
 ### 4.3 Ordering
 
 🟢 `recommendations` arrives sorted by ₪ `valueAtStake` first, then urgency
-(`reorderEngine.js:320`). Pages render in array order and must not re-sort. D-1 shows the top ~20;
+(`reorderEngine.js`). Pages render in array order and must not re-sort. D-1 shows the top ~20;
 the rest go behind a filter.
+
+🟢 **Ranking authority (resolved #39).** Per-sale defensible impact — `actionPriority.js`
+(§5.1) — is the authoritative definition of "most important". `valueAtStake` is a compatible
+*exposure* view (per-unit signal × stock), not a competing one: as of #39 both run through the
+**same credibility guards** (`src/lib/analytics/credibility.js`: `credibleLoss` / `credibleGap`,
+thresholds `MIN_CREDIBLE_PRICE` / `MAX_CREDIBLE_GAP_PCT` / `MAX_CREDIBLE_COST_RATIO`). So
+`valueAtStake` can never state a loss or gap the action list would refuse (a per-case cost
+recorded against a per-unit price is withheld in both), and a negative-stock item carries **no**
+₪ in either surface. When a guard withholds, `valueAtStake` is `0` (sort last, show no figure) —
+the alert itself still appears.
 
 Ordering is **not** part of the stable contract for any other array: treat every other list as
 unordered unless this document says otherwise.
@@ -287,9 +297,15 @@ which returns `{ money, data }` — money-impacting actions and data-quality act
 exports `ACTION_GROUP`, `credibleLoss()`, `estimateImpact()`, `actionGroup()`, `priorityScore()` and
 `totalImpact()`.
 
-🔴 This is a **second, parallel prioritisation model** alongside the `valueAtStake` sort in §4.3, and
-the two share no code, thresholds, or vocabulary. Since PR #36 both ship on `main` simultaneously.
-See §9.5 — this is now a live inconsistency, not a future merge risk.
+🟢 **Authoritative (resolved #39).** `rankActions()` — defensible ₪-per-sale impact with the
+credibility guards, and the deliberate money/data split — is the pilot's committed definition of
+"most important". This is the surface the store manager works top-down, so it wins where the two
+could disagree. It is *not* a rival to `valueAtStake` (§4.3): as of #39 the guards themselves live
+in the shared `credibility.js` and are applied by both, so `credibleLoss()` here and the
+`valueAtStake` exposure figure never contradict each other on whether a loss/gap is real. The
+vocabularies still differ by design — `actionPriority` runs on the real `operationalData` types
+(`CHECK_MARGIN`, `CHECK_WOLT_PRICE_GAP`, …), `reorderEngine` on the demo/reorder types
+(`BELOW_COST`, `PRICE_GAP`, …) — but they no longer disagree about what is defensible.
 
 ---
 
@@ -335,8 +351,8 @@ All rows below are 🟢 on `main` unless marked.
 | `recommendation.explanation` | `undefined` whenever the LLM path is off (**always today**) | fall back to `reason`, which is always present |
 | `recommendation.metrics.daysUntilStockout` | same as above | same as above |
 | `recommendation.context.*` | `null` when live context is off (default) | omit the chip; no "unknown weather" placeholder |
-| `recommendation.valueAtStake` | `0` when not computable | sort last; show no ₪ figure rather than `₪0` |
-| `dashboardStats.valueAtStake` | never null; `0` on a clean clone | `0` is an honest empty state |
+| `recommendation.valueAtStake` | `0` when not computable **or withheld by a credibility guard (#39)** | sort last; show no ₪ figure rather than `₪0` |
+| `dashboardStats.productValueAtStake` | never null; `0` on a clean clone | renamed from `valueAtStake` (#30); **deduplicated per-product** net exposure — each product counted once by its greatest single-signal value. `0` is an honest empty state |
 | `dashboardStats.*Alerts` | never null; `0` when none | counts of live (non-rejected) recommendations by type |
 | `dashboardStats.reorderSuggestions` | never null; `0` when none | stays `0` until real velocity exists |
 | `inventorySummary.noVelocityData` | never null; equals `totalProducts` today | the count behind "we cannot judge these yet" |
@@ -423,7 +439,7 @@ Each row is one of: **contract decision required** · **implementation follow-up
 | 9.1 | `pageProps.products` is an undocumented alias of `analyzedProducts`; no page consumes it | `src/App.jsx:512` | **contract decision required** — keep and document, or drop. |
 | 9.2 | `onDecide` / `decisions` shipped with a shape this contract did not specify; no reason enum, no snooze | `src/App.jsx:133-140,512-514`; `ActionCard.jsx:61-75` | **contract decision required** — §8.2 documents `main` as authoritative. Whether to add the closed reason enum is Malik + Nagham's call (B-3). |
 | 9.4 | Two id namespaces: composite `` `${productId}:${type}` `` vs operational `rec.id` | `getRecommendationKey()` vs `operational.json` | **implementation follow-up** — documented in §2; no code change needed, but they must never be joined. |
-| 9.5 | Two parallel ranking models now ship together: `actionPriority.rankActions()` and the `valueAtStake` sort | `src/lib/analytics/actionPriority.js` + `OperationalPage.jsx:54`; `reorderEngine.js:320` | **contract decision required** — *escalated by PR #36.* Previously a future merge risk; both are now live on `main` and disagree about what "most important" means. |
+| 9.5 | Two parallel ranking models now ship together: `actionPriority.rankActions()` and the `valueAtStake` sort | `src/lib/analytics/actionPriority.js` + `OperationalPage.jsx`; `reorderEngine.js` | **resolved #39** — `actionPriority` (per-sale defensible impact) is authoritative (§4.3, §5.1); the credibility guards now live in shared `credibility.js` and are applied by both, so `valueAtStake` can no longer state a figure the action list would refuse. Vocabularies stay distinct by design; the *defensibility* judgement is shared. |
 | 9.6 | `loadOperationalData()` returns the empty payload for **both** a failed fetch and a genuinely empty file | `src/lib/dataAdapters/loadOperationalData.js:35-54` | **implementation follow-up** — needs an `'error'` member on `operationalStatus`. Violates §6 as written. |
 
 ### Resolved by PR #36 (kept for audit)
@@ -589,9 +605,9 @@ All ten pages are present on `main` @ `67e7ba0`.
 | Velocity — JS passthrough | `scripts/normalize-datasets.mjs:96` | `inventoryEngine.js`, `reorderEngine.js` | **main** |
 | Confidence — `confidence` (model) | `src/lib/analytics/reorderEngine.js` | `RecommendationsPage.jsx` | **main** |
 | Confidence — `velocityConfidence` (data) | `reorderEngine.js:222`, `velocityConfidence.js` | `RecommendationsPage.jsx` | **main** |
-| `valueAtStake` (per rec + dashboard total) | `reorderEngine.js:223`, `App.jsx:566-601` | `DashboardPage.jsx` | **main** |
+| `valueAtStake` (per rec) + `productValueAtStake` (dashboard, deduped #30) — both credibility-guarded #39 | `reorderEngine.js`, `credibility.js`, `App.jsx` | `DashboardPage.jsx` | **main** |
 | Operational recommendations | `scripts/export_dashboard_data.py` → `public/data/operational.json` | `loadOperationalData.js` → `OperationalPage.jsx` | **main** |
-| Operational ranking | `src/lib/analytics/actionPriority.js` `rankActions()` | `src/pages/OperationalPage.jsx:54` | **main** — 🔴 §9.5 |
+| Operational ranking (authoritative) | `src/lib/analytics/actionPriority.js` `rankActions()` + shared `credibility.js` | `src/pages/OperationalPage.jsx` | **main** — 🟢 §9.5 resolved #39 |
 | Decisions / telemetry | `src/App.jsx:133-140` → `src/lib/persistence/persistence.js` | `OperationalPage.jsx:44-45`, `ActionCard.jsx:61-75` | **main** — 🔴 §9.2 |
 | Competitor prices | `src/data/marketData.js` (from `data/matching/barcode_matches.parquet`) | `src/lib/analytics/competitorEngine.js` → `PriceGapPage.jsx` | **main** |
 | Hebrew formatting / collation | `src/lib/utils/format.js`, `src/lib/utils/rtl.js` | all pages | **main** |

@@ -13,6 +13,7 @@ import {
   RECOMMENDATION_TYPES,
   RECOMMENDATION_TYPE_METADATA,
 } from './recommendationTypes.js'
+import { MIN_CREDIBLE_PRICE, credibleGap, credibleLoss } from './credibility.js'
 
 const FAST_MOVER_THRESHOLD = 5
 const SLOW_MOVER_SALES_30D = 5
@@ -383,6 +384,13 @@ function readCompetitorPrice(product, marketContext) {
   return Number.isFinite(contextualPrice) ? contextualPrice : null
 }
 
+// ₪ exposure for a recommendation. The price-signal cases (#39) run through the
+// same credibility guards as the operational action list (actionPriority.js), so
+// this figure can never state a loss/gap that surface would refuse — e.g. a
+// per-case cost recorded against a per-unit price (בראוניז ₪3.90 vs "cost" ₪238)
+// is withheld here exactly as it is there. `null` from a guard means "not
+// defensible", which becomes 0: sort last and show no ₪ figure (contract §7),
+// never a fabricated number.
 function calculateValueAtStake(product, metrics, extras) {
   const stock = Math.max(0, product.currentStock)
   let value = 0
@@ -397,17 +405,30 @@ function calculateValueAtStake(product, metrics, extras) {
     case RECOMMENDATION_TYPES.PROMOTION:
       value = stock * product.cost
       break
-    case RECOMMENDATION_TYPES.BELOW_COST:
-      value = Math.max(0, product.cost - product.price) * stock
+    case RECOMMENDATION_TYPES.BELOW_COST: {
+      const lossPerUnit = credibleLoss(product.price, product.cost)
+      value = lossPerUnit == null ? 0 : lossPerUnit * stock
       break
-    case RECOMMENDATION_TYPES.PRICE_GAP:
-      value = Math.max(0, product.price - extras.competitorPrice) * stock
+    }
+    case RECOMMENDATION_TYPES.PRICE_GAP: {
+      const gapPerUnit = credibleGap(product.price, extras.competitorPrice)
+      value = gapPerUnit == null ? 0 : gapPerUnit * stock
       break
+    }
     case RECOMMENDATION_TYPES.NEGATIVE_STOCK:
-      value = Math.abs(product.currentStock) * product.cost
+      // A negative count is a data-hygiene item, not money: the manager told us
+      // stock counts are unreliable, and actionPriority classes it as DATA with
+      // no ₪. Carry no exposure figure so the two surfaces agree.
+      value = 0
       break
     case RECOMMENDATION_TYPES.THIN_MARGIN:
-      value = Math.max(0, product.price * THIN_MARGIN_THRESHOLD - metrics.margin) * stock
+      // A genuine thin margin (price >= cost, but slim). Only the sub-credible
+      // price guard applies here; a per-case cost error would be price < cost and
+      // is caught by BELOW_COST above.
+      value =
+        product.price < MIN_CREDIBLE_PRICE
+          ? 0
+          : Math.max(0, product.price * THIN_MARGIN_THRESHOLD - metrics.margin) * stock
       break
   }
 

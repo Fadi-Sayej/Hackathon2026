@@ -16,6 +16,13 @@
  *      from prices alone, so they keep their full weight. These carry the product.
  */
 
+import { credibleGap, credibleLoss, toNumber } from './credibility.js'
+
+// Re-exported so existing consumers keep importing it from here; the guard
+// thresholds themselves now live in credibility.js and are shared with
+// reorderEngine's valueAtStake (Issue #39).
+export { credibleLoss }
+
 export const ACTION_GROUP = {
   MONEY: 'money',
   DATA: 'data',
@@ -36,49 +43,6 @@ const TYPE_RULES = {
 
 const DEFAULT_RULE = { group: ACTION_GROUP.DATA, weight: 0 }
 
-// A shelf price of ₪0.01 against a ₪2.28 cost is a data-entry error, not a -22,700%
-// margin. Showing it as the single biggest opportunity in the shop would discredit
-// every other number on the screen.
-const MIN_CREDIBLE_PRICE = 0.5
-const MAX_CREDIBLE_GAP_PCT = 300
-
-// Cost recorded per CASE against a price recorded per UNIT looks identical to a
-// catastrophic loss. Real examples from the YomYom export:
-//
-//   בראוניז (4*4)          sells ₪3.90   "cost" ₪238.00  (a whole case)
-//   כוס חד פעמי 4 OZ       sells ₪8.56   "cost" ₪145.00  (a sleeve of cups)
-//   שקית נייר 25/50 (2000) sells ₪95.58  "cost" ₪162.00  (2,000 bags)
-//
-// The pack size is often right there in the product name. Telling a manager he loses
-// ₪234 on every brownie would discredit every other number on the screen, so anything
-// beyond this ratio is treated as a cost-price data problem, not a loss. Genuine
-// below-cost selling looks like ₪24.90 against a ₪30.00 cost — close, not 60x.
-const MAX_CREDIBLE_COST_RATIO = 2
-
-function toNumber(value) {
-  const parsed = typeof value === 'string' ? Number(value) : value
-  return Number.isFinite(parsed) ? parsed : null
-}
-
-/**
- * Is this a believable below-cost sale, or a cost-price data problem?
- *
- * Shared so the action list and the price screen never disagree about how many
- * products are selling below cost — two screens giving different counts of the same
- * thing costs more credibility than either number is worth.
- *
- * @returns {number|null} loss per unit in shekels, or null if not credible
- */
-export function credibleLoss(sellingPrice, costPrice) {
-  const selling = toNumber(sellingPrice)
-  const cost = toNumber(costPrice)
-  if (selling == null || cost == null) return null
-  if (selling < MIN_CREDIBLE_PRICE || cost <= 0) return null
-  if (cost / selling > MAX_CREDIBLE_COST_RATIO) return null
-  const loss = cost - selling
-  return loss > 0 ? loss : null
-}
-
 /**
  * Money at stake per unit sold, in shekels. Null when we cannot state a figure
  * honestly — the UI must then show no number rather than a zero.
@@ -91,14 +55,8 @@ export function estimateImpact(rec) {
   switch (rec?.type) {
     case 'CHECK_MARGIN':
       return credibleLoss(selling, cost)
-    case 'CHECK_WOLT_PRICE_GAP': {
-      if (selling == null || wolt == null) return null
-      if (selling < MIN_CREDIBLE_PRICE || wolt < MIN_CREDIBLE_PRICE) return null
-      const gap = Math.abs(wolt - selling)
-      const gapPct = (gap / Math.min(selling, wolt)) * 100
-      if (gapPct > MAX_CREDIBLE_GAP_PCT) return null
-      return gap
-    }
+    case 'CHECK_WOLT_PRICE_GAP':
+      return credibleGap(selling, wolt)
     case 'PROMOTE_EXPIRING_PRODUCT':
       // The value of ONE unit at risk, deliberately not multiplied by stock: the
       // manager told us stock counts are unreliable, so a lot value would be a
