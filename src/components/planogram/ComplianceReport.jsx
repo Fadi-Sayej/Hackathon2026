@@ -1,6 +1,8 @@
 import { MetricCard } from '../shared/MetricCard.jsx'
 import { StatusBadge } from '../shared/StatusBadge.jsx'
 import { COMPLIANCE_STATES } from '../../lib/analytics/complianceEngine.js'
+import { formatPercent } from '../../lib/utils/format.js'
+import { dirProps } from '../../lib/utils/rtl.js'
 
 const stateTone = {
   [COMPLIANCE_STATES.CORRECT]: 'success',
@@ -32,7 +34,7 @@ export function ComplianceReport({ report }) {
       <section className="metric-grid metric-grid-compact">
         <MetricCard
           label="Compliance Score"
-          value={`${scorePercent}%`}
+          value={formatPercent(report.score, 0, true)}
           detail={`${report.correctCount} of ${report.totalIdeal} products correct`}
           tone={scoreTone}
         />
@@ -74,9 +76,9 @@ export function ComplianceReport({ report }) {
                   <StatusBadge tone={stateTone[item.state]}>
                     {stateLabel[item.state]}
                   </StatusBadge>
-                  <strong>{item.productName}</strong>
+                  <strong {...dirProps(item.productName)}>{item.productName ?? '—'}</strong>
                 </header>
-                <p>{item.message}</p>
+                <p {...dirProps(item.message)}>{item.message ?? '—'}</p>
                 {item.state === COMPLIANCE_STATES.MISPLACED && (
                   <footer>
                     <span>Move to <strong>{item.idealShelfLabel}</strong></span>
@@ -110,7 +112,7 @@ export function ComplianceReport({ report }) {
             {correct.map((item) => (
               <div className="compliance-correct-item" key={item.productId}>
                 <StatusBadge tone="success">Correct</StatusBadge>
-                <strong>{item.productName}</strong>
+                <strong {...dirProps(item.productName)}>{item.productName ?? '—'}</strong>
                 <span className="muted">{item.idealShelfLabel} — {item.idealFacings} facings</span>
               </div>
             ))}

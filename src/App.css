@@ -2631,3 +2631,48 @@ button {
     border-color: #999;
   }
 }
+
+/* ── Hebrew RTL & Numeric Formatting Primitives (Issue #17) ────────── */
+[dir="auto"] {
+  unicode-bidi: isolate;
+}
+
+.table-cell-hebrew,
+.cell-hebrew {
+  text-align: right;
+  direction: rtl;
+  unicode-bidi: isolate;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.table-cell-ltr,
+.cell-ltr,
+.cell-numeric,
+.cell-price,
+.cell-percent,
+.cell-barcode,
+.cell-date {
+  direction: ltr;
+  text-align: left;
+  unicode-bidi: isolate;
+  white-space: nowrap;
+}
+
+.text-hebrew-title {
+  direction: rtl;
+  unicode-bidi: isolate;
+  font-family: var(--font-hebrew, var(--font-body));
+}
+
+.hebrew-table-container table {
+  table-layout: auto;
+  width: 100%;
+}
+
+.hebrew-table-container th,
+.hebrew-table-container td {
+  overflow-wrap: break-word;
+  max-width: 300px;
+}
