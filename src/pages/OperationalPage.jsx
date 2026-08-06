@@ -6,6 +6,7 @@ import { Button } from '../components/shared/Button.jsx'
 import { ActionCard } from '../components/operational/ActionCard.jsx'
 import { rankActions, totalImpact } from '../lib/analytics/actionPriority.js'
 import { formatCurrency } from '../components/shared/formatters.js'
+import { formatDate } from '../lib/utils/format.js'
 
 const TYPE_META = {
   PROMOTE_EXPIRING_PRODUCT: { label: 'Expiring', tone: 'danger' },
@@ -214,7 +215,7 @@ export function OperationalPage({
           </div>
           <span className="metric-chip">
             {meta.generatedAt
-              ? `Updated ${new Date(meta.generatedAt).toLocaleString()}`
+              ? `Updated ${formatDate(meta.generatedAt)}`
               : 'Static export'}
           </span>
         </div>

@@ -2,6 +2,7 @@ import { EmptyState } from './shared/EmptyState.jsx'
 import { MetricCard } from './shared/MetricCard.jsx'
 import { StatusBadge } from './shared/StatusBadge.jsx'
 import { formatCurrency } from './shared/formatters.js'
+import { dirProps } from '../lib/utils/rtl.js'
 
 function describeDistance(meters) {
   if (!Number.isFinite(meters)) return ''
@@ -123,17 +124,20 @@ function renderStockoutCard(product) {
     <article className="market-intel-card market-intel-card-opportunity" key={`oos-${product.id}`}>
       <header>
         <StatusBadge tone="info">Opportunity</StatusBadge>
-        <strong>{product.name}</strong>
+        <strong {...dirProps(product.name)}>{product.name ?? '—'}</strong>
       </header>
-      <p>{product.category}</p>
+      <p {...dirProps(product.category)}>{product.category ?? '—'}</p>
       {trigger && (
         <p className="market-intel-attribution">
-          <strong>{trigger.storeName} ({trigger.brand})</strong> is OOS — {describeDistance(trigger.distance_m)} away
+          <strong {...dirProps(`${trigger.storeName} ${trigger.brand}`)}>
+            {trigger.storeName ?? '—'} ({trigger.brand ?? '—'})
+          </strong>{' '}
+          is OOS — {describeDistance(trigger.distance_m)} away
         </p>
       )}
       <footer>
         <span>Our stock</span>
-        <strong>{product.currentStock} units</strong>
+        <strong className="numeric-cell">{product.currentStock ?? '—'} units</strong>
       </footer>
     </article>
   )
@@ -145,15 +149,15 @@ function renderPriceLeaderCard(product) {
     <article className="market-intel-card market-intel-card-leader" key={`leader-${product.id}`}>
       <header>
         <StatusBadge tone="success">Cheapest</StatusBadge>
-        <strong>{product.name}</strong>
+        <strong {...dirProps(product.name)}>{product.name ?? '—'}</strong>
       </header>
-      <p>{product.category}</p>
+      <p {...dirProps(product.category)}>{product.category ?? '—'}</p>
       <p className="market-intel-attribution">
         We are <strong>{formatCurrency(Math.abs(delta))}</strong> below the cheapest of {product.competitor.nearbyCompetitors} nearby stores
       </p>
       <footer>
         <span>Our price</span>
-        <strong>{formatCurrency(product.price)}</strong>
+        <strong className="price-cell">{formatCurrency(product.price)}</strong>
       </footer>
     </article>
   )
@@ -165,15 +169,15 @@ function renderPriceProtectionCard(product) {
     <article className="market-intel-card market-intel-card-warning" key={`prot-${product.id}`}>
       <header>
         <StatusBadge tone="warning">Undercut</StatusBadge>
-        <strong>{product.name}</strong>
+        <strong {...dirProps(product.name)}>{product.name ?? '—'}</strong>
       </header>
-      <p>{product.category}</p>
+      <p {...dirProps(product.category)}>{product.category ?? '—'}</p>
       <p className="market-intel-attribution">
         A competitor is <strong>{formatCurrency(delta)}</strong> cheaper — consider matching or repositioning
       </p>
       <footer>
         <span>Our price</span>
-        <strong>{formatCurrency(product.price)}</strong>
+        <strong className="price-cell">{formatCurrency(product.price)}</strong>
       </footer>
     </article>
   )

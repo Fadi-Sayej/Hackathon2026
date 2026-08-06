@@ -6,6 +6,7 @@ import { StatusBadge } from '../components/shared/StatusBadge.jsx'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
 import { DataProvenanceBanner } from '../components/shared/DataProvenanceBanner.jsx'
 import { formatCurrency, formatDays, percent, statusTone } from '../components/shared/formatters.js'
+import { compareHebrew, dirProps } from '../lib/utils/rtl.js'
 
 export function DashboardPage({
   analyzedProducts,
@@ -108,13 +109,15 @@ export function DashboardPage({
             <div className="compact-list">
               {analyzedProducts
                 .slice()
-                .sort((a, b) => b.analytics.riskScore - a.analytics.riskScore)
+                .sort((a, b) =>
+                  b.analytics.riskScore - a.analytics.riskScore || compareHebrew(a.name, b.name),
+                )
                 .slice(0, 6)
                 .map((product) => (
                   <div className="compact-row" key={product.id}>
                     <div>
-                      <strong>{product.name}</strong>
-                      <span>{product.category}</span>
+                      <strong {...dirProps(product.name)}>{product.name ?? '—'}</strong>
+                      <span {...dirProps(product.category)}>{product.category ?? '—'}</span>
                     </div>
                     <div className="compact-row-end">
                       <StatusBadge tone={statusTone(product.analytics.primaryStatus)}>
@@ -145,7 +148,9 @@ export function DashboardPage({
               {urgentRecommendations.map((recommendation) => (
                 <div className="compact-row" key={`${recommendation.productId}:${recommendation.type}`}>
                   <div>
-                    <strong>{recommendation.productName}</strong>
+                    <strong {...dirProps(recommendation.productName)}>
+                      {recommendation.productName ?? '—'}
+                    </strong>
                     <span>{recommendation.type.replace('_', ' ')}</span>
                   </div>
                   <div className="compact-row-end">

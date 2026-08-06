@@ -3,6 +3,8 @@ import { MetricCard } from '../components/shared/MetricCard.jsx'
 import { StatusBadge } from '../components/shared/StatusBadge.jsx'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
 import { Button } from '../components/shared/Button.jsx'
+import { formatBarcode, formatDate } from '../lib/utils/format.js'
+import { dirProps } from '../lib/utils/rtl.js'
 
 const SEVERITY_TONE = {
   expired: 'danger',
@@ -190,10 +192,12 @@ export function ExpiryPage({ operationalData, products = [] }) {
               {queue.slice(0, 10).map((row, idx) => (
                 <div className="compact-row" key={`${row.barcode}:${idx}`}>
                   <div>
-                    <strong dir="auto">{row.productName || row.barcode}</strong>
-                    <span>{row.productName ? row.barcode : 'not in catalog'}</span>
+                    <strong {...dirProps(row.productName || row.barcode)}>
+                      {row.productName || formatBarcode(row.barcode)}
+                    </strong>
+                    <span>{row.productName ? formatBarcode(row.barcode) : 'not in catalog'}</span>
                   </div>
-                  <div className="compact-row-end"><small>{row.expiryDate}</small></div>
+                  <div className="compact-row-end date-cell"><small>{formatDate(row.expiryDate)}</small></div>
                 </div>
               ))}
             </div>
@@ -209,7 +213,7 @@ export function ExpiryPage({ operationalData, products = [] }) {
           </div>
           <span className="metric-chip">
             {operationalData?.meta?.generatedAt
-              ? `From pipeline export · ${new Date(operationalData.meta.generatedAt).toLocaleString()}`
+              ? `From pipeline export · ${formatDate(operationalData.meta.generatedAt)}`
               : 'From last pipeline export'}
           </span>
         </div>
@@ -223,12 +227,14 @@ export function ExpiryPage({ operationalData, products = [] }) {
             {alerts.map((row, idx) => (
               <div className="compact-row" key={`${row.barcode}:${idx}`}>
                 <div>
-                  <strong>{row.productName || row.barcode || 'Unknown'}</strong>
+                  <strong {...dirProps(row.productName || row.barcode)}>
+                    {row.productName || (row.barcode ? formatBarcode(row.barcode) : 'Unknown')}
+                  </strong>
                   <span>{row.knownInPos ? `stock ${row.currentStock}` : 'not in POS'}</span>
                 </div>
                 <div className="compact-row-end">
                   <StatusBadge tone={SEVERITY_TONE[row.severity] ?? 'neutral'}>{row.severity}</StatusBadge>
-                  <small>{row.expiryDate} · {row.daysToExpiry} days</small>
+                  <small className="date-cell">{formatDate(row.expiryDate)} · {row.daysToExpiry ?? '—'} days</small>
                 </div>
               </div>
             ))}

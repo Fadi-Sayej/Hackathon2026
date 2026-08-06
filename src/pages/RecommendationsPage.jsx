@@ -3,6 +3,7 @@ import { EmptyState } from '../components/shared/EmptyState.jsx'
 import { MetricCard } from '../components/shared/MetricCard.jsx'
 import { StatusBadge } from '../components/shared/StatusBadge.jsx'
 import { formatCurrency, formatDays, percent, urgencyTone } from '../components/shared/formatters.js'
+import { dirProps } from '../lib/utils/rtl.js'
 
 export function RecommendationsPage({
   approvedOrders,
@@ -59,8 +60,10 @@ export function RecommendationsPage({
                     <StatusBadge tone={isApproved ? 'success' : urgencyTone(recommendation.urgency)}>
                       {isApproved ? 'APPROVED' : recommendation.urgency}
                     </StatusBadge>
-                    <h2>{recommendation.productName}</h2>
-                    <p>{recommendation.category}</p>
+                    <h2 className="text-hebrew-title" {...dirProps(recommendation.productName)}>
+                      {recommendation.productName ?? '—'}
+                    </h2>
+                    <p {...dirProps(recommendation.category)}>{recommendation.category ?? '—'}</p>
                   </div>
                   <div className="recommendation-qty">
                     <span>Suggested</span>
@@ -77,7 +80,7 @@ export function RecommendationsPage({
                   </div>
                 </div>
 
-                <div className="recommendation-stats">
+                <div className="recommendation-stats ltr-data">
                   <span>Stock: {recommendation.metrics?.currentStock ?? '—'}</span>
                   <span>Daily sales: {recommendation.metrics?.weightedAvgDailySales ?? '—'}</span>
                   <span>Stockout: {formatDays(recommendation.metrics?.daysUntilStockout)}</span>
@@ -86,7 +89,9 @@ export function RecommendationsPage({
 
                 <div className="ai-explanation">
                   <p>AI explanation</p>
-                  <span>{recommendation.explanation}</span>
+                  <span {...dirProps(recommendation.explanation)}>
+                    {recommendation.explanation ?? '—'}
+                  </span>
                 </div>
 
                 <div className="recommendation-actions">
@@ -101,7 +106,7 @@ export function RecommendationsPage({
                   <Button disabled={isApproved} onClick={() => onReject(recommendation)} tone="ghost">
                     Reject
                   </Button>
-                  <span>{formatCurrency(quantity * (product?.cost ?? 0))}</span>
+                  <span className="cell-price">{formatCurrency(quantity * (product?.cost ?? 0))}</span>
                 </div>
               </article>
             )

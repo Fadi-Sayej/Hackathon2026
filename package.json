@@ -20,6 +20,8 @@
     "test:py": "python3 -m pytest tests -q",
     "data:refresh": "python3 scripts/refresh_pipeline.py",
     "data:snapshots": "python3 scripts/compare_pos_snapshots.py",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:pipeline": "python3 scripts/smoke_test_pipeline.py",
     "sprint2": "npm run normalize:data",
     "sprint3": "npm run normalize:data",

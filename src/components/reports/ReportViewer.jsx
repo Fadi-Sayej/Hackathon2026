@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Button } from '../shared/Button.jsx'
+import { dirProps } from '../../lib/utils/rtl.js'
 
 export function ReportViewer({ markdown, onClose }) {
   const [copied, setCopied] = useState(false)
@@ -40,6 +41,7 @@ export function ReportViewer({ markdown, onClose }) {
         <div
           className="report-body"
           dangerouslySetInnerHTML={{ __html: html }}
+          {...dirProps(markdown)}
         />
       </div>
     </div>
