@@ -77,9 +77,13 @@ export function OperationalPage({
   const [search, setSearch] = useState('')
 
   // Completion-action state (Issue #31). `actions[id] = { status, reason?, snoozeUntil? }`.
-  // Seeded from localStorage, then merged with any decisions already persisted
-  // through App.jsx so pre-#31 outcomes still read as handled.
-  const [actions, setActions] = useState(() => loadActions())
+  //
+  // Seeded ONCE, from localStorage merged with any decisions already persisted
+  // through App.jsx, so outcomes recorded before #31 still read as handled.
+  // After that this state is the sole source of truth: re-merging `decisions` on
+  // every render would resurrect an item the moment it was undone, because
+  // onDecide has already written it to App's state.
+  const [actions, setActions] = useState(() => mergeDecisions(loadActions(), decisions))
   const [busyId, setBusyId] = useState(null)
   const [errorId, setErrorId] = useState(null)
   // Re-render tick so expired snoozes reappear without a manual refresh.
@@ -89,11 +93,6 @@ export function OperationalPage({
     const id = setInterval(() => setNow(Date.now()), 60 * 1000)
     return () => clearInterval(id)
   }, [])
-
-  const effectiveActions = useMemo(
-    () => mergeDecisions(actions, decisions),
-    [actions, decisions],
-  )
 
   // Commit an action, persist it, and roll back on failure. The `busyId` guard
   // makes the operation idempotent: a second tap while a row is committing is
@@ -145,17 +144,17 @@ export function OperationalPage({
   const { money, data } = useMemo(() => rankActions(recommendations), [recommendations])
 
   const openMoney = useMemo(
-    () => money.filter((rec) => matchesQuery(rec, query) && !isHandled(effectiveActions[rec.id], now)),
-    [money, effectiveActions, now, query],
+    () => money.filter((rec) => matchesQuery(rec, query) && !isHandled(actions[rec.id], now)),
+    [money, actions, now, query],
   )
   const openData = useMemo(
-    () => data.filter((rec) => matchesQuery(rec, query) && !isHandled(effectiveActions[rec.id], now)),
-    [data, effectiveActions, now, query],
+    () => data.filter((rec) => matchesQuery(rec, query) && !isHandled(actions[rec.id], now)),
+    [data, actions, now, query],
   )
 
   const handledRecommendations = useMemo(
-    () => recommendations.filter((rec) => isHandled(effectiveActions[rec.id], now)),
-    [recommendations, effectiveActions, now],
+    () => recommendations.filter((rec) => isHandled(actions[rec.id], now)),
+    [recommendations, actions, now],
   )
 
   const visible = showAll ? openMoney : openMoney.slice(0, TOP_N)
@@ -264,7 +263,7 @@ export function OperationalPage({
             <summary>Handled ({handledRecommendations.length})</summary>
             <div className="op-handled-list">
               {handledRecommendations.map((rec) => {
-                const entry = effectiveActions[rec.id]
+                const entry = actions[rec.id]
                 const title = recTitle(rec)
                 let outcome = OUTCOME_LABEL[entry?.status] ?? 'Handled'
                 if (entry?.status === ACTION_STATUS.SNOOZED && entry.snoozeUntil) {
