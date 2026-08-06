@@ -38,15 +38,30 @@ service-account files, or `.vercel/`.
 The committed bundle already contains the real YomYom product catalog in `src/data/demoProducts.js`.
 That is enough for the deployed app to show real product names, categories, prices, and inventory.
 
-The daily operational export lives at `public/data/operational.json`, but that file is generated and
-gitignored. A clean Vercel build will not include it unless the deployment owner first chooses one of
-these B-1 data-shipping paths:
+The daily operational export lives at `public/data/operational.json`.
 
-1. Run `npm run data:refresh`, inspect `public/data/operational.json`, and intentionally commit the
-   generated `public/data/*.json` files for each release.
-2. Add a provider-side build step that can regenerate the JSON from available committed or hosted
-   data.
-3. Serve the JSON from durable storage after B-2/B-6 decides where pilot data lives.
+**Decision: option 1 — the generated `public/data/*.json` files are committed.** Option 2 is not
+available: Vercel's build image has no Python, no pyarrow, and no `data/**` parquet (all gitignored),
+so it cannot regenerate the JSON. Option 3 waits on B-2/B-6. Committing the artifact is what makes a
+clean Vercel build produce a working site, and `nagham.md` B-1 is explicit that the pilot cannot
+depend on someone's laptop.
+
+The committed export is real, regenerated from the committed `yomyom-inventory.csv`: **2,183
+recommendations** — 1,147 `CHECK_WOLT_PRICE_GAP`, 625 `CHECK_NEGATIVE_STOCK`, 307
+`VERIFY_UNKNOWN_BARCODE`, 104 `CHECK_MARGIN` — across 7,674 POS products.
+
+To refresh it for a release:
+
+```bash
+python3 scripts/import_yomyom_pos.py --input yomyom-inventory.csv   # POS CSV → silver parquet
+npm run data:dashboard                                              # → public/data/*.json
+git add public/data/operational.json public/data/sources.json
+git commit -m "data: refresh operational export"
+git push                                                            # Vercel redeploys
+```
+
+`vercel.json` serves `/data/*` with `Cache-Control: no-store`, so a redeploy is picked up
+immediately rather than serving a manager yesterday's actions.
 
 Do not implement the runtime-fetch split from Issue #24 as part of B-1.
 
