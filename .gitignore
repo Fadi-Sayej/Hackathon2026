@@ -19,6 +19,7 @@ data/external/silver/
 data/internal/raw_pos/
 data/internal/silver_pos/
 data/internal/expiry/
+data/internal/snapshots/
 data/matching/
 data/signals/
 data/recommendations/
@@ -33,9 +34,10 @@ dist
 dist-ssr
 *.local
 
-# Generated at runtime by Python scripts — keep on disk, do not commit
-public/data/operational.json
-public/data/sources.json
+# public/data/*.json is generated, but it IS committed: docs/DEPLOYMENT.md
+# "Data Refresh" option 1. Vercel's build image has no Python, no pyarrow and
+# no data/** parquet, so it cannot regenerate these. Refresh with
+# `npm run data:dashboard` and commit the result.
 
 # Editor directories and files
 .vscode/*

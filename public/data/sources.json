@@ -1,0 +1,69 @@
+{
+  "generated_at": "2026-08-06T11:58:55.535425+00:00",
+  "scraping_status": "partial",
+  "sources": {
+    "yomyom_pos": {
+      "source_id": "yomyom_pos",
+      "label": "YomYom POS",
+      "kind": "internal_pos",
+      "status": "complete",
+      "last_updated": "2026-08-06T11:58:55.535340+00:00",
+      "row_count": 7674,
+      "schema_version": "1"
+    },
+    "expiry_scans": {
+      "source_id": "expiry_scans",
+      "label": "Expiry scans",
+      "kind": "expiry",
+      "status": "not_started",
+      "last_updated": "2026-08-06T11:58:55.388854+00:00",
+      "row_count": 0,
+      "schema_version": "1"
+    },
+    "kaggle_dor_alon": {
+      "source_id": "kaggle_dor_alon",
+      "label": "Dor Alon (Kaggle)",
+      "kind": "competitor",
+      "status": "not_started",
+      "last_updated": "2026-08-06T11:58:55.507850+00:00",
+      "row_count": 0,
+      "schema_version": "1"
+    },
+    "kaggle_rami_levy": {
+      "source_id": "kaggle_rami_levy",
+      "label": "Rami Levy (Kaggle)",
+      "kind": "competitor",
+      "status": "not_started",
+      "last_updated": "2026-08-06T11:58:55.508067+00:00",
+      "row_count": 0,
+      "schema_version": "1"
+    },
+    "kaggle_shufersal": {
+      "source_id": "kaggle_shufersal",
+      "label": "Shufersal (Kaggle)",
+      "kind": "competitor",
+      "status": "not_started",
+      "last_updated": "2026-08-06T11:58:55.508170+00:00",
+      "row_count": 0,
+      "schema_version": "1"
+    },
+    "wolt_delivery": {
+      "source_id": "wolt_delivery",
+      "label": "Wolt delivery catalog",
+      "kind": "competitor",
+      "status": "complete",
+      "last_updated": "2026-08-06T11:58:55.535065+00:00",
+      "row_count": 1374,
+      "schema_version": "1"
+    },
+    "alonit_prices": {
+      "source_id": "alonit_prices",
+      "label": "Alonit price file",
+      "kind": "competitor",
+      "status": "not_started",
+      "last_updated": "2026-08-06T11:58:55.535246+00:00",
+      "row_count": 0,
+      "schema_version": "1"
+    }
+  }
+}
