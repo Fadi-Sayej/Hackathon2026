@@ -2458,6 +2458,131 @@ button {
   max-width: 300px;
 }
 
+/* ── OperationalPage per-item completion actions (styling for #31) ────
+ * Markup hooks (.op-action*, .op-snooze*, .op-handled*) are added by the
+ * OperationalPage follow-up (Issue #31); this CSS keeps them contained,
+ * finger-sized, and (at phone width, below) inside the thumb zone.
+ * ------------------------------------------------------------------ */
+.compact-row:has(.op-actions) {
+  flex-wrap: wrap;
+}
+
+.op-actions {
+  display: flex;
+  flex: 1 1 100%;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.op-action {
+  min-height: 40px;
+  white-space: nowrap;
+}
+
+.op-snooze {
+  position: relative;
+  display: inline-flex;
+}
+
+.op-snooze-menu {
+  position: absolute;
+  z-index: 60;
+  right: 0;
+  bottom: calc(100% + 6px);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 160px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper-strong);
+  box-shadow: 0 12px 30px rgba(19, 32, 52, 0.18);
+}
+
+.op-snooze-option {
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 8px;
+  color: var(--ink);
+  text-align: start;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+
+.op-snooze-option:hover,
+.op-snooze-option:focus-visible {
+  background: rgba(24, 32, 49, 0.06);
+}
+
+.op-action-error {
+  align-self: center;
+  color: var(--rose);
+  font-size: 0.78rem;
+}
+
+.compact-row-busy {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.op-handled {
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+
+.op-handled > summary {
+  padding: 6px 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.op-handled-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.op-handled-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.op-handled-outcome {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.op-handled-row strong {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.op-handled-row .op-action-undo {
+  flex: 0 0 auto;
+  margin-inline-start: auto;
+}
+
 /* ── Store-floor phone layout (Issue #23) ────────────────────────────
  * The existing 560px rules only stack the desktop layout. At 390px the
  * navigation, wide data surfaces, action controls, and mixed-direction
@@ -2697,6 +2822,8 @@ button {
   }
 
   .compact-row {
+    flex-direction: column;
+    align-items: stretch;
     gap: 10px;
     padding: 12px;
   }
@@ -2906,5 +3033,56 @@ button {
     bottom: calc(76px + env(safe-area-inset-bottom));
     left: 12px;
     max-width: none;
+  }
+
+  /* Completion actions (#31) sit full-width at the bottom of each row so
+   * the most-used action (Done) stays in the one-handed thumb zone. */
+  .op-actions {
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+    justify-content: stretch;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .op-action {
+    flex: 1 1 30%;
+    min-height: 44px;
+    white-space: normal;
+  }
+
+  .op-action-done {
+    flex: 1 1 100%;
+    order: 3;
+  }
+
+  .op-snooze {
+    flex: 1 1 40%;
+    order: 1;
+  }
+
+  .op-snooze .op-action-snooze {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .op-action-dismiss {
+    flex: 1 1 40%;
+    order: 2;
+  }
+
+  .op-snooze-menu {
+    right: 0;
+    left: 0;
+    min-width: 0;
+  }
+
+  .op-snooze-option {
+    min-height: 44px;
+  }
+
+  .op-handled-row .op-action-undo {
+    min-height: 44px;
   }
 }
