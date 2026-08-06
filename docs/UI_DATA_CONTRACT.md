@@ -12,10 +12,16 @@ without changing this file first.
 | | |
 |---|---|
 | C drafted | ☑ Anas — 2026-08-02, revised 2026-08-06 |
-| D agreed | ☐ Malik — _(date: ____)_ |
+| D agreed | ☑ **Project-owner override** — Anas, 2026-08-06 (PR #35) |
 
-> The `D agreed` box and the matching `PLAN.md` §7 item 6 box are ticked **only** after Malik
-> approves in writing on the PR that lands this file. Neither box may be pre-ticked.
+> **This was not signed off by Malik.** D-0b asked for Malik's written agreement; a review was
+> requested from `@malekdi` on PR #35 and none was given. Anas, as Track C owner, authorized this
+> revision as the UI implementation baseline without it, and the `PLAN.md` §7 item 6 box was ticked
+> on that basis.
+>
+> What that costs: §9 lists eight mismatches, two classified *contract decision required* (§9.1,
+> §9.2). Those are precisely the questions a Track D review would have answered, and they are still
+> open. Treat §9 as unreviewed by its consumer.
 
 ---
 
