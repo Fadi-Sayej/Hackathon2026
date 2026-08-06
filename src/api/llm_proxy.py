@@ -8,11 +8,13 @@ Requires: VITE_GEMINI_API_KEY env var (or GEMINI_API_KEY as fallback)
 """
 import os
 import json
+import asyncio
 import textwrap
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import google.generativeai as genai
+from google.api_core.exceptions import TooManyRequests
 
 load_dotenv()
 
@@ -27,6 +29,7 @@ GEMINI_MODEL = (
     or "gemini-2.0-flash"
 )
 model = genai.GenerativeModel(GEMINI_MODEL)
+UPSTREAM_TIMEOUT_SECONDS = float(os.environ.get("LLM_UPSTREAM_TIMEOUT_SECONDS", "3"))
 
 app = FastAPI(title="SmartShelf LLM Proxy")
 
@@ -56,16 +59,32 @@ def health():
 
 
 @app.post("/explain")
-def explain(payload: dict):
+async def explain(payload: dict):
     prompt = SYSTEM_PROMPT + "\n\nPayload:\n" + json.dumps(payload, ensure_ascii=False, indent=2)
     try:
-        response = model.generate_content(prompt)
+        response = await asyncio.wait_for(
+            model.generate_content_async(
+                prompt,
+                request_options={"timeout": UPSTREAM_TIMEOUT_SECONDS},
+            ),
+            timeout=UPSTREAM_TIMEOUT_SECONDS,
+        )
         text = response.text.strip()
         if text.startswith("```"):
             text = text.split("```")[1]
             if text.startswith("json"):
                 text = text[4:]
         result = json.loads(text)
+    except asyncio.TimeoutError as exc:
+        raise HTTPException(status_code=504, detail="Gemini request timed out") from exc
+    except TooManyRequests as exc:
+        retry_after = _retry_after(exc)
+        headers = {"Retry-After": retry_after} if retry_after else None
+        raise HTTPException(
+            status_code=429,
+            detail="Gemini rate limit exceeded",
+            headers=headers,
+        ) from exc
     except json.JSONDecodeError as exc:
         raise HTTPException(status_code=502, detail=f"Gemini returned non-JSON: {exc}") from exc
     except Exception as exc:
@@ -77,6 +96,14 @@ def explain(payload: dict):
         raise HTTPException(status_code=502, detail=f"Gemini response missing fields: {missing}")
 
     return result
+
+
+def _retry_after(exc):
+    response = getattr(exc, "response", None)
+    headers = getattr(response, "headers", None)
+    if headers is None:
+        return None
+    return headers.get("Retry-After") or headers.get("retry-after")
 
 
 REPORT_SYSTEM_PROMPT = textwrap.dedent("""\

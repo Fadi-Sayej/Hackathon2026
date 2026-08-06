@@ -2413,6 +2413,225 @@ button {
   }
 }
 
+/* ── Daily action list (task D-1) ────────────────────────────────────────────
+   Built for a manager holding a phone on the shop floor: one action per card,
+   what it's worth on the right, and three big buttons that close it. */
+
+.action-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.action-card {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--paper-strong);
+  color: var(--ink);
+  box-shadow: var(--shadow-soft);
+}
+
+.action-card--muted {
+  opacity: 0.72;
+}
+
+.action-card-main {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.action-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.35rem;
+}
+
+.action-card-title strong {
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.action-card-do {
+  margin: 0 0 0.25rem;
+  font-size: 0.95rem;
+}
+
+.action-card-detail {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.action-card-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.6rem;
+  flex: 0 0 auto;
+}
+
+.action-card-impact {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.1;
+}
+
+.action-card-impact-value {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.action-card-impact-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.action-card-buttons,
+.action-card-reasons {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.action-card-reasons {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.action-card-reasons-label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-align: right;
+}
+
+/* ── Expiry capture (task D-2) ───────────────────────────────────────────── */
+
+.expiry-capture {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.expiry-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1 1 12rem;
+}
+
+.expiry-field > span {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* 16px minimum stops iOS Safari zooming the page on focus. */
+.expiry-input {
+  font-size: 1rem;
+  padding: 0.7rem 0.75rem;
+  min-height: 2.9rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+  background: var(--paper-strong);
+  color: var(--ink);
+}
+
+.expiry-quick {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.expiry-match {
+  min-height: 1.4rem;
+  margin: 0.6rem 0 0;
+  font-size: 0.9rem;
+}
+
+.expiry-match-ok { color: var(--forest); font-weight: 600; }
+.expiry-match-warn { color: var(--amber); font-weight: 600; }
+
+/* ── Price comparison (task D-3) ─────────────────────────────────────────── */
+
+.price-table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.data-table td.numeric,
+.data-table th.numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.data-table td.negative { color: var(--rose); font-weight: 600; }
+.data-table td.positive { color: var(--forest); font-weight: 600; }
+
+/* ── Phone layout ────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .action-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .action-card-side {
+    align-items: stretch;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .action-card-buttons {
+    justify-content: flex-start;
+  }
+
+  /* Finger-sized targets — staff are not using a mouse. */
+  .action-card-buttons button,
+  .action-card-reasons button {
+    min-height: 2.75rem;
+    padding-inline: 1rem;
+  }
+
+  .expiry-field {
+    flex: 1 1 100%;
+  }
+}
+
+/* ── Print: the daily summary a manager can keep (task D-4) ──────────────── */
+
+@media print {
+  .sidebar,
+  .topbar,
+  .action-card-side,
+  .operational-search,
+  .recommendation-actions {
+    display: none !important;
+  }
+
+  .action-card {
+    break-inside: avoid;
+    border-color: #999;
+  }
+}
+
 /* ── Hebrew RTL & Numeric Formatting Primitives (Issue #17) ────────── */
 [dir="auto"] {
   unicode-bidi: isolate;
@@ -2459,77 +2678,28 @@ button {
 }
 
 /* ── OperationalPage per-item completion actions (styling for #31) ────
- * Markup hooks (.op-action*, .op-snooze*, .op-handled*) are added by the
- * OperationalPage follow-up (Issue #31); this CSS keeps them contained,
- * finger-sized, and (at phone width, below) inside the thumb zone.
+ * #31 merged as the ActionCard markup (.action-card-buttons /
+ * .action-card-reasons), not the inline op-action and op-snooze hooks this
+ * rule set was originally drafted against. The base sizing and the 44px
+ * touch targets already live with the .action-card rules; what remains
+ * here is the Handled/Undo section, which is this issue's own markup, plus
+ * the two states ActionCard gained in the #31 merge.
  * ------------------------------------------------------------------ */
-.compact-row:has(.op-actions) {
-  flex-wrap: wrap;
+.action-card--busy {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
-.op-actions {
-  display: flex;
-  flex: 1 1 100%;
-  min-width: 0;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 4px;
-}
-
-.op-action {
-  min-height: 40px;
-  white-space: nowrap;
-}
-
-.op-snooze {
-  position: relative;
-  display: inline-flex;
-}
-
-.op-snooze-menu {
-  position: absolute;
-  z-index: 60;
-  right: 0;
-  bottom: calc(100% + 6px);
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 160px;
-  padding: 6px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--paper-strong);
-  box-shadow: 0 12px 30px rgba(19, 32, 52, 0.18);
-}
-
-.op-snooze-option {
-  min-height: 40px;
-  padding: 8px 12px;
-  border: 0;
-  border-radius: 8px;
-  color: var(--ink);
-  text-align: start;
-  background: transparent;
-  cursor: pointer;
-  font: inherit;
-}
-
-.op-snooze-option:hover,
-.op-snooze-option:focus-visible {
-  background: rgba(24, 32, 49, 0.06);
-}
-
-.op-action-error {
+.action-card-error {
   align-self: center;
   color: var(--rose);
   font-size: 0.78rem;
 }
 
-.compact-row-busy {
-  opacity: 0.6;
-  pointer-events: none;
+/* The dismissal-reason and snooze pickers replace the old popup menu: they
+ * render inline in the card, so they must wrap rather than overflow. */
+.action-card-reasons {
+  flex-wrap: wrap;
 }
 
 .op-handled {
@@ -2539,6 +2709,12 @@ button {
 }
 
 .op-handled > summary {
+  /* The disclosure is a real touch target on the store floor — it is how a
+   * manager gets back to something they handled by mistake. Keep it at the
+   * same 44px minimum as every other control. */
+  display: flex;
+  align-items: center;
+  min-height: 44px;
   padding: 6px 0;
   color: var(--muted);
   font-size: 0.9rem;
@@ -3035,51 +3211,34 @@ button {
     max-width: none;
   }
 
-  /* Completion actions (#31) sit full-width at the bottom of each row so
-   * the most-used action (Done) stays in the one-handed thumb zone. */
-  .op-actions {
-    flex: 0 0 auto;
+  /* Completion actions (#31) go full-width at the bottom of the card so the
+   * most-used action (Done) stays in the one-handed thumb zone. The 2.75rem
+   * minimum comes from the .action-card rules; these only handle the phone
+   * arrangement and the inline pickers. */
+  .action-card-buttons,
+  .action-card-reasons {
     width: 100%;
     min-width: 0;
-    justify-content: stretch;
+    flex-wrap: wrap;
     gap: 8px;
     margin-top: 8px;
   }
 
-  .op-action {
-    flex: 1 1 30%;
+  .action-card-buttons button,
+  .action-card-reasons button {
+    flex: 1 1 40%;
     min-height: 44px;
     white-space: normal;
   }
 
-  .op-action-done {
+  /* Done is the common case — give it the full row and put it nearest the thumb. */
+  .action-card-buttons button:first-child {
     flex: 1 1 100%;
     order: 3;
   }
 
-  .op-snooze {
-    flex: 1 1 40%;
-    order: 1;
-  }
-
-  .op-snooze .op-action-snooze {
-    width: 100%;
-    min-height: 44px;
-  }
-
-  .op-action-dismiss {
-    flex: 1 1 40%;
-    order: 2;
-  }
-
-  .op-snooze-menu {
-    right: 0;
-    left: 0;
-    min-width: 0;
-  }
-
-  .op-snooze-option {
-    min-height: 44px;
+  .action-card-reasons-label {
+    flex: 1 1 100%;
   }
 
   .op-handled-row .op-action-undo {

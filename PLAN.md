@@ -300,4 +300,16 @@ directly. Write the answers in below, with the date received.**
    Malik signs off (D-0b). This is the only real coupling in the four-way split and the one
    collision the file-ownership split cannot prevent by itself. Neither writes code until it's agreed.
 
-   > **SIGNED OFF:** ☑ C drafted _(2026-08-02 — `docs/UI_DATA_CONTRACT.md`)_  ☐ D agreed  _(date: ____)_
+   > **SIGNED OFF:** ☑ C drafted _(2026-08-02, revised 2026-08-06 — `docs/UI_DATA_CONTRACT.md`)_  ☑ D agreed _(2026-08-06)_
+   >
+   > ☑ **D agreed** — closed by **project-owner override**, not by a Malik review.
+   > Anas, as Track C owner, reviewed the contract revision on PR #35 and authorized it as the UI
+   > implementation baseline without waiting for D-0b. **Malik (`@malekdi`) has not approved it**;
+   > a review was requested on PR #35 and none was given. Audit trail: the override comment on
+   > PR #35 and on issue #14.
+   >
+   > Consequence to be aware of: §9 of the contract lists the open `main` ↔ contract mismatches,
+   > two of them classified *contract decision required* (§9.1 the `pageProps.products` alias, and
+   > §9.2 the `onDecide` dismissal-reason enum that `PLAN.md` §5 and `nagham.md` B-3 grade the
+   > pilot on). Those are the items D-0b existed to catch, and they remain open and unreviewed by
+   > Track D.

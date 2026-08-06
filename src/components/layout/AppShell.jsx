@@ -1,13 +1,20 @@
 import { Button } from '../shared/Button.jsx'
 import { ErrorBoundary } from '../shared/ErrorBoundary.jsx'
 
+// Ordered by what a store manager should look at first. "Today" is the home screen.
+//
+// Planogram is deliberately ABSENT (task D-6). Measured against real data it put all
+// 7,451 products on the bottom shelf with 2 facings each, because 45% of its score is
+// sales velocity we do not have and its category rules are hardcoded English against
+// Hebrew categories. The page still exists in the repo; it comes back when velocity is
+// real and someone has measured YomYom's actual shelves.
 const navItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: 'D' },
+  { id: 'operational', label: 'Today', icon: '!' },
+  { id: 'prices', label: 'Prices', icon: '₪' },
+  { id: 'expiry', label: 'Expiry', icon: 'E' },
   { id: 'products', label: 'Products', icon: 'P' },
-  { id: 'recommendations', label: 'Recommendations', icon: 'R' },
-  { id: 'operational', label: 'Operational Risks', icon: '!' },
-  { id: 'expiry', label: 'Expiry Tracking', icon: 'E' },
-  { id: 'planogram', label: 'Planogram', icon: 'S' },
+  { id: 'dashboard', label: 'Overview', icon: 'D' },
+  { id: 'recommendations', label: 'Reorder', icon: 'R' },
   { id: 'report', label: 'AI Report', icon: 'A' },
   { id: 'orders', label: 'Approved Orders', icon: 'O' },
   { id: 'data-source', label: 'Data Source', icon: 'C' },

@@ -75,6 +75,26 @@ This is what you present to YomYom at the end of the pilot. Without it we hand b
 4. Add a server-side timeout and a **cache** — do not re-bill a Gemini call for the same product on
    every page render.
 
+### 🔴 B-6 (P0 — from Fadi) — Snapshot durability
+
+**`*.parquet` is globally gitignored** (`.gitignore:28`), so POS snapshots under
+`data/internal/snapshots/` are **never committed**. Those snapshots are the *only* source of
+sales velocity — the POS export has no sales history, so velocity is reconstructed entirely
+from stock differences between them.
+
+That means the pilot's most valuable dataset currently lives on one laptop, is not backed up,
+and dies with a reformat. It also cannot accumulate: if Malik receives the CSV on his machine
+and Fadi runs the pipeline on his, neither builds a continuous history.
+
+Velocity needs a **continuous, durable** series. Decide with Fadi and implement:
+
+- a `.gitignore` exception for `data/internal/snapshots/**/*.parquet` (they are small), **or**
+- push snapshots to Firestore / object storage alongside B-2, **or**
+- one designated machine owns ingestion, with a scheduled backup.
+
+Any of the three works. Doing none of them means that on 13/08 we hand YomYom a product whose
+core feature quietly resets whenever a laptop does.
+
 ### B-5 (P1) — Environment hygiene
 
 - `.env` currently has `VITE_HOLIDAY_COUNTRY=AT` (Austria) and weather coords `31.95/35.93` (Amman,
