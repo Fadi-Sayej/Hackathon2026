@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
 import { formatCurrency } from '../components/shared/formatters.js'
 import { Button } from '../components/shared/Button.jsx'
+import { compareHebrew, dirProps } from '../lib/utils/rtl.js'
 
 export function ApprovedOrdersPage({ approvedOrders, productIndex }) {
   const [toast, setToast] = useState(null)
@@ -26,8 +27,14 @@ export function ApprovedOrdersPage({ approvedOrders, productIndex }) {
         const unitCost = product?.cost ?? 0
         return sum + quantity * unitCost
       }, 0)
-      return { supplier, items, subtotal }
-    })
+      return {
+        supplier,
+        items: items.sort((a, b) =>
+          compareHebrew(a.recommendation.productName, b.recommendation.productName),
+        ),
+        subtotal,
+      }
+    }).sort((a, b) => compareHebrew(a.supplier, b.supplier))
   }, [approvedOrders, productIndex])
 
   const total = supplierGroups.reduce((sum, group) => sum + group.subtotal, 0)
@@ -102,25 +109,27 @@ export function ApprovedOrdersPage({ approvedOrders, productIndex }) {
             <header className="supplier-order-header">
               <div>
                 <p className="eyebrow">Supplier</p>
-                <h3>{group.supplier}</h3>
+                <h3 className="text-hebrew-title" {...dirProps(group.supplier)}>
+                  {group.supplier}
+                </h3>
                 <p className="muted">{group.items.length} {group.items.length === 1 ? 'item' : 'items'}</p>
               </div>
               <Button
                 onClick={() => handleSendToSupplier(group.supplier)}
                 tone="primary"
               >
-                Send to {group.supplier}
+                Send to <span {...dirProps(group.supplier)}>{group.supplier}</span>
               </Button>
             </header>
 
-            <div className="table-wrap supplier-table-wrap">
+            <div className="table-wrap supplier-table-wrap hebrew-table-container">
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th>Product</th>
-                    <th className="number-cell">Quantity</th>
-                    <th className="number-cell">Unit Cost</th>
-                    <th className="number-cell">Total</th>
+                    <th className="table-cell-hebrew">Product</th>
+                    <th className="number-cell cell-numeric">Quantity</th>
+                    <th className="number-cell cell-price">Unit Cost</th>
+                    <th className="number-cell cell-price">Total</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -129,13 +138,15 @@ export function ApprovedOrdersPage({ approvedOrders, productIndex }) {
                     const unitCost = product?.cost ?? 0
                     return (
                       <tr key={`${recommendation.productId}:${recommendation.type}`}>
-                        <td>
-                          <strong>{recommendation.productName}</strong>
+                        <td className="table-cell-hebrew">
+                          <strong {...dirProps(recommendation.productName)}>
+                            {recommendation.productName ?? '—'}
+                          </strong>
                           <span className="muted">{recommendation.type.replace('_', ' ')}</span>
                         </td>
-                        <td className="number-cell">{quantity}</td>
-                        <td className="number-cell">{formatCurrency(unitCost)}</td>
-                        <td className="number-cell">{formatCurrency(quantity * unitCost)}</td>
+                        <td className="number-cell cell-numeric">{quantity}</td>
+                        <td className="number-cell cell-price">{formatCurrency(unitCost)}</td>
+                        <td className="number-cell cell-price">{formatCurrency(quantity * unitCost)}</td>
                       </tr>
                     )
                   })}
@@ -145,7 +156,7 @@ export function ApprovedOrdersPage({ approvedOrders, productIndex }) {
 
             <div className="supplier-subtotal">
               <span>Supplier subtotal</span>
-              <strong>{formatCurrency(group.subtotal)}</strong>
+              <strong className="cell-price">{formatCurrency(group.subtotal)}</strong>
             </div>
           </article>
         ))}
@@ -153,11 +164,11 @@ export function ApprovedOrdersPage({ approvedOrders, productIndex }) {
 
       <div className="order-total">
         <span>Estimated total</span>
-        <strong>{formatCurrency(total)}</strong>
+        <strong className="cell-price">{formatCurrency(total)}</strong>
       </div>
 
       {toast && (
-        <div className="toast" role="status" aria-live="polite">
+        <div className="toast" role="status" aria-live="polite" {...dirProps(toast)}>
           {toast}
         </div>
       )}

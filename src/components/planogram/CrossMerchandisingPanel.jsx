@@ -2,6 +2,7 @@ import { EmptyState } from '../shared/EmptyState.jsx'
 import { MetricCard } from '../shared/MetricCard.jsx'
 import { StatusBadge } from '../shared/StatusBadge.jsx'
 import { percent } from '../shared/formatters.js'
+import { dirProps } from '../../lib/utils/rtl.js'
 
 export function CrossMerchandisingPanel({ suggestions = [], summary }) {
   if (!suggestions.length) {
@@ -79,8 +80,12 @@ export function CrossMerchandisingPanel({ suggestions = [], summary }) {
               <div className="affinity-pair">
                 <div className="affinity-product">
                   <span className="affinity-product-role">Anchor</span>
-                  <strong>{suggestion.anchor.name}</strong>
-                  <small>{suggestion.anchor.category}</small>
+                  <strong {...dirProps(suggestion.anchor.name)}>
+                    {suggestion.anchor.name ?? '—'}
+                  </strong>
+                  <small {...dirProps(suggestion.anchor.category)}>
+                    {suggestion.anchor.category ?? '—'}
+                  </small>
                   {suggestion.anchor.shelfLabel && (
                     <span className="affinity-shelf-tag">
                       on {suggestion.anchor.shelfLabel}
@@ -94,8 +99,12 @@ export function CrossMerchandisingPanel({ suggestions = [], summary }) {
 
                 <div className="affinity-product">
                   <span className="affinity-product-role">Pair with</span>
-                  <strong>{suggestion.partner.name}</strong>
-                  <small>{suggestion.partner.category}</small>
+                  <strong {...dirProps(suggestion.partner.name)}>
+                    {suggestion.partner.name ?? '—'}
+                  </strong>
+                  <small {...dirProps(suggestion.partner.category)}>
+                    {suggestion.partner.category ?? '—'}
+                  </small>
                   {suggestion.partner.shelfLabel && (
                     <span className="affinity-shelf-tag">
                       on {suggestion.partner.shelfLabel}
@@ -104,12 +113,14 @@ export function CrossMerchandisingPanel({ suggestions = [], summary }) {
                 </div>
               </div>
 
-              <p className="affinity-reason">{suggestion.reason}</p>
+              <p className="affinity-reason" {...dirProps(suggestion.reason)}>
+                {suggestion.reason ?? '—'}
+              </p>
 
               <footer className="affinity-card-footer">
                 <div className="affinity-action">
                   <span className="affinity-action-label">Suggested action</span>
-                  <span>{suggestion.placement}</span>
+                  <span {...dirProps(suggestion.placement)}>{suggestion.placement ?? '—'}</span>
                 </div>
                 <div className="affinity-impact">
                   <span className="affinity-impact-label">Est. basket lift</span>

@@ -1,11 +1,10 @@
+import { formatPercent, formatShekel } from '../../lib/utils/format.js'
+
 // ₪, not "ILS" — this is an Israeli shop and the manager reads prices in shekels all
 // day. The symbol stays on the left of the number even though the product names beside
 // it are Hebrew; currency is not mirrored by direction.
 export function formatCurrency(value) {
-  return `₪${Number(value ?? 0).toLocaleString(undefined, {
-    maximumFractionDigits: 2,
-    minimumFractionDigits: Number.isInteger(Number(value ?? 0)) ? 0 : 2,
-  })}`
+  return formatShekel(value)
 }
 
 export function formatDays(days) {
@@ -15,7 +14,7 @@ export function formatDays(days) {
 }
 
 export function percent(value) {
-  return `${Math.round((value ?? 0) * 100)}%`
+  return formatPercent(value, 0, true)
 }
 
 export function statusTone(status) {

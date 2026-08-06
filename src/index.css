@@ -10,8 +10,9 @@
   --color-on-surface: #191c1e;
   --color-on-surface-variant: #45474c;
   --color-on-primary: #ffffff;
-  --font-heading: 'Plus Jakarta Sans', system-ui, sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
+  --font-hebrew: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans Hebrew', 'Arial Hebrew', 'Rubik', 'Assistant', sans-serif;
+  --font-heading: 'Plus Jakarta Sans', var(--font-hebrew);
+  --font-body: 'Inter', var(--font-hebrew);
   --font-mono: 'Cascadia Code', 'SFMono-Regular', Consolas, monospace;
   color: var(--color-on-surface);
   background: var(--color-surface);
@@ -59,4 +60,33 @@ a {
 
 #root {
   min-height: 100vh;
+}
+
+/* ── Hebrew and RTL Direction Utilities ────────────────────────────── */
+[dir="auto"],
+bdi,
+.hebrew-text {
+  unicode-bidi: isolate;
+}
+
+.hebrew-column,
+.hebrew-cell,
+.text-hebrew {
+  text-align: right;
+  direction: rtl;
+  unicode-bidi: isolate;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.ltr-data,
+.ltr-cell,
+.numeric-cell,
+.price-cell,
+.barcode-cell,
+.percent-cell,
+.date-cell {
+  direction: ltr;
+  text-align: left;
+  unicode-bidi: isolate;
 }

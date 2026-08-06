@@ -1,3 +1,5 @@
+import { compareHebrew, dirProps } from '../../lib/utils/rtl.js'
+
 export function CategoryBars({ products }) {
   const categories = Object.values(
     products.reduce((acc, product) => {
@@ -9,7 +11,7 @@ export function CategoryBars({ products }) {
       return acc
     }, {}),
   )
-    .sort((a, b) => b.sales - a.sales)
+    .sort((a, b) => b.sales - a.sales || compareHebrew(a.category, b.category))
     .slice(0, 7)
 
   const maxSales = Math.max(...categories.map((category) => category.sales), 1)
@@ -18,11 +20,13 @@ export function CategoryBars({ products }) {
     <div className="bar-list">
       {categories.map((category) => (
         <div className="bar-row" key={category.category}>
-          <span>{category.category}</span>
+          <span className="hebrew-cell" {...dirProps(category.category)}>
+            {category.category ?? '—'}
+          </span>
           <div className="bar-track">
             <div className="bar-fill" style={{ width: `${(category.sales / maxSales) * 100}%` }} />
           </div>
-          <strong>{category.sales}</strong>
+          <strong className="numeric-cell">{category.sales ?? '—'}</strong>
         </div>
       ))}
     </div>
