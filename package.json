@@ -16,6 +16,7 @@
     "data:velocity": "python3 scripts/build_velocity_from_snapshots.py",
     "data:quality": "python3 scripts/check_import_quality.py",
     "pilot:daily": "bash scripts/pilot_daily.sh",
+    "test": "vitest run",
     "test:py": "python3 -m pytest tests -q",
     "data:refresh": "python3 scripts/refresh_pipeline.py",
     "data:snapshots": "python3 scripts/compare_pos_snapshots.py",
@@ -39,6 +40,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.6.0",
-    "vite": "^8.0.12"
+    "vite": "^8.0.12",
+    "vitest": "^4.1.10"
   }
 }
