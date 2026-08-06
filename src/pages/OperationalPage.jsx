@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { MetricCard } from '../components/shared/MetricCard.jsx'
 import { StatusBadge } from '../components/shared/StatusBadge.jsx'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
@@ -7,6 +7,18 @@ import { ActionCard } from '../components/operational/ActionCard.jsx'
 import { rankActions, totalImpact } from '../lib/analytics/actionPriority.js'
 import { formatCurrency } from '../components/shared/formatters.js'
 import { formatDate } from '../lib/utils/format.js'
+import { compareHebrew, dirProps } from '../lib/utils/rtl.js'
+import {
+  ACTION_STATUS,
+  OUTCOME_LABEL,
+  buildEntry,
+  dismissReasonLabel,
+  isHandled,
+  loadActions,
+  mergeDecisions,
+  persistActions,
+  toDecisionRecord,
+} from '../lib/operational/completionActions.js'
 
 const TYPE_META = {
   PROMOTE_EXPIRING_PRODUCT: { label: 'Expiring', tone: 'danger' },
@@ -31,11 +43,26 @@ const SOURCE_STATUS_TONE = {
 // A manager has ten minutes. Show the shortlist, keep the rest one click away.
 const TOP_N = 20
 
+// Hebrew product names must match a Hebrew query regardless of case and of the
+// final-letter forms, so plain toLowerCase() is not enough — compareHebrew()
+// carries the collator that C-1a established.
+function matchesHebrewQuery(value, normalizedQuery) {
+  const text = String(value)
+  return (
+    compareHebrew(text, normalizedQuery) === 0 ||
+    text.toLocaleLowerCase('he-IL').includes(normalizedQuery)
+  )
+}
+
 function matchesQuery(rec, query) {
   if (!query) return true
   return [rec.productName, rec.barcode, rec.category]
     .filter(Boolean)
-    .some((field) => String(field).toLowerCase().includes(query))
+    .some((field) => matchesHebrewQuery(field, query))
+}
+
+function recTitle(rec) {
+  return rec.productName || rec.barcode || 'Unknown item'
 }
 
 export function OperationalPage({
@@ -49,22 +76,85 @@ export function OperationalPage({
   const [showData, setShowData] = useState(false)
   const [search, setSearch] = useState('')
 
-  const query = search.trim().toLowerCase()
+  // Completion-action state (Issue #31). `actions[id] = { status, reason?, snoozeUntil? }`.
+  //
+  // Seeded ONCE, from localStorage merged with any decisions already persisted
+  // through App.jsx, so outcomes recorded before #31 still read as handled.
+  // After that this state is the sole source of truth: re-merging `decisions` on
+  // every render would resurrect an item the moment it was undone, because
+  // onDecide has already written it to App's state.
+  const [actions, setActions] = useState(() => mergeDecisions(loadActions(), decisions))
+  const [busyId, setBusyId] = useState(null)
+  const [errorId, setErrorId] = useState(null)
+  // Re-render tick so expired snoozes reappear without a manual refresh.
+  const [now, setNow] = useState(() => Date.now())
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60 * 1000)
+    return () => clearInterval(id)
+  }, [])
+
+  // Commit an action, persist it, and roll back on failure. The `busyId` guard
+  // makes the operation idempotent: a second tap while a row is committing is
+  // ignored, so repeated taps never produce duplicate effects.
+  const commit = useCallback(
+    (action, entry) => {
+      if (busyId) return
+      const id = action.id
+      setBusyId(id)
+      setErrorId(null)
+
+      const prev = actions
+      const next = { ...prev }
+      if (entry) next[id] = entry
+      else delete next[id]
+      setActions(next)
+
+      persistActions(next)
+        .then(() => {
+          setBusyId(null)
+          // Only report upstream once the write actually succeeded, so telemetry
+          // never records a decision that was rolled back.
+          if (entry) onDecide?.(toDecisionRecord(action, entry))
+        })
+        .catch(() => {
+          setActions(prev)
+          setErrorId(id)
+          setBusyId(null)
+        })
+    },
+    [actions, busyId, onDecide],
+  )
+
+  const decide = useCallback(
+    (action, { status, reason, snoozeOptionId }) => {
+      const entry = buildEntry({ status, reason, snoozeOptionId })
+      // buildEntry returns null for an unusable status or an unknown snooze
+      // option. Leave the item open rather than guessing what was meant.
+      if (!entry) return
+      commit(action, entry)
+    },
+    [commit],
+  )
+
+  const undo = useCallback((action) => commit(action, null), [commit])
+
+  const query = search.trim().toLocaleLowerCase('he-IL')
 
   const { money, data } = useMemo(() => rankActions(recommendations), [recommendations])
 
   const openMoney = useMemo(
-    () => money.filter((rec) => matchesQuery(rec, query) && !decisions[rec.id]),
-    [money, decisions, query],
+    () => money.filter((rec) => matchesQuery(rec, query) && !isHandled(actions[rec.id], now)),
+    [money, actions, now, query],
   )
   const openData = useMemo(
-    () => data.filter((rec) => matchesQuery(rec, query) && !decisions[rec.id]),
-    [data, decisions, query],
+    () => data.filter((rec) => matchesQuery(rec, query) && !isHandled(actions[rec.id], now)),
+    [data, actions, now, query],
   )
 
-  const handledCount = useMemo(
-    () => recommendations.filter((rec) => decisions[rec.id]).length,
-    [recommendations, decisions],
+  const handledRecommendations = useMemo(
+    () => recommendations.filter((rec) => isHandled(actions[rec.id], now)),
+    [recommendations, actions, now],
   )
 
   const visible = showAll ? openMoney : openMoney.slice(0, TOP_N)
@@ -83,6 +173,18 @@ export function OperationalPage({
     )
   }
 
+  const renderCard = (rec, metaOverride) => (
+    <ActionCard
+      key={rec.id}
+      action={rec}
+      meta={metaOverride ?? TYPE_META[rec.type]}
+      busy={busyId === rec.id}
+      error={errorId === rec.id}
+      onDecide={(decision) => decide(rec, decision)}
+      muted={metaOverride ? true : undefined}
+    />
+  )
+
   return (
     <>
       <section className="metric-grid">
@@ -98,7 +200,12 @@ export function OperationalPage({
           detail="Summed across open actions"
           tone="info"
         />
-        <MetricCard label="Handled" value={handledCount} detail="Done, dismissed or snoozed" tone="success" />
+        <MetricCard
+          label="Handled"
+          value={handledRecommendations.length}
+          detail="Done, dismissed or snoozed"
+          tone="success"
+        />
         <MetricCard label="Data to fix" value={openData.length} detail="No money attached" tone="neutral" />
       </section>
 
@@ -134,30 +241,54 @@ export function OperationalPage({
             description={
               query
                 ? 'Clear the search to see the full list.'
-                : 'Every money action has been handled. Anything left is under “Data to fix”.'
+                : handledRecommendations.length
+                  ? 'Every money action has been handled. Undo one below to bring it back.'
+                  : 'Every money action has been handled. Anything left is under “Data to fix”.'
             }
           />
         ) : (
-          <div className="action-list">
-            {visible.map((rec) => (
-              <ActionCard
-                key={rec.id}
-                action={rec}
-                meta={TYPE_META[rec.type]}
-                onDecide={onDecide}
-              />
-            ))}
-          </div>
+          <div className="action-list">{visible.map((rec) => renderCard(rec))}</div>
         )}
 
         {openMoney.length > TOP_N && (
           <div className="recommendation-actions" style={{ marginTop: '1rem' }}>
             <Button tone="ghost" onClick={() => setShowAll((value) => !value)}>
-              {showAll
-                ? `Show top ${TOP_N} only`
-                : `Show all ${openMoney.length} actions`}
+              {showAll ? `Show top ${TOP_N} only` : `Show all ${openMoney.length} actions`}
             </Button>
           </div>
+        )}
+
+        {handledRecommendations.length > 0 && (
+          <details className="op-handled">
+            <summary>Handled ({handledRecommendations.length})</summary>
+            <div className="op-handled-list">
+              {handledRecommendations.map((rec) => {
+                const entry = actions[rec.id]
+                const title = recTitle(rec)
+                let outcome = OUTCOME_LABEL[entry?.status] ?? 'Handled'
+                if (entry?.status === ACTION_STATUS.SNOOZED && entry.snoozeUntil) {
+                  outcome = `Snoozed until ${formatDate(new Date(entry.snoozeUntil).toISOString())}`
+                } else if (entry?.status === ACTION_STATUS.DISMISSED) {
+                  outcome = `Dismissed — ${dismissReasonLabel(entry.reason)}`
+                }
+                return (
+                  <div className="op-handled-row" key={rec.id}>
+                    <span className="op-handled-outcome">{outcome}</span>
+                    <strong {...dirProps(title)}>{title}</strong>
+                    <Button
+                      className="op-action op-action-undo"
+                      tone="ghost"
+                      disabled={busyId === rec.id}
+                      aria-label={`Undo action for ${title}`}
+                      onClick={() => undo(rec)}
+                    >
+                      Undo
+                    </Button>
+                  </div>
+                )
+              })}
+            </div>
+          </details>
         )}
       </section>
 
@@ -177,34 +308,28 @@ export function OperationalPage({
           </Button>
         </div>
 
-        {showData && (
-          openData.length === 0 ? (
+        {showData &&
+          (openData.length === 0 ? (
             <EmptyState title="Nothing to fix" description="No outstanding data issues." />
           ) : (
             <div className="action-list">
-              {openData.slice(0, TOP_N).map((rec) => (
-                <ActionCard
-                  key={rec.id}
-                  action={rec}
-                  meta={
-                    // A below-cost alert that reached this group did so because we could
-                    // not state a credible loss — label it as the data problem it is.
-                    rec.type === 'CHECK_MARGIN'
-                      ? TYPE_META.CHECK_MARGIN_SUSPECT
-                      : TYPE_META[rec.type]
-                  }
-                  onDecide={onDecide}
-                  muted
-                />
-              ))}
+              {openData.slice(0, TOP_N).map((rec) =>
+                renderCard(
+                  rec,
+                  // A below-cost alert that reached this group did so because we could
+                  // not state a credible loss — label it as the data problem it is.
+                  rec.type === 'CHECK_MARGIN'
+                    ? TYPE_META.CHECK_MARGIN_SUSPECT
+                    : (TYPE_META[rec.type] ?? { label: rec.type, tone: 'neutral' }),
+                ),
+              )}
               {openData.length > TOP_N && (
                 <p className="page-description">
                   Showing {TOP_N} of {openData.length}.
                 </p>
               )}
             </div>
-          )
-        )}
+          ))}
       </section>
 
       <section className="panel">
@@ -214,9 +339,7 @@ export function OperationalPage({
             <h2>Data sources</h2>
           </div>
           <span className="metric-chip">
-            {meta.generatedAt
-              ? `Updated ${formatDate(meta.generatedAt)}`
-              : 'Static export'}
+            {meta.generatedAt ? `Updated ${formatDate(meta.generatedAt)}` : 'Static export'}
           </span>
         </div>
         <div className="recommendation-actions" style={{ flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -228,8 +351,8 @@ export function OperationalPage({
           ))}
         </div>
         <p className="page-description" style={{ marginTop: '0.75rem' }}>
-          {posHealth.totalProducts} products from the POS export.
-          {' '}Stock counts are known to be unreliable, so nothing here predicts running out.
+          {posHealth.totalProducts} products from the POS export.{' '}
+          Stock counts are known to be unreliable, so nothing here predicts running out.
         </p>
       </section>
     </>
