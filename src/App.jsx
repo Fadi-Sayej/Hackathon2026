@@ -27,6 +27,7 @@ import {
 import { generateReorderRecommendations } from './lib/analytics/reorderEngine.js'
 import {
   annotateRecommendationsWithExplanations,
+  annotateRecommendationsWithMockExplanations,
   getDefaultExplanationProvider,
 } from './lib/ai/explanationProvider.js'
 import { buildMarketContext } from './lib/context/marketContextAdapter.js'
@@ -52,6 +53,7 @@ import { OperationalPage } from './pages/OperationalPage.jsx'
 import { ExpiryPage } from './pages/ExpiryPage.jsx'
 import { DataSourcePage } from './pages/DataSourcePage.jsx'
 import { PlanogramPage } from './pages/PlanogramPage.jsx'
+import { PriceGapPage } from './pages/PriceGapPage.jsx'
 import { ProductsPage } from './pages/ProductsPage.jsx'
 import { RecommendationsPage } from './pages/RecommendationsPage.jsx'
 import { ReportPage } from './pages/ReportPage.jsx'
@@ -70,8 +72,12 @@ const pageMeta = {
     description: 'Manager approval workflow for AI-assisted purchasing recommendations.',
   },
   operational: {
-    title: 'Operational Risks',
-    description: 'POS-derived risks from the latest pipeline export: expiry, WOLT price gaps, margins, negative stock, and unknown barcodes.',
+    title: "Today's Actions",
+    description: 'What to act on today, ordered by how much money each one is worth. Stock counts are known to be unreliable, so nothing here predicts running out.',
+  },
+  prices: {
+    title: 'Price Comparison',
+    description: 'How your prices compare to Dor Alon, Rami Levy and Shufersal, matched by barcode. Every price shows when it was last seen.',
   },
   expiry: {
     title: 'Expiry Tracking',
@@ -120,6 +126,20 @@ function App() {
   })
   const [operationalData, setOperationalData] = useState(EMPTY_OPERATIONAL_DATA)
   const [operationalStatus, setOperationalStatus] = useState('loading')
+
+  // Decisions on the daily action list. Kept separate from reorder recommendation
+  // overrides: these are operational alerts, and their dismissal reasons are the most
+  // valuable thing the pilot collects — they tell us which alert types to keep.
+  const [actionDecisions, setActionDecisions] = useState(() => loadRecommendationDecisions())
+
+  const decideAction = (decision) => {
+    const saved = saveRecommendationDecision({
+      ...decision,
+      source: 'operational',
+      decidedAt: new Date().toISOString(),
+    })
+    setActionDecisions((current) => ({ ...current, [decision.id]: saved ?? decision }))
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -276,25 +296,82 @@ function App() {
     [products],
   )
 
-  const recommendations = useMemo(() => {
-    const baseRecommendations = annotateRecommendationsWithExplanations({
-      provider: getDefaultExplanationProvider(),
-      products: analyzedProducts,
-      recommendations: generateReorderRecommendations(analyzedProducts, enrichedMarketContext),
-      marketContext: enrichedMarketContext,
-    })
+  const generatedRecommendations = useMemo(
+    () => generateReorderRecommendations(analyzedProducts, enrichedMarketContext),
+    [analyzedProducts, enrichedMarketContext],
+  )
+  const mockRecommendations = useMemo(
+    () =>
+      annotateRecommendationsWithMockExplanations({
+        products: analyzedProducts,
+        recommendations: generatedRecommendations,
+        marketContext: enrichedMarketContext,
+      }),
+    [analyzedProducts, generatedRecommendations, enrichedMarketContext],
+  )
+  const [upgradedRecommendations, setUpgradedRecommendations] = useState(null)
 
-    return baseRecommendations.map((recommendation) => {
-      const key = getRecommendationKey(recommendation)
-      const override = recommendationOverrides[key] ?? {}
-      return {
-        ...recommendation,
-        status: override.status ?? recommendation.status,
-        recommendedOrderQuantity:
-          override.recommendedOrderQuantity ?? recommendation.recommendedOrderQuantity,
+  useEffect(() => {
+    let cancelled = false
+    const controller = new AbortController()
+    const provider = getDefaultExplanationProvider()
+
+    // Mock explanations are already visible from mockRecommendations. When no
+    // remote provider is configured, there is nothing asynchronous to upgrade.
+    if (provider.id === 'mock') {
+      return () => {
+        cancelled = true
+        controller.abort()
       }
-    })
-  }, [analyzedProducts, enrichedMarketContext, recommendationOverrides])
+    }
+
+    async function upgradeExplanations() {
+      try {
+        const nextRecommendations = await annotateRecommendationsWithExplanations({
+          provider,
+          products: analyzedProducts,
+          recommendations: generatedRecommendations,
+          marketContext: enrichedMarketContext,
+          signal: controller.signal,
+        })
+        if (!cancelled) {
+          setUpgradedRecommendations({
+            source: generatedRecommendations,
+            recommendations: nextRecommendations,
+          })
+        }
+      } catch {
+        // The synchronous mock batch remains visible if an unexpected batch-level
+        // failure escapes the provider's per-recommendation fallback.
+      }
+    }
+
+    upgradeExplanations()
+    return () => {
+      cancelled = true
+      controller.abort()
+    }
+  }, [analyzedProducts, generatedRecommendations, enrichedMarketContext])
+
+  const explainedRecommendations =
+    upgradedRecommendations?.source === generatedRecommendations
+      ? upgradedRecommendations.recommendations
+      : mockRecommendations
+
+  const recommendations = useMemo(
+    () =>
+      explainedRecommendations.map((recommendation) => {
+        const key = getRecommendationKey(recommendation)
+        const override = recommendationOverrides[key] ?? {}
+        return {
+          ...recommendation,
+          status: override.status ?? recommendation.status,
+          recommendedOrderQuantity:
+            override.recommendedOrderQuantity ?? recommendation.recommendedOrderQuantity,
+        }
+      }),
+    [explainedRecommendations, recommendationOverrides],
+  )
 
   const planogramItems = useMemo(
     () => generatePlanogram(analyzedProducts, enrichedMarketContext),
@@ -432,6 +509,9 @@ function App() {
     dataProvenance,
     operationalData,
     operationalStatus,
+    products: analyzedProducts,
+    decisions: actionDecisions,
+    onDecide: decideAction,
     onApprove: (recommendation) =>
       updateRecommendation(recommendation, {
         status: 'APPROVED',
@@ -464,6 +544,7 @@ function App() {
       {activePage === 'recommendations' && <RecommendationsPage {...pageProps} />}
       {activePage === 'operational' && <OperationalPage {...pageProps} />}
       {activePage === 'expiry' && <ExpiryPage {...pageProps} />}
+      {activePage === 'prices' && <PriceGapPage {...pageProps} />}
       {activePage === 'planogram' && <PlanogramPage {...pageProps} />}
       {activePage === 'report' && <ReportPage {...pageProps} />}
       {activePage === 'orders' && <ApprovedOrdersPage {...pageProps} />}

@@ -83,6 +83,26 @@ export function formatPercent(value, decimals = 0, isDecimalRate = false) {
 }
 
 /**
+ * Formats a value already expressed in percentage POINTS (12.5 meaning 12.5%),
+ * as opposed to `formatPercent`, which treats a 0..1 input as a ratio.
+ *
+ * Passing percentage points straight to `formatPercent` is wrong twice over: any
+ * value at or below 1 is multiplied by 100 (0.5 points renders as "50%"), and
+ * fractional points lose their decimals. The pipeline's `metricValue` is in
+ * points, so this is the function that must be used for it.
+ * @param {number|string|null|undefined} value
+ * @returns {string} LTR-isolated percentage string or '—'
+ */
+export function formatPercentagePoints(value) {
+  if (value === null || value === undefined) return formatPercent(value);
+  if (typeof value === 'string' && !value.trim()) return formatPercent(value);
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) return formatPercent(value);
+  const decimals = Number.isInteger(numericValue) ? 0 : 2;
+  return formatPercent(numericValue / 100, decimals, true);
+}
+
+/**
  * Formats a date value safely into an LTR-isolated string.
  * Returns an em-dash ('—') for null, undefined, or invalid dates.
  * @param {string|Date|number|null|undefined} dateVal

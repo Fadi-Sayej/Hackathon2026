@@ -137,7 +137,7 @@ export function buildLocalMarketSnapshot(competitorStores = []) {
   const out = {}
   for (const store of competitorStores) {
     const entries = Object.entries(store.snapshot ?? {})
-    for (const [barcode, { price, isAvailable }] of entries) {
+    for (const [barcode, { price, isAvailable, ageDays, observedAt }] of entries) {
       if (!out[barcode]) out[barcode] = []
       out[barcode].push({
         brand: store.brand,
@@ -145,6 +145,10 @@ export function buildLocalMarketSnapshot(competitorStores = []) {
         storeId: store.storeId,
         price,
         isAvailable,
+        // How old this observation is. Carried through so the UI can label a price
+        // rather than presenting a months-old figure as today's shelf price.
+        ageDays: ageDays ?? null,
+        observedAt: observedAt ?? null,
         distance_m: store.distance_m,
       })
     }
