@@ -38,6 +38,39 @@ export function generateReorderRecommendations(products, marketContext = {}) {
   return sortRecommendations(recommendations)
 }
 
+/**
+ * Net ₪-value-at-stake across a set of recommendations (Issue #30).
+ *
+ * DEFINITION — *deduplicated product exposure*, not a gross action-item sum.
+ *
+ * Each recommendation carries its own per-action `valueAtStake`, and a single
+ * product can trip several signals at once — e.g. BELOW_COST *and* PRICE_GAP on
+ * the same stock. Those two often prescribe contradictory fixes (raise the price
+ * to cost vs. drop it to the competitor), so summing their values would count one
+ * product's capital more than once and inflate the headline the pilot is graded
+ * on (PLAN.md §5).
+ *
+ * The roll-up therefore counts each product ONCE, by its single greatest
+ * at-stake value — the worst-case capital exposed on that product's stock — and
+ * sums those per-product maxima. Per-recommendation `valueAtStake` is unchanged
+ * and still drives action-item ranking; this is only the aggregate definition.
+ *
+ * Recommendations without a `productId` are treated as distinct (each counts on
+ * its own). Values are already clamped to >= 0 by calculateValueAtStake.
+ */
+export function aggregateNetValueAtStake(recommendations) {
+  if (!Array.isArray(recommendations)) return 0
+  const worstPerProduct = new Map()
+  for (const recommendation of recommendations) {
+    const key = recommendation.productId ?? recommendation
+    const value = recommendation.valueAtStake ?? 0
+    if (value > (worstPerProduct.get(key) ?? 0)) worstPerProduct.set(key, value)
+  }
+  let total = 0
+  for (const value of worstPerProduct.values()) total += value
+  return round(total)
+}
+
 export function computeMetrics(product, marketContext = {}) {
   const avgDailySales7 = safeDivide(product.salesLast7Days, 7)
   const avgDailySales30 = safeDivide(product.salesLast30Days, 30)

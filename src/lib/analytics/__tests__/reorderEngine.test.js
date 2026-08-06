@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { generateReorderRecommendations } from '../reorderEngine.js'
+import {
+  aggregateNetValueAtStake,
+  generateReorderRecommendations,
+} from '../reorderEngine.js'
 import { RECOMMENDATION_TYPES } from '../recommendationTypes.js'
 
 const CURRENT_DATE = '2026-08-12'
@@ -178,5 +181,84 @@ describe('reorderEngine velocity honesty guarantees', () => {
       new Set(belowCostReasons).size,
       'A store manager would see duplicated reason text that does not identify which product needs action.',
     ).toBe(2)
+  })
+})
+
+describe('net value-at-stake aggregation semantics (#30)', () => {
+  it('counts each product once by its greatest signal (deduplicated exposure)', () => {
+    expect(
+      aggregateNetValueAtStake([
+        { productId: 'p1', valueAtStake: 200 },
+        { productId: 'p1', valueAtStake: 300 }, // same product → keep the larger
+        { productId: 'p2', valueAtStake: 150 },
+      ]),
+      'The headline exposure double-counted a product that trips several signals.',
+    ).toBe(450) // max(200,300) + 150, not 200+300+150
+  })
+
+  it('treats recommendations without a productId as distinct exposures', () => {
+    expect(aggregateNetValueAtStake([{ valueAtStake: 100 }, { valueAtStake: 40 }])).toBe(140)
+  })
+
+  it('returns 0 for empty or non-array input', () => {
+    expect(aggregateNetValueAtStake([])).toBe(0)
+    expect(aggregateNetValueAtStake(null)).toBe(0)
+  })
+
+  it('does not double-count a product that triggers both BELOW_COST and PRICE_GAP', () => {
+    // price 8 < cost 10 → BELOW_COST value = (10-8)*100 = 200
+    // price 8 > competitor 5 → PRICE_GAP value = (8-5)*100 = 300
+    // These prescribe opposite fixes on the same 100 units, so the headline must
+    // count the product once (its worst single exposure), not 200 + 300 = 500.
+    const recommendations = generateReorderRecommendations(
+      [
+        product({
+          id: 'dual-signal',
+          currentStock: 100,
+          price: 8,
+          cost: 10,
+          competitor: { cheapestCompetitorPrice: 5 },
+        }),
+      ],
+      { currentDate: CURRENT_DATE },
+    )
+
+    const dual = recommendations.filter(({ productId }) => productId === 'dual-signal')
+    expect(
+      dual.map(({ type }) => type).sort(),
+      'The dual-signal product should surface both the below-cost and price-gap actions.',
+    ).toEqual([RECOMMENDATION_TYPES.BELOW_COST, RECOMMENDATION_TYPES.PRICE_GAP].sort())
+
+    const grossSum = dual.reduce((sum, { valueAtStake }) => sum + valueAtStake, 0)
+    const worstSingle = Math.max(...dual.map(({ valueAtStake }) => valueAtStake))
+    const net = aggregateNetValueAtStake(recommendations)
+
+    expect(net, 'Net exposure must equal the single worst signal, not the gross sum.').toBe(worstSingle)
+    expect(net).toBeLessThan(grossSum)
+  })
+
+  it('sums exposure across distinct products', () => {
+    const recommendations = generateReorderRecommendations(
+      [
+        product({ id: 'loss', currentStock: 100, price: 8, cost: 10 }), // BELOW_COST = 200
+        product({
+          id: 'overpriced',
+          currentStock: 100,
+          price: 20,
+          cost: 10, // healthy margin → no BELOW_COST / THIN_MARGIN
+          competitor: { cheapestCompetitorPrice: 15 }, // PRICE_GAP = (20-15)*100 = 500
+        }),
+      ],
+      { currentDate: CURRENT_DATE },
+    )
+
+    const maxFor = (id) =>
+      Math.max(
+        ...recommendations
+          .filter(({ productId }) => productId === id)
+          .map(({ valueAtStake }) => valueAtStake),
+      )
+
+    expect(aggregateNetValueAtStake(recommendations)).toBe(maxFor('loss') + maxFor('overpriced'))
   })
 })

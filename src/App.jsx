@@ -24,7 +24,7 @@ import {
   groupPlanogramByShelf,
   summarizePlanogram,
 } from './lib/analytics/planogramEngine.js'
-import { generateReorderRecommendations } from './lib/analytics/reorderEngine.js'
+import { aggregateNetValueAtStake, generateReorderRecommendations } from './lib/analytics/reorderEngine.js'
 import {
   annotateRecommendationsWithExplanations,
   annotateRecommendationsWithMockExplanations,
@@ -578,13 +578,14 @@ function buildDashboardStats({ analyzedProducts, inventorySummary, recommendatio
     return sum + (recommendation.recommendedOrderQuantity ?? 0) * (product?.cost ?? 0)
   }, 0)
 
-  // ₪ at stake is the headline the pilot is graded on (PLAN.md §5): the money
-  // tied up in repriced below-cost items, price gaps, thin margins, and stock
-  // corrections. Each recommendation already carries its own valueAtStake.
-  const valueAtStake = live.reduce(
-    (sum, recommendation) => sum + (recommendation.valueAtStake ?? 0),
-    0,
-  )
+  // Net ₪ at stake is the headline the pilot is graded on (PLAN.md §5). It is
+  // *deduplicated product exposure* (Issue #30), not a gross sum of action-item
+  // values: a product that trips several signals — e.g. BELOW_COST and PRICE_GAP
+  // on the same stock, which prescribe opposite price fixes — is counted once, by
+  // its greatest single-signal value, so the figure can't be mistaken for (or
+  // inflated past) the store's true unique exposure. Per-recommendation
+  // valueAtStake still ranks the action list; see aggregateNetValueAtStake.
+  const productValueAtStake = aggregateNetValueAtStake(live)
 
   return {
     ...inventorySummary,
@@ -598,7 +599,11 @@ function buildDashboardStats({ analyzedProducts, inventorySummary, recommendatio
     negativeStockAlerts: countByType(RECOMMENDATION_TYPES.NEGATIVE_STOCK),
     thinMarginAlerts: countByType(RECOMMENDATION_TYPES.THIN_MARGIN),
     actionableRecommendations: live.length,
-    valueAtStake: round2(valueAtStake),
+    // Renamed from `valueAtStake` (#30): the old name read as unique net
+    // exposure but was a gross per-recommendation sum. This is deduplicated
+    // per-product net exposure. (Computed for the PLAN §5 headline; not yet
+    // rendered — no dashboard label to update.)
+    productValueAtStake: round2(productValueAtStake),
   }
 }
 
