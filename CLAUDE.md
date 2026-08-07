@@ -123,11 +123,11 @@ Each connector implements `{ connect() → {ok, message}, load() → {products, 
 1. `annotateRecommendationsWithExplanations()` in `explanationProvider.js` calls `provider.generateExplanation()` **synchronously**, but `llmExplanationProvider.generateExplanation()` is `async`. The Promise is never awaited, so `result.explanation` is always `undefined` and proxy errors become unhandled rejections. Fixing this means making the function async and moving the recommendations `useMemo` in `App.jsx` to `useEffect` + state.
 2. The Gemini key in `.env` has no prepayment credits (API returns 429).
 
-The proxy itself (`src/api/llm_proxy.py`, Gemini via `/explain` and `/report`) is correct and starts cleanly — verified `/health` returns 200.
+The proxy itself (`src/api/llm_proxy.py`, Gemini via `/explain` and `/report`) has been hardened (B-4): it now starts cleanly **even without a key** (503 instead of crashing at import), caches identical payloads (no re-billing per render), applies an upstream timeout to both endpoints, and reads CORS origins from `LLM_ALLOWED_ORIGINS`. Covered by `tests/test_llm_proxy.py` (6 cases). Both blockers above still stand, plus the proxy still needs to be deployed and `VITE_LLM_PROXY_URL` pointed at it.
 
 ### Persistence
 
-`src/lib/persistence/persistence.js` delegates to `localStorageAdapter`. The design supports swapping in a Supabase adapter without changing callers (see `docs/TECH_PERSISTENCE_AND_SUPABASE.md`).
+`src/lib/persistence/persistence.js` delegates to an adapter chosen at load: **`firestoreAdapter` when the `VITE_FIREBASE_*` config is present, otherwise `localStorageAdapter`** (see `docs/TECH_PERSISTENCE_AND_SUPABASE.md`). The Firestore adapter (B-2) is local-first — reads are served synchronously from a localStorage mirror, writes go through localStorage and mirror to Firestore in the background, and it reconciles both ways (last-write-wins) on load/reconnect. Callers are unchanged. **It is inactive until the Firebase console values are set**, so the default today is still localStorage. The team went with Firestore, not Supabase.
 
 ---
 
@@ -169,6 +169,9 @@ Copy `.env.example` to `.env` before running locally.
 |---|---|---|
 | `VITE_ENABLE_LIVE_MARKET_CONTEXT` | Frontend | Fetch live weather/holidays/news (default `false`) |
 | `VITE_LLM_PROXY_URL` | Frontend | Backend proxy URL for LLM explanations |
+| `VITE_FIREBASE_*` | Frontend | Client Firebase web config (B-2). Set these to activate Firestore persistence; unset ⇒ localStorage only |
+| `VITE_STORE_ID` | Frontend | Firestore store namespace (default `yomyom-kafr-qasim`) |
+| `LLM_ALLOWED_ORIGINS` / `LLM_*` | Python | LLM proxy CORS origins, timeout, and cache settings (B-4) |
 | `FIREBASE_SERVICE_ACCOUNT_PATH` | Python | Firestore credentials file path |
 | `FIREBASE_PROJECT_ID` | Python | Firebase project (`hackathon26-a6ebd`) |
 | `KAGGLE_API_TOKEN` | Python | For downloading Israeli supermarket datasets |
@@ -180,8 +183,8 @@ Copy `.env.example` to `.env` before running locally.
 - Competitor price data on the frontend is **real** — `src/data/marketData.js` is generated from `data/matching/barcode_matches.parquet` (14,406 matched barcodes). `src/data/mockMarketData.js` is now **orphaned**; nothing imports it.
 - **There is no sales data anywhere.** The real POS export is an inventory snapshot with no sales history, so `units_sold_7d`/`units_sold_30d`/`last_sale_date` are null in all 7,674 rows of `yomyom_sales.parquet`, and `salesLast7Days`/`salesLast30Days` are hardcoded to `0` in `normalize-datasets.mjs`. Anything velocity-based (days-until-stockout, top sellers, slow movers) is therefore degenerate.
 - `shelfQuantity` (0), `shelfCapacity` (10), `leadTimeDays` (3), `supplier` ("YomYom"), `returnedUnits`/`damagedUnits` (0) are **hardcoded constants** for every product — the planogram runs on these, not real shelf data.
-- All state is **browser localStorage only** — no backend, no database in production.
-- No test suite exists; ESLint is the only automated check.
+- State defaults to **browser localStorage**, but a **Firestore adapter (B-2) exists behind the persistence interface** and takes over once `VITE_FIREBASE_*` is configured (local-first, with localStorage fallback). No SQL database in production.
+- A test suite now exists: **Vitest** (`npm test` — 117 tests incl. persistence reconcile + telemetry) and **pytest** (`npm run test:py` — LLM proxy). ESLint is still the release gate.
 - The app targets Israeli convenience stores; product data and UI may contain Hebrew text.
 - Use `python3`, not `python` (npm scripts were updated accordingly).
 
@@ -263,7 +266,17 @@ Silver Parquets written:
 The POS export is an inventory snapshot only. Until YomYom provides a sales/transaction export, velocity-based features cannot work. Two options: obtain a real sales export, or reframe recommendations around what does exist — stock levels, margin, and competitor price gaps (the genuinely strong signal, backed by 14,406 barcode matches).
 
 #### 🔴 2. LLM explanations blocked
-See the AI explanations section above — an async/sync bug in `explanationProvider.js` plus a Gemini key with no credits. `VITE_LLM_PROXY_URL` is commented out in `.env` so the app stays on the working mock provider.
+See the AI explanations section above — an async/sync bug in `explanationProvider.js` (Track C) plus a Gemini key with no credits. The **proxy has been hardened** (caching, timeouts, CORS, graceful startup — B-4), but `VITE_LLM_PROXY_URL` stays commented out until the key is funded, the proxy is deployed, and the Track-C async fix lands, so the app stays on the working mock provider.
+
+### Track B (deployment / persistence / telemetry) — status
+
+- ✅ **B-3 pilot telemetry** — read-only dashboard at `/telemetry.html` (second Vite entry), `src/telemetry/`. Alerts shown vs acted-on, acceptance by type, ₪ impact, dismissal-reason breakdown. Verified.
+- ✅ **B-6 snapshot durability** — `.gitignore` exception commits `data/internal/snapshots/**` (the only velocity source). See `docs/SNAPSHOT_DURABILITY.md`.
+- ✅ **B-5 env hygiene** — `.env.example` geo corrected to Kafr Qasim (32.114/34.972).
+- ⏸ **B-2 persistence** — Firestore adapter written; needs Firebase console activation.
+- ⏸ **B-1 deploy** — Vercel config committed; live deploy on a teammate's account.
+
+See `nagham.md` for the full per-task status.
 
 #### 🟡 3. Shelf data is synthetic
 `shelfQuantity`/`shelfCapacity`/`leadTimeDays`/`supplier` are hardcoded constants, so the planogram is not driven by real shelf measurements.

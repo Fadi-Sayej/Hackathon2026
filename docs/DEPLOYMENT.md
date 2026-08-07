@@ -26,6 +26,8 @@ Set these in Vercel before any preview or production deployment:
 | `BASIC_AUTH_USER` | Preview and Production | Login username for the pilot URL. |
 | `BASIC_AUTH_PASSWORD` | Preview and Production | Login password for the pilot URL. |
 | `VITE_LLM_PROXY_URL` | Optional | HTTPS URL for the deployed LLM proxy. Leave unset to use rule-based explanations. |
+| `VITE_FIREBASE_*` | Optional (B-2) | Client Firebase web config to activate Firestore persistence + cross-device telemetry. Unset ⇒ localStorage only. Also enable Anonymous sign-in and deploy `firestore.rules` (`firebase deploy --only firestore:rules`). |
+| `VITE_STORE_ID` | Optional (B-2) | Firestore store namespace (default `yomyom-kafr-qasim`). |
 
 The middleware fails closed: if either Basic Auth variable is absent, every request returns HTTP 503
 instead of serving store data publicly.
@@ -92,6 +94,15 @@ After deployment:
 - Phone QA passes on a real phone.
 - Tablet QA passes on a real tablet.
 - Rollback is tested with `vercel rollback <deployment-url-or-id>`.
+
+## Internal telemetry page (B-3)
+
+The build emits a second entry, `telemetry.html`, from the same `vite build` (multi-page input in
+`vite.config.js`). It is served at **`/telemetry.html`** on the same deployment, behind the same
+Basic Auth gate — Vercel serves the built file directly (the filesystem is checked before the SPA
+rewrite), so no `vercel.json` rewrite change is needed. It is the internal read-only pilot
+dashboard (alerts shown vs acted-on, acceptance by type, ₪ impact). It reads decisions from
+Firestore when `VITE_FIREBASE_*` is set, otherwise from that device's localStorage.
 
 ## Custom Domain
 
