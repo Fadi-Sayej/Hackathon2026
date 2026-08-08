@@ -51,7 +51,16 @@ dist-ssr
 *.sw?
 
 # Firebase configuration
-src/firebase.js
+#
+# src/firebase.js was ignored from the first commit, back when it hardcoded the
+# project's web API key. It is now a required source module — persistence.js,
+# firestoreAdapter.js and the telemetry dashboard all import from it, and the
+# build fails with MISSING_EXPORT without it — and it reads every value from
+# VITE_FIREBASE_* instead of embedding anything. So it must be tracked.
+#
+# This rule is why the file kept "failing to commit": `git add src/firebase.js`
+# was silently refused, and only the build on a clean clone revealed it.
+# Do not re-add it. Secrets belong in .env, which is still ignored below.
 .vercel
 
 # Secrets (Firebase service-account JSON, .env)
@@ -70,3 +79,15 @@ data/exports/
 data/matching/
 data/recommendations/
 reports/
+.env*
+
+# ── B-6: POS snapshot durability (nagham.md B-6) ─────────────────────────────
+# Snapshots — data/internal/snapshots/<ts>/{products,inventory}.parquet + meta.json
+# — are the ONLY source of sales velocity: it is reconstructed from stock deltas
+# between them (the POS export has no sales history). They must be a continuous,
+# durable series, not live on one laptop and die with a reformat. They are tiny
+# (~KB each), so we commit them to git. These negations must stay at the END of
+# the file so they win over `data/internal/snapshots/` (above) and `*.parquet`.
+# NOTE: this puts a real store's inventory data in git — keep the repo PRIVATE.
+!data/internal/snapshots/
+!data/internal/snapshots/**

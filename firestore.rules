@@ -1,0 +1,45 @@
+rules_version = '2';
+
+// SmartShelf pilot Firestore rules.
+//
+// The app sits behind the Vercel Basic Auth gate, but Firestore is reachable
+// directly over the internet, so these rules — not the gate — are the only thing
+// standing in front of the store's data.
+//
+// ⚠️ BE CLEAR ABOUT WHAT THIS DOES AND DOES NOT BUY.
+//
+// Pilot posture: a single store, clients sign in anonymously (src/firebase.js →
+// ensureAnonymousAuth). `request.auth != null` therefore blocks unauthenticated
+// scrapers and nothing more: anonymous sign-in is open by design, and the web
+// API key ships in the client bundle, so anyone who loads the app — or reads the
+// bundle — can mint a token and then read and write the whole /stores subtree.
+// That subtree holds a real business's cost prices, margins and decisions.
+//
+// We accept that for a short single-store pilot on an unadvertised URL. It is a
+// deliberate trade, not a safe default, and it MUST be revisited before the
+// pilot is extended, a second store is added, or the URL is shared more widely.
+//
+// To actually harden it: turn on App Check (blocks tokens not issued to our own
+// app), pin the storeId below instead of matching a wildcard, and move to real
+// per-user accounts so `request.auth.uid` means something.
+//
+// SETUP: enable Anonymous sign-in in the Firebase console
+//   Authentication → Sign-in method → Anonymous → Enable
+// and deploy these rules:
+//   firebase deploy --only firestore:rules
+//
+// Before multi-store or wider exposure, tighten this: pin to specific store
+// ids, add per-user ownership, and turn on App Check.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /stores/{storeId}/{document=**} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

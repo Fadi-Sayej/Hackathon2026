@@ -1,41 +1,137 @@
 """
-LLM proxy — receives explanation payloads from the frontend,
-calls Gemini, returns structured explanation fields.
+LLM proxy — receives explanation payloads from the frontend, calls Gemini, and
+returns structured explanation fields.
 
 Run:  uvicorn src.api.llm_proxy:app --port 8000 --reload
-Requires: VITE_GEMINI_API_KEY env var (or GEMINI_API_KEY as fallback)
-      pip install fastapi uvicorn google-generativeai
+      pip install fastapi uvicorn google-generativeai python-dotenv
+
+Design notes (nagham.md B-4):
+  • Graceful startup. The module imports even when VITE_GEMINI_API_KEY is unset
+    or the google-generativeai SDK is absent — it no longer raises at import, so
+    /health works for deploy checks and the app is testable without the SDK. When
+    the key is missing, /explain and /report return 503 rather than 500.
+  • Caching. Identical payloads are served from an in-memory TTL/LRU cache, so a
+    deployed frontend that re-renders the same product does not re-bill Gemini on
+    every render. (In-memory ⇒ per warm process; good enough to stop render-loop
+    billing. Swap in a shared cache if the proxy ever scales to many instances.)
+  • Timeouts on BOTH endpoints, and CORS origins read from LLM_ALLOWED_ORIGINS so
+    a deploy can point it off localhost.
+
+Still blocked before this can serve real explanations: the Gemini key needs
+prepayment credits (429), and the frontend async bug in explanationProvider.js
+is Anas's (Track C) — coordinate, don't both fix it. VITE_LLM_PROXY_URL stays
+commented out until both are resolved.
 """
 import os
 import json
+import time
 import asyncio
+import hashlib
 import textwrap
+from collections import OrderedDict
+
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-import google.generativeai as genai
-from google.api_core.exceptions import TooManyRequests
+
+# google-api-core ships with google-generativeai. Guard the import so the module
+# still loads (and stays testable) in an environment where it is not installed;
+# the fallback class simply never matches a real rate-limit error.
+try:
+    from google.api_core.exceptions import TooManyRequests
+except Exception:  # pragma: no cover - only hit without the SDK installed
+    class TooManyRequests(Exception):
+        """Fallback so `except TooManyRequests` is always valid."""
 
 load_dotenv()
 
 GEMINI_API_KEY = os.environ.get("VITE_GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY")
-if not GEMINI_API_KEY:
-    raise RuntimeError("VITE_GEMINI_API_KEY (or GEMINI_API_KEY) is not set in the environment.")
-
-genai.configure(api_key=GEMINI_API_KEY)
 GEMINI_MODEL = (
     os.environ.get("VITE_GEMINI_MODEL")
     or os.environ.get("GEMINI_MODEL")
     or "gemini-2.0-flash"
 )
-model = genai.GenerativeModel(GEMINI_MODEL)
 UPSTREAM_TIMEOUT_SECONDS = float(os.environ.get("LLM_UPSTREAM_TIMEOUT_SECONDS", "3"))
+
+# Module-level handle. Left as None and built lazily so importing this module
+# never requires the SDK or a key; tests also override it directly.
+model = None
+
+
+def _import_genai():
+    """Import google-generativeai lazily; return None if unavailable."""
+    try:
+        import google.generativeai as genai
+
+        return genai
+    except Exception:
+        return None
+
+
+def _ensure_model():
+    """
+    Return a usable model, or None when the LLM is not configured.
+
+    Prefers an already-set module-level `model` (production after first use, and
+    the object tests inject), then falls back to building one from the API key.
+    """
+    global model
+    if model is not None:
+        return model
+    if not GEMINI_API_KEY:
+        return None
+    genai = _import_genai()
+    if genai is None:
+        return None
+    genai.configure(api_key=GEMINI_API_KEY)
+    model = genai.GenerativeModel(GEMINI_MODEL)
+    return model
+
+
+# ── Response cache (TTL + LRU) ───────────────────────────────────────────────
+
+CACHE_TTL_SECONDS = float(os.environ.get("LLM_CACHE_TTL_SECONDS", "3600"))
+CACHE_MAX_ENTRIES = int(os.environ.get("LLM_CACHE_MAX_ENTRIES", "500"))
+_cache = OrderedDict()
+
+
+def _cache_key(kind, payload):
+    blob = json.dumps(payload, sort_keys=True, ensure_ascii=False)
+    return f"{kind}:{hashlib.sha256(blob.encode('utf-8')).hexdigest()}"
+
+
+def _cache_get(key):
+    item = _cache.get(key)
+    if item is None:
+        return None
+    stored_at, value = item
+    if CACHE_TTL_SECONDS > 0 and (time.time() - stored_at) > CACHE_TTL_SECONDS:
+        _cache.pop(key, None)
+        return None
+    _cache.move_to_end(key)
+    return value
+
+
+def _cache_set(key, value):
+    _cache[key] = (time.time(), value)
+    _cache.move_to_end(key)
+    while len(_cache) > CACHE_MAX_ENTRIES:
+        _cache.popitem(last=False)
+
+
+# ── App ──────────────────────────────────────────────────────────────────────
+
+
+def _allowed_origins():
+    raw = os.environ.get("LLM_ALLOWED_ORIGINS", "http://localhost:5173")
+    return [origin.strip() for origin in raw.split(",") if origin.strip()]
+
 
 app = FastAPI(title="SmartShelf LLM Proxy")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=_allowed_origins(),
     allow_methods=["POST", "GET"],
     allow_headers=["*"],
 )
@@ -55,26 +151,41 @@ SYSTEM_PROMPT = textwrap.dedent("""\
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    # Reports readiness without leaking the key, so ops can see whether the proxy
+    # will actually serve explanations or fall back to the frontend's mock.
+    return {"status": "ok", "llm_configured": bool(GEMINI_API_KEY)}
+
+
+def _strip_code_fence(text):
+    text = text.strip()
+    if text.startswith("```"):
+        text = text.split("```")[1]
+        if text.startswith("json"):
+            text = text[4:]
+    return text.strip()
 
 
 @app.post("/explain")
 async def explain(payload: dict):
+    key = _cache_key("explain", payload)
+    cached = _cache_get(key)
+    if cached is not None:
+        return cached
+
+    active_model = _ensure_model()
+    if active_model is None:
+        raise HTTPException(status_code=503, detail="LLM not configured (no API key)")
+
     prompt = SYSTEM_PROMPT + "\n\nPayload:\n" + json.dumps(payload, ensure_ascii=False, indent=2)
     try:
         response = await asyncio.wait_for(
-            model.generate_content_async(
+            active_model.generate_content_async(
                 prompt,
                 request_options={"timeout": UPSTREAM_TIMEOUT_SECONDS},
             ),
             timeout=UPSTREAM_TIMEOUT_SECONDS,
         )
-        text = response.text.strip()
-        if text.startswith("```"):
-            text = text.split("```")[1]
-            if text.startswith("json"):
-                text = text[4:]
-        result = json.loads(text)
+        result = json.loads(_strip_code_fence(response.text))
     except asyncio.TimeoutError as exc:
         raise HTTPException(status_code=504, detail="Gemini request timed out") from exc
     except TooManyRequests as exc:
@@ -95,6 +206,7 @@ async def explain(payload: dict):
     if missing:
         raise HTTPException(status_code=502, detail=f"Gemini response missing fields: {missing}")
 
+    _cache_set(key, result)
     return result
 
 
@@ -117,10 +229,32 @@ REPORT_SYSTEM_PROMPT = textwrap.dedent("""\
 
 @app.post("/report")
 def generate_report(payload: dict):
+    key = _cache_key("report", payload)
+    cached = _cache_get(key)
+    if cached is not None:
+        return cached
+
+    active_model = _ensure_model()
+    if active_model is None:
+        raise HTTPException(status_code=503, detail="LLM not configured (no API key)")
+
+    prompt = REPORT_SYSTEM_PROMPT + "\n\nStore data summary:\n" + json.dumps(
+        payload, ensure_ascii=False, indent=2
+    )
     try:
-        prompt = REPORT_SYSTEM_PROMPT + "\n\nStore data summary:\n" + json.dumps(payload, ensure_ascii=False, indent=2)
-        response = model.generate_content(prompt)
-        text = response.text.strip()
-        return {"report": text}
+        response = active_model.generate_content(
+            prompt,
+            request_options={"timeout": UPSTREAM_TIMEOUT_SECONDS},
+        )
+        result = {"report": response.text.strip()}
+    except TooManyRequests as exc:
+        retry_after = _retry_after(exc)
+        headers = {"Retry-After": retry_after} if retry_after else None
+        raise HTTPException(
+            status_code=429, detail="Gemini rate limit exceeded", headers=headers
+        ) from exc
     except Exception as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    _cache_set(key, result)
+    return result

@@ -2,6 +2,14 @@
 
 Sprint C6 makes real AI explanations pluggable later while keeping mock explanations stable today.
 
+> **Update (2026-08-07, B-4): the backend proxy is now implemented** at `src/api/llm_proxy.py`
+> (`/explain`, `/report`, `/health`), hardened with an in-memory TTL/LRU cache (no re-billing per
+> render), an upstream timeout on both endpoints, CORS origins from `LLM_ALLOWED_ORIGINS`, and
+> graceful startup without a key (503, not a crash). Tests: `tests/test_llm_proxy.py` (6 cases).
+> The **frontend LLM path is still disabled**, gated on three things: the Gemini key needs credits
+> (429), the proxy must be deployed and `VITE_LLM_PROXY_URL` set, and the async bug in
+> `explanationProvider.js` (Track C) must be fixed. Mock explanations remain the default.
+
 ## Current Default
 
 The app uses:
@@ -100,6 +108,6 @@ The provider expects:
 
 - No Gemini wiring.
 - No paid APIs.
-- No backend proxy implementation.
+- ~~No backend proxy implementation.~~ **Superseded by B-4 — the proxy now exists (see the update note at the top); it is deployed/wired separately and still gated on the Gemini key + the Track-C async fix.**
 - No vector retrieval execution.
 - No prompt UI.
