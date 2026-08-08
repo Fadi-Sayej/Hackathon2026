@@ -7,8 +7,31 @@ import importlib
 import sys
 from types import SimpleNamespace
 
+import dotenv
+import pytest
 from fastapi.testclient import TestClient
 from google.api_core.exceptions import TooManyRequests
+
+
+@pytest.fixture(autouse=True)
+def _isolate_dotenv(monkeypatch):
+    """Stop the developer's real .env leaking into these tests.
+
+    `llm_proxy` calls `load_dotenv()` at import time, which reads `.env` off disk
+    and repopulates VITE_GEMINI_API_KEY *after* monkeypatch has cleared it. That
+    made the "no key" tests import a fully configured proxy, so the one asserting
+    a 503 instead issued a live Gemini request and got a 429 — a unit test making
+    a real, billable API call, and green only on machines with no `.env`.
+
+    It also silently defeated `_load_proxy`: the proxy prefers VITE_GEMINI_API_KEY
+    over GEMINI_API_KEY, so the real key outranked the test placeholder.
+
+    Autouse, so every test in this module gets a clean environment regardless of
+    which loader it picks.
+    """
+    monkeypatch.setattr(dotenv, "load_dotenv", lambda *args, **kwargs: False)
+    monkeypatch.delenv("VITE_GEMINI_API_KEY", raising=False)
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
 
 
 def _load_proxy(monkeypatch):

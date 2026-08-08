@@ -51,7 +51,16 @@ dist-ssr
 *.sw?
 
 # Firebase configuration
-src/firebase.js
+#
+# src/firebase.js was ignored from the first commit, back when it hardcoded the
+# project's web API key. It is now a required source module — persistence.js,
+# firestoreAdapter.js and the telemetry dashboard all import from it, and the
+# build fails with MISSING_EXPORT without it — and it reads every value from
+# VITE_FIREBASE_* instead of embedding anything. So it must be tracked.
+#
+# This rule is why the file kept "failing to commit": `git add src/firebase.js`
+# was silently refused, and only the build on a clean clone revealed it.
+# Do not re-add it. Secrets belong in .env, which is still ignored below.
 .vercel
 
 # Secrets (Firebase service-account JSON, .env)
