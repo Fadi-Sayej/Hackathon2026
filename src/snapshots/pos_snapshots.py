@@ -54,12 +54,61 @@ def _num(value: Any) -> float | None:
     return None
 
 
-def archive_current_silver(imported_at: str | None = None) -> Path | None:
-    """Copy the current silver products + inventory tables into a new snapshot dir."""
+def _latest_import_id() -> str | None:
+    """Which import the most recent snapshot came from, or None."""
+    from src.snapshots.velocity import list_usable_snapshots, snapshot_import_id
+
+    snapshots = list_usable_snapshots()
+    if not snapshots:
+        return None
+    return snapshot_import_id(snapshots[-1][1])
+
+
+def _current_import_id() -> str | None:
+    """Import identity of the LIVE silver tables.
+
+    Deliberately not snapshot_import_id(): inside a snapshot the files are named
+    products/inventory.parquet, but in the silver root they are yomyom_*.parquet,
+    so that helper finds nothing and returns None — which silently disabled the
+    duplicate check and let another full copy be archived every run.
+    """
+    for name in ("yomyom_products.parquet", "yomyom_inventory.parquet"):
+        path = SILVER_POS_ROOT / name
+        if not path.exists():
+            continue
+        try:
+            schema = pq.read_schema(path)
+            wanted = [c for c in ("_source_file", "_imported_at") if c in schema.names]
+            if not wanted:
+                continue
+            rows = pq.read_table(path, columns=wanted).to_pylist()
+        except Exception:
+            continue
+        if rows:
+            return "%s@%s" % (rows[0].get("_source_file"), rows[0].get("_imported_at"))
+    return None
+
+
+def archive_current_silver(imported_at: str | None = None, force: bool = False) -> Path | None:
+    """Copy the current silver products + inventory tables into a new snapshot dir.
+
+    Skips when the silver tables come from the SAME import as the last snapshot.
+    pilot_daily.sh runs this every time, so without the check a re-run with no new
+    POS export produces another full copy of identical data: pure repo weight that
+    can never yield velocity, because velocity.py rejects same-import pairs anyway.
+    (This is exactly how 8 snapshots accumulated from a single import.)
+
+    Pass force=True to archive regardless.
+    """
     products = SILVER_POS_ROOT / "yomyom_products.parquet"
     inventory = SILVER_POS_ROOT / "yomyom_inventory.parquet"
     if not products.exists():
         return None
+
+    if not force:
+        current = _current_import_id()
+        if current is not None and current == _latest_import_id():
+            return None
 
     ts = _now().strftime("%Y%m%dT%H%M%SZ")
     dest = SNAPSHOTS_ROOT / ts

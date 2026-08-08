@@ -34,7 +34,15 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    match /stores/{storeId}/{document=**} {
+    // Pinned to the one pilot store rather than matching any {storeId}. An
+    // anonymous token is trivial to obtain, so the wildcard let anyone create and
+    // write arbitrary store subtrees inside our project. Pinning does not stop a
+    // determined reader of this store's data — only App Check does that — but it
+    // caps the blast radius at the single store we already accepted exposing.
+    //
+    // Must match VITE_STORE_ID (src/firebase.js → STORE_ID). If you change one,
+    // change the other, or every write starts failing with permission-denied.
+    match /stores/yomyom-kafr-qasim/{document=**} {
       allow read, write: if request.auth != null;
     }
 

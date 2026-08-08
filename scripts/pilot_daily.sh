@@ -76,7 +76,7 @@ sys.path.insert(0, ".")
 from src.snapshots.pos_snapshots import archive_current_silver
 from datetime import datetime, timezone
 dest = archive_current_silver(imported_at=datetime.now(timezone.utc).isoformat())
-print("  snapshot: %s" % (dest.name if dest else "SKIPPED (no silver products table)"))
+print("  snapshot: %s" % (dest.name if dest else "skipped — no new POS export since the last one"))
 PY
 
 # ---------------------------------------------------------------- 4. velocity
