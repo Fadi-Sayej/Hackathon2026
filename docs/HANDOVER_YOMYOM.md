@@ -2,6 +2,10 @@
 
 **Owner:** Malik (task D-5) · Give this to the manager at the training visit.
 
+> 🇸🇦 **Hand over `HANDOVER_YOMYOM_AR.md`, not this file.** Arabic is the language the
+> manager actually uses with us — every WhatsApp exchange has been in Arabic. This English
+> version is the source text; keep the two in sync when either changes.
+
 Three short documents. Print pages 1 and 2; page 3 is for us to read aloud, not to hand over
 silently.
 

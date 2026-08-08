@@ -396,7 +396,7 @@ def apply_to_sales_table(
             row["observed_days"] = None
             row["max_gap_days"] = None
             row["velocity_confidence"] = CONFIDENCE_NONE
-            row["velocity_source"] = "snapshot_delta"
+            row["velocity_source"] = SNAPSHOT_SOURCE
             continue
 
         matched += 1
@@ -408,7 +408,7 @@ def apply_to_sales_table(
         row["observed_days"] = entry.get("observed_days")
         row["max_gap_days"] = entry.get("max_gap_days")
         row["velocity_confidence"] = entry.get("velocity_confidence")
-        row["velocity_source"] = "snapshot_delta"
+        row["velocity_source"] = SNAPSHOT_SOURCE
 
         price = prices.get(barcode)
         row["sales_amount_30d"] = round(units_30 * price, 2) if (price is not None and units_30) else None
@@ -438,8 +438,71 @@ def apply_to_sales_table(
     return {"rows": len(rows), "matched": matched, "unmatched": len(rows) - matched}
 
 
+SNAPSHOT_SOURCE = "snapshot_delta"
+POS_EXPORT_SOURCE = "pos_export"
+
+
+def has_real_sales(sales_path: Optional[Path] = None) -> bool:
+    """Does the sales table already hold sales the POS actually reported?
+
+    The snapshot proxy is a fallback for having no sales data. Real sales beat it
+    on every axis, so the proxy must never overwrite them — and it would: this
+    module rewrites the whole table, so importing YomYom's sales report and then
+    running the daily pipeline would replace measured sales with nulls, silently,
+    the same day we finally got the data. (A-3.)
+
+    Detection: every row this module writes is stamped with velocity_source. Rows
+    carrying units without that stamp therefore came from the importer, i.e. from
+    the POS export itself.
+    """
+    sales_path = sales_path or (SILVER_POS_ROOT / "yomyom_sales.parquet")
+    if not sales_path.exists():
+        return False
+
+    try:
+        schema = pq.read_schema(sales_path)
+    except Exception:
+        return False
+    if "units_sold_30d" not in schema.names:
+        return False
+
+    columns = ["units_sold_30d"]
+    has_source = "velocity_source" in schema.names
+    if has_source:
+        columns.append("velocity_source")
+
+    try:
+        rows = pq.read_table(sales_path, columns=columns).to_pylist()
+    except Exception:
+        return False
+
+    for row in rows:
+        if row.get("units_sold_30d") is None:
+            continue
+        source = row.get("velocity_source") if has_source else None
+        if source != SNAPSHOT_SOURCE:
+            return True
+    return False
+
+
 def build_velocity(as_of: Optional[datetime] = None, write: bool = True) -> Dict[str, Any]:
     """Full pipeline: snapshots -> intervals -> velocity -> sales table."""
+    if has_real_sales():
+        return {
+            "snapshots_found": len(list_usable_snapshots()),
+            "snapshot_range": None,
+            "usable_intervals": 0,
+            "products_with_velocity": 0,
+            "confidence_breakdown": {},
+            "written": False,
+            "skipped_reason": "real_sales_present",
+            "warnings": [
+                "The sales table already holds sales reported by the POS. The snapshot "
+                "proxy is a substitute for exactly that, so it was NOT run — overwriting "
+                "measured sales with an estimate would be a straight downgrade."
+            ],
+        }
+
     snapshots = list_usable_snapshots()
     result: Dict[str, Any] = {
         "snapshots_found": len(snapshots),

@@ -55,7 +55,23 @@ real answers and the date received), and **Fadi is told directly** — they are 
 If the answer to #2 is "no, only weekly", say so immediately and loudly. It does not stop the pilot,
 but Fadi must widen the confidence bands and we must lower what we promise the customer.
 
-### D-0b (P0 — DAY 1) — Co-sign the UI data contract
+### D-0b — ✅ SIGNED OFF (2026-08-08)
+
+Reviewed `docs/UI_DATA_CONTRACT.md` against the running code rather than by reading.
+Two findings:
+
+- **§9.5 resolved.** The two ranking models were not merely a future merge risk — they
+  disagreed in production. `reorderEngine` flagged **63** below-cost products using a bare
+  `price < cost`, while the Prices screen showed **37**, because only the latter applied the
+  case-vs-unit credibility guard. 26 of those 63 were artifacts: a paper bag selling at
+  ₪0.47 with a ₪200 "cost" (425x), and a deliberately free ₪0.01 coffee. `reorderEngine`
+  now imports the shared `credibleLoss()`; all three screens report 37. Locked by 3
+  regression tests.
+- **Doc fix needed (not blocking):** the contract lists `PriceGapPage` props as
+  `priceLeaderProducts / priceProtectionAlerts / stockoutOpportunities`; it actually takes
+  `products`. Works only because `pageProps` is spread. Anas to correct.
+
+### D-0b (original brief) — Co-sign the UI data contract
 
 Anas is drafting `docs/UI_DATA_CONTRACT.md` — the exact prop shape `App.jsx` passes into your
 pages. **Review and agree it before you write a single component.** This is the only real coupling
@@ -167,7 +183,13 @@ A one-page, printable/shareable summary: today's actions, what was done yesterda
 `@media print` rules already exist in `App.css`. Many small-shop owners want paper or a WhatsApp
 screenshot, not a login.
 
-### D-5 (P0) — Handover package
+### D-5 — ✅ DONE (2026-08-08)
+
+`docs/HANDOVER_YOMYOM_AR.md` is the version that actually gets handed over — Arabic,
+because every WhatsApp exchange with the manager has been in Arabic. The English file
+is now marked as the source text and cross-links to it. Keep the two in sync.
+
+### D-5 (original brief) — Handover package
 
 We are handing this to a real business. Written in **Hebrew or Arabic**, not English:
 

@@ -262,3 +262,50 @@ describe('net value-at-stake aggregation semantics (#30)', () => {
     expect(aggregateNetValueAtStake(recommendations)).toBe(maxFor('loss') + maxFor('overpriced'))
   })
 })
+
+describe('BELOW_COST uses the shared credibility guard (UI_DATA_CONTRACT §9.5)', () => {
+  it('flags a genuine below-cost sale', () => {
+    const recs = generateReorderRecommendations(
+      [product({ id: 'sku-real-loss', price: 24.9, cost: 30 })],
+      { currentDate: CURRENT_DATE },
+    )
+    expect(recs.map((r) => r.type)).toContain(RECOMMENDATION_TYPES.BELOW_COST)
+  })
+
+  it('does NOT flag a case price recorded against a unit price', () => {
+    // Real rows from the YomYom catalog: a paper bag at ₪0.47 with a ₪200 "cost"
+    // is a case price, not a ₪199.53 loss on every bag. A bare price < cost
+    // comparison reported 63 below-cost products while the Prices screen showed
+    // 37 — two screens contradicting each other about the same shop.
+    const artifacts = [
+      product({ id: 'sku-case-price', price: 0.47, cost: 200 }),
+      product({ id: 'sku-free-promo', price: 0.01, cost: 2.28 }),
+      product({ id: 'sku-pack-of-4', price: 1.9, cost: 7.6 }),
+    ]
+    for (const item of artifacts) {
+      const recs = generateReorderRecommendations([item], { currentDate: CURRENT_DATE })
+      expect(recs.map((r) => r.type)).not.toContain(RECOMMENDATION_TYPES.BELOW_COST)
+    }
+  })
+
+  it('agrees with credibleLoss on every product, so screens cannot diverge', async () => {
+    const { credibleLoss } = await import('../actionPriority.js')
+    const catalog = [
+      product({ id: 'a', price: 24.9, cost: 30 }),
+      product({ id: 'b', price: 0.47, cost: 200 }),
+      product({ id: 'c', price: 10, cost: 8 }),
+      product({ id: 'd', price: 10, cost: 20 }),
+      product({ id: 'e', price: 10, cost: 20.1 }),
+    ]
+    const flagged = generateReorderRecommendations(catalog, { currentDate: CURRENT_DATE })
+      .filter((r) => r.type === RECOMMENDATION_TYPES.BELOW_COST)
+      .map((r) => r.productId)
+      .sort()
+    const expected = catalog
+      .filter((p) => credibleLoss(p.price, p.cost) !== null)
+      .map((p) => p.id)
+      .sort()
+
+    expect(flagged).toEqual(expected)
+  })
+})

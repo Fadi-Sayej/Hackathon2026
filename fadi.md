@@ -40,8 +40,8 @@ day-over-day stock deltas.
 | A-1 velocity engine | ✅ done, 22 tests passing | `src/snapshots/velocity.py`, `scripts/build_velocity_from_snapshots.py` |
 | A-2 daily routine | ✅ done, runs clean | `scripts/pilot_daily.sh` (`npm run pilot:daily`) |
 | A-4 quality gate | ✅ done, blocks bad imports | `scripts/check_import_quality.py` (`npm run data:quality`) |
-| A-0 chase Malik | ⬜ open — needs the YomYom answers |
-| A-3 sales adapter | ⬜ open — only if YomYom has a sales export |
+| A-0 chase Malik | 🟡 answered — sales report confirmed to exist, not yet sent |
+| A-3 sales adapter | ✅ **done** — on-ramp built, waiting only on the file |
 | A-5 competitor data | ✅ done — rebuilt, dated, de-staled |
 
 **A-5 outcome.** Wolt collector re-ran successfully (285 fresh observations today). The Alonit FTP
@@ -150,7 +150,24 @@ change your work:
 against irregular intervals from day one. But ask Malik on day 1 whether the message went out,
 and check back until the answers are recorded in `PLAN.md` §7.
 
-### A-3 (P1) — Real sales export adapter
+### A-3 — ✅ DONE (2026-08-08)
+
+Two pieces, both testable without the file:
+
+**`scripts/detect_sales_columns.py`** — run it the moment YomYom sends anything.
+Exit 0 = usable sales columns, the importer will pick them up. Exit 2 = sales-like
+columns present but unmapped, and it prints the exact YAML to paste (a config change,
+not a rewrite — which is what A-3 asked for). Exit 1 = no sales in this file, ask again.
+Handles semicolon CSVs and rejects Excel with an instruction.
+
+**A guard against destroying the data on arrival.** `velocity.py` rewrites the whole
+sales table, so the first `pilot_daily` run after importing a real sales report would
+have replaced measured units with nulls — silently, on the day the data finally showed
+up. `has_real_sales()` now detects sales that came from the POS (rows carrying units
+without our `velocity_source` stamp) and `build_velocity()` stands down rather than
+overwrite them. 13 pytest cases in `tests/test_sales_adapter.py`.
+
+### A-3 (original brief) — Real sales export adapter
 
 If YomYom *can* provide a transaction export, it beats the proxy. Build the on-ramp now so adopting
 it is a config change, not a rewrite: `scripts/inspect_yomyom_pos_file.py` should detect sales

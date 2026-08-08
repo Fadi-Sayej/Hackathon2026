@@ -13,6 +13,7 @@ import {
   RECOMMENDATION_TYPES,
   RECOMMENDATION_TYPE_METADATA,
 } from './recommendationTypes.js'
+import { credibleLoss } from './actionPriority.js'
 
 const FAST_MOVER_THRESHOLD = 5
 const SLOW_MOVER_SALES_30D = 5
@@ -166,7 +167,15 @@ function buildRecommendationCandidates(product, metrics, marketContext) {
     )
   }
 
-  if (product.price < product.cost) {
+  // Uses the SHARED credibility guard, not a bare price < cost. A cost recorded
+  // per case against a price recorded per unit is indistinguishable from a
+  // catastrophic loss: this catalog has a paper bag selling at ₪0.47 with a
+  // "cost" of ₪200 (425x), and a deliberately free ₪0.01 coffee. A bare
+  // comparison flagged 63 products, 26 of them artifacts, while the Prices screen
+  // — which does guard — showed 37. Two screens contradicting each other about
+  // the same shop on the same day costs more trust than either number is worth.
+  // See UI_DATA_CONTRACT §9.5.
+  if (credibleLoss(product.price, product.cost) !== null) {
     recommendations.push(
       makeRecommendation(product, metrics, marketContext, {
         type: RECOMMENDATION_TYPES.BELOW_COST,
