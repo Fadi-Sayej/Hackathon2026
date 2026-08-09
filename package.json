@@ -13,6 +13,8 @@
     "collect:alonit-signals": "python3 scripts/run_alonit_signal_pipeline.py",
     "normalize:data": "node scripts/normalize-datasets.mjs",
     "data:dashboard": "python3 scripts/export_dashboard_data.py",
+    "check:firebase": "node scripts/check_firebase_config.mjs",
+    "preflight": "bash scripts/preflight_deploy.sh",
     "data:velocity": "python3 scripts/build_velocity_from_snapshots.py",
     "data:quality": "python3 scripts/check_import_quality.py",
     "pilot:daily": "bash scripts/pilot_daily.sh",
