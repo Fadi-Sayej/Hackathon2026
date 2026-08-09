@@ -10,7 +10,11 @@ This is the B-1 deployment runbook for the current Vite app.
 - Install command: `npm ci`.
 - Output directory: `dist`.
 - Access protection: Vercel Routing Middleware with HTTP Basic Auth.
-- Production deploy command: `vercel deploy --prod`.
+- Production deploy command: `npx vercel deploy --prod`.
+- **Use `npx`, not a global install.** `npm i -g vercel` fails on macOS with
+  `EACCES: permission denied, mkdir '/usr/local/lib/node_modules/vercel'`, and
+  `sudo npm i -g` is not the fix — it leaves root-owned files in a system
+  directory and causes worse problems later. `npx vercel` needs no install.
 - Rollback command: `vercel rollback <deployment-url-or-id>`.
 
 Vercel was chosen because this repository is a static Vite app, the Vercel CLI is already available

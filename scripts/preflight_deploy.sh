@@ -112,17 +112,20 @@ else
 
   Next (needs YOUR Vercel account — nobody else can do these):
 
-    npm i -g vercel && vercel login
-    vercel link                       # connect this repo to a Vercel project
+    # Use npx. `npm i -g vercel` fails on macOS with EACCES because /usr/local
+    # is not user-writable, and `sudo npm i -g` is not the fix — it just puts
+    # root-owned files in a system directory. npx needs no install at all.
+    npx vercel login
+    npx vercel link                   # connect this repo to a Vercel project
 
     # Set on BOTH Production and Preview. Setting only Production makes every
     # preview deploy serve the "not configured" 503 and look like a broken build.
-    vercel env add BASIC_AUTH_USER production
-    vercel env add BASIC_AUTH_USER preview
-    vercel env add BASIC_AUTH_PASSWORD production
-    vercel env add BASIC_AUTH_PASSWORD preview
+    npx vercel env add BASIC_AUTH_USER production
+    npx vercel env add BASIC_AUTH_USER preview
+    npx vercel env add BASIC_AUTH_PASSWORD production
+    npx vercel env add BASIC_AUTH_PASSWORD preview
 
-    vercel deploy --prod
+    npx vercel deploy --prod
 
   Then check, in this order:
     1. open the URL in a private window  → must ask for username/password
