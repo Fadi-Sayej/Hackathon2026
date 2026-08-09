@@ -35,6 +35,8 @@ function whatToDo(action) {
       return 'Decide which price is correct and align the other one.'
     case 'PROMOTE_EXPIRING_PRODUCT':
       return 'Discount it, move it to the front, or pull it.'
+    case 'CHECK_STOCK_DISCREPANCY':
+      return 'Count this product on the shelf — deliveries and sales do not match the stock figure.'
     case 'CHECK_NEGATIVE_STOCK':
       return 'Count what is actually on the shelf and correct the system.'
     case 'VERIFY_UNKNOWN_BARCODE':
@@ -54,6 +56,8 @@ function detailLine(action) {
       return `Shelf ${formatCurrency(action.sellingPrice)} · WOLT ${formatCurrency(action.woltPrice)} · gap ${formatPercentagePoints(action.metricValue)}`
     case 'PROMOTE_EXPIRING_PRODUCT':
       return `Expires ${action.expiryDate} · ${action.daysToExpiry} days left`
+    case 'CHECK_STOCK_DISCREPANCY':
+      return `System says ${action.currentStock} in stock · ${Math.round(action.metricValue ?? 0)} units unaccounted for`
     case 'CHECK_NEGATIVE_STOCK':
       return `System says ${action.currentStock} in stock`
     case 'VERIFY_UNKNOWN_BARCODE':
@@ -94,7 +98,12 @@ export function ActionCard({ action, meta, onDecide, muted = false, busy = false
         {action.impactIls != null && (
           <div className="action-card-impact">
             <span className="action-card-impact-value">{formatCurrency(action.impactIls)}</span>
-            <span className="action-card-impact-label">per sale</span>
+            {/* A stock shortfall is a fixed amount already at stake, not a cost
+                incurred on every sale. Labelling it "per sale" would overstate it
+                enormously — ₪8,719 of unaccounted water is not per-transaction. */}
+            <span className="action-card-impact-label">
+              {action.impactKind === 'one_off' ? 'at stake' : 'per sale'}
+            </span>
           </div>
         )}
 

@@ -4,7 +4,7 @@ import { StatusBadge } from '../components/shared/StatusBadge.jsx'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
 import { Button } from '../components/shared/Button.jsx'
 import { ActionCard } from '../components/operational/ActionCard.jsx'
-import { rankActions, totalImpact } from '../lib/analytics/actionPriority.js'
+import { rankActions, totalImpact, IMPACT_KIND } from '../lib/analytics/actionPriority.js'
 import { formatCurrency } from '../components/shared/formatters.js'
 import { formatDate } from '../lib/utils/format.js'
 import { compareHebrew, dirProps } from '../lib/utils/rtl.js'
@@ -22,6 +22,7 @@ import {
 
 const TYPE_META = {
   PROMOTE_EXPIRING_PRODUCT: { label: 'Expiring', tone: 'danger' },
+  CHECK_STOCK_DISCREPANCY: { label: 'Stock does not add up', tone: 'warning' },
   CHECK_NEGATIVE_STOCK: { label: 'Stock count wrong', tone: 'neutral' },
   CHECK_WOLT_PRICE_GAP: { label: 'WOLT price gap', tone: 'warning' },
   CHECK_MARGIN: { label: 'Selling below cost', tone: 'danger' },
@@ -158,7 +159,10 @@ export function OperationalPage({
   )
 
   const visible = showAll ? openMoney : openMoney.slice(0, TOP_N)
-  const perUnitTotal = totalImpact(openMoney)
+  const perUnitTotal = totalImpact(openMoney, IMPACT_KIND.PER_SALE)
+  // Kept separate on purpose: one-off exposure and per-sale cost are different
+  // units, and adding them makes the headline meaningless.
+  const oneOffTotal = totalImpact(openMoney, IMPACT_KIND.ONE_OFF)
 
   if (operationalStatus === 'loading') {
     return <EmptyState title="Loading today's actions" description="Reading the latest pipeline export…" />
@@ -197,8 +201,17 @@ export function OperationalPage({
         <MetricCard
           label="Per sale at stake"
           value={formatCurrency(perUnitTotal)}
-          detail="Summed across open actions"
+          detail="Costs you on every sale"
           tone="info"
+        />
+        {/* Kept separate from the per-sale figure on purpose. One-off exposure and
+            a per-sale cost are different units; adding them produced a
+            "₪106,164 per sale" headline that meant nothing. */}
+        <MetricCard
+          label="Stock unaccounted"
+          value={formatCurrency(oneOffTotal)}
+          detail="Value of stock that does not add up"
+          tone="warning"
         />
         <MetricCard
           label="Handled"

@@ -21,6 +21,28 @@ export const ACTION_GROUP = {
   DATA: 'data',
 }
 
+/**
+ * Two kinds of shekel figure that must never be added together.
+ *
+ * PER_SALE  — what the item costs on every single sale (a thin margin, a price
+ *             gap). It recurs, and its size depends on volume we cannot measure.
+ * ONE_OFF   — a fixed amount already at stake right now (the cost value of stock
+ *             that cannot be accounted for). It does not recur.
+ *
+ * Summing them produced a "₪106,164 per sale" headline, which is meaningless:
+ * ₪8,719 of unaccounted water bottles is not something that happens on every sale.
+ */
+export const IMPACT_KIND = {
+  PER_SALE: 'per_sale',
+  ONE_OFF: 'one_off',
+}
+
+const ONE_OFF_TYPES = new Set(['CHECK_STOCK_DISCREPANCY'])
+
+export function impactKind(rec) {
+  return ONE_OFF_TYPES.has(rec?.type) ? IMPACT_KIND.ONE_OFF : IMPACT_KIND.PER_SALE
+}
+
 const TYPE_RULES = {
   // Losing money on every single sale. Highest confidence we have.
   CHECK_MARGIN: { group: ACTION_GROUP.MONEY, weight: 1.0 },
@@ -28,6 +50,9 @@ const TYPE_RULES = {
   CHECK_WOLT_PRICE_GAP: { group: ACTION_GROUP.MONEY, weight: 0.8 },
   // Expiry is real money, when we have a date at all.
   PROMOTE_EXPIRING_PRODUCT: { group: ACTION_GROUP.MONEY, weight: 0.9 },
+  // The one stock-derived signal we allow. It does not TRUST the stock count —
+  // it proves the count cannot be right, which is what the manager asked for.
+  CHECK_STOCK_DISCREPANCY: { group: ACTION_GROUP.MONEY, weight: 0.7 },
   // Derived from stock counts the manager has told us not to trust.
   CHECK_NEGATIVE_STOCK: { group: ACTION_GROUP.DATA, weight: 0 },
   // Admin: can't scan or match it. No money attached.
@@ -99,6 +124,14 @@ export function estimateImpact(rec) {
       if (gapPct > MAX_CREDIBLE_GAP_PCT) return null
       return gap
     }
+    case 'CHECK_STOCK_DISCREPANCY': {
+      // Value of the unaccounted units at what they cost the shop. metricValue is
+      // the shortfall in units. Without a cost we state no figure rather than guess.
+      const missing = toNumber(rec?.metricValue)
+      if (missing == null || missing <= 0) return null
+      if (cost == null || cost <= 0) return null
+      return missing * cost
+    }
     case 'PROMOTE_EXPIRING_PRODUCT':
       // The value of ONE unit at risk, deliberately not multiplied by stock: the
       // manager told us stock counts are unreliable, so a lot value would be a
@@ -143,6 +176,7 @@ export function rankActions(recommendations = []) {
     const scored = {
       ...rec,
       impactIls: estimateImpact(rec),
+      impactKind: impactKind(rec),
       priorityScore: priorityScore(rec),
       group: actionGroup(rec),
     }
@@ -160,9 +194,13 @@ export function rankActions(recommendations = []) {
 }
 
 /**
- * Total shekels represented by the ranked money actions — per unit sold, so it is
- * deliberately NOT presented as a total saving. We have no reliable sales volume yet.
+ * Totals, split by kind. Never add these two together — see IMPACT_KIND.
+ *
+ * `perSale` is deliberately NOT presented as a total saving: we have no reliable
+ * sales volume, so it is what each item costs per sale, summed across items.
  */
-export function totalImpact(actions = []) {
-  return actions.reduce((sum, action) => sum + (action.impactIls ?? 0), 0)
+export function totalImpact(actions = [], kind = IMPACT_KIND.PER_SALE) {
+  return actions
+    .filter((action) => (action.impactKind ?? IMPACT_KIND.PER_SALE) === kind)
+    .reduce((sum, action) => sum + (action.impactIls ?? 0), 0)
 }

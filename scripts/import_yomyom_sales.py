@@ -141,7 +141,30 @@ def load_all(directory: Path):
     return by_barcode, sorted(set(periods))
 
 
-def build_velocity(by_barcode, periods):
+def _inventory_snapshot_month(inventory_path: Path):
+    """First day of the month in which the stock count was taken, or None.
+
+    D-7 reconciles stock_now = opening + received - sold. Sales from AFTER the
+    count obviously cannot have affected it, so including them inflates every
+    shortfall. With a 2026-06-06 count and reports through July, two extra months
+    of sales were being charged against the figure.
+    """
+    if not inventory_path.exists():
+        return None
+    try:
+        rows = pq.read_table(inventory_path, columns=["_imported_at"]).to_pylist()
+    except Exception:
+        return None
+    if not rows or not rows[0].get("_imported_at"):
+        return None
+    try:
+        stamp = datetime.fromisoformat(str(rows[0]["_imported_at"]).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return date(stamp.year, stamp.month, 1)
+
+
+def build_velocity(by_barcode, periods, reconcile_before=None):
     if not periods:
         return {}, None
 
@@ -167,6 +190,15 @@ def build_velocity(by_barcode, periods):
                 last_sale = date(period.year, period.month, last_month_days).isoformat()
                 break
 
+        # Months that closed strictly before the stock count. Only these can be
+        # reconciled against it.
+        if reconcile_before is not None:
+            window = [p for p in months if p < reconcile_before]
+        else:
+            window = list(months)
+        reconcile_units = sum(months[p]["units_sold"] for p in window)
+        reconcile_receipts = sum(months[p]["receipts"] for p in window)
+
         any_row = latest_row or months[max(months)]
         velocity[barcode] = {
             "units_sold_30d": int(round(units_latest)),
@@ -187,6 +219,9 @@ def build_velocity(by_barcode, periods):
             # "you are running out, reorder" is nonsense for a car wash. 683 of 1,778
             # products are in this category.
             "is_stocked": sum(m["receipts"] for m in months.values()) > 0,
+            "reconcile_units": int(round(reconcile_units)),
+            "reconcile_receipts": int(round(reconcile_receipts)),
+            "reconcile_months": len(window),
             "product_name": any_row["product_name"],
         }
     return velocity, latest
@@ -214,6 +249,10 @@ def write_sales_table(velocity, sales_path: Path, dry_run: bool):
             # Unknown, not false: absent from the sales reports tells us nothing
             # about whether the shop stocks it.
             row["is_stocked"] = None
+            row["total_units_all_months"] = None
+            row["total_receipts_all_months"] = None
+            row["reconcile_units"] = None
+            row["reconcile_receipts"] = None
             continue
 
         matched += 1
@@ -227,6 +266,12 @@ def write_sales_table(velocity, sales_path: Path, dry_run: bool):
         row["velocity_source"] = POS_EXPORT_SOURCE
         row["sales_amount_30d"] = None
         row["is_stocked"] = entry["is_stocked"]
+        # Persisted for D-7: the stock-accuracy check reconciles
+        # stock_now = opening + received - sold and needs both totals.
+        row["total_units_all_months"] = entry["total_units_all_months"]
+        row["total_receipts_all_months"] = entry["total_receipts_all_months"]
+        row["reconcile_units"] = entry["reconcile_units"]
+        row["reconcile_receipts"] = entry["reconcile_receipts"]
 
     schema = pa.schema([
         ("barcode", pa.string()), ("product_name", pa.string()), ("category", pa.string()),
@@ -235,6 +280,8 @@ def write_sales_table(velocity, sales_path: Path, dry_run: bool):
         ("units_per_day", pa.float64()), ("observed_days", pa.float64()),
         ("max_gap_days", pa.float64()), ("velocity_confidence", pa.string()),
         ("velocity_source", pa.string()), ("is_stocked", pa.bool_()),
+        ("total_units_all_months", pa.int64()), ("total_receipts_all_months", pa.int64()),
+        ("reconcile_units", pa.int64()), ("reconcile_receipts", pa.int64()),
         ("_imported_at", pa.string()),
         ("_source_file", pa.string()), ("_source_kind", pa.string()),
     ])
@@ -261,7 +308,8 @@ def main() -> int:
         print("No usable monthly reports found.", file=sys.stderr)
         return 1
 
-    velocity, latest = build_velocity(by_barcode, periods)
+    reconcile_before = _inventory_snapshot_month(SILVER_POS_ROOT / "yomyom_inventory.parquet")
+    velocity, latest = build_velocity(by_barcode, periods, reconcile_before)
     stats = write_sales_table(velocity, SILVER_POS_ROOT / "yomyom_sales.parquet", args.dry_run)
 
     movers = sum(1 for v in velocity.values() if v["units_sold_30d"] > 0)
@@ -283,6 +331,8 @@ def main() -> int:
         print("  matched to catalog: %d of %d rows" % (stats["matched"], stats["rows"]))
         print("  sold in %s : %d" % (latest.strftime("%b %Y"), movers))
         print("  velocity_source   : %s" % POS_EXPORT_SOURCE)
+        print("  reconcile window  : months before %s (stock count date)" % (
+            reconcile_before.isoformat() if reconcile_before else "unknown"))
         if args.dry_run:
             print("  (dry run — nothing written)")
         else:

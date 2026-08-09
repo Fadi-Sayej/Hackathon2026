@@ -184,6 +184,107 @@ def _negative_stock_recommendations(observed_at: datetime, inventory: list[dict[
     return out
 
 
+def _stock_accuracy_recommendations(
+    observed_at: datetime,
+    inventory: list[dict[str, Any]],
+    sales: list[dict[str, Any]],
+    margins: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """D-7 — products whose stock cannot be reconciled with sales and deliveries.
+
+    The manager raised this himself, unprompted: "the report may say 8 Kinder
+    chocolates when there is 1". This quantifies it.
+
+    Stock obeys one identity:  stock_now = stock_opening + received - sold.
+    We do not know stock_opening, but we can solve for it:
+
+        implied_opening = stock_now - received + sold
+
+    A NEGATIVE implied opening is arithmetically impossible — you cannot have
+    started with less than nothing — so the three numbers cannot all be right.
+    That is a fact about the books, not an estimate, which is why this is the one
+    stock-derived signal allowed anywhere in the product.
+
+    It deliberately does NOT claim to know which number is wrong. Under-recorded
+    sales, over-recorded deliveries, breakage, miscounting and theft all produce
+    the same shortfall, and we cannot tell them apart. The recommendation says
+    "these do not add up, count them" and stops there.
+
+    Restricted to products the shop actually stocks (received > 0). Items sold but
+    never delivered — car washes, espresso, staff consumption — always look
+    impossible and are a different, already-known story.
+    """
+    received = {}
+    sold_units = {}
+    for row in sales:
+        barcode = str(row.get("barcode") or "").strip().lstrip("0")
+        if not barcode:
+            continue
+        # Only months that closed BEFORE the stock count — sales after it cannot
+        # explain the figure it produced. Falls back to the all-time totals when
+        # the windowed columns are absent (older sales imports).
+        received[barcode] = _num(row.get("reconcile_receipts"))
+        if received[barcode] is None:
+            received[barcode] = _num(row.get("total_receipts_all_months")) or 0.0
+        sold_units[barcode] = _num(row.get("reconcile_units"))
+        if sold_units[barcode] is None:
+            sold_units[barcode] = _num(row.get("total_units_all_months")) or 0.0
+
+
+    # Cost price turns "115 units unaccounted for" into a shekel figure, which is
+    # what ranks it against the other actions. Without one we emit no figure rather
+    # than guess, and the item falls back to the data-quality group.
+    cost_by_barcode = {}
+    for row in margins:
+        barcode = str(row.get("barcode") or "").strip().lstrip("0")
+        cost = _num(row.get("cost_price"))
+        if barcode and cost:
+            cost_by_barcode[barcode] = cost
+
+    out: list[dict[str, Any]] = []
+    for row in inventory:
+        barcode = str(row.get("barcode") or "").strip().lstrip("0")
+        if not barcode:
+            continue
+        got = received.get(barcode, 0.0)
+        if got <= 0:
+            continue  # never delivered — not a stock discrepancy
+        stock = _num(row.get("current_stock"))
+        if stock is None:
+            continue
+
+        implied_opening = stock - got + sold_units.get(barcode, 0.0)
+        if implied_opening >= 0:
+            continue
+
+        missing = abs(implied_opening)
+        share = missing / got if got else 0.0
+        out.append(
+            _record(
+                observed_at,
+                recommendation_id=_recommendation_id(barcode, "CHECK_STOCK_DISCREPANCY"),
+                recommendation_type="CHECK_STOCK_DISCREPANCY",
+                barcode=barcode,
+                product_name=row.get("product_name"),
+                category=row.get("category"),
+                # Confidence in the ARITHMETIC, which is certain; scaled by how
+                # large the gap is relative to deliveries so a rounding-sized
+                # mismatch does not rank beside a 68% one.
+                confidence=_confidence(0.6 + min(share, 1.0) * 0.35),
+                evidence=["POS inventory", "monthly sales reports", "monthly deliveries"],
+                reason=(
+                    "Stock, deliveries and sales do not add up: %d received and %d sold "
+                    "leaves %d unaccounted for. Count this product."
+                    % (round(got), round(sold_units.get(barcode, 0.0)), round(missing))
+                ),
+                current_stock=row.get("current_stock"),
+                cost_price=cost_by_barcode.get(barcode),
+                metric_value=round(missing, 2),
+            )
+        )
+    return out
+
+
 def _wolt_gap_recommendations(observed_at: datetime, products: list[dict[str, Any]]) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
     for row in products:
@@ -327,6 +428,7 @@ def generate_operational_recommendations() -> dict[str, Any]:
     products = _read_parquet_rows(SILVER_POS_ROOT / "yomyom_products.parquet")
     inventory = _read_parquet_rows(SILVER_POS_ROOT / "yomyom_inventory.parquet")
     margins = _read_parquet_rows(SILVER_POS_ROOT / "yomyom_margins.parquet")
+    sales = _read_parquet_rows(SILVER_POS_ROOT / "yomyom_sales.parquet")
     expiry_path = _latest_expiry_parquet()
     expiry_count = len(_read_parquet_rows(expiry_path)) if expiry_path else 0
 
@@ -346,6 +448,7 @@ def generate_operational_recommendations() -> dict[str, Any]:
     recs += _wolt_gap_recommendations(observed_at, products)
     recs += _margin_recommendations(observed_at, margins)
     recs += _unknown_barcode_recommendations(observed_at, products)
+    recs += _stock_accuracy_recommendations(observed_at, inventory, sales, margins)
 
     recs.sort(key=lambda r: (-r["confidence"], r["recommendation_type"]))
 
