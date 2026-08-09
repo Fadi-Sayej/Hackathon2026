@@ -35,14 +35,25 @@ try {
   console.log('STEP 1 anonymous sign-in : ✅ enabled (uid ' + uid.slice(0,8) + '…)')
 } catch (e) {
   console.log('STEP 1 anonymous sign-in : ❌ ' + e.code)
-  if (e.code === 'auth/configuration-not-found')
-    console.log('   → Authentication has never been set up on this project.')
-    console.log('     Firebase console → Authentication → Get started,')
-    console.log('     then Sign-in method → Anonymous → Enable.')
-  else if (e.code === 'auth/operation-not-allowed' || e.code === 'auth/admin-restricted-operation')
-    console.log('   → Firebase console → Authentication → Sign-in method → Anonymous → Enable')
-  else if (e.code === 'auth/api-key-not-valid')
-    console.log('   → VITE_FIREBASE_API_KEY is wrong. Re-copy it from the console.')
+  const FIXES = {
+    'auth/configuration-not-found': [
+      'Authentication has never been set up on this project.',
+      'Firebase console → Authentication → Get started,',
+      'then Sign-in method → Anonymous → Enable.',
+    ],
+    'auth/operation-not-allowed': [
+      'Firebase console → Authentication → Sign-in method → Anonymous → Enable',
+    ],
+    'auth/admin-restricted-operation': [
+      'Firebase console → Authentication → Sign-in method → Anonymous → Enable',
+    ],
+    'auth/api-key-not-valid': [
+      'VITE_FIREBASE_API_KEY is wrong. Re-copy it from the console.',
+    ],
+  }
+  for (const line of FIXES[e.code] ?? ['Unrecognised auth error — check the Firebase console.']) {
+    console.log('   → ' + line)
+  }
   process.exit(1)
 }
 
