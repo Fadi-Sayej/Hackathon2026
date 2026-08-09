@@ -45,7 +45,7 @@ else:
 if os.path.exists('${SILVER_SALES_PARQUET}'):
     sales = keyed(pl.read_parquet('${SILVER_SALES_PARQUET}'))
     velocity_columns = [
-        column for column in ['units_sold_7d', 'units_sold_30d', 'velocity_confidence']
+        column for column in ['units_sold_7d', 'units_sold_30d', 'velocity_confidence', 'is_stocked']
         if column in sales.columns
     ]
     sales = sales.select(['_join_key', *velocity_columns]).unique(
@@ -96,6 +96,10 @@ function loadYomYomSilver() {
           velocityConfidence: hasVelocityData
             ? normalizeVelocityConfidence(row.velocity_confidence)
             : 'none',
+          // null = we have no sales report for it, so we cannot tell. Only an
+          // explicit false means "sells but is never delivered" (car wash,
+          // espresso, staff items) — those must never get a reorder suggestion.
+          isStocked: typeof row.is_stocked === 'boolean' ? row.is_stocked : null,
           supplier: 'YomYom',
           leadTimeDays: 3,
           returnedUnits: 0,

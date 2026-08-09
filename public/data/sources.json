@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-06T11:58:55.535425+00:00",
+  "generated_at": "2026-08-09T12:29:29.772924+00:00",
   "scraping_status": "partial",
   "sources": {
     "yomyom_pos": {
@@ -7,7 +7,7 @@
       "label": "YomYom POS",
       "kind": "internal_pos",
       "status": "complete",
-      "last_updated": "2026-08-06T11:58:55.535340+00:00",
+      "last_updated": "2026-08-09T12:29:29.772799+00:00",
       "row_count": 7674,
       "schema_version": "1"
     },
@@ -16,7 +16,7 @@
       "label": "Expiry scans",
       "kind": "expiry",
       "status": "not_started",
-      "last_updated": "2026-08-06T11:58:55.388854+00:00",
+      "last_updated": "2026-08-09T12:29:28.587843+00:00",
       "row_count": 0,
       "schema_version": "1"
     },
@@ -24,27 +24,27 @@
       "source_id": "kaggle_dor_alon",
       "label": "Dor Alon (Kaggle)",
       "kind": "competitor",
-      "status": "not_started",
-      "last_updated": "2026-08-06T11:58:55.507850+00:00",
-      "row_count": 0,
+      "status": "complete",
+      "last_updated": "2026-08-09T12:29:29.742975+00:00",
+      "row_count": 33094,
       "schema_version": "1"
     },
     "kaggle_rami_levy": {
       "source_id": "kaggle_rami_levy",
       "label": "Rami Levy (Kaggle)",
       "kind": "competitor",
-      "status": "not_started",
-      "last_updated": "2026-08-06T11:58:55.508067+00:00",
-      "row_count": 0,
+      "status": "complete",
+      "last_updated": "2026-08-09T12:29:29.746793+00:00",
+      "row_count": 43698,
       "schema_version": "1"
     },
     "kaggle_shufersal": {
       "source_id": "kaggle_shufersal",
       "label": "Shufersal (Kaggle)",
       "kind": "competitor",
-      "status": "not_started",
-      "last_updated": "2026-08-06T11:58:55.508170+00:00",
-      "row_count": 0,
+      "status": "complete",
+      "last_updated": "2026-08-09T12:29:29.750495+00:00",
+      "row_count": 45518,
       "schema_version": "1"
     },
     "wolt_delivery": {
@@ -52,8 +52,8 @@
       "label": "Wolt delivery catalog",
       "kind": "competitor",
       "status": "complete",
-      "last_updated": "2026-08-06T11:58:55.535065+00:00",
-      "row_count": 1374,
+      "last_updated": "2026-08-09T12:29:29.772472+00:00",
+      "row_count": 1659,
       "schema_version": "1"
     },
     "alonit_prices": {
@@ -61,7 +61,7 @@
       "label": "Alonit price file",
       "kind": "competitor",
       "status": "not_started",
-      "last_updated": "2026-08-06T11:58:55.535246+00:00",
+      "last_updated": "2026-08-09T12:29:29.772661+00:00",
       "row_count": 0,
       "schema_version": "1"
     }

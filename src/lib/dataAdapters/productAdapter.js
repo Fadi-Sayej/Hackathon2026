@@ -48,6 +48,15 @@ export function normalizeProduct(rawProduct, rowIndex = 0) {
       'leadTimeDays',
       localIssues,
     ),
+    // How much sales history the numbers above rest on: 'none' | 'low' | 'medium'
+    // | 'high'. inventoryEngine gates every velocity-derived verdict on this, so
+    // dropping it here made real measured sales read as "no history" and put the
+    // whole catalog back on "Not enough sales history yet". Anything without the
+    // field is genuinely unknown, so 'none' is the right default.
+    velocityConfidence: rawProduct.velocityConfidence ?? 'none',
+    // true = restocked at least once; false = sells but is never delivered
+    // (services, made-to-order, staff consumption); null = unknown.
+    isStocked: typeof rawProduct.isStocked === 'boolean' ? rawProduct.isStocked : null,
   }
 
   if (product.shelfCapacity === 0) product.shelfCapacity = Math.max(product.shelfQuantity, 1)

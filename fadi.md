@@ -40,8 +40,8 @@ day-over-day stock deltas.
 | A-1 velocity engine | ✅ done, 22 tests passing | `src/snapshots/velocity.py`, `scripts/build_velocity_from_snapshots.py` |
 | A-2 daily routine | ✅ done, runs clean | `scripts/pilot_daily.sh` (`npm run pilot:daily`) |
 | A-4 quality gate | ✅ done, blocks bad imports | `scripts/check_import_quality.py` (`npm run data:quality`) |
-| A-0 chase Malik | 🟡 answered — sales report confirmed to exist, not yet sent |
-| A-3 sales adapter | ✅ **done** — on-ramp built, waiting only on the file |
+| A-0 sales report | ✅ **RECEIVED 09/08** — 7 monthly reports, Jan–Jul 2026 |
+| A-3 sales adapter | ✅ **done and ACTIVE** — real velocity is live |
 | A-5 competitor data | ✅ done — rebuilt, dated, de-staled |
 
 **A-5 outcome.** Wolt collector re-ran successfully (285 fresh observations today). The Alonit FTP

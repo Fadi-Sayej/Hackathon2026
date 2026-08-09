@@ -309,3 +309,47 @@ describe('BELOW_COST uses the shared credibility guard (UI_DATA_CONTRACT §9.5)'
     expect(flagged).toEqual(expected)
   })
 })
+
+describe('never suggests reordering something the shop does not stock', () => {
+  const seller = (overrides = {}) => product({
+    id: 'sku-fast', currentStock: 0, salesLast7Days: 140, salesLast30Days: 600,
+    velocityConfidence: 'high', ...overrides,
+  })
+
+  it('does suggest reorder for a normal stocked product', () => {
+    const recs = generateReorderRecommendations([seller({ isStocked: true })], { currentDate: CURRENT_DATE })
+    expect(recs.map((r) => r.type)).toContain(RECOMMENDATION_TYPES.REORDER)
+  })
+
+  it('does NOT suggest reorder when the product is never delivered', () => {
+    // A car wash sells 20/day and is always "0 in stock". 683 of the 1,778
+    // products in YomYom's sales reports had sales but zero receipts across
+    // seven months, and they took over the top of the reorder list.
+    const recs = generateReorderRecommendations([seller({ isStocked: false })], { currentDate: CURRENT_DATE })
+    expect(recs.map((r) => r.type)).not.toContain(RECOMMENDATION_TYPES.REORDER)
+  })
+
+  it('does NOT suggest reducing stock on a never-delivered product either', () => {
+    const recs = generateReorderRecommendations(
+      [seller({ isStocked: false, currentStock: 100000, salesLast7Days: 7, salesLast30Days: 30 })],
+      { currentDate: CURRENT_DATE },
+    )
+    expect(recs.map((r) => r.type)).not.toContain(RECOMMENDATION_TYPES.REDUCE_STOCK)
+  })
+
+  it('still suggests reorder when stocking is unknown (null), rather than going silent', () => {
+    // null means "no sales report for it", not "not stocked". Suppressing on
+    // unknown would hide real replenishment needs for most of the catalog.
+    const recs = generateReorderRecommendations([seller({ isStocked: null })], { currentDate: CURRENT_DATE })
+    expect(recs.map((r) => r.type)).toContain(RECOMMENDATION_TYPES.REORDER)
+  })
+
+  it('keeps margin advice on a never-delivered product', () => {
+    // Velocity is still real for a car wash; only replenishment is meaningless.
+    const recs = generateReorderRecommendations(
+      [seller({ isStocked: false, price: 24.9, cost: 30 })],
+      { currentDate: CURRENT_DATE },
+    )
+    expect(recs.map((r) => r.type)).toContain(RECOMMENDATION_TYPES.BELOW_COST)
+  })
+})

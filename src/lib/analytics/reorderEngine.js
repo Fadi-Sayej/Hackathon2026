@@ -119,7 +119,16 @@ function buildRecommendationCandidates(product, metrics, marketContext) {
   const velocityConfidence = readVelocityConfidence(product)
   const hasVelocityConfidence = velocityConfidence !== 'none'
 
-  if (hasVelocityConfidence && shouldReorder(metrics)) {
+  // Some products sell fast and are never delivered: car washes, espresso pulled
+  // to order, staff consumption. 683 of the 1,778 products in YomYom's sales
+  // reports had sales but ZERO stock receipts across seven months. They always
+  // read as "0 in stock, selling 20/day, reorder now", which put car washes at
+  // the top of the reorder list. Velocity is still real and useful for margin
+  // work — only replenishment is meaningless. isStocked === false says so
+  // explicitly; null means we have no sales report and therefore cannot tell.
+  const isReplenishable = product.isStocked !== false
+
+  if (hasVelocityConfidence && isReplenishable && shouldReorder(metrics)) {
     recommendations.push(
       makeRecommendation(product, metrics, marketContext, {
         type: RECOMMENDATION_TYPES.REORDER,
@@ -131,7 +140,7 @@ function buildRecommendationCandidates(product, metrics, marketContext) {
     )
   }
 
-  if (hasVelocityConfidence && metrics.overstocked) {
+  if (hasVelocityConfidence && isReplenishable && metrics.overstocked) {
     recommendations.push(
       makeRecommendation(product, metrics, marketContext, {
         type: RECOMMENDATION_TYPES.REDUCE_STOCK,
