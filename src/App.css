@@ -891,7 +891,10 @@ button {
 
 @media (max-width: 860px) {
   .app-shell {
-    grid-template-columns: 1fr;
+    /* minmax(0, …), not 1fr: `1fr` is minmax(auto, 1fr), and the auto minimum
+       lets a wide child stretch the column past the viewport, which clipped
+       every card's right edge on a phone. */
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .sidebar {
@@ -3243,5 +3246,68 @@ button {
 
   .op-handled-row .op-action-undo {
     min-height: 44px;
+  }
+}
+
+/* ── Phone layout for the store floor ───────────────────────────────────────
+   The manager opens this on a phone behind the counter. Before this rule the
+   sidebar rendered as nine full-width rows, so "Today's Actions" — the entire
+   point of the screen — sat below a full screen of navigation.
+   Verified at 390px against the live deployment. */
+
+@media (max-width: 640px) {
+  .sidebar {
+    padding: 12px 14px;
+    min-width: 0;      /* let the scrolling nav scroll instead of widening the shell */
+    overflow: hidden;
+  }
+
+  /* Nav becomes a horizontal strip of chips instead of a vertical list. */
+  .sidebar-nav {
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    grid-template-columns: none;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 6px;
+    padding-bottom: 4px;
+  }
+
+  .sidebar-nav::-webkit-scrollbar { display: none; }
+
+  .nav-item {
+    padding: 10px 14px;
+    white-space: nowrap;
+    min-height: 2.75rem;   /* finger-sized */
+  }
+
+  /* The letter badges cost horizontal room and carry no meaning on a phone. */
+  .nav-icon { display: none; }
+
+  /* Internal build info, not customer content. */
+  .sidebar-card {
+    display: none;
+  }
+
+  /* The brand block eats a third of a phone screen above the fold. */
+  .brand-block {
+    margin-bottom: 10px;
+  }
+  .brand-subtitle {
+    display: none;
+  }
+}
+
+/* A long ₪ total (e.g. ₪2,336.01) overflowed its card and was clipped mid-number
+   on the live site. Let it shrink and never spill. */
+.metric-value {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 900px) {
+  .metric-value {
+    font-size: clamp(1.35rem, 5.5vw, 2rem);
   }
 }
