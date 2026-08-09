@@ -1,4 +1,8 @@
 /**
+ * NOTE: the probe doc id must NOT be wrapped in double underscores. Firestore
+ * reserves ids matching __.*__ and rejects the write with INVALID_ARGUMENT,
+ * which looks like a rules failure but is not one.
+ *
  * check_firebase_live.mjs — does Firestore ACTUALLY work? (npm run check:firebase-live)
  *
  * `check:firebase` validates the values. This one uses them: it signs in
@@ -6,7 +10,7 @@
  * tells you which of the two console steps is still outstanding instead of
  * leaving you to guess from a silent localStorage fallback.
  *
- * Safe: writes one doc named __connectivity_probe__ and deletes it again.
+ * Safe: writes one probe doc and deletes it again.
  */
 import { initializeApp } from 'firebase/app'
 import { getAuth, signInAnonymously } from 'firebase/auth'
@@ -58,7 +62,7 @@ try {
 }
 
 const db = getFirestore(app)
-const ref = doc(db, 'stores', STORE, 'recommendationDecisions', '__connectivity_probe__')
+const ref = doc(db, 'stores', STORE, 'recommendationDecisions', 'zz-smartshelf-connectivity-probe')
 try {
   await setDoc(ref, { probe: true, at: new Date().toISOString() })
   const snap = await getDoc(ref)
