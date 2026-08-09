@@ -129,13 +129,27 @@ function buildRecommendationCandidates(product, metrics, marketContext) {
   const isReplenishable = product.isStocked !== false
 
   if (hasVelocityConfidence && isReplenishable && shouldReorder(metrics)) {
+    // The order quantity is (daily sales x lead time) + safety - CURRENT STOCK.
+    // When D-7 has proven that stock figure cannot be right, the arithmetic is
+    // sound but its input is not, so we keep the signal ("this is selling and
+    // may be low") and drop the false precision ("order exactly 108"). 59% of
+    // reorder suggestions were in exactly this position. Telling a manager to
+    // order a specific number from a count we disproved on the next screen is
+    // the fastest way to lose him.
+    const stockIsTrustworthy = product.stockReconciles !== false
     recommendations.push(
       makeRecommendation(product, metrics, marketContext, {
         type: RECOMMENDATION_TYPES.REORDER,
-        recommendedOrderQuantity: metrics.recommendedOrder,
+        recommendedOrderQuantity: stockIsTrustworthy ? metrics.recommendedOrder : null,
         urgency: classifyReorderUrgency(metrics, product),
-        confidence: scoreReorderConfidence(product, metrics),
-        reason: buildReorderReason(product, metrics, marketContext),
+        confidence: stockIsTrustworthy
+          ? scoreReorderConfidence(product, metrics)
+          : Math.min(scoreReorderConfidence(product, metrics), 0.4),
+        reason: stockIsTrustworthy
+          ? buildReorderReason(product, metrics, marketContext)
+          : `Selling ${metrics.weightedAvgDailySales}/day, but the stock figure for this `
+            + `product does not reconcile with deliveries and sales. Count it, then decide `
+            + `how much to order.`,
       }),
     )
   }

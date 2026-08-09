@@ -57,6 +57,10 @@ export function normalizeProduct(rawProduct, rowIndex = 0) {
     // true = restocked at least once; false = sells but is never delivered
     // (services, made-to-order, staff consumption); null = unknown.
     isStocked: typeof rawProduct.isStocked === 'boolean' ? rawProduct.isStocked : null,
+    // false = stock fails the D-7 reconciliation, so any figure computed FROM it
+    // (days of cover, order quantity) is not defensible. null = not checkable.
+    stockReconciles:
+      typeof rawProduct.stockReconciles === 'boolean' ? rawProduct.stockReconciles : null,
   }
 
   if (product.shelfCapacity === 0) product.shelfCapacity = Math.max(product.shelfQuantity, 1)

@@ -222,9 +222,39 @@ def build_velocity(by_barcode, periods, reconcile_before=None):
             "reconcile_units": int(round(reconcile_units)),
             "reconcile_receipts": int(round(reconcile_receipts)),
             "reconcile_months": len(window),
+            # Does the stock figure survive its own arithmetic? Filled in below,
+            # once we can see the inventory count. See D-7.
+            "stock_reconciles": None,
             "product_name": any_row["product_name"],
         }
     return velocity, latest
+
+
+def annotate_stock_trust(velocity, inventory_path: Path):
+    """Mark whether each product's stock figure survives its own arithmetic.
+
+    Same identity as D-7: implied_opening = stock - received + sold. Negative is
+    impossible, so the stock number cannot be right. The reorder engine uses this
+    to avoid stating an exact order quantity computed from a figure we have just
+    proven wrong — 59% of REORDER suggestions were in that position.
+    """
+    if not inventory_path.exists():
+        return
+    try:
+        rows = pq.read_table(inventory_path, columns=["barcode", "current_stock"]).to_pylist()
+    except Exception:
+        return
+    stock = {
+        normalise_barcode(r.get("barcode")): r.get("current_stock")
+        for r in rows if r.get("barcode")
+    }
+    for barcode, entry in velocity.items():
+        current = stock.get(barcode)
+        if current is None or entry["reconcile_receipts"] <= 0:
+            entry["stock_reconciles"] = None      # nothing to check against
+            continue
+        implied = current - entry["reconcile_receipts"] + entry["reconcile_units"]
+        entry["stock_reconciles"] = implied >= 0
 
 
 def write_sales_table(velocity, sales_path: Path, dry_run: bool):
@@ -253,6 +283,7 @@ def write_sales_table(velocity, sales_path: Path, dry_run: bool):
             row["total_receipts_all_months"] = None
             row["reconcile_units"] = None
             row["reconcile_receipts"] = None
+            row["stock_reconciles"] = None
             continue
 
         matched += 1
@@ -272,6 +303,7 @@ def write_sales_table(velocity, sales_path: Path, dry_run: bool):
         row["total_receipts_all_months"] = entry["total_receipts_all_months"]
         row["reconcile_units"] = entry["reconcile_units"]
         row["reconcile_receipts"] = entry["reconcile_receipts"]
+        row["stock_reconciles"] = entry["stock_reconciles"]
 
     schema = pa.schema([
         ("barcode", pa.string()), ("product_name", pa.string()), ("category", pa.string()),
@@ -282,6 +314,7 @@ def write_sales_table(velocity, sales_path: Path, dry_run: bool):
         ("velocity_source", pa.string()), ("is_stocked", pa.bool_()),
         ("total_units_all_months", pa.int64()), ("total_receipts_all_months", pa.int64()),
         ("reconcile_units", pa.int64()), ("reconcile_receipts", pa.int64()),
+        ("stock_reconciles", pa.bool_()),
         ("_imported_at", pa.string()),
         ("_source_file", pa.string()), ("_source_kind", pa.string()),
     ])
@@ -310,6 +343,7 @@ def main() -> int:
 
     reconcile_before = _inventory_snapshot_month(SILVER_POS_ROOT / "yomyom_inventory.parquet")
     velocity, latest = build_velocity(by_barcode, periods, reconcile_before)
+    annotate_stock_trust(velocity, SILVER_POS_ROOT / "yomyom_inventory.parquet")
     stats = write_sales_table(velocity, SILVER_POS_ROOT / "yomyom_sales.parquet", args.dry_run)
 
     movers = sum(1 for v in velocity.values() if v["units_sold_30d"] > 0)

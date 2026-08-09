@@ -353,3 +353,39 @@ describe('never suggests reordering something the shop does not stock', () => {
     expect(recs.map((r) => r.type)).toContain(RECOMMENDATION_TYPES.BELOW_COST)
   })
 })
+
+describe('never quotes an order quantity from a stock figure we disproved', () => {
+  const lowAndSelling = (overrides = {}) => product({
+    id: 'sku-low', currentStock: 2, salesLast7Days: 70, salesLast30Days: 300,
+    velocityConfidence: 'high', isStocked: true, ...overrides,
+  })
+
+  it('gives a quantity when the stock figure reconciles', () => {
+    const [rec] = generateReorderRecommendations(
+      [lowAndSelling({ stockReconciles: true })], { currentDate: CURRENT_DATE },
+    ).filter((r) => r.type === RECOMMENDATION_TYPES.REORDER)
+    expect(rec.recommendedOrderQuantity).toBeGreaterThan(0)
+  })
+
+  it('withholds the quantity when D-7 proved the stock figure wrong', () => {
+    // The quantity is (daily x lead time) + safety - currentStock. If that stock
+    // number is disproven on another screen, quoting "order exactly 108" from it
+    // is the fastest way to lose the manager. Keep the signal, drop the number.
+    const [rec] = generateReorderRecommendations(
+      [lowAndSelling({ stockReconciles: false })], { currentDate: CURRENT_DATE },
+    ).filter((r) => r.type === RECOMMENDATION_TYPES.REORDER)
+    expect(rec).toBeDefined()                       // still tells him it is selling
+    expect(rec.recommendedOrderQuantity).toBeNull() // but not how many
+    expect(rec.reason).toMatch(/does not reconcile/)
+    expect(rec.confidence).toBeLessThanOrEqual(0.4)
+  })
+
+  it('still gives a quantity when reconciliation is simply unknown', () => {
+    // null means we have no deliveries data to check against, not that the stock
+    // is wrong. Withholding on unknown would blank out most of the catalog.
+    const [rec] = generateReorderRecommendations(
+      [lowAndSelling({ stockReconciles: null })], { currentDate: CURRENT_DATE },
+    ).filter((r) => r.type === RECOMMENDATION_TYPES.REORDER)
+    expect(rec.recommendedOrderQuantity).toBeGreaterThan(0)
+  })
+})

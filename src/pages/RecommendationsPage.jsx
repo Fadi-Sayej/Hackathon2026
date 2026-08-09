@@ -42,13 +42,23 @@ export function RecommendationsPage({
           pendingRecommendations.map((recommendation) => {
             const product = productIndex.get(recommendation.productId)
             const isApproved = recommendation.status === 'APPROVED'
+            // Only REORDER ever carries a quantity. PROMOTION, THIN_MARGIN and
+            // BELOW_COST have none by design, so a missing quantity there is
+            // normal and must NOT be labelled "count first". Withheld means:
+            // this IS a reorder, but the stock figure its size would be computed
+            // from has been disproven (D-7), so we refuse to invent a number.
+            const quantityWithheld =
+              recommendation.type === 'REORDER' &&
+              recommendation.recommendedOrderQuantity == null
             const quantity = recommendation.recommendedOrderQuantity ?? 0
             const canApprove = !isApproved && quantity > 0
             const approveTitle = isApproved
               ? 'Already approved'
-              : quantity > 0
-                ? 'Approve this recommendation'
-                : 'Enter a quantity above zero to approve'
+              : quantityWithheld
+                ? 'Count this product first — its stock figure does not reconcile'
+                : quantity > 0
+                  ? 'Approve this recommendation'
+                  : 'Enter a quantity above zero to approve'
             return (
               <article
                 className={`recommendation-card recommendation-${recommendation.urgency.toLowerCase()}${isApproved ? ' recommendation-approved' : ''}`}
@@ -66,7 +76,7 @@ export function RecommendationsPage({
                     <p {...dirProps(recommendation.category)}>{recommendation.category ?? '—'}</p>
                   </div>
                   <div className="recommendation-qty">
-                    <span>Suggested</span>
+                    <span>{quantityWithheld ? 'Count first' : 'Suggested'}</span>
                     <input
                       aria-label={`Suggested order quantity for ${recommendation.productName}`}
                       min="1"
@@ -75,7 +85,8 @@ export function RecommendationsPage({
                       }
                       step="1"
                       type="number"
-                      value={quantity}
+                      placeholder={quantityWithheld ? '?' : undefined}
+                      value={quantityWithheld ? '' : quantity}
                     />
                   </div>
                 </div>
