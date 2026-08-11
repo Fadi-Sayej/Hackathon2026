@@ -1,0 +1,87 @@
+# Daily market snapshot — T1 / #46, Step 5.
+#
+# This is the whole point of T1. History depth cannot be bought with money or
+# code, only with elapsed time, and the price-transparency server keeps ONLY the
+# current day (verified 2026-08-11, #46 Step 1). Every day this does not run is a
+# day of market history permanently lost — it cannot be backfilled by any amount
+# of effort later.
+#
+# It runs here rather than on a laptop because a laptop sleeps. Confirmed from a
+# runner before committing to it: FTPS returned 693 files and Wolt returned 200
+# (see .github/workflows/connectivity-probe.yml).
+#
+# 03:00 Asia/Jerusalem = 00:00 UTC. Price files are published overnight;
+# collecting during business hours catches half-written files.
+name: collect daily market snapshot
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      date:
+        description: 'Override the snapshot date (YYYY-MM-DD). Leave blank for today.'
+        required: false
+
+# One collection at a time. Two concurrent runs writing the same day is exactly
+# how a half-populated snapshot gets sealed as though it were complete.
+concurrency:
+  group: collect-daily
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Collect
+        id: collect
+        run: |
+          if [ -n "${{ inputs.date }}" ]; then
+            bash scripts/collect_daily.sh --date "${{ inputs.date }}"
+          else
+            bash scripts/collect_daily.sh
+          fi
+
+      - name: Commit the snapshot
+        # Runs even when collection was partial — a partial day is still history,
+        # and the manifest records exactly what was and was not captured. Only a
+        # wholly failed day has nothing to commit.
+        if: always() && steps.collect.outcome != 'cancelled'
+        run: |
+          git config user.name  "smartshelf-collector"
+          git config user.email "collector@users.noreply.github.com"
+          git add -f data/external/snapshots/ || true
+          if git diff --cached --quiet; then
+            echo "No new snapshot data to commit."
+            exit 0
+          fi
+          DAY=$(date -u +%Y-%m-%d)
+          git commit -q -m "snapshot: market data for ${DAY}"
+          # Another run may have landed while we collected.
+          git pull --rebase --autostash origin main || true
+          git push origin HEAD:main
+
+      - name: Fail loudly
+        # A collector that dies silently in week 3 and is noticed in week 8 has
+        # cost five weeks of irreplaceable history. This is the single most
+        # likely way this track fails, so a failed day must be noisy: the run is
+        # marked failed, which surfaces in the Actions UI and in GitHub's
+        # notification email to the repo owner.
+        if: steps.collect.outcome == 'failure'
+        run: |
+          echo "::error::Daily market collection FAILED. This day cannot be re-collected."
+          echo "::error::Check the manifest in data/external/snapshots/ and rerun promptly."
+          exit 1

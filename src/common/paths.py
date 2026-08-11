@@ -14,7 +14,7 @@ Usage
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -41,6 +41,11 @@ EXTERNAL_RAW_ROOT    = EXTERNAL_ROOT / "raw"
 EXTERNAL_BRONZE_ROOT = EXTERNAL_ROOT / "bronze"
 EXTERNAL_SILVER_ROOT = EXTERNAL_ROOT / "silver"
 
+# Immutable dated market snapshots (T1 / #46). One folder per calendar day, never
+# rewritten. The price-transparency server keeps only the current day, so a day
+# lost here is lost permanently — see docs/SNAPSHOT_DURABILITY.md.
+EXTERNAL_SNAPSHOTS_ROOT = EXTERNAL_ROOT / "snapshots"
+
 # ── Reports / logs ────────────────────────────────────────────────────────────
 QUALITY_ROOT      = PROJECT_ROOT / "reports" / "quality"
 LOGS_ROOT         = PROJECT_ROOT / "logs"
@@ -60,7 +65,42 @@ def _source_root(source_id: str) -> Path:
     return EXTERNAL_RAW_ROOT / source_id
 
 
+def _snapshot_day(collected_on: "str | date | datetime") -> str:
+    """YYYY-MM-DD for a snapshot folder, from a date, datetime or ISO string."""
+    if isinstance(collected_on, str):
+        text = collected_on.replace("Z", "+00:00")
+        try:
+            collected_on = datetime.fromisoformat(text)
+        except ValueError:
+            # Already a plain YYYY-MM-DD.
+            return collected_on[:10]
+    return collected_on.strftime("%Y-%m-%d")
+
+
 # ── Public path functions ──────────────────────────────────────────────────────
+
+def get_snapshot_path(source_id: str, collected_on: "str | date | datetime") -> Path:
+    """Directory for one source's contribution to one day's market snapshot.
+
+        data/external/snapshots/<YYYY-MM-DD>/<source_id>/
+
+    Dated rather than partitioned as YYYY/MM/DD because a snapshot is a single
+    atomic unit: the whole day either succeeded or it did not, and #49 reasons
+    about days as points on a time axis. Flat dates also make "diff any two
+    dates" a one-liner.
+    """
+    return EXTERNAL_SNAPSHOTS_ROOT / _snapshot_day(collected_on) / source_id
+
+
+def get_snapshot_manifest_path(collected_on: "str | date | datetime") -> Path:
+    """data/external/snapshots/<YYYY-MM-DD>/_manifest.json
+
+    Not optional. Without it there is no way to distinguish a product that was
+    genuinely absent from the market on a given day from one that a failed
+    scrape simply never saw — and that distinction is the entire basis of the
+    latent-state inference in #49.
+    """
+    return EXTERNAL_SNAPSHOTS_ROOT / _snapshot_day(collected_on) / "_manifest.json"
 
 def get_raw_path(source_id: str, observed_at: str | datetime, extension: str) -> Path:
     """
