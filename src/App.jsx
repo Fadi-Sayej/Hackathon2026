@@ -29,6 +29,7 @@ import {
   annotateRecommendationsWithExplanations,
   annotateRecommendationsWithMockExplanations,
   getDefaultExplanationProvider,
+  getRemoteExplanationBudget,
 } from './lib/ai/explanationProvider.js'
 import { buildMarketContext } from './lib/context/marketContextAdapter.js'
 import { fallbackMarketContext } from './lib/context/fallbackMarketContext.js'
@@ -332,6 +333,7 @@ function App() {
           products: analyzedProducts,
           recommendations: generatedRecommendations,
           marketContext: enrichedMarketContext,
+          maxRemoteExplanations: getRemoteExplanationBudget(),
           signal: controller.signal,
         })
         if (!cancelled) {

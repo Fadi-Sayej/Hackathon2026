@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   annotateRecommendationsWithExplanations,
   annotateRecommendationsWithMockExplanations,
+  getRemoteExplanationBudget,
 } from '../explanationProvider.js'
 import { llmExplanationProvider } from '../llmExplanationProvider.js'
 
@@ -132,6 +133,81 @@ describe('async explanation pipeline', () => {
 
     expect(result[0].explanationProvider).toBe('mock')
     expect(result[0].explanation).not.toBe('')
+  })
+})
+
+describe('remote explanation budget', () => {
+  function buildBatch(size) {
+    const products = Array.from({ length: size }, (_, index) => ({
+      ...product,
+      id: `product-${index}`,
+    }))
+    const recommendations = products.map((item) => ({
+      ...recommendation,
+      productId: item.id,
+    }))
+    return { products, recommendations }
+  }
+
+  function countingProvider() {
+    const calls = []
+    return {
+      calls,
+      id: 'llm',
+      async generateExplanation({ product: item }) {
+        calls.push(item.id)
+        return { provider: 'llm', explanation: `Live for ${item.id}` }
+      },
+    }
+  }
+
+  it('sends only the highest-priority recommendations to the remote provider', async () => {
+    const { products, recommendations } = buildBatch(5)
+    const provider = countingProvider()
+
+    const result = await annotateRecommendationsWithExplanations({
+      marketContext,
+      products,
+      recommendations,
+      provider,
+      maxRemoteExplanations: 2,
+    })
+
+    expect(provider.calls).toEqual(['product-0', 'product-1'])
+    expect(result[1].explanationProvider).toBe('llm')
+    expect(result[2].explanationProvider).toBe('mock')
+    expect(result[4].explanationProvider).toBe('mock')
+  })
+
+  it('caps an unbounded batch at the default budget instead of billing every row', async () => {
+    const { products, recommendations } = buildBatch(300)
+    const provider = countingProvider()
+
+    await annotateRecommendationsWithExplanations({
+      marketContext,
+      products,
+      recommendations,
+      provider,
+    })
+
+    expect(provider.calls.length).toBe(40)
+  })
+})
+
+describe('remote explanation budget configuration', () => {
+  it('falls back to the built-in budget when the env override is unset', () => {
+    vi.stubEnv('VITE_LLM_MAX_EXPLANATIONS', '')
+    expect(getRemoteExplanationBudget()).toBe(40)
+  })
+
+  it('reads a deployment-specific budget from the environment', () => {
+    vi.stubEnv('VITE_LLM_MAX_EXPLANATIONS', '10')
+    expect(getRemoteExplanationBudget()).toBe(10)
+  })
+
+  it('ignores a non-numeric override rather than disabling the cap', () => {
+    vi.stubEnv('VITE_LLM_MAX_EXPLANATIONS', 'all')
+    expect(getRemoteExplanationBudget()).toBe(40)
   })
 })
 

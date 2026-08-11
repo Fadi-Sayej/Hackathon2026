@@ -32,6 +32,8 @@ def _isolate_dotenv(monkeypatch):
     monkeypatch.setattr(dotenv, "load_dotenv", lambda *args, **kwargs: False)
     monkeypatch.delenv("VITE_GEMINI_API_KEY", raising=False)
     monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    monkeypatch.delenv("VITE_GEMINI_MODEL", raising=False)
+    monkeypatch.delenv("GEMINI_MODEL", raising=False)
 
 
 def _load_proxy(monkeypatch):
@@ -53,7 +55,7 @@ class _CountingModel:
     def __init__(self):
         self.calls = 0
 
-    async def generate_content_async(self, _prompt, request_options):
+    async def generate_content_async(self, _prompt, request_options, generation_config=None):
         assert request_options["timeout"] > 0
         self.calls += 1
         return SimpleNamespace(text='''{
@@ -65,7 +67,7 @@ class _CountingModel:
 
 
 class _SuccessfulModel:
-    async def generate_content_async(self, _prompt, request_options):
+    async def generate_content_async(self, _prompt, request_options, generation_config=None):
         assert request_options["timeout"] > 0
         return SimpleNamespace(text='''{
             "shortExplanation": "Live proxy explanation",
@@ -79,7 +81,7 @@ class _DelayedModel:
     def __init__(self):
         self.cancelled = False
 
-    async def generate_content_async(self, _prompt, request_options):
+    async def generate_content_async(self, _prompt, request_options, generation_config=None):
         assert request_options["timeout"] > 0
         try:
             await asyncio.sleep(60)
@@ -89,7 +91,7 @@ class _DelayedModel:
 
 
 class _RateLimitedModel:
-    async def generate_content_async(self, _prompt, request_options):
+    async def generate_content_async(self, _prompt, request_options, generation_config=None):
         assert request_options["timeout"] > 0
         raise TooManyRequests(
             "quota exhausted",
@@ -150,6 +152,61 @@ def test_explain_without_key_returns_503(monkeypatch):
     response = TestClient(proxy.app).post("/explain", json={"product": "test"})
     assert response.status_code == 503
     assert response.json() == {"detail": "LLM not configured (no API key)"}
+
+
+class _ConfigRecordingModel:
+    """Captures the generation config the proxy asks Gemini for."""
+
+    def __init__(self):
+        self.generation_config = None
+
+    async def generate_content_async(self, _prompt, request_options, generation_config=None):
+        assert request_options["timeout"] > 0
+        self.generation_config = generation_config
+        return SimpleNamespace(text='''{
+            "shortExplanation": "s",
+            "riskReason": "r",
+            "businessImpact": "b",
+            "confidenceNote": "c"
+        }''')
+
+
+def test_default_model_is_the_cheapest_tier_that_fits_the_task(monkeypatch):
+    # gemini-2.5-flash bills output at $2.50/1M and thinks by default (thinking
+    # tokens are billed as output, and the pinned SDK cannot switch that off).
+    # flash-lite is $0.40/1M with thinking off — ample for a 4-field JSON answer.
+    proxy = _load_proxy(monkeypatch)
+    assert proxy.GEMINI_MODEL == "gemini-2.5-flash-lite"
+
+
+def test_explain_asks_for_bounded_json_instead_of_free_text(monkeypatch):
+    # Output tokens are the expensive half of the bill: a JSON mime type drops the
+    # markdown fence the prompt otherwise invites, and the cap bounds a runaway answer.
+    proxy = _load_proxy(monkeypatch)
+    recording = _ConfigRecordingModel()
+    proxy.model = recording
+
+    response = TestClient(proxy.app).post("/explain", json={"product": "test"})
+
+    assert response.status_code == 200
+    assert recording.generation_config["response_mime_type"] == "application/json"
+    assert recording.generation_config["max_output_tokens"] == 400
+
+
+def test_cache_holds_a_working_set_larger_than_the_old_500_ceiling(monkeypatch):
+    # The LRU used to be smaller than one pass over the recommendation list, so
+    # entry 1 was evicted before the next pass reached it — a 0% hit rate that
+    # re-billed every row.
+    proxy = _load_proxy(monkeypatch)
+    counting = _CountingModel()
+    proxy.model = counting
+    client = TestClient(proxy.app)
+
+    for index in range(600):
+        client.post("/explain", json={"product": f"item-{index}"})
+    client.post("/explain", json={"product": "item-0"})
+
+    assert counting.calls == 600  # the first entry survived the pass
 
 
 def test_identical_payload_is_served_from_cache(monkeypatch):

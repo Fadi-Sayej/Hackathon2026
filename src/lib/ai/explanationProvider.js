@@ -4,6 +4,16 @@ import { mockExplanationProvider } from './mockExplanationProvider.js'
 /** Outer bound for a single remote explanation attempt. */
 const DEFAULT_EXPLANATION_TIMEOUT_MS = 3500
 const DEFAULT_EXPLANATION_CONCURRENCY = 8
+/**
+ * How many rows may reach the paid provider in one pass.
+ *
+ * A full YomYom batch is ~2,100 recommendations, and every remote call is billed.
+ * A manager reads the top of the list, not row 1,800, so paying to explain the
+ * tail is pure waste. Recommendations arrive pre-sorted by value at stake
+ * (`sortRecommendations` in reorderEngine.js), so the first N are the ones worth
+ * spending on; everything below keeps its rule-based explanation.
+ */
+const DEFAULT_REMOTE_EXPLANATION_BUDGET = 40
 
 /**
  * Synchronous mock/rule-based annotation.
@@ -49,6 +59,7 @@ export async function annotateRecommendationsWithExplanations({
   provider = mockExplanationProvider,
   timeoutMs = DEFAULT_EXPLANATION_TIMEOUT_MS,
   concurrency = DEFAULT_EXPLANATION_CONCURRENCY,
+  maxRemoteExplanations = DEFAULT_REMOTE_EXPLANATION_BUDGET,
   signal,
 }) {
   const productIndex = new Map(products.map((product) => [product.id, product]))
@@ -64,13 +75,14 @@ export async function annotateRecommendationsWithExplanations({
 
   const upgraded = [...mockAnnotated]
   let nextIndex = 0
-  const workerCount = Math.min(
+  const budget = Math.min(
     recommendations.length,
-    normalizeConcurrency(concurrency),
+    normalizeBudget(maxRemoteExplanations),
   )
+  const workerCount = Math.min(budget, normalizeConcurrency(concurrency))
 
   async function upgradeNext() {
-    while (!signal?.aborted && nextIndex < recommendations.length) {
+    while (!signal?.aborted && nextIndex < budget) {
       const index = nextIndex
       nextIndex += 1
       const recommendation = recommendations[index]
@@ -127,6 +139,18 @@ export function getDefaultExplanationProvider() {
   return mockExplanationProvider
 }
 
+/**
+ * Per-pass cap on paid explanation calls, overridable per deployment with
+ * VITE_LLM_MAX_EXPLANATIONS. A bad value keeps the cap rather than removing it —
+ * an unreadable env var must never turn into an unbounded bill.
+ */
+export function getRemoteExplanationBudget() {
+  const configured = Number(import.meta.env.VITE_LLM_MAX_EXPLANATIONS)
+  return Number.isFinite(configured) && configured > 0
+    ? Math.floor(configured)
+    : DEFAULT_REMOTE_EXPLANATION_BUDGET
+}
+
 export function getLLMExplanationProviderStatus() {
   const proxyUrl = import.meta.env.VITE_LLM_PROXY_URL
   return {
@@ -171,6 +195,13 @@ function isUsableExplanationResult(result) {
       typeof result.explanation === 'string' &&
       result.explanation.trim().length > 0,
   )
+}
+
+function normalizeBudget(budget) {
+  if (budget === Infinity) return Number.MAX_SAFE_INTEGER
+  return Number.isFinite(budget) && budget >= 0
+    ? Math.floor(budget)
+    : DEFAULT_REMOTE_EXPLANATION_BUDGET
 }
 
 function normalizeConcurrency(concurrency) {

@@ -50,12 +50,26 @@ load_dotenv()
 # name that publishes it. VITE_GEMINI_API_KEY is still read as a fallback so
 # existing local setups keep working, but it is deprecated — see .env.example.
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") or os.environ.get("VITE_GEMINI_API_KEY")
+# Cost note. gemini-2.5-flash bills output at $2.50/1M and has thinking ON by
+# default — thinking tokens are billed as output, and the pinned (deprecated)
+# google-generativeai SDK exposes no way to switch it off. flash-lite is $0.10 in
+# / $0.40 out with thinking off by default, which is ample for turning structured
+# product metrics into four short sentences. Override with GEMINI_MODEL if a
+# harder task ever justifies the 6x output price.
 GEMINI_MODEL = (
     os.environ.get("VITE_GEMINI_MODEL")
     or os.environ.get("GEMINI_MODEL")
-    or "gemini-2.5-flash"
+    or "gemini-2.5-flash-lite"
 )
 UPSTREAM_TIMEOUT_SECONDS = float(os.environ.get("LLM_UPSTREAM_TIMEOUT_SECONDS", "3"))
+
+# Output is the expensive half of the bill. Asking for a JSON mime type drops the
+# ```json fence the model would otherwise wrap the answer in, and the ceiling
+# bounds a runaway answer — four short fields need nowhere near 400 tokens.
+EXPLAIN_GENERATION_CONFIG = {
+    "response_mime_type": "application/json",
+    "max_output_tokens": 400,
+}
 
 # Module-level handle. Left as None and built lazily so importing this module
 # never requires the SDK or a key; tests also override it directly.
@@ -95,7 +109,11 @@ def _ensure_model():
 # ── Response cache (TTL + LRU) ───────────────────────────────────────────────
 
 CACHE_TTL_SECONDS = float(os.environ.get("LLM_CACHE_TTL_SECONDS", "3600"))
-CACHE_MAX_ENTRIES = int(os.environ.get("LLM_CACHE_MAX_ENTRIES", "500"))
+# Must stay comfortably above one pass over the recommendation list. At 500 the
+# LRU evicted the head of a pass before the next pass got back to it, so the hit
+# rate was ~0 and every pass re-billed in full. Entries are four short strings;
+# 3,000 of them is a couple of MB.
+CACHE_MAX_ENTRIES = int(os.environ.get("LLM_CACHE_MAX_ENTRIES", "3000"))
 _cache = OrderedDict()
 
 
@@ -186,6 +204,7 @@ async def explain(payload: dict):
             active_model.generate_content_async(
                 prompt,
                 request_options={"timeout": UPSTREAM_TIMEOUT_SECONDS},
+                generation_config=EXPLAIN_GENERATION_CONFIG,
             ),
             timeout=UPSTREAM_TIMEOUT_SECONDS,
         )

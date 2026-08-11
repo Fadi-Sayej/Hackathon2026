@@ -145,12 +145,20 @@ competitor-sourced, all from Alonit.
 
 `getDefaultExplanationProvider()` returns `mockExplanationProvider` (rule-based text) unless `VITE_LLM_PROXY_URL` is set — that variable is the only switch. (`VITE_LLM_EXPLANATIONS_ENABLED` exists in `.env` but nothing in `src/` reads it.)
 
-**The LLM path does not currently work; leave `VITE_LLM_PROXY_URL` commented out.** Two blockers:
+The async/sync bug that used to block this path is **fixed**: `annotateRecommendationsWithExplanations()` is now `async` with bounded concurrency, and `App.jsx` upgrades the mock batch from a `useEffect` (line ~314). The remaining blocker is billing — the Gemini key in `.env` has no prepayment credits (429) — plus deploying the proxy and pointing `VITE_LLM_PROXY_URL` at it.
 
-1. `annotateRecommendationsWithExplanations()` in `explanationProvider.js` calls `provider.generateExplanation()` **synchronously**, but `llmExplanationProvider.generateExplanation()` is `async`. The Promise is never awaited, so `result.explanation` is always `undefined` and proxy errors become unhandled rejections. Fixing this means making the function async and moving the recommendations `useMemo` in `App.jsx` to `useEffect` + state.
-2. The Gemini key in `.env` has no prepayment credits (API returns 429).
+#### Cost controls (do not remove these without doing the arithmetic)
 
-The proxy itself (`src/api/llm_proxy.py`, Gemini via `/explain` and `/report`) has been hardened (B-4): it now starts cleanly **even without a key** (503 instead of crashing at import), caches identical payloads (no re-billing per render), applies an upstream timeout to both endpoints, and reads CORS origins from `LLM_ALLOWED_ORIGINS`. Covered by `tests/test_llm_proxy.py` (6 cases). Both blockers above still stand, plus the proxy still needs to be deployed and `VITE_LLM_PROXY_URL` pointed at it.
+Every `/explain` call is billed, and a full batch is ~2,100 recommendations. Four guards keep that from becoming a per-render bill:
+
+1. **Per-pass budget.** `annotateRecommendationsWithExplanations({ maxRemoteExplanations })` sends only the top N rows to the paid provider (default **40**, override with `VITE_LLM_MAX_EXPLANATIONS`). Recommendations arrive pre-sorted by value at stake, so the head of the list is what a manager actually reads; everything below keeps its rule-based text. This is worth ~98% of the savings.
+2. **Cheap model by default.** `GEMINI_MODEL` defaults to `gemini-2.5-flash-lite` ($0.10/1M in, $0.40/1M out, thinking off). `gemini-2.5-flash` costs $2.50/1M output **and thinks by default** — thinking tokens bill as output, and the pinned `google-generativeai` 0.8.6 SDK cannot disable them. Use the server-side `GEMINI_MODEL`, not `VITE_GEMINI_MODEL` (a `VITE_` prefix inlines the value into the browser bundle).
+3. **Bounded JSON output.** `/explain` requests `response_mime_type: application/json` with `max_output_tokens: 400`.
+4. **Cache sized above one pass.** `LLM_CACHE_MAX_ENTRIES` defaults to **3000**. At the old 500 the LRU evicted the head of a pass before the next pass reached it — a ~0% hit rate that re-billed everything.
+
+Order of magnitude with these in place: **$1–5/month per store**, against $200–650 without them.
+
+The proxy itself (`src/api/llm_proxy.py`, Gemini via `/explain` and `/report`) is hardened (B-4): it starts cleanly **even without a key** (503 instead of crashing at import), caches identical payloads, applies an upstream timeout to both endpoints, and reads CORS origins from `LLM_ALLOWED_ORIGINS`. Covered by `tests/test_llm_proxy.py` (9 cases).
 
 ### Persistence
 
@@ -199,6 +207,8 @@ Copy `.env.example` to `.env` before running locally.
 | `VITE_FIREBASE_*` | Frontend | Client Firebase web config (B-2). Set these to activate Firestore persistence; unset ⇒ localStorage only |
 | `VITE_STORE_ID` | Frontend | Firestore store namespace (default `yomyom-kafr-qasim`) |
 | `LLM_ALLOWED_ORIGINS` / `LLM_*` | Python | LLM proxy CORS origins, timeout, and cache settings (B-4) |
+| `GEMINI_MODEL` | Python | Gemini model for the proxy (default `gemini-2.5-flash-lite` — see cost controls) |
+| `VITE_LLM_MAX_EXPLANATIONS` | Frontend | Max rows upgraded to a paid LLM explanation per pass (default `40`) |
 | `FIREBASE_SERVICE_ACCOUNT_PATH` | Python | Firestore credentials file path |
 | `FIREBASE_PROJECT_ID` | Python | Firebase project (`hackathon26-a6ebd`) |
 | `KAGGLE_API_TOKEN` | Python | For downloading Israeli supermarket datasets |
@@ -293,7 +303,7 @@ Silver Parquets written:
 The POS export is an inventory snapshot only. Until YomYom provides a sales/transaction export, velocity-based features cannot work. Two options: obtain a real sales export, or reframe recommendations around what does exist — stock levels, margin, and competitor price gaps (the genuinely strong signal, backed by 14,406 barcode matches).
 
 #### 🔴 2. LLM explanations blocked
-See the AI explanations section above — an async/sync bug in `explanationProvider.js` (Track C) plus a Gemini key with no credits. The **proxy has been hardened** (caching, timeouts, CORS, graceful startup — B-4), but `VITE_LLM_PROXY_URL` stays commented out until the key is funded, the proxy is deployed, and the Track-C async fix lands, so the app stays on the working mock provider.
+See the AI explanations section above. The Track-C async fix has landed and the cost controls are in place; what remains is an unfunded Gemini key and an undeployed proxy. `VITE_LLM_PROXY_URL` stays empty until both are resolved, so the app runs on the mock provider.
 
 ### Track B (deployment / persistence / telemetry) — status
 
