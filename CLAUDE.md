@@ -114,6 +114,33 @@ Three connectors exist:
 
 Each connector implements `{ connect() → {ok, message}, load() → {products, validationIssues, source} }`.
 
+### Store format filter (`src/lib/analytics/storeFormat.js`)
+
+YomYom is a `gas_convenience` forecourt shop. Comparing it to a hypermarket produces
+recommendations the manager instantly recognises as absurd, so every competitor entry
+passes a format-affinity gate before any engine sees it:
+
+- **affinity 0.0** → dropped entirely (hypermarket vs. forecourt shop)
+- **0.0 < affinity < 0.3** → context only; never the basis of a recommendation
+- **affinity ≥ 0.3** → comparable; the price-protection threshold widens as affinity falls
+
+Reference data is `configs/store_types.yaml` (hand-edited, with the 5-format scale and
+the affinity matrix). Each branch carries two separate fields: `verified` (who decided
+— `manual` is final and no script overwrites it) and `basis` (what the decision rests
+on — `branch_known` first-hand vs `chain_format` desk knowledge). Only YomYom, Alonit
+and the YomYom Wolt venue are `branch_known`; the rest are reasoned from chain format
+and will be wrong for a branch that is unusual for its chain. Machine-inferred
+classifications go to `configs/store_types.inferred.yaml` and never override the
+hand-written file.
+`npm run data:store-types` publishes both to the generated `src/data/storeTypes.js`.
+`npm run classify:store-types` infers formats from distinct-SKU counts;
+`npm run audit:store-format` is the acceptance check (exits non-zero if any
+recommendation is sourced from an affinity-0.0 store).
+
+Today that excludes **Shufersal Deal** (hypermarket, 677 prices) outright and demotes
+**Rami Levy** (supermarket, affinity 0.1) to context — 457 of 2,101 recommendations are
+competitor-sourced, all from Alonit.
+
 ### AI explanations (`src/lib/ai/`)
 
 `getDefaultExplanationProvider()` returns `mockExplanationProvider` (rule-based text) unless `VITE_LLM_PROXY_URL` is set — that variable is the only switch. (`VITE_LLM_EXPLANATIONS_ENABLED` exists in `.env` but nothing in `src/` reads it.)

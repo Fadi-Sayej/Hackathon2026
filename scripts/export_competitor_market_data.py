@@ -6,8 +6,15 @@ Writes: src/data/marketData.js
 """
 import polars as pl
 import json
+import sys
 from pathlib import Path
 from datetime import datetime, timezone
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from src.common.store_types import load_store_types
 
 MATCHES = Path("data/matching/barcode_matches.parquet")
 DELIVERY_SILVER = Path("data/external/silver/products/delivery_catalog")
@@ -59,6 +66,38 @@ CHAIN_ALIASES = {
 }
 
 
+def attach_store_types(our_store: dict, chain_meta: dict) -> tuple[dict, dict, list]:
+    """Stamp every store with its format from configs/store_types.yaml.
+
+    The format is what stops the frontend comparing a hypermarket to a forecourt
+    shop. Baking it in here means the browser never has to look a branch up, and a
+    branch nobody has classified is visibly `unknown` rather than silently assumed
+    to be comparable.
+    """
+    config = load_store_types()
+    our_type = config.store_type(our_store["storeId"])
+
+    our_out = {**our_store, "storeType": our_type}
+    record = config.store(our_store["storeId"])
+    our_out["storeTypeVerified"] = record.verified if record else "unknown"
+
+    meta_out = {}
+    excluded = []
+    for chain, meta in chain_meta.items():
+        store_record = config.store(meta["storeId"])
+        store_type = store_record.store_type if store_record else "unknown"
+        affinity = config.affinity(our_type, store_type)
+        meta_out[chain] = {
+            **meta,
+            "storeType": store_type,
+            "storeTypeVerified": store_record.verified if store_record else "unknown",
+            "formatAffinity": affinity,
+        }
+        if affinity == 0.0:
+            excluded.append((meta["storeId"], store_type))
+    return our_out, meta_out, excluded
+
+
 def load_wolt_availability() -> set:
     available = set()
     parquet_files = list(DELIVERY_SILVER.rglob("*.parquet"))
@@ -86,6 +125,7 @@ def main():
 
     matches = pl.read_parquet(MATCHES)
     wolt_available = load_wolt_availability()
+    our_store, chain_meta, format_excluded = attach_store_types(OUR_STORE, CHAIN_META)
 
     has_age = "price_age_days" in matches.columns
     if not has_age:
@@ -115,7 +155,7 @@ def main():
     product_id_to_barcode = {}
     all_ages = []
 
-    for chain, meta in CHAIN_META.items():
+    for chain, meta in chain_meta.items():
         chain_rows = matches.filter(pl.col("store_key") == chain)
         if len(chain_rows) == 0:
             continue
@@ -183,7 +223,7 @@ def main():
 // Generated: {datetime.now(timezone.utc).isoformat()}
 // Source: data/matching/barcode_matches.parquet
 
-export const OUR_STORE = {json.dumps(OUR_STORE, ensure_ascii=False, indent=2)}
+export const OUR_STORE = {json.dumps(our_store, ensure_ascii=False, indent=2)}
 
 export const COMPETITOR_STORES = {json.dumps(competitor_stores, ensure_ascii=False, indent=2)}
 
@@ -199,6 +239,13 @@ export const DATA_FRESHNESS = {json.dumps(data_freshness, ensure_ascii=False, in
     OUTPUT.write_text(js_content, encoding="utf-8")
     total_barcodes = sum(len(s["snapshot"]) for s in competitor_stores)
     print(f"Wrote {OUTPUT}: {len(competitor_stores)} stores, {total_barcodes} barcode entries")
+    print(f"  our format: {our_store['storeType']}")
+    for store in competitor_stores:
+        print("  %-18s %-16s affinity=%.1f (%s)" % (
+            store["storeId"], store["storeType"], store["formatAffinity"], store["storeTypeVerified"]))
+    for store_id, store_type in format_excluded:
+        print(f"  NOT COMPARED: {store_id} is a {store_type} — affinity 0.0. Prices are")
+        print("                exported for reference but no engine may act on them.")
     if all_ages:
         print("  price age (days): newest %d, median %d, oldest %d" % (
             min(all_ages), sorted(all_ages)[len(all_ages) // 2], max(all_ages)))

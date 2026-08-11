@@ -143,6 +143,11 @@ export function buildLocalMarketSnapshot(competitorStores = []) {
         brand: store.brand,
         storeName: store.storeName,
         storeId: store.storeId,
+        // Store format travels with every price. Downstream, competitorEngine
+        // refuses to compare a forecourt shop against a big box, and it can only
+        // do that if it knows which kind of store the number came from.
+        storeType: store.storeType ?? null,
+        storeTypeVerified: store.storeTypeVerified ?? null,
         price,
         isAvailable,
         // How old this observation is. Carried through so the UI can label a price

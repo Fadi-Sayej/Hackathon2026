@@ -9,9 +9,14 @@
  *
  * Pure analytics. No I/O, no React state. Operates on the LocalMarketSnapshot
  * produced by multiCompetitorAdapter.buildLocalMarketSnapshot.
+ *
+ * Every competitor entry passes the store-format filter first (see storeFormat.js):
+ * a hypermarket is not a price source for a forecourt shop, and proximity alone
+ * does not make it one.
  */
 
 import { PRODUCT_ID_TO_BARCODE } from '../../data/marketData.js'
+import { MIN_AFFINITY, partitionByFormat } from './storeFormat.js'
 
 const PROXIMITY_RADIUS_M = 3000
 const PRICE_PROTECTION_THRESHOLD = 0.15 // competitor must be ≥15% cheaper
@@ -47,6 +52,17 @@ function nearbyEntries(barcode, snapshot, radiusMeters = PROXIMITY_RADIUS_M) {
 }
 
 /**
+ * Nearby entries the store format allows us to act on.
+ *
+ * `comparable` drives every number below. `contextOnly` is shown but never acted
+ * on. `excluded` is gone — a hypermarket price is not evidence about a forecourt
+ * shop no matter how close it is.
+ */
+function comparableEntries(barcode, snapshot, radiusMeters = PROXIMITY_RADIUS_M) {
+  return partitionByFormat(nearbyEntries(barcode, snapshot, radiusMeters))
+}
+
+/**
  * Demand multiplier driven by competitor stock state within 1km.
  *   - All competitors OOS  → 1.25
  *   - Some (but not all)   → 1.15
@@ -57,12 +73,14 @@ function nearbyEntries(barcode, snapshot, radiusMeters = PROXIMITY_RADIUS_M) {
  * @returns {number}
  */
 export function getCompetitorDemandBoost(barcode, localMarketSnapshot) {
-  const nearby = nearbyEntries(barcode, localMarketSnapshot)
-  if (nearby.length === 0) return 1.0
+  // A stockout at a store we would never compare prices against is not evidence
+  // that demand is about to land here, so the boost sees comparable stores only.
+  const { comparable } = comparableEntries(barcode, localMarketSnapshot)
+  if (comparable.length === 0) return 1.0
 
-  const oosCount = nearby.filter((entry) => entry.isAvailable === false).length
+  const oosCount = comparable.filter((entry) => entry.isAvailable === false).length
   if (oosCount === 0) return 1.0
-  if (oosCount === nearby.length) return 1.25
+  if (oosCount === comparable.length) return 1.25
   return 1.15
 }
 
@@ -71,7 +89,13 @@ export function getCompetitorDemandBoost(barcode, localMarketSnapshot) {
  */
 function analyzeProductMarket(product, snapshot, barcodeMap) {
   const barcode = resolveBarcode(product, barcodeMap)
-  const nearby = barcode ? nearbyEntries(barcode, snapshot) : []
+  const { comparable, contextOnly, excluded } = barcode
+    ? comparableEntries(barcode, snapshot)
+    : { comparable: [], contextOnly: [], excluded: [] }
+
+  // From here down, "nearby" means nearby AND comparable. Everything else is
+  // reported as a count so the UI can explain the gap, never mixed into a number.
+  const nearby = comparable
   const available = nearby.filter((entry) => entry.isAvailable !== false)
   const oos = nearby.filter((entry) => entry.isAvailable === false)
 
@@ -94,15 +118,20 @@ function analyzeProductMarket(product, snapshot, barcodeMap) {
   const priceAgeDays = cheapestEntry?.ageDays ?? null
   const priceObservedAt = cheapestEntry?.observedAt ?? null
 
+  // How comparable the store behind the cheapest price actually is. A 1.0 is the
+  // forecourt shop down the road; a 0.3 is a mid-size grocery whose scale we
+  // cannot match, so its gap has to be bigger before it means anything.
+  const priceAffinity = cheapestEntry?.formatAffinity ?? null
+
   if (cheapestCompetitor !== null && Number.isFinite(product.price)) {
     priceDelta = round(product.price - cheapestCompetitor)
     isPriceLeader = available.length > 0 && product.price < cheapestCompetitor + 0.001
     isPriceSensitive = priceDelta > 0.001
-    // ≥15% cheaper triggers price protection
-    if (
-      product.price > 0 &&
-      cheapestCompetitor / product.price <= 1 - PRICE_PROTECTION_THRESHOLD
-    ) {
+    // ≥15% cheaper triggers price protection — but the threshold widens as the
+    // source gets less comparable, so a distant format needs a starker gap.
+    const affinity = priceAffinity ?? 1
+    const threshold = affinity > 0 ? PRICE_PROTECTION_THRESHOLD / affinity : Infinity
+    if (product.price > 0 && cheapestCompetitor / product.price <= 1 - threshold) {
       priceProtectionAlert = true
     }
   }
@@ -121,10 +150,17 @@ function analyzeProductMarket(product, snapshot, barcodeMap) {
   return {
     barcode,
     nearbyCompetitors: nearby.length,
+    // Nearby but not comparable. Split so the UI can say "3 nearby stores, none of
+    // them your format" instead of silently showing no competitors at all.
+    contextOnlyCompetitors: contextOnly.length,
+    excludedByFormat: excluded.length,
+    excludedStoreTypes: [...new Set(excluded.map((entry) => entry.storeType))],
     cheapestCompetitorPrice: cheapestCompetitor,
     priciestCompetitorPrice: priciestCompetitor,
     priceAgeDays,
     priceObservedAt,
+    priceAffinity,
+    priceStoreType: cheapestEntry?.storeType ?? null,
     priceDelta,
     isPriceSensitive,
     isPriceLeader,
@@ -203,8 +239,16 @@ export function summarizeCompetitorIntelligence(enrichedProducts) {
     competitorOOSCount: selectStockoutOpportunities(enrichedProducts).length,
     priceProtectionCount: selectPriceProtectionAlerts(enrichedProducts).length,
     productsWithCoverage: enrichedProducts.filter((p) => (p.competitor?.nearbyCompetitors ?? 0) > 0).length,
+    // Products whose only nearby price came from a store format we refuse to
+    // compare against. These are not "no data" — they are a deliberate silence.
+    productsExcludedByFormat: enrichedProducts.filter(
+      (p) => (p.competitor?.nearbyCompetitors ?? 0) === 0 && (p.competitor?.excludedByFormat ?? 0) > 0,
+    ).length,
   }
 }
+
+/** Re-exported so callers can reason about the gate without importing two modules. */
+export { MIN_AFFINITY }
 
 function round(value) {
   return Math.round(value * 100) / 100

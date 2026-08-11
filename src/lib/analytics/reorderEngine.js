@@ -288,6 +288,12 @@ function makeRecommendation(product, metrics, marketContext, extras) {
     valueAtStake: calculateValueAtStake(product, metrics, extras),
     reason: extras.reason,
     status: 'PENDING',
+    // Which competitor price this was built on, and how comparable that store's
+    // format is to ours. Carried so an auditor can check that no recommendation
+    // was ever sourced from a store we are not supposed to compare against.
+    competitorPrice: extras.competitorPrice ?? null,
+    competitorStoreType: product.competitor?.priceStoreType ?? null,
+    competitorFormatAffinity: product.competitor?.priceAffinity ?? null,
     metrics: {
       currentStock: product.currentStock,
       weightedAvgDailySales: metrics.weightedAvgDailySales,
