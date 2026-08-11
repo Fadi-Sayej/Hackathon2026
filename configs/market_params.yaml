@@ -1,0 +1,292 @@
+# market_params.yaml — the registry of external factors that move demand (issue #50).
+#
+# ADDING PARAMETER #110 MUST BE A LINE IN THIS FILE, NOT A CODE CHANGE.
+# The engine reads this registry; it knows nothing about any individual parameter.
+#
+# ── THREE TYPES, AND THE DISTINCTION IS THE WHOLE POINT ──────────────────────
+#   multiplier  raises or lowers demand          36 °C  → water x1.45
+#   gate        permits or forbids ABSOLUTELY    Pesach → chametz = 0
+#   signal      suggests a product, never touches demand
+#
+# A system that can only multiply cannot express a prohibition, and will happily
+# recommend reordering bamba three weeks before Pesach. That is why `gate` exists
+# as its own type rather than as a very small multiplier.
+#
+# ── COMPOSITION RULES ENFORCED BY THE ENGINE ────────────────────────────────
+#   1. Group WITHIN a family, then multiply ACROSS families. temp_max_c, season and
+#      month_of_year all say "summer"; multiplied naively that is triple-counting.
+#   2. neutral is always 1.0 — a missing parameter must vanish without trace. This is
+#      what makes 109 parameters safe when only 35 are live.
+#   3. clamp the final product to [0.2, 3.0]. There is no day on which the shop sells
+#      47x normal; twenty mild multipliers otherwise produce nonsense.
+#   4. gates evaluate LAST and override everything above them.
+#
+# ── STATUS ──────────────────────────────────────────────────────────────────
+#   active: true   collected today, feeding the engine
+#   active: false  defined, not yet wired. Sits at neutral and changes nothing.
+#                  The engine runs identically with 35 active or 109.
+#
+# Weights marked `weight_source: assumed` are educated guesses awaiting issue #53,
+# which measures the real effect from seven months of our own sales. Never present
+# an assumed weight to a manager as a measured fact.
+
+version: 1
+
+clamp: [0.2, 3.0]
+
+families:
+
+  # ── 1. WEATHER ─────────────────────────────────────────────────────────────
+  weather:
+    label_ar: "الطقس"
+    weight: 1.0
+    source: open_meteo
+    params:
+      - { id: temp_max_c,          type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: temp_min_c,          type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: apparent_temp_c,     type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: temp_delta_vs_yday,  type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: precipitation_mm,    type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: humidity_pct,        type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: wind_speed_kmh,      type: multiplier, neutral: 1.0, active: false, refresh: daily }
+      - { id: uv_index,            type: multiplier, neutral: 1.0, active: false, refresh: daily }
+      - { id: heatwave_day,        type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: first_hot_day,       type: multiplier, neutral: 1.0, active: false, refresh: daily }
+      - { id: first_cold_day,      type: multiplier, neutral: 1.0, active: false, refresh: daily }
+      - { id: dust_storm,          type: multiplier, neutral: 1.0, active: false, refresh: daily }
+
+  # ── 2. HEBREW CALENDAR ─────────────────────────────────────────────────────
+  # Hebcal, free and keyless. Date Nager (the current source) gives civil public
+  # holidays only — no erev chag, no fast days, and critically no chametz window,
+  # which is the single highest-value gate in the whole registry.
+  calendar_hebrew:
+    label_ar: "التقويم العبري"
+    weight: 1.0
+    source: hebcal
+    params:
+      - { id: pesach_chametz_window, type: gate,       neutral: 1.0, active: true,  refresh: daily }
+      - { id: pesach_day,            type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: erev_chag,             type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: shabbat_eve,           type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: rosh_hashanah,         type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: yom_kippur_fast,       type: gate,       neutral: 1.0, active: true,  refresh: daily }
+      - { id: sukkot,                type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: hanukkah,              type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: purim,                 type: multiplier, neutral: 1.0, active: false, refresh: daily }
+      - { id: minor_fast_day,        type: multiplier, neutral: 1.0, active: false, refresh: daily }
+
+  # ── 3. ISLAMIC CALENDAR ────────────────────────────────────────────────────
+  # NO API REQUIRED. This is astronomical computation: `hijri-converter` in Python,
+  # Intl.DateTimeFormat with the islamic calendar in JS. Kafr Qasim is a
+  # predominantly Arab town, so this family is decisive here, and it is free.
+  calendar_islamic:
+    label_ar: "التقويم الهجري"
+    weight: 1.0
+    source: computed_hijri
+    params:
+      - { id: ramadan_daytime,   type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: ramadan_iftar,     type: multiplier, neutral: 1.0, active: true,  refresh: hourly }
+      - { id: ramadan_suhoor,    type: multiplier, neutral: 1.0, active: true,  refresh: hourly }
+      - { id: ramadan_last_10,   type: multiplier, neutral: 1.0, active: false, refresh: daily }
+      - { id: eid_al_fitr,       type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: eid_al_adha,       type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: eid_eve,           type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: ashura,            type: multiplier, neutral: 1.0, active: false, refresh: daily }
+
+  # ── 4. CIVIL / SCHOOL CALENDAR ─────────────────────────────────────────────
+  calendar_civil:
+    label_ar: "التقويم المدني والمدرسي"
+    weight: 0.8
+    source: static_table
+    params:
+      - { id: school_day,        type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: school_holiday,    type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: exam_period,       type: multiplier, neutral: 1.0, active: false, refresh: daily }
+      - { id: summer_break,      type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: national_holiday,  type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: memorial_day,      type: multiplier, neutral: 1.0, active: false, refresh: daily }
+      - { id: election_day,      type: multiplier, neutral: 1.0, active: false, refresh: daily }
+      - { id: municipal_event,   type: signal,     neutral: 1.0, active: false, refresh: daily }
+
+  # ── 5. TIME CYCLES ─────────────────────────────────────────────────────────
+  time_cycles:
+    label_ar: "دورات الزمن"
+    weight: 1.0
+    source: computed
+    params:
+      - { id: day_of_week,       type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: weekend_fri_sat,   type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: pre_weekend_thu,   type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: hour_of_day,       type: multiplier, neutral: 1.0, active: false, refresh: hourly }
+      - { id: payday_window,     type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: month_start,       type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: month_end,         type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: season,            type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+
+  # ── 6. COMPETITOR PRESENCE ─────────────────────────────────────────────────
+  # Live today via the daily collector (#46): 156 comparable branches.
+  competitor_presence:
+    label_ar: "حضور المنافسين"
+    weight: 1.0
+    source: price_transparency
+    params:
+      - { id: coverage_ratio,            type: signal,     neutral: 1.0, active: true,  refresh: daily }
+      - { id: branches_carrying,         type: signal,     neutral: 1.0, active: true,  refresh: daily }
+      - { id: newly_appeared,            type: signal,     neutral: 1.0, active: false, refresh: daily }
+      - { id: disappeared,               type: signal,     neutral: 1.0, active: false, refresh: daily }
+      - { id: disappearance_concentration, type: signal,   neutral: 1.0, active: false, refresh: daily }
+      - { id: days_since_first_seen,     type: signal,     neutral: 1.0, active: false, refresh: daily }
+      - { id: days_since_last_seen,      type: signal,     neutral: 1.0, active: false, refresh: daily }
+      - { id: coverage_acceleration,     type: signal,     neutral: 1.0, active: false, refresh: daily }
+      - { id: stockout_like,             type: multiplier, neutral: 1.0, active: false, refresh: daily }
+      - { id: delisting_like,            type: gate,       neutral: 1.0, active: false, refresh: daily }
+
+  # ── 7. COMPETITOR PRICE ────────────────────────────────────────────────────
+  competitor_price:
+    label_ar: "أسعار المنافسين"
+    weight: 0.9
+    source: price_transparency
+    params:
+      - { id: price_gap_vs_median, type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: competitor_price_min, type: signal,    neutral: 1.0, active: true,  refresh: daily }
+      - { id: competitor_price_med, type: signal,    neutral: 1.0, active: true,  refresh: daily }
+      - { id: competitor_price_max, type: signal,    neutral: 1.0, active: true,  refresh: daily }
+      - { id: promo_active,        type: multiplier, neutral: 1.0, active: false, refresh: daily }
+      - { id: promo_depth,         type: multiplier, neutral: 1.0, active: false, refresh: daily }
+      - { id: promo_density,       type: multiplier, neutral: 1.0, active: false, refresh: daily }
+      - { id: promo_cycle_phase,   type: signal,     neutral: 1.0, active: false, refresh: daily }
+      - { id: price_volatility,    type: signal,     neutral: 1.0, active: false, refresh: daily }
+      - { id: price_changepoint,   type: signal,     neutral: 1.0, active: false, refresh: daily }
+
+  # ── 8. TREND ───────────────────────────────────────────────────────────────
+  trend:
+    label_ar: "الاتجاهات"
+    weight: 0.6
+    source: delivery_catalog
+    params:
+      - { id: wolt_most_ordered,    type: signal,     neutral: 1.0, active: true,  refresh: daily }
+      - { id: wolt_rank_in_category, type: signal,    neutral: 1.0, active: true,  refresh: daily }
+      - { id: rank_delta,           type: signal,     neutral: 1.0, active: false, refresh: daily }
+      - { id: is_online_available,  type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: google_trends_index,  type: signal,     neutral: 1.0, active: false, refresh: weekly }
+      - { id: google_trends_slope,  type: signal,     neutral: 1.0, active: false, refresh: weekly }
+      - { id: social_mentions,      type: signal,     neutral: 1.0, active: false, refresh: weekly }
+      - { id: adoption_curve_phase, type: signal,     neutral: 1.0, active: false, refresh: weekly }
+
+  # ── 9. LOCATION AND MOBILITY ───────────────────────────────────────────────
+  # YomYom sits on a highway junction, so through-traffic is a real demand driver
+  # and behaves nothing like a residential catchment.
+  location_mobility:
+    label_ar: "الموقع والحركة"
+    weight: 0.7
+    source: mixed
+    params:
+      - { id: highway_traffic_index, type: multiplier, neutral: 1.0, active: false, refresh: hourly }
+      - { id: competitor_open_now,   type: multiplier, neutral: 1.0, active: false, refresh: hourly }
+      - { id: nearby_event,          type: multiplier, neutral: 1.0, active: false, refresh: daily }
+      - { id: roadworks_nearby,      type: multiplier, neutral: 1.0, active: false, refresh: daily }
+      - { id: public_transport_gap,  type: multiplier, neutral: 1.0, active: false, refresh: daily }
+      - { id: fuel_station_footfall, type: multiplier, neutral: 1.0, active: false, refresh: daily }
+      - { id: holiday_travel_peak,   type: multiplier, neutral: 1.0, active: false, refresh: daily }
+      - { id: weather_travel_damper, type: multiplier, neutral: 1.0, active: false, refresh: daily }
+
+  # ── 10. MACRO ──────────────────────────────────────────────────────────────
+  macro:
+    label_ar: "الاقتصاد الكلي"
+    weight: 0.4
+    source: public_data
+    params:
+      - { id: fuel_price_ils,     type: multiplier, neutral: 1.0, active: false, refresh: weekly }
+      - { id: fuel_price_delta,   type: multiplier, neutral: 1.0, active: false, refresh: weekly }
+      - { id: usd_ils_rate,       type: signal,     neutral: 1.0, active: false, refresh: daily }
+      - { id: cpi_food,           type: signal,     neutral: 1.0, active: false, refresh: monthly }
+      - { id: cpi_general,        type: signal,     neutral: 1.0, active: false, refresh: monthly }
+      - { id: minimum_wage_day,   type: multiplier, neutral: 1.0, active: false, refresh: monthly }
+      - { id: national_strike,    type: multiplier, neutral: 1.0, active: false, refresh: daily }
+
+  # ── 11. STORE INTERNAL ─────────────────────────────────────────────────────
+  # The only family that can produce a HARD gate from our own data: an expired
+  # product must never be recommended, whatever every other factor says.
+  store_internal:
+    label_ar: "داخلي — المتجر"
+    weight: 1.2
+    source: internal_pos
+    params:
+      - { id: current_stock,        type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: days_of_cover,        type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: days_to_expiry,       type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: expired,              type: gate,       neutral: 1.0, active: true,  refresh: daily }
+      - { id: margin_rate,          type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: below_cost,           type: signal,     neutral: 1.0, active: true,  refresh: daily }
+      - { id: negative_stock,       type: gate,       neutral: 1.0, active: true,  refresh: daily }
+      - { id: stock_reconciles,     type: multiplier, neutral: 1.0, active: true,  refresh: daily }
+      - { id: supplier_lead_time,   type: multiplier, neutral: 1.0, active: false, refresh: weekly }
+      - { id: supplier_min_order,   type: signal,     neutral: 1.0, active: false, refresh: weekly }
+
+  # ── 12. PRODUCT INTRINSIC ──────────────────────────────────────────────────
+  # Static per product. These do not vary by day; they come from the archetype and
+  # from issue #51's classification, and they modulate how strongly every family
+  # above applies.
+  product_intrinsic:
+    label_ar: "ذاتي — المنتج"
+    weight: 1.0
+    source: product_profiles
+    params:
+      - { id: archetype,          type: signal,     neutral: 1.0, active: true,  refresh: static }
+      - { id: pack_class,         type: signal,     neutral: 1.0, active: true,  refresh: static }
+      - { id: is_impulse,         type: multiplier, neutral: 1.0, active: true,  refresh: static }
+      - { id: is_on_the_go,       type: multiplier, neutral: 1.0, active: true,  refresh: static }
+      - { id: is_perishable,      type: multiplier, neutral: 1.0, active: true,  refresh: static }
+      - { id: is_chametz,         type: signal,     neutral: 1.0, active: true,  refresh: static }
+      - { id: is_kitniyot,        type: signal,     neutral: 1.0, active: false, refresh: static }
+      - { id: store_fit,          type: multiplier, neutral: 1.0, active: true,  refresh: static }
+      - { id: price_band,         type: signal,     neutral: 1.0, active: true,  refresh: static }
+      - { id: segment,            type: signal,     neutral: 1.0, active: true,  refresh: static }
+
+# ── GATE DEFINITIONS ─────────────────────────────────────────────────────────
+# A gate is evaluated last and overrides every multiplier above it. Each names the
+# product flag it keys off, so a gate can never fire on a product that has not been
+# classified — see `requires_flag`.
+#
+# NON-NEGOTIABLE: a gate keyed on a flag whose profile has `reviewed_by: null` must
+# NOT fire. One wrong chametz call means a forbidden sale in our client's store.
+# The engine enforces this; it is not left to convention.
+gates:
+
+  pesach_chametz_window:
+    requires_flag: is_chametz
+    requires_human_review: true
+    windows:
+      - { from: pesach-30d, to: pesach-15d, action: STOP_REORDER,
+          reason_he: "לא להזמין חמץ — פסח בעוד חודש",
+          reason_ar: "لا تطلب الحمץ — الفصح بعد شهر" }
+      - { from: pesach-14d, to: pesach-1d,  action: CLEAR_STOCK,
+          reason_he: "צריך למכור לפני החג",
+          reason_ar: "صفِّ المخزون قبل العيد",
+          suggest: "discount ~20% to sell down" }
+      - { from: pesach,     to: pesach+8d,  action: BLOCK,
+          reason_he: "אסור למכירה",
+          reason_ar: "ممنوع البيع" }
+
+  # NOT A GATE: Yom Kippur, Ramadan fasting hours, and any other "the shop is shut"
+  # rule are properties of the STORE's opening hours, not of a product. A product
+  # gate says "this item may not be sold"; a closed shop sells nothing at all, which
+  # is a different statement and belongs in store policy.
+  #
+  # Modelling it as a product gate would also bake in an assumption about which
+  # calendar a given store observes. SmartShelf must work for a shop that closes on
+  # Yom Kippur and one that does not, with neither treated as the normal case.
+
+  expired:
+    requires_flag: null           # computed from our own stock, no classification needed
+    requires_human_review: false
+    windows:
+      - { when: days_to_expiry_lte_0, action: BLOCK,
+          reason_ar: "منتهي الصلاحية — يُسحب من الرف" }
+
+  negative_stock:
+    requires_flag: null
+    requires_human_review: false
+    windows:
+      - { when: stock_lt_0, action: BLOCK,
+          reason_ar: "مخزون سالب — جرد أولاً" }

@@ -1,0 +1,376 @@
+# archetypes.yaml — product archetypes and their sensitivity vectors (issue #50).
+#
+# ── WHY THIS FILE IS THE STEP THAT MAKES 109 PARAMETERS FEASIBLE ────────────
+#   Assigning 109 weights to each of 7,674 products means tuning 836,466 numbers.
+#   Nobody can review that, and an LLM asked to invent them produces confident
+#   nonsense.
+#
+#   Instead every product is assigned ONE archetype, and the archetype carries the
+#   vector. ~40 archetypes x ~15 meaningful weights is about 600 numbers a human can
+#   actually read and argue with.
+#
+#   It also reframes issue #51's job from "invent 109 floats" — which LLMs do badly —
+#   into "pick one bucket from a closed list", which they do well.
+#
+# ── HOW TO READ A SENSITIVITY ───────────────────────────────────────────────
+#   1.0  = unaffected. Omit it; the engine defaults every unlisted parameter to 1.0.
+#   1.4  = demand rises 40% when the factor is fully present
+#   0.6  = demand falls 40%
+#   Only list what genuinely moves. A vector full of 1.05s is noise pretending to be
+#   knowledge.
+#
+# ── WEIGHTS ARE ASSUMED UNTIL ISSUE #53 MEASURES THEM ───────────────────────
+#   Every number here is an educated guess about a forecourt shop on a highway in
+#   Kafr Qasim. Issue #53 decomposes seven months of our own sales and replaces these
+#   with measured effects carrying confidence intervals. Until then `confidence:
+#   assumed` is on every archetype, and no manager-facing text may present these as
+#   measured facts.
+#
+# ── GATES ARE NOT SET HERE ──────────────────────────────────────────────────
+#   An archetype may declare `flags`, and gates in market_params.yaml key off those
+#   flags. But a gate only fires when the PRODUCT's own profile has the flag AND has
+#   been reviewed by a human (`reviewed_by` non-null). An archetype can never by
+#   itself block a product from sale.
+
+version: 1
+
+defaults:
+  confidence: assumed
+  store_fit: gas_convenience
+
+archetypes:
+
+  # ── COLD DRINKS ───────────────────────────────────────────────────────────
+  water_bottle:
+    label_ar: "مياه معبأة"
+    flags: { is_impulse: true, is_on_the_go: true }
+    sensitivities:
+      temp_max_c: 1.45
+      apparent_temp_c: 1.30
+      heatwave_day: 1.60
+      precipitation_mm: 0.85
+      ramadan_iftar: 1.55
+      ramadan_daytime: 0.70
+      highway_traffic_index: 1.35
+      summer_break: 1.20
+
+  cold_drink_single:
+    label_ar: "مشروب بارد فردي"
+    flags: { is_impulse: true, is_on_the_go: true }
+    sensitivities:
+      temp_max_c: 1.40
+      heatwave_day: 1.50
+      precipitation_mm: 0.85
+      ramadan_iftar: 1.45
+      ramadan_daytime: 0.55
+      pre_weekend_thu: 1.15
+      school_day: 1.15
+
+  energy_drink:
+    label_ar: "مشروب طاقة"
+    flags: { is_impulse: true, is_on_the_go: true }
+    sensitivities:
+      temp_max_c: 1.25
+      highway_traffic_index: 1.40
+      exam_period: 1.30
+      pre_weekend_thu: 1.20
+      hour_of_day: 1.15
+      ramadan_daytime: 0.45
+
+  juice_carton:
+    label_ar: "عصير"
+    flags: { is_perishable: true }
+    sensitivities:
+      temp_max_c: 1.20
+      ramadan_iftar: 1.70
+      eid_eve: 1.35
+      school_day: 1.20
+
+  hot_beverage:
+    label_ar: "مشروب ساخن"
+    flags: { is_on_the_go: true }
+    sensitivities:
+      temp_max_c: 0.60
+      temp_min_c: 1.45
+      precipitation_mm: 1.35
+      first_cold_day: 1.50
+      highway_traffic_index: 1.25
+
+  # ── SNACKS ────────────────────────────────────────────────────────────────
+  chametz_snack:
+    label_ar: "وجبة خفيفة تحتوي حمץ"
+    flags: { is_chametz: true, is_impulse: true, is_on_the_go: true }
+    sensitivities:
+      school_day: 1.30
+      pre_weekend_thu: 1.15
+      summer_break: 1.15
+      ramadan_daytime: 0.40
+
+  chametz_bakery:
+    label_ar: "مخبوزات تحتوي حمץ"
+    flags: { is_chametz: true, is_perishable: true }
+    sensitivities:
+      shabbat_eve: 1.25
+      erev_chag: 1.20
+      ramadan_suhoor: 1.40
+      ramadan_daytime: 0.35
+
+  salty_snack:
+    label_ar: "وجبة خفيفة مالحة"
+    flags: { is_impulse: true, is_on_the_go: true }
+    sensitivities:
+      school_day: 1.25
+      pre_weekend_thu: 1.20
+      weekend_fri_sat: 1.15
+      ramadan_daytime: 0.40
+      ramadan_iftar: 1.20
+
+  impulse_chocolate:
+    label_ar: "شوكولاتة"
+    flags: { is_impulse: true }
+    sensitivities:
+      temp_max_c: 0.80          # melts; forecourt shelves are warm
+      eid_eve: 1.45
+      hanukkah: 1.30
+      purim: 1.40
+      school_day: 1.20
+      ramadan_daytime: 0.40
+
+  candy_gum:
+    label_ar: "حلوى وعلكة"
+    flags: { is_impulse: true, is_on_the_go: true }
+    sensitivities:
+      school_day: 1.30
+      highway_traffic_index: 1.25
+      ramadan_daytime: 0.50
+
+  nuts_seeds:
+    label_ar: "مكسرات وبذور"
+    flags: { is_impulse: true }
+    sensitivities:
+      ramadan_iftar: 1.50
+      eid_al_fitr: 1.40
+      weekend_fri_sat: 1.20
+      temp_max_c: 1.05
+
+  protein_health_snack:
+    label_ar: "وجبة بروتين صحية"
+    flags: { is_impulse: true, is_on_the_go: true }
+    sensitivities:
+      highway_traffic_index: 1.25
+      school_day: 1.10
+      ramadan_daytime: 0.55
+
+  ice_cream:
+    label_ar: "مثلجات"
+    flags: { is_impulse: true, is_perishable: true }
+    sensitivities:
+      temp_max_c: 1.70
+      heatwave_day: 1.90
+      first_hot_day: 1.60
+      temp_min_c: 0.50
+      precipitation_mm: 0.65
+      summer_break: 1.40
+      ramadan_daytime: 0.40
+
+  # ── RAMADAN AND HOLIDAY STAPLES ───────────────────────────────────────────
+  ramadan_iftar_staple:
+    label_ar: "أساسيات الإفطار"
+    flags: {}
+    sensitivities:
+      ramadan_iftar: 2.20
+      ramadan_daytime: 1.60       # bought during the day, consumed at iftar
+      ramadan_last_10: 1.35
+      eid_eve: 1.30
+
+  dates_dried_fruit:
+    label_ar: "تمر وفواكه مجففة"
+    flags: {}
+    sensitivities:
+      ramadan_iftar: 2.40
+      ramadan_daytime: 1.80
+      eid_al_fitr: 1.50
+      rosh_hashanah: 1.30
+
+  holiday_gift_item:
+    label_ar: "هدايا الأعياد"
+    flags: {}
+    sensitivities:
+      eid_eve: 1.80
+      erev_chag: 1.70
+      rosh_hashanah: 1.50
+      hanukkah: 1.40
+
+  # ── FRESH AND CHILLED ─────────────────────────────────────────────────────
+  dairy_fresh:
+    label_ar: "ألبان طازجة"
+    flags: { is_perishable: true }
+    sensitivities:
+      days_to_expiry: 1.40
+      shabbat_eve: 1.25
+      ramadan_suhoor: 1.45
+      school_day: 1.15
+
+  ready_meal:
+    label_ar: "وجبة جاهزة"
+    flags: { is_perishable: true, is_on_the_go: true }
+    sensitivities:
+      highway_traffic_index: 1.45
+      hour_of_day: 1.30
+      ramadan_daytime: 0.30
+      ramadan_iftar: 1.40
+      school_day: 1.15
+
+  bread_fresh:
+    label_ar: "خبز طازج"
+    flags: { is_chametz: true, is_perishable: true }
+    sensitivities:
+      shabbat_eve: 1.35
+      ramadan_suhoor: 1.50
+      erev_chag: 1.30
+
+  # ── GROCERY ───────────────────────────────────────────────────────────────
+  grocery_staple:
+    label_ar: "سلع أساسية"
+    flags: {}
+    sensitivities:
+      payday_window: 1.25
+      month_start: 1.20
+      ramadan_daytime: 1.30
+      eid_eve: 1.35
+
+  household_bulk:
+    label_ar: "عبوات كبيرة منزلية"
+    flags: {}
+    sensitivities:
+      payday_window: 1.40
+      month_start: 1.30
+      store_fit: 0.50           # a forecourt shop is the wrong format for bulk
+      highway_traffic_index: 0.70
+
+  cleaning_supplies:
+    label_ar: "مواد تنظيف"
+    flags: {}
+    sensitivities:
+      payday_window: 1.25
+      erev_chag: 1.50           # pre-holiday cleaning is a real Israeli pattern
+      pesach_day: 1.60
+
+  # ── REGULATED SEGMENTS ────────────────────────────────────────────────────
+  # Present because competitors carry them and the data shows it. Whether THIS store
+  # sells them is decided in configs/store_policy.yaml, never here.
+  tobacco:
+    label_ar: "تبغ"
+    flags: { is_impulse: true }
+    sensitivities:
+      highway_traffic_index: 1.40
+      hour_of_day: 1.20
+      ramadan_daytime: 0.60
+      ramadan_iftar: 1.50
+
+  alcohol_beer:
+    label_ar: "بيرة"
+    flags: {}
+    sensitivities:
+      temp_max_c: 1.45
+      heatwave_day: 1.55
+      pre_weekend_thu: 1.35
+      weekend_fri_sat: 1.30
+      ramadan_daytime: 0.30
+
+  alcohol_spirits:
+    label_ar: "مشروبات روحية"
+    flags: {}
+    sensitivities:
+      erev_chag: 1.40
+      pre_weekend_thu: 1.25
+      payday_window: 1.20
+
+  # ── NON-FOOD ──────────────────────────────────────────────────────────────
+  car_accessory:
+    label_ar: "مستلزمات السيارة"
+    flags: { is_on_the_go: true }
+    sensitivities:
+      highway_traffic_index: 1.60
+      holiday_travel_peak: 1.50
+      summer_break: 1.30
+      precipitation_mm: 1.25
+
+  phone_accessory:
+    label_ar: "ملحقات الهاتف"
+    flags: { is_impulse: true }
+    sensitivities:
+      highway_traffic_index: 1.30
+      payday_window: 1.15
+
+  personal_care:
+    label_ar: "عناية شخصية"
+    flags: {}
+    sensitivities:
+      payday_window: 1.20
+      erev_chag: 1.25
+      temp_max_c: 1.10
+
+  baby_care:
+    label_ar: "مستلزمات الأطفال"
+    flags: {}
+    sensitivities:
+      payday_window: 1.25
+      month_start: 1.20
+
+  pharmacy_otc:
+    label_ar: "أدوية بلا وصفة"
+    flags: {}
+    sensitivities:
+      first_cold_day: 1.50
+      temp_min_c: 1.30
+      heatwave_day: 1.25
+      dust_storm: 1.40
+
+  high_ticket_electronics:
+    label_ar: "إلكترونيات مرتفعة الثمن"
+    flags: {}
+    sensitivities:
+      store_fit: 0.30           # ties up capital, turns a few times a year
+      payday_window: 1.30
+      holiday_gift_season: 1.40
+      highway_traffic_index: 0.60
+
+  # ── SEASONAL ──────────────────────────────────────────────────────────────
+  summer_seasonal:
+    label_ar: "موسمي صيفي"
+    flags: {}
+    sensitivities:
+      temp_max_c: 1.60
+      season: 1.50
+      summer_break: 1.45
+      first_hot_day: 1.70
+      temp_min_c: 0.50
+
+  winter_seasonal:
+    label_ar: "موسمي شتوي"
+    flags: {}
+    sensitivities:
+      temp_min_c: 1.60
+      precipitation_mm: 1.50
+      first_cold_day: 1.70
+      temp_max_c: 0.50
+
+  school_seasonal:
+    label_ar: "موسمي مدرسي"
+    flags: {}
+    sensitivities:
+      school_day: 1.50
+      summer_break: 0.40
+      school_holiday: 0.50
+
+  # ── FALLBACK ──────────────────────────────────────────────────────────────
+  # Anything issue #51 cannot classify with confidence lands here. A completely
+  # neutral vector: it never boosts, never suppresses, and never fires a gate.
+  # An unclassified product must behave as though we know nothing about it, because
+  # we do not.
+  unclassified:
+    label_ar: "غير مصنّف"
+    flags: {}
+    sensitivities: {}
+    confidence: none
