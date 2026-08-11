@@ -32,6 +32,9 @@ import {
   getRemoteExplanationBudget,
 } from './lib/ai/explanationProvider.js'
 import { buildMarketContext } from './lib/context/marketContextAdapter.js'
+import { toDemandFactors } from './lib/context/liveMarketContext.js'
+import { computeDemand } from './lib/analytics/demandEngine.js'
+import { MARKET_PARAM_REGISTRY, PRODUCT_ARCHETYPES } from './data/marketParams.js'
 import { fallbackMarketContext } from './lib/context/fallbackMarketContext.js'
 import { loadDemoStoreData } from './lib/dataAdapters/loadDemoStoreData.js'
 import {
@@ -55,6 +58,7 @@ import { ExpiryPage } from './pages/ExpiryPage.jsx'
 import { DataSourcePage } from './pages/DataSourcePage.jsx'
 import { PlanogramPage } from './pages/PlanogramPage.jsx'
 import { PriceGapPage } from './pages/PriceGapPage.jsx'
+import { AssortmentGapPage } from './pages/AssortmentGapPage.jsx'
 import { ProductsPage } from './pages/ProductsPage.jsx'
 import { RecommendationsPage } from './pages/RecommendationsPage.jsx'
 import { ReportPage } from './pages/ReportPage.jsx'
@@ -75,6 +79,10 @@ const pageMeta = {
   operational: {
     title: "Today's Actions",
     description: 'What to act on today, ordered by how much money each one is worth. Stock counts are known to be unreliable, so nothing here predicts running out.',
+  },
+  assortment: {
+    title: 'Assortment Gap',
+    description: 'Products that shops of the same format carry and this one does not. These have never been stocked here, so no sales rate is shown for any of them — the evidence is how many comparable branches carry each one.',
   },
   prices: {
     title: 'Price Comparison',
@@ -297,10 +305,52 @@ function App() {
     [products],
   )
 
-  const generatedRecommendations = useMemo(
+  // Today's external factors, as intensities the demand engine can weigh. Derived
+  // from the live context (weather + both calendars); an absent factor is simply
+  // missing from the map and contributes nothing.
+  const demandFactors = useMemo(
+    () => toDemandFactors(enrichedMarketContext),
+    [enrichedMarketContext],
+  )
+
+  const baseRecommendations = useMemo(
     () => generateReorderRecommendations(analyzedProducts, enrichedMarketContext),
     [analyzedProducts, enrichedMarketContext],
   )
+
+  // Attach the demand decomposition to each recommendation: which factors moved it
+  // and by how much. This is what turns 109 parameters into something debuggable,
+  // and it gives the explanation layer real evidence instead of generic phrasing.
+  //
+  // Product profiles (#51) are not available yet, so every product resolves to the
+  // `unclassified` archetype — which is inert by design. The engine still runs, and
+  // starts producing per-product effects the moment classification lands, with no
+  // change here.
+  const generatedRecommendations = useMemo(() => {
+    if (!Object.keys(demandFactors).length) return baseRecommendations
+    return baseRecommendations.map((recommendation) => {
+      const product = productIndex.get(recommendation.productId)
+      const demand = computeDemand({
+        product: product ?? { id: recommendation.productId },
+        profile: product?.profile ?? null,
+        archetypes: PRODUCT_ARCHETYPES,
+        registry: MARKET_PARAM_REGISTRY,
+        factors: demandFactors,
+      })
+      if (demand.demandIndex === 1 && !demand.blocked) return recommendation
+      return {
+        ...recommendation,
+        demandIndex: demand.demandIndex,
+        topDrivers: demand.topDrivers,
+        gatesEvaluated: demand.gatesEvaluated,
+        // A fired gate outranks whatever the reorder engine concluded — no amount
+        // of demand makes a blocked product orderable.
+        ...(demand.blocked
+          ? { urgency: 'HIGH', reason: demand.blocked.reason ?? recommendation.reason }
+          : null),
+      }
+    })
+  }, [baseRecommendations, demandFactors, productIndex])
   const mockRecommendations = useMemo(
     () =>
       annotateRecommendationsWithMockExplanations({
@@ -547,6 +597,7 @@ function App() {
       {activePage === 'operational' && <OperationalPage {...pageProps} />}
       {activePage === 'expiry' && <ExpiryPage {...pageProps} />}
       {activePage === 'prices' && <PriceGapPage {...pageProps} />}
+      {activePage === 'assortment' && <AssortmentGapPage {...pageProps} />}
       {activePage === 'planogram' && <PlanogramPage {...pageProps} />}
       {activePage === 'report' && <ReportPage {...pageProps} />}
       {activePage === 'orders' && <ApprovedOrdersPage {...pageProps} />}

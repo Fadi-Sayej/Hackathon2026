@@ -1,4 +1,5 @@
-import { getHolidayForDate, getNearbyHoliday } from './holidays.js'
+import { getHebrewContext } from './hebcal.js'
+import { getIslamicContext } from './hijri.js'
 import { fetchNewsHeadlines, hasDemandSignal } from './news.js'
 import { fetchCurrentWeather } from './weather.js'
 import { fallbackMarketContext } from './fallbackMarketContext.js'
@@ -56,37 +57,46 @@ export async function fetchWeatherContext(location, options = {}) {
   }
 }
 
-export async function fetchHolidayContext(countryCode, options = {}) {
+export async function fetchHolidayContext(_countryCode, options = {}) {
   const currentDate = normalizeDate(options.date ?? fallbackMarketContext.currentDate)
 
-  try {
-    const [holidayToday, nearbyHoliday] = await Promise.all([
-      withAbortableTimeout(
-        (signal) => getHolidayForDate(currentDate, countryCode, { signal }),
-        options.timeoutMs ?? DEFAULT_TIMEOUT_MS,
-        'Nager.Date holiday lookup timed out',
-      ),
-      withAbortableTimeout(
-        (signal) => getNearbyHoliday(currentDate, countryCode, 2, { signal }),
-        options.timeoutMs ?? DEFAULT_TIMEOUT_MS,
-        'Nager.Date nearby holiday lookup timed out',
-      ),
-    ])
+  // Was Nager.Date, which returns an EMPTY response for Israel — so correcting
+  // VITE_HOLIDAY_COUNTRY from AT to IL did not fix this source, it silently
+  // emptied it. Hebcal is free and keyless and carries erev chag, fast days and
+  // the chametz window that Nager.Date has no concept of. The country code is no
+  // longer used and is kept only so existing callers do not break.
+  //
+  // The Islamic calendar is arithmetic — no network, so it cannot fail or be slow,
+  // and it matters more than the Hebrew one for a shop in Kafr Qasim.
+  const islamic = getIslamicContext(currentDate)
 
+  try {
+    const hebrew = await withAbortableTimeout(
+      (signal) => getHebrewContext(currentDate, { signal }),
+      options.timeoutMs ?? DEFAULT_TIMEOUT_MS,
+      'Hebcal holiday lookup timed out',
+    )
+
+    const hebrewHoliday = hebrew?.holidays?.[0] ?? null
     return {
-      source: 'live',
-      provider: 'Nager.Date',
-      holiday: Boolean(holidayToday),
-      holidayName: holidayToday?.name ?? nearbyHoliday?.name ?? null,
-      upcomingHolidayInDays: holidayToday ? 0 : nearbyHoliday?.diffDays ?? null,
+      source: hebrew?.source ? 'live' : 'static-fallback',
+      provider: 'Hebcal + computed Hijri',
+      holiday: Boolean(hebrewHoliday) || islamic.isEidAlFitr || islamic.isEidAlAdha,
+      holidayName: hebrewHoliday?.hebrew ?? hebrewHoliday?.title
+        ?? (islamic.isRamadan ? 'רמדאן' : null),
+      upcomingHolidayInDays: hebrew?.chametz?.daysToPesach ?? islamic.daysToRamadan ?? null,
+      hebrew: hebrew ?? null,
+      islamic,
     }
   } catch (error) {
     return {
       source: 'static-fallback',
-      provider: 'Nager.Date',
-      holiday: fallbackMarketContext.holiday,
-      holidayName: fallbackMarketContext.holidayName ?? null,
-      upcomingHolidayInDays: fallbackMarketContext.upcomingHolidayInDays ?? null,
+      provider: 'Hebcal + computed Hijri',
+      holiday: islamic.isEidAlFitr || islamic.isEidAlAdha,
+      holidayName: islamic.isRamadan ? 'רמדאן' : null,
+      upcomingHolidayInDays: islamic.daysToRamadan ?? null,
+      hebrew: null,
+      islamic,
       error: error.message,
     }
   }
@@ -146,6 +156,10 @@ export async function buildMarketContext(options = {}) {
     holiday: holiday.holiday,
     holidayName: holiday.holidayName,
     upcomingHolidayInDays: holiday.upcomingHolidayInDays,
+    // Kept whole, not flattened: a chametz window and an iftar hour are not the
+    // same kind of fact as "today is a holiday", and the demand engine needs both.
+    hebrew: holiday.hebrew ?? null,
+    islamic: holiday.islamic ?? null,
     localEvent: event.localEvent,
     season: inferSeason(currentDate),
     newsHeadlines: event.newsHeadlines,
