@@ -38,6 +38,7 @@ from __future__ import annotations
 
 import fnmatch
 import ftplib
+import ssl
 import gzip
 import io
 import json
@@ -97,6 +98,33 @@ _PAT_PROMO  = "*promof*"
 # FTP helpers
 # ─────────────────────────────────────────────────────────────────────────────
 
+class _ReusingFTP_TLS(ftplib.FTP_TLS):
+    """FTPS client for the Israeli price-transparency servers.
+
+    Two non-obvious requirements, both of which look like a firewall block when
+    missing — the connection authenticates, then NLST hangs until it times out:
+
+    1. TLS SESSION REUSE on the data channel. The server refuses a data
+       connection that negotiates a fresh session.
+
+    2. TRUSTING THE PASV ADDRESS. The service sits behind several IPs: the
+       control connection lands on 194.90.26.22 while PASV directs data to
+       194.90.26.21. Python (and modern curl) ignore the PASV-reported address
+       by default as an anti-spoofing measure and reconnect to the control host,
+       where nothing is listening on that port. Here the mismatch is real
+       infrastructure, not an attack, so the address is trusted — see
+       `trust_server_pasv_ipv4_address` in `_ftp_connect`.
+    """
+
+    def ntransfercmd(self, cmd, rest=None):
+        conn, size = ftplib.FTP.ntransfercmd(self, cmd, rest)
+        if self._prot_p:
+            conn = self.context.wrap_socket(
+                conn, server_hostname=self.host, session=self.sock.session
+            )
+        return conn, size
+
+
 def _ftp_connect() -> ftplib.FTP:
     """Open and return an authenticated FTP connection."""
     logger.info("Connecting to FTP  user={}  host={}", FTP_USER, FTP_HOST)
@@ -116,11 +144,16 @@ def _ftp_connect() -> ftplib.FTP:
             raise
 
     logger.info("FTP server requires TLS; retrying with explicit FTPS")
-    ftps = ftplib.FTP_TLS()
+    # The server's certificate does not match its hostname. It serves public
+    # price data with no credentials, so verification is relaxed deliberately
+    # rather than silently — there is nothing confidential to protect here.
+    context = ssl._create_unverified_context()
+    ftps = _ReusingFTP_TLS(context=context)
     ftps.connect(host=FTP_HOST, port=21, timeout=FTP_TIMEOUT)
     ftps.login(user=FTP_USER, passwd=FTP_PASS)
     ftps.prot_p()
     ftps.set_pasv(True)
+    ftps.trust_server_pasv_ipv4_address = True
     logger.info("FTPS connected: {!r}", ftps.getwelcome())
     return ftps
 

@@ -1,0 +1,101 @@
+# Can a GitHub-hosted runner actually reach our two external sources?
+#
+# T1 (#46) needs a scheduled collector, and history cannot be backfilled — the
+# price-transparency server keeps only the current day. So the schedule has to
+# run somewhere that is reliably awake, and a laptop that sleeps is not that.
+#
+# Before committing to Actions as the host, two things need proving from a
+# runner, neither of which can be assumed:
+#
+#   1. FTPS to the price-transparency server. It needs TLS session reuse AND
+#      trusting the PASV-reported IP (the service sits behind several hosts).
+#      Data channels on high ports are exactly what cloud egress rules break.
+#   2. Wolt. Datacenter IPs are commonly blocked where residential ones are not.
+#
+# Manual trigger only. This is a diagnostic, not part of the pipeline.
+name: connectivity probe
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Probe price-transparency FTPS
+        id: ftps
+        continue-on-error: true
+        run: |
+          python3 - <<'PY'
+          import ftplib, re, ssl, sys
+          from collections import Counter
+
+          HOST = "url.retail.publishedprices.co.il"
+
+          class Reusing(ftplib.FTP_TLS):
+              def ntransfercmd(self, cmd, rest=None):
+                  conn, size = ftplib.FTP.ntransfercmd(self, cmd, rest)
+                  if self._prot_p:
+                      conn = self.context.wrap_socket(
+                          conn, server_hostname=self.host, session=self.sock.session)
+                  return conn, size
+
+          try:
+              ftp = Reusing(context=ssl._create_unverified_context())
+              ftp.connect(HOST, 21, timeout=60)
+              ftp.login("doralon", "")
+              ftp.prot_p()
+              ftp.trust_server_pasv_ipv4_address = True
+              names = ftp.nlst()
+          except Exception as exc:
+              print(f"::error::FTPS FAILED from runner: {type(exc).__name__}: {exc}")
+              sys.exit(1)
+
+          dates = Counter()
+          for n in names:
+              m = re.search(r"-(\d{8})-(\d{6})\.", n)
+              if m:
+                  dates[m.group(1)] += 1
+          print(f"FTPS OK — {len(names)} files, {len(dates)} distinct dates")
+          for d, c in sorted(dates.items()):
+              print(f"  {d}: {c}")
+          PY
+
+      - name: Probe Wolt delivery catalog
+        id: wolt
+        continue-on-error: true
+        run: |
+          python3 -m pip install --quiet requests
+          python3 - <<'PY'
+          import sys, requests
+          # Any venue endpoint is enough; we only need to know whether a
+          # datacenter IP gets served or blocked.
+          url = "https://restaurant-api.wolt.com/v1/pages/front"
+          try:
+              r = requests.get(url, timeout=30, headers={"User-Agent": "Mozilla/5.0"})
+              print(f"Wolt HTTP {r.status_code}, {len(r.content)} bytes")
+              if r.status_code >= 400:
+                  print("::warning::Wolt returned an error status from this runner")
+                  sys.exit(1)
+              print("Wolt OK from runner")
+          except Exception as exc:
+              print(f"::error::Wolt FAILED from runner: {type(exc).__name__}: {exc}")
+              sys.exit(1)
+          PY
+
+      - name: Verdict
+        run: |
+          echo "FTPS : ${{ steps.ftps.outcome }}"
+          echo "Wolt : ${{ steps.wolt.outcome }}"
+          if [ "${{ steps.ftps.outcome }}" != "success" ]; then
+            echo "::error::FTPS is unreachable from GitHub runners — schedule must run elsewhere."
+            exit 1
+          fi
+          echo "GitHub Actions can host the daily collector."
