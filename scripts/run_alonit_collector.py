@@ -69,6 +69,18 @@ def parse_args() -> argparse.Namespace:
         help="Skip saving raw XML.gz files to disk (bronze layer only).",
     )
     parser.add_argument(
+        "--all-stores",
+        action="store_true",
+        default=False,
+        help=(
+            "Collect every branch the chain publishes (156), not just the two "
+            "named target locations. Needed for chain-wide inference (#49): a "
+            "delisting is a chain-wide decision, and with only 3 branches 94%% "
+            "of products are carried at fewer than 3 of them, leaving the "
+            "concentration test no statistical power."
+        ),
+    )
+    parser.add_argument(
         "--collected-at",
         type=str,
         default=None,
@@ -97,6 +109,7 @@ def main() -> None:
     result = run_alonit_collection(
         save_raw=not args.no_save_raw,
         observed_at=collected_at,
+        all_stores=args.all_stores,
     )
 
     if result.get("status") != "ok":

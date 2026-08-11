@@ -49,12 +49,17 @@ fi
 mkdir -p "$SNAP_DIR"
 
 # ── 1. Price transparency (Dor Alon / Alonit FTPS) ───────────────────────────
+# --all-stores collects every branch the chain publishes (156), not just the two
+# nearby target locations. A delisting is a chain-wide decision, so telling one
+# apart from an ordinary stockout needs chain-wide visibility: on a 3-branch
+# snapshot, 94% of products appeared at fewer than 3 branches and the
+# concentration test in #49 had power over 6% of the catalog.
 # Needs TLS session reuse AND trusting the PASV-reported IP; without both it
 # authenticates and then hangs on NLST, which looks exactly like a firewall.
 # See src/external/alonit_connector.py.
 echo
 echo "[1/3] Price transparency"
-if $PY scripts/run_alonit_collector.py --collected-at "$COLLECTED_AT"; then
+if $PY scripts/run_alonit_collector.py --all-stores --collected-at "$COLLECTED_AT"; then
   echo "  ok"
 else
   echo "  FAILED"

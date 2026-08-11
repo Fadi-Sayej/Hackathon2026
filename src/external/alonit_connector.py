@@ -384,9 +384,25 @@ def parse_stores(root: ET.Element) -> list[dict]:
     return stores
 
 
-def filter_target_stores(stores: list[dict]) -> dict[str, dict]:
+def filter_target_stores(stores: list[dict], all_stores: bool = False) -> dict[str, dict]:
     """
-    Return {store_id: store_info} for Kafr Qasim and Einat stores only.
+    Return {store_id: store_info}, by default only Kafr Qasim and Einat.
+
+    TWO DIFFERENT QUESTIONS NEED TWO DIFFERENT STORE SETS
+    ----------------------------------------------------
+    *Price comparison* asks "what does the shop down the road charge?" — three
+    nearby branches, which is what the default gives.
+
+    *Latent-state inference* (#49) asks "is the chain dropping this product?"
+    A delisting is a chain-wide decision, so telling one apart from an ordinary
+    stockout needs chain-wide visibility. Measured on the 3-branch snapshot:
+    75.6% of products appeared at a single branch and only 6.0% at all three,
+    so the concentration test had statistical power on 6% of the catalog and
+    reported UNCERTAIN for the rest. The chain publishes 156 stores.
+
+    `all_stores=True` keeps every branch, for the snapshot. Nothing downstream
+    of the price comparison changes: `target_label` is still set for the two
+    named locations, so existing consumers filter exactly as before.
     """
     result: dict[str, dict] = {}
     for s in stores:
@@ -408,6 +424,17 @@ def filter_target_stores(stores: list[dict]) -> dict[str, dict]:
                 "Target store found: target={} id={!r}  name={!r}  city={!r}",
                 result[sid]["target_label"], sid, name, city,
             )
+        elif all_stores:
+            # Kept for chain-wide inference, but deliberately left without a
+            # target_label so nothing that filters on one starts picking these up.
+            result[sid] = s
+            result[sid]["target_label"] = None
+    if all_stores:
+        labelled = sum(1 for s in result.values() if s.get("target_label"))
+        logger.info(
+            "Chain-wide collection: {} stores ({} named targets, {} additional)",
+            len(result), labelled, len(result) - labelled,
+        )
     return result
 
 
@@ -723,7 +750,7 @@ def run_alonit_portal_collection(
         )
         stores_root = _parse_xml_gz(stores_response.content)
         stores = parse_stores(stores_root)
-        target_stores = filter_target_stores(stores)
+        target_stores = filter_target_stores(stores, all_stores=all_stores)
 
         price_by_store = _latest_files_by_store(price_files)
         promo_by_store_files = _latest_files_by_store(promo_files)
@@ -827,6 +854,7 @@ def run_alonit_portal_collection(
 def run_alonit_collection(
     save_raw: bool = True,
     observed_at: Optional[datetime] = None,
+    all_stores: bool = False,
 ) -> dict:
     """
     Run the full Alonit price-transparency collection pipeline.
@@ -899,7 +927,7 @@ def run_alonit_collection(
 
             stores = parse_stores(root)
             logger.info("  {} stores in {}", len(stores), fname)
-            target_stores.update(filter_target_stores(stores))
+            target_stores.update(filter_target_stores(stores, all_stores=all_stores))
 
         if not target_stores:
             logger.warning(
