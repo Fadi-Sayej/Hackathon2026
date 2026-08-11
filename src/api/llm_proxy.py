@@ -45,11 +45,15 @@ except Exception:  # pragma: no cover - only hit without the SDK installed
 
 load_dotenv()
 
-GEMINI_API_KEY = os.environ.get("VITE_GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY")
+# Prefer the un-prefixed name. A VITE_-prefixed variable is inlined by Vite into
+# the browser bundle, so keeping it first invited someone to store the key under a
+# name that publishes it. VITE_GEMINI_API_KEY is still read as a fallback so
+# existing local setups keep working, but it is deprecated — see .env.example.
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") or os.environ.get("VITE_GEMINI_API_KEY")
 GEMINI_MODEL = (
     os.environ.get("VITE_GEMINI_MODEL")
     or os.environ.get("GEMINI_MODEL")
-    or "gemini-2.0-flash"
+    or "gemini-2.5-flash"
 )
 UPSTREAM_TIMEOUT_SECONDS = float(os.environ.get("LLM_UPSTREAM_TIMEOUT_SECONDS", "3"))
 
