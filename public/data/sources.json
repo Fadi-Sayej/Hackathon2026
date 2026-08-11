@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-09T13:15:19.825837+00:00",
+  "generated_at": "2026-08-11T22:34:52.213014+00:00",
   "scraping_status": "partial",
   "sources": {
     "yomyom_pos": {
@@ -7,7 +7,7 @@
       "label": "YomYom POS",
       "kind": "internal_pos",
       "status": "complete",
-      "last_updated": "2026-08-09T13:15:19.825714+00:00",
+      "last_updated": "2026-08-11T22:34:52.213011+00:00",
       "row_count": 7674,
       "schema_version": "1"
     },

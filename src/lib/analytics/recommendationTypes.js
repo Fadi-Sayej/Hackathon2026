@@ -8,6 +8,7 @@ export const RECOMMENDATION_TYPES = Object.freeze({
   PRICE_GAP: 'PRICE_GAP',
   NEGATIVE_STOCK: 'NEGATIVE_STOCK',
   THIN_MARGIN: 'THIN_MARGIN',
+  ASSORTMENT_GAP: 'ASSORTMENT_GAP',
 })
 
 export const RECOMMENDATION_TYPE_METADATA = Object.freeze({
@@ -55,5 +56,14 @@ export const RECOMMENDATION_TYPE_METADATA = Object.freeze({
     label: 'Thin margin',
     defaultUrgency: 'MEDIUM',
     valueAtStakeField: 'marginRate',
+  }),
+  // The only type that is about a product we do NOT stock. Every other type
+  // describes something already on our shelves, so `productId` here is a barcode
+  // from the competitor feed and there is no stock, cost or margin of our own to
+  // reason about — see docs/UI_DATA_CONTRACT.md §4.1.
+  [RECOMMENDATION_TYPES.ASSORTMENT_GAP]: Object.freeze({
+    label: 'Add to assortment',
+    defaultUrgency: 'MEDIUM',
+    valueAtStakeField: 'gapScore',
   }),
 })

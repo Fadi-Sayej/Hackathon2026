@@ -1,0 +1,85 @@
+# store_policy.yaml — what each store chooses to carry.
+#
+# THE RULE THAT MAKES THIS A PRODUCT AND NOT A SCRIPT
+#   The default is CARRY EVERYTHING. A store that has configured nothing sees every
+#   opportunity the market shows, with no assumption made on its behalf about
+#   religion, licensing, neighbourhood, or owner preference.
+#
+#   SmartShelf must work for a shop that sells alcohol and for one that refuses it,
+#   without either being the "normal" case. Exclusions are opt-in, per store, and
+#   always evidence-based or owner-stated — never inferred from the store's location,
+#   name, or the language its products are labelled in.
+#
+# HOW A SEGMENT GETS EXCLUDED
+#   Only by appearing in `excludes` below. Nothing else suppresses a product.
+#   Segments themselves are defined in configs/product_segments.yaml, which answers
+#   "what kind of product is this?" and nothing more.
+#
+# `verified` — WHERE THE ANSWER CAME FROM
+#   manual   an owner said so. Never overwritten by any script.
+#   derived  computed from the store's own sales history by
+#            scripts/derive_store_policy.py. Evidence is recorded below.
+#   (absent) nothing known — carries everything.
+#
+# WHY NOT JUST LET THE MANAGER DISMISS THEM IN THE UI
+#   He can, and dismissals are tracked (see src/telemetry/). But a shop that does not
+#   sell alcohol should not have to dismiss 26 beers every week to reach the snacks.
+#   A standing policy is set once; a dismissal is paid for repeatedly.
+
+version: 1
+
+# ── Applied to every store unless the store overrides it ─────────────────────
+defaults:
+  excludes: []              # carry everything
+  flag_for_review:
+    # Not excluded — surfaced with a warning so the owner decides once, knowingly.
+    # These are segments where getting it wrong is expensive: a licence the store
+    # does not hold, or a product it is not permitted to sell.
+    - pharmacy_otc
+    - vaping
+
+# ── Per store ────────────────────────────────────────────────────────────────
+stores:
+
+  yomyom-kq-01:
+    label: YomYom Kafr Qasim
+    verified: derived
+    derived_from: 7 monthly sales reports, Jan-Jul 2026 (1,564 products with sales)
+    excludes:
+      - alcohol
+      - vaping
+      - pork
+    # Confirms the shop DOES carry tobacco (1,390 units) and non-food (108 units),
+    # so neither is excluded. Worth stating explicitly: the exclusions below are not
+    # a guess about a predominantly Arab town — they are what seven months of this
+    # shop's own till says. A different store in the same town could well differ.
+    #
+    # ⚠️ Absence of evidence is not proof. A segment may be missing because the shop
+    # dropped it, because the export is partial, or because it is seasonal. Change
+    # `verified` to `manual` once the owner confirms, and no script will touch it.
+    evidence:
+      alcohol:
+        products_sold: 0
+        units: 0
+        carried: false
+        note: >-
+          Zero across seven months. An earlier keyword rule reported 4 products /
+          34 units, but all four were ממתק ליקריץ — liquorice sweets matching the
+          substring ליקר. Fixed in product_segments.yaml.
+      tobacco:
+        products_sold: 23
+        units: 1390
+        carried: true
+      vaping:
+        products_sold: 0
+        units: 0
+        carried: false
+      pork:
+        products_sold: 0
+        units: 0
+        carried: false
+      non_food:
+        products_sold: 7
+        units: 108
+        carried: true
+        note: Car chargers and cables — consistent with a forecourt shop.

@@ -1,0 +1,149 @@
+# product_segments.yaml — segments a store may choose to carry or not.
+#
+# WHY THIS FILE EXISTS
+#   Stores differ. One sells alcohol, another does not. One sells tobacco, another
+#   refuses it. A recommendation engine that hardcodes any of those choices is a
+#   script for one shop, not a product.
+#
+#   So this file only ever ANSWERS "what kind of product is this?".
+#   It never answers "should this store carry it?" — that lives in store_policy.yaml,
+#   per store, and defaults to carrying everything.
+#
+# DETECTION IS INTERIM
+#   The price-transparency feed carries no category at all (category is null in
+#   100% of rows), so segments are detected from the Hebrew product name by keyword.
+#   That is transparent and editable, but it is genuinely fragile: `כדורי` matches
+#   both "כדורי תירס" (corn balls, a snack) and a medicine. Every rule below is
+#   therefore marked with the confidence it deserves, and low-confidence matches are
+#   FLAGGED FOR REVIEW rather than acted on.
+#
+#   Issue #51 replaces this with per-product LLM classification. When a product has
+#   an entry in data/profiles/product_profiles.jsonl, that wins and these rules are
+#   skipped. Until then, this keeps the pipeline honest instead of blocked.
+#
+# Consumers:
+#   - scripts/build_assortment_gap.py   (tags each gap product)
+#   - configs/store_policy.yaml         (decides what to do with the tag)
+
+version: 1
+
+segments:
+
+  alcohol:
+    label_en: "Alcoholic drinks"
+    label_he: "משקאות אלכוהוליים"
+    label_ar: "مشروبات كحولية"
+    confidence: high          # these words are unambiguous in Hebrew retail
+    match_any:
+      - בירה
+      - וודקה
+      - ויסקי
+      - וויסקי
+      - טקילה
+      - שמפניה
+      - ערק
+      - אבסינת
+      - ברנדי
+      - קוניאק
+      # Brand names, unambiguous as substrings:
+      - בריזר          # Bacardi Breezer
+      - סמירנוף        # Smirnoff
+      - בקרדי
+      - יגרמייסטר
+      - קמפרי
+      - אפרול
+      - מרטיני
+    # Deliberately NOT in match_any — every one of these was tested against the real
+    # feed and produced false positives. Hebrew has no word boundaries a regex can
+    # trust, and these are all live substrings of unrelated products:
+    #   ארק  → טונה סטארקיסט · ג'ילט ארקטיק · נוזל כלים סנו ספארק
+    #   יין  → חומץ יין (vinegar)
+    #   גין  → margarine, and many others
+    #   רום  → ארומה · קרום · רומנו
+    # Matching them would wrongly hide tuna and shaving gel from a store that
+    # excludes alcohol. They are flagged for review and resolved properly by #51.
+    review_any:
+      - ארק
+      - יין
+      - גין
+      - רום
+      - ליקר          # matches ממתק ליקריץ — liquorice sweets, not liqueur.
+                      # Caught by running this against seven months of real sales:
+                      # all four "alcohol" products YomYom had ever sold were
+                      # liquorice. Without that check we would have concluded the
+                      # shop sells alcohol and shown it beer recommendations.
+
+  tobacco:
+    label_en: "Tobacco and smoking"
+    label_he: "טבק ועישון"
+    label_ar: "تبغ ومنتجات التدخين"
+    confidence: high
+    match_any:
+      - סיגריות
+      - סיגרילות
+      - טבק
+      - נרגילה
+      - מקטרת
+      - גליל טבק
+      - פילטר
+
+  vaping:
+    label_en: "Vaping and e-cigarettes"
+    label_he: "סיגריות אלקטרוניות"
+    label_ar: "سجائر إلكترونية"
+    confidence: high
+    match_any:
+      - אלקטרונית
+      - וייפ
+      - פוד חד פעמי
+
+  pork:
+    label_en: "Pork"
+    label_he: "בשר חזיר"
+    label_ar: "لحم خنزير"
+    confidence: high
+    match_any:
+      - חזיר
+    # `לבן` was here for the "בשר לבן" euphemism and was removed after testing
+    # against seven months of real sales: it means "white", and matched
+    # נייר גלגול לבן (white rolling paper), קינדר בואנו לבן, היפי היפו לבן.
+    # The euphemism only works with the full phrase, and even then rarely appears
+    # in a POS product name. Left to #51.
+    review_any:
+      - בשר לבן
+
+  pharmacy_otc:
+    label_en: "Over-the-counter medicine"
+    label_he: "תרופות ללא מרשם"
+    label_ar: "أدوية بلا وصفة"
+    confidence: low           # keyword matching is unreliable here — see header
+    review_any:
+      - אקמול
+      - נורופן
+      - אופטלגין
+      - תרופה
+      - משכך כאבים
+
+  non_food:
+    label_en: "Non-food and general merchandise"
+    label_he: "מוצרים שאינם מזון"
+    label_ar: "سلع غير غذائية"
+    confidence: medium
+    match_any:
+      - מקרן
+      - מטען
+      - כבל USB
+      - סוללה
+      - אוזניות
+      - מברג
+      - נורה
+
+  high_ticket:
+    label_en: "High-ticket items"
+    label_he: "מוצרים יקרים"
+    label_ar: "سلع مرتفعة الثمن"
+    confidence: high
+    # Not a keyword segment — derived from price. A forecourt shop rarely wants to
+    # tie up capital in items that turn a few times a year, but that is the owner's
+    # call, not ours, so it is a tag and not a filter.
+    price_above: 150

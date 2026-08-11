@@ -215,6 +215,48 @@ Canonical enum: `RECOMMENDATION_TYPES` in `src/lib/analytics/recommendationTypes
 | `PRICE_GAP` | Our price vs. competitor | 🟢 main — from 14,406 barcode matches |
 | `NEGATIVE_STOCK` | `currentStock < 0` | 🟢 main — ~625 products |
 | `THIN_MARGIN` | `marginRate < 0.20` | 🟢 main — ~232 products |
+| `ASSORTMENT_GAP` | Competitors carry it, we don't | 🟢 main — from 156 comparable branches |
+
+#### `ASSORTMENT_GAP` is the one type about a product we do not stock
+
+Every other type describes something already on our shelves. This one does not, and
+three fields behave differently as a result:
+
+- **`productId` is a competitor barcode**, not one of our product ids. There is no
+  matching row in `products`, so a page must not try to look one up.
+- **`metrics` is `null`.** Every field in the block — `currentStock`,
+  `weightedAvgDailySales`, `daysUntilStockout`, `margin` — is about a product we
+  carry. Emitting zeros there would read as measured facts about a real shelf.
+  Read `evidence` instead: `branchesCarrying`, `branchesCompared`, `coverageRatio`,
+  `competitorPriceMedian`, `priceBand`.
+- **`velocityConfidence` is always `'none'`, permanently.** We have never sold these
+  products, so §4.2 binds absolutely: no units per day, no days-until-stockout, no
+  projected revenue. The only honest evidence is branch coverage and the competitor's
+  price.
+
+`confidence` is capped at **0.7**. One snapshot proves competitors stock a product;
+it never proves the product sells.
+
+Two extra fields ride along, both optional:
+
+- **`segments`** — what kind of product this is (`alcohol`, `tobacco`, `pork`,
+  `high_ticket`, …), from `configs/product_segments.yaml`. A tag, never a judgement.
+  Whether a store carries a segment is decided per store in `configs/store_policy.yaml`
+  and **defaults to carrying everything**; SmartShelf must work for a shop that sells
+  alcohol and one that refuses it, with neither treated as the normal case.
+- **`reviewRequired`** — segments matched by an ambiguous keyword rule. Hebrew has no
+  regex-safe word boundaries, so e.g. `ארק` also matches `טונה סטארקיסט`. These are
+  surfaced for a human rather than acted on, and are resolved by the per-product
+  classification in issue #51.
+
+*Produced by* `scripts/build_assortment_gap.py` → `scripts/export_assortment_gap.py`
+→ `public/data/assortment_gap.json`.
+
+Ranked by **branch coverage alone**. A margin-weighted ranker was built and measured
+against it (`scripts/measure_gap_ranking.py`) and lost decisively — it surfaced 0%
+convenience-band items against the baseline's 90%, because without sales history an
+assumed margin is not evidence of anything, while coverage across 156 comparable
+branches is.
 
 `urgency` is `'LOW' | 'MEDIUM' | 'HIGH'`. `status` is
 `'PENDING' | 'APPROVED' | 'REJECTED' | 'EDITED'`. Both are closed enums; a page must not invent a
