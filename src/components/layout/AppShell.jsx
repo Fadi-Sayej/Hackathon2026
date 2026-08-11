@@ -11,6 +11,7 @@ import { ErrorBoundary } from '../shared/ErrorBoundary.jsx'
 const navItems = [
   { id: 'operational', label: 'Today', icon: '!' },
   { id: 'prices', label: 'Prices', icon: '₪' },
+  { id: 'assortment', label: 'Gaps', icon: '◫' },
   { id: 'expiry', label: 'Expiry', icon: 'E' },
   { id: 'products', label: 'Products', icon: 'P' },
   { id: 'dashboard', label: 'Overview', icon: 'D' },
