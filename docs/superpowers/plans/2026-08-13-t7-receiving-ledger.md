@@ -54,7 +54,8 @@ Written to `data/internal/receiving/receipts.csv`.
 ### Repository realities — verified 2026-08-13 on `worktree-t7-receiving-ledger` @ `436f84d`
 
 - **Baseline is green:** `npm run lint` exits 0, `npm test` = 172 passed, pytest = 89 passed. Do not land a task that breaks any of the three.
-- **Vitest runs in `environment: 'node'`** (`vitest.config.js`), and the project has **no jsdom, no `@testing-library/react`, and no component test anywhere.** **Do not add them.** Every piece of logic that needs a test goes in a pure module under `src/lib/`; `.jsx` files stay thin render layers verified by hand. `vitest.config.js` includes only `src/**/*.{test,spec}.{js,jsx}` — a test outside `src/` will not run.
+- **Vitest's default environment is `node`** (`vitest.config.js`) and the repository had no component test before this plan. **Task 0 adds jsdom + Testing Library**, and from then on a component test opts in per file with a `// @vitest-environment jsdom` docblock. The 172 existing tests keep running under `node` — do not flip the global environment. `vitest.config.js` includes only `src/**/*.{test,spec}.{js,jsx}` — a test outside `src/` will not run.
+- **Business logic still belongs in pure modules under `src/lib/`**, not in components. Component tests cover wiring and interaction (focus movement, undo, the error path); they are not the place to re-assert validation rules that `receivingQueue.js` already owns.
 - **`globalThis.localStorage` does not exist in the node test environment.** Follow the existing idiom in `src/lib/persistence/localStorageAdapter.js:109` — guard with `typeof globalThis.localStorage !== 'undefined'`, and accept an injected storage object so tests can pass a fake.
 - **Python is 3.9.6.** Every new module starts with `from __future__ import annotations`, exactly as `src/expiry/expiry_tracking.py:1` does. `X | Y` is fine in annotations under that import but **fails at runtime** — never use it in `isinstance()` or any evaluated position.
 - **Run pytest with the project venv,** because bare `python3` has no pyarrow:
@@ -90,6 +91,8 @@ Written to `data/internal/receiving/receipts.csv`.
 
 | File | Responsibility | Task |
 |---|---|---|
+| `package.json`, `vitest.config.js` (modify) | jsdom + Testing Library, opt-in per file | 0 |
+| `src/components/shared/__tests__/smoke.test.jsx` (create) | Proves the component-test path works | 0 |
 | `src/common/paths.py` (modify) | `RECEIVING_ROOT`, `RECEIPTS_CSV`, `SUPPLIER_LEAD_TIMES_JSON` | 1 |
 | `src/internal/receiving.py` (create) | The ledger: schema, validation, append, load, CSV import | 1 |
 | `tests/test_receiving.py` (create) | Ledger unit tests | 1, 3 |
@@ -103,12 +106,115 @@ Written to `data/internal/receiving/receipts.csv`.
 | `scripts/normalize-datasets.mjs` (modify) | Consume the resolver instead of `leadTimeDays: 3` | 5 |
 | `src/lib/receiving/receivingQueue.js` (create) | Pure queue: entry building, validation, undo, CSV, supplier memory | 6 |
 | `src/lib/receiving/__tests__/receivingQueue.test.js` (create) | Queue tests | 6 |
-| `src/components/receiving/ReceivingCaptureForm.jsx` (create) | The capture form — thin render layer | 7 |
+| `src/components/receiving/ReceivingCaptureForm.jsx` (create) | The capture form | 7 |
+| `src/components/receiving/__tests__/ReceivingCaptureForm.test.jsx` (create) | Interaction tests for the form | 7 |
 | `src/pages/ExpiryPage.jsx` (modify) | Host the form, drop the inlined two-field version | 7 |
 | `src/App.css` (modify) | Receiving form styles at 390 px | 7 |
 | `docs/RECEIVING_LEDGER.md` (create) | Operator + developer reference | 8 |
 | `src/internal/restock_reconcile.py` (create) | Recorded receipts vs. snapshot-inferred restocks | 9 |
 | `tests/test_restock_reconcile.py` (create) | Reconciliation tests | 9 |
+
+---
+
+## Task 0: Component-test infrastructure
+
+The capture form is the deliverable this whole track stands on — if it is slower than paper it gets abandoned, and everything downstream dies with it. It should not be the one part of the plan that ships unverified. This task adds the smallest infrastructure that lets Task 7 assert focus movement, undo and the error path, and proves it works before anything depends on it.
+
+**Files:**
+- Modify: `package.json` (devDependencies)
+- Modify: `vitest.config.js`
+- Create: `src/components/shared/__tests__/smoke.test.jsx`
+
+**Interfaces:**
+- Consumes: nothing.
+- Produces: the ability for any file to opt into a DOM environment with a `// @vitest-environment jsdom` docblock on its first line, and to import `render`, `screen` from `@testing-library/react` and `userEvent` from `@testing-library/user-event`.
+
+**Versions (verified available 2026-08-13):** `jsdom@30.0.1`, `@testing-library/react@16.3.2`, `@testing-library/dom@10` (peer of the former), `@testing-library/user-event@14.6.4`. React is `^19.2.6`; Testing Library 16.x is the line that supports React 19.
+
+- [ ] **Step 1: Install the dev dependencies**
+
+```bash
+npm install --save-dev jsdom@^30.0.1 @testing-library/react@^16.3.2 @testing-library/dom@^10 @testing-library/user-event@^14.6.4
+```
+
+- [ ] **Step 2: Leave the global environment alone**
+
+Open `vitest.config.js` and confirm it still reads:
+
+```js
+import { defineConfig } from 'vitest/config'
+
+export default defineConfig({
+  test: {
+    environment: 'node',
+    include: ['src/**/*.{test,spec}.{js,jsx}'],
+  },
+})
+```
+
+**Do not change `environment` to `'jsdom'`.** The 172 existing tests are pure-logic tests that run faster and more honestly under `node`; a component test opts in per file instead. No edit is needed in this step — it exists so nobody "helpfully" flips it.
+
+- [ ] **Step 3: Write the smoke test**
+
+Create `src/components/shared/__tests__/smoke.test.jsx`:
+
+```jsx
+// @vitest-environment jsdom
+
+/**
+ * Proves the component-test path actually works: jsdom is active, React 19
+ * renders, Testing Library queries resolve, and user-event drives an interaction.
+ *
+ * This project runs vitest under `node` by default. Component tests opt in with
+ * the docblock on line 1 of this file — copy it into any new .test.jsx.
+ */
+
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { cleanup, render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+
+import { Button } from '../Button.jsx'
+
+// Auto-cleanup only fires when vitest globals are enabled, and they are not.
+afterEach(cleanup)
+
+describe('component test infrastructure', () => {
+  it('has a DOM', () => {
+    expect(typeof document).toBe('object')
+  })
+
+  it('renders a shared component and finds it by role', () => {
+    render(<Button tone="primary">Save</Button>)
+    expect(screen.getByRole('button', { name: 'Save' })).toBeDefined()
+  })
+
+  it('drives a click through user-event', async () => {
+    const onClick = vi.fn()
+    render(<Button tone="primary" onClick={onClick}>Save</Button>)
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }))
+    expect(onClick).toHaveBeenCalledTimes(1)
+  })
+})
+```
+
+If `Button.jsx` does not accept `onClick` or renders something other than a `<button>`, read `src/components/shared/Button.jsx` and adjust the test to what it actually is — do not change `Button.jsx` to suit the test.
+
+- [ ] **Step 4: Run the smoke test**
+
+Run: `npx vitest run src/components/shared/__tests__/smoke.test.jsx`
+Expected: PASS, 3 passed.
+
+- [ ] **Step 5: Confirm the existing suite is untouched**
+
+Run: `npm run lint && npm test`
+Expected: lint exits 0; 175 tests pass (172 baseline + 3 new). If any of the original 172 changed status, the environment was flipped globally — revert and use the docblock.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add package.json package-lock.json vitest.config.js src/components/shared/__tests__/smoke.test.jsx
+git commit -m "test: add jsdom + Testing Library for opt-in component tests"
+```
 
 ---
 
@@ -1417,7 +1523,7 @@ Expected: the export prints `1 with a measured lead time`, and the normalized ou
 - [ ] **Step 7: Run lint and the full JS suite**
 
 Run: `npm run lint && npm test`
-Expected: lint exits 0; 180 tests pass (172 baseline + 8 new).
+Expected: lint exits 0; 183 tests pass (175 after Task 0 + 8 new).
 
 - [ ] **Step 8: Commit**
 
@@ -1814,7 +1920,7 @@ Expected: PASS, 28 passed (the `it.each` blocks contribute 2 + 5 + 2 cases).
 - [ ] **Step 5: Run lint and the full JS suite**
 
 Run: `npm run lint && npm test`
-Expected: lint exits 0; 208 tests pass (180 after Task 5 + 28 new).
+Expected: lint exits 0; 211 tests pass (183 after Task 5 + 28 new).
 
 - [ ] **Step 6: Commit**
 
@@ -1829,14 +1935,15 @@ git commit -m "feat: receiving queue — entry validation, undo, supplier memory
 
 **Files:**
 - Create: `src/components/receiving/ReceivingCaptureForm.jsx`
+- Test: `src/components/receiving/__tests__/ReceivingCaptureForm.test.jsx`
 - Modify: `src/pages/ExpiryPage.jsx:36-40, 48-99, 111-205`
 - Modify: `src/App.css:2522-2575` (extend the existing "Expiry capture" block)
 
 **Interfaces:**
-- Consumes: every export of `src/lib/receiving/receivingQueue.js` (Task 6); `dirProps` from `src/lib/utils/rtl.js`; `formatBarcode`, `formatDate` from `src/lib/utils/format.js`; `Button` from `src/components/shared/Button.jsx`.
+- Consumes: every export of `src/lib/receiving/receivingQueue.js` (Task 6); `dirProps` from `src/lib/utils/rtl.js`; `formatBarcode`, `formatDate` from `src/lib/utils/format.js`; `Button` from `src/components/shared/Button.jsx`; the jsdom setup from Task 0.
 - Produces: `<ReceivingCaptureForm products={products} />` — self-contained, owns its own queue state, takes no callbacks.
 
-**No automated tests.** Vitest runs in a node environment with no DOM and the project has no component-test infrastructure (see Global Constraints). Every rule worth asserting already lives in `receivingQueue.js` and is covered by Task 6. This task is verified by hand in Step 6.
+**What the component tests cover:** wiring and interaction — the focus jump, undo, supplier carry-over, the error path, and queue persistence across a remount. They do **not** re-assert the validation rules; those belong to `receivingQueue.js` and are covered by Task 6's 28 tests. Layout at 390 px and the stopwatch test stay manual (Step 7).
 
 - [ ] **Step 1: Write the component**
 
@@ -2159,35 +2266,155 @@ In `src/App.css`, after the existing `.expiry-match-warn` rule (line 2573), add:
 }
 ```
 
-- [ ] **Step 4: Run lint and the full JS suite**
+- [ ] **Step 4: Write the component tests**
 
-Run: `npm run lint && npm test`
-Expected: lint exits 0 (no unused imports left in `ExpiryPage.jsx`); 208 tests pass — unchanged from Task 6, since this task adds no tests.
+Create `src/components/receiving/__tests__/ReceivingCaptureForm.test.jsx`:
 
-- [ ] **Step 5: Verify the production build**
+```jsx
+// @vitest-environment jsdom
 
-Run: `npm run build`
-Expected: exits 0.
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { cleanup, render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
-- [ ] **Step 6: Verify by hand at 390 px**
+import { ReceivingCaptureForm } from '../ReceivingCaptureForm.jsx'
+import { RECEIVING_QUEUE_KEY, LAST_SUPPLIER_KEY } from '../../../lib/receiving/receivingQueue.js'
 
-Run `npm run dev`, open the Expiry page, set the browser device width to **390 px**, and confirm each of these. Record the result of every line in the task report:
+const PRODUCTS = [{ id: 'ym-7290000066318', name: 'קוקה קולה 1.5 ליטר' }]
 
-1. Typing a barcode shows the Hebrew product name within one keystroke of finishing.
-2. Pressing **Enter** in the barcode field moves focus to Quantity and does **not** submit.
-3. Quantity and Unit cost open a numeric keypad (`inputMode`) — check the rendered attribute in devtools.
-4. Saving with an empty quantity shows "Quantity must be a whole number of units." and saves nothing.
-5. After a save, Supplier, Received and Unit cost keep their values; Barcode and Quantity clear; focus returns to Barcode.
-6. **Undo last** removes only the most recent line.
-7. Reloading the page keeps the queue.
-8. A Hebrew product name renders right-to-left inside a left-to-right row without breaking the layout.
-9. Nothing overflows horizontally at 390 px.
-10. Saving with no expiry date works.
+afterEach(cleanup)
+beforeEach(() => {
+  globalThis.localStorage.clear()
+})
 
-- [ ] **Step 7: Commit**
+function fields() {
+  return {
+    barcode: screen.getByLabelText(/barcode/i),
+    quantity: screen.getByLabelText(/quantity/i),
+    supplier: screen.getByLabelText(/supplier/i),
+    save: screen.getByRole('button', { name: /^save$/i }),
+  }
+}
+
+async function recordOneLine(user, { barcode = '7290000066318', quantity = '24', supplier = 'Tempo' } = {}) {
+  const el = fields()
+  await user.clear(el.barcode)
+  await user.type(el.barcode, barcode)
+  await user.clear(el.quantity)
+  await user.type(el.quantity, quantity)
+  await user.clear(el.supplier)
+  await user.type(el.supplier, supplier)
+  await user.click(el.save)
+}
+
+describe('ReceivingCaptureForm', () => {
+  it('shows the Hebrew product name as soon as a known barcode is entered', async () => {
+    const user = userEvent.setup()
+    render(<ReceivingCaptureForm products={PRODUCTS} />)
+    await user.type(fields().barcode, '7290000066318')
+    expect(screen.getByText(/קוקה קולה 1.5 ליטר/)).toBeDefined()
+  })
+
+  it('warns but still allows a barcode that is not in the catalog', async () => {
+    const user = userEvent.setup()
+    render(<ReceivingCaptureForm products={PRODUCTS} />)
+    await user.type(fields().barcode, '999')
+    expect(screen.getByText(/not found in the catalog/i)).toBeDefined()
+  })
+
+  it('moves focus to quantity on Enter in the barcode field instead of submitting', async () => {
+    const user = userEvent.setup()
+    render(<ReceivingCaptureForm products={PRODUCTS} />)
+    const el = fields()
+    await user.type(el.barcode, '7290000066318{Enter}')
+    expect(document.activeElement).toBe(el.quantity)
+    // Nothing was saved: no queue list appeared.
+    expect(screen.queryByRole('button', { name: /download/i })).toBeNull()
+  })
+
+  it('saves a line and returns focus to the barcode field', async () => {
+    const user = userEvent.setup()
+    render(<ReceivingCaptureForm products={PRODUCTS} />)
+    await recordOneLine(user)
+    expect(screen.getByText(/saved:/i)).toBeDefined()
+    expect(document.activeElement).toBe(fields().barcode)
+  })
+
+  it('keeps the supplier but clears barcode and quantity between lines', async () => {
+    const user = userEvent.setup()
+    render(<ReceivingCaptureForm products={PRODUCTS} />)
+    await recordOneLine(user, { supplier: 'Tempo' })
+    const el = fields()
+    expect(el.supplier.value).toBe('Tempo')
+    expect(el.barcode.value).toBe('')
+    expect(el.quantity.value).toBe('')
+  })
+
+  it('shows the validation message and saves nothing when quantity is empty', async () => {
+    const user = userEvent.setup()
+    render(<ReceivingCaptureForm products={PRODUCTS} />)
+    const el = fields()
+    await user.type(el.barcode, '7290000066318')
+    await user.type(el.supplier, 'Tempo')
+    await user.click(el.save)
+    expect(screen.getByText(/quantity must be a whole number/i)).toBeDefined()
+    expect(screen.queryByRole('button', { name: /download/i })).toBeNull()
+  })
+
+  it('undo removes only the most recent line', async () => {
+    const user = userEvent.setup()
+    render(<ReceivingCaptureForm products={PRODUCTS} />)
+    await recordOneLine(user, { barcode: '111', quantity: '5' })
+    await recordOneLine(user, { barcode: '222', quantity: '6' })
+    expect(screen.getByRole('button', { name: /download 2 recorded lines/i })).toBeDefined()
+
+    await user.click(screen.getByRole('button', { name: /undo last/i }))
+    expect(screen.getByRole('button', { name: /download 1 recorded line/i })).toBeDefined()
+  })
+
+  it('the queue survives a remount, and the supplier pre-fills', async () => {
+    const user = userEvent.setup()
+    const { unmount } = render(<ReceivingCaptureForm products={PRODUCTS} />)
+    await recordOneLine(user, { supplier: 'Osem' })
+    expect(globalThis.localStorage.getItem(RECEIVING_QUEUE_KEY)).toContain('Osem')
+    expect(globalThis.localStorage.getItem(LAST_SUPPLIER_KEY)).toBe('Osem')
+
+    unmount()
+    render(<ReceivingCaptureForm products={PRODUCTS} />)
+    expect(screen.getByRole('button', { name: /download 1 recorded line/i })).toBeDefined()
+    expect(fields().supplier.value).toBe('Osem')
+  })
+})
+```
+
+If a query fails because a `<label>` is not associated with its input, fix the **component** (that is a real accessibility defect on a touch form), not the query.
+
+- [ ] **Step 5: Run the component tests**
+
+Run: `npx vitest run src/components/receiving/__tests__/ReceivingCaptureForm.test.jsx`
+Expected: PASS, 8 passed.
+
+- [ ] **Step 6: Run lint, the full JS suite, and the build**
+
+Run: `npm run lint && npm test && npm run build`
+Expected: lint exits 0 (no unused imports left in `ExpiryPage.jsx`); 219 tests pass (211 after Task 6 + 8 new); build exits 0.
+
+- [ ] **Step 7: Verify by hand at 390 px**
+
+Step 4's tests already cover the focus jump, undo, supplier carry-over, the error path and persistence. What remains is what a DOM test cannot see. Run `npm run dev`, open the Expiry page, set the browser device width to **390 px**, and record the result of every line in the task report:
+
+1. **Nothing overflows horizontally at 390 px** — the page must not scroll sideways.
+2. **Quantity and Unit cost open a numeric keypad.** Confirm `inputMode="numeric"` and `inputMode="decimal"` on the rendered elements in devtools.
+3. **Every control is a thumb-sized target** — no input shorter than the existing `.expiry-input` minimum of 2.9rem.
+4. **A Hebrew product name renders right-to-left** inside a left-to-right row without dragging the rest of the row with it.
+5. **Focus is visible** as it moves from Barcode to Quantity — a manager cannot use a keyboard flow they cannot see.
+6. **Saving with no expiry date and no unit cost works** and reads naturally on screen.
+7. **The datalist offers previously used suppliers** after two lines from different suppliers.
+
+- [ ] **Step 8: Commit**
 
 ```bash
-git add src/components/receiving/ReceivingCaptureForm.jsx src/pages/ExpiryPage.jsx src/App.css
+git add src/components/receiving/ReceivingCaptureForm.jsx src/components/receiving/__tests__/ReceivingCaptureForm.test.jsx src/pages/ExpiryPage.jsx src/App.css
 git commit -m "feat: keyboard-first delivery capture form with undo and supplier memory"
 ```
 
@@ -2541,7 +2768,7 @@ npm test
 npm run build
 ```
 
-Expected: lint 0, **208 JS tests**, **137 Python tests**, build 0.
+Expected: lint 0, **219 JS tests**, **137 Python tests**, build 0.
 
 ## Handover to the human — what this plan does not prove
 
