@@ -5,7 +5,11 @@ import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { ReceivingCaptureForm } from '../ReceivingCaptureForm.jsx'
-import { RECEIVING_QUEUE_KEY, LAST_SUPPLIER_KEY } from '../../../lib/receiving/receivingQueue.js'
+import {
+  EXPIRY_QUEUE_KEY,
+  LAST_SUPPLIER_KEY,
+  RECEIVING_QUEUE_KEY,
+} from '../../../lib/receiving/receivingQueue.js'
 
 const PRODUCTS = [{ id: 'ym-7290000066318', name: 'קוקה קולה 1.5 ליטר' }]
 
@@ -137,5 +141,109 @@ describe('ReceivingCaptureForm', () => {
     )
     expect(options).toContain('Tempo')
     expect(options).toContain('Osem')
+  })
+
+  // The bolded requirement is scan -> focus jumps -> Enter -> saved, without a
+  // hand leaving the barcode gun. Every other test here clicks Save, which
+  // proves the form works but not that the speed path does: the last hop, Enter
+  // in the quantity field submitting, was asserted by nothing.
+  it('saves a line with the keyboard alone — no click anywhere', async () => {
+    const user = userEvent.setup()
+    render(<ReceivingCaptureForm products={PRODUCTS} />)
+
+    // Supplier is the one field a gun cannot fill; it is typed once and then
+    // remembered, so the per-line path below never touches it again.
+    await user.type(fields().supplier, 'Tempo')
+
+    fields().barcode.focus()
+    await user.keyboard('7290000066318{Enter}')      // the gun's own Enter
+    expect(document.activeElement).toBe(fields().quantity)
+    await user.keyboard('24{Enter}')                 // and the worker's
+
+    expect(screen.getByText(/saved: 24 ×/i)).toBeDefined()
+    expect(screen.getByRole('button', { name: /download 1 recorded line/i })).toBeDefined()
+    expect(document.activeElement).toBe(fields().barcode)
+
+    // And straight into the next line, still without touching the mouse.
+    await user.keyboard('111{Enter}')
+    await user.keyboard('6{Enter}')
+    expect(screen.getByRole('button', { name: /download 2 recorded lines/i })).toBeDefined()
+  })
+})
+
+describe('ReceivingCaptureForm — expiry-only mode', () => {
+  function switchToExpiryOnly(user) {
+    return user.click(screen.getByLabelText(/expiry only/i))
+  }
+
+  it('drops the quantity and supplier fields the delivery path requires', async () => {
+    const user = userEvent.setup()
+    render(<ReceivingCaptureForm products={PRODUCTS} />)
+    expect(screen.getByLabelText(/quantity/i)).toBeDefined()
+
+    await switchToExpiryOnly(user)
+    expect(screen.queryByLabelText(/quantity/i)).toBeNull()
+    expect(screen.queryByLabelText(/supplier/i)).toBeNull()
+    expect(screen.queryByLabelText(/unit cost/i)).toBeNull()
+    expect(screen.getByLabelText(/expiry date/i)).toBeDefined()
+  })
+
+  it('records a date for stock already on the shelf, with no supplier invented', async () => {
+    const user = userEvent.setup()
+    render(<ReceivingCaptureForm products={PRODUCTS} />)
+    await switchToExpiryOnly(user)
+
+    await user.type(screen.getByLabelText(/barcode/i), '7290000066318')
+    await user.type(screen.getByLabelText(/expiry date/i), '2026-12-31')
+    await user.click(screen.getByRole('button', { name: /^save$/i }))
+
+    expect(screen.getByText(/saved:/i)).toBeDefined()
+    const stored = JSON.parse(globalThis.localStorage.getItem(EXPIRY_QUEUE_KEY))
+    expect(stored).toHaveLength(1)
+    expect(stored[0]).toMatchObject({ barcode: '7290000066318', expiryDate: '2026-12-31' })
+    expect(stored[0].supplier).toBeUndefined()
+    expect(stored[0].quantity).toBeUndefined()
+  })
+
+  it('refuses a line with no expiry date, which is the whole point of the mode', async () => {
+    const user = userEvent.setup()
+    render(<ReceivingCaptureForm products={PRODUCTS} />)
+    await switchToExpiryOnly(user)
+
+    await user.type(screen.getByLabelText(/barcode/i), '7290000066318')
+    await user.click(screen.getByRole('button', { name: /^save$/i }))
+    expect(screen.getByText(/enter the expiry date printed on the package/i)).toBeDefined()
+    expect(screen.queryByRole('button', { name: /download/i })).toBeNull()
+  })
+
+  it('keeps the two lists apart so an expiry line never lands in the ledger', async () => {
+    const user = userEvent.setup()
+    render(<ReceivingCaptureForm products={PRODUCTS} />)
+    await recordOneLine(user, { barcode: '111', quantity: '5', supplier: 'Tempo' })
+
+    await switchToExpiryOnly(user)
+    // The delivery list is not showing here, and the expiry list is empty.
+    expect(screen.queryByRole('button', { name: /download/i })).toBeNull()
+
+    await user.type(screen.getByLabelText(/barcode/i), '222')
+    await user.type(screen.getByLabelText(/expiry date/i), '2026-12-31')
+    await user.click(screen.getByRole('button', { name: /^save$/i }))
+
+    expect(JSON.parse(globalThis.localStorage.getItem(RECEIVING_QUEUE_KEY))).toHaveLength(1)
+    expect(JSON.parse(globalThis.localStorage.getItem(EXPIRY_QUEUE_KEY))).toHaveLength(1)
+  })
+
+  it('fills the date from a quick-date button', async () => {
+    const user = userEvent.setup()
+    render(<ReceivingCaptureForm products={PRODUCTS} />)
+    await switchToExpiryOnly(user)
+
+    await user.click(screen.getByRole('button', { name: /1 week/i }))
+    const expected = new Date()
+    expected.setDate(expected.getDate() + 7)
+    const pad = (n) => String(n).padStart(2, '0')
+    expect(screen.getByLabelText(/expiry date/i).value).toBe(
+      `${expected.getFullYear()}-${pad(expected.getMonth() + 1)}-${pad(expected.getDate())}`,
+    )
   })
 })
