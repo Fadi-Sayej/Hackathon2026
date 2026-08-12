@@ -319,7 +319,7 @@ See the AI explanations section above. The Track-C async fix has landed and the 
 See `nagham.md` for the full per-task status.
 
 #### 🟡 3. Shelf data is synthetic
-`shelfQuantity`/`shelfCapacity`/`leadTimeDays`/`supplier` are hardcoded constants, so the planogram is not driven by real shelf measurements.
+`shelfQuantity`/`shelfCapacity` are still hardcoded constants, so the planogram is not driven by real shelf measurements. (`leadTimeDays`/`supplier` are no longer in this category — see the Key Constraints bullet above and `docs/RECEIVING_LEDGER.md`.)
 
 #### 🟡 4. Geo/context config points at the wrong country
 `.env` has `VITE_HOLIDAY_COUNTRY=AT` (Austria), `VITE_WEATHER_LAT/LON=31.95/35.93` (Amman, Jordan) and `VITE_NEWS_QUERY=Jordan`, but the store is YomYom Kafr Qasim, Israel (32.114/34.972). Currently harmless because `VITE_ENABLE_LIVE_MARKET_CONTEXT=false`, but it must be corrected before enabling live context.
