@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import csv
 import hashlib
+import statistics
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
@@ -233,3 +234,68 @@ def receipts_as_expiry_scans(path: Path = RECEIPTS_CSV) -> list[dict[str, Any]]:
             }
         )
     return scans
+
+
+def supplier_lead_times(receipts: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    """Median days between consecutive deliveries, per supplier.
+
+    Returns {supplier: {median_days, n_observations, confidence}}.
+
+    n_observations counts distinct delivery DATES, not receipt lines: twenty
+    items off one delivery note is one delivery. Below
+    MIN_DELIVERIES_FOR_LEAD_TIME, median_days is None and the caller must keep
+    its default — a median of two observations is not a measurement.
+    """
+    days_by_supplier: dict[str, set] = {}
+    for row in receipts:
+        supplier = _clean(row.get("supplier"))
+        raw_day = _clean(row.get("received_at"))
+        if not supplier or not raw_day:
+            continue
+        try:
+            day = _parse_date(raw_day)
+        except ValueError:
+            continue
+        days_by_supplier.setdefault(supplier, set()).add(day)
+
+    result: dict[str, dict[str, Any]] = {}
+    for supplier, days in days_by_supplier.items():
+        ordered = sorted(days)
+        count = len(ordered)
+        if count < MIN_DELIVERIES_FOR_LEAD_TIME:
+            result[supplier] = {
+                "median_days": None,
+                "n_observations": count,
+                "confidence": "low",
+            }
+            continue
+        gaps = [(later - earlier).days for earlier, later in zip(ordered, ordered[1:])]
+        result[supplier] = {
+            "median_days": statistics.median(gaps),
+            "n_observations": count,
+            "confidence": "high" if count >= 6 else "medium",
+        }
+    return result
+
+
+def barcode_supplier_map(receipts: list[dict[str, Any]]) -> dict[str, str]:
+    """Barcode -> the supplier of that barcode's most recent delivery.
+
+    Products carry supplier 'YomYom' for all 7,674 rows because the POS export
+    has no supplier column. The ledger is the first place a real supplier per
+    product is ever observed.
+    """
+    latest: dict[str, tuple] = {}
+    for row in receipts:
+        barcode = _clean(row.get("barcode"))
+        supplier = _clean(row.get("supplier"))
+        raw_day = _clean(row.get("received_at"))
+        if not barcode or not supplier or not raw_day:
+            continue
+        try:
+            day = _parse_date(raw_day)
+        except ValueError:
+            continue
+        if barcode not in latest or day >= latest[barcode][0]:
+            latest[barcode] = (day, supplier)
+    return {barcode: supplier for barcode, (_, supplier) in latest.items()}

@@ -19,10 +19,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.internal.receiving import (  # noqa: E402
     RECEIVING_COLUMNS,
     add_receipt,
+    barcode_supplier_map,
     ensure_receipts_csv,
     import_receiving_csv,
     load_receipts,
     make_receipt_id,
+    supplier_lead_times,
 )
 
 
@@ -140,3 +142,92 @@ def test_import_receiving_csv_counts_good_and_rejected_rows(tmp_path: Path) -> N
     assert result["rejected_rows"] == 2
     assert {row["row_number"] for row in result["rejected_preview"]} == {4, 5}
     assert all(row["source"] == "csv_import" for row in load_receipts(ledger))
+
+
+def _delivery(barcode: str, supplier: str, day: str, quantity: int = 1) -> dict:
+    return {
+        "barcode": barcode,
+        "supplier": supplier,
+        "received_at": day,
+        "quantity": str(quantity),
+    }
+
+
+class TestSupplierLeadTimes:
+    def test_empty_ledger_yields_no_suppliers(self) -> None:
+        assert supplier_lead_times([]) == {}
+
+    def test_two_deliveries_are_not_enough_to_claim_a_median(self) -> None:
+        result = supplier_lead_times([
+            _delivery("111", "Tempo", "2026-08-01"),
+            _delivery("111", "Tempo", "2026-08-08"),
+        ])
+        assert result["Tempo"]["median_days"] is None
+        assert result["Tempo"]["n_observations"] == 2
+        assert result["Tempo"]["confidence"] == "low"
+
+    def test_three_deliveries_give_a_medium_confidence_median(self) -> None:
+        result = supplier_lead_times([
+            _delivery("111", "Tempo", "2026-08-01"),
+            _delivery("111", "Tempo", "2026-08-08"),
+            _delivery("111", "Tempo", "2026-08-15"),
+        ])
+        assert result["Tempo"]["median_days"] == 7
+        assert result["Tempo"]["n_observations"] == 3
+        assert result["Tempo"]["confidence"] == "medium"
+
+    def test_six_deliveries_give_high_confidence(self) -> None:
+        days = ["2026-08-01", "2026-08-04", "2026-08-07", "2026-08-10", "2026-08-13", "2026-08-16"]
+        result = supplier_lead_times([_delivery("111", "Osem", day) for day in days])
+        assert result["Osem"]["median_days"] == 3
+        assert result["Osem"]["n_observations"] == 6
+        assert result["Osem"]["confidence"] == "high"
+
+    def test_many_lines_on_one_delivery_note_count_as_one_delivery(self) -> None:
+        result = supplier_lead_times([
+            _delivery(str(n), "Tempo", "2026-08-01") for n in range(20)
+        ])
+        assert result["Tempo"]["n_observations"] == 1
+        assert result["Tempo"]["median_days"] is None
+
+    def test_median_ignores_a_single_outlying_gap(self) -> None:
+        result = supplier_lead_times([
+            _delivery("111", "Tempo", "2026-01-01"),
+            _delivery("111", "Tempo", "2026-01-08"),
+            _delivery("111", "Tempo", "2026-01-15"),
+            _delivery("111", "Tempo", "2026-06-15"),
+        ])
+        assert result["Tempo"]["median_days"] == 7
+
+    def test_suppliers_are_tracked_independently(self) -> None:
+        rows = [_delivery("111", "Tempo", d) for d in ("2026-08-01", "2026-08-08", "2026-08-15")]
+        rows += [_delivery("222", "Osem", d) for d in ("2026-08-01", "2026-08-03", "2026-08-05")]
+        result = supplier_lead_times(rows)
+        assert result["Tempo"]["median_days"] == 7
+        assert result["Osem"]["median_days"] == 2
+
+    def test_rows_with_no_supplier_or_unparseable_date_are_skipped(self) -> None:
+        result = supplier_lead_times([
+            _delivery("111", "", "2026-08-01"),
+            _delivery("111", "Tempo", "not-a-date"),
+            _delivery("111", "Tempo", "2026-08-01"),
+        ])
+        assert list(result) == ["Tempo"]
+        assert result["Tempo"]["n_observations"] == 1
+
+
+class TestBarcodeSupplierMap:
+    def test_barcode_maps_to_its_most_recent_supplier(self) -> None:
+        result = barcode_supplier_map([
+            _delivery("111", "Tempo", "2026-08-01"),
+            _delivery("111", "Osem", "2026-08-20"),
+            _delivery("222", "Tempo", "2026-08-05"),
+        ])
+        assert result == {"111": "Osem", "222": "Tempo"}
+
+    def test_rows_missing_a_barcode_or_supplier_are_skipped(self) -> None:
+        result = barcode_supplier_map([
+            _delivery("", "Tempo", "2026-08-01"),
+            _delivery("111", "", "2026-08-01"),
+        ])
+        assert result == {}
