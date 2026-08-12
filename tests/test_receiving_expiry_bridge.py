@@ -24,6 +24,30 @@ def ledger(tmp_path: Path) -> Path:
     return tmp_path / "receipts.csv"
 
 
+@pytest.fixture()
+def isolated_report_output(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Redirect build_expiry_report's real-path side effects into tmp_path.
+
+    build_expiry_report writes Parquet/JSON/Markdown under the module-level
+    EXPIRY_SIGNALS_DIR/EXPIRY_REPORTS_DIR constants, and separately calls
+    update_source() (imported inside the function from src.common.source_status),
+    which persists to the git-tracked public/data/sources.json. None of that is
+    parameterized by build_expiry_report's own arguments, so any test that calls
+    it must redirect these paths itself or it both dirties the working tree and
+    leaves stray timestamped files behind on every run. update_source() is
+    imported fresh inside build_expiry_report on each call, but it still looks up
+    SOURCES_JSON as a global in its *defining* module (source_status), so that is
+    the module we patch — patching a name in expiry_tracking would not work,
+    since expiry_tracking never binds SOURCES_JSON itself.
+    """
+    import src.common.source_status as source_status
+    import src.expiry.expiry_tracking as expiry_tracking
+
+    monkeypatch.setattr(source_status, "SOURCES_JSON", tmp_path / "sources.json")
+    monkeypatch.setattr(expiry_tracking, "EXPIRY_SIGNALS_DIR", tmp_path / "signals" / "expiry")
+    monkeypatch.setattr(expiry_tracking, "EXPIRY_REPORTS_DIR", tmp_path / "reports" / "expiry")
+
+
 def test_only_receipts_with_an_expiry_date_become_scans(ledger: Path) -> None:
     add_receipt(barcode="111", quantity=6, supplier="Osem", expiry_date="2026-09-01", path=ledger)
     add_receipt(barcode="222", quantity=6, supplier="Osem", path=ledger)
@@ -48,7 +72,9 @@ def test_missing_ledger_yields_no_scans(tmp_path: Path) -> None:
     assert receipts_as_expiry_scans(tmp_path / "absent.csv") == []
 
 
-def test_report_includes_receipt_borne_expiry_dates(tmp_path: Path) -> None:
+def test_report_includes_receipt_borne_expiry_dates(
+    tmp_path: Path, isolated_report_output: None
+) -> None:
     ledger = tmp_path / "receipts.csv"
     scans_csv = tmp_path / "expiry_scans.csv"
     add_receipt(
@@ -65,7 +91,9 @@ def test_report_includes_receipt_borne_expiry_dates(tmp_path: Path) -> None:
     assert severity == "critical_7d"
 
 
-def test_report_still_works_with_no_receipts_at_all(tmp_path: Path) -> None:
+def test_report_still_works_with_no_receipts_at_all(
+    tmp_path: Path, isolated_report_output: None
+) -> None:
     report = build_expiry_report(
         as_of="2026-08-13",
         path=tmp_path / "expiry_scans.csv",
