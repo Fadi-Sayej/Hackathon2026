@@ -236,6 +236,33 @@ def receipts_as_expiry_scans(path: Path = RECEIPTS_CSV) -> list[dict[str, Any]]:
     return scans
 
 
+def _parse_delivery_row(
+    row: dict[str, Any], require_barcode: bool = False
+) -> tuple[str, str, date] | None:
+    """Clean and parse one receipt row into (barcode, supplier, received date).
+
+    Shared by supplier_lead_times and barcode_supplier_map so the skip rules —
+    which fields are required, and what counts as an unparseable date — live
+    in exactly one place. A blank barcode still counts as a delivery for
+    lead-time purposes (a supplier and a date are enough to place it in the
+    calendar), but barcode_supplier_map has nothing to key on without one;
+    require_barcode lets each caller ask for the guard it actually needs
+    instead of duplicating the parsing around it.
+    """
+    barcode = _clean(row.get("barcode"))
+    supplier = _clean(row.get("supplier"))
+    raw_day = _clean(row.get("received_at"))
+    if not supplier or not raw_day:
+        return None
+    if require_barcode and not barcode:
+        return None
+    try:
+        day = _parse_date(raw_day)
+    except ValueError:
+        return None
+    return barcode, supplier, day
+
+
 def supplier_lead_times(receipts: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
     """Median days between consecutive deliveries, per supplier.
 
@@ -248,14 +275,10 @@ def supplier_lead_times(receipts: list[dict[str, Any]]) -> dict[str, dict[str, A
     """
     days_by_supplier: dict[str, set] = {}
     for row in receipts:
-        supplier = _clean(row.get("supplier"))
-        raw_day = _clean(row.get("received_at"))
-        if not supplier or not raw_day:
+        parsed = _parse_delivery_row(row)
+        if parsed is None:
             continue
-        try:
-            day = _parse_date(raw_day)
-        except ValueError:
-            continue
+        _, supplier, day = parsed
         days_by_supplier.setdefault(supplier, set()).add(day)
 
     result: dict[str, dict[str, Any]] = {}
@@ -287,15 +310,13 @@ def barcode_supplier_map(receipts: list[dict[str, Any]]) -> dict[str, str]:
     """
     latest: dict[str, tuple] = {}
     for row in receipts:
-        barcode = _clean(row.get("barcode"))
-        supplier = _clean(row.get("supplier"))
-        raw_day = _clean(row.get("received_at"))
-        if not barcode or not supplier or not raw_day:
+        parsed = _parse_delivery_row(row, require_barcode=True)
+        if parsed is None:
             continue
-        try:
-            day = _parse_date(raw_day)
-        except ValueError:
-            continue
+        barcode, supplier, day = parsed
+        # Ties go to the later ledger row: the ledger is append-only, so when
+        # two deliveries for the same barcode land on the same date, the one
+        # that appears later in the file is the more recent entry.
         if barcode not in latest or day >= latest[barcode][0]:
             latest[barcode] = (day, supplier)
     return {barcode: supplier for barcode, (_, supplier) in latest.items()}

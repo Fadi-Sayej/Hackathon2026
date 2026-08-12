@@ -231,3 +231,10 @@ class TestBarcodeSupplierMap:
             _delivery("111", "", "2026-08-01"),
         ])
         assert result == {}
+
+    def test_same_day_tie_for_a_barcode_goes_to_the_later_ledger_row(self) -> None:
+        result = barcode_supplier_map([
+            _delivery("111", "Tempo", "2026-08-01"),
+            _delivery("111", "Osem", "2026-08-01"),
+        ])
+        assert result == {"111": "Osem"}
