@@ -179,7 +179,10 @@ def _severity(days_to_expiry: int) -> str:
 
 
 def _recommended_action(severity: str, current_stock: Any) -> str:
-    stock = current_stock if isinstance(current_stock, int | float) else None
+    # NOTE: `int | float` here must stay a tuple, not a PEP 604 union — this is
+    # a runtime isinstance() check, not an annotation, and PEP 604 unions in
+    # evaluated positions require Python 3.10+. The project venv is 3.9.6.
+    stock = current_stock if isinstance(current_stock, (int, float)) else None
     if severity == "expired":
         return "Remove from shelf and verify disposal/return."
     if severity == "critical_7d":
@@ -197,13 +200,23 @@ def build_expiry_report(
     *,
     as_of: str | None = None,
     path: Path = EXPIRY_SCANS_CSV,
+    receipts_path: Path | None = None,
 ) -> dict[str, Any]:
     as_of_date = parse_expiry_date(as_of) if as_of else _now().date()
     generated_at = _now()
     ts = generated_at.strftime("%Y%m%dT%H%M%SZ")
 
     product_by_barcode, inventory_by_barcode = _pos_indexes()
-    scans = load_expiry_scans(path)
+
+    # A receipt carrying an expiry date is an expiry observation and belongs in
+    # this report. Imported inside the function because receiving.py imports
+    # parse_expiry_date from this module — same local-import idiom as
+    # update_source() below.
+    from src.internal.receiving import RECEIPTS_CSV, receipts_as_expiry_scans
+
+    scans = load_expiry_scans(path) + receipts_as_expiry_scans(
+        receipts_path if receipts_path is not None else RECEIPTS_CSV
+    )
 
     alerts: list[dict[str, Any]] = []
     for scan in scans:

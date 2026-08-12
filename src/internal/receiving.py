@@ -203,3 +203,33 @@ def import_receiving_csv(
         "rejected_rows": len(rejected),
         "rejected_preview": rejected[:20],
     }
+
+
+def receipts_as_expiry_scans(path: Path = RECEIPTS_CSV) -> list[dict[str, Any]]:
+    """Receipts that carry an expiry date, in the expiry-scan shape.
+
+    A delivery with a date on the package is an expiry observation. Rather than
+    forking the bucketing and severity logic in expiry_tracking, we translate
+    into the shape that module already reads.
+    """
+    scans: list[dict[str, Any]] = []
+    for row in load_receipts(path):
+        expiry = _clean(row.get("expiry_date"))
+        barcode = _clean(row.get("barcode"))
+        if not expiry or not barcode:
+            continue
+        scans.append(
+            {
+                "scan_id": _clean(row.get("receipt_id")),
+                "barcode": barcode,
+                "expiry_date": expiry,
+                "scanned_at": _clean(row.get("recorded_at")),
+                "source": f"receiving:{_clean(row.get('source')) or 'unknown'}",
+                "notes": (
+                    f"received {_clean(row.get('quantity'))} units "
+                    f"from {_clean(row.get('supplier'))} "
+                    f"on {_clean(row.get('received_at'))}"
+                ),
+            }
+        )
+    return scans
