@@ -389,3 +389,44 @@ describe('never quotes an order quantity from a stock figure we disproved', () =
     expect(rec.recommendedOrderQuantity).toBeGreaterThan(0)
   })
 })
+
+describe('never states an assumed lead time as a measured one', () => {
+  // The trap is not today's all-defaults state. It is the day after the first
+  // supplier crosses three delivery dates: resolveSupplierAndLeadTime then
+  // returns that supplier's real NAME with the fallback 3 for its other
+  // barcodes, and a sentence naming a real supplier and a number reads as a
+  // measurement of that supplier's responsiveness.
+  const selling = (overrides = {}) => product({
+    id: 'sku-lead', currentStock: 4, salesLast7Days: 70, salesLast30Days: 300,
+    velocityConfidence: 'high', isStocked: true, leadTimeDays: 3, ...overrides,
+  })
+
+  function reorderReason(overrides) {
+    const [rec] = generateReorderRecommendations(
+      [selling(overrides)], { currentDate: CURRENT_DATE },
+    ).filter((r) => r.type === RECOMMENDATION_TYPES.REORDER)
+    return rec.reason
+  }
+
+  it('marks the lead time as assumed when it came from the default', () => {
+    const reason = reorderReason({ leadTimeSource: 'default' })
+    expect(reason).toMatch(/assumed 3-day supplier lead time/)
+    expect(reason).toMatch(/not enough deliveries have been recorded/)
+    expect(reason).toMatch(/not a measurement/)
+  })
+
+  it('states it plainly once it is measured from recorded deliveries', () => {
+    const reason = reorderReason({ leadTimeSource: 'measured' })
+    expect(reason).toMatch(/the supplier lead time is 3 days/)
+    expect(reason).not.toMatch(/assumed/)
+  })
+
+  it('the two reasons genuinely differ for the same lead time', () => {
+    expect(reorderReason({ leadTimeSource: 'default' }))
+      .not.toBe(reorderReason({ leadTimeSource: 'measured' }))
+  })
+
+  it('treats a product with no lead-time metadata at all as assumed', () => {
+    expect(reorderReason({})).toMatch(/assumed/)
+  })
+})

@@ -13,6 +13,10 @@
  * @property {string | undefined} expiryDate
  * @property {string | undefined} supplier
  * @property {number} leadTimeDays
+ * @property {'measured' | 'default'} leadTimeSource  where leadTimeDays came from — 'default'
+ *   means no delivery interval was ever observed and the number is an assumption
+ * @property {'low' | 'medium' | 'high'} leadTimeConfidence  'low' whenever leadTimeSource
+ *   is 'default'; otherwise how many delivery dates the median rests on
  * @property {number | undefined} returnedUnits
  * @property {number | undefined} damagedUnits
  */

@@ -14,6 +14,7 @@ import {
   RECOMMENDATION_TYPE_METADATA,
 } from './recommendationTypes.js'
 import { credibleLoss } from './actionPriority.js'
+import { isAssumedLeadTime } from '../receiving/leadTimeResolver.js'
 
 const FAST_MOVER_THRESHOLD = 5
 const SLOW_MOVER_SALES_30D = 5
@@ -321,7 +322,9 @@ function buildReorderReason(product, metrics, marketContext) {
   )
   if (metrics.daysUntilStockout !== null) {
     parts.push(
-      `Current stock of ${product.currentStock} covers about ${metrics.daysUntilStockout} days while the supplier lead time is ${product.leadTimeDays} days.`,
+      isAssumedLeadTime(product)
+        ? `Current stock of ${product.currentStock} covers about ${metrics.daysUntilStockout} days against an assumed ${product.leadTimeDays}-day supplier lead time — not enough deliveries have been recorded to measure the real one, so that figure is the system default and not a measurement.`
+        : `Current stock of ${product.currentStock} covers about ${metrics.daysUntilStockout} days while the supplier lead time is ${product.leadTimeDays} days.`,
     )
   }
   if (metrics.demandMultiplier > 1) {

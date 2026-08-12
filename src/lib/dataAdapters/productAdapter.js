@@ -8,6 +8,8 @@ import {
   withProductContext,
 } from './validation.js'
 
+const LEAD_TIME_CONFIDENCES = new Set(['low', 'medium', 'high'])
+
 export function normalizeProduct(rawProduct, rowIndex = 0) {
   const localIssues = []
   const productId = requiredString(
@@ -61,6 +63,18 @@ export function normalizeProduct(rawProduct, rowIndex = 0) {
     // (days of cover, order quantity) is not defensible. null = not checkable.
     stockReconciles:
       typeof rawProduct.stockReconciles === 'boolean' ? rawProduct.stockReconciles : null,
+    // Where leadTimeDays came from: 'measured' = a median over at least three
+    // recorded deliveries from this supplier (T7 receiving ledger); 'default' =
+    // no delivery interval has ever been observed for it, so the number is an
+    // assumption. Anything that puts leadTimeDays into a sentence has to know
+    // which of the two it is holding, so this must survive normalization —
+    // dropping it here is what let the reason text state an assumed 3 as fact.
+    leadTimeSource: rawProduct.leadTimeSource === 'measured' ? 'measured' : 'default',
+    // What the measured median rests on: 'high' (>= 6 delivery dates), 'medium'
+    // (3-5), 'low' (below the threshold, i.e. not measured at all).
+    leadTimeConfidence: LEAD_TIME_CONFIDENCES.has(rawProduct.leadTimeConfidence)
+      ? rawProduct.leadTimeConfidence
+      : 'low',
   }
 
   if (product.shelfCapacity === 0) product.shelfCapacity = Math.max(product.shelfQuantity, 1)

@@ -47,6 +47,24 @@ function barcodeKeys(barcode) {
   return unpadded && unpadded !== raw ? [raw, unpadded] : [raw]
 }
 
+/**
+ * True when a product's `leadTimeDays` is the assumed default rather than a
+ * median measured from recorded deliveries.
+ *
+ * Anything that writes `leadTimeDays` into a sentence a manager reads must ask
+ * this first. The trap it guards against is not the current all-defaults state
+ * — it is the state right after the first supplier crosses three delivery
+ * dates, when the resolver starts returning that supplier's real NAME with the
+ * fallback lead time for its other barcodes. A sentence that names a real
+ * supplier and states a number is read as a measurement of that supplier.
+ *
+ * A missing field counts as assumed: a product that never carried the metadata
+ * certainly never had a delivery interval observed.
+ */
+export function isAssumedLeadTime(product) {
+  return product?.leadTimeSource !== 'measured'
+}
+
 export function resolveSupplierAndLeadTime(barcode, ledger = emptyLedger()) {
   const safe = normalizeLedger(ledger)
   const fallback = {
