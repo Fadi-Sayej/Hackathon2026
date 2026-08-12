@@ -32,13 +32,15 @@ export function ExpiryPage({ operationalData, products = [] }) {
         <div className="panel-heading">
           <div>
             <p className="eyebrow">Receiving</p>
-            <h2>Record a delivery</h2>
+            <h2>Record a delivery or an expiry date</h2>
           </div>
         </div>
         <p className="page-description">
           When goods arrive, record what came in: how many, from whom, and the date on
-          the package if there is one. This is the only record of what the shop actually
-          receives — the POS export contains neither deliveries nor expiry dates.
+          the package if there is one. For something already on the shelf, switch to
+          <strong> Expiry only</strong> and record just the barcode and the date. This is
+          the only record of either — the POS export contains neither deliveries nor
+          expiry dates.
         </p>
 
         <ReceivingCaptureForm products={products} />

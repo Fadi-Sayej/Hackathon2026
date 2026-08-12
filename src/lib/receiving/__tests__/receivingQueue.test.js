@@ -1,16 +1,26 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import {
+  CAPTURE_MODE_DELIVERY,
+  CAPTURE_MODE_EXPIRY,
+  EXPIRY_CSV_HEADER,
+  EXPIRY_QUEUE_KEY,
   RECEIVING_CSV_HEADER,
   RECEIVING_QUEUE_KEY,
   appendEntry,
+  exportForMode,
+  isExpiryOnlyMode,
   knownSuppliers,
   loadQueue,
   makeEntry,
+  makeEntryForMode,
+  makeExpiryEntry,
+  queueKeyForMode,
   readLastSupplier,
   rememberLastSupplier,
   saveQueue,
   toCsv,
+  toExpiryCsv,
   todayIso,
   undoLast,
 } from '../receivingQueue.js'
@@ -53,8 +63,10 @@ describe('makeEntry', () => {
     })
   })
 
-  it('defaults receivedAt to today', () => {
-    const entry = makeEntry(validInput({ receivedAt: '' }), { now: new Date('2026-08-13T09:00:00Z') })
+  it('defaults receivedAt to the local calendar date', () => {
+    // Local components, not an instant: this must hold in whatever timezone the
+    // suite happens to run in, and the date it defaults to is the shop's day.
+    const entry = makeEntry(validInput({ receivedAt: '' }), { now: new Date(2026, 7, 13, 9, 0, 0) })
     expect(entry.receivedAt).toBe('2026-08-13')
   })
 
@@ -187,8 +199,118 @@ describe('storage', () => {
   })
 })
 
-describe('todayIso', () => {
-  it('returns the UTC calendar date', () => {
-    expect(todayIso(new Date('2026-08-13T22:30:00Z'))).toBe('2026-08-13')
+// received_at is the one date the lead-time median and the restock
+// reconciliation window both rest on, and YomYom is a 24-hour forecourt shop
+// where a 01:00 delivery is ordinary. Under toISOString() every delivery
+// recorded between midnight and 03:00 Israel time was filed as yesterday.
+describe('todayIso — the LOCAL business date, not the UTC one', () => {
+  const originalTz = process.env.TZ
+
+  beforeAll(() => {
+    process.env.TZ = 'Asia/Jerusalem'
+  })
+  afterAll(() => {
+    process.env.TZ = originalTz
+  })
+
+  it('files a 01:30 Israel-time delivery under that morning, not the previous day', () => {
+    // 22:30Z on the 13th is 01:30 on the 14th in Jerusalem (UTC+3 in August).
+    expect(todayIso(new Date('2026-08-13T22:30:00Z'))).toBe('2026-08-14')
+  })
+
+  it('returns the calendar date the shop is standing in, whatever the machine TZ', () => {
+    expect(todayIso(new Date(2026, 7, 14, 0, 30, 0))).toBe('2026-08-14')
+    expect(todayIso(new Date(2026, 0, 5, 23, 59, 0))).toBe('2026-01-05')
+  })
+
+  // The mirror image, west of UTC. It also proves the TZ override above is
+  // doing something: this repo's own machines sit at UTC+3, where the broken
+  // UTC implementation would agree with the Jerusalem case by luck.
+  it('does not run ahead of the local day in a timezone behind UTC', () => {
+    process.env.TZ = 'Pacific/Honolulu'
+    // 05:00Z on the 14th is still 19:00 on the 13th in Honolulu (UTC-10).
+    expect(todayIso(new Date('2026-08-14T05:00:00Z'))).toBe('2026-08-13')
+    process.env.TZ = 'Asia/Jerusalem'
+  })
+})
+
+describe('expiry-only capture mode', () => {
+  it('recognises the mode', () => {
+    expect(isExpiryOnlyMode(CAPTURE_MODE_EXPIRY)).toBe(true)
+    expect(isExpiryOnlyMode(CAPTURE_MODE_DELIVERY)).toBe(false)
+    expect(isExpiryOnlyMode(undefined)).toBe(false)
+  })
+
+  it('keeps the two queues apart, so the exports cannot be mixed', () => {
+    expect(queueKeyForMode(CAPTURE_MODE_EXPIRY)).toBe(EXPIRY_QUEUE_KEY)
+    expect(queueKeyForMode(CAPTURE_MODE_DELIVERY)).toBe(RECEIVING_QUEUE_KEY)
+    expect(EXPIRY_QUEUE_KEY).not.toBe(RECEIVING_QUEUE_KEY)
+  })
+
+  it('records stock already on the shelf with no quantity and no supplier', () => {
+    const entry = makeExpiryEntry(
+      { barcode: ' 7290000066318 ', productName: 'במבה', expiryDate: '2026-12-31' },
+      { now: new Date('2026-08-13T09:00:00Z') },
+    )
+    expect(entry).toEqual({
+      barcode: '7290000066318',
+      productName: 'במבה',
+      expiryDate: '2026-12-31',
+      recordedAt: '2026-08-13T09:00:00.000Z',
+      source: 'manual_ui',
+    })
+  })
+
+  it('still requires a barcode and an expiry date', () => {
+    expect(() => makeExpiryEntry({ barcode: '', expiryDate: '2026-12-31' })).toThrow(/barcode/i)
+    expect(() => makeExpiryEntry({ barcode: '111', expiryDate: '' })).toThrow(/expiry/i)
+  })
+
+  it('routes the mode to the matching validation rules', () => {
+    // The same input that is a complete expiry line is an incomplete delivery.
+    const expiryOnlyInput = { barcode: '111', expiryDate: '2026-12-31' }
+    expect(makeEntryForMode(CAPTURE_MODE_EXPIRY, expiryOnlyInput).barcode).toBe('111')
+    expect(() => makeEntryForMode(CAPTURE_MODE_DELIVERY, expiryOnlyInput)).toThrow(/quantity/i)
+
+    // ...and a delivery line still goes through the full rules by default.
+    expect(makeEntryForMode(CAPTURE_MODE_DELIVERY, validInput()).quantity).toBe(24)
+  })
+
+  it('exports the two-column shape import_expiry_csv already reads', () => {
+    const queue = [
+      makeExpiryEntry({ barcode: '111', productName: 'ignored', expiryDate: '2026-12-31' }),
+    ]
+    expect(toExpiryCsv(queue)).toBe('barcode,expiry_date\n111,2026-12-31\n')
+    expect(toExpiryCsv([]).trim()).toBe(EXPIRY_CSV_HEADER)
+  })
+
+  it('names the file after the importer that reads it', () => {
+    const now = new Date(2026, 7, 13, 12, 0, 0)
+    expect(exportForMode(CAPTURE_MODE_EXPIRY, [], { now }).filename)
+      .toBe('expiry_scans_2026-08-13.csv')
+    expect(exportForMode(CAPTURE_MODE_DELIVERY, [], { now }).filename)
+      .toBe('receiving_2026-08-13.csv')
+  })
+
+  it('exports each mode with its own header', () => {
+    expect(exportForMode(CAPTURE_MODE_EXPIRY, []).csv.trim()).toBe(EXPIRY_CSV_HEADER)
+    expect(exportForMode(CAPTURE_MODE_DELIVERY, []).csv.trim()).toBe(RECEIVING_CSV_HEADER)
+  })
+
+  // Lines captured by the pre-T7 expiry form are still sitting under this key.
+  it('drains a queue left behind by the old expiry form', () => {
+    const legacy = [{ barcode: '111', expiryDate: '2026-12-31', addedAt: '2026-01-01T00:00:00Z' }]
+    const storage = fakeStorage({ [EXPIRY_QUEUE_KEY]: JSON.stringify(legacy) })
+    const loaded = loadQueue(storage, EXPIRY_QUEUE_KEY)
+    expect(loaded).toEqual(legacy)
+    expect(toExpiryCsv(loaded)).toBe('barcode,expiry_date\n111,2026-12-31\n')
+  })
+
+  it('round-trips an expiry queue under its own key without touching the delivery queue', () => {
+    const storage = fakeStorage()
+    saveQueue([makeExpiryEntry({ barcode: '111', expiryDate: '2026-12-31' })], storage,
+      EXPIRY_QUEUE_KEY)
+    expect(loadQueue(storage, EXPIRY_QUEUE_KEY)).toHaveLength(1)
+    expect(loadQueue(storage, RECEIVING_QUEUE_KEY)).toEqual([])
   })
 })

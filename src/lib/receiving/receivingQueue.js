@@ -13,19 +13,53 @@
 
 export const RECEIVING_QUEUE_KEY = 'receiving_queue'
 export const LAST_SUPPLIER_KEY = 'receiving_last_supplier'
+// The pre-T7 expiry capture wrote here. Reusing the same key means the lines a
+// worker recorded before this branch are still in the list and can still be
+// exported, instead of sitting in localStorage with nothing able to drain them.
+export const EXPIRY_QUEUE_KEY = 'expiry_scan_queue'
+
+/**
+ * Two things get captured at the same counter and they are not the same event.
+ *
+ * DELIVERY is goods arriving: how many, from whom — the receiving ledger.
+ * EXPIRY_ONLY is a date read off a package already on the shelf. There is no
+ * delivery and no supplier to name, and requiring one would mean inventing a
+ * fake one. Both write the barcode and a date; only the delivery path can
+ * honestly claim a quantity and a supplier, so the two exports go to two
+ * different Python importers and must not be mixed into one file.
+ */
+export const CAPTURE_MODE_DELIVERY = 'delivery'
+export const CAPTURE_MODE_EXPIRY = 'expiry'
 
 // Must stay in lockstep with RECEIVING_COLUMNS in src/internal/receiving.py.
 // receipt_id is derived server-side and is deliberately absent here.
 export const RECEIVING_CSV_HEADER =
   'barcode,product_name,quantity,supplier,unit_cost,received_at,expiry_date,recorded_at,source'
 
+// The shape src/expiry/expiry_tracking.py's import_expiry_csv already reads.
+// Deliberately not extended: that importer exists and works, and a second
+// column set would mean a second import path for the same fact.
+export const EXPIRY_CSV_HEADER = 'barcode,expiry_date'
+
 const CSV_FIELDS = [
   'barcode', 'productName', 'quantity', 'supplier',
   'unitCost', 'receivedAt', 'expiryDate', 'recordedAt', 'source',
 ]
 
+const EXPIRY_CSV_FIELDS = ['barcode', 'expiryDate']
+
+/**
+ * Today's LOCAL calendar date.
+ *
+ * Not `toISOString()`: Israel is UTC+2/+3, so between midnight and 03:00 local
+ * the UTC date is still yesterday. YomYom is a 24-hour forecourt shop and night
+ * deliveries are ordinary, and `received_at` is the single date the lead-time
+ * median and the restock reconciliation window both rest on — a delivery
+ * silently filed a day early moves both.
+ */
 export function todayIso(now = new Date()) {
-  return now.toISOString().slice(0, 10)
+  const pad = (value) => String(value).padStart(2, '0')
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
 }
 
 /** The real localStorage when there is one — absent in the node test environment. */
@@ -74,6 +108,49 @@ export function makeEntry(input, { now = new Date() } = {}) {
   }
 }
 
+/**
+ * One expiry observation: a barcode and the date printed on the package.
+ *
+ * No quantity and no supplier — not "optional", absent. Stock already on the
+ * shelf did not arrive today from anyone in particular, and the only way to
+ * push it through makeEntry() would be to type a supplier that never delivered
+ * it, which would then be counted as a real delivery date by
+ * supplier_lead_times().
+ */
+export function makeExpiryEntry(input, { now = new Date() } = {}) {
+  const barcode = text(input?.barcode)
+  if (!barcode) throw new Error('Scan or type a barcode first.')
+
+  const expiryDate = text(input?.expiryDate)
+  if (!expiryDate) throw new Error('Enter the expiry date printed on the package.')
+
+  return {
+    barcode,
+    productName: text(input?.productName),
+    expiryDate,
+    recordedAt: now.toISOString(),
+    source: 'manual_ui',
+  }
+}
+
+export function isExpiryOnlyMode(mode) {
+  return mode === CAPTURE_MODE_EXPIRY
+}
+
+/**
+ * The mode decision itself, kept out of the render function so it is testable:
+ * which validation rules apply, and therefore which required fields the form
+ * can drop. Everything else about the mode (which queue, which CSV, which
+ * filename) follows from this one branch.
+ */
+export function makeEntryForMode(mode, input, options = {}) {
+  return isExpiryOnlyMode(mode) ? makeExpiryEntry(input, options) : makeEntry(input, options)
+}
+
+export function queueKeyForMode(mode) {
+  return isExpiryOnlyMode(mode) ? EXPIRY_QUEUE_KEY : RECEIVING_QUEUE_KEY
+}
+
 export function appendEntry(queue, entry) {
   return [entry, ...(Array.isArray(queue) ? queue : [])]
 }
@@ -109,20 +186,37 @@ export function toCsv(queue) {
   return [RECEIVING_CSV_HEADER, ...rows].join('\n') + '\n'
 }
 
-export function loadQueue(storage = getStorage()) {
+export function toExpiryCsv(queue) {
+  const rows = (Array.isArray(queue) ? queue : []).map((entry) =>
+    EXPIRY_CSV_FIELDS.map((field) => csvCell(field, entry?.[field])).join(','),
+  )
+  return [EXPIRY_CSV_HEADER, ...rows].join('\n') + '\n'
+}
+
+/**
+ * What to download for a mode: the file the matching Python importer reads,
+ * under a filename that says which importer that is.
+ */
+export function exportForMode(mode, queue, { now = new Date() } = {}) {
+  return isExpiryOnlyMode(mode)
+    ? { filename: `expiry_scans_${todayIso(now)}.csv`, csv: toExpiryCsv(queue) }
+    : { filename: `receiving_${todayIso(now)}.csv`, csv: toCsv(queue) }
+}
+
+export function loadQueue(storage = getStorage(), key = RECEIVING_QUEUE_KEY) {
   if (!storage) return []
   try {
-    const parsed = JSON.parse(storage.getItem(RECEIVING_QUEUE_KEY) ?? '[]')
+    const parsed = JSON.parse(storage.getItem(key) ?? '[]')
     return Array.isArray(parsed) ? parsed : []
   } catch {
     return []
   }
 }
 
-export function saveQueue(queue, storage = getStorage()) {
+export function saveQueue(queue, storage = getStorage(), key = RECEIVING_QUEUE_KEY) {
   if (!storage) return
   try {
-    storage.setItem(RECEIVING_QUEUE_KEY, JSON.stringify(queue))
+    storage.setItem(key, JSON.stringify(queue))
   } catch {
     // A full quota must not lose the line the manager just typed — it stays in
     // React state and the CSV export still sees it.
