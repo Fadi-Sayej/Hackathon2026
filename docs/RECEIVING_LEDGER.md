@@ -24,28 +24,59 @@ edited in place, only added to.
 No developer needed for this part.
 
 1. Open the **Expiry** page in the app.
-2. In the **Receiving → Record a delivery** panel, scan (or type) the barcode. The
+2. Leave the mode on **Delivery** (the default). For something already on the shelf
+   that just needs a date, see *Expiry only* below.
+3. In the **Receiving → Record a delivery** panel, scan (or type) the barcode. The
    product's name appears immediately if it's in the catalog — check it matches
    before continuing.
-3. The cursor jumps straight to **Quantity**. Type the number of units, then press
+4. The cursor jumps straight to **Quantity**. Type the number of units, then press
    **Enter** (a barcode-gun Enter after the barcode field also jumps here — it does
-   not submit).
-4. **Supplier** pre-fills with whoever you used last; a delivery is usually twenty
+   not submit). Enter in the quantity field saves the line, so a whole delivery can
+   be entered without touching the screen.
+5. **Supplier** pre-fills with whoever you used last; a delivery is usually twenty
    items from one supplier, not twenty separate suppliers.
-5. **Unit cost** and **Expiry date** are optional — fill them in when the delivery
+6. **Unit cost** and **Expiry date** are optional — fill them in when the delivery
    note has them, skip them when it doesn't.
-6. Press **Save**. The line is queued on this device (it survives closing the app,
+7. Press **Save**. The line is queued on this device (it survives closing the app,
    and needs no network) and the form resets for the next item, with supplier and
    date carried over.
-7. Made a mistake on the last line? **Undo last** removes only that line.
-8. When the delivery is fully entered, press **Download N recorded lines**. This
+8. Made a mistake on the last line? **Undo last** removes only that line.
+9. When the delivery is fully entered, press **Download N recorded lines**. This
    saves a `receiving_<date>.csv` file.
-9. Send that CSV file to the SmartShelf team (WhatsApp, email — whatever channel is
-   already in use). Once it's imported, **Clear list** to empty the queue on this
-   device.
+10. Send that CSV file to the SmartShelf team (WhatsApp, email — whatever channel is
+    already in use). Once it's imported, **Clear list** to empty the queue on this
+    device.
 
-Every field on the form uses a number pad (`inputMode="numeric"` / `"decimal"`) — it
-is built for a phone in a shop, not a desktop.
+The three fields that take digits — barcode, quantity and unit cost — ask the phone
+for a number pad (`inputMode="numeric"` / `"decimal"`). Supplier is free text with a
+dropdown of suppliers already used, and the two dates use the phone's own date
+picker. It is built for a phone in a shop, not a desktop.
+
+### Expiry only — a date on something already on the shelf
+
+Not every expiry date comes off a delivery. A worker walking the fridge and finding a
+carton dated next week has a date worth recording and no delivery to attach it to.
+
+Switch the mode at the top of the panel to **Expiry only**. Quantity, supplier, unit
+cost and the received date disappear; the barcode and the expiry date are all that is
+asked for, and the **Quick date** buttons (3 days / 1 week / 2 weeks / 1 month) fill
+the date in one tap. **Download** then saves an `expiry_scans_<date>.csv` — a
+different file for a different importer, and the two lists are kept separately so an
+expiry line can never end up in the receiving ledger claiming a delivery happened.
+
+There is no supplier field here on purpose. Requiring one would mean typing a name
+that never delivered the item, and `supplier_lead_times()` would then count that day
+as a real delivery date for that supplier.
+
+The team imports that file with the expiry importer, not the receiving one:
+
+```bash
+/path/to/.venv/bin/python -c "
+from pathlib import Path
+from src.expiry.expiry_tracking import import_expiry_csv
+print(import_expiry_csv(Path('expiry_scans_2026-08-13.csv')))
+"
+```
 
 ## The loop for the team — importing what the manager sends
 
@@ -65,7 +96,18 @@ print(import_receiving_csv(Path('inbox.csv')))
 Run from the repo root. `import_receiving_csv` appends every valid row from
 `inbox.csv` into `data/internal/receiving/receipts.csv` and returns a summary —
 `imported_rows`, `rejected_rows`, and a `rejected_preview` of up to 20 bad rows with
-the reason each one failed (invalid rows are reported, never silently dropped).
+the reason each one failed (invalid rows are reported, never silently dropped), plus
+`skipped_duplicates` and a `skipped_preview` for rows that were already in the ledger.
+
+**Importing the same file twice is safe.** A row is skipped when the whole normalized
+row already exists — not when `receipt_id` matches, because `receipt_id` collides for
+two genuine same-day deliveries (see below) and skipping on it would discard a real
+one. The comparison runs after parsing, so `10/08/2026` does not slip past as a new
+delivery day. One case the data cannot settle: a hand-written CSV with no
+`recorded_at` has no per-line timestamp to distinguish its rows, so it is compared on
+its remaining columns — two genuinely identical same-day deliveries typed that way
+will have the second reported in `skipped_preview`. Every CSV the capture form
+exports carries `recorded_at`, so this only affects files typed by hand.
 
 Once the ledger has new rows, republish the derived data (like every other `npm run
 data:*` script in this repo, `npm run data:lead-times` shells out to bare `python3` —
@@ -118,9 +160,11 @@ carried in the export):
 `receipt_id = sha256(barcode | received_at | supplier)[:16]`. Two separate deliveries
 of the same barcode from the same supplier on the same day therefore hash to the same
 id — and the ledger keeps **both rows**, because it is append-only. `receipt_id` is a
-stable key for re-import (so importing the same CSV twice is recognizable), not a
-uniqueness constraint on the ledger. Do not deduplicate on it, and do not add a
-uniqueness check without re-reading the docstring in `src/internal/receiving.py` first.
+stable grouping key, not a uniqueness constraint on the ledger. Do not deduplicate on
+it, and do not add a uniqueness check without re-reading the docstring in
+`src/internal/receiving.py` first. Re-import protection does not use it: that is a
+whole-row comparison (`_row_identity`), precisely so those two real deliveries both
+survive an import.
 
 ## When a lead time becomes real
 
@@ -145,6 +189,59 @@ crosses the 3-date threshold, `resolveSupplierAndLeadTime()`
 (`src/lib/receiving/leadTimeResolver.js`) starts returning `leadTimeSource: 'measured'`
 and a real `leadTimeDays`/`leadTimeConfidence` for that supplier's products
 automatically — no code change needed, just more deliveries recorded.
+
+`leadTimeSource` is carried through `productAdapter.js` onto every normalized product
+and is read where it matters: the reorder reason text and the on-screen explanation
+both say **"an assumed 3-day supplier lead time … the system default and not a
+measurement"**
+while it is `'default'`, and drop the qualifier only once it is `'measured'`. That
+matters most in the state just after the first supplier crosses three dates: the
+resolver then returns that supplier's **real name** with the fallback lead time for
+its *other* barcodes, and a sentence naming a real supplier alongside a number reads
+as a measurement of that supplier unless it says otherwise.
+
+### What the number actually measures — read this before trusting it
+
+`supplier_lead_times()` returns the **median gap between consecutive delivery dates**:
+how often this supplier turns up. It is *not* order-to-arrival time — nothing in the
+ledger records when an order was placed, so responsiveness cannot be measured from it.
+A supplier who calls every Monday and delivers next-day yields `median_days: 7`, not 1.
+
+`reorderEngine.js` then consumes `leadTimeDays` as the horizon to cover: it multiplies
+it by daily sales to size an order, and treats `daysUntilStockout <= leadTimeDays` as
+stockout risk. **That is an assumption, not a measurement**, and it is deliberate:
+YomYom does not place orders on demand, it is a periodic-review shop that gets what it
+gets when the supplier's van comes. For a shop like that the interval you must survive
+on is the gap between vans, so the delivery cadence is the right horizon — but if the
+shop starts placing on-demand orders, or a supplier delivers weekly while accepting
+next-day calls, this number will overstate what has to be covered.
+
+The field is **not renamed** despite the mismatch: too many consumers read
+`leadTimeDays`, and a rename would spread the confusion rather than fix it. The
+assumption is documented here and at `scripts/normalize-datasets.mjs` instead.
+
+## Checking the ledger against the shelves
+
+`src/internal/restock_reconcile.py` compares deliveries recorded here against the
+restocks `src/snapshots/velocity.py` infers from a stock rise between two POS
+snapshots — the only independent check either source has.
+
+```bash
+npm run check:restocks             # scripts/reconcile_restocks.py
+npm run check:restocks -- --json   # the raw per-barcode report
+```
+
+It reads and prints; it writes nothing and nothing downstream consumes it. Output is
+grouped worst-first: `no_receipts` (stock rose, nothing recorded) and
+`under_recorded` are the ones that cost something; `unobserved` usually means the
+goods sold through before the next snapshot rather than that anything is wrong.
+Barcodes with no movement on either side are counted, not listed — with one delivery
+in the ledger there are ~7,300 of them, and calling those "agreements" would be a wall
+of meaningless success. With no receipts or fewer than two comparable snapshots it
+says so and exits 0: that is the normal pre-pilot state, not a failure.
+
+Like `npm run data:lead-times`, it shells out to bare `python3` and needs the project
+venv on `PATH` (it imports `pyarrow` transitively through the snapshot reader).
 
 ## Backing up the ledger
 

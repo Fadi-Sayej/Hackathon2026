@@ -123,9 +123,25 @@ function loadYomYomSilver() {
           stockReconciles:
             typeof row.stock_reconciles === 'boolean' ? row.stock_reconciles : null,
           supplier: sourcing.supplier,
+          // What this number IS: the median gap between consecutive delivery
+          // dates for this supplier — how often the van comes. What it is NOT:
+          // order-to-arrival time. Nothing records when an order was placed, so
+          // supplier responsiveness cannot be measured from the ledger. A
+          // supplier who is called every Monday and delivers next-day gives 7
+          // here, not 1.
+          //
+          // reorderEngine.js consumes it as the horizon to cover (daily sales x
+          // leadTimeDays, and stockout risk at daysUntilStockout <= it). That is
+          // an ASSUMPTION and it is deliberate: YomYom is a periodic-review shop
+          // that takes what the van brings, so the gap between vans is the
+          // interval it has to survive on. Not renamed despite the mismatch —
+          // too many consumers read leadTimeDays. See docs/RECEIVING_LEDGER.md,
+          // "What the number actually measures".
           leadTimeDays: sourcing.leadTimeDays,
           // 'default' means no supplier has reached three deliveries yet, so the
-          // lead time is still the assumed 3 — say so rather than implying it was measured.
+          // lead time is still the assumed 3 — say so rather than implying it was
+          // measured. productAdapter.js carries both fields onto the normalized
+          // product; reorderEngine.js and mockAI.js qualify their wording on them.
           leadTimeSource: sourcing.leadTimeSource,
           leadTimeConfidence: sourcing.leadTimeConfidence,
           returnedUnits: 0,
