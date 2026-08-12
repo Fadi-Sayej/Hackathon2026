@@ -19,6 +19,7 @@ function fields() {
     barcode: screen.getByLabelText(/barcode/i),
     quantity: screen.getByLabelText(/quantity/i),
     supplier: screen.getByLabelText(/supplier/i),
+    unitCost: screen.getByLabelText(/unit cost/i),
     save: screen.getByRole('button', { name: /^save$/i }),
   }
 }
@@ -110,5 +111,31 @@ describe('ReceivingCaptureForm', () => {
     render(<ReceivingCaptureForm products={PRODUCTS} />)
     expect(screen.getByRole('button', { name: /download 1 recorded line/i })).toBeDefined()
     expect(fields().supplier.value).toBe('Osem')
+  })
+
+  // A phone that pops a full QWERTY keyboard for a barcode or a quantity costs
+  // seconds on every single line — against a 20-second-per-line budget, that is
+  // the difference between the tool winning and losing to a pen. inputMode is
+  // what tells the phone to show digits instead, so it is worth locking in as
+  // an assertion and not just a one-time manual glance.
+  it('requests a numeric keypad for barcode and quantity, and a decimal keypad for unit cost', () => {
+    render(<ReceivingCaptureForm products={PRODUCTS} />)
+    const el = fields()
+    expect(el.barcode.getAttribute('inputmode')).toBe('numeric')
+    expect(el.quantity.getAttribute('inputmode')).toBe('numeric')
+    expect(el.unitCost.getAttribute('inputmode')).toBe('decimal')
+  })
+
+  it('offers previously used suppliers in the datalist after two lines from different suppliers', async () => {
+    const user = userEvent.setup()
+    const { container } = render(<ReceivingCaptureForm products={PRODUCTS} />)
+    await recordOneLine(user, { barcode: '111', quantity: '5', supplier: 'Tempo' })
+    await recordOneLine(user, { barcode: '222', quantity: '6', supplier: 'Osem' })
+
+    const options = [...container.querySelectorAll('#receiving-suppliers option')].map(
+      (option) => option.value,
+    )
+    expect(options).toContain('Tempo')
+    expect(options).toContain('Osem')
   })
 })
