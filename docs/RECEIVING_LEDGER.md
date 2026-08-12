@@ -67,7 +67,10 @@ Run from the repo root. `import_receiving_csv` appends every valid row from
 `imported_rows`, `rejected_rows`, and a `rejected_preview` of up to 20 bad rows with
 the reason each one failed (invalid rows are reported, never silently dropped).
 
-Once the ledger has new rows, republish the derived data:
+Once the ledger has new rows, republish the derived data (like every other `npm run
+data:*` script in this repo, `npm run data:lead-times` shells out to bare `python3` —
+have the project venv active on `PATH` first, or it fails the same way the one-liner
+above does without it):
 
 ```bash
 npm run data:lead-times     # receipts.csv -> data/internal/receiving/supplier_lead_times.json
