@@ -30,6 +30,9 @@ npm run preview      # preview the build
 
 # Data pipeline helpers (run normalization, then lint/build)
 npm run sprint7      # normalize:data + lint + build
+
+# Publish measured supplier lead times from the receiving ledger (see docs/RECEIVING_LEDGER.md)
+npm run data:lead-times
 ```
 
 ### Python data pipeline
@@ -218,8 +221,8 @@ Copy `.env.example` to `.env` before running locally.
 ## Key Constraints
 
 - Competitor price data on the frontend is **real** — `src/data/marketData.js` is generated from `data/matching/barcode_matches.parquet` (14,406 matched barcodes). `src/data/mockMarketData.js` is now **orphaned**; nothing imports it.
-- **There is no sales data anywhere.** The real POS export is an inventory snapshot with no sales history, so `units_sold_7d`/`units_sold_30d`/`last_sale_date` are null in all 7,674 rows of `yomyom_sales.parquet`, and `salesLast7Days`/`salesLast30Days` are hardcoded to `0` in `normalize-datasets.mjs`. Anything velocity-based (days-until-stockout, top sellers, slow movers) is therefore degenerate.
-- `shelfQuantity` (0), `shelfCapacity` (10), `leadTimeDays` (3), `supplier` ("YomYom"), `returnedUnits`/`damagedUnits` (0) are **hardcoded constants** for every product — the planogram runs on these, not real shelf data.
+- **The POS export itself still has no sales history** — `units_sold_7d`/`units_sold_30d`/`last_sale_date` are null in all 7,674 rows of `yomyom_sales.parquet`. But sales velocity is no longer uniformly absent: `src/snapshots/velocity.py` reconstructs it from stock deltas between POS snapshots, and it now covers **1,565 of 7,674 products** (`velocity_confidence` `high` for 504, `medium` for 1,061, `none` for the remaining 6,109). Velocity-derived features work for that 1,565-product subset and are suppressed elsewhere — every consumer must check `velocityConfidence`/`hasVelocity` before showing a velocity claim (see `docs/UI_DATA_CONTRACT.md` §4.2), not assume it is present.
+- `shelfQuantity` (0), `shelfCapacity` (10), `returnedUnits`/`damagedUnits` (0) are **hardcoded constants** for every product — the planogram runs on these, not real shelf data. `leadTimeDays` and `supplier` are **no longer hardcoded**: they resolve from `data/internal/receiving/supplier_lead_times.json` (built by the receiving ledger, T7 — see `docs/RECEIVING_LEDGER.md`) when that file is present, and fall back to `3` / `"YomYom"` when it is absent, which is still the case for every product today since no supplier has reached the 3-delivery threshold for a measured lead time.
 - State defaults to **browser localStorage**, but a **Firestore adapter (B-2) exists behind the persistence interface** and takes over once `VITE_FIREBASE_*` is configured (local-first, with localStorage fallback). No SQL database in production.
 - A test suite now exists: **Vitest** (`npm test` — 117 tests incl. persistence reconcile + telemetry) and **pytest** (`npm run test:py` — LLM proxy). ESLint is still the release gate.
 - The app targets Israeli convenience stores; product data and UI may contain Hebrew text.
