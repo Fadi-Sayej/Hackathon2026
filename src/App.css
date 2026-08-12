@@ -2570,6 +2570,44 @@ button {
 .expiry-match-ok { color: var(--forest); font-weight: 600; }
 .expiry-match-warn { color: var(--amber); font-weight: 600; }
 
+/* ── Receiving capture (T7 / #52) ────────────────────────────────────────── */
+
+/* Six fields on a 390 px phone: a two-column grid keeps every control at a
+   thumb-sized target instead of collapsing to a single scrolling column. */
+.receiving-capture {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  align-items: end;
+}
+
+.receiving-capture .expiry-field {
+  flex: initial;
+  min-width: 0;
+}
+
+/* Barcode is scanned first and is the widest value on the line. */
+.receiving-field-barcode {
+  grid-column: 1 / -1;
+}
+
+.receiving-capture > button {
+  grid-column: 1 / -1;
+  min-height: 3rem;
+}
+
+@media (min-width: 48rem) {
+  .receiving-capture {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .receiving-field-barcode {
+    grid-column: auto;
+  }
+  .receiving-capture > button {
+    grid-column: auto;
+  }
+}
+
 /* ── Price comparison (task D-3) ─────────────────────────────────────────── */
 
 .price-table-scroll {
