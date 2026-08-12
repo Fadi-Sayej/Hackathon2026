@@ -17,6 +17,7 @@
     "check:firebase": "node scripts/check_firebase_config.mjs",
     "preflight": "bash scripts/preflight_deploy.sh",
     "data:velocity": "python3 scripts/build_velocity_from_snapshots.py",
+    "data:lead-times": "python3 scripts/export_supplier_lead_times.py",
     "data:quality": "python3 scripts/check_import_quality.py",
     "pilot:daily": "bash scripts/pilot_daily.sh",
     "test": "vitest run",
