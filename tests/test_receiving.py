@@ -140,8 +140,118 @@ def test_import_receiving_csv_counts_good_and_rejected_rows(tmp_path: Path) -> N
 
     assert result["imported_rows"] == 2
     assert result["rejected_rows"] == 2
+    assert result["skipped_duplicates"] == 0
     assert {row["row_number"] for row in result["rejected_preview"]} == {4, 5}
     assert all(row["source"] == "csv_import" for row in load_receipts(ledger))
+
+
+# The ledger is append-only and git-ignored, and its only backup is out-of-band.
+# Importing the same file twice used to double every quantity in it, silently.
+class TestImportIsIdempotent:
+    def test_reimporting_the_same_file_changes_nothing(self, tmp_path: Path) -> None:
+        source = tmp_path / "upload.csv"
+        source.write_text(
+            "barcode,product_name,quantity,supplier,unit_cost,received_at,"
+            "expiry_date,recorded_at,source\n"
+            "111,במבה,12,Osem,2.10,2026-08-10,2026-11-01,2026-08-10T09:00:00Z,manual_ui\n"
+            "222,ביסלי,6,Osem,,2026-08-10,,2026-08-10T09:01:00Z,manual_ui\n",
+            encoding="utf-8",
+        )
+        ledger = tmp_path / "receipts.csv"
+
+        first = import_receiving_csv(source, path=ledger)
+        assert first["imported_rows"] == 2
+        assert first["skipped_duplicates"] == 0
+
+        second = import_receiving_csv(source, path=ledger)
+        assert second["imported_rows"] == 0
+        assert second["skipped_duplicates"] == 2
+        assert {row["row_number"] for row in second["skipped_preview"]} == {2, 3}
+
+        rows = load_receipts(ledger)
+        assert len(rows) == 2
+        assert sum(int(row["quantity"]) for row in rows) == 18
+
+    def test_two_genuine_same_day_deliveries_both_land(self, tmp_path: Path) -> None:
+        # Same barcode, same supplier, same day: receipt_id is identical for
+        # both by design. Skipping on it would throw away a real delivery.
+        source = tmp_path / "upload.csv"
+        source.write_text(
+            "barcode,product_name,quantity,supplier,unit_cost,received_at,"
+            "expiry_date,recorded_at,source\n"
+            "111,במבה,12,Osem,,2026-08-10,,2026-08-10T08:00:00Z,manual_ui\n"
+            "111,במבה,12,Osem,,2026-08-10,,2026-08-10T17:30:00Z,manual_ui\n",
+            encoding="utf-8",
+        )
+        ledger = tmp_path / "receipts.csv"
+
+        result = import_receiving_csv(source, path=ledger)
+        assert result["imported_rows"] == 2
+        assert result["skipped_duplicates"] == 0
+
+        rows = load_receipts(ledger)
+        assert len(rows) == 2
+        assert rows[0]["receipt_id"] == rows[1]["receipt_id"]
+        assert sum(int(row["quantity"]) for row in rows) == 24
+
+        # And re-importing that file still adds nothing.
+        assert import_receiving_csv(source, path=ledger)["imported_rows"] == 0
+        assert len(load_receipts(ledger)) == 2
+
+    def test_a_second_delivery_that_differs_in_any_field_is_not_a_duplicate(
+        self, tmp_path: Path
+    ) -> None:
+        ledger = tmp_path / "receipts.csv"
+        add_receipt(barcode="111", quantity=12, supplier="Osem", received_at="2026-08-10",
+                    recorded_at="2026-08-10T08:00:00Z", source="csv_import", path=ledger)
+
+        source = tmp_path / "upload.csv"
+        source.write_text(
+            "barcode,product_name,quantity,supplier,unit_cost,received_at,"
+            "expiry_date,recorded_at,source\n"
+            # identical except the quantity — a genuinely different delivery
+            "111,,18,Osem,,2026-08-10,,2026-08-10T08:00:00Z,csv_import\n",
+            encoding="utf-8",
+        )
+        assert import_receiving_csv(source, path=ledger)["imported_rows"] == 1
+        assert len(load_receipts(ledger)) == 2
+
+    def test_date_written_differently_is_still_the_same_row(self, tmp_path: Path) -> None:
+        # The comparison runs on the normalized record, so 10/08/2026 does not
+        # sneak past as a new delivery day.
+        ledger = tmp_path / "receipts.csv"
+        add_receipt(barcode="111", quantity=12, supplier="Osem", received_at="2026-08-10",
+                    recorded_at="2026-08-10T08:00:00Z", source="csv_import", path=ledger)
+
+        source = tmp_path / "upload.csv"
+        source.write_text(
+            "barcode,product_name,quantity,supplier,unit_cost,received_at,"
+            "expiry_date,recorded_at,source\n"
+            "111,,12,Osem,,10/08/2026,,2026-08-10T08:00:00Z,csv_import\n",
+            encoding="utf-8",
+        )
+        result = import_receiving_csv(source, path=ledger)
+        assert result["imported_rows"] == 0
+        assert result["skipped_duplicates"] == 1
+
+    def test_a_hand_made_csv_without_recorded_at_is_still_recognized(
+        self, tmp_path: Path
+    ) -> None:
+        # No per-line timestamp to compare, so the remaining columns decide.
+        # Without this, every re-import of a hand-typed file would double it,
+        # because add_receipt stamps a fresh recorded_at each run.
+        source = tmp_path / "upload.csv"
+        source.write_text(
+            "barcode,quantity,supplier,received_at\n"
+            "111,12,Osem,2026-08-10\n",
+            encoding="utf-8",
+        )
+        ledger = tmp_path / "receipts.csv"
+        assert import_receiving_csv(source, path=ledger)["imported_rows"] == 1
+        second = import_receiving_csv(source, path=ledger)
+        assert second["imported_rows"] == 0
+        assert second["skipped_duplicates"] == 1
+        assert len(load_receipts(ledger)) == 1
 
 
 def _delivery(barcode: str, supplier: str, day: str, quantity: int = 1) -> dict:

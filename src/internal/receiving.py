@@ -13,8 +13,9 @@ a delivery that happened is a fact, and facts are not edited in place.
 `receipt_id` is a stable hash of (barcode, received_at, supplier) exactly as
 specified in issue #52. Two separate deliveries of the same barcode from the
 same supplier on the same day therefore share an id. That is intentional — the
-id is a stable key for re-import, not a uniqueness constraint, and both rows
-are kept.
+id is a grouping key, not a uniqueness constraint, and both rows are kept.
+Re-import protection is a whole-row comparison instead (see _row_identity);
+deduplicating on receipt_id would throw away one of those two real deliveries.
 """
 
 from __future__ import annotations
@@ -117,6 +118,56 @@ def ensure_receipts_csv(path: Path = RECEIPTS_CSV) -> Path:
     return path
 
 
+def build_receipt_record(
+    *,
+    barcode: str,
+    quantity: Any,
+    supplier: str,
+    received_at: Any = None,
+    unit_cost: Any = None,
+    expiry_date: Any = None,
+    product_name: Any = None,
+    source: str = "manual_ui",
+    recorded_at: Any = None,
+) -> dict[str, Any]:
+    """Validate and normalize one delivery line without writing it.
+
+    Split out of add_receipt so import_receiving_csv can decide whether a row is
+    already in the ledger BEFORE appending it. The comparison has to happen on
+    the normalized record, not on the raw CSV text: '10/08/2026' and
+    '2026-08-10' are the same delivery day, and only this function knows that.
+    """
+    clean_barcode = _require_barcode(barcode)
+    clean_quantity = _require_quantity(quantity)
+    clean_supplier = _require_supplier(supplier)
+    cost = _optional_cost(unit_cost)
+    expiry = _optional_date(expiry_date)
+
+    received = _optional_date(received_at) or _now().date()
+    recorded = _clean(recorded_at) or _now().isoformat()
+
+    return {
+        "receipt_id": make_receipt_id(clean_barcode, received, clean_supplier),
+        "barcode": clean_barcode,
+        "product_name": _clean(product_name),
+        "quantity": clean_quantity,
+        "supplier": clean_supplier,
+        "unit_cost": cost if cost is not None else "",
+        "received_at": received.isoformat(),
+        "expiry_date": expiry.isoformat() if expiry else "",
+        "recorded_at": recorded,
+        "source": source,
+    }
+
+
+def append_receipt_record(record: dict[str, Any], path: Path = RECEIPTS_CSV) -> dict[str, Any]:
+    """Write one already-validated record to the end of the ledger."""
+    ensure_receipts_csv(path)
+    with path.open("a", encoding="utf-8", newline="") as handle:
+        csv.DictWriter(handle, fieldnames=RECEIVING_COLUMNS).writerow(record)
+    return record
+
+
 def add_receipt(
     *,
     barcode: str,
@@ -131,32 +182,34 @@ def add_receipt(
     path: Path = RECEIPTS_CSV,
 ) -> dict[str, Any]:
     """Append one delivery line. Raises ValueError on any invalid required field."""
-    clean_barcode = _require_barcode(barcode)
-    clean_quantity = _require_quantity(quantity)
-    clean_supplier = _require_supplier(supplier)
-    cost = _optional_cost(unit_cost)
-    expiry = _optional_date(expiry_date)
+    record = build_receipt_record(
+        barcode=barcode,
+        quantity=quantity,
+        supplier=supplier,
+        received_at=received_at,
+        unit_cost=unit_cost,
+        expiry_date=expiry_date,
+        product_name=product_name,
+        source=source,
+        recorded_at=recorded_at,
+    )
+    return append_receipt_record(record, path)
 
-    received = _optional_date(received_at) or _now().date()
-    recorded = _clean(recorded_at) or _now().isoformat()
 
-    record = {
-        "receipt_id": make_receipt_id(clean_barcode, received, clean_supplier),
-        "barcode": clean_barcode,
-        "product_name": _clean(product_name),
-        "quantity": clean_quantity,
-        "supplier": clean_supplier,
-        "unit_cost": cost if cost is not None else "",
-        "received_at": received.isoformat(),
-        "expiry_date": expiry.isoformat() if expiry else "",
-        "recorded_at": recorded,
-        "source": source,
-    }
+def _row_identity(row: dict[str, Any], with_recorded_at: bool = True) -> tuple:
+    """Every column of a row as written, for duplicate detection.
 
-    ensure_receipts_csv(path)
-    with path.open("a", encoding="utf-8", newline="") as handle:
-        csv.DictWriter(handle, fieldnames=RECEIVING_COLUMNS).writerow(record)
-    return record
+    NOT receipt_id: that hashes only (barcode, received_at, supplier) and
+    deliberately collides for two genuine same-day deliveries of the same
+    barcode from the same supplier. Those differ in quantity, in cost, or at
+    minimum in recorded_at — the per-line timestamp the capture form stamps —
+    so the whole row is what tells a real second delivery apart from the same
+    delivery imported twice.
+    """
+    columns = [column for column in RECEIVING_COLUMNS if column != "recorded_at"]
+    if with_recorded_at:
+        columns.append("recorded_at")
+    return tuple(_clean(row.get(column)) for column in columns)
 
 
 def load_receipts(path: Path = RECEIPTS_CSV) -> list[dict[str, Any]]:
@@ -172,15 +225,36 @@ def import_receiving_csv(
     path: Path = RECEIPTS_CSV,
     source: str = "csv_import",
 ) -> dict[str, Any]:
-    """Load a CSV exported by the capture form. Bad rows are reported, not silently dropped."""
+    """Load a CSV exported by the capture form, skipping rows already in the ledger.
+
+    The ledger is append-only and git-ignored, so a CSV imported twice used to
+    double every quantity it contained with nothing to undo it. A row is skipped
+    when the whole normalized row already exists (see _row_identity) — not when
+    receipt_id matches, because receipt_id collides for two genuine same-day
+    deliveries and skipping on it would silently drop a real one.
+
+    One case cannot be resolved by the data: a row whose recorded_at is blank
+    has no per-line timestamp to tell it apart, so it is compared on its other
+    columns. Two truly identical, same-day, same-quantity deliveries hand-typed
+    into a CSV with no recorded_at will therefore see the second skipped. It is
+    reported in skipped_preview rather than dropped quietly, and every CSV the
+    capture form exports carries recorded_at.
+
+    Bad rows are still reported, never silently dropped.
+    """
     ensure_receipts_csv(path)
     imported = 0
     rejected: list[dict[str, Any]] = []
+    skipped: list[dict[str, Any]] = []
+
+    existing = load_receipts(path)
+    seen_full = {_row_identity(row) for row in existing}
+    seen_loose = {_row_identity(row, with_recorded_at=False) for row in existing}
 
     with input_path.open("r", encoding="utf-8-sig", newline="") as handle:
         for row_number, row in enumerate(csv.DictReader(handle), start=2):
             try:
-                add_receipt(
+                record = build_receipt_record(
                     barcode=row.get("barcode", ""),
                     quantity=row.get("quantity", ""),
                     supplier=row.get("supplier", ""),
@@ -190,11 +264,28 @@ def import_receiving_csv(
                     product_name=row.get("product_name") or None,
                     source=row.get("source") or source,
                     recorded_at=row.get("recorded_at") or None,
-                    path=path,
                 )
-                imported += 1
             except Exception as exc:
                 rejected.append({"row_number": row_number, "error": str(exc), "row": row})
+                continue
+
+            has_recorded_at = bool(_clean(row.get("recorded_at")))
+            identity = _row_identity(record, with_recorded_at=has_recorded_at)
+            if identity in (seen_full if has_recorded_at else seen_loose):
+                skipped.append(
+                    {
+                        "row_number": row_number,
+                        "receipt_id": record["receipt_id"],
+                        "reason": "already in the ledger",
+                        "row": row,
+                    }
+                )
+                continue
+
+            append_receipt_record(record, path)
+            seen_full.add(_row_identity(record))
+            seen_loose.add(_row_identity(record, with_recorded_at=False))
+            imported += 1
 
     return {
         "status": "ok",
@@ -203,6 +294,8 @@ def import_receiving_csv(
         "imported_rows": imported,
         "rejected_rows": len(rejected),
         "rejected_preview": rejected[:20],
+        "skipped_duplicates": len(skipped),
+        "skipped_preview": skipped[:20],
     }
 
 
