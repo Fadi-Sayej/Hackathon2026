@@ -46,7 +46,24 @@ for (const language of LANGUAGES) {
       const errors = []
       page.on('pageerror', (error) => errors.push(String(error)))
       page.on('console', (message) => {
-        if (message.type() === 'error') errors.push(message.text())
+        // Chrome's message for a failed fetch is "Failed to load resource: the
+        // server responded with a status of 404 ()" — no URL, so a failure here
+        // says nothing about what is missing. The response handler below
+        // records the URL instead; this one keeps everything else.
+        if (message.type() !== 'error') return
+        if (message.text().startsWith('Failed to load resource')) return
+        errors.push(message.text())
+      })
+      // This test has failed intermittently (roughly one full-suite run in
+      // four) on a 404 that could not be reproduced in isolation, under
+      // sequential navigation, or under six parallel contexts with the dev
+      // server churning HMR updates. Every occurrence was during a run where
+      // source files were being edited. Rather than suppress it on a guess
+      // about which URL it was, record the URL so the next occurrence says.
+      page.on('response', (response) => {
+        if (response.status() >= 400) {
+          errors.push(`HTTP ${response.status()} — ${response.url()}`)
+        }
       })
 
       await page.goto('/')

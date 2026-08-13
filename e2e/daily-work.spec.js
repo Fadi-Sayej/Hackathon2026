@@ -23,7 +23,16 @@ test('the data provenance strip never claims more than it has', async ({ page })
 
 test('searching the action list filters it', async ({ page }) => {
   const search = page.locator('.operational-search')
-  if ((await search.count()) === 0) test.skip(true, 'no operational data bundled in this build')
+  // `public/data/operational.json` is a build artifact and is not committed, so
+  // on a fresh checkout this test legitimately does not apply. But it is
+  // fetched asynchronously: asking for count() straight after goto() skipped on
+  // a race even when the file was there, and a test that quietly removes itself
+  // under load is worse than one that fails. Wait, then skip only if it never
+  // arrives.
+  const loaded = await search
+    .waitFor({ state: 'visible', timeout: 5000 })
+    .then(() => true, () => false)
+  test.skip(!loaded, 'no operational data bundled in this build')
 
   await search.fill('zzz-no-such-product')
   await expect(page.getByText('Nothing matches that search')).toBeVisible()
