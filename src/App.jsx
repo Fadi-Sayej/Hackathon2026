@@ -90,7 +90,7 @@ function App() {
   const [storeData, setStoreData] = useState(initialStoreData)
   const [connectorStatus, setConnectorStatus] = useState({
     state: 'ready',
-    message: 'Demo dataset loaded.',
+    messageKey: 'ds.demoLoaded',
   })
   const [operationalData, setOperationalData] = useState(EMPTY_OPERATIONAL_DATA)
   const [operationalStatus, setOperationalStatus] = useState('loading')
@@ -440,7 +440,7 @@ function App() {
     resetDemoState()
     setRecommendationOverrides({})
     setStoreData(initialStoreData())
-    setConnectorStatus({ state: 'ready', message: 'Demo dataset loaded.' })
+    setConnectorStatus({ state: 'ready', messageKey: 'ds.demoLoaded' })
     setActivePage('dashboard')
   }
 

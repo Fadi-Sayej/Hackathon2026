@@ -538,11 +538,33 @@ function ShelfPosition({ item, hovered, onHover, tipBelow, tipAtStart, t, n, d }
   return (
     <div
       className="pg-position"
-      style={{ flex: `${item.facings} 1 0` }}
+      /*
+       * Width comes from facings twice over, and it has to.
+       *
+       * `flex-grow: facings` makes a four-facing block twice a two-facing one —
+       * correct, and on its own unreadable: twenty-three blocks sharing a 712px
+       * deck landed at 29px each, below the 54px the label's container query
+       * needs, so the plan rendered as anonymous yellow bars with no product
+       * name anywhere on it. A flex-basis of 0 will shrink to nothing.
+       *
+       * `min-width` is the same ratio expressed as a floor: 18px of deck per
+       * facing, never below the 72px a name needs to be legible. Blocks keep
+       * their relative sizes, every one of them can say what it holds, and the
+       * deck scrolls when the shelf is longer than the screen — which, for six
+       * metres of gondola on a laptop, it always is.
+       */
+      style={{
+        flex: `${item.facings} 1 0`,
+        minWidth: `${Math.max(72, item.facings * 18 + 10)}px`,
+      }}
       onMouseEnter={() => onHover(item.productId)}
       onMouseLeave={() => onHover(null)}
     >
+      {/* A button per facing gave the screen reader a dozen unnamed controls and
+          left 10px-wide tap targets. The position is one thing to a user, so it
+          is one control: the name is the product, and the width is the block. */}
       <button
+        aria-label={item.productName}
         className="pg-facings"
         style={{ display: 'flex', width: '100%' }}
         type="button"

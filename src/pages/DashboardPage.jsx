@@ -43,7 +43,7 @@ export function DashboardPage({
         <MetricCard
           label={t('dash.highRisk')}
           value={dashboardStats.highRiskStockouts}
-          detail={velocityDetail ?? `${dashboardStats.highPriority} high priority items`}
+          detail={velocityDetail ?? t('dash.highPriorityItems', { n: dashboardStats.highPriority })}
           tone="danger"
         />
         <MetricCard
@@ -76,7 +76,7 @@ export function DashboardPage({
         <article className="panel panel-large">
           <div className="panel-heading">
             <div>
-              <p className="eyebrow">Category movement</p>
+              <p className="eyebrow">{t('eb.categoryMovement')}</p>
               <h2>{t('dash.salesDistribution')}</h2>
             </div>
             <span className="metric-chip">30 day view</span>
@@ -98,7 +98,7 @@ export function DashboardPage({
         <article className="panel">
           <div className="panel-heading">
             <div>
-              <p className="eyebrow">Stock risk</p>
+              <p className="eyebrow">{t('eb.stockRisk')}</p>
               <h2>{t('dash.highestRisk')}</h2>
             </div>
           </div>
@@ -136,7 +136,7 @@ export function DashboardPage({
         <article className="panel">
           <div className="panel-heading">
             <div>
-              <p className="eyebrow">Manager attention</p>
+              <p className="eyebrow">{t('eb.managerAttention')}</p>
               <h2>{t('dash.urgentTitle')}</h2>
             </div>
           </div>

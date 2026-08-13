@@ -1,4 +1,5 @@
 import { EmptyState } from './shared/EmptyState.jsx'
+import { useT } from '../lib/i18n/index.js'
 import { MetricCard } from './shared/MetricCard.jsx'
 import { StatusBadge } from './shared/StatusBadge.jsx'
 import { formatCurrency } from './shared/formatters.js'
@@ -24,6 +25,7 @@ export function MarketIntelligencePanel({
   stockoutOpportunities = [],
   priceProtectionAlerts = [],
 }) {
+  const t = useT()
   const hasAnyData =
     priceLeaders.length || stockoutOpportunities.length || priceProtectionAlerts.length
 
@@ -31,69 +33,66 @@ export function MarketIntelligencePanel({
     <section className="market-intel-section">
       <section className="metric-grid metric-grid-compact">
         <MetricCard
-          label="Local Price Leaders"
+          label={t('mi.priceLeaders')}
           value={competitorSummary?.priceLeaderCount ?? 0}
-          detail="Items where we beat every nearby chain"
+          detail={t('mi.priceLeadersDetail')}
           tone="success"
         />
         <MetricCard
-          label="Competitor OOS"
+          label={t('mi.competitorOos')}
           value={competitorSummary?.competitorOOSCount ?? 0}
-          detail="Profit opportunities within 1 km"
+          detail={t('mi.profitWithin1km')}
           tone="info"
         />
         <MetricCard
-          label="Price Protection"
+          label={t('mi.priceProtection')}
           value={competitorSummary?.priceProtectionCount ?? 0}
-          detail="Items where rivals are >15% cheaper"
+          detail={t('mi.undercuttingDetail')}
           tone="warning"
         />
         <MetricCard
-          label="Tracked SKUs"
+          label={t('mi.trackedSkus')}
           value={competitorSummary?.productsWithCoverage ?? 0}
-          detail="Joined to the local market feed"
+          detail={t('mi.joinedToFeed')}
         />
       </section>
 
       <section className="panel">
         <div className="panel-heading">
           <div>
-            <p className="eyebrow">Hyper-local intelligence</p>
-            <h2>Market signals from Paz, Delek, Sonol & Dor Alon</h2>
-            <p className="page-description">
-              Built from the Israeli "Hok HaMazon" transparency feed — barcode-level price
-              and stock data from every chain within 1 km, updated hourly.
-            </p>
+            <p className="eyebrow">{t('mi.hyperLocal')}</p>
+            <h2>{t('mi.signalsFrom')}</h2>
+            <p className="page-description">{t('mi.feedDesc')}</p>
           </div>
         </div>
 
         {!hasAnyData ? (
           <EmptyState
-            description="No competitor signals are firing right now. The mock neighborhood feed will surface alerts as soon as a barcode goes OOS at a nearby station."
-            title="No market signals"
+            description={t('mi.noSignalsDesc')}
+            title={t('mi.noSignals')}
           />
         ) : (
           <div className="market-intel-grid">
             <MarketIntelColumn
-              eyebrow="Stockout opportunity"
-              title="Competitor stockout alerts"
-              empty="No nearby competitor is OOS on our top sellers right now."
+              eyebrow={t('mi.stockoutOpportunity')}
+              title={t('mi.stockoutAlerts')}
+              empty={t('mi.noStockouts')}
               items={stockoutOpportunities}
-              renderItem={renderStockoutCard}
+              renderItem={(product) => renderStockoutCard(product, t)}
             />
             <MarketIntelColumn
-              eyebrow="Price leader"
-              title="Local price leaders"
-              empty="No items where we currently beat every nearby chain."
+              eyebrow={t('mi.leaderBadge')}
+              title={t('mi.priceLeaders')}
+              empty={t('mi.noLeaders')}
               items={priceLeaders}
-              renderItem={renderPriceLeaderCard}
+              renderItem={(product) => renderPriceLeaderCard(product, t)}
             />
             <MarketIntelColumn
-              eyebrow="Price protection"
-              title="Rivals undercutting us"
-              empty="No competitor is more than 15% cheaper on tracked SKUs."
+              eyebrow={t('mi.priceProtection')}
+              title={t('mi.undercutting')}
+              empty={t('mi.noUndercut')}
               items={priceProtectionAlerts}
-              renderItem={renderPriceProtectionCard}
+              renderItem={(product) => renderPriceProtectionCard(product, t)}
             />
           </div>
         )}
@@ -118,12 +117,12 @@ function MarketIntelColumn({ eyebrow, title, empty, items, renderItem }) {
   )
 }
 
-function renderStockoutCard(product) {
+function renderStockoutCard(product, t) {
   const trigger = closestTrigger(product.competitor?.triggeredBy)
   return (
     <article className="market-intel-card market-intel-card-opportunity" key={`oos-${product.id}`}>
       <header>
-        <StatusBadge tone="info">Opportunity</StatusBadge>
+        <StatusBadge tone="info">{t('mi.opportunity')}</StatusBadge>
         <strong {...dirProps(product.name)}>{product.name ?? '—'}</strong>
       </header>
       <p {...dirProps(product.category)}>{product.category ?? '—'}</p>
@@ -132,51 +131,54 @@ function renderStockoutCard(product) {
           <strong {...dirProps(`${trigger.storeName} ${trigger.brand}`)}>
             {trigger.storeName ?? '—'} ({trigger.brand ?? '—'})
           </strong>{' '}
-          is OOS — {describeDistance(trigger.distance_m)} away
+          {t('mi.isOos', { distance: describeDistance(trigger.distance_m) })}
         </p>
       )}
       <footer>
-        <span>Our stock</span>
+        <span>{t('mi.ourStock')}</span>
         <strong className="numeric-cell">{product.currentStock ?? '—'} units</strong>
       </footer>
     </article>
   )
 }
 
-function renderPriceLeaderCard(product) {
+function renderPriceLeaderCard(product, t) {
   const delta = product.competitor?.priceDelta ?? 0
   return (
     <article className="market-intel-card market-intel-card-leader" key={`leader-${product.id}`}>
       <header>
-        <StatusBadge tone="success">Cheapest</StatusBadge>
+        <StatusBadge tone="success">{t('mi.cheapest')}</StatusBadge>
         <strong {...dirProps(product.name)}>{product.name ?? '—'}</strong>
       </header>
       <p {...dirProps(product.category)}>{product.category ?? '—'}</p>
       <p className="market-intel-attribution">
-        We are <strong>{formatCurrency(Math.abs(delta))}</strong> below the cheapest of {product.competitor.nearbyCompetitors} nearby stores
+        {t('mi.belowCheapestBy', {
+          amount: formatCurrency(Math.abs(delta)),
+          n: product.competitor.nearbyCompetitors,
+        })}
       </p>
       <footer>
-        <span>Our price</span>
+        <span>{t('mi.ourPrice')}</span>
         <strong className="price-cell">{formatCurrency(product.price)}</strong>
       </footer>
     </article>
   )
 }
 
-function renderPriceProtectionCard(product) {
+function renderPriceProtectionCard(product, t) {
   const delta = product.competitor?.priceDelta ?? 0
   return (
     <article className="market-intel-card market-intel-card-warning" key={`prot-${product.id}`}>
       <header>
-        <StatusBadge tone="warning">Undercut</StatusBadge>
+        <StatusBadge tone="warning">{t('mi.undercut')}</StatusBadge>
         <strong {...dirProps(product.name)}>{product.name ?? '—'}</strong>
       </header>
       <p {...dirProps(product.category)}>{product.category ?? '—'}</p>
       <p className="market-intel-attribution">
-        A competitor is <strong>{formatCurrency(delta)}</strong> cheaper — consider matching or repositioning
+        {t('mi.cheaperBy', { amount: formatCurrency(delta) })}
       </p>
       <footer>
-        <span>Our price</span>
+        <span>{t('mi.ourPrice')}</span>
         <strong className="price-cell">{formatCurrency(product.price)}</strong>
       </footer>
     </article>

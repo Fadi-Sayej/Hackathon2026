@@ -84,12 +84,10 @@ export function AssortmentGapPage() {
   return (
     <section className="page">
       <header className="page-header">
-        <p className="eyebrow">Assortment</p>
+        <p className="eyebrow">{t('eb.assortment')}</p>
         <h1>{t('gap.headline')}</h1>
         <p className="page-intro">
-          Compared against {branchesCompared} branches of the same store format. These are
-          products you have never stocked, so there is no sales history for any of them —
-          the evidence is how many of those branches carry it.
+          {t('gap.comparedIntro', { n: branchesCompared })} {t('gap.comparedRest')}
         </p>
       </header>
 
@@ -97,7 +95,7 @@ export function AssortmentGapPage() {
         <MetricCard
           label={t('gap.products')}
           value={counts.gapTotal.toLocaleString()}
-          detail={`Across ${branchesCompared} comparable branches`}
+          detail={t('gap.acrossBranches', { n: branchesCompared })}
         />
         <MetricCard
           label={t('gap.widely')}
@@ -115,7 +113,7 @@ export function AssortmentGapPage() {
           value={counts.excludedByPolicy.toLocaleString()}
           detail={
             policy.excludes.length
-              ? `Not stocked here: ${policy.excludes.join(', ')}`
+              ? t('gap.notStockedList', { list: policy.excludes.join('، ') })
               : t('gap.nothingExcluded')
           }
           tone={counts.excludedByPolicy ? 'warning' : 'neutral'}
@@ -187,8 +185,7 @@ export function AssortmentGapPage() {
       )}
 
       <p className="page-footnote">
-        No sales rate is shown for any row, and none can be: this shop has never sold
-        these products. Prices are what comparable branches charged when last collected.
+        {t('gap.footnote')}
       </p>
     </section>
   )

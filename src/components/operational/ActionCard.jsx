@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { StatusBadge } from '../shared/StatusBadge.jsx'
 import { Button } from '../shared/Button.jsx'
+import { useT } from '../../lib/i18n/index.js'
 import { formatCurrency } from '../shared/formatters.js'
 import { formatPercentagePoints } from '../../lib/utils/format.js'
 import { dirProps } from '../../lib/utils/rtl.js'
 import {
   ACTION_STATUS,
-  DISMISS_REASON_LABEL,
   DISMISS_REASON_ORDER,
   SNOOZE_OPTIONS,
 } from '../../lib/operational/completionActions.js'
@@ -23,55 +23,69 @@ import {
 
 // What the manager should actually DO. Recommendation text from the pipeline explains
 // the problem; this says the next physical action.
-function whatToDo(action) {
+/**
+ * What the manager should do about this alert.
+ *
+ * Built from the alert type and the numbers, never taken from the data export.
+ * The export is produced by a Python pipeline that has no idea which language
+ * the screen is in; a sentence baked in there is English forever.
+ */
+function whatToDo(action, t) {
   switch (action.type) {
     case 'CHECK_MARGIN':
       // When we couldn't put a credible figure on it, the cost price is the suspect —
       // usually a case price recorded against a per-unit selling price.
-      return action.impactIls == null
-        ? 'The cost price looks wrong — it may be the price of a whole case rather than one unit.'
-        : 'Raise the shelf price, or check the cost price is right.'
+      return action.impactIls == null ? t('ac.do.CHECK_MARGIN_suspect') : t('ac.do.CHECK_MARGIN')
     case 'CHECK_WOLT_PRICE_GAP':
-      return 'Decide which price is correct and align the other one.'
     case 'PROMOTE_EXPIRING_PRODUCT':
-      return 'Discount it, move it to the front, or pull it.'
     case 'CHECK_STOCK_DISCREPANCY':
-      return 'Count this product on the shelf — deliveries and sales do not match the stock figure.'
     case 'CHECK_NEGATIVE_STOCK':
-      return 'Count what is actually on the shelf and correct the system.'
     case 'VERIFY_UNKNOWN_BARCODE':
-      return 'Add a barcode so it can be scanned and tracked.'
+      return t(`ac.do.${action.type}`)
     default:
       return action.reason ?? ''
   }
 }
 
-function detailLine(action) {
+function detailLine(action, t) {
   switch (action.type) {
     case 'CHECK_MARGIN':
-      return `Sells for ${formatCurrency(action.sellingPrice)} · costs ${formatCurrency(action.costPrice)}`
+      return t('ac.dt.CHECK_MARGIN', {
+        price: formatCurrency(action.sellingPrice),
+        cost: formatCurrency(action.costPrice),
+      })
     case 'CHECK_WOLT_PRICE_GAP':
       // metricValue is in percentage POINTS — formatPercent would multiply a
       // sub-1 gap by 100 and report 0.5 points as "50%".
-      return `Shelf ${formatCurrency(action.sellingPrice)} · WOLT ${formatCurrency(action.woltPrice)} · gap ${formatPercentagePoints(action.metricValue)}`
+      return t('ac.dt.CHECK_WOLT_PRICE_GAP', {
+        shelf: formatCurrency(action.sellingPrice),
+        wolt: formatCurrency(action.woltPrice),
+        gap: formatPercentagePoints(action.metricValue),
+      })
     case 'PROMOTE_EXPIRING_PRODUCT':
-      return `Expires ${action.expiryDate} · ${action.daysToExpiry} days left`
+      return t('ac.dt.PROMOTE_EXPIRING_PRODUCT', { date: action.expiryDate, days: action.daysToExpiry })
     case 'CHECK_STOCK_DISCREPANCY':
-      return `System says ${action.currentStock} in stock · ${Math.round(action.metricValue ?? 0)} units unaccounted for`
+      return t('ac.dt.CHECK_STOCK_DISCREPANCY', {
+        stock: action.currentStock,
+        missing: Math.round(action.metricValue ?? 0),
+      })
     case 'CHECK_NEGATIVE_STOCK':
-      return `System says ${action.currentStock} in stock`
+      return t('ac.dt.CHECK_NEGATIVE_STOCK', { stock: action.currentStock })
     case 'VERIFY_UNKNOWN_BARCODE':
-      return action.sellingPrice != null ? `Sells for ${formatCurrency(action.sellingPrice)}` : 'No barcode'
+      return action.sellingPrice != null
+        ? t('ac.dt.VERIFY_UNKNOWN_BARCODE', { price: formatCurrency(action.sellingPrice) })
+        : t('ac.noBarcode')
     default:
       return ''
   }
 }
 
 export function ActionCard({ action, meta, onDecide, muted = false, busy = false, error = false }) {
+  const t = useT()
   // 'reasons' → the dismissal picker; 'snooze' → the duration picker.
   const [asking, setAsking] = useState(null)
 
-  const title = action.productName || action.barcode || 'Unknown item'
+  const title = action.productName || action.barcode || t('ac.unknownItem')
 
   const decide = (status, extra = {}) => {
     setAsking(null)
@@ -86,10 +100,10 @@ export function ActionCard({ action, meta, onDecide, muted = false, busy = false
           <StatusBadge tone={meta?.tone ?? 'neutral'}>{meta?.label ?? action.type}</StatusBadge>
         </div>
 
-        <p className="action-card-do">{whatToDo(action)}</p>
+        <p className="action-card-do">{whatToDo(action, t)}</p>
 
         <p className="action-card-detail">
-          {detailLine(action)}
+          {detailLine(action, t)}
           {action.category ? <span {...dirProps(action.category)}> · {action.category}</span> : null}
         </p>
       </div>
@@ -102,14 +116,14 @@ export function ActionCard({ action, meta, onDecide, muted = false, busy = false
                 incurred on every sale. Labelling it "per sale" would overstate it
                 enormously — ₪8,719 of unaccounted water is not per-transaction. */}
             <span className="action-card-impact-label">
-              {action.impactKind === 'one_off' ? 'at stake' : 'per sale'}
+              {action.impactKind === 'one_off' ? t('ac.atStake') : t('ac.perSale')}
             </span>
           </div>
         )}
 
         {asking === 'reasons' && (
-          <div className="action-card-reasons" role="group" aria-label={`Why dismiss ${title}?`}>
-            <span className="action-card-reasons-label">Why not?</span>
+          <div className="action-card-reasons" role="group" aria-label={t('ac.ariaWhyDismiss', { title })}>
+            <span className="action-card-reasons-label">{t('ac.whyNot')}</span>
             {DISMISS_REASON_ORDER.map((reason) => (
               <Button
                 key={reason}
@@ -117,18 +131,18 @@ export function ActionCard({ action, meta, onDecide, muted = false, busy = false
                 disabled={busy}
                 onClick={() => decide(ACTION_STATUS.DISMISSED, { reason })}
               >
-                {DISMISS_REASON_LABEL[reason]}
+                {t(`ac.reason.${reason}`)}
               </Button>
             ))}
             <Button tone="ghost" onClick={() => setAsking(null)}>
-              Cancel
+              {t('ac.cancel')}
             </Button>
           </div>
         )}
 
         {asking === 'snooze' && (
-          <div className="action-card-reasons" role="group" aria-label={`Snooze ${title} for`}>
-            <span className="action-card-reasons-label">Remind me…</span>
+          <div className="action-card-reasons" role="group" aria-label={t('ac.ariaSnoozeFor', { title })}>
+            <span className="action-card-reasons-label">{t('ac.remindMe')}</span>
             {SNOOZE_OPTIONS.map((option) => (
               <Button
                 key={option.id}
@@ -136,11 +150,11 @@ export function ActionCard({ action, meta, onDecide, muted = false, busy = false
                 disabled={busy}
                 onClick={() => decide(ACTION_STATUS.SNOOZED, { snoozeOptionId: option.id })}
               >
-                {option.label}
+                {t(`ac.snooze.${option.id}`)}
               </Button>
             ))}
             <Button tone="ghost" onClick={() => setAsking(null)}>
-              Cancel
+              {t('ac.cancel')}
             </Button>
           </div>
         )}
@@ -150,33 +164,33 @@ export function ActionCard({ action, meta, onDecide, muted = false, busy = false
             <Button
               tone="primary"
               disabled={busy}
-              aria-label={`Mark ${title} done`}
+              aria-label={t('ac.ariaDone', { title })}
               onClick={() => decide(ACTION_STATUS.DONE)}
             >
-              Done
+              {t('ac.done')}
             </Button>
             <Button
               tone="ghost"
               disabled={busy}
-              aria-label={`Dismiss ${title}`}
+              aria-label={t('ac.ariaDismiss', { title })}
               onClick={() => setAsking('reasons')}
             >
-              Dismiss
+              {t('ac.dismiss')}
             </Button>
             <Button
               tone="ghost"
               disabled={busy}
-              aria-label={`Snooze ${title}`}
+              aria-label={t('ac.ariaSnooze', { title })}
               onClick={() => setAsking('snooze')}
             >
-              Later
+              {t('ac.later')}
             </Button>
           </div>
         )}
 
         {error && (
           <span className="action-card-error" role="alert">
-            Couldn’t save — tap again
+            {t('ac.saveFailed')}
           </span>
         )}
       </div>

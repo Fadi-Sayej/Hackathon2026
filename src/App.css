@@ -47,7 +47,8 @@ button {
   color: var(--paper-300);
   /* Warm near-black rather than navy: a blue sidebar next to warm paper reads
      as two different products bolted together. */
-  background: linear-gradient(180deg, var(--night-2) 0%, var(--night) 100%);
+  background-color: var(--night);
+  background-image: linear-gradient(180deg, var(--night-2) 0%, var(--night) 100%);
   box-shadow: var(--shadow);
 }
 
@@ -66,7 +67,8 @@ button {
   border-radius: var(--radius-lg);
   color: var(--ink-900);
   font-weight: 900;
-  background: linear-gradient(135deg, var(--teal-600), var(--teal-700));
+  background-color: var(--teal-600);
+  background-image: linear-gradient(135deg, var(--teal-600), var(--teal-700));
   box-shadow: 0 18px 42px rgba(93, 211, 165, 0.2);
 }
 
@@ -245,7 +247,18 @@ button {
 
 .metric-grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  /*
+   * Was `repeat(6, minmax(0, 1fr))`. A fixed six-column track sized every card
+   * to a sixth of the row whether or not six cards existed — the daily-work page
+   * has five, so they sat at 132px with an empty column beside them, and
+   * `₪63,571.87` was clipped to "₪63,57" by the card's own overflow:hidden.
+   * A currency figure truncated mid-number is worse than no figure at all.
+   *
+   * auto-fit sizes to the cards that are actually there and needs no breakpoint
+   * overrides: the same rule gives six columns at 1440px, three on a tablet and
+   * one on a phone.
+   */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
   gap: 14px;
 }
 
@@ -302,6 +315,25 @@ button {
   font-size: clamp(1.8rem, 4vw, 2.6rem);
   font-weight: 900;
   letter-spacing: -0.055em;
+}
+
+/*
+ * One display size cannot fit both "0" and "₪63,571.87" in the same box, and
+ * the card clips rather than wraps — so a value too long for its card came out
+ * as "₪63,57", a truncated number that reads as a real one. A wider column
+ * helps but cannot be relied on: the same component renders in an eight-card
+ * grid and on a 390px phone.
+ *
+ * MetricCard picks the step from the rendered character count. Long values give
+ * up display size, which is the right trade — a smaller number you can read
+ * beats a huge one you cannot.
+ */
+.metric-value--md {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.metric-value--sm {
+  font-size: clamp(1.25rem, 2.4vw, 1.6rem);
 }
 
 .metric-helper {
@@ -435,7 +467,8 @@ button {
 .bar-fill {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--forest), var(--lime));
+  background-color: var(--teal-600);
+  background-image: linear-gradient(90deg, var(--forest), var(--lime));
 }
 
 .compact-row {
@@ -488,7 +521,16 @@ button {
   box-shadow: 0 0 0 4px rgba(31, 122, 92, 0.12);
 }
 
-.table-wrap {
+/**
+ * Any wrapper around a `.data-table` has to scroll.
+ *
+ * `.table-scroll` was used in the markup with no rule behind it, so the
+ * assortment table — 880px minimum against a 390px phone — simply ran off the
+ * screen and its right-hand columns were unreachable. Both names now resolve to
+ * the same behaviour rather than one of them silently doing nothing.
+ */
+.table-wrap,
+.table-scroll {
   overflow: auto;
   max-height: calc(100vh - 285px);
   border: 1px solid var(--line);
@@ -575,7 +617,7 @@ button {
 }
 
 .recommendation-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
 }
 
 .recommendation-card {
@@ -583,9 +625,10 @@ button {
   gap: 16px;
   padding: 18px;
   border-radius: var(--radius-xl);
-  background:
+  background-color: var(--paper-100);
+  background-image:
     linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.72)),
-    radial-gradient(circle at top right, rgba(35, 104, 216, 0.08), transparent 13rem);
+    radial-gradient(circle at top right, rgba(15, 107, 99, 0.06), transparent 13rem);
 }
 
 .recommendation-header {
@@ -657,6 +700,14 @@ button {
   gap: 10px;
 }
 
+/* Checkboxes and radios ship at 13px; this is a tool used on a phone behind a
+   counter, so they get the same 24px floor as everything else. */
+input[type='checkbox'],
+input[type='radio'] {
+  min-width: 24px;
+  min-height: 24px;
+}
+
 .btn {
   min-height: 42px;
   padding: 10px 14px;
@@ -685,7 +736,8 @@ button {
 
 .btn-primary {
   color: var(--paper-100);
-  background: linear-gradient(135deg, var(--teal-600), var(--teal-700));
+  background-color: var(--teal-600);
+  background-image: linear-gradient(135deg, var(--teal-600), var(--teal-700));
 }
 
 .btn-secondary {
@@ -710,7 +762,8 @@ button {
   gap: 14px;
   padding: 18px;
   border-radius: var(--radius-xl);
-  background:
+  background-color: var(--night);
+  background-image:
     linear-gradient(180deg, rgba(22, 42, 67, 0.98), rgba(18, 32, 52, 0.96)),
     radial-gradient(circle at 18% 10%, rgba(146, 201, 95, 0.2), transparent 18rem);
   box-shadow: var(--shadow);
@@ -729,8 +782,9 @@ button {
 
 .fixture-shelf-premium {
   border-color: rgba(215, 255, 157, 0.42);
-  background:
-    linear-gradient(90deg, rgba(215, 255, 157, 0.14), rgba(255, 255, 255, 0.09)),
+  background-color: rgba(255, 255, 255, 0.08);
+  background-image:
+    linear-gradient(90deg, rgba(15, 107, 99, 0.18), rgba(255, 255, 255, 0.09)),
     rgba(255, 255, 255, 0.08);
   box-shadow: inset 0 0 0 1px rgba(215, 255, 157, 0.16), 0 22px 42px rgba(0, 0, 0, 0.12);
 }
@@ -868,7 +922,6 @@ button {
 }
 
 @media (max-width: 1220px) {
-  .metric-grid,
   .recommendation-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -911,7 +964,6 @@ button {
     min-width: 0;
   }
 
-  .metric-grid,
   .recommendation-grid,
   .signal-grid,
   .fixture-products {
@@ -1159,11 +1211,37 @@ button {
 }
 
 /* Recommendation card header: product info left, qty right */
+/**
+ * A flex row whose children default to `min-width: auto` — they refuse to shrink
+ * below their content, so a long Hebrew product name pushed this header 26px
+ * wider than the 302px card holding it and the whole block hung off the edge.
+ * `min-width: 0` on the row and its children is the fix; the name then
+ * truncates instead of escaping.
+ */
 .recommendation-card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 16px;
+  min-width: 0;
+}
+
+.recommendation-card-header > * {
+  min-width: 0;
+}
+
+.recommendation-card-header strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Same reasoning for every other block inside a card. */
+.recommendation-card > *,
+.recommendation-stats,
+.recommendation-qty,
+.recommendation-actions,
+.ai-explanation {
+  min-width: 0;
 }
 
 /* Quantity input block: label above input, right-aligned */
@@ -1212,7 +1290,7 @@ button {
 }
 
 .metric-grid-compact {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
 }
 
 .affinity-grid {
@@ -1228,7 +1306,8 @@ button {
   padding: 18px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--line);
-  background:
+  background-color: var(--paper-100);
+  background-image:
     linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.74)),
     radial-gradient(circle at top right, rgba(146, 201, 95, 0.10), transparent 12rem);
   box-shadow: var(--shadow-soft);
@@ -1308,7 +1387,8 @@ button {
   border-radius: var(--radius-pill);
   color: var(--paper-100);
   font-weight: 900;
-  background: linear-gradient(135deg, var(--teal-600), var(--teal-700));
+  background-color: var(--teal-600);
+  background-image: linear-gradient(135deg, var(--teal-600), var(--teal-700));
   box-shadow: 0 10px 24px rgba(31, 122, 92, 0.28);
 }
 
@@ -1375,9 +1455,7 @@ button {
 }
 
 @media (max-width: 900px) {
-  .metric-grid-compact {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+
   .affinity-pair {
     grid-template-columns: 1fr;
     text-align: center;
@@ -1463,7 +1541,8 @@ button {
 
 .approved-orders-panel .order-total {
   margin-top: 18px;
-  background: linear-gradient(135deg, var(--forest-soft), rgba(231, 239, 255, 0.7));
+  background-color: var(--ok-wash);
+  background-image: linear-gradient(135deg, var(--forest-soft), rgba(231, 239, 255, 0.7));
   border: 1px solid rgba(31, 122, 92, 0.22);
 }
 
@@ -1477,7 +1556,8 @@ button {
   padding: 14px 18px;
   border-radius: var(--radius-md);
   color: var(--paper-100);
-  background: linear-gradient(135deg, var(--teal-600), var(--teal-700));
+  background-color: var(--teal-600);
+  background-image: linear-gradient(135deg, var(--teal-600), var(--teal-700));
   box-shadow: 0 22px 50px rgba(31, 122, 92, 0.32);
   font-size: 0.92rem;
   font-weight: 700;
@@ -1546,6 +1626,7 @@ button {
 }
 
 .market-intel-card {
+  background-color: var(--paper-100);
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -1608,17 +1689,20 @@ button {
 
 .market-intel-card-opportunity {
   border-color: rgba(35, 104, 216, 0.30);
-  background: linear-gradient(180deg, var(--blue-soft), rgba(255, 255, 255, 0.86));
+  background-color: var(--info-wash);
+  background-image: linear-gradient(180deg, var(--blue-soft), rgba(255, 255, 255, 0.86));
 }
 
 .market-intel-card-leader {
   border-color: rgba(31, 122, 92, 0.30);
-  background: linear-gradient(180deg, var(--forest-soft), rgba(255, 255, 255, 0.86));
+  background-color: var(--ok-wash);
+  background-image: linear-gradient(180deg, var(--forest-soft), rgba(255, 255, 255, 0.86));
 }
 
 .market-intel-card-warning {
   border-color: rgba(201, 122, 21, 0.30);
-  background: linear-gradient(180deg, var(--amber-soft), rgba(255, 255, 255, 0.86));
+  background-color: var(--warn-wash);
+  background-image: linear-gradient(180deg, var(--amber-soft), rgba(255, 255, 255, 0.86));
 }
 
 /* Inline price-vs-market badge on the products table */
@@ -1638,7 +1722,9 @@ button {
   align-items: center;
   padding: 3px 8px;
   border-radius: var(--radius-pill);
-  font-size: 0.68rem;
+  /* 0.68rem was 10.88px: below the 11px floor and the smallest text anywhere in
+     the app. These badges carry price deltas, so they have to be readable. */
+  font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   white-space: nowrap;
@@ -1796,12 +1882,14 @@ button {
 
 .compliance-card-warning {
   border-color: rgba(201, 122, 21, 0.28);
-  background: linear-gradient(180deg, var(--amber-soft), rgba(255, 255, 255, 0.86));
+  background-color: var(--warn-wash);
+  background-image: linear-gradient(180deg, var(--amber-soft), rgba(255, 255, 255, 0.86));
 }
 
 .compliance-card-info {
   border-color: rgba(35, 104, 216, 0.28);
-  background: linear-gradient(180deg, var(--blue-soft), rgba(255, 255, 255, 0.86));
+  background-color: var(--info-wash);
+  background-image: linear-gradient(180deg, var(--blue-soft), rgba(255, 255, 255, 0.86));
 }
 
 .compliance-correct-list {
@@ -1851,7 +1939,9 @@ button {
   margin-top: 6px;
   padding: 2px 8px;
   border-radius: var(--radius-pill);
-  font-size: 0.68rem;
+  /* 0.68rem was 10.88px: below the 11px floor and the smallest text anywhere in
+     the app. These badges carry price deltas, so they have to be readable. */
+  font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -2885,6 +2975,23 @@ button {
     -webkit-overflow-scrolling: touch;
   }
 
+  /*
+   * The bottom bar was written when the nav was a flat list of `.nav-item`s.
+   * Grouping them under `.nav-group` wrappers later made the WRAPPERS the flex
+   * children: each group stacked its own items vertically and the groups sat
+   * side by side, so the bar came out two rows tall, scrolled sideways at the
+   * same time, cut labels mid-word at both edges, and covered the page beneath
+   * it — the shell reserves 72px for a bar that was twice that.
+   *
+   * `display: contents` dissolves the wrapper at this width so its items become
+   * direct children of the strip again, which is what every rule below assumes.
+   * The group labels are already hidden here, so the grouping has nothing left
+   * to express on a phone.
+   */
+  .nav-group {
+    display: contents;
+  }
+
   .nav-item {
     flex: 0 0 auto;
     width: auto;
@@ -3070,6 +3177,7 @@ button {
   }
 
   .table-wrap,
+  .table-scroll,
   .data-source-table-wrap {
     width: 100%;
     max-width: 100%;
@@ -3323,6 +3431,12 @@ button {
 
   .sidebar-nav::-webkit-scrollbar { display: none; }
 
+  /* Same reason as the bottom-bar block: the strip's children must be the
+     items, not the group wrappers, or it stacks into rows. */
+  .nav-group {
+    display: contents;
+  }
+
   .nav-item {
     padding: 10px 14px;
     white-space: nowrap;
@@ -3373,11 +3487,12 @@ button {
 .nav-group-label {
   margin: 0 0 6px;
   padding-inline-start: 12px;
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.38);
+  /* 0.38 alpha on the dark sidebar measured under 4.5:1. */
+  color: rgba(255, 255, 255, 0.62);
 }
 
 .nav-item-text {
@@ -3434,6 +3549,9 @@ button {
 
 .lang-switch-select {
   border: 0;
+  /* Was 18px tall — under the 24px minimum for something tapped on a phone
+     behind a counter. */
+  min-height: 28px;
   background: transparent;
   color: var(--paper-100);
   font-weight: 600;
@@ -3475,9 +3593,40 @@ button {
   unicode-bidi: plaintext;
 }
 
-/* Money, counts and measurements are always read left-to-right, whatever
-   language surrounds them. */
-.page-body :is(.metric-value, .money, .pg-mono, [data-numeric]) {
+/**
+ * Money, counts and measurements.
+ *
+ * Two rules, and the second is the one that mattered. `unicode-bidi: isolate`
+ * stops the surrounding Arabic or Hebrew from reordering the digits, but it does
+ * nothing about line breaking — and the isolate marks themselves introduce break
+ * opportunities. "₪63,571.87" was rendering as "₪63,5" on one line and "71.87"
+ * on the next: not a wrap, a wrong number. `white-space: nowrap` is what fixes
+ * it, and it has to cover every element that holds a figure, not just the two
+ * that were listed here.
+ */
+.page-body :is(
+  .metric-value,
+  .metric-chip,
+  .money,
+  .pg-mono,
+  .price-cell,
+  .cell-price,
+  .numeric,
+  td.numeric,
+  .action-card-impact-value,
+  .op-handled-outcome,
+  .pg-kv-value,
+  .pg-unit-dims,
+  .recommendation-metric-value,
+  [data-numeric]
+) {
   unicode-bidi: isolate;
   direction: ltr;
+  white-space: nowrap;
+}
+
+/* A nowrap figure must still be allowed to shrink its own column rather than
+   push the table sideways. */
+.page-body :is(td, th):has(> .numeric, > .price-cell, > .money) {
+  white-space: nowrap;
 }

@@ -109,3 +109,6 @@ playwright-report/
 #     that precedent doesn't apply here. Durability is handled by an
 #     out-of-band backup instead (see Task 8), not by committing it to git.
 data/internal/receiving/
+
+# UI audit output (screenshots + findings). Regenerated on demand.
+audit/

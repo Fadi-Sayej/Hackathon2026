@@ -19,6 +19,7 @@
 
 import { loadDemoStoreData } from '../src/lib/dataAdapters/loadDemoStoreData.js'
 import { isShelvable, packageGeometry } from '../src/lib/planogram/packageShapes.js'
+import { FIXTURE_PRESETS } from '../src/lib/planogram/fixtures.js'
 
 const ERROR = 'ERROR'
 const WARN = 'WARN'
@@ -162,6 +163,29 @@ const { products, validationIssues } = loadDemoStoreData()
   )
   if (uncategorised.length) {
     report(WARN, 'categories', `${uncategorised.length} products have no department`, 'They cannot be planned onto a fixture, which is always per-department')
+  }
+}
+
+// ── 7. Preset floor plans ────────────────────────────────────────────
+// A starting floor plan is the first thing a manager sees, and every fixture in
+// it must physically fit the room. One preset shipped a checkout at x=17.8 with
+// a 2.5m footprint in a 20m store — 30cm of till hanging through the wall. It
+// surfaced only as a 4px clip on a dimension label in a UI screenshot, which is
+// not how you want to find out that a floor plan is impossible.
+{
+  for (const [key, preset] of Object.entries(FIXTURE_PRESETS)) {
+    for (const [kind, name, x, y, w, d] of preset.items) {
+      const overRight = x + w - preset.w
+      const overBottom = y + d - preset.h
+      if (overRight > 1e-9 || overBottom > 1e-9) {
+        report(
+          ERROR,
+          'fixtures',
+          `preset "${key}": ${kind} "${name}" extends ${Math.max(overRight, overBottom).toFixed(2)}m outside a ${preset.w}×${preset.h}m store`,
+          'A fixture cannot be placed through a wall. Fix its x/y in src/lib/planogram/fixtures.js',
+        )
+      }
+    }
   }
 }
 

@@ -1,20 +1,24 @@
+import { useT } from '../../lib/i18n/index.js'
 export function MarketContextPanel({ marketContext }) {
+  const t = useT()
   const sourceLabel = marketContext.sourceLabel ?? marketContext.contextSource ?? 'mock'
   const signals = [
     {
-      label: 'Weather signal',
+      label: t('mc.weatherSignal'),
       value: marketContext.weather,
-      detail: 'Demand lift for water, cold drinks, and ice cream.',
+      detail: t('mc.weatherNote'),
     },
     {
-      label: 'Weekend / holiday',
-      value: marketContext.weekend ? 'Weekend active' : marketContext.holiday ? 'Holiday active' : 'Normal day',
-      detail: 'Impulse categories receive a demand multiplier.',
+      label: t('mc.weekendHoliday'),
+      value: marketContext.weekend ? t('mc.weekendActive') : marketContext.holiday ? t('mc.holidayActive') : t('mc.normalDay'),
+      detail: t('mc.impulseNote'),
     },
     {
-      label: 'Local event',
-      value: marketContext.localEvent || 'No event',
-      detail: 'Foot traffic signal used for recommendations.',
+      label: t('mc.localEvent'),
+      value: marketContext.localEventKey
+        ? t(marketContext.localEventKey)
+        : marketContext.localEvent || t('mc.noEvent'),
+      detail: t('mc.footTrafficNote'),
     },
   ]
 
@@ -22,10 +26,10 @@ export function MarketContextPanel({ marketContext }) {
     <section className="panel market-panel">
       <div className="panel-heading">
         <div>
-          <p className="eyebrow">{sourceLabel === 'live' ? 'Live Market Signals' : 'Market Signals'}</p>
-          <h2>AI market context</h2>
+          <p className="eyebrow">{sourceLabel === 'live' ? t('mc.liveSignals') : t('mc.signals')}</p>
+          <h2>{t('mc.aiContext')}</h2>
           <p className="muted" style={{ marginTop: '0.25rem', fontSize: '0.8rem' }}>
-            {marketContext.sourceSummary ?? 'Static demo context with optional live adapters for weather, holidays, and news.'}
+            {marketContext.sourceSummary ?? t('mc.contextNote')}
           </p>
         </div>
       </div>

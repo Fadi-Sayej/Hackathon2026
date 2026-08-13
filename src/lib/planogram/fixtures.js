@@ -36,7 +36,9 @@ const HAND_LEVEL_FLOOR = 0.6
  */
 export const FIXTURE_KINDS = {
   gondola: { label: 'رف مزدوج (جزيرة)', color: '#c8a97e', stroke: '#8d6a45', text: '#3a2a19', radius: '3px', w: 6, d: 1.2, levels: 4, height: 1.8, sides: 2 },
-  wall: { label: 'رف جداري', color: '#a8894f', stroke: '#6f5730', text: '#ffffff', radius: '3px', w: 8, d: 0.6, levels: 5, height: 2.2, sides: 1 },
+  // Dark text, not white: white on this fill measured 3.30:1, the only fixture
+  // of the nine that failed the 4.5:1 floor.
+  wall: { label: 'رف جداري', color: '#a8894f', stroke: '#6f5730', text: '#2a1f12', radius: '3px', w: 8, d: 0.6, levels: 5, height: 2.2, sides: 1 },
   endcap: { label: 'رأس ممر (إندكاب)', color: '#d98c3c', stroke: '#9c5e21', text: '#3a2a19', radius: '3px', w: 1.2, d: 1.2, levels: 4, height: 1.6, sides: 1 },
   fridge: { label: 'ثلاجة عرض', color: '#7fbcd8', stroke: '#3f7f9c', text: '#12313d', radius: '3px', w: 3, d: 0.9, levels: 5, height: 2, sides: 1 },
   freezer: { label: 'فريزر أفقي', color: '#a9d8e8', stroke: '#5b9cb5', text: '#12313d', radius: '7px', w: 2, d: 1, levels: 1, height: 0.9, sides: 1 },
@@ -78,7 +80,9 @@ export const FIXTURE_PRESETS = {
       ['produce', 'خضار وفواكه', 10.5, 10, 3, 1.6],
       ['bakery', 'مخبوزات', 1, 10.2, 2.5, 1],
       ['checkout', 'كاشير ١', 15, 11.8, 2.5, 1],
-      ['checkout', 'كاشير ٢', 17.8, 11.8, 2.5, 1],
+      // x + w must stay inside the store: at 17.8 this checkout ended at 20.3m
+      // in a 20m room, hanging 30cm through the wall.
+      ['checkout', 'كاشير ٢', 17.2, 11.8, 2.5, 1],
     ],
   },
   large: {

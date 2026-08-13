@@ -122,7 +122,7 @@ export function RecommendationsPage({
                     {isApproved ? t('rec.approvedBtn') : t('rec.approve')}
                   </Button>
                   <Button disabled={isApproved} onClick={() => onReject(recommendation)} tone="ghost">
-                    Reject
+                    {t('common.reject')}
                   </Button>
                   <span className="cell-price">{formatCurrency(quantity * (product?.cost ?? 0))}</span>
                 </div>

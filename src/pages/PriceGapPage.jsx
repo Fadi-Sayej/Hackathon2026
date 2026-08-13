@@ -118,7 +118,7 @@ export function PriceGapPage({ products = [] }) {
         <MetricCard
           label={t('pg.compared')}
           value={DATA_FRESHNESS?.priceCount ?? rows.length}
-          detail={`Median age ${DATA_FRESHNESS?.medianPriceAgeDays ?? '?'} days`}
+          detail={t('pg.medianAge', { n: DATA_FRESHNESS?.medianPriceAgeDays ?? '?' })}
           tone="info"
         />
       </section>
@@ -126,11 +126,11 @@ export function PriceGapPage({ products = [] }) {
       <section className="panel">
         <div className="panel-heading">
           <div>
-            <p className="eyebrow">Competitor prices</p>
+            <p className="eyebrow">{t('eb.competitorPrices')}</p>
             <h2>{t('pg.title')}</h2>
             <p className="page-description" style={{ marginTop: '0.25rem' }}>
-              Matched by barcode against Dor Alon, Rami Levy and Shufersal. These are
-              <strong> reference observations, not live prices</strong> — every row shows when the
+              {t('pg.matchedNote')}
+              <strong>{t('pg.referenceNote')}</strong> {t('pg.everyRowShows')}
               price was last seen. Check before acting on a price that is months old.
             </p>
           </div>

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useNumbers, useT } from '../../lib/i18n/index.js'
 import { Button } from '../shared/Button.jsx'
 import { formatBarcode, formatDate } from '../../lib/utils/format.js'
 import { dirProps } from '../../lib/utils/rtl.js'
@@ -36,6 +37,8 @@ import {
  * because they feed two different Python importers.
  */
 export function ReceivingCaptureForm({ products = [] }) {
+  const t = useT()
+  const { n } = useNumbers()
   const [mode, setMode] = useState(CAPTURE_MODE_DELIVERY)
   const [deliveryQueue, setDeliveryQueue] = useState(() =>
     loadQueue(getStorage(), RECEIVING_QUEUE_KEY),
@@ -166,7 +169,7 @@ export function ReceivingCaptureForm({ products = [] }) {
       <div
         className="receiving-mode"
         role="radiogroup"
-        aria-label="What are you recording?"
+        aria-label={t('rc.whatRecording')}
       >
         <label>
           <input
@@ -175,7 +178,7 @@ export function ReceivingCaptureForm({ products = [] }) {
             checked={!expiryOnly}
             onChange={() => switchMode(CAPTURE_MODE_DELIVERY)}
           />
-          <span>Delivery</span>
+          <span>{t('rc.delivery')}</span>
         </label>
         <label>
           <input
@@ -184,7 +187,7 @@ export function ReceivingCaptureForm({ products = [] }) {
             checked={expiryOnly}
             onChange={() => switchMode(CAPTURE_MODE_EXPIRY)}
           />
-          <span>Expiry only</span>
+          <span>{t('rc.expiryOnly')}</span>
         </label>
       </div>
 
@@ -193,14 +196,14 @@ export function ReceivingCaptureForm({ products = [] }) {
         onSubmit={handleSubmit}
       >
         <label className="expiry-field receiving-field-barcode">
-          <span>Barcode</span>
+          <span>{t('rc.barcode')}</span>
           <input
             ref={barcodeRef}
             className="expiry-input"
             value={barcode}
             onChange={(e) => { setBarcode(e.target.value); setJustAdded(null); setError('') }}
             onKeyDown={handleBarcodeKeyDown}
-            placeholder="Scan or type"
+            placeholder={t('rc.scanOrType')}
             inputMode="numeric"
             autoComplete="off"
             aria-describedby="receiving-match"
@@ -210,26 +213,26 @@ export function ReceivingCaptureForm({ products = [] }) {
         {!expiryOnly && (
           <>
             <label className="expiry-field receiving-field-quantity">
-              <span>Quantity *</span>
+              <span>{t('rc.quantity')}</span>
               <input
                 ref={quantityRef}
                 className="expiry-input"
                 value={quantity}
                 onChange={(e) => { setQuantity(e.target.value); setError('') }}
-                placeholder="Units"
+                placeholder={t('rc.units')}
                 inputMode="numeric"
                 autoComplete="off"
               />
             </label>
 
             <label className="expiry-field">
-              <span>Supplier *</span>
+              <span>{t('rc.supplier')}</span>
               <input
                 className="expiry-input"
                 value={supplier}
                 onChange={(e) => { setSupplier(e.target.value); setError('') }}
                 list="receiving-suppliers"
-                placeholder="From the delivery note"
+                placeholder={t('rc.fromNote')}
                 autoComplete="off"
               />
               <datalist id="receiving-suppliers">
@@ -238,19 +241,19 @@ export function ReceivingCaptureForm({ products = [] }) {
             </label>
 
             <label className="expiry-field receiving-field-cost">
-              <span>Unit cost ₪</span>
+              <span>{t('rc.unitCost')}</span>
               <input
                 className="expiry-input"
                 value={unitCost}
                 onChange={(e) => { setUnitCost(e.target.value); setError('') }}
-                placeholder="Optional"
+                placeholder={t('rc.optional')}
                 inputMode="decimal"
                 autoComplete="off"
               />
             </label>
 
             <label className="expiry-field">
-              <span>Received *</span>
+              <span>{t('rc.received')}</span>
               <input
                 className="expiry-input"
                 type="date"
@@ -262,7 +265,7 @@ export function ReceivingCaptureForm({ products = [] }) {
         )}
 
         <label className="expiry-field">
-          <span>{expiryOnly ? 'Expiry date *' : 'Expiry date'}</span>
+          <span>{expiryOnly ? t('rc.expiryDateReq') : t('rc.expiryDate')}</span>
           <input
             ref={expiryRef}
             className="expiry-input"
@@ -272,20 +275,20 @@ export function ReceivingCaptureForm({ products = [] }) {
           />
         </label>
 
-        <Button tone="primary" {...{ type: 'submit' }}>Save</Button>
+        <Button tone="primary" {...{ type: 'submit' }}>{t('common.save')}</Button>
       </form>
 
       {expiryOnly && (
         <div className="expiry-quick">
-          <span>Quick date:</span>
+          <span>{t('rc.quickDate')}</span>
           {[
-            ['3 days', 3],
-            ['1 week', 7],
-            ['2 weeks', 14],
-            ['1 month', 30],
-          ].map(([label, days]) => (
+            ['rc.d3', 3],
+            ['rc.w1', 7],
+            ['rc.w2', 14],
+            ['rc.m1', 30],
+          ].map(([key, days]) => (
             <Button key={days} tone="ghost" onClick={() => setExpiryInDays(days)}>
-              {label}
+              {t(key)}
             </Button>
           ))}
         </div>
@@ -298,11 +301,11 @@ export function ReceivingCaptureForm({ products = [] }) {
         )}
         {!error && trimmed && !matchedProduct && (
           <span className="expiry-match-warn">
-            Not found in the catalog — check the barcode. You can still save it.
+            {t('rc.notInCatalog')}
           </span>
         )}
         {!error && !trimmed && justAdded && (
-          <span className="expiry-match-ok" dir="auto">Saved: {justAdded}</span>
+          <span className="expiry-match-ok" dir="auto">{t('rc.savedItem', { name: justAdded })}</span>
         )}
       </p>
 
@@ -310,15 +313,15 @@ export function ReceivingCaptureForm({ products = [] }) {
         <>
           <div className="recommendation-actions" style={{ marginTop: '1rem', gap: '0.5rem' }}>
             <Button tone="secondary" onClick={downloadCsv}>
-              Download {queue.length} recorded {queue.length === 1 ? 'line' : 'lines'}
+              {t('rc.downloadLines', { n: n(queue.length) })}
             </Button>
-            <Button tone="ghost" onClick={handleUndo}>Undo last</Button>
-            <Button tone="ghost" onClick={() => setQueue([])}>Clear list</Button>
+            <Button tone="ghost" onClick={handleUndo}>{t('rc.undoLast')}</Button>
+            <Button tone="ghost" onClick={() => setQueue([])}>{t('rc.clearList')}</Button>
           </div>
           <p className="page-description" style={{ marginTop: '0.5rem' }}>
             {expiryOnly
-              ? 'Expiry dates are saved on this device and survive closing the app. Send the downloaded file to the SmartShelf team to load it in.'
-              : 'Deliveries are saved on this device and survive closing the app. Send the downloaded file to the SmartShelf team to load it in.'}
+              ? t('rc.savedLocallyExpiry')
+              : t('rc.savedLocallyDelivery')}
           </p>
           <div className="compact-list">
             {queue.slice(0, 10).map((row, idx) => (
@@ -329,13 +332,13 @@ export function ReceivingCaptureForm({ products = [] }) {
                   </strong>
                   <span>
                     {expiryOnly
-                      ? (row.productName ? formatBarcode(row.barcode) : 'not in catalog')
-                      : `${row.quantity} units · ${row.supplier}`}
+                      ? (row.productName ? formatBarcode(row.barcode) : t('rc.notInCatalogShort'))
+                      : t('rc.unitsFrom', { n: n(row.quantity), supplier: row.supplier })}
                   </span>
                 </div>
                 <div className="compact-row-end date-cell">
                   {!expiryOnly && <small>{formatDate(row.receivedAt)}</small>}
-                  {row.expiryDate && <small>exp {formatDate(row.expiryDate)}</small>}
+                  {row.expiryDate && <small>{t('rc.exp')} {formatDate(row.expiryDate)}</small>}
                 </div>
               </div>
             ))}

@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { Button } from '../components/shared/Button.jsx'
 import { StatusBadge } from '../components/shared/StatusBadge.jsx'
+import { translateIssue } from '../lib/dataAdapters/issueText.js'
 import { useT } from '../lib/i18n/index.js'
 import { CONNECTOR_MODES, EXPECTED_POS_FIELDS } from '../lib/posConnectors/index.js'
 
@@ -38,7 +39,7 @@ export function DataSourcePage({
       mode: CONNECTOR_MODES.DEMO,
       label: t('ds.bundled'),
       description:
-        'The real YomYom POS catalog exported to the app (falls back to a small demo sample if the export is absent). Always available, no upload required.',
+        t('ds.demoDesc'),
       action: (
         <Button
           disabled={isLoading || activeMode === CONNECTOR_MODES.DEMO}
@@ -50,15 +51,14 @@ export function DataSourcePage({
       ),
       meta: (
         <StatusBadge tone={activeMode === CONNECTOR_MODES.DEMO ? 'success' : 'neutral'}>
-          {activeMode === CONNECTOR_MODES.DEMO ? 'Active' : 'Available'}
+          {activeMode === CONNECTOR_MODES.DEMO ? t('ds.active') : t('ds.available')}
         </StatusBadge>
       ),
     },
     {
       mode: CONNECTOR_MODES.CSV,
       label: t('ds.uploadCsv'),
-      description:
-        'Drop in a POS export. The file is parsed in the browser and fed through the same adapter pipeline as the demo data.',
+      description: t('ds.csvDesc'),
       action: (
         <>
           <input
@@ -76,18 +76,17 @@ export function DataSourcePage({
       ),
       meta: (
         <StatusBadge tone={activeMode === CONNECTOR_MODES.CSV ? 'success' : 'neutral'}>
-          {activeMode === CONNECTOR_MODES.CSV ? 'Active' : 'Available'}
+          {activeMode === CONNECTOR_MODES.CSV ? t('ds.active') : t('ds.available')}
         </StatusBadge>
       ),
     },
     {
       mode: CONNECTOR_MODES.COMAX,
       label: t('ds.comax'),
-      description:
-        'Live Comax sync. Disabled in the frontend — a backend proxy must hold the API key and perform the outbound call.',
+      description: t('ds.comaxDesc'),
       action: (
         <Button disabled onClick={onSelectComaxSource} tone="ghost">
-          Backend proxy required
+          {t('ds.backendRequired')}
         </Button>
       ),
       meta: <StatusBadge tone="warning">{t('ds.disabled')}</StatusBadge>,
@@ -99,7 +98,7 @@ export function DataSourcePage({
       <section className="data-source-summary panel">
         <div className="panel-heading">
           <div>
-            <p className="eyebrow">Active source</p>
+            <p className="eyebrow">{t('eb.activeSource')}</p>
             <h2>{describeSource(storeData, t)}</h2>
             <p className="page-description">{describeStatus(connectorStatus, t)}</p>
           </div>
@@ -135,12 +134,9 @@ export function DataSourcePage({
       <section className="panel">
         <div className="panel-heading">
           <div>
-            <p className="eyebrow">Schema reference</p>
+            <p className="eyebrow">{t('ds.schemaReference')}</p>
             <h2>{t('ds.expectedFields')}</h2>
-            <p className="page-description">
-              Any connector (CSV, Comax, or future) should produce rows that map to these fields.
-              Aliases are accepted by the data adapter.
-            </p>
+            <p className="page-description">{t('ds.fieldsDesc')}</p>
           </div>
         </div>
         <div className="data-source-table-wrap">
@@ -173,7 +169,7 @@ export function DataSourcePage({
         <section className="panel">
           <div className="panel-heading">
             <div>
-              <p className="eyebrow">Validation</p>
+              <p className="eyebrow">{t('eb.validation')}</p>
               <h2>Data quality warnings ({issues.length})</h2>
             </div>
           </div>
@@ -184,14 +180,14 @@ export function DataSourcePage({
                   {issue.severity ?? 'warning'}
                 </StatusBadge>
                 <strong>{issue.field}</strong>
-                <span>{issue.message}</span>
+                <span>{translateIssue(issue, t)}</span>
                 {issue.productId && <small>SKU {issue.productId}</small>}
               </li>
             ))}
           </ul>
           {issues.length > 12 && (
             <p className="data-source-issues-note">
-              Showing 12 of {issues.length} issues. Cleaner POS exports reduce this list.
+              {t('ds.issuesNote', { n: issues.length })}
             </p>
           )}
         </section>
@@ -217,9 +213,12 @@ function describeSource(storeData, t) {
 
 function describeStatus(connectorStatus, t) {
   if (!connectorStatus) return t('ds.ready')
-  if (connectorStatus.state === 'loading') return connectorStatus.message ?? t('common.loading')
-  if (connectorStatus.state === 'error') return connectorStatus.message ?? t('ds.loadFailed')
-  return connectorStatus.message ?? t('ds.ready')
+  // A `messageKey` is ours and translates; a bare `message` came from a thrown
+  // connector error and is shown as-is — an untranslated cause beats no cause.
+  const own = connectorStatus.messageKey ? t(connectorStatus.messageKey) : connectorStatus.message
+  if (connectorStatus.state === 'loading') return own ?? t('common.loading')
+  if (connectorStatus.state === 'error') return own ?? t('ds.loadFailed')
+  return own ?? t('ds.ready')
 }
 
 function statusTone(state) {

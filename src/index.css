@@ -44,9 +44,12 @@
   /* ── Status ──────────────────────────────────────────────────────── */
   --ok: #0f6b63;
   --ok-wash: rgba(15, 107, 99, 0.09);
-  --warn: #a8700f;
+  /* Darkened from #a8700f, which measured 4.21:1 on white and 3.54:1 on its own
+     wash — under the 4.5:1 floor everywhere it was actually used. */
+  --warn: #8f6000;
   --warn-wash: rgba(168, 112, 15, 0.12);
-  --danger: #b4541f;
+  /* Darkened from #b4541f: 4.18:1 on its own wash. */
+  --danger: #9e4514;
   --danger-wash: rgba(180, 84, 31, 0.11);
   --info: #2f6f9e;
   --info-wash: rgba(47, 111, 158, 0.1);

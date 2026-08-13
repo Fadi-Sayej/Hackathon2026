@@ -108,13 +108,9 @@ export function ReportPage({
       <section className="panel report-launch-panel">
         <div className="panel-heading">
           <div>
-            <p className="eyebrow">AI Report Engine</p>
+            <p className="eyebrow">{t('rep.engine')}</p>
             <h2>{t('rep.title')}</h2>
-            <p className="page-description">
-              Generate a comprehensive markdown report combining inventory health, planogram analysis,
-              competitor intelligence, cross-merchandising opportunities, and an actionable optimization plan.
-              Powered by SmartShelf AI analytics engine.
-            </p>
+            <p className="page-description">{t('rep.generateDesc')}</p>
           </div>
         </div>
 

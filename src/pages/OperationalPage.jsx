@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useT } from '../lib/i18n/index.js'
+import { useNumbers, useT } from '../lib/i18n/index.js'
 import { MetricCard } from '../components/shared/MetricCard.jsx'
 import { StatusBadge } from '../components/shared/StatusBadge.jsx'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
@@ -83,6 +83,7 @@ export function OperationalPage({
   onDecide,
 }) {
   const t = useT()
+  const { n } = useNumbers()
   const { meta, posHealth, sources, recommendations } = operationalData
   const [showAll, setShowAll] = useState(false)
   const [showData, setShowData] = useState(false)
@@ -370,8 +371,8 @@ export function OperationalPage({
         <div className="recommendation-actions" style={{ flexWrap: 'wrap', gap: '0.5rem' }}>
           {(sources ?? []).map((src) => (
             <StatusBadge key={src.source_id} tone={SOURCE_STATUS_TONE[src.status] ?? 'neutral'}>
-              {src.label}: {src.status}
-              {src.row_count ? ` (${src.row_count})` : ''}
+              {src.label}: {t(`op.src.${src.status}`)}
+              {src.row_count ? ` (${n(src.row_count.toLocaleString())})` : ''}
             </StatusBadge>
           ))}
         </div>

@@ -3,7 +3,7 @@ export const marketContext = {
   weather: 'hot',
   weekend: true,
   holiday: false,
-  localEvent: 'football match nearby',
+  localEventKey: 'ctx.localEvent',
   season: 'summer',
   demandSignals: {
     'Cold Drinks': 1.18,

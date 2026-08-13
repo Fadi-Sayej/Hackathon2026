@@ -39,7 +39,7 @@ export function ProductsPage({ analyzedProducts }) {
     <section className="panel">
       <div className="panel-heading page-tools">
         <div>
-          <p className="eyebrow">Product health</p>
+          <p className="eyebrow">{t('eb.productHealth')}</p>
           <h2>{t('prod.tableTitle')}</h2>
         </div>
         <div className="toolbar">

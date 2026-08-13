@@ -292,7 +292,8 @@
  * brown rectangle from looking like a placeholder.
  */
 .pg-bay {
-  background: linear-gradient(180deg, var(--pg-wood-deck) 0%, var(--pg-wood) 12%, var(--pg-wood) 100%);
+  background-color: var(--pg-wood);
+  background-image: linear-gradient(180deg, var(--pg-wood-deck) 0%, var(--pg-wood) 12%, var(--pg-wood) 100%);
   border-radius: var(--radius-lg);
   padding: 18px 18px 22px;
   box-shadow:
@@ -375,7 +376,9 @@
     display: block;
     margin-top: 4px;
     padding: 0 2px;
-    font-size: 9px;
+    /* 11px is the app-wide legibility floor. This rule escaped the earlier
+       tiny-text sweep only because it was display:none at every width. */
+    font-size: 11px;
     line-height: 1.25;
     font-weight: 600;
     text-align: center;
@@ -384,6 +387,10 @@
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
+    /* Israeli product names mix Hebrew with un-hyphenated Latin brand tokens —
+       "בלנדר BLACK+DECKER" has a 79px word in a 72px column. Without a break
+       opportunity it overflows sideways, where line-clamp cannot reach it. */
+    overflow-wrap: anywhere;
   }
 }
 
@@ -502,7 +509,7 @@
 }
 
 .pg-tag {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
   padding: 2px 7px;
   border-radius: var(--radius-pill);
@@ -655,7 +662,7 @@
 }
 
 .pg-catalogue-label {
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 600;
   text-align: center;
   line-height: 1.25;
@@ -724,7 +731,7 @@
 }
 
 .pg-palette-dims {
-  font-size: 10.5px;
+  font-size: 11px;
   color: var(--pg-muted);
   font-family: var(--font-mono);
 }
@@ -760,7 +767,7 @@
 }
 
 .pg-unit-label {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   text-align: center;
   line-height: 1.25;
@@ -775,14 +782,19 @@
   position: absolute;
   bottom: 2px;
   inset-inline-end: 4px;
-  font-size: 8.5px;
+  font-size: 11px;
   font-family: var(--font-mono);
   color: rgba(0, 0, 0, 0.45);
 }
 
 .pg-unit-tag {
   position: absolute;
-  font-size: 9.5px;
+  /* Parked outside the fixture box, this ran off the right edge of a phone.
+     Clamped so a long fixture name truncates instead of escaping. */
+  max-width: 40vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 11px;
   font-weight: 700;
   color: var(--pg-muted);
   white-space: nowrap;
@@ -809,7 +821,7 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 10.5px;
+  font-size: 11px;
   font-family: var(--font-mono);
   color: rgba(0, 0, 0, 0.55);
   pointer-events: none;
@@ -1011,4 +1023,56 @@
   margin-top: 12px;
   border-radius: var(--radius-md);
   border: 1px solid var(--pg-line);
+}
+
+/**
+ * A phone is narrower than a shelf. That is a fact about the objects, not a
+ * layout problem to solve by squeezing.
+ *
+ * `.pg-shelf-deck` is a flex row, so at 390px it crushed every `.pg-position`
+ * below the width of its own contents: packages spilled past the bay edge, and
+ * the facings button — the thing you tap to change a facing count — collapsed
+ * to 10px wide against a 44px minimum. Both were the same bug.
+ *
+ * Below 720px the deck scrolls horizontally instead. Positions keep their
+ * natural width, the packages stay inside the wood, and every facings block
+ * stays tappable. It also reads correctly: you pan along a shelf the way you
+ * walk along one.
+ */
+.pg-shelf-deck {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+/*
+ * A position's width is the linear centimetres it consumes, not a share of
+ * whatever screen it lands on. `flex: 1 1 0` made it the latter: 20 positions
+ * on one shelf each got a twentieth of the deck, so the facings button — the
+ * thing you click to change a facing count — came out 16px wide on a 1280px
+ * laptop. That is unusable with a mouse, never mind a thumb.
+ *
+ * `flex: 0 0 auto` lets each block size to its own contents and the deck scroll
+ * when the shelf is longer than the screen. A three-metre shelf does not fit a
+ * laptop at a legible scale, and pretending otherwise is what produced the
+ * slivers. It also reads right: you pan along the shelf the way you walk along
+ * one, and a shelf with three products correctly shows empty wood beside them.
+ */
+
+/* 24px is the pointer-target floor for the button you click to change a facing
+   count. The slots inside it are not interactive, so they keep their visual
+   minimum. */
+.pg-facings {
+  min-width: 44px;
+}
+
+@media (max-width: 720px) {
+  .pg-shelf-deck {
+    scroll-snap-type: x proximity;
+  }
+
+  .pg-position {
+    scroll-snap-align: start;
+  }
 }

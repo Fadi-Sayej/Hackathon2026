@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
+import { renderWithI18n } from '../../../test/renderWithI18n.jsx'
 import { ReceivingCaptureForm } from '../ReceivingCaptureForm.jsx'
 import {
   EXPIRY_QUEUE_KEY,
@@ -12,6 +13,12 @@ import {
 } from '../../../lib/receiving/receivingQueue.js'
 
 const PRODUCTS = [{ id: 'ym-7290000066318', name: 'קוקה קולה 1.5 ליטר' }]
+
+// Every caption in this form comes from the dictionaries, so it cannot render
+// outside the provider. English is the chosen language purely so the queries
+// below read as the labels a user sees; the behaviour under test is the same in
+// all three.
+const render = (ui) => renderWithI18n(ui, { language: 'en' })
 
 afterEach(cleanup)
 beforeEach(() => {
