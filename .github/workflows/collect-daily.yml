@@ -46,6 +46,15 @@ jobs:
 
       - run: pip install -r requirements.txt
 
+      - name: Health check before collecting
+        # Reports the state of the series BEFORE today's run touches it, so a
+        # gap that opened while nobody was looking is visible in the log of the
+        # very next run. `continue-on-error` because a hole in history is not a
+        # reason to skip today's collection — today is the one day still
+        # recoverable.
+        continue-on-error: true
+        run: python3 scripts/check_collection_health.py
+
       - name: Collect
         id: collect
         run: |
@@ -73,6 +82,12 @@ jobs:
           # Another run may have landed while we collected.
           git pull --rebase --autostash origin main || true
           git push origin HEAD:main
+
+      - name: Health check after collecting
+        # Now it IS a gate. If the day we just collected is unusable — a short
+        # run, an empty source, a failed manifest — the job goes red while the
+        # server still holds today's file and a rerun can still save it.
+        run: python3 scripts/check_collection_health.py --max-age-days 1
 
       - name: Fail loudly
         # A collector that dies silently in week 3 and is noticed in week 8 has

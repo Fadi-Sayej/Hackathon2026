@@ -37,6 +37,7 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 
 import polars as pl
+import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -64,6 +65,17 @@ EXPECTED_SOURCES = ("price_transparency", "delivery_catalog")
 # independently; this is the half that makes the collector say so out loud.
 MIN_BRANCH_COVERAGE_RATIO = 0.5
 
+# What one "unit of coverage" is called per source, matching the manifest shape
+# specified in #46 Step 3: `stores` for the price file, `venues` for delivery.
+# The concept is identical — how many distinct places did we actually reach.
+UNIT_FIELD = {
+    "price_transparency": "stores",
+    "delivery_catalog": "venues",
+}
+DEFAULT_UNIT_FIELD = "stores"
+
+DELIVERY_TARGETS_PATH = ROOT / "configs" / "delivery_targets.yaml"
+
 
 def _sha256_of_dir(directory: Path) -> str:
     """Stable digest over a directory's file contents.
@@ -78,6 +90,47 @@ def _sha256_of_dir(directory: Path) -> str:
             for chunk in iter(lambda: handle.read(1024 * 1024), b""):
                 digest.update(chunk)
     return digest.hexdigest()
+
+
+def unit_field(source_id: str) -> str:
+    return UNIT_FIELD.get(source_id, DEFAULT_UNIT_FIELD)
+
+
+def expected_units(source_id: str) -> int | None:
+    """How many places this source was SUPPOSED to reach, where that is declared.
+
+    Only the delivery catalogue declares its targets. The price file publishes
+    whatever branches the chain chooses to publish, so there is no honest fixed
+    expectation — the median check below is what covers it.
+    """
+    if source_id != "delivery_catalog":
+        return None
+    if not DELIVERY_TARGETS_PATH.exists():
+        return None
+    try:
+        config = yaml.safe_load(DELIVERY_TARGETS_PATH.read_text(encoding="utf-8")) or {}
+    except Exception:
+        return None
+    targets = config.get("targets") or []
+    return sum(
+        1 for t in targets
+        if isinstance(t, dict) and t.get("url") and t.get("enabled", True)
+    ) or None
+
+
+def count_rows(source_dir: Path) -> int | None:
+    """Total rows across a source's silver files."""
+    total = 0
+    found = False
+    for path in sorted(source_dir.rglob("*.parquet")):
+        if "silver" not in path.name:
+            continue
+        try:
+            total += pl.read_parquet(path).height
+        except Exception:
+            continue
+        found = True
+    return total if found else None
 
 
 def count_branches(source_dir: Path) -> int | None:
@@ -114,7 +167,10 @@ def median_branches_before(day: str, source_id: str) -> float | None:
             entry = json.loads(manifest_path.read_text(encoding="utf-8"))
         except ValueError:
             continue
-        branches = entry.get("sources", {}).get(source_id, {}).get("branches")
+        source = entry.get("sources", {}).get(source_id, {})
+        # `branches` is the pre-spec name, kept readable so history written
+        # before the rename still counts toward the median.
+        branches = source.get(unit_field(source_id), source.get("branches"))
         if isinstance(branches, int) and branches > 0:
             counts.append(branches)
     return statistics.median(counts) if counts else None
@@ -139,16 +195,36 @@ def describe_source(day_dir: Path, source_id: str) -> dict:
         "sha256": _sha256_of_dir(source_dir) if files else None,
     }
 
-    branches = count_branches(source_dir) if files else None
-    if branches is not None:
-        entry["branches"] = branches
-        median = median_branches_before(day_dir.name, source_id)
-        if median and branches < median * MIN_BRANCH_COVERAGE_RATIO:
+    if not files:
+        return entry
+
+    field = unit_field(source_id)
+    rows = count_rows(source_dir)
+    if rows is not None:
+        entry["rows"] = rows
+
+    branches = count_branches(source_dir)
+    if branches is None:
+        return entry
+
+    entry[field] = branches
+
+    expected = expected_units(source_id)
+    if expected is not None:
+        entry["expected"] = expected
+        if branches < expected:
             entry["status"] = STATUS_PARTIAL
             entry["note"] = (
-                "short run: %d branches against a %d-branch median — files arrived "
-                "but the collection is incomplete" % (branches, int(median))
+                "reached %d of %d declared %s" % (branches, expected, field)
             )
+
+    median = median_branches_before(day_dir.name, source_id)
+    if median and branches < median * MIN_BRANCH_COVERAGE_RATIO:
+        entry["status"] = STATUS_PARTIAL
+        entry["note"] = (
+            "short run: %d %s against a %d-%s median — files arrived but the "
+            "collection is incomplete" % (branches, field, int(median), field[:-1])
+        )
     return entry
 
 

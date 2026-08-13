@@ -24,6 +24,7 @@ from datetime import date
 from pathlib import Path
 
 import pandas as pd
+import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -32,17 +33,33 @@ if str(ROOT) not in sys.path:
 from src.common.paths import EXTERNAL_SNAPSHOTS_ROOT, SILVER_POS_ROOT
 from src.market.baseline import Score, score_membership_rule
 
-# The one venue that appears in BOTH sources today. The delivery catalogue names
-# it "Super Alonit | Kibbutz Einat"; the price file names branch 657 "עינת".
+# Venues that can be scored at all: those declaring `price_file_store_id` in
+# configs/delivery_targets.yaml, i.e. present in BOTH the delivery catalogue and
+# the price file. Today that is one — "Super Alonit | Kibbutz Einat" <-> branch
+# 657 ("עינת").
 #
-# The identification rests on that name match. Barcode overlap corroborates but
-# does not prove it — 657 shares 239 of the venue's 273 barcodes, and the next
-# two branches share 236 and 226, which is what you would expect of any three
-# branches of one chain. If this mapping is wrong, N2 is measuring the wrong
-# store, so it is stated here rather than buried in a join.
-WOLT_VENUE_TO_PRICE_STORE = {
-    "Super Alonit | Kibbutz Einat": "657",
-}
+# The identification rests on the name match. Barcode overlap corroborates but
+# does not prove it: 657 shares 239 of the venue's 273 barcodes, and the next
+# two branches share 236 and 226, which is what any three branches of one chain
+# would look like. If the mapping is wrong, N2 measures the wrong store — which
+# is why it is declared in config rather than inferred by a join.
+DELIVERY_TARGETS_PATH = ROOT / "configs" / "delivery_targets.yaml"
+
+
+def venue_to_price_store() -> dict[str, str]:
+    """{wolt store_name -> price-file store_id} for targets that declare one.
+
+    Keyed on the venue's Wolt display name because that is what lands in the
+    silver `store_name` column. Falls back to matching on the URL slug so a
+    display-name change does not silently empty the mapping.
+    """
+    config = yaml.safe_load(DELIVERY_TARGETS_PATH.read_text(encoding="utf-8")) or {}
+    return {
+        t["url"].rstrip("/").rsplit("/", 1)[-1]: str(t["price_file_store_id"])
+        for t in (config.get("targets") or [])
+        if isinstance(t, dict) and t.get("price_file_store_id") and t.get("url")
+        and t.get("enabled", True)
+    }
 
 
 def _read_day(day_dir: Path, source: str, columns):
@@ -55,9 +72,18 @@ def _read_day(day_dir: Path, source: str, columns):
         return None
     pattern = str(day_dir / source / "*" / "*_silver.parquet")
     files = sorted(glob.glob(pattern))
-    if not files:
+    frames = []
+    for path in files:
+        try:
+            frames.append(pd.read_parquet(path, columns=columns))
+        except Exception:
+            # A venue that returned no products writes a schema-less file. It is
+            # an absence of data, not a corrupt day — skip it and keep the rest,
+            # rather than losing eight good venues to one empty one.
+            continue
+    if not frames:
         return None
-    return pd.concat([pd.read_parquet(f, columns=columns) for f in files], ignore_index=True)
+    return pd.concat(frames, ignore_index=True)
 
 
 def measure_n1() -> dict:
@@ -141,11 +167,19 @@ def measure_n2() -> dict:
         price = _read_day(day_dir, "price_transparency", ["barcode", "store_id"])
         if wolt is None or price is None:
             continue
-        wolt = wolt[wolt["store_name"].isin(WOLT_VENUE_TO_PRICE_STORE)]
+        # Silver carries store_name, not the URL slug, so match on a normalised
+        # form of both: "Super Alonit | Kibbutz Einat" -> super-alonit-kibbutz-einat.
+        def slug(name: str) -> str:
+            return "-".join("".join(
+                c.lower() if c.isalnum() else " " for c in str(name)
+            ).split())
+
+        mapping = venue_to_price_store()
+        wolt = wolt[wolt["store_name"].map(lambda n: slug(n) in mapping)]
         if wolt.empty:
             continue
         chain_wide |= set(price["barcode"].dropna().astype(str))
-        store_ids = {WOLT_VENUE_TO_PRICE_STORE[v] for v in wolt["store_name"].unique()}
+        store_ids = {mapping[slug(v)] for v in wolt["store_name"].unique()}
         price = price[price["store_id"].astype(str).isin(store_ids)]
 
         w = set(wolt["barcode"].dropna().astype(str))
@@ -163,7 +197,7 @@ def measure_n2() -> dict:
 
     total = Score(
         rule="N2: present in today's price file ⇒ available",
-        label_source="delivery-catalogue orderability (Super Alonit | Kibbutz Einat)",
+        label_source="delivery-catalogue orderability (venues declaring price_file_store_id)",
         true_positive=0, false_positive=0, true_negative=0, false_negative=0,
     )
     for day, w in sorted(wolt_by_day.items()):

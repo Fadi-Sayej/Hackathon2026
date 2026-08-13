@@ -77,9 +77,12 @@ def test_a_single_venue_source_counts_as_one(snapshots):
     )
     assert wsm.count_branches(snapshots / "2026-08-11" / "delivery_catalog") == 1
 
-    seal(snapshots, "2026-08-10", {"delivery_catalog": {"status": "ok", "branches": 1}})
+    seal(snapshots, "2026-08-10", {"delivery_catalog": {"status": "ok", "venues": 1}})
     entry = wsm.describe_source(snapshots / "2026-08-11", "delivery_catalog")
-    assert entry["status"] == "ok"
+    # Short against the 9 declared targets, which is correct and is exactly what
+    # the daily run looked like before the config was wired in.
+    assert entry["status"] == "partial"
+    assert entry["venues"] == 1
 
 
 def test_bronze_files_are_not_counted(snapshots):
@@ -101,23 +104,52 @@ def test_the_first_day_is_not_downgraded(snapshots):
     write_source(snapshots, "2026-08-11", branches=31)
     entry = wsm.describe_source(snapshots / "2026-08-11", "price_transparency")
     assert entry["status"] == "ok"
-    assert entry["branches"] == 31
+    assert entry["stores"] == 31
+
+
+def test_the_manifest_uses_the_field_names_from_the_spec(snapshots):
+    """#46 Step 3 names them `stores` and `venues`, with `rows`. The concept is
+    the same; the names are what anyone reading a manifest will look for."""
+    write_source(snapshots, "2026-08-11", branches=3)
+    entry = wsm.describe_source(snapshots / "2026-08-11", "price_transparency")
+    assert entry["stores"] == 3
+    assert entry["rows"] == 9              # 3 branches x 3 products
+    assert "branches" not in entry
+
+
+def test_a_short_delivery_run_is_measured_against_the_declared_targets(snapshots):
+    """The delivery catalogue is the one source that DECLARES how many places it
+    should reach, so it does not have to wait for a median to notice a shortfall."""
+    write_source(snapshots, "2026-08-11", branches=4, source="delivery_catalog")
+    entry = wsm.describe_source(snapshots / "2026-08-11", "delivery_catalog")
+    assert entry["venues"] == 4
+    assert entry["expected"] == wsm.expected_units("delivery_catalog")
+    assert entry["status"] == "partial"
+    assert "4 of" in entry["note"]
+
+
+def test_a_complete_delivery_run_is_ok(snapshots):
+    expected = wsm.expected_units("delivery_catalog")
+    write_source(snapshots, "2026-08-11", branches=expected, source="delivery_catalog")
+    entry = wsm.describe_source(snapshots / "2026-08-11", "delivery_catalog")
+    assert entry["status"] == "ok"
+    assert entry["venues"] == expected
 
 
 def test_a_short_run_is_downgraded_against_the_history(snapshots):
-    seal(snapshots, "2026-08-11", {"price_transparency": {"status": "ok", "branches": 156}})
-    seal(snapshots, "2026-08-12", {"price_transparency": {"status": "ok", "branches": 156}})
+    seal(snapshots, "2026-08-11", {"price_transparency": {"status": "ok", "stores": 156}})
+    seal(snapshots, "2026-08-12", {"price_transparency": {"status": "ok", "stores": 156}})
     write_source(snapshots, "2026-08-13", branches=31)          # the 11 Aug shape
 
     entry = wsm.describe_source(snapshots / "2026-08-13", "price_transparency")
     assert entry["status"] == "partial"
-    assert entry["branches"] == 31
+    assert entry["stores"] == 31
     assert "short run" in entry["note"]
 
 
 def test_an_ordinary_day_survives_the_check(snapshots):
-    seal(snapshots, "2026-08-11", {"price_transparency": {"status": "ok", "branches": 156}})
-    seal(snapshots, "2026-08-12", {"price_transparency": {"status": "ok", "branches": 154}})
+    seal(snapshots, "2026-08-11", {"price_transparency": {"status": "ok", "stores": 156}})
+    seal(snapshots, "2026-08-12", {"price_transparency": {"status": "ok", "stores": 154}})
     write_source(snapshots, "2026-08-13", branches=155)
 
     entry = wsm.describe_source(snapshots / "2026-08-13", "price_transparency")
@@ -125,23 +157,30 @@ def test_an_ordinary_day_survives_the_check(snapshots):
     assert "note" not in entry
 
 
+def test_the_pre_spec_field_name_still_counts_toward_the_median(snapshots):
+    """Manifests written before the rename say `branches`. Ignoring them would
+    reset the median to nothing and disarm the check for days."""
+    seal(snapshots, "2026-08-11", {"price_transparency": {"status": "ok", "branches": 156}})
+    assert wsm.median_branches_before("2026-08-12", "price_transparency") == 156
+
+
 def test_the_median_ignores_later_days(snapshots):
     """A day is judged against what came before it, so re-sealing an old day
     cannot be swayed by days collected after it."""
-    seal(snapshots, "2026-08-10", {"price_transparency": {"status": "ok", "branches": 30}})
-    seal(snapshots, "2026-08-20", {"price_transparency": {"status": "ok", "branches": 156}})
+    seal(snapshots, "2026-08-10", {"price_transparency": {"status": "ok", "stores": 30}})
+    seal(snapshots, "2026-08-20", {"price_transparency": {"status": "ok", "stores": 156}})
     assert wsm.median_branches_before("2026-08-15", "price_transparency") == 30
 
 
 def test_a_corrupt_earlier_manifest_does_not_break_the_comparison(snapshots):
     (snapshots / "2026-08-11").mkdir(parents=True)
     (snapshots / "2026-08-11" / "_manifest.json").write_text("{ not json")
-    seal(snapshots, "2026-08-12", {"price_transparency": {"status": "ok", "branches": 156}})
+    seal(snapshots, "2026-08-12", {"price_transparency": {"status": "ok", "stores": 156}})
     assert wsm.median_branches_before("2026-08-13", "price_transparency") == 156
 
 
 def test_the_whole_manifest_reflects_a_short_run(snapshots):
-    seal(snapshots, "2026-08-11", {"price_transparency": {"status": "ok", "branches": 156}})
+    seal(snapshots, "2026-08-11", {"price_transparency": {"status": "ok", "stores": 156}})
     write_source(snapshots, "2026-08-12", branches=31)
     write_source(snapshots, "2026-08-12", branches=1, source="delivery_catalog")
 

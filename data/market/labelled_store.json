@@ -1,0 +1,64 @@
+{
+  "measured_on": "2026-08-13",
+  "issue": "#49 Step 5 — validation against a store whose truth we own",
+  "days": [
+    "2026-08-13"
+  ],
+  "universe": 169,
+  "matched_to_pos": 169,
+  "unmatched_barcodes": [],
+  "staleness_days": 68,
+  "pos_imported_at": "2026-06-06T15:32:59.781662+00:00",
+  "score": {
+    "rule": "orderable on our delivery venue ⇒ in stock",
+    "label_source": "YomYom POS current_stock > 0",
+    "true_positive": 159,
+    "false_positive": 10,
+    "true_negative": 0,
+    "false_negative": 0,
+    "total": 169,
+    "predicted_positive": 169,
+    "actual_positive": 159,
+    "actual_negative": 10,
+    "precision": 0.9408284023668639,
+    "recall": 1.0,
+    "f1": 0.9695121951219512,
+    "accuracy": 0.9408284023668639,
+    "false_positive_rate": 1.0,
+    "precision_interval": [
+      0.8945156348853855,
+      0.9675453504329636
+    ],
+    "has_negative_class": true
+  },
+  "predicts_everything": true,
+  "emissions": {
+    "P(orderable | in stock)": 1.0,
+    "P(orderable | out of stock)": 1.0
+  },
+  "per_day": [
+    {
+      "day": "2026-08-13",
+      "rule": "orderable on our delivery venue ⇒ in stock",
+      "label_source": "YomYom POS current_stock > 0",
+      "true_positive": 159,
+      "false_positive": 10,
+      "true_negative": 0,
+      "false_negative": 0,
+      "total": 169,
+      "predicted_positive": 169,
+      "actual_positive": 159,
+      "actual_negative": 10,
+      "precision": 0.9408284023668639,
+      "recall": 1.0,
+      "f1": 0.9695121951219512,
+      "accuracy": 0.9408284023668639,
+      "false_positive_rate": 1.0,
+      "precision_interval": [
+        0.8945156348853855,
+        0.9675453504329636
+      ],
+      "has_negative_class": true
+    }
+  ]
+}

@@ -64,6 +64,54 @@ python scripts/run_delivery_venue_connector.py
 python scripts/run_mcp_price_lookup.py
 ```
 
+### Market snapshots and latent-state inference (T1 / #46, T4 / #49)
+
+```bash
+# Collect one day of the outside market. Idempotent; a source already sealed
+# `ok` is never re-pulled or overwritten. Scheduled in .github/workflows/collect-daily.yml.
+bash scripts/collect_daily.sh
+bash scripts/collect_daily.sh --date 2026-08-11
+
+# Has history actually been accumulating? Non-zero exit on a gap, a stale
+# latest day, or a day that was collected but is unusable.
+python3 scripts/check_collection_health.py
+
+# What changed between any two collected days (#46 acceptance + Step 6).
+python3 scripts/diff_snapshots.py --latest
+python3 scripts/diff_snapshots.py --from 2026-08-11 --to 2026-08-13 --json
+
+# Stockout vs delisting (#49 Step 1)
+python3 scripts/analyse_market_drops.py
+
+# The naive baselines every later model must beat (#49 Step 2)
+python3 scripts/measure_baselines.py        # -> data/market/baselines.json
+
+# Inference scored against a store whose truth we own (#49 Step 5)
+python3 scripts/validate_labelled_store.py  # -> data/market/labelled_store.json
+```
+
+**`data/external/snapshots/<date>/` is immutable and irreplaceable.** The
+price-transparency server keeps only the current day, so a day lost is lost
+permanently. Three rules hold it together, each of which failed at least once
+before it was written down:
+
+- **Per-source, not per-day.** A day is `partial` the moment any one source is
+  short. A day-level guard would then stop protecting the sources that already
+  succeeded.
+- **Merge, never replace.** `scripts/seal_snapshot.py` seeds its temp dir from the
+  existing snapshot before adding new files. The scheduled runner commits only
+  `data/external/snapshots/` — its bronze/silver trees are gitignored — so
+  rebuilding a day from a local lakehouse destroys whatever the runner collected.
+- **Coverage, not just arrival.** A run that returns 31 of 156 branches finishes
+  cleanly. The manifest records `stores`/`venues` against `expected` and a running
+  median; `src/market/presence.py` independently drops such a day.
+
+Delivery venues come from `configs/delivery_targets.yaml` (10 enabled), **not**
+from a default in the script. `yomyom_kafr_qasim` is our own store and is the
+ground truth for #49 Step 5; `super_alonit_einat` carries `price_file_store_id`
+and is the only venue visible in both the price file and the delivery catalogue,
+which is what makes the #49 Step 2 baseline measurable at all.
+
 ---
 
 ## Frontend Architecture

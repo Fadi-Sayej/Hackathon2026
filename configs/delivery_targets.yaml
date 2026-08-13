@@ -17,7 +17,8 @@
 # The Wolt URLs use the petah-tikva geographic slug because Wolt routes
 # the Kafr Qasim / Rosh Ha'ayin sector through that city slug.
 #
-# Loaded by: scripts/run_delivery_to_firestore.py
+# Loaded by: scripts/run_delivery_venue_connector.py (the daily collector) and
+# scripts/run_delivery_to_firestore.py.
 
 targets:
 
@@ -32,6 +33,24 @@ targets:
     enabled: true
 
   # ── COMPETITORS (sorted by distance from YomYom) ────────────────────────
+
+  # Further away than the rest, and kept for a different reason: this is the
+  # ONLY venue that appears in both the Wolt catalogue and the Alonit price
+  # file (branch 657, "עינת"). That overlap is what makes the #49 Step 2
+  # baseline measurable at all — the price file says what is supposed to be on
+  # the shelf, Wolt says what is actually orderable, and nowhere else can we
+  # see both for the same store. It was collected daily by a hardcoded default
+  # while this file went unread; dropping it now would break the only series
+  # that can score "present in the price file => available".
+  - key: super_alonit_einat
+    chain: alonit
+    chain_display: "Super Alonit"
+    provider: wolt
+    url: https://wolt.com/en/isr/petah-tikva/venue/super-alonit-kibbutz-einat
+    city: "Kibbutz Einat"
+    role: reference
+    price_file_store_id: "657"
+    enabled: true
 
   - key: victory_park_afek           # 0.21km — closest direct supermarket
     chain: victory

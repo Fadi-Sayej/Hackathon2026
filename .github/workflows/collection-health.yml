@@ -1,0 +1,55 @@
+# Independent watchdog on the daily collector — T1 / #46, Step 5.
+#
+# collect-daily.yml already checks its own health, which covers the common
+# failures: a source returns nothing, a run is short, a manifest reads `failed`.
+# It cannot cover the one that costs the most — **the schedule silently stops
+# firing**. A workflow that never runs cannot report that it never ran.
+#
+# This is a second pair of eyes on a different schedule. It does not collect
+# anything; it only asks whether fresh, usable history exists. For the failure to
+# stay invisible now, BOTH crons have to stop firing at once, which is a great
+# deal less likely than one.
+#
+# It is deliberately not a full solution. An external heartbeat (a service that
+# alerts when it stops being pinged) is the only thing that truly closes this,
+# and it needs an account nobody has set up yet. Until then: two crons, and
+# someone glancing at the snapshot count once a week.
+#
+# 15:00 Asia/Jerusalem = 12:00 UTC — twelve hours offset from the collector, so
+# a missed night is reported the same day rather than the next.
+name: collection health
+
+on:
+  schedule:
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Is history still accumulating?
+        id: health
+        run: python3 scripts/check_collection_health.py
+
+      - name: Say so loudly
+        # The point of the whole workflow. A red run here means days are being
+        # lost right now, and the price-transparency server keeps only the
+        # current day — so every hour this goes unread is unrecoverable.
+        if: failure() && steps.health.outcome == 'failure'
+        run: |
+          echo "::error::Market history has STOPPED accumulating."
+          echo "::error::Days lost here cannot be re-collected. Investigate today."

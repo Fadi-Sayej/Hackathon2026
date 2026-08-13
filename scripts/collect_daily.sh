@@ -39,7 +39,22 @@ declare -a ERRORS_DC=()
 printf '=== market snapshot %s ===\n' "$DATE"
 
 # ── Immutability check ───────────────────────────────────────────────────────
-if [ -f "$MANIFEST" ] && grep -q '"status": *"ok"' "$MANIFEST"; then
+# Parsed, not grepped. `grep '"status": *"ok"'` matches the status of any nested
+# SOURCE, so a partial day containing one good source read as complete and could
+# never be retried — which is the opposite of what Step 4 asks for.
+day_complete() {
+  [ -f "$MANIFEST" ] || return 1
+  $PY - "$MANIFEST" <<'PYEOF'
+import json, sys
+try:
+    manifest = json.load(open(sys.argv[1], encoding="utf-8"))
+except Exception:
+    sys.exit(1)
+sys.exit(0 if manifest.get("status") == "ok" else 1)
+PYEOF
+}
+
+if day_complete; then
   echo "Day already collected and complete. Nothing to do."
   echo "(Re-running is a no-op by design — overwriting would destroy history"
   echo " that cannot be re-fetched.)"
@@ -47,6 +62,22 @@ if [ -f "$MANIFEST" ] && grep -q '"status": *"ok"' "$MANIFEST"; then
 fi
 
 mkdir -p "$SNAP_DIR"
+
+# True when this source already reads "ok" in today's manifest. Retrying a
+# partial day must not re-pull a source that already succeeded: the point of the
+# retry is the source that failed, and a fresh pull could return less than what
+# is already safely on disk.
+source_complete() {
+  [ -f "$MANIFEST" ] || return 1
+  $PY - "$MANIFEST" "$1" <<'PYEOF'
+import json, sys
+try:
+    manifest = json.load(open(sys.argv[1], encoding="utf-8"))
+except Exception:
+    sys.exit(1)
+sys.exit(0 if manifest.get("sources", {}).get(sys.argv[2], {}).get("status") == "ok" else 1)
+PYEOF
+}
 
 # ── 1. Price transparency (Dor Alon / Alonit FTPS) ───────────────────────────
 # --all-stores collects every branch the chain publishes (156), not just the two
@@ -59,7 +90,9 @@ mkdir -p "$SNAP_DIR"
 # See src/external/alonit_connector.py.
 echo
 echo "[1/3] Price transparency"
-if $PY scripts/run_alonit_collector.py --all-stores --collected-at "$COLLECTED_AT"; then
+if source_complete price_transparency; then
+  echo "  already complete for ${DATE} — skipping"
+elif $PY scripts/run_alonit_collector.py --all-stores --collected-at "$COLLECTED_AT"; then
   echo "  ok"
 else
   echo "  FAILED"
@@ -67,14 +100,38 @@ else
 fi
 
 # ── 2. Delivery catalog (Wolt) ───────────────────────────────────────────────
+# No --url: the connector reads every enabled target from
+# configs/delivery_targets.yaml (9 venues, including our own store). It used to
+# default to a single hardcoded competitor URL while that config went unread.
 echo
 echo "[2/3] Delivery catalog"
-if $PY scripts/run_delivery_venue_connector.py; then
+DC_OUT="$(mktemp)"
+if source_complete delivery_catalog; then
+  echo "  already complete for ${DATE} — skipping"
+  echo '{}' > "$DC_OUT"
+elif $PY scripts/run_delivery_venue_connector.py > "$DC_OUT"; then
   echo "  ok"
 else
   echo "  FAILED"
   ERRORS_DC+=("run_delivery_venue_connector.py exited non-zero")
 fi
+
+# Individual venue failures are reported in the payload even when the exit code
+# is zero — a partial run must still reach the manifest, or one dead venue
+# either discards eight good ones or passes as a clean day.
+while IFS= read -r line; do
+  [ -n "$line" ] && ERRORS_DC+=("$line")
+done < <($PY - "$DC_OUT" <<'PYEOF'
+import json, sys
+try:
+    payload = json.load(open(sys.argv[1], encoding="utf-8"))
+except Exception:
+    sys.exit(0)
+for error in payload.get("errors", []):
+    print(error)
+PYEOF
+)
+rm -f "$DC_OUT"
 
 # ── 3. Materialise into the dated snapshot, atomically ───────────────────────
 # The collectors write into their own bronze/silver trees. The snapshot is a
@@ -82,65 +139,35 @@ fi
 # must not move when the lakehouse layout changes.
 echo
 echo "[3/3] Sealing snapshot"
-$PY - "$DATE" <<'PYEOF'
-import shutil, sys, tempfile
-from pathlib import Path
-sys.path.insert(0, ".")
-from src.common.paths import (
-    EXTERNAL_BRONZE_ROOT, EXTERNAL_SILVER_ROOT, get_snapshot_path,
-)
-
-day = sys.argv[1]
-y, m, d = day.split("-")
-
-def materialise(source_id: str, candidates):
-    dest = get_snapshot_path(source_id, day)
-    present = [c for c in candidates if c.exists() and any(c.rglob("*"))]
-    if not present:
-        print(f"  {source_id}: nothing collected today")
-        return
-    # Write to a temp dir alongside, then move into place, so a crash mid-copy
-    # never leaves a half-populated day that later reads as a real absence.
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    tmp = Path(tempfile.mkdtemp(dir=dest.parent, prefix=f".{source_id}.tmp."))
-    copied = 0
-    for src in present:
-        for path in src.rglob("*"):
-            if not path.is_file():
-                continue
-            rel = path.relative_to(src)
-            target = tmp / src.name / rel
-            target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(path, target)
-            copied += 1
-    if dest.exists():
-        shutil.rmtree(dest)
-    tmp.replace(dest)
-    print(f"  {source_id}: {copied} files")
-
-materialise("price_transparency", [
-    EXTERNAL_BRONZE_ROOT / "alonit" / y / m / d,
-    EXTERNAL_SILVER_ROOT / "alonit_prices" / "alonit" / y / m / d,
-])
-materialise("delivery_catalog", [
-    EXTERNAL_BRONZE_ROOT / "delivery_catalog" / y / m / d,
-    EXTERNAL_SILVER_ROOT / "products" / "delivery_catalog" / y / m / d,
-])
-PYEOF
+$PY scripts/seal_snapshot.py --date "$DATE"
 
 # ── Manifest ─────────────────────────────────────────────────────────────────
+# Errors travel through files, one per line. Interpolating the arrays into a
+# heredoc joined every message into a single string, so nine venue failures
+# arrived as one unreadable line — and any message containing a quote broke the
+# JSON outright.
 ERR_JSON="{}"
 if [ ${#ERRORS_PT[@]} -gt 0 ] || [ ${#ERRORS_DC[@]} -gt 0 ]; then
-  ERR_JSON=$($PY - <<PYEOF
-import json
+  ERR_PT_FILE="$(mktemp)"; ERR_DC_FILE="$(mktemp)"
+  [ ${#ERRORS_PT[@]} -gt 0 ] && printf '%s\n' "${ERRORS_PT[@]}" > "$ERR_PT_FILE"
+  [ ${#ERRORS_DC[@]} -gt 0 ] && printf '%s\n' "${ERRORS_DC[@]}" > "$ERR_DC_FILE"
+  ERR_JSON=$($PY - "$ERR_PT_FILE" "$ERR_DC_FILE" <<'PYEOF'
+import json, sys
+from pathlib import Path
+
+def lines(path):
+    text = Path(path).read_text(encoding="utf-8") if Path(path).exists() else ""
+    return [line for line in text.splitlines() if line.strip()]
+
 errors = {}
-pt = """${ERRORS_PT[*]:-}""".strip()
-dc = """${ERRORS_DC[*]:-}""".strip()
-if pt: errors["price_transparency"] = [pt]
-if dc: errors["delivery_catalog"] = [dc]
+for source, path in (("price_transparency", sys.argv[1]), ("delivery_catalog", sys.argv[2])):
+    found = lines(path)
+    if found:
+        errors[source] = found
 print(json.dumps(errors))
 PYEOF
 )
+  rm -f "$ERR_PT_FILE" "$ERR_DC_FILE"
 fi
 
 echo

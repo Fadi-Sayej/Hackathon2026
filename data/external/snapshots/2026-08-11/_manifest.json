@@ -2,21 +2,25 @@
   "date": "2026-08-11",
   "collected_at": "2026-08-11T21:14:43.921303+00:00",
   "collector_version": "smartshelf@1.0.0",
-  "status": "ok",
+  "status": "partial",
   "sources": {
     "price_transparency": {
       "status": "ok",
       "files": 8,
       "bytes": 12852236,
       "sha256": "94b8e043c4b932d3b1350b698d135bde1f5d38ea309427f7ee94f7f854f25887",
-      "branches": 156
+      "stores": 156,
+      "rows": 750173
     },
     "delivery_catalog": {
-      "status": "ok",
+      "status": "partial",
       "files": 4,
       "bytes": 311192,
       "sha256": "9feeb8fdd6ca3f3109842cf79896fa36dcea9a753bc6e6c8b4985ff64a828a41",
-      "branches": 1
+      "venues": 1,
+      "rows": 566,
+      "expected": 9,
+      "note": "reached 1 of 9 declared venues — the collector read a hardcoded default instead of configs/delivery_targets.yaml"
     }
   }
 }
