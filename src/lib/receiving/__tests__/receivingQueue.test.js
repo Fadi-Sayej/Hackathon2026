@@ -210,7 +210,15 @@ describe('todayIso — the LOCAL business date, not the UTC one', () => {
     process.env.TZ = 'Asia/Jerusalem'
   })
   afterAll(() => {
-    process.env.TZ = originalTz
+    // `process.env.TZ = undefined` coerces to the literal string "undefined",
+    // an invalid zone Node resolves to UTC — silently poisoning every later
+    // test in this worker that reads local time. Delete the key instead when
+    // it was never set to begin with.
+    if (originalTz === undefined) {
+      delete process.env.TZ
+    } else {
+      process.env.TZ = originalTz
+    }
   })
 
   it('files a 01:30 Israel-time delivery under that morning, not the previous day', () => {
