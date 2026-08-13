@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import { Button } from '../components/shared/Button.jsx'
 import { MetricCard } from '../components/shared/MetricCard.jsx'
+import { useT } from '../lib/i18n/index.js'
 import { ReportViewer } from '../components/reports/ReportViewer.jsx'
 import { buildOptimizationReport } from '../lib/ai/reportBuilder.js'
 
@@ -15,6 +16,7 @@ export function ReportPage({
   recommendations,
   affinitySuggestions,
 }) {
+  const t = useT()
   const [report, setReport] = useState(null)
   const [isGenerating, setIsGenerating] = useState(false)
 
@@ -79,26 +81,26 @@ export function ReportPage({
     <>
       <section className="metric-grid metric-grid-compact">
         <MetricCard
-          label="Products Analyzed"
+          label={t('rep.analyzed')}
           value={analyzedProducts?.length ?? 0}
-          detail="SKUs in current dataset"
+          detail={t('rep.analyzedDetail')}
         />
         <MetricCard
-          label="Reorder Alerts"
+          label={t('rep.alerts')}
           value={recommendations?.filter((r) => r.type === 'REORDER').length ?? 0}
-          detail="Pending reorder suggestions"
+          detail={t('rep.alertsDetail')}
           tone="warning"
         />
         <MetricCard
-          label="Planogram Items"
+          label={t('rep.planogramItems')}
           value={planogramSummary?.totalItems ?? 0}
-          detail="Products with shelf placement"
+          detail={t('rep.planogramDetail')}
           tone="success"
         />
         <MetricCard
-          label="Competitor Signals"
+          label={t('rep.signals')}
           value={(competitorSummary?.priceLeaderCount ?? 0) + (competitorSummary?.competitorOOSCount ?? 0)}
-          detail="Active market intelligence"
+          detail={t('rep.signalsDetail')}
           tone="info"
         />
       </section>
@@ -107,7 +109,7 @@ export function ReportPage({
         <div className="panel-heading">
           <div>
             <p className="eyebrow">AI Report Engine</p>
-            <h2>Shelf Optimization Report</h2>
+            <h2>{t('rep.title')}</h2>
             <p className="page-description">
               Generate a comprehensive markdown report combining inventory health, planogram analysis,
               competitor intelligence, cross-merchandising opportunities, and an actionable optimization plan.
@@ -119,33 +121,33 @@ export function ReportPage({
         <div className="report-launch-content">
           <div className="report-launch-features">
             <div className="report-feature">
-              <strong>Executive Summary</strong>
-              <span>KPIs, stockout risks, and order cost estimates</span>
+              <strong>{t('rep.execSummary')}</strong>
+              <span>{t('rep.execSummaryDesc')}</span>
             </div>
             <div className="report-feature">
-              <strong>Planogram Analysis</strong>
-              <span>Shelf-level breakdown with top-scoring products</span>
+              <strong>{t('rep.planogramAnalysis')}</strong>
+              <span>{t('rep.planogramAnalysisDesc')}</span>
             </div>
             <div className="report-feature">
-              <strong>Competitor Intelligence</strong>
-              <span>Price leadership, OOS opportunities, protection alerts</span>
+              <strong>{t('rep.competitorIntel')}</strong>
+              <span>{t('rep.competitorIntelDesc')}</span>
             </div>
             <div className="report-feature">
-              <strong>Reorder Priorities</strong>
-              <span>Urgency-ranked replenishment recommendations</span>
+              <strong>{t('rep.reorderPriorities')}</strong>
+              <span>{t('rep.reorderPrioritiesDesc')}</span>
             </div>
             <div className="report-feature">
-              <strong>Cross-Merchandising</strong>
-              <span>Basket affinity pairs with estimated uplift</span>
+              <strong>{t('rep.crossMerch')}</strong>
+              <span>{t('rep.crossMerchDesc')}</span>
             </div>
             <div className="report-feature">
-              <strong>Action Plan</strong>
-              <span>Prioritized steps for immediate shelf optimization</span>
+              <strong>{t('rep.actionPlan')}</strong>
+              <span>{t('rep.actionPlanDesc')}</span>
             </div>
           </div>
 
           <Button tone="primary" onClick={handleGenerate} disabled={isGenerating}>
-            {isGenerating ? 'Generating Report...' : 'Generate Optimization Report'}
+            {isGenerating ? t('rep.generating') : t('rep.generate')}
           </Button>
         </div>
       </section>

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { MetricCard } from '../components/shared/MetricCard.jsx'
 import { StatusBadge } from '../components/shared/StatusBadge.jsx'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
+import { useT } from '../lib/i18n/index.js'
 import { Button } from '../components/shared/Button.jsx'
 import { formatCurrency } from '../components/shared/formatters.js'
 
@@ -20,11 +21,11 @@ import { formatCurrency } from '../components/shared/formatters.js'
  */
 
 const BANDS = [
-  { id: 'all', label: 'All' },
-  { id: 'impulse', label: 'Under ₪15' },
+  { id: 'all', labelKey: 'common.all' },
+  { id: 'impulse', labelKey: 'gap.under15' },
   { id: 'everyday', label: '₪15–40' },
   { id: 'considered', label: '₪40–100' },
-  { id: 'high_ticket', label: 'Over ₪100' },
+  { id: 'high_ticket', labelKey: 'gap.over100' },
 ]
 
 const TOP_N = 30
@@ -36,6 +37,7 @@ function coverageTone(ratio) {
 }
 
 export function AssortmentGapPage() {
+  const t = useT()
   const [data, setData] = useState(null)
   const [status, setStatus] = useState('loading')
   const [band, setBand] = useState('all')
@@ -65,14 +67,14 @@ export function AssortmentGapPage() {
   }, [data, band])
 
   if (status === 'loading') {
-    return <EmptyState title="Loading" detail="Reading the assortment gap." />
+    return <EmptyState title={t('gap.loading')} detail={t('gap.loadingDetail')} />
   }
 
   if (status === 'empty' || !data?.recommendations?.length) {
     return (
       <EmptyState
-        title="No assortment gap yet"
-        detail="Run scripts/build_assortment_gap.py then scripts/export_assortment_gap.py to generate it."
+        title={t('gap.emptyTitle')}
+        detail={t('gap.emptyDetail')}
       />
     )
   }
@@ -83,7 +85,7 @@ export function AssortmentGapPage() {
     <section className="page">
       <header className="page-header">
         <p className="eyebrow">Assortment</p>
-        <h1>What shops like yours carry, and you don&apos;t</h1>
+        <h1>{t('gap.headline')}</h1>
         <p className="page-intro">
           Compared against {branchesCompared} branches of the same store format. These are
           products you have never stocked, so there is no sales history for any of them —
@@ -93,28 +95,28 @@ export function AssortmentGapPage() {
 
       <div className="metric-grid">
         <MetricCard
-          label="Gap products"
+          label={t('gap.products')}
           value={counts.gapTotal.toLocaleString()}
           detail={`Across ${branchesCompared} comparable branches`}
         />
         <MetricCard
-          label="Widely carried"
+          label={t('gap.widely')}
           value={counts.afterMinCoverage.toLocaleString()}
-          detail="Stocked by at least a quarter of them"
+          detail={t('gap.widelyDetail')}
           tone="info"
         />
         <MetricCard
-          label="Shown here"
+          label={t('gap.shown')}
           value={counts.emitted.toLocaleString()}
-          detail="Ranked by branch coverage"
+          detail={t('gap.shownDetail')}
         />
         <MetricCard
-          label="Hidden by your settings"
+          label={t('gap.hidden')}
           value={counts.excludedByPolicy.toLocaleString()}
           detail={
             policy.excludes.length
               ? `Not stocked here: ${policy.excludes.join(', ')}`
-              : 'Nothing excluded'
+              : t('gap.nothingExcluded')
           }
           tone={counts.excludedByPolicy ? 'warning' : 'neutral'}
         />
@@ -127,22 +129,22 @@ export function AssortmentGapPage() {
             variant={band === entry.id ? 'primary' : 'ghost'}
             onClick={() => setBand(entry.id)}
           >
-            {entry.label}
+            {entry.labelKey ? t(entry.labelKey) : entry.label}
           </Button>
         ))}
       </div>
 
       {rows.length === 0 ? (
-        <EmptyState title="Nothing in this price range" detail="Try another range." />
+        <EmptyState title={t('gap.noneInRange')} detail={t('gap.tryAnother')} />
       ) : (
         <div className="table-scroll">
           <table className="data-table">
             <thead>
               <tr>
-                <th>Product</th>
-                <th>Carried by</th>
-                <th>Their price</th>
-                <th>Notes</th>
+                <th>{t('common.product')}</th>
+                <th>{t('gap.carriedBy')}</th>
+                <th>{t('gap.theirPrice')}</th>
+                <th>{t('gap.notes')}</th>
               </tr>
             </thead>
             <tbody>
@@ -173,7 +175,7 @@ export function AssortmentGapPage() {
                         <StatusBadge tone="neutral">{row.segments.join(', ')}</StatusBadge>
                       ) : null}
                       {row.reviewRequired?.length ? (
-                        <StatusBadge tone="warning">needs checking</StatusBadge>
+                        <StatusBadge tone="warning">{t('gap.needsChecking')}</StatusBadge>
                       ) : null}
                     </td>
                   </tr>

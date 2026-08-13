@@ -160,6 +160,66 @@ Order of magnitude with these in place: **$1–5/month per store**, against $200
 
 The proxy itself (`src/api/llm_proxy.py`, Gemini via `/explain` and `/report`) is hardened (B-4): it starts cleanly **even without a key** (503 instead of crashing at import), caches identical payloads, applies an upstream timeout to both endpoints, and reads CORS origins from `LLM_ALLOWED_ORIGINS`. Covered by `tests/test_llm_proxy.py` (9 cases).
 
+### Internationalisation
+
+**Three languages: Arabic (default), Hebrew, English.** Switcher in the sidebar; the choice persists and sets `lang`/`dir` on `<html>` so the whole document mirrors.
+
+- Tokens: `src/lib/i18n/` — `index.js` (constants, context, `useT`, `useNumbers`), `I18nProvider.jsx` (component only, for Fast Refresh), `dictionaries/{ar,he,en}.js`.
+- **424 keys, enforced identical across all three** by `src/lib/i18n/__tests__/i18n.test.js`, which also checks that `{placeholders}` match.
+- A missing key renders as the key itself (`page.expiry.title`) on purpose — invisible fallbacks ship, visible ones get fixed. Both the component suite and the e2e suite assert no dotted key reaches the screen.
+- **Product names, barcodes and SKU codes are never translated.** They arrive from the till in Hebrew and are the only string tying the screen to the physical item.
+- Numbers follow the language: Arabic-Indic digits for Arabic, Western for Hebrew and English (`useNumbers()`).
+- `.page-body` sets `unicode-bidi: plaintext`, which fixes mixed-direction mangling (English periods jumping to the front, currency splitting) across every page at once.
+- App.css uses logical properties only (`padding-inline-start`, `text-align: start`), so RTL is a `dir` flip rather than a stylesheet fork.
+
+### Testing
+
+Four layers. `npm run test:all` runs lint + Vitest + Playwright.
+
+| Layer | Command | Count | What it covers |
+|---|---|---|---|
+| Unit | `npm test` | 286 | Engines, i18n, dictionary parity |
+| Component | `npm test` | included | Every page × every language renders; no raw keys; Hebrew names survive |
+| Use case | `npm test` | included | Draw → select → plan → approve → build sheet, through real components |
+| End-to-end | `npm run test:e2e` | 21 | Real Chrome: 12 pages × 3 languages, no console errors, CSV download, persistence |
+
+Component and integration files declare `/** @vitest-environment jsdom */` — Vitest 4 removed `environmentMatchGlobs`.
+
+**Bugs the test layers found (all fixed):** duplicate React keys on the reorder list; `catalogCount.toLocaleString()` crashing the Overview page on a partial provenance object; the sidebar growing taller than the viewport with its last items unreachable; `memoryStore` shadowing `localStorage` so clearing browser storage did not clear approvals.
+
+### Duplicate product ids — fixed at the root
+
+**76 ids collided across 7,451 rows, 83 rows deep**, and 68 of those collisions held genuinely different prices or costs: the same sandwich sold from the barista counter and the drive-through. Every consumer indexes by id, so a `Map` kept whichever row came last and dropped the rest — including the row supplying a purchase order's unit cost.
+
+Fixed in two places, deliberately:
+
+- **Source** — `scripts/normalize-datasets.mjs` runs `makeIdsUnique()` over the finished list, scoping *only* the colliding ids by department. Rewriting all 7,451 would detach every saved plan and decision from its product for no benefit.
+- **Boundary** — `normalizeProducts()` in `productAdapter.js` enforces the same invariant for anything that never passes through the generator, notably CSV uploads. It disambiguates deterministically and emits a `field: 'id'` validation issue per collision, so the problem is reported rather than hidden.
+
+`npm run doctor` now reports zero rows lost. Covered by `src/lib/dataAdapters/__tests__/productAdapter.test.js`.
+
+### `npm run doctor`
+
+Data-integrity checks against the **real** catalogue, which is where the interesting failures live — unit tests only assert on fixtures the author chose. Reports unique ids, pricing sanity, negative stock, velocity confidence bands, package-geometry coverage and uncategorised rows. Exits non-zero on an ERROR so it can gate a release; warnings never fail the run.
+
+### Design system
+
+**All tokens live in `src/index.css`, in the single `:root` block. Nothing else may define `:root`.**
+
+There used to be two competing `:root` palettes — this file's cool Material set and a second warm one in `App.css` — plus a third in `planogram.css`. `App.css` loads later so it won, which made most of `index.css` dead code and left the planogram a different green (`#006c49`) from the rest of the app (`#1f7a5c`).
+
+The palette is now the one from the SmartShelf design project: deep teal `#0f6b63` on warm paper `#f4f1ec`, warm near-black sidebar, wood browns reserved for shelf fixtures. Both older naming vocabularies (`--color-*` Material and `--ink`/`--forest`/`--paper`) survive as **aliases** onto it, so ~3,300 lines of existing CSS adopt the palette without being rewritten.
+
+| Scale | Tokens |
+|---|---|
+| Colour | `--teal-*`, `--paper-*`, `--ink-*`, `--wood-*` |
+| Status | `--ok` / `--warn` / `--danger` / `--info`, each with a `-wash` |
+| Shape | `--radius-sm` 8 / `md` 10 / `lg` 12 / `xl` 14 / `pill` — was thirteen ad-hoc values |
+| Elevation | `--shadow-sm` / `-soft` / `--shadow` / `-lifted`, warm-tinted |
+| Type | `--font-heading` / `--font-body` / `--font-arabic` / `--font-mono`. Stacks resolve per-glyph: Latin from Plus Jakarta/Inter, Arabic from Cairo, Hebrew from Noto Sans Hebrew |
+
+A raw hex in a component is a bug. The only literals left are 10 in the `@media print` block of `App.css` (print must be pure black on white) and 2 micro-radii.
+
 ### Persistence
 
 `src/lib/persistence/persistence.js` delegates to an adapter chosen at load: **`firestoreAdapter` when the `VITE_FIREBASE_*` config is present, otherwise `localStorageAdapter`** (see `docs/TECH_PERSISTENCE_AND_SUPABASE.md`). The Firestore adapter (B-2) is local-first — reads are served synchronously from a localStorage mirror, writes go through localStorage and mirror to Firestore in the background, and it reconciles both ways (last-write-wins) on load/reconnect. Callers are unchanged. **It is inactive until the Firebase console values are set**, so the default today is still localStorage. The team went with Firestore, not Supabase.
@@ -218,7 +278,17 @@ Copy `.env.example` to `.env` before running locally.
 ## Key Constraints
 
 - Competitor price data on the frontend is **real** — `src/data/marketData.js` is generated from `data/matching/barcode_matches.parquet` (14,406 matched barcodes). `src/data/mockMarketData.js` is now **orphaned**; nothing imports it.
-- **There is no sales data anywhere.** The real POS export is an inventory snapshot with no sales history, so `units_sold_7d`/`units_sold_30d`/`last_sale_date` are null in all 7,674 rows of `yomyom_sales.parquet`, and `salesLast7Days`/`salesLast30Days` are hardcoded to `0` in `normalize-datasets.mjs`. Anything velocity-based (days-until-stockout, top sellers, slow movers) is therefore degenerate.
+- **Sales data is partial, not absent.** An earlier version of this file claimed there was none anywhere and that `salesLast7Days`/`salesLast30Days` were hardcoded to `0`. **Both claims are false** — verified with `npm run doctor`:
+
+  | `velocityConfidence` | products |
+  |---|---:|
+  | high | 504 |
+  | medium | 1,060 |
+  | none | 5,887 |
+
+  So **1,564 of 7,451 products carry usable velocity**, and the planogram allocator uses days-of-supply for exactly those while falling back to a category assumption for the rest. The shelf plan states the mix per fixture rather than making a blanket claim in either direction.
+
+  Separately, **seven monthly sales reports (Jan–Jul 2026, 410,687 units, 1,778 barcodes) sit in `data/internal/raw_pos/yomyom/sales/`** and are a richer source than whatever produced the current confidence bands. Importing them is charter task T8 (#53).
 - `shelfQuantity` (0), `shelfCapacity` (10), `leadTimeDays` (3), `supplier` ("YomYom"), `returnedUnits`/`damagedUnits` (0) are **hardcoded constants** for every product — the planogram runs on these, not real shelf data.
 - State defaults to **browser localStorage**, but a **Firestore adapter (B-2) exists behind the persistence interface** and takes over once `VITE_FIREBASE_*` is configured (local-first, with localStorage fallback). No SQL database in production.
 - A test suite now exists: **Vitest** (`npm test` — 117 tests incl. persistence reconcile + telemetry) and **pytest** (`npm run test:py` — LLM proxy). ESLint is still the release gate.
@@ -239,7 +309,7 @@ Copy `.env.example` to `.env` before running locally.
 - ~6,902 rows have barcodes — matchable against Kaggle competitor data
 - Departments include: מוצרי מכולת (grocery), חטיפים מתוקים (sweet snacks), משקאות (beverages), מוצרי מקרר (refrigerated), חטיפים מלוחים (salty snacks), and ~20 others
 - ✅ **Imported.** Lives at `data/internal/raw_pos/yomyom/all4shop_Mlai.csv` (7,674 rows) and is the source of all four `data/internal/silver_pos/*.parquet` tables. The fake seed=42 CSV is no longer used.
-- Stock is **negative for 625 rows** (POS artifact). `normalize-datasets.mjs` clamps these to 0; 2,797 rows have genuine positive stock.
+- Stock is **negative for 631 rows** (POS artefact). `normalizeProducts()` clamps these to 0 at the adapter boundary, so nothing downstream ever sees a negative quantity; `npm run doctor` reports the count.
 - The export contains **no sales columns** — see the sales constraint above.
 
 #### External — Competitor prices (collected AND wired to frontend)
@@ -315,8 +385,30 @@ See the AI explanations section above. The Track-C async fix has landed and the 
 
 See `nagham.md` for the full per-task status.
 
-#### 🟡 3. Shelf data is synthetic
-`shelfQuantity`/`shelfCapacity`/`leadTimeDays`/`supplier` are hardcoded constants, so the planogram is not driven by real shelf measurements.
+#### 🟡 3. Shelf data is synthetic — largely addressed
+`shelfQuantity`/`leadTimeDays`/`supplier` are still hardcoded constants. **`shelfCapacity: 10` no longer drives the planogram**: `src/lib/planogram/` derives capacity from a floor plan the manager draws (`StoreLayoutPage`) and from real package widths. See `docs/PLANOGRAM_ROADMAP.md`.
+
+What remains synthetic there is the *package dimensions*: 53 archetypes with real centimetres, scaled by size parsed from the Hebrew product name, but never measured. The roadmap's §4.1 ruler sample is what closes this.
+
+### Planogram subsystem (`src/lib/planogram/`)
+
+Replaces the score-ranked `analytics/planogramEngine.js`, which stays as a fallback and is still absent from the nav (task D-6).
+
+| Module | Purpose |
+|---|---|
+| `fixtures.js` | 9 fixture types with real dimensions; shelf levels classified by **height in metres**, not by rank; double-sided gondolas |
+| `packageShapes.js` | 53 package archetypes (cm + drawing recipe), YomYom department mapping, cube-root size scaling from names like `1.5 ליטר`, `isShelvable()` excluding service departments |
+| `allocationEngine.js` | Greedy SSAP: assortment cut → one facing each spread across shelves → marginal facings by profit-per-cm with space elasticity. Hard constraints: shelf width, vertical clearance, heavy goods bottom-only |
+| `planValidation.js` | Independent re-check of a finished plan. Hard vs soft severity |
+| `baselines.js` | B2 margin-proportional + `comparePlans` on margin per linear metre |
+| `planVersion.js` | draft → approved versions, and change cost against the approved plan |
+| `buildSheet.js` | The build sheet a worker carries: shelf order, cm offsets, units capped at real stock |
+
+Two screens: `store-layout` (draw the floor plan) and `shelf-plan` (allocate one fixture). Arabic/RTL islands in an otherwise English LTR app, fed by real `analyzedProducts`.
+
+**Objective:** `profitPerCm = (price − cost) × demand ÷ packageWidthCm`. With no sales history the demand term is a category baseline at `confidence: 'none'`, so this degrades to margin-per-centimetre — which the UI states on screen rather than hiding.
+
+Measured against the margin-proportional baseline on the six largest departments: **+20% to +68% margin per linear metre, zero hard violations**. That is a structural result (both plans share the same assumed demand), not a revenue forecast.
 
 #### 🟡 4. Geo/context config points at the wrong country
 `.env` has `VITE_HOLIDAY_COUNTRY=AT` (Austria), `VITE_WEATHER_LAT/LON=31.95/35.93` (Amman, Jordan) and `VITE_NEWS_QUERY=Jordan`, but the store is YomYom Kafr Qasim, Israel (32.114/34.972). Currently harmless because `VITE_ENABLE_LIVE_MARKET_CONTEXT=false`, but it must be corrected before enabling live context.

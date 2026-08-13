@@ -1,23 +1,25 @@
 import { useEffect, useMemo, useState } from 'react'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
 import { formatCurrency } from '../components/shared/formatters.js'
+import { useT } from '../lib/i18n/index.js'
 import { Button } from '../components/shared/Button.jsx'
 import { compareHebrew, dirProps } from '../lib/utils/rtl.js'
 
 export function ApprovedOrdersPage({ approvedOrders, productIndex }) {
+  const t = useT()
   const [toast, setToast] = useState(null)
 
   useEffect(() => {
     if (!toast) return undefined
     const timer = setTimeout(() => setToast(null), 3200)
     return () => clearTimeout(timer)
-  }, [toast])
+  }, [toast, t])
 
   const supplierGroups = useMemo(() => {
     const groups = new Map()
     for (const recommendation of approvedOrders) {
       const product = productIndex.get(recommendation.productId)
-      const supplier = product?.supplier ?? 'Preferred supplier'
+      const supplier = product?.supplier ?? t('ord.preferredSupplier')
       if (!groups.has(supplier)) groups.set(supplier, [])
       groups.get(supplier).push({ recommendation, product })
     }
@@ -35,7 +37,9 @@ export function ApprovedOrdersPage({ approvedOrders, productIndex }) {
         subtotal,
       }
     }).sort((a, b) => compareHebrew(a.supplier, b.supplier))
-  }, [approvedOrders, productIndex])
+    // `t` is read for the fallback supplier name, so grouping has to recompute
+    // when the language changes — otherwise the label stays in the old language.
+  }, [approvedOrders, productIndex, t])
 
   const total = supplierGroups.reduce((sum, group) => sum + group.subtotal, 0)
 
@@ -48,7 +52,9 @@ export function ApprovedOrdersPage({ approvedOrders, productIndex }) {
   }
 
   function handleExportCsv() {
-    const rows = [['Supplier', 'Product', 'Quantity', 'Unit Cost', 'Total']]
+    const rows = [
+      [t('ord.csv.supplier'), t('ord.csv.product'), t('ord.csv.quantity'), t('ord.csv.unitCost'), t('ord.csv.total')],
+    ]
     for (const group of supplierGroups) {
       for (const { recommendation, product } of group.items) {
         const quantity = recommendation.recommendedOrderQuantity ?? 0
@@ -64,7 +70,7 @@ export function ApprovedOrdersPage({ approvedOrders, productIndex }) {
       rows.push([`${group.supplier} subtotal`, '', '', '', group.subtotal])
       rows.push(['', '', '', '', ''])
     }
-    rows.push(['Estimated total', '', '', '', total])
+    rows.push([t('ord.estTotal'), '', '', '', total])
 
     const csv = rows.map((row) => row.map(escapeCsvValue).join(',')).join('\n')
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
@@ -81,8 +87,8 @@ export function ApprovedOrdersPage({ approvedOrders, productIndex }) {
   if (approvedOrders.length === 0) {
     return (
       <EmptyState
-        description="Approve items in Smart Reorder and they will appear here as a clean purchase-order draft for manager review, printing, or supplier export."
-        title="No approved purchase orders yet"
+        description={t('ord.emptyDesc')}
+        title={t('ord.emptyTitle')}
       />
     )
   }
@@ -92,14 +98,14 @@ export function ApprovedOrdersPage({ approvedOrders, productIndex }) {
       <div className="panel-heading page-tools">
         <div>
           <p className="eyebrow">Purchase orders</p>
-          <h2>Approved replenishment list</h2>
+          <h2>{t('ord.title')}</h2>
           <p className="page-description">
             Orders grouped by supplier — review each cluster, then send the purchase order with one click.
           </p>
         </div>
         <div className="toolbar">
-          <Button onClick={handlePrint} tone="ghost">Print</Button>
-          <Button onClick={handleExportCsv} tone="primary">Export CSV</Button>
+          <Button onClick={handlePrint} tone="ghost">{t('common.print')}</Button>
+          <Button onClick={handleExportCsv} tone="primary">{t('ord.exportCsv')}</Button>
         </div>
       </div>
 
@@ -155,7 +161,7 @@ export function ApprovedOrdersPage({ approvedOrders, productIndex }) {
             </div>
 
             <div className="supplier-subtotal">
-              <span>Supplier subtotal</span>
+              <span>{t('ord.subtotal')}</span>
               <strong className="cell-price">{formatCurrency(group.subtotal)}</strong>
             </div>
           </article>
@@ -163,7 +169,7 @@ export function ApprovedOrdersPage({ approvedOrders, productIndex }) {
       </div>
 
       <div className="order-total">
-        <span>Estimated total</span>
+        <span>{t('ord.estTotal')}</span>
         <strong className="cell-price">{formatCurrency(total)}</strong>
       </div>
 

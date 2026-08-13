@@ -1,31 +1,10 @@
-:root {
-  color: #1a2433;
-  background: #f5f2ea;
-  font-family: var(--font-body, "Segoe UI", sans-serif);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  --ink: #172031;
-  --muted: #697386;
-  --line: rgba(24, 32, 49, 0.1);
-  --paper: rgba(255, 255, 255, 0.82);
-  --paper-strong: #fffefa;
-  --night: #142033;
-  --night-2: #1d314a;
-  --forest: #1f7a5c;
-  --forest-soft: #e5f5ee;
-  --blue: #2368d8;
-  --blue-soft: #e7efff;
-  --amber: #c97a15;
-  --amber-soft: #fff1d6;
-  --rose: #bd3b52;
-  --rose-soft: #ffe5eb;
-  --lime: #92c95f;
-  --shadow: 0 22px 70px rgba(31, 43, 63, 0.12);
-  --shadow-soft: 0 14px 38px rgba(31, 43, 63, 0.08);
-  --radius-xl: 28px;
-  --radius-lg: 22px;
-  --radius-md: 16px;
-}
+/**
+ * App styles. Tokens live in index.css — this file must not define `:root`.
+ *
+ * It used to, with a second full palette that overrode index.css because it
+ * loads later. Everything below now inherits the single token set, so a colour
+ * change happens in one file.
+ */
 
 * {
   box-sizing: border-box;
@@ -35,10 +14,10 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 12% 12%, rgba(146, 201, 95, 0.24), transparent 28rem),
-    radial-gradient(circle at 86% 8%, rgba(35, 104, 216, 0.13), transparent 24rem),
-    linear-gradient(135deg, #f8f4ea 0%, #eef3ec 48%, #f5f8ff 100%);
+  /* A single warm wash. The previous background layered a lime and a blue
+     radial over a three-stop gradient, which fought the teal accent and tinted
+     every "white" card differently depending on where it sat on the page. */
+  background: var(--paper-300);
 }
 
 button,
@@ -65,11 +44,11 @@ button {
   gap: 24px;
   height: 100vh;
   padding: 24px;
-  color: #eef7f0;
-  background:
-    radial-gradient(circle at 20% 0%, rgba(146, 201, 95, 0.24), transparent 16rem),
-    linear-gradient(180deg, #132034 0%, #162a43 52%, #101827 100%);
-  box-shadow: 14px 0 50px rgba(19, 32, 52, 0.2);
+  color: var(--paper-300);
+  /* Warm near-black rather than navy: a blue sidebar next to warm paper reads
+     as two different products bolted together. */
+  background: linear-gradient(180deg, var(--night-2) 0%, var(--night) 100%);
+  box-shadow: var(--shadow);
 }
 
 .brand-block {
@@ -84,10 +63,10 @@ button {
   width: 52px;
   height: 52px;
   border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 18px;
-  color: #122033;
+  border-radius: var(--radius-lg);
+  color: var(--ink-900);
   font-weight: 900;
-  background: linear-gradient(135deg, #d7ff9d, #5dd3a5);
+  background: linear-gradient(135deg, var(--teal-600), var(--teal-700));
   box-shadow: 0 18px 42px rgba(93, 211, 165, 0.2);
 }
 
@@ -115,6 +94,16 @@ button {
 .sidebar-nav {
   display: grid;
   gap: 8px;
+  /* Grouping the twelve entries and giving each a hint made the nav taller than
+     the viewport, and the sidebar is a sticky full-height column — the last
+     items became unreachable. Found by the end-to-end suite, which could not
+     click "Data source". */
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  align-content: start;
+  scrollbar-width: thin;
+  padding-inline-end: 4px;
 }
 
 .nav-item {
@@ -124,17 +113,17 @@ button {
   width: 100%;
   padding: 12px 14px;
   border: 1px solid transparent;
-  border-radius: 16px;
+  border-radius: var(--radius-md);
   color: rgba(238, 247, 240, 0.72);
   background: transparent;
-  text-align: left;
+  text-align: start;
   transition: transform 160ms ease, background 160ms ease, color 160ms ease, border-color 160ms ease;
 }
 
 .nav-item:hover,
 .nav-item-active {
   transform: translateX(3px);
-  color: #fffefa;
+  color: var(--paper-100);
   background: rgba(255, 255, 255, 0.09);
   border-color: rgba(255, 255, 255, 0.12);
 }
@@ -144,7 +133,7 @@ button {
   place-items: center;
   width: 34px;
   height: 34px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background: rgba(255, 255, 255, 0.09);
 }
 
@@ -152,7 +141,7 @@ button {
   margin-top: auto;
   padding: 18px;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(18px);
 }
@@ -160,7 +149,7 @@ button {
 .sidebar-card strong {
   display: block;
   margin-bottom: 8px;
-  color: #fffefa;
+  color: var(--paper-100);
 }
 
 .sidebar-card p {
@@ -197,7 +186,8 @@ button {
 .topbar h1 {
   margin: 8px 0 8px;
   color: var(--ink);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
   font-size: clamp(2rem, 4vw, 3.8rem);
   line-height: 0.96;
   letter-spacing: -0.055em;
@@ -225,7 +215,7 @@ button {
   gap: 6px;
   min-height: 28px;
   padding: 6px 10px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--line);
   font-size: 0.74rem;
   font-weight: 800;
@@ -235,8 +225,8 @@ button {
 }
 
 .pill {
-  color: #244160;
-  background: #edf4ff;
+  color: var(--ink-600);
+  background: var(--paper-200);
 }
 
 .eyebrow {
@@ -276,16 +266,16 @@ button {
   overflow: hidden;
   min-height: 154px;
   padding: 18px;
-  border-radius: 24px;
+  border-radius: var(--radius-xl);
 }
 
 .metric-card::after {
   position: absolute;
-  right: -34px;
+  inset-inline-end: -34px;
   bottom: -48px;
   width: 110px;
   height: 110px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: currentColor;
   content: "";
   opacity: 0.08;
@@ -338,7 +328,7 @@ button {
 }
 
 .metric-card-purple {
-  color: #7357c5;
+  color: var(--info);
 }
 
 .dashboard-grid,
@@ -404,7 +394,7 @@ button {
 .signal-card {
   padding: 14px;
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.58);
 }
 
@@ -438,8 +428,8 @@ button {
 .bar-track {
   overflow: hidden;
   height: 12px;
-  border-radius: 999px;
-  background: #e9edf2;
+  border-radius: var(--radius-pill);
+  background: var(--paper-400);
 }
 
 .bar-fill {
@@ -455,7 +445,7 @@ button {
   align-items: center;
   padding: 14px;
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.54);
 }
 
@@ -464,7 +454,7 @@ button {
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 8px;
-  text-align: right;
+  text-align: end;
 }
 
 .page-tools {
@@ -485,7 +475,7 @@ button {
   min-height: 44px;
   padding: 10px 12px;
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   color: var(--ink);
   background: rgba(255, 255, 255, 0.82);
   outline: none;
@@ -494,7 +484,7 @@ button {
 
 .input:focus {
   border-color: rgba(31, 122, 92, 0.6);
-  background: #fffefa;
+  background: var(--paper-100);
   box-shadow: 0 0 0 4px rgba(31, 122, 92, 0.12);
 }
 
@@ -502,7 +492,7 @@ button {
   overflow: auto;
   max-height: calc(100vh - 285px);
   border: 1px solid var(--line);
-  border-radius: 24px;
+  border-radius: var(--radius-xl);
   background: rgba(255, 255, 255, 0.76);
 }
 
@@ -517,7 +507,7 @@ button {
 .data-table td {
   padding: 14px 16px;
   border-bottom: 1px solid rgba(24, 32, 49, 0.07);
-  text-align: left;
+  text-align: start;
   vertical-align: middle;
 }
 
@@ -525,7 +515,7 @@ button {
   position: sticky;
   top: 0;
   z-index: 1;
-  color: #546174;
+  color: var(--ink-600);
   background: rgba(248, 250, 246, 0.96);
   font-size: 0.72rem;
   font-weight: 900;
@@ -543,11 +533,11 @@ button {
 
 .number-cell {
   font-variant-numeric: tabular-nums;
-  text-align: right !important;
+  text-align: end !important;
 }
 
 .status-badge-healthy {
-  color: #19704f;
+  color: var(--teal-600);
   background: var(--forest-soft);
 }
 
@@ -573,8 +563,8 @@ button {
 
 .status-badge-neutral,
 .status-badge-approved {
-  color: #466073;
-  background: #eef3f6;
+  color: var(--ink-600);
+  background: var(--paper-200);
 }
 
 .recommendation-title {
@@ -592,7 +582,7 @@ button {
   display: grid;
   gap: 16px;
   padding: 18px;
-  border-radius: 24px;
+  border-radius: var(--radius-xl);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.72)),
     radial-gradient(circle at top right, rgba(35, 104, 216, 0.08), transparent 13rem);
@@ -620,7 +610,7 @@ button {
 
 .stat-tile {
   padding: 12px;
-  border-radius: 16px;
+  border-radius: var(--radius-md);
   background: rgba(245, 248, 250, 0.82);
 }
 
@@ -654,9 +644,9 @@ button {
   min-height: 78px;
   padding: 14px;
   border: 1px solid rgba(35, 104, 216, 0.14);
-  border-radius: 18px;
-  color: #2c4560;
-  background: #edf4ff;
+  border-radius: var(--radius-lg);
+  color: var(--ink-900);
+  background: var(--info-wash);
   line-height: 1.5;
 }
 
@@ -671,7 +661,7 @@ button {
   min-height: 42px;
   padding: 10px 14px;
   border: 1px solid transparent;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   font-weight: 900;
   transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease, border-color 140ms ease;
 }
@@ -694,18 +684,18 @@ button {
 }
 
 .btn-primary {
-  color: #fff;
-  background: linear-gradient(135deg, var(--forest), #2aa979);
+  color: var(--paper-100);
+  background: linear-gradient(135deg, var(--teal-600), var(--teal-700));
 }
 
 .btn-secondary {
   color: var(--ink);
   border-color: var(--line);
-  background: #fffefa;
+  background: var(--paper-100);
 }
 
 .btn-ghost {
-  color: #536274;
+  color: var(--ink-600);
   border-color: var(--line);
   background: rgba(255, 255, 255, 0.42);
 }
@@ -719,7 +709,7 @@ button {
   display: grid;
   gap: 14px;
   padding: 18px;
-  border-radius: 28px;
+  border-radius: var(--radius-xl);
   background:
     linear-gradient(180deg, rgba(22, 42, 67, 0.98), rgba(18, 32, 52, 0.96)),
     radial-gradient(circle at 18% 10%, rgba(146, 201, 95, 0.2), transparent 18rem);
@@ -733,7 +723,7 @@ button {
   gap: 14px;
   padding: 14px;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.07);
 }
 
@@ -749,7 +739,7 @@ button {
   display: grid;
   align-content: center;
   gap: 4px;
-  color: #fffefa;
+  color: var(--paper-100);
   font-weight: 900;
 }
 
@@ -767,7 +757,7 @@ button {
   min-height: 126px;
   padding: 14px;
   border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   color: rgba(238, 247, 240, 0.72);
   background: rgba(255, 255, 255, 0.1);
   transition: transform 150ms ease, border-color 150ms ease, background 150ms ease;
@@ -783,7 +773,7 @@ button {
 .fixture-product strong {
   display: block;
   margin-bottom: 6px;
-  color: #fffefa;
+  color: var(--paper-100);
 }
 
 .fixture-product span {
@@ -822,7 +812,7 @@ button {
   margin: 0;
   color: var(--ink);
   font-weight: 900;
-  text-align: right;
+  text-align: end;
 }
 
 .empty-state {
@@ -840,7 +830,7 @@ button {
   place-items: center;
   width: 76px;
   height: 76px;
-  border-radius: 24px;
+  border-radius: var(--radius-xl);
   color: var(--forest);
   background: var(--forest-soft);
   font-size: 2rem;
@@ -863,7 +853,7 @@ button {
   align-items: center;
   gap: 20px;
   padding: 18px 22px;
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
 }
 
 .order-total span {
@@ -1081,7 +1071,7 @@ button {
 
 .data-source-table th,
 .data-source-table td {
-  text-align: left;
+  text-align: start;
   padding: 10px 12px;
   border-bottom: 1px solid var(--line);
 }
@@ -1099,7 +1089,7 @@ button {
   font-size: 0.88rem;
   background: rgba(31, 43, 63, 0.06);
   padding: 2px 6px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 
 .data-source-issues {
@@ -1134,7 +1124,7 @@ button {
 }
 
 .status-badge-success {
-  color: #19704f;
+  color: var(--teal-600);
   background: var(--forest-soft);
 }
 
@@ -1194,7 +1184,7 @@ button {
 
 .recommendation-qty input {
   width: 100%;
-  text-align: right;
+  text-align: end;
 }
 
 /* AI explanation: label visually distinct from body text */
@@ -1204,7 +1194,7 @@ button {
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #4a6fa5;
+  color: var(--info);
 }
 
 .ai-explanation span {
@@ -1315,10 +1305,10 @@ button {
   place-items: center;
   width: 32px;
   height: 32px;
-  border-radius: 999px;
-  color: #fffefa;
+  border-radius: var(--radius-pill);
+  color: var(--paper-100);
   font-weight: 900;
-  background: linear-gradient(135deg, var(--forest), #2aa979);
+  background: linear-gradient(135deg, var(--teal-600), var(--teal-700));
   box-shadow: 0 10px 24px rgba(31, 122, 92, 0.28);
 }
 
@@ -1378,7 +1368,7 @@ button {
   margin: 0;
   padding: 8px 12px;
   border-radius: var(--radius-md);
-  color: #19704f;
+  color: var(--teal-600);
   background: var(--forest-soft);
   font-size: 0.82rem;
   font-weight: 700;
@@ -1480,14 +1470,14 @@ button {
 /* Toast: ephemeral confirmation after "Send to supplier" */
 .toast {
   position: fixed;
-  right: 24px;
+  inset-inline-end: 24px;
   bottom: 24px;
   z-index: 100;
   max-width: 420px;
   padding: 14px 18px;
   border-radius: var(--radius-md);
-  color: #fffefa;
-  background: linear-gradient(135deg, var(--forest), #2aa979);
+  color: var(--paper-100);
+  background: linear-gradient(135deg, var(--teal-600), var(--teal-700));
   box-shadow: 0 22px 50px rgba(31, 122, 92, 0.32);
   font-size: 0.92rem;
   font-weight: 700;
@@ -1585,7 +1575,7 @@ button {
 }
 
 .market-intel-attribution {
-  color: #2c4560;
+  color: var(--ink-900);
 }
 
 .market-intel-attribution strong {
@@ -1647,7 +1637,7 @@ button {
   display: inline-flex;
   align-items: center;
   padding: 3px 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: 0.04em;
@@ -1656,7 +1646,7 @@ button {
 }
 
 .competitor-badge-leader {
-  color: #19704f;
+  color: var(--teal-600);
   background: var(--forest-soft);
   border-color: rgba(31, 122, 92, 0.28);
 }
@@ -1726,7 +1716,7 @@ button {
   width: 56px;
   height: 56px;
   margin: 0 auto 14px;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   color: var(--forest);
   background: var(--forest-soft);
   font-size: 1.6rem;
@@ -1860,7 +1850,7 @@ button {
   display: inline-block;
   margin-top: 6px;
   padding: 2px 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: 0.04em;
@@ -1868,17 +1858,17 @@ button {
 }
 
 .fixture-compliance-correct {
-  color: #19704f;
+  color: var(--teal-600);
   background: rgba(31, 122, 92, 0.24);
 }
 
 .fixture-compliance-misplaced {
-  color: #bd3b52;
+  color: var(--danger);
   background: rgba(189, 59, 82, 0.24);
 }
 
 .fixture-compliance-wrong_facings {
-  color: #c97a15;
+  color: var(--warn);
   background: rgba(201, 122, 21, 0.24);
 }
 
@@ -2004,7 +1994,7 @@ button {
 
 .report-body li {
   margin: 6px 0;
-  padding-left: 8px;
+  padding-inline-start: 8px;
   list-style: none;
 }
 
@@ -2012,7 +2002,7 @@ button {
   content: "•";
   color: var(--forest);
   font-weight: 900;
-  margin-right: 8px;
+  margin-inline-end: 8px;
 }
 
 .report-table {
@@ -2026,7 +2016,7 @@ button {
 .report-table td {
   padding: 8px 12px;
   border-bottom: 1px solid var(--line);
-  text-align: left;
+  text-align: start;
 }
 
 .report-table th {
@@ -2074,7 +2064,7 @@ button {
 .fixture-shelf {
   position: relative;
   grid-template-columns: 140px 1fr;
-  padding-left: 22px;
+  padding-inline-start: 22px;
 }
 
 /* Left accent strip — colored per tier */
@@ -2082,15 +2072,15 @@ button {
   position: absolute;
   top: 14px;
   bottom: 14px;
-  left: 8px;
+  inset-inline-start: 8px;
   width: 4px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.18);
   pointer-events: none;
 }
 
 .fixture-shelf-premium .fixture-tier-accent {
-  background: linear-gradient(180deg, #d7ff9d, #5dd3a5);
+  background: linear-gradient(180deg, var(--teal-600), var(--teal-700));
   box-shadow: 0 0 18px rgba(215, 255, 157, 0.45);
 }
 
@@ -2124,7 +2114,7 @@ button {
   margin-top: 6px;
   display: inline-block;
   padding: 3px 9px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   color: rgba(238, 247, 240, 0.78);
   background: rgba(255, 255, 255, 0.08);
   font-size: 0.66rem;
@@ -2134,7 +2124,7 @@ button {
 }
 
 .fixture-shelf-premium .fixture-tier-priority {
-  color: #d7ff9d;
+  color: var(--teal-600);
   background: rgba(215, 255, 157, 0.16);
 }
 
@@ -2160,7 +2150,7 @@ button {
   flex-direction: column;
   gap: 6px;
   padding: 14px 14px 12px;
-  text-align: left;
+  text-align: start;
   overflow: hidden;
 }
 
@@ -2179,7 +2169,7 @@ button {
 .fixture-product-name {
   display: block;
   margin-top: 4px;
-  color: #fffefa;
+  color: var(--paper-100);
   font-weight: 800;
   font-size: 0.92rem;
   line-height: 1.25;
@@ -2195,7 +2185,7 @@ button {
 .fixture-product-facings {
   display: block;
   margin-top: 4px;
-  color: #fffefa;
+  color: var(--paper-100);
   font-size: 0.82rem;
   font-weight: 800;
   letter-spacing: 0.01em;
@@ -2268,7 +2258,7 @@ button {
   align-items: center;
   gap: 10px;
   padding: 8px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background: rgba(245, 248, 250, 0.86);
   border: 1px solid var(--line);
 }
@@ -2282,7 +2272,7 @@ button {
 .top-movers-swatch {
   width: 10px;
   height: 28px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .top-movers-name {
@@ -2315,7 +2305,7 @@ button {
 
 .top-movers-empty {
   padding: 10px 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   color: var(--muted);
   background: rgba(245, 248, 250, 0.7);
   font-size: 0.86rem;
@@ -2396,7 +2386,7 @@ button {
 .operational-search {
   min-width: 240px;
   padding: 9px 14px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--line);
   background: var(--paper-strong);
   font-size: 0.85rem;
@@ -2516,7 +2506,7 @@ button {
 .action-card-reasons-label {
   font-size: 0.75rem;
   color: var(--muted);
-  text-align: right;
+  text-align: end;
 }
 
 /* ── Expiry capture (task D-2) ───────────────────────────────────────────── */
@@ -2579,7 +2569,7 @@ button {
 
 .data-table td.numeric,
 .data-table th.numeric {
-  text-align: right;
+  text-align: end;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -2642,7 +2632,7 @@ button {
 
 .table-cell-hebrew,
 .cell-hebrew {
-  text-align: right;
+  text-align: end;
   direction: rtl;
   unicode-bidi: isolate;
   max-width: 100%;
@@ -2658,7 +2648,7 @@ button {
 .cell-barcode,
 .cell-date {
   direction: ltr;
-  text-align: left;
+  text-align: start;
   unicode-bidi: isolate;
   white-space: nowrap;
 }
@@ -2738,7 +2728,7 @@ button {
   gap: 10px;
   padding: 10px 12px;
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   background: rgba(255, 255, 255, 0.42);
 }
 
@@ -2805,7 +2795,7 @@ button {
     flex: 0 0 44px;
     width: 44px;
     height: 44px;
-    border-radius: 14px;
+    border-radius: var(--radius-md);
   }
 
   .brand-title,
@@ -2843,7 +2833,7 @@ button {
     width: auto;
     min-height: 48px;
     padding: 6px 10px;
-    border-radius: 14px;
+    border-radius: var(--radius-md);
     white-space: nowrap;
     scroll-snap-align: start;
   }
@@ -2857,7 +2847,7 @@ button {
     flex: 0 0 32px;
     width: 32px;
     height: 32px;
-    border-radius: 10px;
+    border-radius: var(--radius-sm);
   }
 
   .main-panel {
@@ -2869,7 +2859,7 @@ button {
     gap: 14px;
     margin-bottom: 14px;
     padding: 16px;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
   }
 
   .topbar h1 {
@@ -2914,7 +2904,7 @@ button {
   .metric-card {
     min-height: 0;
     padding: 16px;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
   }
 
   .metric-label {
@@ -2927,7 +2917,7 @@ button {
 
   .panel {
     padding: 16px;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
   }
 
   .panel-large {
@@ -2995,7 +2985,7 @@ button {
     min-width: 0;
     padding: 10px 12px;
     border: 1px solid var(--line);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     color: var(--ink);
     background: var(--paper-strong);
   }
@@ -3019,7 +3009,7 @@ button {
   .compact-row-end {
     width: 100%;
     justify-content: flex-start;
-    text-align: left;
+    text-align: start;
   }
 
   .table-wrap,
@@ -3035,7 +3025,7 @@ button {
 
   .table-wrap {
     max-height: min(62vh, 560px);
-    border-radius: 16px;
+    border-radius: var(--radius-md);
   }
 
   .data-table {
@@ -3083,7 +3073,7 @@ button {
 
   .recommendation-card {
     padding: 16px;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
   }
 
   .recommendation-card-header {
@@ -3117,7 +3107,7 @@ button {
 
   .recommendation-actions > .cell-price {
     align-self: center;
-    margin-left: auto;
+    margin-inline-start: auto;
   }
 
   .data-source-card {
@@ -3189,7 +3179,7 @@ button {
   .report-modal {
     max-height: calc(100dvh - 16px);
     padding: 14px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .report-modal-header {
@@ -3310,4 +3300,127 @@ button {
   .metric-value {
     font-size: clamp(1.35rem, 5.5vw, 2rem);
   }
+}
+
+/* ── Grouped navigation and language switch ─────────────────────────── */
+
+/**
+ * A flat list of twelve engine names told nobody what any screen was for.
+ * Grouping by the manager's question, and giving every entry a one-line hint,
+ * is the whole fix — the sidebar is now readable rather than memorised.
+ */
+.nav-group + .nav-group {
+  margin-top: 18px;
+}
+
+.nav-group-label {
+  margin: 0 0 6px;
+  padding-inline-start: 12px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.nav-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  text-align: start;
+}
+
+.nav-item-name {
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.nav-item-hint {
+  font-size: 0.72rem;
+  line-height: 1.3;
+  color: rgba(255, 255, 255, 0.45);
+  /* Two lines maximum: a hint that wraps to four is a paragraph, and nobody
+     reads a paragraph in a sidebar. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.nav-item-active .nav-item-hint {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.sidebar-foot {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lang-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lang-switch-label {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.lang-switch-select {
+  border: 0;
+  background: transparent;
+  color: var(--paper-100);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.lang-switch-select option {
+  color: var(--ink-900);
+}
+
+@media (max-width: 900px) {
+  /* The mobile nav is a bottom bar; hints and group labels do not fit and the
+     icons plus names carry it. */
+  .nav-group-label,
+  .nav-item-hint {
+    display: none;
+  }
+
+  .nav-group + .nav-group {
+    margin-top: 0;
+  }
+}
+
+/* ── Bidirectional text isolation ───────────────────────────────────── */
+
+/**
+ * The app runs in an RTL document but still contains Latin sentences, Hebrew
+ * product names and Western numerals side by side. Without isolation the
+ * browser applies the paragraph direction to everything, and trailing neutral
+ * characters migrate: an English sentence renders as ".Count this product",
+ * and "₪63,571.87" breaks into "₪63,57 / 1.87".
+ *
+ * `unicode-bidi: plaintext` is the CSS equivalent of `dir="auto"` — each
+ * element resolves its own direction from its first strong character. One rule
+ * fixes every page at once, including the ones not yet translated.
+ */
+.page-body :is(p, h1, h2, h3, h4, li, td, th, button, label, figcaption, dd, dt) {
+  unicode-bidi: plaintext;
+}
+
+/* Money, counts and measurements are always read left-to-right, whatever
+   language surrounds them. */
+.page-body :is(.metric-value, .money, .pg-mono, [data-numeric]) {
+  unicode-bidi: isolate;
+  direction: ltr;
 }

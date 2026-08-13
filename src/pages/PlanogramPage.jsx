@@ -5,6 +5,7 @@ import { ShelfLayout } from '../components/planogram/ShelfLayout.jsx'
 import { ShelfImageUpload } from '../components/planogram/ShelfImageUpload.jsx'
 import { ComplianceReport } from '../components/planogram/ComplianceReport.jsx'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
+import { useT } from '../lib/i18n/index.js'
 import { MetricCard } from '../components/shared/MetricCard.jsx'
 import {
   analyzeCompliance,
@@ -19,6 +20,7 @@ export function PlanogramPage({
   planogramSummary,
   shelfGroups,
 }) {
+  const t = useT()
   const [selectedProductId, setSelectedProductId] = useState(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [complianceReport, setComplianceReport] = useState(null)
@@ -53,8 +55,8 @@ export function PlanogramPage({
   if (planogramItems.length === 0) {
     return (
       <EmptyState
-        description="The current dataset did not produce shelf placements. Add eligible inventory data to generate a visual planogram."
-        title="No planogram placements"
+        description={t('pgm.emptyDesc')}
+        title={t('pgm.emptyTitle')}
       />
     )
   }
@@ -62,9 +64,9 @@ export function PlanogramPage({
   return (
     <>
       <section className="metric-grid">
-        <MetricCard label="Planogram Items" value={planogramSummary.totalItems} detail="Products placed" />
-        <MetricCard label="Eye Level" value={planogramSummary.eyeLevelItems} detail="Premium shelf spots" tone="success" />
-        <MetricCard label="Total Facings" value={planogramSummary.totalFacings} detail="Recommended display units" tone="warning" />
+        <MetricCard label={t('rep.planogramItems')} value={planogramSummary.totalItems} detail={t('pgm.placed')} />
+        <MetricCard label={t('pgm.eyeLevel')} value={planogramSummary.eyeLevelItems} detail={t('pgm.eyeLevelDetail')} tone="success" />
+        <MetricCard label={t('pgm.facings')} value={planogramSummary.totalFacings} detail={t('pgm.facingsDetail')} tone="warning" />
       </section>
 
       <section className="planogram-workspace">

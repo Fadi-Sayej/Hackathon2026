@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { MetricCard } from '../components/shared/MetricCard.jsx'
+import { useT } from '../lib/i18n/index.js'
 import { StatusBadge } from '../components/shared/StatusBadge.jsx'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
 import { Button } from '../components/shared/Button.jsx'
@@ -46,6 +47,7 @@ function isoInDays(days) {
 }
 
 export function ExpiryPage({ operationalData, products = [] }) {
+  const t = useT()
   const { expiry } = operationalData
   const buckets = expiry?.buckets ?? {}
   const alerts = expiry?.alerts ?? []
@@ -101,18 +103,18 @@ export function ExpiryPage({ operationalData, products = [] }) {
   return (
     <>
       <section className="metric-grid">
-        <MetricCard label="Expired" value={buckets.expired ?? 0} detail="Remove from shelf" tone="danger" />
-        <MetricCard label="0–7 days" value={buckets.critical_7d ?? 0} detail="Promote / discount now" tone="danger" />
-        <MetricCard label="8–14 days" value={buckets.warning_14d ?? 0} detail="Prioritize placement" tone="warning" />
-        <MetricCard label="15–30 days" value={buckets.upcoming_30d ?? 0} detail="Keep visible" tone="info" />
-        <MetricCard label="Scans recorded" value={expiry?.totalScans ?? 0} detail="Total expiry scans" />
+        <MetricCard label={t('exp.expired')} value={buckets.expired ?? 0} detail={t('exp.expiredDetail')} tone="danger" />
+        <MetricCard label={t('exp.d7')} value={buckets.critical_7d ?? 0} detail={t('exp.d7Detail')} tone="danger" />
+        <MetricCard label={t('exp.d14')} value={buckets.warning_14d ?? 0} detail={t('exp.d14Detail')} tone="warning" />
+        <MetricCard label={t('exp.d30')} value={buckets.upcoming_30d ?? 0} detail={t('exp.d30Detail')} tone="info" />
+        <MetricCard label={t('exp.scans')} value={expiry?.totalScans ?? 0} detail={t('exp.scansDetail')} />
       </section>
 
       <section className="panel">
         <div className="panel-heading">
           <div>
             <p className="eyebrow">Receiving</p>
-            <h2>Record expiry at intake</h2>
+            <h2>{t('exp.recordTitle')}</h2>
           </div>
         </div>
         <p className="page-description">
@@ -123,12 +125,12 @@ export function ExpiryPage({ operationalData, products = [] }) {
 
         <form className="expiry-capture" onSubmit={addToQueue}>
           <label className="expiry-field">
-            <span>Barcode</span>
+            <span>{t('exp.barcode')}</span>
             <input
               className="expiry-input"
               value={barcode}
               onChange={(e) => { setBarcode(e.target.value); setJustAdded(null) }}
-              placeholder="Scan or type"
+              placeholder={t('exp.scanOrType')}
               inputMode="numeric"
               autoComplete="off"
               aria-describedby="expiry-match"
@@ -136,7 +138,7 @@ export function ExpiryPage({ operationalData, products = [] }) {
           </label>
 
           <label className="expiry-field">
-            <span>Expiry date</span>
+            <span>{t('exp.expiryDate')}</span>
             <input
               className="expiry-input"
               type="date"
@@ -151,7 +153,7 @@ export function ExpiryPage({ operationalData, products = [] }) {
         </form>
 
         <div className="expiry-quick">
-          <span>Quick date:</span>
+          <span>{t('exp.quickDate')}</span>
           {[
             ['3 days', 3],
             ['1 week', 7],
@@ -182,7 +184,7 @@ export function ExpiryPage({ operationalData, products = [] }) {
               <Button tone="secondary" onClick={downloadCsv}>
                 Download {queue.length} recorded {queue.length === 1 ? 'date' : 'dates'}
               </Button>
-              <Button tone="ghost" onClick={() => setQueue([])}>Clear list</Button>
+              <Button tone="ghost" onClick={() => setQueue([])}>{t('exp.clearList')}</Button>
             </div>
             <p className="page-description" style={{ marginTop: '0.5rem' }}>
               Dates are saved on this device. Send the downloaded file to the SmartShelf team and
@@ -209,18 +211,18 @@ export function ExpiryPage({ operationalData, products = [] }) {
         <div className="panel-heading">
           <div>
             <p className="eyebrow">Expiry alerts</p>
-            <h2>Items nearing or past expiry</h2>
+            <h2>{t('exp.nearingTitle')}</h2>
           </div>
           <span className="metric-chip">
             {operationalData?.meta?.generatedAt
               ? `From pipeline export · ${formatDate(operationalData.meta.generatedAt)}`
-              : 'From last pipeline export'}
+              : t('exp.fromExport')}
           </span>
         </div>
         {alerts.length === 0 ? (
           <EmptyState
-            title="No expiry alerts yet"
-            description="Record expiry dates at receiving, then run npm run data:refresh to populate alerts."
+            title={t('exp.noAlerts')}
+            description={t('exp.noAlertsDesc')}
           />
         ) : (
           <div className="compact-list">
@@ -228,7 +230,7 @@ export function ExpiryPage({ operationalData, products = [] }) {
               <div className="compact-row" key={`${row.barcode}:${idx}`}>
                 <div>
                   <strong {...dirProps(row.productName || row.barcode)}>
-                    {row.productName || (row.barcode ? formatBarcode(row.barcode) : 'Unknown')}
+                    {row.productName || (row.barcode ? formatBarcode(row.barcode) : t('exp.unknown'))}
                   </strong>
                   <span>{row.knownInPos ? `stock ${row.currentStock}` : 'not in POS'}</span>
                 </div>

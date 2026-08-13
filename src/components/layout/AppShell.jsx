@@ -1,24 +1,61 @@
 import { Button } from '../shared/Button.jsx'
 import { ErrorBoundary } from '../shared/ErrorBoundary.jsx'
+import { LANGUAGES, useI18n } from '../../lib/i18n/index.js'
 
-// Ordered by what a store manager should look at first. "Today" is the home screen.
-//
-// Planogram is deliberately ABSENT (task D-6). Measured against real data it put all
-// 7,451 products on the bottom shelf with 2 facings each, because 45% of its score is
-// sales velocity we do not have and its category rules are hardcoded English against
-// Hebrew categories. The page still exists in the repo; it comes back when velocity is
-// real and someone has measured YomYom's actual shelves.
-const navItems = [
-  { id: 'operational', label: 'Today', icon: '!' },
-  { id: 'prices', label: 'Prices', icon: '₪' },
-  { id: 'assortment', label: 'Gaps', icon: '◫' },
-  { id: 'expiry', label: 'Expiry', icon: 'E' },
-  { id: 'products', label: 'Products', icon: 'P' },
-  { id: 'dashboard', label: 'Overview', icon: 'D' },
-  { id: 'recommendations', label: 'Reorder', icon: 'R' },
-  { id: 'report', label: 'AI Report', icon: 'A' },
-  { id: 'orders', label: 'Approved Orders', icon: 'O' },
-  { id: 'data-source', label: 'Data Source', icon: 'C' },
+/**
+ * Navigation, grouped by the question the manager is asking.
+ *
+ * A flat list of twelve engine names told nobody what any screen was for. The
+ * groups below are phrased as jobs — daily work, market, shelves, inventory —
+ * and every entry carries a one-line hint under its name for the same reason.
+ *
+ * All labels are keys, not strings: the app runs in Arabic, Hebrew or English.
+ *
+ * The old score-ranked Planogram page stays ABSENT (task D-6). Measured against
+ * real data it put all 7,451 products on the bottom shelf with 2 facings each.
+ * `store-layout` and `shelf-plan` replace it.
+ */
+const navGroups = [
+  {
+    id: 'group.daily',
+    items: [
+      { id: 'operational', icon: '!' },
+      { id: 'recommendations', icon: 'R' },
+      { id: 'orders', icon: 'O' },
+    ],
+  },
+  {
+    id: 'group.market',
+    items: [
+      { id: 'prices', icon: '₪' },
+      { id: 'assortment', icon: '◫' },
+    ],
+  },
+  {
+    id: 'group.shelves',
+    items: [
+      { id: 'store-layout', icon: '▦' },
+      { id: 'shelf-plan', icon: '☰' },
+    ],
+  },
+  {
+    id: 'group.inventory',
+    items: [
+      { id: 'products', icon: 'P' },
+      { id: 'expiry', icon: 'E' },
+    ],
+  },
+  {
+    id: 'group.reports',
+    items: [
+      { id: 'dashboard', icon: 'D' },
+      { id: 'report', icon: 'A' },
+    ],
+  },
+  {
+    id: 'group.system',
+    items: [{ id: 'data-source', icon: 'C' }],
+  },
 ]
 
 export function AppShell({
@@ -28,48 +65,72 @@ export function AppShell({
   hasDemoState = false,
   onNavigate,
   onResetDemoState,
-  pageMeta,
 }) {
+  const { t, language, setLanguage } = useI18n()
   const catalogIsReal = dataProvenance?.catalog === 'real'
   const competitorIsReal = dataProvenance?.competitor === 'real'
+
   return (
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand-block">
           <div className="brand-mark">SS</div>
           <div>
-            <p className="brand-title">SmartShelf AI</p>
-            <p className="brand-subtitle">Retail AI Operations</p>
+            <p className="brand-title">{t('app.name')}</p>
+            <p className="brand-subtitle">{t('app.tagline')}</p>
           </div>
         </div>
 
-        <nav className="sidebar-nav" aria-label="Main navigation">
-          {navItems.map((item) => {
-            const isActive = activePage === item.id
-            return (
-              <button
-                key={item.id}
-                type="button"
-                aria-current={isActive ? 'page' : undefined}
-                className={`nav-item ${isActive ? 'nav-item-active' : ''}`}
-                onClick={() => onNavigate(item.id)}
-              >
-                <span className="nav-icon" aria-hidden="true">
-                  {item.icon}
-                </span>
-                <span>{item.label}</span>
-              </button>
-            )
-          })}
+        <nav className="sidebar-nav" aria-label={t('app.nav')}>
+          {navGroups.map((group) => (
+            <div className="nav-group" key={group.id}>
+              <p className="nav-group-label">{t(group.id)}</p>
+              {group.items.map((item) => {
+                const isActive = activePage === item.id
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    aria-current={isActive ? 'page' : undefined}
+                    className={`nav-item ${isActive ? 'nav-item-active' : ''}`}
+                    onClick={() => onNavigate(item.id)}
+                  >
+                    <span className="nav-icon" aria-hidden="true">
+                      {item.icon}
+                    </span>
+                    <span className="nav-item-text">
+                      <span className="nav-item-name">{t(`page.${item.id}.name`)}</span>
+                      {/* The hint is why anyone would open this screen. Without it
+                          a name like "Gaps" or "Overview" is a guess. */}
+                      <span className="nav-item-hint">{t(`page.${item.id}.hint`)}</span>
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          ))}
         </nav>
 
-        <div className="sidebar-card">
-          <p className="sidebar-card-eyebrow">Demo mode</p>
-          <h2>POC Demo</h2>
-          <p>Local-first data and deterministic retail logic.</p>
+        <div className="sidebar-foot">
+          <label className="lang-switch">
+            <span className="lang-switch-label">{t('app.language')}</span>
+            <select
+              aria-label={t('app.language')}
+              className="lang-switch-select"
+              onChange={(event) => setLanguage(event.target.value)}
+              value={language}
+            >
+              {Object.values(LANGUAGES).map((entry) => (
+                <option key={entry.code} value={entry.code}>
+                  {entry.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
           {hasDemoState && (
             <Button className="sidebar-reset-btn" onClick={onResetDemoState} tone="ghost">
-              Reset demo state
+              {t('app.resetDemo')}
             </Button>
           )}
         </div>
@@ -78,19 +139,16 @@ export function AppShell({
       <main className="main-panel">
         <header className="topbar">
           <div>
-            <p className="eyebrow">SmartShelf AI</p>
-            <h1>{pageMeta.title}</h1>
-            <p className="page-description">{pageMeta.description}</p>
+            <h1>{t(`page.${activePage}.title`)}</h1>
+            <p className="page-description">{t(`page.${activePage}.description`)}</p>
           </div>
 
-          <div className="topbar-meta" aria-label="Data status">
+          <div className="topbar-meta" aria-label={t('provenance.realPos')}>
             <span className={`pill ${catalogIsReal ? 'pill-success' : ''}`}>
-              {catalogIsReal ? 'Real POS data' : 'Demo data'}
+              {catalogIsReal ? t('provenance.realPos') : t('provenance.demo')}
             </span>
-            <span className={`pill ${competitorIsReal ? 'pill-success' : ''}`}>
-              {competitorIsReal ? 'Real competitor prices' : 'No competitor data'}
-            </span>
-            <span className="pill">POC</span>
+            {competitorIsReal && <span className="pill pill-success">{t('provenance.realPrices')}</span>}
+            <span className="pill">{t('provenance.poc')}</span>
           </div>
         </header>
 

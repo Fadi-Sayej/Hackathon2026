@@ -2,6 +2,7 @@ import { CategoryBars } from '../components/dashboard/CategoryBars.jsx'
 import { MarketContextPanel } from '../components/dashboard/MarketContextPanel.jsx'
 import { MarketIntelligencePanel } from '../components/MarketIntelligencePanel.jsx'
 import { MetricCard } from '../components/shared/MetricCard.jsx'
+import { useT } from '../lib/i18n/index.js'
 import { StatusBadge } from '../components/shared/StatusBadge.jsx'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
 import { DataProvenanceBanner } from '../components/shared/DataProvenanceBanner.jsx'
@@ -19,53 +20,54 @@ export function DashboardPage({
   recommendations,
   stockoutOpportunities,
 }) {
+  const t = useT()
   const urgentRecommendations = recommendations
     .filter((recommendation) => recommendation.urgency === 'HIGH')
     .slice(0, 4)
 
   const catalogDetail =
     dataProvenance?.catalog === 'real'
-      ? 'Real YomYom POS SKUs'
+      ? t('dash.realSkus')
       : dataProvenance?.catalog === 'uploaded'
-        ? 'Uploaded CSV SKUs'
-        : 'Demo sample SKUs'
+        ? t('dash.csvSkus')
+        : t('dash.demoSkus')
   // Sales history is absent in the YomYom inventory snapshot, so stockout /
   // reorder figures are model estimates, not observed demand. Say so.
-  const velocityDetail = dataProvenance?.hasSalesHistory ? null : 'Estimated — no sales history in POS export'
+  const velocityDetail = dataProvenance?.hasSalesHistory ? null : t('dash.estimatedNoHistory')
 
   return (
     <>
       <DataProvenanceBanner dataProvenance={dataProvenance} />
       <section className="metric-grid">
-        <MetricCard label="Total Products" value={dashboardStats.totalProducts} detail={catalogDetail} />
+        <MetricCard label={t('dash.totalProducts')} value={dashboardStats.totalProducts} detail={catalogDetail} />
         <MetricCard
-          label="High Risk Stockouts"
+          label={t('dash.highRisk')}
           value={dashboardStats.highRiskStockouts}
           detail={velocityDetail ?? `${dashboardStats.highPriority} high priority items`}
           tone="danger"
         />
         <MetricCard
-          label="Reorder Suggestions"
+          label={t('dash.reorderSuggestions')}
           value={dashboardStats.reorderSuggestions}
-          detail={velocityDetail ?? 'Pending purchase decisions'}
+          detail={velocityDetail ?? t('dash.pendingDecisions')}
           tone="success"
         />
         <MetricCard
-          label="Estimated Order Cost"
+          label={t('dash.estOrderCost')}
           value={formatCurrency(dashboardStats.estimatedOrderCost)}
-          detail="Based on recommended quantities"
+          detail={t('dash.estOrderCostDetail')}
           tone="warning"
         />
         <MetricCard
-          label="Overstocked Items"
+          label={t('dash.overstocked')}
           value={dashboardStats.overstocked}
-          detail="Capital tied in excess stock"
+          detail={t('dash.overstockedDetail')}
           tone="info"
         />
         <MetricCard
-          label="Waste Risk"
+          label={t('dash.wasteRisk')}
           value={dashboardStats.wasteRisk}
-          detail="Near-expiry products"
+          detail={t('dash.wasteRiskDetail')}
           tone="danger"
         />
       </section>
@@ -75,7 +77,7 @@ export function DashboardPage({
           <div className="panel-heading">
             <div>
               <p className="eyebrow">Category movement</p>
-              <h2>Sales distribution</h2>
+              <h2>{t('dash.salesDistribution')}</h2>
             </div>
             <span className="metric-chip">30 day view</span>
           </div>
@@ -97,13 +99,13 @@ export function DashboardPage({
           <div className="panel-heading">
             <div>
               <p className="eyebrow">Stock risk</p>
-              <h2>Highest risk products</h2>
+              <h2>{t('dash.highestRisk')}</h2>
             </div>
           </div>
           {analyzedProducts.length === 0 ? (
             <EmptyState
-              description="Load demo products to populate the risk-ranked overview."
-              title="No products to rank"
+              description={t('dash.noRankDesc')}
+              title={t('dash.noRankTitle')}
             />
           ) : (
             <div className="compact-list">
@@ -113,8 +115,8 @@ export function DashboardPage({
                   b.analytics.riskScore - a.analytics.riskScore || compareHebrew(a.name, b.name),
                 )
                 .slice(0, 6)
-                .map((product) => (
-                  <div className="compact-row" key={product.id}>
+                .map((product, index) => (
+                  <div className="compact-row" key={`${product.id}:${index}`}>
                     <div>
                       <strong {...dirProps(product.name)}>{product.name ?? '—'}</strong>
                       <span {...dirProps(product.category)}>{product.category ?? '—'}</span>
@@ -135,13 +137,13 @@ export function DashboardPage({
           <div className="panel-heading">
             <div>
               <p className="eyebrow">Manager attention</p>
-              <h2>Urgent recommendations</h2>
+              <h2>{t('dash.urgentTitle')}</h2>
             </div>
           </div>
           {urgentRecommendations.length === 0 ? (
             <EmptyState
-              description="No high-urgency reorder or promotion actions are pending right now."
-              title="No urgent recommendations"
+              description={t('dash.noUrgentDesc')}
+              title={t('dash.noUrgentTitle')}
             />
           ) : (
             <div className="compact-list">

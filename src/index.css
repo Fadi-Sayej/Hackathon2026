@@ -1,21 +1,112 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=Noto+Sans+Hebrew:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
+
+/**
+ * THE design tokens. One source of truth, for the whole app.
+ *
+ * There used to be three competing palettes: this file's cool Material set, a
+ * warm one redefining `:root` again in App.css, and a third in planogram.css.
+ * App.css loaded last and won, which quietly made most of this file dead code
+ * and left the planogram a different green from everything around it.
+ *
+ * The palette below is the one from the SmartShelf design project — deep teal
+ * on warm paper. It is defined ONCE here, and both older naming vocabularies
+ * (`--color-*` and `--ink`/`--forest`/`--paper`) are kept as aliases pointing at
+ * it. That is deliberate: it lets three thousand lines of existing CSS adopt the
+ * new palette without a single rule being rewritten, and it means a colour
+ * changes in one place from now on.
+ *
+ * Rule for anything new: use a token. A raw hex in a component is a bug.
+ */
 
 :root {
-  --color-surface: #f7f9fb;
-  --color-surface-container-lowest: #ffffff;
-  --color-surface-container-low: #f2f4f6;
-  --color-primary: #091426;
-  --color-secondary: #006c49;
-  --color-outline-variant: #c5c6cd;
-  --color-on-surface: #191c1e;
-  --color-on-surface-variant: #45474c;
-  --color-on-primary: #ffffff;
-  --font-hebrew: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans Hebrew', 'Arial Hebrew', 'Rubik', 'Assistant', sans-serif;
-  --font-heading: 'Plus Jakarta Sans', var(--font-hebrew);
-  --font-body: 'Inter', var(--font-hebrew);
-  --font-mono: 'Cascadia Code', 'SFMono-Regular', Consolas, monospace;
-  color: var(--color-on-surface);
-  background: var(--color-surface);
+  /* ── Palette ─────────────────────────────────────────────────────── */
+  --teal-700: #0a4a44;
+  --teal-600: #0f6b63;
+  --teal-100: rgba(15, 107, 99, 0.1);
+  --teal-050: rgba(15, 107, 99, 0.06);
+
+  --paper-100: #ffffff;
+  --paper-200: #faf8f5;
+  --paper-300: #f4f1ec;
+  --paper-400: #ebe6dd;
+
+  --ink-900: #1c1a17;
+  --ink-600: rgba(28, 26, 23, 0.62);
+  --ink-400: rgba(28, 26, 23, 0.45);
+  --ink-line: rgba(28, 26, 23, 0.11);
+  --ink-line-strong: rgba(28, 26, 23, 0.2);
+
+  /* Shelf timber. Not chrome — a planogram has to read as a physical object. */
+  --wood-700: #3c2b1f;
+  --wood-600: #4a3627;
+  --wood-500: #5a4433;
+
+  /* ── Status ──────────────────────────────────────────────────────── */
+  --ok: #0f6b63;
+  --ok-wash: rgba(15, 107, 99, 0.09);
+  --warn: #a8700f;
+  --warn-wash: rgba(168, 112, 15, 0.12);
+  --danger: #b4541f;
+  --danger-wash: rgba(180, 84, 31, 0.11);
+  --info: #2f6f9e;
+  --info-wash: rgba(47, 111, 158, 0.1);
+
+  /* ── Shape ───────────────────────────────────────────────────────── */
+  /* Tightened from 16/22/28. The old radii read as a consumer app; a tool a
+     manager uses all day wants crisper corners and less wasted edge. */
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 14px;
+  --radius-pill: 999px;
+
+  /* ── Elevation ───────────────────────────────────────────────────── */
+  /* Warm-tinted: a neutral grey shadow over warm paper reads as dirt. */
+  --shadow-sm: 0 1px 2px rgba(60, 43, 31, 0.06);
+  --shadow-soft: 0 4px 16px rgba(60, 43, 31, 0.07);
+  --shadow: 0 12px 32px rgba(60, 43, 31, 0.12);
+  --shadow-lifted: 0 16px 38px rgba(60, 43, 31, 0.18);
+
+  /* ── Type ────────────────────────────────────────────────────────── */
+  /* Stacks are per-glyph: Latin resolves from Jakarta/Inter, Arabic from Cairo,
+     Hebrew from Noto Sans Hebrew. One stack serves all three scripts. */
+  --font-hebrew: 'Noto Sans Hebrew', 'Arial Hebrew', system-ui, sans-serif;
+  --font-heading: 'Plus Jakarta Sans', 'Cairo', var(--font-hebrew);
+  --font-body: 'Inter', 'Cairo', var(--font-hebrew);
+  --font-arabic: 'Cairo', var(--font-body);
+  --font-mono: 'IBM Plex Mono', 'Cascadia Code', 'SFMono-Regular', Consolas, monospace;
+
+  /* ── Aliases: Material vocabulary ────────────────────────────────── */
+  --color-surface: var(--paper-300);
+  --color-surface-container-lowest: var(--paper-100);
+  --color-surface-container-low: var(--paper-200);
+  --color-primary: var(--ink-900);
+  --color-secondary: var(--teal-600);
+  --color-outline-variant: var(--ink-line-strong);
+  --color-on-surface: var(--ink-900);
+  --color-on-surface-variant: var(--ink-600);
+  --color-on-primary: var(--paper-100);
+
+  /* ── Aliases: App.css vocabulary ─────────────────────────────────── */
+  --ink: var(--ink-900);
+  --muted: var(--ink-600);
+  --line: var(--ink-line);
+  --paper: var(--paper-100);
+  --paper-strong: var(--paper-100);
+  --night: #1f1a15;
+  --night-2: #2a231c;
+  --forest: var(--teal-600);
+  --forest-soft: var(--ok-wash);
+  --blue: var(--info);
+  --blue-soft: var(--info-wash);
+  --amber: var(--warn);
+  --amber-soft: var(--warn-wash);
+  --rose: var(--danger);
+  --rose-soft: var(--danger-wash);
+  --lime: var(--teal-600);
+
+  color: var(--ink-900);
+  background: var(--paper-300);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -29,7 +120,7 @@
 html {
   max-width: 100%;
   overflow-x: hidden;
-  background: var(--color-surface);
+  background: var(--paper-300);
 }
 
 body {
@@ -39,8 +130,8 @@ body {
   min-width: 320px;
   overflow-x: hidden;
   font: 400 16px/1.55 var(--font-body);
-  background: var(--color-surface);
-  color: var(--color-on-surface);
+  background: var(--paper-300);
+  color: var(--ink-900);
 }
 
 button,
@@ -60,7 +151,11 @@ img {
 }
 
 a {
-  color: inherit;
+  color: var(--teal-600);
+}
+
+a:hover {
+  color: var(--teal-700);
 }
 
 #root {
@@ -70,6 +165,14 @@ a {
   min-height: 100vh;
 }
 
+/* A visible focus ring everywhere, on the accent rather than the browser
+   default — this is a tool operated with a keyboard as much as a mouse. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--teal-600);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
 /* ── Hebrew and RTL Direction Utilities ────────────────────────────── */
 [dir="auto"],
 bdi,
@@ -77,27 +180,4 @@ bdi,
   unicode-bidi: isolate;
   overflow-wrap: break-word;
   word-break: normal;
-}
-
-.hebrew-column,
-.hebrew-cell,
-.text-hebrew {
-  text-align: right;
-  direction: rtl;
-  unicode-bidi: isolate;
-  overflow-wrap: break-word;
-  word-break: break-word;
-}
-
-.ltr-data,
-.ltr-cell,
-.numeric-cell,
-.price-cell,
-.barcode-cell,
-.percent-cell,
-.date-cell {
-  direction: ltr;
-  text-align: left;
-  unicode-bidi: isolate;
-  font-variant-numeric: tabular-nums;
 }

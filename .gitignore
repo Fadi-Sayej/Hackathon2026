@@ -91,3 +91,7 @@ reports/
 # NOTE: this puts a real store's inventory data in git — keep the repo PRIVATE.
 !data/internal/snapshots/
 !data/internal/snapshots/**
+
+# Playwright run output (e2e). Regenerated on every run.
+test-results/
+playwright-report/

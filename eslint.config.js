@@ -5,7 +5,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', '.claude/**', 'coverage', 'playwright-report', 'test-results']),
   {
     files: ['**/*.{js,jsx}'],
     extends: [
@@ -19,8 +19,13 @@ export default defineConfig([
     },
   },
   {
-    // Tests run under Node and set process.env for the middleware gate.
-    files: ['src/**/__tests__/**/*.{js,jsx}'],
+    // Tests, the Playwright suite and its config run under Node, not the browser.
+    files: [
+      'src/**/__tests__/**/*.{js,jsx}',
+      'src/test/**/*.{js,jsx}',
+      'e2e/**/*.{js,jsx}',
+      '*.config.js',
+    ],
     languageOptions: {
       globals: { ...globals.browser, ...globals.node },
     },

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useT } from '../lib/i18n/index.js'
 import { MetricCard } from '../components/shared/MetricCard.jsx'
 import { StatusBadge } from '../components/shared/StatusBadge.jsx'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
@@ -20,17 +21,26 @@ import {
   toDecisionRecord,
 } from '../lib/operational/completionActions.js'
 
-const TYPE_META = {
-  PROMOTE_EXPIRING_PRODUCT: { label: 'Expiring', tone: 'danger' },
-  CHECK_STOCK_DISCREPANCY: { label: 'Stock does not add up', tone: 'warning' },
-  CHECK_NEGATIVE_STOCK: { label: 'Stock count wrong', tone: 'neutral' },
-  CHECK_WOLT_PRICE_GAP: { label: 'WOLT price gap', tone: 'warning' },
-  CHECK_MARGIN: { label: 'Selling below cost', tone: 'danger' },
-  CHECK_MARGIN_SUSPECT: { label: 'Cost price looks wrong', tone: 'neutral' },
-  VERIFY_UNKNOWN_BARCODE: { label: 'No barcode', tone: 'info' },
-  PRICE_CHECK: { label: 'Price check', tone: 'warning' },
-  REORDER: { label: 'Reorder', tone: 'success' },
-  WATCH_PRODUCT: { label: 'Watch', tone: 'info' },
+// Tone is a property of the alert type; the label is a translation key, so the
+// same table serves all three languages.
+const TYPE_TONE = {
+  PROMOTE_EXPIRING_PRODUCT: 'danger',
+  CHECK_STOCK_DISCREPANCY: 'warning',
+  CHECK_NEGATIVE_STOCK: 'neutral',
+  CHECK_WOLT_PRICE_GAP: 'warning',
+  CHECK_MARGIN: 'danger',
+  CHECK_MARGIN_SUSPECT: 'neutral',
+  VERIFY_UNKNOWN_BARCODE: 'info',
+  PRICE_CHECK: 'warning',
+  REORDER: 'success',
+  WATCH_PRODUCT: 'info',
+}
+
+/** Label plus tone for an alert type, or a neutral fallback for an unknown one. */
+function typeMeta(t, type) {
+  const tone = TYPE_TONE[type]
+  if (!tone) return { label: type, tone: 'neutral' }
+  return { label: t(`op.type.${type}`), tone }
 }
 
 const SOURCE_STATUS_TONE = {
@@ -62,8 +72,8 @@ function matchesQuery(rec, query) {
     .some((field) => matchesHebrewQuery(field, query))
 }
 
-function recTitle(rec) {
-  return rec.productName || rec.barcode || 'Unknown item'
+function recTitle(rec, t) {
+  return rec.productName || rec.barcode || t('op.unknownItem')
 }
 
 export function OperationalPage({
@@ -72,6 +82,7 @@ export function OperationalPage({
   decisions = {},
   onDecide,
 }) {
+  const t = useT()
   const { meta, posHealth, sources, recommendations } = operationalData
   const [showAll, setShowAll] = useState(false)
   const [showData, setShowData] = useState(false)
@@ -165,14 +176,14 @@ export function OperationalPage({
   const oneOffTotal = totalImpact(openMoney, IMPACT_KIND.ONE_OFF)
 
   if (operationalStatus === 'loading') {
-    return <EmptyState title="Loading today's actions" description="Reading the latest pipeline export…" />
+    return <EmptyState title={t('op.loading.title')} description={t('op.loading.desc')} />
   }
 
   if (!recommendations.length) {
     return (
       <EmptyState
-        title="No actions yet"
-        description="Run `npm run pilot:daily` to refresh from the latest POS export."
+        title={t('op.none.title')}
+        description={t('op.none.desc')}
       />
     )
   }
@@ -181,7 +192,7 @@ export function OperationalPage({
     <ActionCard
       key={rec.id}
       action={rec}
-      meta={metaOverride ?? TYPE_META[rec.type]}
+      meta={metaOverride ?? typeMeta(t, rec.type)}
       busy={busyId === rec.id}
       error={errorId === rec.id}
       onDecide={(decision) => decide(rec, decision)}
@@ -193,43 +204,42 @@ export function OperationalPage({
     <>
       <section className="metric-grid">
         <MetricCard
-          label="Actions today"
+          label={t('op.metric.actions')}
           value={openMoney.length}
-          detail="Ranked by money at stake"
+          detail={t('op.metric.actionsDetail')}
           tone={openMoney.length ? 'warning' : 'success'}
         />
         <MetricCard
-          label="Per sale at stake"
+          label={t('op.metric.perSale')}
           value={formatCurrency(perUnitTotal)}
-          detail="Costs you on every sale"
+          detail={t('op.metric.perSaleDetail')}
           tone="info"
         />
         {/* Kept separate from the per-sale figure on purpose. One-off exposure and
             a per-sale cost are different units; adding them produced a
             "₪106,164 per sale" headline that meant nothing. */}
         <MetricCard
-          label="Stock unaccounted"
+          label={t('op.metric.unaccounted')}
           value={formatCurrency(oneOffTotal)}
-          detail="Value of stock that does not add up"
+          detail={t('op.metric.unaccountedDetail')}
           tone="warning"
         />
         <MetricCard
-          label="Handled"
+          label={t('op.metric.handled')}
           value={handledRecommendations.length}
-          detail="Done, dismissed or snoozed"
+          detail={t('op.metric.handledDetail')}
           tone="success"
         />
-        <MetricCard label="Data to fix" value={openData.length} detail="No money attached" tone="neutral" />
+        <MetricCard label={t('op.metric.dataToFix')} value={openData.length} detail={t('op.metric.dataDetail')} tone="neutral" />
       </section>
 
       <section className="panel">
         <div className="panel-heading">
           <div>
-            <p className="eyebrow">Start here</p>
-            <h2>Today&apos;s actions</h2>
+            <p className="eyebrow">{t('op.startHere')}</p>
+            <h2>{t('op.todaysActions')}</h2>
             <p className="page-description" style={{ marginTop: '0.25rem' }}>
-              Ordered by how much money each one is worth per sale. Work down from the top —
-              the first few are worth more than all the rest together.
+              {t('op.todaysActionsDesc')}
             </p>
           </div>
           <div className="recommendation-actions" style={{ gap: '0.5rem' }}>
@@ -238,25 +248,25 @@ export function OperationalPage({
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search product or barcode…"
-              aria-label="Search actions"
+              placeholder={t('op.search')}
+              aria-label={t('op.searchLabel')}
             />
             {/* Many small-shop owners want paper or a WhatsApp screenshot, not a login. */}
             <Button tone="ghost" onClick={() => globalThis.print?.()}>
-              Print list
+              {t('op.print')}
             </Button>
           </div>
         </div>
 
         {visible.length === 0 ? (
           <EmptyState
-            title={query ? 'Nothing matches that search' : 'All clear'}
+            title={query ? t('op.noMatch') : t('op.allClear')}
             description={
               query
-                ? 'Clear the search to see the full list.'
+                ? t('op.noMatchDesc')
                 : handledRecommendations.length
-                  ? 'Every money action has been handled. Undo one below to bring it back.'
-                  : 'Every money action has been handled. Anything left is under “Data to fix”.'
+                  ? t('op.allClearUndo')
+                  : t('op.allClearData')
             }
           />
         ) : (
@@ -266,23 +276,25 @@ export function OperationalPage({
         {openMoney.length > TOP_N && (
           <div className="recommendation-actions" style={{ marginTop: '1rem' }}>
             <Button tone="ghost" onClick={() => setShowAll((value) => !value)}>
-              {showAll ? `Show top ${TOP_N} only` : `Show all ${openMoney.length} actions`}
+              {showAll ? t('op.showTop', { n: TOP_N }) : t('op.showAll', { n: openMoney.length })}
             </Button>
           </div>
         )}
 
         {handledRecommendations.length > 0 && (
           <details className="op-handled">
-            <summary>Handled ({handledRecommendations.length})</summary>
+            <summary>{t('op.handledCount', { n: handledRecommendations.length })}</summary>
             <div className="op-handled-list">
               {handledRecommendations.map((rec) => {
                 const entry = actions[rec.id]
-                const title = recTitle(rec)
-                let outcome = OUTCOME_LABEL[entry?.status] ?? 'Handled'
+                const title = recTitle(rec, t)
+                let outcome = OUTCOME_LABEL[entry?.status] ?? t('op.handledFallback')
                 if (entry?.status === ACTION_STATUS.SNOOZED && entry.snoozeUntil) {
-                  outcome = `Snoozed until ${formatDate(new Date(entry.snoozeUntil).toISOString())}`
+                  outcome = t('op.snoozedUntil', {
+                    date: formatDate(new Date(entry.snoozeUntil).toISOString()),
+                  })
                 } else if (entry?.status === ACTION_STATUS.DISMISSED) {
-                  outcome = `Dismissed — ${dismissReasonLabel(entry.reason)}`
+                  outcome = t('op.dismissedBecause', { reason: dismissReasonLabel(entry.reason) })
                 }
                 return (
                   <div className="op-handled-row" key={rec.id}>
@@ -292,10 +304,10 @@ export function OperationalPage({
                       className="op-action op-action-undo"
                       tone="ghost"
                       disabled={busyId === rec.id}
-                      aria-label={`Undo action for ${title}`}
+                      aria-label={t('op.undoFor', { title })}
                       onClick={() => undo(rec)}
                     >
-                      Undo
+                      {t('op.undo')}
                     </Button>
                   </div>
                 )
@@ -308,22 +320,20 @@ export function OperationalPage({
       <section className="panel">
         <div className="panel-heading">
           <div>
-            <p className="eyebrow">Not urgent</p>
-            <h2>Data to fix ({openData.length})</h2>
+            <p className="eyebrow">{t('op.notUrgent')}</p>
+            <h2>{t('op.dataToFixCount', { n: openData.length })}</h2>
             <p className="page-description" style={{ marginTop: '0.25rem' }}>
-              Catalog issues with no direct money attached — mostly stock counts that need a
-              physical check, and items with no barcode. Worth cleaning up when there is time,
-              but nothing here is losing you money today.
+              {t('op.dataToFixDesc')}
             </p>
           </div>
           <Button tone="ghost" onClick={() => setShowData((value) => !value)}>
-            {showData ? 'Hide' : 'Show'}
+            {showData ? t('op.hide') : t('op.show')}
           </Button>
         </div>
 
         {showData &&
           (openData.length === 0 ? (
-            <EmptyState title="Nothing to fix" description="No outstanding data issues." />
+            <EmptyState title={t('op.nothingToFix')} description={t('op.nothingToFixDesc')} />
           ) : (
             <div className="action-list">
               {openData.slice(0, TOP_N).map((rec) =>
@@ -332,13 +342,13 @@ export function OperationalPage({
                   // A below-cost alert that reached this group did so because we could
                   // not state a credible loss — label it as the data problem it is.
                   rec.type === 'CHECK_MARGIN'
-                    ? TYPE_META.CHECK_MARGIN_SUSPECT
-                    : (TYPE_META[rec.type] ?? { label: rec.type, tone: 'neutral' }),
+                    ? typeMeta(t, 'CHECK_MARGIN_SUSPECT')
+                    : typeMeta(t, rec.type),
                 ),
               )}
               {openData.length > TOP_N && (
                 <p className="page-description">
-                  Showing {TOP_N} of {openData.length}.
+                  {t('op.showingOf', { shown: TOP_N, total: openData.length })}
                 </p>
               )}
             </div>
@@ -348,11 +358,13 @@ export function OperationalPage({
       <section className="panel">
         <div className="panel-heading">
           <div>
-            <p className="eyebrow">Where this comes from</p>
-            <h2>Data sources</h2>
+            <p className="eyebrow">{t('op.whereFrom')}</p>
+            <h2>{t('op.dataSources')}</h2>
           </div>
           <span className="metric-chip">
-            {meta.generatedAt ? `Updated ${formatDate(meta.generatedAt)}` : 'Static export'}
+            {meta.generatedAt
+              ? t('op.updated', { date: formatDate(meta.generatedAt) })
+              : t('op.staticExport')}
           </span>
         </div>
         <div className="recommendation-actions" style={{ flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -364,8 +376,7 @@ export function OperationalPage({
           ))}
         </div>
         <p className="page-description" style={{ marginTop: '0.75rem' }}>
-          {posHealth.totalProducts} products from the POS export.{' '}
-          Stock counts are known to be unreliable, so nothing here predicts running out.
+          {t('op.posFooter', { n: posHealth.totalProducts })}
         </p>
       </section>
     </>

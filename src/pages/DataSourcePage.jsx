@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { Button } from '../components/shared/Button.jsx'
 import { StatusBadge } from '../components/shared/StatusBadge.jsx'
+import { useT } from '../lib/i18n/index.js'
 import { CONNECTOR_MODES, EXPECTED_POS_FIELDS } from '../lib/posConnectors/index.js'
 
 export function DataSourcePage({
@@ -10,6 +11,7 @@ export function DataSourcePage({
   onSelectCsvSource,
   onSelectComaxSource,
 }) {
+  const t = useT()
   const fileInputRef = useRef(null)
   const [pendingFileName, setPendingFileName] = useState(null)
 
@@ -34,7 +36,7 @@ export function DataSourcePage({
   const sourceCards = [
     {
       mode: CONNECTOR_MODES.DEMO,
-      label: 'Bundled Catalog',
+      label: t('ds.bundled'),
       description:
         'The real YomYom POS catalog exported to the app (falls back to a small demo sample if the export is absent). Always available, no upload required.',
       action: (
@@ -43,7 +45,7 @@ export function DataSourcePage({
           onClick={onSelectDemoSource}
           tone="primary"
         >
-          {activeMode === CONNECTOR_MODES.DEMO ? 'Currently active' : 'Use demo dataset'}
+          {activeMode === CONNECTOR_MODES.DEMO ? t('ds.currentlyActive') : t('ds.useDemo')}
         </Button>
       ),
       meta: (
@@ -54,21 +56,21 @@ export function DataSourcePage({
     },
     {
       mode: CONNECTOR_MODES.CSV,
-      label: 'Upload CSV',
+      label: t('ds.uploadCsv'),
       description:
         'Drop in a POS export. The file is parsed in the browser and fed through the same adapter pipeline as the demo data.',
       action: (
         <>
           <input
             accept=".csv,text/csv"
-            aria-label="Upload POS CSV"
+            aria-label={t('ds.uploadLabel')}
             onChange={handleFilePick}
             ref={fileInputRef}
             style={{ display: 'none' }}
             type="file"
           />
           <Button disabled={isLoading} onClick={openFileDialog} tone="primary">
-            {activeMode === CONNECTOR_MODES.CSV ? 'Replace CSV...' : 'Upload CSV...'}
+            {activeMode === CONNECTOR_MODES.CSV ? t('ds.replaceCsv') : t('ds.chooseCsv')}
           </Button>
         </>
       ),
@@ -80,7 +82,7 @@ export function DataSourcePage({
     },
     {
       mode: CONNECTOR_MODES.COMAX,
-      label: 'Comax POS Connector',
+      label: t('ds.comax'),
       description:
         'Live Comax sync. Disabled in the frontend — a backend proxy must hold the API key and perform the outbound call.',
       action: (
@@ -88,7 +90,7 @@ export function DataSourcePage({
           Backend proxy required
         </Button>
       ),
-      meta: <StatusBadge tone="warning">Disabled</StatusBadge>,
+      meta: <StatusBadge tone="warning">{t('ds.disabled')}</StatusBadge>,
     },
   ]
 
@@ -98,8 +100,8 @@ export function DataSourcePage({
         <div className="panel-heading">
           <div>
             <p className="eyebrow">Active source</p>
-            <h2>{describeSource(storeData)}</h2>
-            <p className="page-description">{describeStatus(connectorStatus)}</p>
+            <h2>{describeSource(storeData, t)}</h2>
+            <p className="page-description">{describeStatus(connectorStatus, t)}</p>
           </div>
           <div className="data-source-summary-meta">
             <StatusBadge tone={statusTone(connectorStatus?.state)}>
@@ -134,7 +136,7 @@ export function DataSourcePage({
         <div className="panel-heading">
           <div>
             <p className="eyebrow">Schema reference</p>
-            <h2>Expected POS fields</h2>
+            <h2>{t('ds.expectedFields')}</h2>
             <p className="page-description">
               Any connector (CSV, Comax, or future) should produce rows that map to these fields.
               Aliases are accepted by the data adapter.
@@ -145,9 +147,9 @@ export function DataSourcePage({
           <table className="data-source-table">
             <thead>
               <tr>
-                <th>Field</th>
-                <th>Aliases</th>
-                <th>Required</th>
+                <th>{t('ds.field')}</th>
+                <th>{t('ds.aliases')}</th>
+                <th>{t('ds.required')}</th>
               </tr>
             </thead>
             <tbody>
@@ -157,7 +159,7 @@ export function DataSourcePage({
                   <td>{field.aliases.length ? field.aliases.join(', ') : '—'}</td>
                   <td>
                     <StatusBadge tone={field.required ? 'danger' : 'neutral'}>
-                      {field.required ? 'Required' : 'Optional'}
+                      {field.required ? t('ds.required') : t('ds.optional')}
                     </StatusBadge>
                   </td>
                 </tr>
@@ -204,20 +206,20 @@ export function DataSourcePage({
   )
 }
 
-function describeSource(storeData) {
-  if (!storeData) return 'No data loaded'
+function describeSource(storeData, t) {
+  if (!storeData) return t('ds.noDataLoaded')
   if (storeData.connectorMode === CONNECTOR_MODES.CSV) {
     return `CSV upload${storeData.fileName ? ` — ${storeData.fileName}` : ''}`
   }
-  if (storeData.connectorMode === CONNECTOR_MODES.COMAX) return 'Comax POS (stub)'
-  return 'Bundled demo dataset'
+  if (storeData.connectorMode === CONNECTOR_MODES.COMAX) return t('ds.comaxStub')
+  return t('ds.bundledDemo')
 }
 
-function describeStatus(connectorStatus) {
-  if (!connectorStatus) return 'Ready.'
-  if (connectorStatus.state === 'loading') return connectorStatus.message ?? 'Loading…'
-  if (connectorStatus.state === 'error') return connectorStatus.message ?? 'Failed to load source.'
-  return connectorStatus.message ?? 'Ready.'
+function describeStatus(connectorStatus, t) {
+  if (!connectorStatus) return t('ds.ready')
+  if (connectorStatus.state === 'loading') return connectorStatus.message ?? t('common.loading')
+  if (connectorStatus.state === 'error') return connectorStatus.message ?? t('ds.loadFailed')
+  return connectorStatus.message ?? t('ds.ready')
 }
 
 function statusTone(state) {

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { MetricCard } from '../components/shared/MetricCard.jsx'
 import { StatusBadge } from '../components/shared/StatusBadge.jsx'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
+import { useT } from '../lib/i18n/index.js'
 import { Button } from '../components/shared/Button.jsx'
 import { formatCurrency } from '../components/shared/formatters.js'
 import { DATA_FRESHNESS } from '../data/marketData.js'
@@ -44,6 +45,7 @@ function ageLabel(days) {
 }
 
 export function PriceGapPage({ products = [] }) {
+  const t = useT()
   const [view, setView] = useState(VIEWS.DEARER)
 
   const rows = useMemo(() => {
@@ -94,27 +96,27 @@ export function PriceGapPage({ products = [] }) {
   const active = view === VIEWS.DEARER ? dearer : view === VIEWS.CHEAPER ? cheaper : belowCost
 
   if (!products.length) {
-    return <EmptyState title="No product data" description="Load a POS export to compare prices." />
+    return <EmptyState title={t('pg.noData')} description={t('pg.noDataDesc')} />
   }
 
   return (
     <>
       <section className="metric-grid">
         <MetricCard
-          label="Selling below cost"
+          label={t('pg.belowCost')}
           value={belowCost.length}
-          detail="Losing money on every sale"
+          detail={t('pg.belowCostDetail')}
           tone="danger"
         />
         <MetricCard
-          label="Dearer than nearby"
+          label={t('pg.dearer')}
           value={dearer.length}
-          detail="Customers may notice"
+          detail={t('pg.dearerDetail')}
           tone="warning"
         />
-        <MetricCard label="Cheaper than nearby" value={cheaper.length} detail="Your advantage" tone="success" />
+        <MetricCard label={t('pg.cheaper')} value={cheaper.length} detail={t('pg.cheaperDetail')} tone="success" />
         <MetricCard
-          label="Prices compared"
+          label={t('pg.compared')}
           value={DATA_FRESHNESS?.priceCount ?? rows.length}
           detail={`Median age ${DATA_FRESHNESS?.medianPriceAgeDays ?? '?'} days`}
           tone="info"
@@ -125,7 +127,7 @@ export function PriceGapPage({ products = [] }) {
         <div className="panel-heading">
           <div>
             <p className="eyebrow">Competitor prices</p>
-            <h2>Price comparison</h2>
+            <h2>{t('pg.title')}</h2>
             <p className="page-description" style={{ marginTop: '0.25rem' }}>
               Matched by barcode against Dor Alon, Rami Levy and Shufersal. These are
               <strong> reference observations, not live prices</strong> — every row shows when the
@@ -147,13 +149,13 @@ export function PriceGapPage({ products = [] }) {
         </div>
 
         {active.length === 0 ? (
-          <EmptyState title="Nothing here" description="No products fall into this group." />
+          <EmptyState title={t('pg.nothingHere')} description={t('pg.nothingHereDesc')} />
         ) : (
           <div className="price-table-scroll">
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Product</th>
+                  <th>{t('common.product')}</th>
                   <th className="numeric">Our price</th>
                   {view === VIEWS.BELOW_COST ? (
                     <>
@@ -164,7 +166,7 @@ export function PriceGapPage({ products = [] }) {
                     <>
                       <th className="numeric">Cheapest nearby</th>
                       <th className="numeric">Difference</th>
-                      <th>Price seen</th>
+                      <th>{t('pg.priceSeen')}</th>
                     </>
                   )}
                 </tr>

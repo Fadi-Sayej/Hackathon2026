@@ -4,6 +4,7 @@ import { MetricCard } from '../components/shared/MetricCard.jsx'
 import { StatusBadge } from '../components/shared/StatusBadge.jsx'
 import { formatCurrency, formatDays, percent, urgencyTone } from '../components/shared/formatters.js'
 import { dirProps } from '../lib/utils/rtl.js'
+import { useT } from '../lib/i18n/index.js'
 
 export function RecommendationsPage({
   approvedOrders,
@@ -13,6 +14,7 @@ export function RecommendationsPage({
   productIndex,
   recommendations,
 }) {
+  const t = useT()
   const pendingRecommendations = recommendations.filter(
     (recommendation) => recommendation.status !== 'REJECTED',
   )
@@ -27,19 +29,19 @@ export function RecommendationsPage({
   return (
     <>
       <section className="metric-grid">
-        <MetricCard label="Approved" value={approvedOrders.length} detail="Manager approved actions" tone="success" />
-        <MetricCard label="Estimated Cost" value={formatCurrency(estimatedCost)} detail="Approved order total" tone="warning" />
-        <MetricCard label="Prevented Stockouts" value={preventedStockouts} detail="High urgency approvals" tone="danger" />
+        <MetricCard label={t('rec.approved')} value={approvedOrders.length} detail={t('rec.approvedDetail')} tone="success" />
+        <MetricCard label={t('rec.estCost')} value={formatCurrency(estimatedCost)} detail={t('rec.estCostDetail')} tone="warning" />
+        <MetricCard label={t('rec.prevented')} value={preventedStockouts} detail={t('rec.preventedDetail')} tone="danger" />
       </section>
 
       <section className="recommendation-grid">
         {pendingRecommendations.length === 0 ? (
           <EmptyState
-            description="No active recommendations match the current dataset."
-            title="No recommendations pending"
+            description={t('rec.emptyDesc')}
+            title={t('rec.emptyTitle')}
           />
         ) : (
-          pendingRecommendations.map((recommendation) => {
+          pendingRecommendations.map((recommendation, index) => {
             const product = productIndex.get(recommendation.productId)
             const isApproved = recommendation.status === 'APPROVED'
             // Only REORDER ever carries a quantity. PROMOTION, THIN_MARGIN and
@@ -53,22 +55,27 @@ export function RecommendationsPage({
             const quantity = recommendation.recommendedOrderQuantity ?? 0
             const canApprove = !isApproved && quantity > 0
             const approveTitle = isApproved
-              ? 'Already approved'
+              ? t('rec.alreadyApproved')
               : quantityWithheld
-                ? 'Count this product first — its stock figure does not reconcile'
+                ? t('rec.countFirstTitle')
                 : quantity > 0
-                  ? 'Approve this recommendation'
-                  : 'Enter a quantity above zero to approve'
+                  ? t('rec.approveThis')
+                  : t('rec.needQuantity')
             return (
               <article
                 className={`recommendation-card recommendation-${recommendation.urgency.toLowerCase()}${isApproved ? ' recommendation-approved' : ''}`}
-                key={`${recommendation.productId}:${recommendation.type}`}
+                // `productId:type` is not unique — the same product can raise two
+                // recommendations of the same type, and React was warning about
+                // duplicate keys and may drop or duplicate rows. The list index
+                // disambiguates without changing the decision key used for
+                // persistence, which is deliberately coarser.
+                key={`${recommendation.productId}:${recommendation.type}:${index}`}
                 style={isApproved ? { opacity: 0.65 } : undefined}
               >
                 <div className="recommendation-card-header">
                   <div>
                     <StatusBadge tone={isApproved ? 'success' : urgencyTone(recommendation.urgency)}>
-                      {isApproved ? 'APPROVED' : recommendation.urgency}
+                      {isApproved ? t('rec.badgeApproved') : recommendation.urgency}
                     </StatusBadge>
                     <h2 className="text-hebrew-title" {...dirProps(recommendation.productName)}>
                       {recommendation.productName ?? '—'}
@@ -76,9 +83,9 @@ export function RecommendationsPage({
                     <p {...dirProps(recommendation.category)}>{recommendation.category ?? '—'}</p>
                   </div>
                   <div className="recommendation-qty">
-                    <span>{quantityWithheld ? 'Count first' : 'Suggested'}</span>
+                    <span>{quantityWithheld ? t('rec.countFirst') : t('rec.suggested')}</span>
                     <input
-                      aria-label={`Suggested order quantity for ${recommendation.productName}`}
+                      aria-label={t('rec.qtyLabel', { name: recommendation.productName })}
                       min="1"
                       onChange={(event) =>
                         onEditQuantity(recommendation, Number(event.target.value || 0))
@@ -99,7 +106,7 @@ export function RecommendationsPage({
                 </div>
 
                 <div className="ai-explanation">
-                  <p>AI explanation</p>
+                  <p>{t('rec.aiExplanation')}</p>
                   <span {...dirProps(recommendation.explanation)}>
                     {recommendation.explanation ?? '—'}
                   </span>
@@ -112,7 +119,7 @@ export function RecommendationsPage({
                     title={approveTitle}
                     tone="primary"
                   >
-                    {isApproved ? 'Approved' : 'Approve'}
+                    {isApproved ? t('rec.approvedBtn') : t('rec.approve')}
                   </Button>
                   <Button disabled={isApproved} onClick={() => onReject(recommendation)} tone="ghost">
                     Reject

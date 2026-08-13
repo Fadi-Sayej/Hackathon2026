@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useT } from '../lib/i18n/index.js'
 import { CompetitorBadge } from '../components/shared/CompetitorBadge.jsx'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
 import { StatusBadge } from '../components/shared/StatusBadge.jsx'
@@ -6,6 +7,7 @@ import { formatCurrency, formatDays, statusTone } from '../components/shared/for
 import { compareHebrew, dirProps } from '../lib/utils/rtl.js'
 
 export function ProductsPage({ analyzedProducts }) {
+  const t = useT()
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('All')
 
@@ -38,18 +40,18 @@ export function ProductsPage({ analyzedProducts }) {
       <div className="panel-heading page-tools">
         <div>
           <p className="eyebrow">Product health</p>
-          <h2>Inventory table</h2>
+          <h2>{t('prod.tableTitle')}</h2>
         </div>
         <div className="toolbar">
           <input
-            aria-label="Search products"
+            aria-label={t('prod.searchLabel')}
             className="input"
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search products"
+            placeholder={t('prod.searchLabel')}
             value={query}
           />
           <select
-            aria-label="Filter category"
+            aria-label={t('prod.filterLabel')}
             className="input"
             onChange={(event) => setCategory(event.target.value)}
             value={category}
@@ -63,8 +65,8 @@ export function ProductsPage({ analyzedProducts }) {
 
       {filteredProducts.length === 0 ? (
         <EmptyState
-          description="No products match the current search and category filter. Clear the search or choose another category to continue."
-          title="No matching products"
+          description={t('prod.emptyDesc')}
+          title={t('prod.emptyTitle')}
         />
       ) : (
         <div className="table-wrap hebrew-table-container">
@@ -78,12 +80,16 @@ export function ProductsPage({ analyzedProducts }) {
                 <th className="number-cell cell-numeric">30d Sales</th>
                 <th className="number-cell cell-price">Price</th>
                 <th className="cell-numeric">Stockout</th>
-                <th>Status</th>
+                <th>{t('prod.status')}</th>
               </tr>
             </thead>
             <tbody>
-              {filteredProducts.map((product) => (
-                <tr key={product.id}>
+              {/* 76 of the 7,451 catalogue rows share an id: products with no barcode
+                  fall back to `ym-<name>` in normalize-datasets.mjs and identical names
+                  collide. The index disambiguates the render; the data issue itself is
+                  recorded in CLAUDE.md. */}
+              {filteredProducts.map((product, index) => (
+                <tr key={`${product.id}:${index}`}>
                   <td className="table-cell-hebrew">
                     <strong {...dirProps(product.name)}>{product.name ?? '—'}</strong>
                     <span className="muted" {...dirProps(product.supplier)}>

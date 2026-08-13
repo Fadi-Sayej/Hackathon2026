@@ -57,58 +57,14 @@ import { OperationalPage } from './pages/OperationalPage.jsx'
 import { ExpiryPage } from './pages/ExpiryPage.jsx'
 import { DataSourcePage } from './pages/DataSourcePage.jsx'
 import { PlanogramPage } from './pages/PlanogramPage.jsx'
+import { ShelfPlanPage } from './pages/ShelfPlanPage.jsx'
+import { StoreLayoutPage } from './pages/StoreLayoutPage.jsx'
 import { PriceGapPage } from './pages/PriceGapPage.jsx'
 import { AssortmentGapPage } from './pages/AssortmentGapPage.jsx'
 import { ProductsPage } from './pages/ProductsPage.jsx'
 import { RecommendationsPage } from './pages/RecommendationsPage.jsx'
 import { ReportPage } from './pages/ReportPage.jsx'
 
-const pageMeta = {
-  dashboard: {
-    title: 'Inventory Intelligence',
-    description: 'AI-assisted operating view for stock risk, reorder pressure, and market context.',
-  },
-  products: {
-    title: 'Product Health',
-    description: 'Search, filter, and compare every SKU by stock status and sales velocity.',
-  },
-  recommendations: {
-    title: 'Smart Reorder',
-    description: 'Manager approval workflow for AI-assisted purchasing recommendations.',
-  },
-  operational: {
-    title: "Today's Actions",
-    description: 'What to act on today, ordered by how much money each one is worth. Stock counts are known to be unreliable, so nothing here predicts running out.',
-  },
-  assortment: {
-    title: 'Assortment Gap',
-    description: 'Products that shops of the same format carry and this one does not. These have never been stocked here, so no sales rate is shown for any of them — the evidence is how many comparable branches carry each one.',
-  },
-  prices: {
-    title: 'Price Comparison',
-    description: 'How your prices compare to Dor Alon, Rami Levy and Shufersal, matched by barcode. Every price shows when it was last seen.',
-  },
-  expiry: {
-    title: 'Expiry Tracking',
-    description: 'Record barcode + expiry date at receiving and monitor items nearing or past expiry.',
-  },
-  planogram: {
-    title: 'Shelf Optimization',
-    description: 'A visual planogram generated from sales velocity, margin, risk, and shelf capacity.',
-  },
-  report: {
-    title: 'AI Report',
-    description: 'Generate a comprehensive AI-powered optimization report with actionable insights.',
-  },
-  orders: {
-    title: 'Approved Orders',
-    description: 'Purchase-order style summary for approved replenishment actions.',
-  },
-  'data-source': {
-    title: 'Data Source',
-    description: 'Choose between bundled demo data, a CSV export, or a future Comax POS feed.',
-  },
-}
 
 function initialStoreData() {
   const data = loadDemoStoreData()
@@ -124,6 +80,9 @@ function initialStoreData() {
 
 function App() {
   const [activePage, setActivePage] = useState('operational')
+  // The fixture the shelf plan is drawn for. Set from the layout editor; null
+  // means the shelf plan falls back to the first gondola in the saved layout.
+  const [planogramUnit, setPlanogramUnit] = useState(null)
   const [marketContext, setMarketContext] = useState(fallbackMarketContext)
   const [recommendationOverrides, setRecommendationOverrides] = useState(() =>
     loadRecommendationDecisions(),
@@ -539,8 +498,26 @@ function App() {
     await applyConnector(createComaxConnectorStub())
   }
 
+  // The context multiplier per product, for the shelf-space allocator. Same
+  // decomposition the recommendations already carry, keyed by product id.
+  const demandIndexById = useMemo(() => {
+    const index = {}
+    for (const recommendation of generatedRecommendations) {
+      if (typeof recommendation.demandIndex === 'number') {
+        index[recommendation.productId] = recommendation.demandIndex
+      }
+    }
+    return index
+  }, [generatedRecommendations])
+
   const pageProps = {
     approvedOrders,
+    demandIndexById,
+    planogramUnit,
+    onOpenUnit: (unit) => {
+      setPlanogramUnit(unit)
+      setActivePage('shelf-plan')
+    },
     affinitySuggestions,
     affinitySummary,
     analyzedProducts,
@@ -588,7 +565,6 @@ function App() {
       dataProvenance={dataProvenance}
       hasDemoState={Object.keys(recommendationOverrides).length > 0}
       onResetDemoState={handleResetDemoState}
-      pageMeta={pageMeta[activePage]}
       onNavigate={setActivePage}
     >
       {activePage === 'dashboard' && <DashboardPage {...pageProps} />}
@@ -599,6 +575,8 @@ function App() {
       {activePage === 'prices' && <PriceGapPage {...pageProps} />}
       {activePage === 'assortment' && <AssortmentGapPage {...pageProps} />}
       {activePage === 'planogram' && <PlanogramPage {...pageProps} />}
+      {activePage === 'store-layout' && <StoreLayoutPage {...pageProps} />}
+      {activePage === 'shelf-plan' && <ShelfPlanPage {...pageProps} />}
       {activePage === 'report' && <ReportPage {...pageProps} />}
       {activePage === 'orders' && <ApprovedOrdersPage {...pageProps} />}
       {activePage === 'data-source' && <DataSourcePage {...pageProps} />}

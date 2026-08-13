@@ -61,6 +61,59 @@ function normalizeVelocityConfidence(value) {
   return validVelocityConfidenceLevels.has(value) ? value : 'none'
 }
 
+/** Barcode if there is one, otherwise the name. Not unique on its own. */
+function baseProductId(row) {
+  return row.barcode
+    ? `ym-${String(row.barcode).replace(/^0+/, '')}`
+    : `ym-${row.product_name}`
+}
+
+/**
+ * Guarantee unique product ids, changing as few as possible.
+ *
+ * Barcode-or-name is not unique in this export: 76 ids collide across 7,451
+ * rows, 83 rows deep, and 68 of those collisions hold genuinely different prices
+ * or costs — the same sandwich sold from the barista counter and the drive-
+ * through. Everything downstream indexes by id, so a `Map` kept whichever row
+ * came last and dropped the others without a word, including the row that
+ * supplies a purchase order's unit cost.
+ *
+ * ONLY the colliding ids are changed. Rewriting all 7,451 would detach every
+ * approved plan and reorder decision already saved against the old key, for no
+ * benefit to the 7,368 that were already fine.
+ *
+ * The department is what distinguishes them, so it is what disambiguates. The
+ * same invariant is enforced independently by `normalizeProducts()` in the
+ * adapter layer, which also covers CSV uploads that never pass through here.
+ */
+function makeIdsUnique(products) {
+  const taken = new Set()
+  let collisions = 0
+
+  for (const product of products) {
+    if (!taken.has(product.id)) {
+      taken.add(product.id)
+      continue
+    }
+
+    collisions += 1
+    const scoped = product.category ? `${product.id}--${product.category}` : product.id
+    let unique = scoped
+    let occurrence = 2
+    while (taken.has(unique)) {
+      unique = `${scoped}#${occurrence}`
+      occurrence += 1
+    }
+    product.id = unique
+    taken.add(unique)
+  }
+
+  if (collisions) {
+    process.stderr.write(`Note: disambiguated ${collisions} duplicate product ids.\n`)
+  }
+  return products
+}
+
 function parseFiniteNumber(value) {
   if (typeof value === 'number') return Number.isFinite(value) ? value : null
   if (typeof value !== 'string' || value.trim() === '') return null
@@ -74,7 +127,7 @@ function loadYomYomSilver() {
   try {
     execSync(`python3 -c "${exportSilverPy}"`, { stdio: 'pipe', cwd: rootDir })
     const raw = JSON.parse(readFileSync(SILVER_JSON_CACHE, 'utf-8'))
-    return raw
+    return makeIdsUnique(raw
       .filter(row => row.selling_price && row.selling_price > 0 && row.product_name)
       .map(row => {
         const currentStock = parseFiniteNumber(row.current_stock)
@@ -83,7 +136,9 @@ function loadYomYomSilver() {
         const hasVelocityData = salesLast7Days !== null && salesLast30Days !== null
 
         return {
-          id: row.barcode ? `ym-${String(row.barcode).replace(/^0+/, '')}` : `ym-${row.product_name}`,
+          // Base key only. It is NOT unique — see `makeIdsUnique()` below, which
+          // runs over the finished list.
+          id: baseProductId(row),
           name: row.product_name,
           category: row.category ?? 'Uncategorized',
           price: Number(row.selling_price) || 0,
@@ -110,7 +165,7 @@ function loadYomYomSilver() {
           damagedUnits: 0,
           expiryDate: undefined,
         }
-      })
+      }))
   } catch (err) {
     process.stderr.write(`Warning: could not load YomYom silver Parquet: ${err.message}\n`)
     return null

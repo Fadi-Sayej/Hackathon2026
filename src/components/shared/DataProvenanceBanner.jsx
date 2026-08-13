@@ -1,10 +1,15 @@
+import { useNumbers, useT } from '../../lib/i18n/index.js'
+
 /**
  * DataProvenanceBanner — an honest, at-a-glance summary of where the data on
- * screen actually comes from. Built for the demo so nobody mistakes real POS
- * data for demo data (or vice versa) and so known gaps (no sales history) are
- * stated plainly instead of being implied as observed demand.
+ * screen actually comes from. Built so nobody mistakes real POS data for demo
+ * data (or vice versa) and so known gaps are stated plainly rather than implied
+ * as observed demand.
  */
 export function DataProvenanceBanner({ dataProvenance }) {
+  const t = useT()
+  const { n } = useNumbers()
+
   if (!dataProvenance) return null
 
   const {
@@ -17,38 +22,44 @@ export function DataProvenanceBanner({ dataProvenance }) {
     liveMarketContext,
   } = dataProvenance
 
+  // A partial provenance object used to crash the whole Overview page here:
+  // `catalogCount.toLocaleString()` throws on undefined. A banner that reports
+  // data health must never be the thing that takes the page down.
+  const skuCount = Number.isFinite(catalogCount) ? n(catalogCount.toLocaleString()) : '—'
+  const label = catalogLabel ?? t('prov.unknownSource')
+
   const items = [
     {
       key: 'catalog',
-      label: 'Product catalog',
-      value: `${catalogLabel} · ${catalogCount.toLocaleString()} SKUs`,
-      tone: catalog === 'real' ? 'real' : catalog === 'uploaded' ? 'real' : 'demo',
+      label: t('prov.catalog'),
+      value: `${label} · ${skuCount} ${t('prov.skus')}`,
+      tone: catalog === 'real' || catalog === 'uploaded' ? 'real' : 'demo',
     },
     {
       key: 'competitor',
-      label: 'Competitor prices',
+      label: t('prov.competitorPrices'),
       value:
         competitor === 'real'
-          ? `Real (Kaggle) · ${competitorStoreCount} chains`
-          : 'Not available',
+          ? t('prov.competitorReal', { n: n(competitorStoreCount ?? 0) })
+          : t('prov.notAvailable'),
       tone: competitor === 'real' ? 'real' : 'demo',
     },
     {
       key: 'sales',
-      label: 'Sales history',
-      value: hasSalesHistory ? 'Available' : 'Not in POS export — velocity metrics estimated',
+      label: t('prov.salesHistory'),
+      value: hasSalesHistory ? t('prov.available') : t('prov.noSalesHistory'),
       tone: hasSalesHistory ? 'real' : 'partial',
     },
     {
       key: 'market',
-      label: 'Market context',
-      value: liveMarketContext ? 'Live (weather / holidays / news)' : 'Static demo context',
+      label: t('prov.marketContext'),
+      value: liveMarketContext ? t('prov.marketLive') : t('prov.marketStatic'),
       tone: liveMarketContext ? 'real' : 'demo',
     },
   ]
 
   return (
-    <section className="provenance-banner" aria-label="Data provenance">
+    <section className="provenance-banner" aria-label={t('prov.catalog')}>
       {items.map((item) => (
         <div className={`provenance-item provenance-${item.tone}`} key={item.key}>
           <span className="provenance-dot" aria-hidden="true" />
