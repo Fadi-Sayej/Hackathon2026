@@ -7,6 +7,8 @@
  * what a real LLM call would look like so it can be swapped later.
  */
 
+import { isAssumedLeadTime } from '../receiving/leadTimeResolver.js'
+
 export function generateMockAIExplanation(product, recommendation, context = {}) {
   if (!product || !recommendation) return ''
 
@@ -48,13 +50,24 @@ function buildReorderExplanation(product, recommendation, context) {
 
   if (m.daysUntilStockout !== null && m.daysUntilStockout !== undefined) {
     const days = m.daysUntilStockout
+    // This block is the string a manager actually reads on the Recommendations
+    // page, so it carries the same honesty rule as the rule-based reason text:
+    // never present the fallback lead time as though a delivery was observed.
+    const assumed = isAssumedLeadTime(product)
+    const leadTimePhrase = assumed ? 'assumed supplier lead time' : 'supplier lead time'
+    const indefinite = assumed ? 'an' : 'a'
     if (days <= product.leadTimeDays) {
       sentences.push(
-        `Current stock of ${product.currentStock} units only covers ${days} days, which is shorter than the ${product.leadTimeDays}-day supplier lead time, so a stockout is likely before the next delivery.`,
+        `Current stock of ${product.currentStock} units only covers ${days} days, which is shorter than the ${leadTimePhrase} of ${product.leadTimeDays} days, so a stockout is likely before the next delivery.`,
       )
     } else {
       sentences.push(
-        `Current stock of ${product.currentStock} units covers ${days} days versus a ${product.leadTimeDays}-day lead time.`,
+        `Current stock of ${product.currentStock} units covers ${days} days versus ${indefinite} ${leadTimePhrase} of ${product.leadTimeDays} days.`,
+      )
+    }
+    if (assumed) {
+      sentences.push(
+        "Not enough deliveries have been recorded to measure this supplier's lead time, so the figure above is the system default rather than something observed.",
       )
     }
   }

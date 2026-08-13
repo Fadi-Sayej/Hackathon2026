@@ -265,7 +265,7 @@ export const ar = {
   'exp.d30Detail': 'أبقها ظاهرة',
   'exp.scans': 'عمليات مسح مسجّلة',
   'exp.scansDetail': 'إجمالي مسح تواريخ الصلاحية',
-  'exp.recordTitle': 'سجّل الصلاحية عند الاستلام',
+  'exp.recordTitle': 'سجّل توريداً أو تاريخ صلاحية',
   'exp.barcode': 'الباركود',
   'exp.scanOrType': 'امسح أو اكتب',
   'exp.expiryDate': 'تاريخ الصلاحية',

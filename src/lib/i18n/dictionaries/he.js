@@ -260,7 +260,7 @@ export const he = {
   'exp.d30Detail': 'שמור על נראות',
   'exp.scans': 'סריקות שנרשמו',
   'exp.scansDetail': 'סך סריקות התפוגה',
-  'exp.recordTitle': 'רשום תפוגה בקבלה',
+  'exp.recordTitle': 'רשום קבלת סחורה או תאריך תפוגה',
   'exp.barcode': 'ברקוד',
   'exp.scanOrType': 'סרוק או הקלד',
   'exp.expiryDate': 'תאריך תפוגה',

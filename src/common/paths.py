@@ -29,12 +29,19 @@ MATCHING_ROOT     = DATA_ROOT / "matching"
 SIGNALS_ROOT      = DATA_ROOT / "signals"
 RECOMMENDATIONS_ROOT = DATA_ROOT / "recommendations"
 EXPIRY_ROOT       = INTERNAL_ROOT / "expiry"
+RECEIVING_ROOT    = INTERNAL_ROOT / "receiving"
 
 # ── Internal sub-folders ───────────────────────────────────────────────────────
 RAW_POS_ROOT      = INTERNAL_ROOT / "raw_pos"
 SILVER_POS_ROOT   = INTERNAL_ROOT / "silver_pos"
 SNAPSHOTS_ROOT    = INTERNAL_ROOT / "snapshots"
 EXPIRY_SCANS_CSV  = EXPIRY_ROOT / "expiry_scans.csv"
+
+# The receiving ledger (T7 / #52). Append-only: the POS records what was sold and
+# never what arrived, so this file is the only record of the `received` term in
+# stock_now = opening + received - sold.
+RECEIPTS_CSV             = RECEIVING_ROOT / "receipts.csv"
+SUPPLIER_LEAD_TIMES_JSON = RECEIVING_ROOT / "supplier_lead_times.json"
 
 # ── External sub-folders ──────────────────────────────────────────────────────
 EXTERNAL_RAW_ROOT    = EXTERNAL_ROOT / "raw"

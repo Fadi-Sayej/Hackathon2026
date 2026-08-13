@@ -259,7 +259,7 @@ export const en = {
   'exp.d30Detail': 'Keep visible',
   'exp.scans': 'Scans recorded',
   'exp.scansDetail': 'Total expiry scans',
-  'exp.recordTitle': 'Record expiry at intake',
+  'exp.recordTitle': 'Record a delivery or an expiry date',
   'exp.barcode': 'Barcode',
   'exp.scanOrType': 'Scan or type',
   'exp.expiryDate': 'Expiry date',

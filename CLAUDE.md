@@ -30,6 +30,9 @@ npm run preview      # preview the build
 
 # Data pipeline helpers (run normalization, then lint/build)
 npm run sprint7      # normalize:data + lint + build
+
+# Publish measured supplier lead times from the receiving ledger (see docs/RECEIVING_LEDGER.md)
+npm run data:lead-times
 ```
 
 ### Python data pipeline
@@ -288,10 +291,14 @@ Copy `.env.example` to `.env` before running locally.
 
   So **1,564 of 7,451 products carry usable velocity**, and the planogram allocator uses days-of-supply for exactly those while falling back to a category assumption for the rest. The shelf plan states the mix per fixture rather than making a blanket claim in either direction.
 
+  Those counts are of **normalized products** (7,451 after duplicate ids are disambiguated). Counted at the source instead, `yomyom_sales.parquet` has 7,674 rows of which 1,565 carry velocity — `high` 504, `medium` 1,061, `none` 6,109. The two totals differ only by that dedup step.
+
+  Note where the velocity comes from: **the POS export itself has no sales history** (`units_sold_7d`/`units_sold_30d`/`last_sale_date` are null in every row). `src/snapshots/velocity.py` reconstructs it from stock deltas between dated POS snapshots. Every consumer must check `velocityConfidence`/`hasVelocity` before showing a velocity claim (see `docs/UI_DATA_CONTRACT.md` §4.2) rather than assuming it is present.
+
   Separately, **seven monthly sales reports (Jan–Jul 2026, 410,687 units, 1,778 barcodes) sit in `data/internal/raw_pos/yomyom/sales/`** and are a richer source than whatever produced the current confidence bands. Importing them is charter task T8 (#53).
-- `shelfQuantity` (0), `shelfCapacity` (10), `leadTimeDays` (3), `supplier` ("YomYom"), `returnedUnits`/`damagedUnits` (0) are **hardcoded constants** for every product — the planogram runs on these, not real shelf data.
+- `shelfQuantity` (0), `shelfCapacity` (10), `returnedUnits`/`damagedUnits` (0) are **hardcoded constants** for every product — the planogram runs on these, not real shelf data. `leadTimeDays` and `supplier` are **no longer hardcoded**: they resolve from `data/internal/receiving/supplier_lead_times.json` (built by the receiving ledger, T7 — see `docs/RECEIVING_LEDGER.md`) when that file is present, and fall back to `3` / `"YomYom"` when it is absent, which is still the case for every product today since no supplier has reached the 3-delivery threshold for a measured lead time. Which of the two a product is holding travels with it as `leadTimeSource` (`'measured'` / `'default'`) through `productAdapter.js`, and `reorderEngine.js` + `mockAI.js` qualify their wording on it, so an assumed lead time is never stated as a fact. Note that a measured `leadTimeDays` is a **delivery cadence**, not order-to-arrival time — see `docs/RECEIVING_LEDGER.md`, "What the number actually measures".
 - State defaults to **browser localStorage**, but a **Firestore adapter (B-2) exists behind the persistence interface** and takes over once `VITE_FIREBASE_*` is configured (local-first, with localStorage fallback). No SQL database in production.
-- A test suite now exists: **Vitest** (`npm test` — 117 tests incl. persistence reconcile + telemetry) and **pytest** (`npm run test:py` — LLM proxy). ESLint is still the release gate.
+- A test suite now exists: **Vitest** (`npm test` — 253 tests incl. persistence reconcile + telemetry) and **pytest** (`npm run test:py` — LLM proxy). ESLint is still the release gate.
 - The app targets Israeli convenience stores; product data and UI may contain Hebrew text.
 - Use `python3`, not `python` (npm scripts were updated accordingly).
 

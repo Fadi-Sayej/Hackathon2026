@@ -95,3 +95,17 @@ reports/
 # Playwright run output (e2e). Regenerated on every run.
 test-results/
 playwright-report/
+# ── T7: receiving ledger (nagham.md T7) ───────────────────────────────────────
+# data/internal/receiving/ holds two files, and both stay out of git, for two
+# different reasons:
+#   - supplier_lead_times.json is a regenerable build artifact — rerun
+#     `npm run data:lead-times` and it comes back byte-for-byte from
+#     receipts.csv. Same class as every other generated JSON above.
+#   - receipts.csv is the append-only ledger of real deliveries and IS
+#     irreplaceable (there is no upstream system to regenerate it from), but
+#     unlike the B-6 snapshots above it carries the client's supplier names and
+#     purchase costs — private commercial data, not public competitor prices.
+#     Do not add a `!data/internal/receiving/` exception by analogy with B-6:
+#     that precedent doesn't apply here. Durability is handled by an
+#     out-of-band backup instead (see Task 8), not by committing it to git.
+data/internal/receiving/
