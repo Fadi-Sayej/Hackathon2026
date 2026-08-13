@@ -7,10 +7,10 @@ dropping."* So the direction is asserted in both directions, by name, and the
 binomial maths is checked against values worked out by hand rather than against
 whatever the implementation happens to return.
 
-There is only one day of real snapshots so far, so everything here is synthetic.
-That is not a workaround: these are the cases where the right answer is known,
-which is the only way to be sure the sign is right before 30 days of real data
-arrive.
+Everything here is synthetic, deliberately: these are the cases where the right
+answer is known, which is the only way to be sure the sign is right before 30
+days of real data arrive. Three real days exist so far (11–13 Aug 2026), and the
+persistence cases below are modelled on what those days actually showed.
 """
 
 from __future__ import annotations
@@ -27,6 +27,7 @@ if str(ROOT) not in sys.path:
 
 from src.market.concentration import (  # noqa: E402
     STATE_DELISTING,
+    STATE_DELISTING_PROVISIONAL,
     STATE_STOCKOUT,
     STATE_UNCERTAIN,
     binomial_tail_ge,
@@ -152,17 +153,49 @@ def test_base_rate_of_a_single_day_is_zero_not_a_crash():
 # End to end
 # ---------------------------------------------------------------------------
 
-def test_detects_a_network_wide_delisting():
+def test_a_network_wide_drop_is_provisional_until_it_stays_gone():
+    """One morning of evidence is not a delisting.
+
+    Measured on the first three real days: of 11 same-day delisting calls, 2 were
+    listed again the next morning. Acting on those would have suppressed two
+    perfectly good products.
+    """
     stores = [str(i) for i in range(1, 13)]
     day1 = [("doomed", s) for s in stores] + [("fine", s) for s in stores]
-    day2 = [("fine", s) for s in stores]          # doomed vanishes everywhere
+    day2 = [("fine", s) for s in stores]
     events = detect_drops(series_from([day1, day2]), base_rate=0.05)
 
     doomed = [e for e in events if e.barcode == "doomed"]
     assert len(doomed) == 1
+    assert doomed[0].state == STATE_DELISTING_PROVISIONAL
+    # Provisional must never be presented as a warning.
+    assert doomed[0].is_warning is False
+
+
+def test_a_network_wide_drop_that_stays_gone_is_confirmed():
+    stores = [str(i) for i in range(1, 13)]
+    day1 = [("doomed", s) for s in stores] + [("fine", s) for s in stores]
+    day2 = [("fine", s) for s in stores]
+    day3 = [("fine", s) for s in stores]          # still gone
+    events = detect_drops(series_from([day1, day2, day3]), base_rate=0.05)
+
+    doomed = [e for e in events if e.barcode == "doomed"]
     assert doomed[0].state == STATE_DELISTING
     assert doomed[0].is_warning is True
-    assert doomed[0].is_opportunity is False
+    assert doomed[0].days_absent_since >= 1
+
+
+def test_a_synchronised_drop_that_returns_is_a_stockout_not_a_delisting():
+    """The two real false positives on 2026-08-12 looked exactly like this."""
+    stores = [str(i) for i in range(1, 13)]
+    day1 = [("blip", s) for s in stores]
+    day2 = []                                     # vanishes everywhere
+    day3 = [("blip", s) for s in stores]          # …and comes straight back
+    events = detect_drops(series_from([day1, day2, day3]), base_rate=0.05)
+
+    blip = [e for e in events if e.barcode == "blip" and str(e.day) == "2026-08-02"]
+    assert blip[0].state == STATE_STOCKOUT
+    assert blip[0].is_warning is False
 
 
 def test_detects_a_single_branch_stockout():
@@ -205,7 +238,8 @@ def test_events_are_ordered_warnings_first():
     stores = [str(i) for i in range(1, 13)]
     day1 = [("gone", s) for s in stores] + [("blip", s) for s in stores]
     day2 = [("blip", s) for s in stores if s != "4"]
-    events = detect_drops(series_from([day1, day2]), base_rate=0.05)
+    day3 = [("blip", s) for s in stores]          # gone stays gone; blip returns
+    events = detect_drops(series_from([day1, day2, day3]), base_rate=0.05)
 
     # The delisting must not be buried under scattered stockouts: a missed
     # warning means someone bulk-buys a product the market is dropping.

@@ -8,7 +8,10 @@ Reads the dated snapshots collected by T1 and classifies every product that
 stopped being listed at one or more branches:
 
     STOCKOUT   scattered drops    → their customer wants it today. OPPORTUNITY.
-    DELISTING  synchronised drops → the chain is walking away. DO NOT BULK BUY.
+    DELISTING  synchronised drops that stayed gone → the chain is walking away.
+                                    DO NOT BULK BUY.
+    DELISTING_PROVISIONAL  synchronised, but not yet seen to stay gone. Reported
+                                    separately; never presented as a warning.
     UNCERTAIN  too few branches to tell the two apart.
 
 Needs at least two usable snapshot days. History cannot be backfilled, so the
@@ -27,8 +30,10 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.market.concentration import (
+    CONFIRM_DAYS,
     MIN_STORES_FOR_INFERENCE,
     STATE_DELISTING,
+    STATE_DELISTING_PROVISIONAL,
     STATE_STOCKOUT,
     detect_drops,
     estimate_base_rate,
@@ -92,6 +97,15 @@ def main() -> int:
     if warnings:
         print("\n⚠️  LIKELY DELISTINGS — do not bulk-buy these:")
         for e in warnings[:args.limit]:
+            print("   %-30s %d/%d branches, p=%.5f  (%s)"
+                  % ((e.product_name or e.barcode)[:30], e.stores_dropped,
+                     e.stores_carrying, e.p_value, e.day))
+
+    provisional = [e for e in events if e.state == STATE_DELISTING_PROVISIONAL]
+    if provisional:
+        print("\n⏳ SYNCHRONISED, NOT YET CONFIRMED — need %d more day(s) before acting:"
+              % CONFIRM_DAYS)
+        for e in provisional[:args.limit]:
             print("   %-30s %d/%d branches, p=%.5f  (%s)"
                   % ((e.product_name or e.barcode)[:30], e.stores_dropped,
                      e.stores_carrying, e.p_value, e.day))
