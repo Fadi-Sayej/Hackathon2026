@@ -20,6 +20,14 @@ const LEAD_TIMES_JSON = path.join(rootDir, 'data', 'internal', 'receiving', 'sup
 const VELOCITY_CONFIDENCE_LEVELS = ['none', 'low', 'medium', 'high']
 const validVelocityConfidenceLevels = new Set(VELOCITY_CONFIDENCE_LEVELS)
 
+const DEMO_PRODUCTS_JS = path.join(appDataDir, 'demoProducts.js')
+// "A few hundred" per the fix request: comfortably above any hand-authored demo
+// set (the Sprint-2 fallback slice tops out at ~30) and comfortably below the
+// real dataset (7,451 products as of this writing), so it separates the two
+// cases the guard cares about without being sensitive to either one's exact size.
+const DEMO_FALLBACK_PRODUCT_THRESHOLD = 300
+const ALLOW_DEMO_FALLBACK_FLAG = '--allow-demo-fallback'
+
 // Stock and velocity live outside the products table, so the silver tables are
 // joined before the rows reach the normalizer. Barcode is the join key; the ~300
 // rows with no barcode fall back to product name, matching how `id` is derived below.
@@ -83,6 +91,25 @@ function loadLeadTimeLedger() {
     process.stderr.write(`Warning: ignoring unreadable lead-time ledger: ${err.message}\n`)
     return normalizeLedger(null)
   }
+}
+
+// Cheap product-count proxy for the committed src/data/demoProducts.js, used
+// only to decide whether a demo-fallback run would be destructive. Every
+// product object this script has ever written carries exactly one `"id":`
+// key (see the canonical product shape in CLAUDE.md), so counting substring
+// occurrences with a single linear scan gives an accurate count without
+// JSON/AST-parsing a multi-megabyte generated file just to measure its
+// array length.
+function countCommittedDemoProducts() {
+  if (!existsSync(DEMO_PRODUCTS_JS)) return 0
+  const contents = readFileSync(DEMO_PRODUCTS_JS, 'utf-8')
+  let count = 0
+  let index = contents.indexOf('"id":')
+  while (index !== -1) {
+    count += 1
+    index = contents.indexOf('"id":', index + 1)
+  }
+  return count
 }
 
 function loadYomYomSilver() {
@@ -208,9 +235,34 @@ const leadTimeByCategory = {
 const perishableCategories = new Set(['Dairy', 'Bakery', 'Ice Cream'])
 
 async function main() {
-  await ensureDirectories()
-
   const yomyomProducts = loadYomYomSilver()
+
+  if (!yomyomProducts || yomyomProducts.length === 0) {
+    const allowDemoFallback = process.argv.includes(ALLOW_DEMO_FALLBACK_FLAG)
+    const committedProductCount = countCommittedDemoProducts()
+    if (!allowDemoFallback && committedProductCount > DEMO_FALLBACK_PRODUCT_THRESHOLD) {
+      process.stderr.write(
+        [
+          `Refusing to run: data/internal/silver_pos/yomyom_products.parquet is absent`,
+          `(its normal state on a fresh clone, since data/internal/silver_pos/ is`,
+          `git-ignored), which would fall back to the ~30-product demo connector and`,
+          `overwrite src/data/demoProducts.js and five other committed generated files —`,
+          `currently holding ${committedProductCount} real products — with demo data.`,
+          '',
+          'To fix this properly: import the real POS data first, so',
+          'data/internal/silver_pos/ is populated (see the Python pipeline commands in',
+          'CLAUDE.md), then re-run this script.',
+          '',
+          'If you genuinely want the demo dataset (e.g. a demo/sandbox environment with',
+          `no real POS data), opt in explicitly: npm run normalize:data -- ${ALLOW_DEMO_FALLBACK_FLAG}`,
+        ].join('\n') + '\n',
+      )
+      process.exitCode = 1
+      return
+    }
+  }
+
+  await ensureDirectories()
 
   let demoProducts
   let normalized
