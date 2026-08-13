@@ -93,7 +93,7 @@ print(import_receiving_csv(Path('inbox.csv')))
 "
 ```
 
-Run from the repo root. `import_receiving_csv` appends every valid row from
+Run from the repo root. `import_receiving_csv` appends each new valid row from
 `inbox.csv` into `data/internal/receiving/receipts.csv` and returns a summary —
 `imported_rows`, `rejected_rows`, and a `rejected_preview` of up to 20 bad rows with
 the reason each one failed (invalid rows are reported, never silently dropped), plus
@@ -116,25 +116,31 @@ above does without it):
 
 ```bash
 npm run data:lead-times     # receipts.csv -> data/internal/receiving/supplier_lead_times.json
-npm run normalize:data      # picks up the new lead-time ledger (see the warning below)
+npm run normalize:data      # picks up the new lead-time ledger (see below)
 ```
 
 `npm run data:lead-times` runs `scripts/export_supplier_lead_times.py`, which reads
 every receipt and writes the measured per-supplier lead times and the
 barcode → supplier map that `normalize-datasets.mjs` consumes.
 
-### ⚠️ `npm run normalize:data` can destroy the committed dataset
+### `npm run normalize:data` refuses to run against an absent silver Parquet
 
 If `data/internal/silver_pos/` is **absent** — which is its state on a fresh clone,
-because it is git-ignored — `npm run normalize:data` does not fail. It silently falls
-back to the 30-product demo connector and **overwrites the committed
-`src/data/demoProducts.js`** (7,451 real products, 141,572 lines) and five other
-committed generated files with demo data. This is a pre-existing hazard in the
-pipeline, not something this ledger introduces, but it applies directly here: never
-run `npm run normalize:data` on a machine where `data/internal/silver_pos/` hasn't
-been populated by a real POS import first. Check `ls data/internal/silver_pos/`
-before running it, and if it's empty, import the POS data first (see the root
-`CLAUDE.md` Python pipeline commands) instead of proceeding.
+because it is git-ignored — falling through to the 30-product demo connector would
+overwrite the committed `src/data/demoProducts.js` (7,451 real products, 141,572
+lines) and five other committed generated files with demo data. This was a
+pre-existing hazard in the pipeline, not something this ledger introduced, but the
+ledger workflow is what turns `npm run normalize:data` into a routine step, so it now
+guards against it directly: the script counts the products already committed in
+`src/data/demoProducts.js`, and if that count is above a small threshold (300 — well
+past any hand-authored demo set, well under the real dataset) and the silver Parquet
+is missing, it **refuses to run and exits non-zero** instead of silently overwriting
+anything. The message it prints explains what would have happened and how to proceed:
+import the real POS data first (see the root `CLAUDE.md` Python pipeline commands) so
+`data/internal/silver_pos/` is populated, then re-run. For the rare case where the
+demo dataset is genuinely wanted with no real POS data present, pass
+`--allow-demo-fallback` to opt in explicitly: `npm run normalize:data --
+--allow-demo-fallback`.
 
 ## The schema — `RECEIVING_COLUMNS`
 
@@ -191,10 +197,12 @@ and a real `leadTimeDays`/`leadTimeConfidence` for that supplier's products
 automatically — no code change needed, just more deliveries recorded.
 
 `leadTimeSource` is carried through `productAdapter.js` onto every normalized product
-and is read where it matters: the reorder reason text and the on-screen explanation
-both say **"an assumed 3-day supplier lead time … the system default and not a
-measurement"**
-while it is `'default'`, and drop the qualifier only once it is `'measured'`. That
+and is read where it matters: the reorder reason text (`reorderEngine.js`) and the
+on-screen explanation (`mockAI.js`) each phrase it in their own words, but both convey
+the same thing while it is `'default'` — that the lead time is an assumed figure, that
+not enough deliveries have been recorded to measure the real one, and that the number
+is the system default rather than an observed measurement — and both drop the
+qualifier once it is `'measured'`. That
 matters most in the state just after the first supplier crosses three dates: the
 resolver then returns that supplier's **real name** with the fallback lead time for
 its *other* barcodes, and a sentence naming a real supplier alongside a number reads
