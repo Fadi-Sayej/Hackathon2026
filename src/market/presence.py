@@ -26,6 +26,7 @@ TWO RULES THAT MATTER MORE THAN THE CODE
 from __future__ import annotations
 
 import json
+import statistics
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
@@ -40,6 +41,25 @@ DELIVERY_CATALOG = "delivery_catalog"
 
 # Manifest statuses whose day may be trusted as a real observation of the market.
 USABLE_STATUSES = {"ok", "partial"}
+
+# A day covering less than this share of the median branch count is treated as a
+# partial collection, not as a market in which branches vanished.
+#
+# This exists because a partial run SUCCEEDS. On 11 Aug one run reached 31 of 156
+# branches and was recorded `ok` — the manifest checks that files arrived, not
+# that they are complete. Had that been the only run, 125 branches would have
+# disappeared on one morning and every product in them would have read as a
+# synchronised, chain-wide delisting. That is the single worst failure this
+# series can produce, and it is indistinguishable from a real event without a
+# coverage check.
+#
+# Half is deliberately loose. A chain does not shed half its branches overnight,
+# so a day below this is far more likely to be a truncated download than news.
+MIN_BRANCH_COVERAGE_RATIO = 0.5
+
+# Below this many days a median is not robust enough to judge against, so the
+# guard stays out of the way rather than skipping on two points of evidence.
+MIN_DAYS_FOR_COVERAGE_GUARD = 3
 
 
 @dataclass
@@ -158,4 +178,32 @@ def load_presence(
             series.product_names.setdefault(barcode, name)
 
     series.days.sort()
+    _drop_undercovered_days(series)
     return series
+
+
+def _drop_undercovered_days(
+    series: PresenceSeries,
+    ratio: float = MIN_BRANCH_COVERAGE_RATIO,
+    min_days: int = MIN_DAYS_FOR_COVERAGE_GUARD,
+) -> None:
+    """Remove days whose branch coverage is far below the run of the series.
+
+    Mutates `series` in place and records the reason in `skipped`, so a dropped
+    day is reported rather than silently missing — the same contract as a failed
+    manifest.
+    """
+    if len(series.days) < min_days:
+        return
+
+    counts = {day: len({store for (_b, store) in series.listings[day]}) for day in series.days}
+    floor = statistics.median(counts.values()) * ratio
+
+    for day in list(series.days):
+        if counts[day] < floor:
+            series.skipped[day] = (
+                "partial collection: %d branches, below %.0f%% of the %d-branch median"
+                % (counts[day], ratio * 100, int(statistics.median(counts.values())))
+            )
+            series.days.remove(day)
+            del series.listings[day]

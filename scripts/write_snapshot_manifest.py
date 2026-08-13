@@ -31,9 +31,12 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import statistics
 import sys
 from datetime import date, datetime, timezone
 from pathlib import Path
+
+import polars as pl
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -51,6 +54,16 @@ STATUS_MISSING = "missing"
 # as "nothing to collect" later.
 EXPECTED_SOURCES = ("price_transparency", "delivery_catalog")
 
+# A run covering less than this share of the median branch count of previous days
+# is recorded as `partial`, however cleanly it finished.
+#
+# On 11 Aug one run reached 31 of 156 branches and was recorded `ok`, because
+# every check here asked whether files arrived, not whether they were complete.
+# A short run that is trusted looks exactly like 125 branches dropping their
+# entire assortment overnight. src/market/presence.py refuses such a day
+# independently; this is the half that makes the collector say so out loud.
+MIN_BRANCH_COVERAGE_RATIO = 0.5
+
 
 def _sha256_of_dir(directory: Path) -> str:
     """Stable digest over a directory's file contents.
@@ -67,6 +80,46 @@ def _sha256_of_dir(directory: Path) -> str:
     return digest.hexdigest()
 
 
+def count_branches(source_dir: Path) -> int | None:
+    """Distinct store_ids across a source's silver files, or None if not applicable.
+
+    Only silver carries a normalised `store_id`; the delivery catalogue is a
+    single venue and has no branch count worth checking.
+    """
+    stores: set[str] = set()
+    found = False
+    for path in sorted(source_dir.rglob("*.parquet")):
+        if "silver" not in path.name:
+            continue
+        try:
+            frame = pl.read_parquet(path, columns=["store_id"])
+        except Exception:
+            continue
+        found = True
+        stores.update(str(v) for v in frame["store_id"].unique() if v is not None)
+    return len(stores) if found else None
+
+
+def median_branches_before(day: str, source_id: str) -> float | None:
+    """Median branch count recorded for this source on earlier days.
+
+    Read from the manifests rather than recomputed, so the comparison is against
+    what was actually accepted, not against files that may since have changed.
+    """
+    counts = []
+    for manifest_path in sorted(EXTERNAL_SNAPSHOTS_ROOT.glob("*/_manifest.json")):
+        if manifest_path.parent.name >= day:
+            continue
+        try:
+            entry = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except ValueError:
+            continue
+        branches = entry.get("sources", {}).get(source_id, {}).get("branches")
+        if isinstance(branches, int) and branches > 0:
+            counts.append(branches)
+    return statistics.median(counts) if counts else None
+
+
 def describe_source(day_dir: Path, source_id: str) -> dict:
     source_dir = day_dir / source_id
     if not source_dir.exists():
@@ -79,12 +132,24 @@ def describe_source(day_dir: Path, source_id: str) -> dict:
 
     files = [p for p in source_dir.rglob("*") if p.is_file()]
     total_bytes = sum(p.stat().st_size for p in files)
-    return {
+    entry = {
         "status": STATUS_OK if files else STATUS_FAILED,
         "files": len(files),
         "bytes": total_bytes,
         "sha256": _sha256_of_dir(source_dir) if files else None,
     }
+
+    branches = count_branches(source_dir) if files else None
+    if branches is not None:
+        entry["branches"] = branches
+        median = median_branches_before(day_dir.name, source_id)
+        if median and branches < median * MIN_BRANCH_COVERAGE_RATIO:
+            entry["status"] = STATUS_PARTIAL
+            entry["note"] = (
+                "short run: %d branches against a %d-branch median — files arrived "
+                "but the collection is incomplete" % (branches, int(median))
+            )
+    return entry
 
 
 def build_manifest(day: str, collector_version: str, errors: dict | None = None) -> dict:

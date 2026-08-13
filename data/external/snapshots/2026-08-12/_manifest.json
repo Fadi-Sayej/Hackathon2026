@@ -8,13 +8,15 @@
       "status": "ok",
       "files": 2,
       "bytes": 8003535,
-      "sha256": "c617cb7b4d15b3c6775767d178999a9a029815c830bdd86ce06f59c0e71bc7d0"
+      "sha256": "c617cb7b4d15b3c6775767d178999a9a029815c830bdd86ce06f59c0e71bc7d0",
+      "branches": 155
     },
     "delivery_catalog": {
       "status": "ok",
       "files": 2,
       "bytes": 156190,
-      "sha256": "b9f380303c66644b06723631484c369d531ee70025fbda2b73629820fec4c06e"
+      "sha256": "b9f380303c66644b06723631484c369d531ee70025fbda2b73629820fec4c06e",
+      "branches": 1
     }
   }
 }
