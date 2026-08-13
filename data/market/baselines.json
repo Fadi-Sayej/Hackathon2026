@@ -1,0 +1,170 @@
+{
+  "measured_on": "2026-08-13",
+  "issue": "#49 Step 2 — baselines measured before any model",
+  "n1": {
+    "rule": "N1: listed in the catalogue ⇒ available",
+    "label_source": "YomYom POS current_stock > 0",
+    "true_positive": 2764,
+    "false_positive": 4223,
+    "true_negative": 0,
+    "false_negative": 0,
+    "total": 6987,
+    "predicted_positive": 6987,
+    "actual_positive": 2764,
+    "actual_negative": 4223,
+    "precision": 0.39559181336768284,
+    "recall": 1.0,
+    "f1": 0.5669162137216696,
+    "accuracy": 0.39559181336768284,
+    "false_positive_rate": 1.0,
+    "precision_interval": [
+      0.3841865227165621,
+      0.40711185257490495
+    ],
+    "has_negative_class": true,
+    "excluded_negative_stock_rows": 604,
+    "sensitivity_negative_as_unavailable": {
+      "rule": "N1 (negative stock counted as unavailable)",
+      "label_source": "YomYom POS current_stock > 0",
+      "true_positive": 2764,
+      "false_positive": 4827,
+      "true_negative": 0,
+      "false_negative": 0,
+      "total": 7591,
+      "predicted_positive": 7591,
+      "actual_positive": 2764,
+      "actual_negative": 4827,
+      "precision": 0.36411539981557106,
+      "recall": 1.0,
+      "f1": 0.5338483824239497,
+      "accuracy": 0.36411539981557106,
+      "false_positive_rate": 1.0,
+      "precision_interval": [
+        0.3533619676445942,
+        0.37500629746840036
+      ],
+      "has_negative_class": true
+    }
+  },
+  "n2": {
+    "rule": "N2: present in today's price file ⇒ available",
+    "label_source": "delivery-catalogue orderability (Super Alonit | Kibbutz Einat)",
+    "true_positive": 719,
+    "false_positive": 13,
+    "true_negative": 0,
+    "false_negative": 18,
+    "total": 750,
+    "predicted_positive": 732,
+    "actual_positive": 737,
+    "actual_negative": 13,
+    "precision": 0.98224043715847,
+    "recall": 0.9755766621438263,
+    "f1": 0.9788972089857045,
+    "accuracy": 0.9586666666666667,
+    "false_positive_rate": 1.0,
+    "precision_interval": [
+      0.9698532110455446,
+      0.9895924087726337
+    ],
+    "has_negative_class": true,
+    "constant_available_comparator": {
+      "rule": "N0: always available (degenerate comparator)",
+      "label_source": "delivery-catalogue orderability (Super Alonit | Kibbutz Einat)",
+      "true_positive": 737,
+      "false_positive": 13,
+      "true_negative": 0,
+      "false_negative": 0,
+      "total": 750,
+      "predicted_positive": 750,
+      "actual_positive": 737,
+      "actual_negative": 13,
+      "precision": 0.9826666666666667,
+      "recall": 1.0,
+      "f1": 0.9912575655682582,
+      "accuracy": 0.9826666666666667,
+      "false_positive_rate": 1.0,
+      "precision_interval": [
+        0.9705711030419554,
+        0.9898428619077105
+      ],
+      "has_negative_class": true
+    },
+    "beats_constant": false,
+    "unavailability_events_caught": 0,
+    "usable_days": 3,
+    "universe_size": 250,
+    "delivered_barcodes": 278,
+    "excluded_not_in_any_price_file": 28,
+    "per_day": [
+      {
+        "day": "2026-08-11",
+        "rule": "N2: present in today's price file ⇒ available",
+        "label_source": "delivery-catalogue orderability (Super Alonit | Kibbutz Einat)",
+        "true_positive": 240,
+        "false_positive": 4,
+        "true_negative": 0,
+        "false_negative": 6,
+        "total": 250,
+        "predicted_positive": 244,
+        "actual_positive": 246,
+        "actual_negative": 4,
+        "precision": 0.9836065573770492,
+        "recall": 0.975609756097561,
+        "f1": 0.9795918367346939,
+        "accuracy": 0.96,
+        "false_positive_rate": 1.0,
+        "precision_interval": [
+          0.9586140752038075,
+          0.9936070208510921
+        ],
+        "has_negative_class": true
+      },
+      {
+        "day": "2026-08-12",
+        "rule": "N2: present in today's price file ⇒ available",
+        "label_source": "delivery-catalogue orderability (Super Alonit | Kibbutz Einat)",
+        "true_positive": 240,
+        "false_positive": 4,
+        "true_negative": 0,
+        "false_negative": 6,
+        "total": 250,
+        "predicted_positive": 244,
+        "actual_positive": 246,
+        "actual_negative": 4,
+        "precision": 0.9836065573770492,
+        "recall": 0.975609756097561,
+        "f1": 0.9795918367346939,
+        "accuracy": 0.96,
+        "false_positive_rate": 1.0,
+        "precision_interval": [
+          0.9586140752038075,
+          0.9936070208510921
+        ],
+        "has_negative_class": true
+      },
+      {
+        "day": "2026-08-13",
+        "rule": "N2: present in today's price file ⇒ available",
+        "label_source": "delivery-catalogue orderability (Super Alonit | Kibbutz Einat)",
+        "true_positive": 239,
+        "false_positive": 5,
+        "true_negative": 0,
+        "false_negative": 6,
+        "total": 250,
+        "predicted_positive": 244,
+        "actual_positive": 245,
+        "actual_negative": 5,
+        "precision": 0.9795081967213115,
+        "recall": 0.9755102040816327,
+        "f1": 0.9775051124744377,
+        "accuracy": 0.956,
+        "false_positive_rate": 1.0,
+        "precision_interval": [
+          0.9529351650665636,
+          0.9912162606827861
+        ],
+        "has_negative_class": true
+      }
+    ]
+  }
+}
