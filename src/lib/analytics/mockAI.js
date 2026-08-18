@@ -8,6 +8,7 @@
  */
 
 import { isAssumedLeadTime } from '../receiving/leadTimeResolver.js'
+import { hasUsableVelocity, resolveVelocityConfidence } from './velocityConfidence.js'
 
 export function generateMockAIExplanation(product, recommendation, context = {}) {
   if (!product || !recommendation) return ''
@@ -44,9 +45,28 @@ function buildReorderExplanation(product, recommendation, context) {
   const qty = recommendation.recommendedOrderQuantity ?? 0
   const sentences = []
 
-  sentences.push(
-    `We recommend ordering ${qty} units of ${product.name} because it moves about ${m.weightedAvgDailySales ?? '—'} units per day on average.`,
-  )
+  // UI_DATA_CONTRACT §4.2 is binding on this sentence, not just on the numbers
+  // beside it: at velocityConfidence 'none' the text must not claim a sales
+  // rate. This used to read "it moves about — units per day on average" for
+  // every product without velocity — both a §4.2 breach and a literal em-dash
+  // rendered where a number belongs. 5,539 of 7,317 products are at 'none',
+  // so that was the common case, not the edge case.
+  //
+  // Same rule as the assumed-lead-time wording below: say what we know, and
+  // stay silent about what we do not.
+  const rate = m.weightedAvgDailySales
+  const canClaimRate =
+    hasUsableVelocity(resolveVelocityConfidence(product)) && Number.isFinite(rate) && rate > 0
+
+  if (canClaimRate) {
+    sentences.push(
+      `We recommend ordering ${qty} units of ${product.name} because it moves about ${rate} units per day on average.`,
+    )
+  } else {
+    sentences.push(
+      `We recommend ordering ${qty} units of ${product.name}. Sales history for this product is too thin to state a daily rate, so this is based on stock level and margin rather than measured demand.`,
+    )
+  }
 
   if (m.daysUntilStockout !== null && m.daysUntilStockout !== undefined) {
     const days = m.daysUntilStockout

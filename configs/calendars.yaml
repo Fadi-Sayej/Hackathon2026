@@ -1,0 +1,75 @@
+# calendars.yaml — calendar windows for T8 / #53 Step 4.
+#
+# ⚠️ VERIFY THESE DATES BEFORE QUOTING ANY EFFECT SIZE FROM THEM.
+#
+# Step 4 is the most valuable step in T8, and it is entirely downstream of this
+# file. If a window is wrong, the measured effect is attached to the wrong weeks
+# and every number derived from it is wrong while looking perfectly plausible.
+# They are written here, in one checkable place, rather than buried in code, so
+# that someone who knows the local calendar can correct them in one edit.
+#
+# Islamic dates are lunar and depend on local moon sighting, so a ±1 day
+# difference from any printed calendar is normal and does not matter at monthly
+# resolution. What matters is the month a window lands in.
+#
+# Sales data covers 2026-01 .. 2026-07, so only windows inside that range can be
+# measured. Others are listed for completeness and reported as out of range.
+#
+# `population` records who the event moves. Kafr Qasim is a predominantly Arab
+# town on a highway serving mixed traffic, so Islamic events act mainly on local
+# residents and Jewish holidays mainly on through-traffic. The two should never
+# be pooled.
+
+verified_by: null          # ← put your name here once you have checked the dates
+verified_on: null
+
+windows:
+  - key: ramadan
+    calendar: islamic
+    population: local
+    label_he: "רמדאן"
+    start: 2026-02-17
+    end: 2026-03-19
+    note: >-
+      Ramadan 1447 AH. Straddles February and March, so neither month is fully
+      exposed — the analysis uses each month's overlap fraction rather than a
+      binary flag.
+
+  - key: eid_al_fitr
+    calendar: islamic
+    population: local
+    label_he: "עיד אל-פיטר"
+    start: 2026-03-20
+    end: 2026-03-22
+
+  - key: eid_al_adha
+    calendar: islamic
+    population: local
+    label_he: "עיד אל-אדחא"
+    start: 2026-05-27
+    end: 2026-05-30
+
+  - key: pesach
+    calendar: hebrew
+    population: through_traffic
+    label_he: "פסח"
+    start: 2026-04-01
+    end: 2026-04-09
+    note: >-
+      Chametz gate. Effect here is expected to come from highway traffic rather
+      than local residents.
+
+  - key: shavuot
+    calendar: hebrew
+    population: through_traffic
+    label_he: "שבועות"
+    start: 2026-05-21
+    end: 2026-05-22
+
+  - key: rosh_hashanah
+    calendar: hebrew
+    population: through_traffic
+    label_he: "ראש השנה"
+    start: 2026-09-11
+    end: 2026-09-13
+    note: "Outside the Jan-Jul sales window; listed so it is not forgotten."
