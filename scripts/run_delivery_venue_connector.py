@@ -56,11 +56,17 @@ from src.external.delivery_venue_connector import run_delivery_venue_collection
 DEFAULT_TARGETS_PATH = _ROOT / "configs" / "delivery_targets.yaml"
 
 
-def load_targets(path: Path, keys: list[str] | None = None) -> list[dict]:
+def load_targets(path: Path, keys: list[str] | None = None,
+                 include_disabled: bool = False) -> list[dict]:
     """Enabled targets from delivery_targets.yaml, optionally filtered by key.
 
     A target with no URL is skipped rather than crashing the run — one
     malformed config entry must not cost a day of everyone else's history.
+
+    `include_disabled` re-tests targets switched off for a known cause (see
+    `disabled_reason`). A disabled venue is not forgotten, it is quarantined:
+    a nightly alert for a cause nobody intends to act on tonight is how alerts
+    stop being read.
     """
     if not path.exists():
         raise FileNotFoundError("delivery targets config not found: %s" % path)
@@ -71,7 +77,7 @@ def load_targets(path: Path, keys: list[str] | None = None) -> list[dict]:
     for target in targets:
         if not isinstance(target, dict) or not target.get("url"):
             continue
-        if not target.get("enabled", True):
+        if not include_disabled and not target.get("enabled", True):
             continue
         if keys and target.get("key") not in keys:
             continue
@@ -98,6 +104,11 @@ def parse_args() -> argparse.Namespace:
         action="append",
         default=[],
         help="Collect only these target keys from the config. May be repeated.",
+    )
+    parser.add_argument(
+        "--include-disabled",
+        action="store_true",
+        help="also collect targets with enabled: false, to re-test a quarantined venue",
     )
     parser.add_argument(
         "--targets",
@@ -158,7 +169,8 @@ def main() -> None:
         targets = [{"key": url, "url": url} for url in args.url]
     else:
         try:
-            targets = load_targets(args.targets, args.key or None)
+            targets = load_targets(args.targets, args.key or None,
+                                   include_disabled=args.include_disabled)
         except Exception as exc:
             logger.exception("Could not read delivery targets: {}", exc)
             sys.exit(1)

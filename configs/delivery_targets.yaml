@@ -106,6 +106,24 @@ targets:
     role: competitor
     enabled: true
 
+  # DISABLED 2026-08-18 — Wolt serves no assortment for this venue.
+  #
+  # The URL is live (HTTP 200) and the venue resolves, but its category pages
+  # carry no ["venue-assortment", "category", ...] data at all — only a 12-item
+  # "Most ordered" teaser and a "temporarily closed" banner. The other nine
+  # venues serve that key normally, so this is the venue's state, not our parser.
+  #
+  # Those 12 teaser items are deliberately NOT ingested. A closed venue that
+  # appears to carry 12 products and to have dropped everything else is exactly
+  # the shape #49 reads as a chain-wide delisting.
+  #
+  # Disabled rather than left failing because it had been red for six consecutive
+  # nights (13-18 Aug). A manifest that alerts every night for a known cause
+  # trains everyone to ignore it — the alert fatigue #46 Step 5 warns about.
+  #
+  # Re-check with:  python3 scripts/run_delivery_venue_connector.py \
+  #                   --include-disabled --key shuk_bair_rosh_haayin
+  # If it returns products, set enabled: true again.
   - key: shuk_bair_rosh_haayin       # 2.53km — fresh produce market
     chain: shuk_bair
     chain_display: "Shuk Bair"
@@ -113,7 +131,8 @@ targets:
     url: https://wolt.com/en/isr/petah-tikva/venue/shuk-bair-rosh-haain
     city: "Rosh Ha'ayin"
     role: competitor
-    enabled: true
+    enabled: false
+    disabled_reason: "wolt serves no assortment; venue appears closed (2026-08-18)"
 
   - key: shufersal_rosh_haayin       # 2.76km — was on 10bis; available on Wolt
     chain: shufersal

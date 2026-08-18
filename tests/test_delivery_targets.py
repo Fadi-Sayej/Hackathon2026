@@ -93,6 +93,43 @@ def test_targets_default_to_enabled(tmp_path):
     assert len(load_targets(path)) == 1
 
 
+def test_a_quarantined_target_is_excluded_from_the_daily_run(tmp_path):
+    """A venue disabled for a known cause must not fail the manifest nightly.
+    An alert that fires every night for something nobody intends to act on
+    tonight is how alerts stop being read — #46 Step 5's own warning."""
+    path = write_config(tmp_path, [
+        {"key": "live", "url": "https://x/live"},
+        {"key": "dead", "url": "https://x/dead", "enabled": False,
+         "disabled_reason": "wolt serves no assortment"},
+    ])
+    assert [t["key"] for t in load_targets(path)] == ["live"]
+
+
+def test_a_quarantined_target_can_be_re_tested_on_demand(tmp_path):
+    """Quarantined, not forgotten. Re-checking must not require editing config."""
+    path = write_config(tmp_path, [
+        {"key": "live", "url": "https://x/live"},
+        {"key": "dead", "url": "https://x/dead", "enabled": False},
+    ])
+    keys = [t["key"] for t in load_targets(path, include_disabled=True)]
+    assert keys == ["live", "dead"]
+
+
+def test_the_real_config_quarantines_shuk_bair_with_a_reason(tmp_path):
+    """Whoever re-enables it should find out why it was switched off."""
+    config = yaml.safe_load(DEFAULT_TARGETS_PATH.read_text(encoding="utf-8"))
+    dead = [t for t in config["targets"] if t.get("enabled") is False]
+    assert dead, "expected at least one quarantined target"
+    for target in dead:
+        assert target.get("disabled_reason"), f"{target['key']} disabled with no reason"
+
+
+def test_our_own_store_is_never_quarantined():
+    """#49 Step 5 loses its ground truth the moment this one goes dark."""
+    keys = {t["key"] for t in load_targets(DEFAULT_TARGETS_PATH)}
+    assert "yomyom_kafr_qasim" in keys
+
+
 def test_keys_filter_the_selection(tmp_path):
     path = write_config(tmp_path, [
         {"key": "a", "url": "https://x/a"},

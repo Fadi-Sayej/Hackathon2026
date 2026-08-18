@@ -106,8 +106,11 @@ before it was written down:
   cleanly. The manifest records `stores`/`venues` against `expected` and a running
   median; `src/market/presence.py` independently drops such a day.
 
-Delivery venues come from `configs/delivery_targets.yaml` (10 enabled), **not**
-from a default in the script. `yomyom_kafr_qasim` is our own store and is the
+Delivery venues come from `configs/delivery_targets.yaml` (9 enabled, 1
+quarantined), **not** from a default in the script. A venue that stops serving
+its assortment is set `enabled: false` with a `disabled_reason` and a date, and
+re-tested with `--include-disabled` — leaving it failing turns the nightly
+manifest permanently red, which is how alerts stop being read. `yomyom_kafr_qasim` is our own store and is the
 ground truth for #49 Step 5; `super_alonit_einat` carries `price_file_store_id`
 and is the only venue visible in both the price file and the delivery catalogue,
 which is what makes the #49 Step 2 baseline measurable at all.
