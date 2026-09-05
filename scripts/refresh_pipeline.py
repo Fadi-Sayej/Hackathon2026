@@ -29,6 +29,18 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 
+def _inner_degraded(step: dict) -> bool:
+    """A step that raised nothing but did no work.
+
+    generate_product_recommendations() returns {"status": "readiness_only"} when its
+    inputs are missing. That is not an exception, so the old code recorded it as "ok"
+    and the run reported success while producing nothing. Anything whose own result
+    reports a status other than "ok" is surfaced instead of hidden.
+    """
+    result = step.get("result")
+    return isinstance(result, dict) and result.get("status") not in (None, "ok")
+
+
 def _step(name: str, fn) -> dict:
     try:
         result = fn()
@@ -37,13 +49,35 @@ def _step(name: str, fn) -> dict:
         return {"step": name, "status": "error", "error": f"{type(exc).__name__}: {exc}"}
 
 
-def run(input_csv: str | None) -> dict:
+def run(input_csv: str | None, skip_market: bool = False) -> dict:
     steps: list[dict] = []
 
     if input_csv:
         from src.internal_pos.pos_importer import import_pos_file
 
         steps.append(_step("pos_import", lambda: import_pos_file(Path(input_csv))))
+
+    # MARKET CHAIN. Until 2026-09-05 these three ran only by hand, so nothing ever
+    # wrote data/signals/competitor_product_signals/ or
+    # data/recommendations/product_recommendations/. The exporter globs both
+    # directories, found nothing, and shipped "competitorSignals: 0" every time —
+    # the market half of the product was absent from the dashboard, silently,
+    # because a missing directory is not an exception.
+    #
+    # Order is a hard dependency chain: signals feed matching, matching feeds
+    # recommendations. Running them out of order yields "readiness_only".
+    if not skip_market:
+        from src.signals.competitor_product_signals import build_competitor_product_signals
+
+        steps.append(_step("competitor_signals", build_competitor_product_signals))
+
+        from src.matching.product_matching import run_product_matching
+
+        steps.append(_step("product_matching", run_product_matching))
+
+        from src.recommendations.product_recommendations import generate_product_recommendations
+
+        steps.append(_step("product_recommendations", generate_product_recommendations))
 
     from src.expiry.expiry_tracking import build_expiry_report
 
@@ -55,15 +89,23 @@ def run(input_csv: str | None) -> dict:
     steps.append(_step("dashboard_export", export))
 
     overall = "ok" if all(s["status"] == "ok" for s in steps) else "partial"
-    return {"status": overall, "steps": steps}
+    degraded = [s["step"] for s in steps if s["status"] == "ok" and _inner_degraded(s)]
+    if degraded and overall == "ok":
+        overall = "degraded"
+    return {"status": overall, "steps": steps, "degraded_steps": degraded}
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Refresh all dashboard inputs in one run.")
     parser.add_argument("--input", default=None, help="Optional POS CSV to import first.")
+    parser.add_argument(
+        "--skip-market",
+        action="store_true",
+        help="Skip the competitor signal/matching/recommendation chain (POS-only refresh).",
+    )
     args = parser.parse_args()
 
-    summary = run(args.input)
+    summary = run(args.input, skip_market=args.skip_market)
     print(json.dumps(summary, ensure_ascii=False, indent=2))
     return 0 if summary["status"] == "ok" else 1
 
