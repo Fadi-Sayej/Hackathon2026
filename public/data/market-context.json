@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-05T13:11:23.439319+00:00",
+  "date": "2026-09-05",
+  "status": "ok",
+  "sources": {
+    "weather": "open-meteo",
+    "hebrew": "hebcal",
+    "islamic": "computed_hijri"
+  },
+  "weather": {
+    "temperatureC": 30.8,
+    "precipitation": 0.0,
+    "windSpeed": 17.9,
+    "weatherCode": 1,
+    "label": "hot",
+    "observedAt": "2026-09-05T16:00",
+    "lat": 32.114,
+    "lon": 34.976,
+    "source": "open-meteo"
+  },
+  "hebrew": {
+    "date": "2026-09-05",
+    "holidays": [
+      {
+        "title": "Leil Selichot",
+        "hebrew": "סליחות",
+        "category": "holiday"
+      }
+    ],
+    "isErevChag": false,
+    "isFastDay": false,
+    "isShabbatEve": false,
+    "chametz": null,
+    "pesachStart": "2027-04-22",
+    "windows": {
+      "chametz_stop_reorder_days": 30,
+      "chametz_clear_stock_days": 14,
+      "pesach_length_days": 8
+    },
+    "source": "hebcal"
+  },
+  "islamic": {
+    "date": "2026-09-05",
+    "hijri": {
+      "year": 1448,
+      "month": 3,
+      "day": 22
+    },
+    "isRamadan": false,
+    "ramadanDay": null,
+    "isLastTenNights": false,
+    "isEidAlFitr": false,
+    "isEidAlAdha": false,
+    "ramadanStart": "2027-02-08",
+    "daysToRamadan": 156,
+    "daysToEidAlFitr": 186,
+    "phase": null,
+    "windows": {
+      "ramadan_build_up_days": 21,
+      "eid_al_fitr_build_up_days": 10,
+      "eid_al_adha_build_up_days": 10,
+      "eid_tail_days": 3
+    },
+    "source": "computed_hijri"
+  }
+}

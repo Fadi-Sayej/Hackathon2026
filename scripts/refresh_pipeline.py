@@ -86,6 +86,13 @@ def run(input_csv: str | None, skip_market: bool = False) -> dict:
 
         steps.append(_step("product_recommendations", generate_product_recommendations))
 
+    # Fetch weather and both calendars once, and commit the result. Previously the
+    # browser fetched these at render time, so the recommender could not see them
+    # and two page loads could disagree about the same day.
+    from src.context.build import write_market_context
+
+    steps.append(_step("market_context", write_market_context))
+
     from src.expiry.expiry_tracking import build_expiry_report
 
     steps.append(_step("expiry_report", lambda: build_expiry_report()))

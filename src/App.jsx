@@ -32,6 +32,7 @@ import {
   getRemoteExplanationBudget,
 } from './lib/ai/explanationProvider.js'
 import { buildMarketContext } from './lib/context/marketContextAdapter.js'
+import { loadMarketContext, toEngineContext } from './lib/dataAdapters/loadMarketContext.js'
 import { toDemandFactors } from './lib/context/liveMarketContext.js'
 import { computeDemand } from './lib/analytics/demandEngine.js'
 import { MARKET_PARAM_REGISTRY, PRODUCT_ARCHETYPES } from './data/marketParams.js'
@@ -124,7 +125,14 @@ function App() {
   useEffect(() => {
     let cancelled = false
 
-    async function loadMarketContext() {
+    async function loadMarketContextEffect() {
+      // Prefer the artifact the pipeline committed: it is what the recommender
+      // actually decided on, so the screen and the order agree by construction.
+      const artifact = await loadMarketContext()
+      if (artifact) {
+        if (!cancelled) setMarketContext(toEngineContext(artifact, fallbackMarketContext))
+        return
+      }
       const nextContext = await buildMarketContext({
         enableLive: import.meta.env.VITE_ENABLE_LIVE_MARKET_CONTEXT === 'true',
         countryCode: import.meta.env.VITE_HOLIDAY_COUNTRY,
@@ -137,7 +145,7 @@ function App() {
       if (!cancelled) setMarketContext(nextContext)
     }
 
-    loadMarketContext()
+    loadMarketContextEffect()
     return () => {
       cancelled = true
     }
