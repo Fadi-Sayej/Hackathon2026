@@ -97,6 +97,9 @@ def month_from_filename(path: Path):
     return None
 
 
+from src.snapshots.censored_demand import correct_for_censoring  # noqa: E402
+
+
 def read_month(path: Path):
     period = month_from_filename(path)
     if period is None:
@@ -219,6 +222,9 @@ def build_velocity(by_barcode, periods, reconcile_before=None):
             # "you are running out, reorder" is nonsense for a car wash. 683 of 1,778
             # products are in this category.
             "is_stocked": sum(m["receipts"] for m in months.values()) > 0,
+            # Raw units over a calendar period measure supply, not demand, whenever
+            # supply ran out. See src/snapshots/censored_demand.py.
+            **{k: v for k, v in correct_for_censoring(months, periods).items()},
             "reconcile_units": int(round(reconcile_units)),
             "reconcile_receipts": int(round(reconcile_receipts)),
             "reconcile_months": len(window),
@@ -284,6 +290,11 @@ def write_sales_table(velocity, sales_path: Path, dry_run: bool):
             row["reconcile_units"] = None
             row["reconcile_receipts"] = None
             row["stock_reconciles"] = None
+            row["availability_state"] = None
+            row["available_days"] = None
+            row["censored_days"] = None
+            row["demand_per_day_corrected"] = None
+            row["demand_confidence"] = "none"
             continue
 
         matched += 1
@@ -304,6 +315,11 @@ def write_sales_table(velocity, sales_path: Path, dry_run: bool):
         row["reconcile_units"] = entry["reconcile_units"]
         row["reconcile_receipts"] = entry["reconcile_receipts"]
         row["stock_reconciles"] = entry["stock_reconciles"]
+        row["availability_state"] = entry["availability_state"]
+        row["available_days"] = entry["available_days"]
+        row["censored_days"] = entry["censored_days"]
+        row["demand_per_day_corrected"] = entry["demand_per_day_corrected"]
+        row["demand_confidence"] = entry["demand_confidence"]
 
     schema = pa.schema([
         ("barcode", pa.string()), ("product_name", pa.string()), ("category", pa.string()),
@@ -315,6 +331,9 @@ def write_sales_table(velocity, sales_path: Path, dry_run: bool):
         ("total_units_all_months", pa.int64()), ("total_receipts_all_months", pa.int64()),
         ("reconcile_units", pa.int64()), ("reconcile_receipts", pa.int64()),
         ("stock_reconciles", pa.bool_()),
+        ("availability_state", pa.string()), ("available_days", pa.float64()),
+        ("censored_days", pa.float64()), ("demand_per_day_corrected", pa.float64()),
+        ("demand_confidence", pa.string()),
         ("_imported_at", pa.string()),
         ("_source_file", pa.string()), ("_source_kind", pa.string()),
     ])

@@ -12,6 +12,12 @@ from src.common.paths import MATCHING_ROOT, RECOMMENDATIONS_ROOT, SIGNALS_ROOT, 
 
 
 REPORTS_ROOT = Path(__file__).resolve().parents[2] / "reports" / "recommendations"
+from src.snapshots.censored_demand import (
+    STATE_DELISTED,
+    STATE_NEVER_STOCKED,
+    corrected_monthly_demand,
+)
+
 PRODUCT_RECOMMENDATION_DIR = RECOMMENDATIONS_ROOT / "product_recommendations"
 
 POS_FILES = {
@@ -238,6 +244,17 @@ def generate_product_recommendations() -> dict[str, Any]:
         )
         stock = inventory.get("current_stock") if inventory else None
         sold_30d = sales.get("units_sold_30d") if sales else None
+
+        # Demand corrected for the months the product was not on the shelf. Raw
+        # units_sold_30d measures supply whenever supply ran out, so the products
+        # most in need of a reorder were the ones the old rule could never see.
+        demand_30d = corrected_monthly_demand(sales)
+        availability = sales.get("availability_state") if sales else None
+        demand_confidence = sales.get("demand_confidence") if sales else None
+        # A car wash or an espresso pulled to order sells without ever being
+        # delivered; a dropped line stops for good. Neither is a stockout, and
+        # "you are running out, reorder" is nonsense for both.
+        reorderable = availability not in (STATE_NEVER_STOCKED, STATE_DELISTED, None)
         margin_pct = margin.get("margin_pct") if margin else None
 
         recommendation_type = None
@@ -248,9 +265,22 @@ def generate_product_recommendations() -> dict[str, Any]:
             recommendation_type = "PRICE_CHECK"
             reason = "Competitor price is materially below YomYom shelf price while local margin data exists."
             confidence = _confidence(0.55 + 0.1 * min(len(evidence), 4))
-        elif stock is not None and sold_30d not in (None, 0) and stock <= 10 and sold_30d >= 20:
+        elif (
+            stock is not None
+            and stock <= 10
+            and reorderable
+            and demand_30d is not None
+            and demand_30d >= 20
+        ):
             recommendation_type = "REORDER"
-            reason = "Local stock is low relative to recent sales and the product also appears in competitor signals."
+            if (sold_30d or 0) < 20:
+                reason = (
+                    "Stock is low and corrected demand clears the reorder threshold. "
+                    "Raw sales understate it because the product spent part of the "
+                    "period out of stock."
+                )
+            else:
+                reason = "Local stock is low relative to recent sales and the product also appears in competitor signals."
             confidence = _confidence(0.6 + 0.08 * min(len(evidence), 4))
         elif competitor.get("appears_in_delivery_catalog") and sold_30d in (None, 0) and stock not in (None, 0):
             recommendation_type = "WATCH_PRODUCT"
@@ -276,6 +306,9 @@ def generate_product_recommendations() -> dict[str, Any]:
                 "competitor_price": competitor_price or None,
                 "current_stock": stock,
                 "units_sold_30d": sold_30d,
+                "demand_30d_corrected": round(demand_30d, 2) if demand_30d is not None else None,
+                "availability_state": availability,
+                "demand_confidence": demand_confidence,
                 "margin_pct": margin_pct,
                 "competitor_signal_id": signal_id,
             }
