@@ -67,6 +67,13 @@ def run(input_csv: str | None, skip_market: bool = False) -> dict:
     # Order is a hard dependency chain: signals feed matching, matching feeds
     # recommendations. Running them out of order yields "readiness_only".
     if not skip_market:
+        # silver/ is gitignored while the snapshots that contain the same files are
+        # committed, so on a fresh clone or in CI the signal builder reads a silver
+        # tree months out of date. Rebuild it from the snapshots first.
+        from scripts.rehydrate_silver import rehydrate
+
+        steps.append(_step("rehydrate_silver", rehydrate))
+
         from src.signals.competitor_product_signals import build_competitor_product_signals
 
         steps.append(_step("competitor_signals", build_competitor_product_signals))
@@ -86,7 +93,9 @@ def run(input_csv: str | None, skip_market: bool = False) -> dict:
     # The exporter regenerates operational recommendations and refreshes sources.json.
     from scripts.export_dashboard_data import export
 
-    steps.append(_step("dashboard_export", export))
+    # A POS-only refresh legitimately has no competitor recommendations; any other
+    # run with none is the seam failing again, and must not publish silently.
+    steps.append(_step("dashboard_export", lambda: export(allow_no_competitor=skip_market)))
 
     overall = "ok" if all(s["status"] == "ok" for s in steps) else "partial"
     degraded = [s["step"] for s in steps if s["status"] == "ok" and _inner_degraded(s)]
