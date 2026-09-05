@@ -217,7 +217,22 @@ def _expiry_summary() -> dict[str, Any]:
     }
 
 
-def export() -> dict[str, Any]:
+class EmptyExportError(RuntimeError):
+    """Refused to publish a dashboard with nothing in it.
+
+    Both pipeline bugs found on 2026-09-05 had the same shape: a glob over a
+    directory that did not exist returned no rows, which is indistinguishable from
+    a successful run that found nothing. The export then wrote a valid, empty JSON
+    file and exited 0.
+
+    On a clean clone that was actively destructive — it overwrote a committed
+    3,035-recommendation operational.json with 0 recommendations and reported
+    success. So this check runs BEFORE the write: an empty export never reaches
+    disk, and the last good file survives.
+    """
+
+
+def export(allow_no_competitor: bool = False) -> dict[str, Any]:
     generated_at = datetime.now(timezone.utc)
 
     # Refresh operational recommendations so the export always reflects current POS data.
@@ -265,6 +280,27 @@ def export() -> dict[str, Any]:
         "recommendations": recommendations,
     }
 
+    operational_count = len(recommendations) - len(competitor_recs)
+    problems: list[str] = []
+    if operational_count == 0:
+        problems.append(
+            "zero operational recommendations — data/internal/silver_pos/ is empty or "
+            "missing. Import the POS export first: "
+            "python3 scripts/import_yomyom_pos.py --input yomyom-inventory.csv"
+        )
+    if len(competitor_recs) == 0 and not allow_no_competitor:
+        problems.append(
+            "zero competitor recommendations — nothing in "
+            "data/recommendations/product_recommendations/. Run `npm run data:refresh`, "
+            "which rebuilds the market chain. For a deliberate POS-only export pass "
+            "--allow-no-competitor (or run refresh with --skip-market)."
+        )
+    if problems:
+        raise EmptyExportError(
+            "refusing to overwrite " + str(PUBLIC_DATA_DIR / "operational.json")
+            + " with an empty export:\n  - " + "\n  - ".join(problems)
+        )
+
     PUBLIC_DATA_DIR.mkdir(parents=True, exist_ok=True)
     out_path = PUBLIC_DATA_DIR / "operational.json"
     out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -272,6 +308,8 @@ def export() -> dict[str, Any]:
         "status": "ok",
         "output": str(out_path),
         "recommendation_count": len(recommendations),
+        "operational_count": operational_count,
+        "competitor_count": len(competitor_recs),
         "by_type": by_type,
         "by_family": by_family,
         "scraping_status": scraping_status,
@@ -280,7 +318,21 @@ def export() -> dict[str, Any]:
 
 
 def main() -> int:
-    result = export()
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Export dashboard JSON from the pipelines.")
+    parser.add_argument(
+        "--allow-no-competitor",
+        action="store_true",
+        help="Permit an export with no competitor recommendations (POS-only run).",
+    )
+    args = parser.parse_args()
+
+    try:
+        result = export(allow_no_competitor=args.allow_no_competitor)
+    except EmptyExportError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 1
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0
 
