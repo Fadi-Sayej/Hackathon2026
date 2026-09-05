@@ -29,6 +29,12 @@ data/recommendations/                   data/recommendations/
                     ▼  src/lib/dataAdapters/loadOperationalData.js  (fetch)
             src/App.jsx ──► src/pages/OperationalPage.jsx
                     ▼  src/lib/analytics/actionPriority.js          ← ranks by ₪; money vs data-hygiene
+
+MARKET CONTEXT (decided once, in Python)
+src/context/{weather,hebrew,islamic}.py ─► src/context/demand_signals.py
+        └─► public/data/market-context.json  [committed]
+                ├─► src/recommendations/product_recommendations.py   (applies the multiplier)
+                └─► src/lib/dataAdapters/loadMarketContext.js ─► reorderEngine.js (renders only)
 ```
 
 `scripts/refresh_pipeline.py` (`npm run data:refresh`) is the only thing that runs
@@ -41,6 +47,8 @@ continues as `partial`.
 |---|---|
 | `scripts/refresh_pipeline.py` | Runs both pipelines in dependency order, then the exporter. |
 | `scripts/rehydrate_silver.py` | Rebuilds `data/external/silver/` from the committed snapshots so a clone has market data. |
+| `src/context/build.py` | Fetches weather + both calendars once per run → `public/data/market-context.json`. |
+| `src/snapshots/censored_demand.py` | Corrects demand for months a product was off the shelf, so stockouts stop hiding reorders. |
 | `src/internal_pos/pos_importer.py` | POS CSV → the four silver parquet tables. The **live** importer. |
 | `src/recommendations/operational_recommendations.py` | Silver POS + expiry → the 5 operational recommendation types. |
 | `src/signals/competitor_product_signals.py` | Alonit prices + Wolt catalog → one unified competitor signal table. |
@@ -78,6 +86,14 @@ continues as `partial`.
 6. **Expiry parquets are globbed by two consumers independently**
    (`operational_recommendations.py` and the exporter); a run landing between them
    makes them disagree.
+
+7. **Market context is decided in Python, rendered in JS.** `demandSignals` comes
+   from `public/data/market-context.json`; `reorderEngine.js` applies it and must not
+   reintroduce a table of its own. The previous in-browser table was keyed in English
+   against a Hebrew catalog, so it matched nothing and every multiplier was 1.
+8. **`market_context` must run before `product_recommendations`** in
+   `refresh_pipeline.py` — the recommender reads the artifact, so the wrong order
+   decides today's orders on yesterday's context.
 
 ## npm scripts — product path
 

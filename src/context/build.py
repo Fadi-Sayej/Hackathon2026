@@ -27,6 +27,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from src.common.paths import PROJECT_ROOT
+from src.context.demand_signals import build_demand_signals
 from src.context.hebrew import get_hebrew_context
 from src.context.islamic import get_islamic_context
 from src.context.weather import get_weather
@@ -56,6 +57,10 @@ def build_market_context(
     live = [k for k, v in sources.items() if v]
     status = "ok" if len(live) == len(sources) else ("partial" if live else "unavailable")
 
+    demand = build_demand_signals(
+        {"weather": weather, "hebrew": hebrew, "islamic": islamic}
+    )
+
     return {
         "schemaVersion": SCHEMA_VERSION,
         "generatedAt": datetime.now(timezone.utc).isoformat(),
@@ -65,6 +70,11 @@ def build_market_context(
         "weather": weather,
         "hebrew": hebrew,
         "islamic": islamic,
+        # The decision the pipeline made, for the frontend to render rather than
+        # recompute. Keyed on real catalog categories.
+        "demandSignals": demand["signals"],
+        "demandBasis": demand["basis"],
+        "activeReasons": demand["activeReasons"],
     }
 
 
@@ -85,4 +95,5 @@ def write_market_context(
         "islamicPhase": payload["islamic"]["phase"],
         "chametzPhase": (payload["hebrew"]["chametz"] or {}).get("phase"),
         "weatherLabel": payload["weather"]["label"],
+        "activeReasons": payload["activeReasons"],
     }

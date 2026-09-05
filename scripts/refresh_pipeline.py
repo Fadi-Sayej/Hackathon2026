@@ -66,6 +66,13 @@ def run(input_csv: str | None, skip_market: bool = False) -> dict:
     #
     # Order is a hard dependency chain: signals feed matching, matching feeds
     # recommendations. Running them out of order yields "readiness_only".
+    # Weather and both calendars, fetched once and committed. Must run BEFORE the
+    # recommender: product_recommendations reads demandSignals out of the artifact,
+    # so building it afterwards would decide today's orders on yesterday's context.
+    from src.context.build import write_market_context
+
+    steps.append(_step("market_context", write_market_context))
+
     if not skip_market:
         # silver/ is gitignored while the snapshots that contain the same files are
         # committed, so on a fresh clone or in CI the signal builder reads a silver
@@ -85,13 +92,6 @@ def run(input_csv: str | None, skip_market: bool = False) -> dict:
         from src.recommendations.product_recommendations import generate_product_recommendations
 
         steps.append(_step("product_recommendations", generate_product_recommendations))
-
-    # Fetch weather and both calendars once, and commit the result. Previously the
-    # browser fetched these at render time, so the recommender could not see them
-    # and two page loads could disagree about the same day.
-    from src.context.build import write_market_context
-
-    steps.append(_step("market_context", write_market_context))
 
     from src.expiry.expiry_tracking import build_expiry_report
 

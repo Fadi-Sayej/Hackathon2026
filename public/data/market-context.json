@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-05T13:11:23.439319+00:00",
+  "generatedAt": "2026-09-05T13:16:35.945720+00:00",
   "date": "2026-09-05",
   "status": "ok",
   "sources": {
@@ -9,12 +9,12 @@
     "islamic": "computed_hijri"
   },
   "weather": {
-    "temperatureC": 30.8,
+    "temperatureC": 30.6,
     "precipitation": 0.0,
-    "windSpeed": 17.9,
+    "windSpeed": 17.8,
     "weatherCode": 1,
     "label": "hot",
-    "observedAt": "2026-09-05T16:00",
+    "observedAt": "2026-09-05T16:15",
     "lat": 32.114,
     "lon": 34.976,
     "source": "open-meteo"
@@ -63,5 +63,28 @@
       "eid_tail_days": 3
     },
     "source": "computed_hijri"
-  }
+  },
+  "demandSignals": {
+    "משקאות": 1.2,
+    "מחלקת -barista": 1.2,
+    "גלידות": 1.15,
+    "קפואים מצוננים": 1.15
+  },
+  "demandBasis": {
+    "משקאות": [
+      "hot_weather"
+    ],
+    "מחלקת -barista": [
+      "hot_weather"
+    ],
+    "גלידות": [
+      "hot_weather"
+    ],
+    "קפואים מצוננים": [
+      "hot_weather"
+    ]
+  },
+  "activeReasons": [
+    "hot_weather"
+  ]
 }

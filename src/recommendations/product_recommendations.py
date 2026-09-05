@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
@@ -8,7 +10,7 @@ from typing import Any
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from src.common.paths import MATCHING_ROOT, RECOMMENDATIONS_ROOT, SIGNALS_ROOT, SILVER_POS_ROOT
+from src.common.paths import PROJECT_ROOT, MATCHING_ROOT, RECOMMENDATIONS_ROOT, SIGNALS_ROOT, SILVER_POS_ROOT
 
 
 REPORTS_ROOT = Path(__file__).resolve().parents[2] / "reports" / "recommendations"
@@ -87,6 +89,15 @@ def _confidence(score: float) -> float:
 
 def _recommendation_id(*parts: str) -> str:
     return hashlib.sha256("|".join(parts).encode("utf-8")).hexdigest()[:16]
+
+
+def _load_demand_signals() -> dict[str, float]:
+    """Category multipliers the context step decided. Empty when unavailable."""
+    path = PROJECT_ROOT / "public" / "data" / "market-context.json"
+    try:
+        return json.loads(path.read_text(encoding="utf-8")).get("demandSignals") or {}
+    except (OSError, ValueError):
+        return {}
 
 
 def generate_product_recommendations() -> dict[str, Any]:
@@ -201,6 +212,8 @@ def generate_product_recommendations() -> dict[str, Any]:
                 competitor_by_signal.setdefault(str(value), row)
 
     recommendations: list[dict[str, Any]] = []
+    demand_signals = _load_demand_signals()
+
     for match in matching_rows:
         internal_barcode = str(match.get(matching_columns["internal_barcode"]) or "")
         competitor_barcode = str(match.get(matching_columns["competitor_barcode"]) or "")
@@ -249,6 +262,12 @@ def generate_product_recommendations() -> dict[str, Any]:
         # units_sold_30d measures supply whenever supply ran out, so the products
         # most in need of a reorder were the ones the old rule could never see.
         demand_30d = corrected_monthly_demand(sales)
+        # Weather and both calendars, decided once by the context step. The browser
+        # used to compute this at render time against category keys that never
+        # matched the catalog, so it was always 1.
+        demand_multiplier = demand_signals.get(product.get("category")) or 1.0
+        if demand_30d is not None:
+            demand_30d *= demand_multiplier
         availability = sales.get("availability_state") if sales else None
         demand_confidence = sales.get("demand_confidence") if sales else None
         # A car wash or an espresso pulled to order sells without ever being
@@ -309,6 +328,7 @@ def generate_product_recommendations() -> dict[str, Any]:
                 "demand_30d_corrected": round(demand_30d, 2) if demand_30d is not None else None,
                 "availability_state": availability,
                 "demand_confidence": demand_confidence,
+                "demand_multiplier": round(demand_multiplier, 3),
                 "margin_pct": margin_pct,
                 "competitor_signal_id": signal_id,
             }

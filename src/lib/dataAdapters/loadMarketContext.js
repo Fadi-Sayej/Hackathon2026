@@ -45,6 +45,13 @@ export function toEngineContext(artifact, fallback) {
     // not recompute it.
     islamicPhase: islamic?.phase ?? null,
     chametz: hebrew?.chametz ?? null,
+    // The multipliers the pipeline decided, keyed on real catalog categories. The
+    // previous table was keyed in English ('Cold Drinks', 'Snacks') while every
+    // category in the catalog is Hebrew, so it silently matched nothing and every
+    // multiplier was 1. reorderEngine.js renders this; it no longer decides it.
+    demandSignals: artifact.demandSignals ?? {},
+    demandBasis: artifact.demandBasis ?? {},
+    activeReasons: artifact.activeReasons ?? [],
     sourceLabel: artifact.status === 'ok' ? 'live' : artifact.status,
     provenance: artifact.sources ?? null,
     generatedAt: artifact.generatedAt ?? null,

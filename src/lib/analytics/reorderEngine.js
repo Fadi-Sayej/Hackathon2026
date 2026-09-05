@@ -73,6 +73,14 @@ export function aggregateNetValueAtStake(recommendations) {
   return round(total)
 }
 
+/**
+ * NOTE ON WHO DECIDES
+ * `marketContext.demandSignals` is computed by the pipeline
+ * (src/context/demand_signals.py) and read from public/data/market-context.json.
+ * This module applies it; it does not choose it. Do not reintroduce a signal table
+ * here — the previous one was keyed in English against a Hebrew catalog and
+ * silently multiplied everything by 1.
+ */
 export function computeMetrics(product, marketContext = {}) {
   const avgDailySales7 = safeDivide(product.salesLast7Days, 7)
   const avgDailySales30 = safeDivide(product.salesLast30Days, 30)
