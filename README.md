@@ -9,8 +9,9 @@
 
 ## Project Docs
 
-- الخطة الأصلية: [SmartShelf_AI_Hackathon_Plan.md](/C:/Users/mshar/Desktop/hackathonsj/SmartShelf_AI_Hackathon_Plan.md)
-- خطة السبرنتات: [SPRINTS.md](/C:/Users/mshar/Desktop/hackathonsj/SPRINTS.md)
+- [ARCHITECTURE.md](ARCHITECTURE.md) — how the two pipelines fit together, and every seam between them
+- [CLAUDE.md](CLAUDE.md) — the rules for working in this repo
+- Older planning docs are in `docs/archive/` and are out of date
 
 ### Source Semantics
 
@@ -43,8 +44,9 @@ python scripts/import_yomyom_pos.py --input <path-to-pos.csv>
 # Generate product recommendations when real POS + matching + competitor signals exist
 python scripts/generate_product_recommendations.py
 
-# One command after every new POS export or scrape:
-# import (optional) → expiry report → operational recs → dashboard JSON + sources.json
+# One command after every new POS export or scrape: rebuilds silver from the
+# committed snapshots, then competitor signals → matching → product recs →
+# expiry → operational recs → dashboard JSON + sources.json
 npm run data:refresh                 # or: python scripts/refresh_pipeline.py
 npm run data:refresh -- --input data/internal/raw_pos/yomyom/all4shop_Mlai.csv
 
@@ -96,9 +98,8 @@ Outputs:
 
 ## Current Stack
 
-- React
-- Vite
-- JavaScript
+- React + Vite (frontend)
+- Python 3 + pyarrow/polars (data pipelines) — no virtualenv; see `setup.sh`
 
 ## Run Locally
 
@@ -107,23 +108,11 @@ npm install
 npm run dev
 ```
 
-## Current Goal
-
-تحويل هذا الريبو من قالب Vite افتراضي إلى MVP قابل للعرض باسم `SmartShelf AI` يحتوي على:
-
-- Dashboard
-- Products view
-- Reorder recommendations
-- Planogram view
-- Approved orders flow
-
----
-
 ## YomYom Market-Intelligence — Python Storage Layer
 
 A local, automated storage foundation for raw data, bronze/silver Parquet, quality
-reports, and logs.  **No scraping is included** — this layer is purely the
-infrastructure that every future collector will use.
+reports, and logs. The collectors that use it now run daily in
+`.github/workflows/collect-daily.yml`.
 
 ### Folder layout
 
@@ -149,8 +138,8 @@ src/
     parquet_writer.py ← write_bronze_parquet() / write_silver_parquet()
     schema.py         ← Pydantic models (ExternalProductObservation, …)
     quality.py        ← generate_basic_quality_report()
-  internal/
-    pos_importer.py   ← full POS import pipeline (schema-map → validate → Parquet → signals)
+  internal_pos/
+    pos_importer.py   ← POS CSV → silver Parquet + quality report (the live importer)
 configs/
   pos_schema_mapping.yaml  ← column mapping, types, validation rules, signal thresholds
 scripts/
@@ -160,17 +149,13 @@ scripts/
   import_yomyom_pos.py        ← CLI: import a POS CSV into silver Parquet + signals
 data/
   internal/
-    raw_pos/yomyom/sample_yomyom_pos.csv  ← 121-row fake POS dataset
     silver_pos/
       yomyom_products.parquet   ← master product catalog (barcode, name, category, price…)
       yomyom_sales.parquet      ← sales data (units_sold_7d/30d, revenue)
       yomyom_inventory.parquet  ← stock levels + last purchase date
       yomyom_margins.parquet    ← margin analysis (selling, cost, profit, margin_pct)
-  signals/yomyom/
-    pos_signals_latest.json     ← always the most recent signal snapshot
-    pos_signals_<timestamp>.json← timestamped archive
-reports/quality/yomyom_pos/
-    yomyom_pos_<timestamp>_quality.json ← per-run quality report
+reports/quality/
+    yomyom_pos_<timestamp>.json ← per-run quality report
 ```
 
 ### Quick start (Python backend)
@@ -199,59 +184,15 @@ python scripts/import_yomyom_pos.py \
     --imported-at 2025-05-25T08:00:00+00:00
 ```
 
-### POS Import Pipeline — `src/internal/pos_importer.py`
+### POS Import Pipeline — `src/internal_pos/pos_importer.py`
 
-```
-CSV
- │
- ├─[1] load_csv()              raw string rows
- │
- ├─[2] apply_schema_mapping()  rename + normalise + type-cast  (driven by YAML)
- │
- ├─[3] validate_rows()         hard rejects + soft warnings
- │       ├─ required fields present
- │       ├─ positive prices / non-negative stock
- │       ├─ margin_pct range [0,100]
- │       └─ cross-field warnings (7d ≤ 30d, cost < sell, margin consistency)
- │
- ├─[4] write_silver_tables()   4 × Parquet (products / sales / inventory / margins)
- │
- ├─[5] generate_pos_quality_report()   enriched JSON quality snapshot
- │       completeness, duplicate names, price stats, margin stats, category dist.
- │
- └─[6] generate_signals()      6 × business signals → JSON
-         top_sellers              (top N by units_sold_30d)
-         top_profit_products      (top N by gross_profit_30d)
-         low_stock_fast_movers    (stock ≤ 15 AND sold_30d ≥ 30)
-         slow_movers              (sold_30d ≤ 10)
-         high_margin_impulse      (margin ≥ 35% AND impulse category)
-         category_sales_summary   (SUM revenue / profit / units per category)
-```
+CSV → schema mapping (`configs/pos_schema_mapping.yaml`) → validation → four silver
+Parquet tables + a quality report in `reports/quality/`. To adapt it for a different
+POS export, change only the `columns[].raw_name` fields in the YAML.
 
-All thresholds are in `configs/pos_schema_mapping.yaml` under `signals:`.  
-To adapt for the real Comax/Priority CSV: update only the `columns[].raw_name` fields in the YAML.
+Where it sits in the wider flow: [ARCHITECTURE.md](ARCHITECTURE.md).
 
-### Fake POS CSV — `data/internal/raw_pos/yomyom/sample_yomyom_pos.csv`
-
-121 rows across 12 product categories for a neighbourhood market in Kafr Qasim.
-Generated with a fixed seed (42) — output is fully reproducible.
-
-| Metric | Value |
-|---|---|
-| Total rows | 121 |
-| Categories | energy_drinks, soft_drinks, water, snacks, chocolate, dairy, coffee_tea, bakery, household, ready_to_eat, juice, candy_gum |
-| Missing barcode | ~12 % of rows |
-| Missing supplier | ~17 % of rows |
-| Duplicate product names | 4 name pairs (data-entry error simulation) |
-| Low-stock fast-movers | 5 products (reorder alert candidates) |
-| Dead-stock rows | 4 products (0–5 units sold in 30 days) |
-
-Columns: `barcode`, `product_name`, `category`, `brand`, `supplier`,
-`selling_price`, `cost_price`, `current_stock`, `units_sold_7d`,
-`units_sold_30d`, `sales_amount_30d`, `gross_profit_30d`, `margin_pct`,
-`last_sale_date`, `last_purchase_date`
-
-### How a future collector uses this layer
+### How a collector uses this layer
 
 ```python
 from src.common.raw_storage    import save_raw_response
