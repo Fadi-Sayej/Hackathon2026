@@ -10,7 +10,8 @@ not verified reachable is omitted.
 INTERNAL (POS)                          MARKET (competitors)
 yomyom-inventory.csv                    src/external/*_connector.py  (CI, daily 00:00 UTC)
     │                                       │
-    ▼ src/internal_pos/pos_importer.py      ▼ data/external/bronze/ + silver/   [gitignored]
+    ▼ src/internal_pos/pos_importer.py      ▼ data/external/snapshots/  [committed]
+    │                                       │  └─ scripts/rehydrate_silver.py ─► silver/
 data/internal/silver_pos/*.parquet          │
   products·inventory·margins·sales          ▼ src/signals/competitor_product_signals.py
     │                    │              data/signals/competitor_product_signals/*.parquet
@@ -39,6 +40,7 @@ continues as `partial`.
 | File | Job |
 |---|---|
 | `scripts/refresh_pipeline.py` | Runs both pipelines in dependency order, then the exporter. |
+| `scripts/rehydrate_silver.py` | Rebuilds `data/external/silver/` from the committed snapshots so a clone has market data. |
 | `src/internal_pos/pos_importer.py` | POS CSV → the four silver parquet tables. The **live** importer. |
 | `src/recommendations/operational_recommendations.py` | Silver POS + expiry → the 5 operational recommendation types. |
 | `src/signals/competitor_product_signals.py` | Alonit prices + Wolt catalog → one unified competitor signal table. |
@@ -51,14 +53,20 @@ continues as `partial`.
 
 1. **Producer ↔ exporter, by glob.** The exporter takes the newest
    `operational_recommendations_*.parquet` and `product_recommendations_*.parquet`
-   by mtime, not run id. A missing directory is not an error: it exports
-   `competitorSignals: 0` and looks successful. This hid the whole market half
-   until 2026-09-05.
+   by mtime, not run id. A missing directory is not an error, which hid the whole
+   market half until 2026-09-05. **Now guarded:** the exporter raises
+   `EmptyExportError` before writing if either family is empty, so an empty run
+   cannot overwrite a good `operational.json`. `--allow-no-competitor` is the
+   deliberate POS-only escape hatch.
 2. **`data/**` is gitignored; `public/data/operational.json` is committed.** A fresh
    clone has the dashboard JSON and nothing to regenerate it from.
 3. **CI commits `data/external/snapshots/` only.** The collector also writes
    `bronze/` and `silver/`, but only `snapshots/` is `git add -f`'d, and the signal
-   builder reads `silver/`. Committed daily data does not reach the product.
+   builder reads `silver/`. Verified on a clean clone: the export came back with 0
+   recommendations and exit 0. **Now closed:** `scripts/rehydrate_silver.py` runs
+   first in `data:refresh` and rebuilds `silver/` from the committed snapshots —
+   the exact inverse of `seal_snapshot.py`, adding no committed bytes. `bronze/` is
+   still clone-stale; nothing downstream reads it.
 4. **Two unrelated matching artifacts in one directory.** `product_matching.py`
    writes `product_matches.parquet` (feeds recommendations); `join_yomyom_kaggle.py`
    writes `barcode_matches.parquet` (feeds `src/data/marketData.js`). Different

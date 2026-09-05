@@ -8,7 +8,7 @@ of how the pipelines fit together. This file is the rules; that file is the map.
 Anything in `docs/archive/` is retained for history and is **out of date** — it
 describes modules that no longer exist. Do not act on it.
 
-## The 10 rules
+## The 11 rules
 
 1. **Run Python from the repo root.** Scripts insert the repo root into `sys.path`
    themselves (`sys.path.insert(0, ROOT)`); `src` is a namespace package with no
@@ -53,12 +53,19 @@ describes modules that no longer exist. Do not act on it.
    unreliable in both directions. When a number cannot be stated honestly, the UI
    shows **no number**, not zero.
 
-9. **CI commits only `data/external/snapshots/`.** The daily collector also writes
-   `bronze/` and `silver/`, but the workflow `git add -f`s just `snapshots/`. The
-   signal builder reads `silver/`, so daily collection does **not** reach the product
-   on its own — `silver/` only advances when someone runs the collectors locally.
+9. **CI commits only `data/external/snapshots/`; `silver/` is derived, never
+   committed.** The signal builder reads `silver/`, so `data:refresh` rebuilds it
+   from those snapshots first (`scripts/rehydrate_silver.py`). Do not "fix" a stale
+   market half by committing `silver/` — the same bytes are already in the
+   snapshots. If competitor counts look wrong, run `data:refresh`, not the
+   collector.
 
-10. **Verify before you document.** Counts in this repo drifted badly: docs claimed
+10. **An empty export is a failure, not a result.** `export_dashboard_data.py`
+    raises `EmptyExportError` before writing when either recommendation family is
+    empty — a clean clone once overwrote a committed 3,035-recommendation file with
+    0 and exited 0. Pass `--allow-no-competitor` only for a deliberate POS-only run.
+
+11. **Verify before you document.** Counts in this repo drifted badly: docs claimed
     14,406 barcode matches where the artifact holds 2,848, and 2,183 recommendations
     where the exporter emits 3,035. Read the parquet or the JSON, never another
     markdown file.
