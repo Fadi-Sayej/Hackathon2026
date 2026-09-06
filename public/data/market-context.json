@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-05T13:16:35.945720+00:00",
-  "date": "2026-09-05",
+  "generatedAt": "2026-09-06T13:24:55.979573+00:00",
+  "date": "2026-09-06",
   "status": "ok",
   "sources": {
     "weather": "open-meteo",
@@ -9,25 +9,19 @@
     "islamic": "computed_hijri"
   },
   "weather": {
-    "temperatureC": 30.6,
+    "temperatureC": 29.6,
     "precipitation": 0.0,
-    "windSpeed": 17.8,
-    "weatherCode": 1,
-    "label": "hot",
-    "observedAt": "2026-09-05T16:15",
+    "windSpeed": 17.2,
+    "weatherCode": 2,
+    "label": "warm",
+    "observedAt": "2026-09-06T16:15",
     "lat": 32.114,
     "lon": 34.976,
     "source": "open-meteo"
   },
   "hebrew": {
-    "date": "2026-09-05",
-    "holidays": [
-      {
-        "title": "Leil Selichot",
-        "hebrew": "סליחות",
-        "category": "holiday"
-      }
-    ],
+    "date": "2026-09-06",
+    "holidays": [],
     "isErevChag": false,
     "isFastDay": false,
     "isShabbatEve": false,
@@ -41,11 +35,11 @@
     "source": "hebcal"
   },
   "islamic": {
-    "date": "2026-09-05",
+    "date": "2026-09-06",
     "hijri": {
       "year": 1448,
       "month": 3,
-      "day": 22
+      "day": 23
     },
     "isRamadan": false,
     "ramadanDay": null,
@@ -53,8 +47,8 @@
     "isEidAlFitr": false,
     "isEidAlAdha": false,
     "ramadanStart": "2027-02-08",
-    "daysToRamadan": 156,
-    "daysToEidAlFitr": 186,
+    "daysToRamadan": 155,
+    "daysToEidAlFitr": 185,
     "phase": null,
     "windows": {
       "ramadan_build_up_days": 21,
@@ -64,27 +58,7 @@
     },
     "source": "computed_hijri"
   },
-  "demandSignals": {
-    "משקאות": 1.2,
-    "מחלקת -barista": 1.2,
-    "גלידות": 1.15,
-    "קפואים מצוננים": 1.15
-  },
-  "demandBasis": {
-    "משקאות": [
-      "hot_weather"
-    ],
-    "מחלקת -barista": [
-      "hot_weather"
-    ],
-    "גלידות": [
-      "hot_weather"
-    ],
-    "קפואים מצוננים": [
-      "hot_weather"
-    ]
-  },
-  "activeReasons": [
-    "hot_weather"
-  ]
+  "demandSignals": {},
+  "demandBasis": {},
+  "activeReasons": []
 }
