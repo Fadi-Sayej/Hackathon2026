@@ -67,7 +67,7 @@ describe('reorder explanation — figures must match the decision', () => {
   })
 
   it('falls back to observed sales when no corrected rate exists', () => {
-    const { demandPerDayCorrected, ...noCorrection } = product
+    const noCorrection = { ...product, demandPerDayCorrected: null }
     const metrics = computeMetrics(noCorrection, { demandSignals: {} })
     expect(metrics.rateBasis).toBe('observed')
   })
