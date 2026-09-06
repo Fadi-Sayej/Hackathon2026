@@ -15,6 +15,7 @@ import {
 } from './recommendationTypes.js'
 import { credibleLoss } from './actionPriority.js'
 import { isAssumedLeadTime } from '../receiving/leadTimeResolver.js'
+import { buildReorderFacts, resolveDailyRate } from './reorderFacts.js'
 
 const FAST_MOVER_THRESHOLD = 5
 const SLOW_MOVER_SALES_30D = 5
@@ -85,7 +86,13 @@ export function computeMetrics(product, marketContext = {}) {
   const avgDailySales7 = safeDivide(product.salesLast7Days, 7)
   const avgDailySales30 = safeDivide(product.salesLast30Days, 30)
   const demandMultiplier = marketContext.demandSignals?.[product.category] ?? 1
-  const baseWeightedAvg = avgDailySales7 * 0.7 + avgDailySales30 * 0.3
+  const observedWeightedAvg = avgDailySales7 * 0.7 + avgDailySales30 * 0.3
+  // Prefer the availability-corrected rate: raw sales measure supply, not demand,
+  // once the shelf has emptied. The basis travels on the metrics so the
+  // explanation can state which of the two it sized the order from.
+  const { dailyRate: baseRate, rateBasis, rateConfidence, censoredDays } =
+    resolveDailyRate(product, observedWeightedAvg)
+  const baseWeightedAvg = baseRate
   const weightedAvgDailySales = baseWeightedAvg * demandMultiplier
   const daysUntilStockout =
     weightedAvgDailySales > 0
@@ -109,6 +116,11 @@ export function computeMetrics(product, marketContext = {}) {
     avgDailySales7: round(avgDailySales7),
     avgDailySales30: round(avgDailySales30),
     weightedAvgDailySales: round(weightedAvgDailySales),
+    // The exact rate the order quantity was sized from, and what it rests on.
+    dailyRate: round(weightedAvgDailySales),
+    rateBasis,
+    rateConfidence,
+    censoredDays,
     demandMultiplier,
     daysUntilStockout: Number.isFinite(daysUntilStockout) ? round(daysUntilStockout) : null,
     isFastMover,
@@ -303,6 +315,10 @@ function makeRecommendation(product, metrics, marketContext, extras) {
     competitorPrice: extras.competitorPrice ?? null,
     competitorStoreType: product.competitor?.priceStoreType ?? null,
     competitorFormatAffinity: product.competitor?.priceAffinity ?? null,
+    // The checkable facts behind this number, captured from the values that
+    // produced it. src/lib/i18n/explainReorder.js renders these per language;
+    // nothing downstream recomputes any of them.
+    facts: extras.type === 'REORDER' ? buildReorderFacts(product, metrics, marketContext) : null,
     metrics: {
       currentStock: product.currentStock,
       weightedAvgDailySales: metrics.weightedAvgDailySales,

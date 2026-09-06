@@ -59,6 +59,20 @@ export function normalizeProduct(rawProduct, rowIndex = 0) {
     // true = restocked at least once; false = sells but is never delivered
     // (services, made-to-order, staff consumption); null = unknown.
     isStocked: typeof rawProduct.isStocked === 'boolean' ? rawProduct.isStocked : null,
+    // Availability-corrected demand rate (units/day) and how much it rests on.
+    // null = never measured, in which case the engine falls back to raw sales and
+    // the explanation must say which of the two it used.
+    demandPerDayCorrected:
+      typeof rawProduct.demandPerDayCorrected === 'number' &&
+      Number.isFinite(rawProduct.demandPerDayCorrected)
+        ? rawProduct.demandPerDayCorrected
+        : null,
+    demandConfidence: rawProduct.demandConfidence ?? 'none',
+    availabilityState: rawProduct.availabilityState ?? null,
+    censoredDays:
+      typeof rawProduct.censoredDays === 'number' && Number.isFinite(rawProduct.censoredDays)
+        ? rawProduct.censoredDays
+        : null,
     // false = stock fails the D-7 reconciliation, so any figure computed FROM it
     // (days of cover, order quantity) is not defensible. null = not checkable.
     stockReconciles:

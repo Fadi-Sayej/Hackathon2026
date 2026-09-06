@@ -37,6 +37,7 @@ import { toDemandFactors } from './lib/context/liveMarketContext.js'
 import { computeDemand } from './lib/analytics/demandEngine.js'
 import { MARKET_PARAM_REGISTRY, PRODUCT_ARCHETYPES } from './data/marketParams.js'
 import { fallbackMarketContext } from './lib/context/fallbackMarketContext.js'
+import { useI18n } from './lib/i18n/index.js'
 import { loadDemoStoreData } from './lib/dataAdapters/loadDemoStoreData.js'
 import {
   CONNECTOR_MODES,
@@ -80,6 +81,8 @@ function initialStoreData() {
 }
 
 function App() {
+  // Explanations are rendered per language, so the component needs the translator.
+  const { t, language } = useI18n()
   const [activePage, setActivePage] = useState('operational')
   // The fixture the shelf plan is drawn for. Set from the layout editor; null
   // means the shelf plan falls back to the first gondola in the saved layout.
@@ -324,8 +327,12 @@ function App() {
         products: analyzedProducts,
         recommendations: generatedRecommendations,
         marketContext: enrichedMarketContext,
+        // Explanations are rendered in the reader's language, so they must be
+        // rebuilt when he switches it.
+        t,
+        language,
       }),
-    [analyzedProducts, generatedRecommendations, enrichedMarketContext],
+    [analyzedProducts, generatedRecommendations, enrichedMarketContext, t, language],
   )
   const [upgradedRecommendations, setUpgradedRecommendations] = useState(null)
 

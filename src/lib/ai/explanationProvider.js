@@ -23,6 +23,8 @@ export function annotateRecommendationsWithMockExplanations({
   marketContext,
   products,
   recommendations,
+  t,
+  language,
 }) {
   const productIndex = new Map(products.map((product) => [product.id, product]))
 
@@ -36,6 +38,8 @@ export function annotateRecommendationsWithMockExplanations({
       marketContext,
       product,
       recommendation,
+      t,
+      language,
     })
 
     return buildAnnotatedRecommendation(recommendation, result)
@@ -56,6 +60,8 @@ export async function annotateRecommendationsWithExplanations({
   marketContext,
   products,
   recommendations,
+  t,
+  language,
   provider = mockExplanationProvider,
   timeoutMs = DEFAULT_EXPLANATION_TIMEOUT_MS,
   concurrency = DEFAULT_EXPLANATION_CONCURRENCY,
@@ -67,6 +73,8 @@ export async function annotateRecommendationsWithExplanations({
     marketContext,
     products,
     recommendations,
+    t,
+    language,
   })
 
   if (!provider || provider === mockExplanationProvider || provider.id === 'mock') {
