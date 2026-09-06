@@ -1,0 +1,39 @@
+# YomYom market-intelligence — Python backend dependencies
+# Install with: pip install -r requirements.txt
+
+# Data serialisation
+pyarrow>=14.0
+polars>=0.20
+
+# Schema validation
+pydantic>=2.0
+
+# Config / serialisation
+pyyaml>=6.0
+
+# Logging
+loguru>=0.7
+
+# HTTP client (used by delivery scrapers; Alonit connector uses ftplib from stdlib)
+httpx>=0.27
+
+# HTML parsing for delivery-catalog scrapers (Wolt query-state, 10bis __NEXT_DATA__)
+beautifulsoup4>=4.12
+lxml>=5.0
+
+# Firestore writer (Python admin SDK) + .env loader
+firebase-admin>=6.5
+python-dotenv>=1.0
+
+# MCP server (Model Context Protocol — expose price-lookup tools to Claude)
+mcp>=1.0
+
+# Fuzzy string matching (product-matching layer — Pass 3 WRatio scorer)
+rapidfuzz>=3.0
+
+# LLM proxy server (enables real AI explanations via Gemini)
+fastapi>=0.111
+uvicorn>=0.29
+google-generativeai>=0.7
+
+# (Future collectors will add: selectolax, lxml, etc.)
