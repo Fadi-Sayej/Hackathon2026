@@ -695,4 +695,10 @@ export const en = {
   'explain.driver.chametz_stop_reorder': 'chametz — Pesach approaching',
   'explain.driver.chametz_clear_stock': 'chametz — clear stock',
   'explain.driver.chametz_pesach': 'Pesach',
+  'explain.qty.shelfLifeCap': 'Quantity capped: this keeps about {days} days, so at most {cap} units can sell before it spoils — instead of the {uncapped} the plain arithmetic would order.',
+  'explain.unsure.shelfLifeDefault': 'The shelf life ({days} days) is a category default, not a measurement of this product — it can be corrected.',
+  'explain.unsure.leadExceedsShelfLife': 'The lead time ({lead} days) is longer than the shelf life ({days} days) — the answer is more frequent delivery, not a bigger order.',
+  'explain.orderCost': 'Order cost',
+  'explain.urgency': 'Urgency',
+  'explain.orderQty': 'Order',
 }

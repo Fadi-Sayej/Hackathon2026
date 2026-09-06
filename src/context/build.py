@@ -30,6 +30,7 @@ from src.common.paths import PROJECT_ROOT
 from src.context.demand_signals import build_demand_signals
 from src.context.hebrew import get_hebrew_context
 from src.context.islamic import get_islamic_context
+from src.context.shelf_life import load_shelf_life
 from src.context.weather import get_weather
 
 OUTPUT_PATH = PROJECT_ROOT / "public" / "data" / "market-context.json"
@@ -75,6 +76,9 @@ def build_market_context(
         "demandSignals": demand["signals"],
         "demandBasis": demand["basis"],
         "activeReasons": demand["activeReasons"],
+        # Category shelf-life defaults, published so the browser caps order
+        # quantities against the same numbers the pipeline holds.
+        "shelfLife": load_shelf_life(),
     }
 
 

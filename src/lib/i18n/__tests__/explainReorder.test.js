@@ -148,3 +148,107 @@ describe('facts travel with every REORDER the engine emits', () => {
     expect(reorder.facts.orderQty).toBe(reorder.recommendedOrderQuantity)
   })
 })
+
+describe('shelf-life cap', () => {
+  const shelfLife = { categories: { 'מחלקת -barista': 2, 'כל הסיגריות': null }, defaultDays: null }
+  const croissant = {
+    ...product, name: 'קרואסון', category: 'מחלקת -barista',
+    currentStock: 0, demandPerDayCorrected: 8.38, leadTimeDays: 3,
+  }
+
+  it('caps the order at what can sell within one shelf life', () => {
+    const capped = computeMetrics(croissant, { demandSignals: {}, shelfLife })
+    const uncapped = computeMetrics(croissant, { demandSignals: {} })
+    // 8.38/day x 2 days = 16 sellable, against ~42 from the plain arithmetic.
+    expect(capped.recommendedOrder).toBe(16)
+    expect(capped.recommendedOrder).toBeLessThan(uncapped.recommendedOrder)
+    expect(capped.shelfLifeCapped).toBe(true)
+  })
+
+  it('leaves non-perishable categories uncapped', () => {
+    const smokes = { ...croissant, category: 'כל הסיגריות' }
+    const metrics = computeMetrics(smokes, { demandSignals: {}, shelfLife })
+    expect(metrics.shelfLifeDays).toBeNull()
+    expect(metrics.shelfLifeCapped).toBe(false)
+  })
+
+  it('leaves an unlisted category uncapped rather than guessing', () => {
+    const unknown = { ...croissant, category: 'קטגוריה שלא קיימת' }
+    const metrics = computeMetrics(unknown, { demandSignals: {}, shelfLife })
+    expect(metrics.shelfLifeCapped).toBe(false)
+  })
+
+  it.each(LANGUAGES)('says why the order was capped, in %s', (language) => {
+    const metrics = computeMetrics(croissant, { demandSignals: {}, shelfLife })
+    const facts = buildReorderFacts(croissant, metrics, {})
+    const t = createTranslator(language)
+    const rendered = renderReorderExplanation(facts, t)
+    expect(rendered.quantity).toContain(
+      t('explain.qty.shelfLifeCap', {
+        days: facts.shelfLifeDays, cap: facts.orderQty, uncapped: facts.uncappedOrderQty,
+      }),
+    )
+  })
+
+  it.each(LANGUAGES)('marks the shelf life as a default, not a measurement, in %s', (language) => {
+    const metrics = computeMetrics(croissant, { demandSignals: {}, shelfLife })
+    const facts = buildReorderFacts(croissant, metrics, {})
+    const t = createTranslator(language)
+    expect(facts.shelfLifeSource).toBe('config_default')
+    expect(renderReorderExplanation(facts, t).uncertainty)
+      .toContain(t('explain.unsure.shelfLifeDefault', { days: facts.shelfLifeDays }))
+  })
+
+  it('names the case where lead time exceeds shelf life', () => {
+    const metrics = computeMetrics(croissant, { demandSignals: {}, shelfLife })
+    const facts = buildReorderFacts(croissant, metrics, {})
+    const t = createTranslator('he')
+    expect(renderReorderExplanation(facts, t).uncertainty).toContain(
+      t('explain.unsure.leadExceedsShelfLife', { lead: 3, days: 2 }),
+    )
+  })
+
+  it('never prints a number the decision did not hold', () => {
+    const metrics = computeMetrics(croissant, { demandSignals: {}, shelfLife })
+    const facts = buildReorderFacts(croissant, metrics, {})
+    const text = renderReorderExplanationText(facts, createTranslator('en'))
+    const allowed = new Set([
+      facts.currentStock, facts.dailyRate, facts.leadTimeDays, facts.expectedDemandDuringLeadTime,
+      facts.safetyStock, facts.orderQty, facts.uncappedOrderQty, facts.shelfLifeDays,
+      facts.coverDays, facts.censoredDays, facts.costToIgnore,
+      Math.round((facts.demandMultiplier - 1) * 100),
+    ].filter((v) => typeof v === 'number'))
+    for (const printed of (text.match(/\d+(?:\.\d+)?/g) ?? []).map(Number)) {
+      expect(allowed.has(printed), `${printed} is not a decision value`).toBe(true)
+    }
+  })
+})
+
+describe('the printed arithmetic adds up', () => {
+  const shelfLife = { categories: { 'מחלקת -barista': 2 }, defaultDays: null }
+  const croissant = {
+    ...product, name: 'קרואסון', category: 'מחלקת -barista',
+    currentStock: 0, demandPerDayCorrected: 8.38, leadTimeDays: 3,
+  }
+
+  it('states the uncapped total in the sum, and the cap separately', () => {
+    const metrics = computeMetrics(croissant, { demandSignals: {}, shelfLife })
+    const facts = buildReorderFacts(croissant, metrics, {})
+    const t = createTranslator('en')
+    const quantity = renderReorderExplanation(facts, t).quantity
+
+    // The sum shown must actually equal the total shown next to it.
+    const sum = facts.expectedDemandDuringLeadTime + facts.safetyStock - facts.currentStock
+    expect(Math.ceil(sum)).toBe(facts.uncappedOrderQty)
+    expect(quantity).toContain(
+      t('explain.qty.formula', {
+        leadDemand: facts.expectedDemandDuringLeadTime,
+        safety: facts.safetyStock,
+        stock: facts.currentStock,
+        qty: facts.uncappedOrderQty,
+      }),
+    )
+    // And the capped figure is the one actually ordered.
+    expect(facts.orderQty).toBeLessThan(facts.uncappedOrderQty)
+  })
+})

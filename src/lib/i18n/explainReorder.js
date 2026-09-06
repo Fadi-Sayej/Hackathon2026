@@ -51,18 +51,29 @@ export function renderReorderExplanation(facts, t, n = (value) => String(value))
     t(facts.leadTimeAssumed ? 'explain.qty.leadAssumed' : 'explain.qty.leadMeasured', {
       lead: n(facts.leadTimeDays),
     }),
+    // The arithmetic must add up on its face. When a cap applied, this line states
+    // what the arithmetic gave and the cap line below states what it was reduced
+    // to — printing the capped total here made the sum read 25 + 25 - 0 = 16.
     t('explain.qty.formula', {
       leadDemand: n(facts.expectedDemandDuringLeadTime),
       safety: n(facts.safetyStock),
       stock: n(facts.currentStock),
-      qty: n(facts.orderQty),
+      qty: n(facts.uncappedOrderQty),
     }),
     // Units per case is absent from the POS export, so the number is single units
     // and says so rather than implying a case the supplier may not ship.
     facts.caseSize === null
       ? t('explain.qty.noCaseSize')
       : t('explain.qty.caseSize', { caseSize: n(facts.caseSize) }),
-  ].join(' ')
+    // A capped order must say why it was capped, and show what it would have been.
+    facts.shelfLifeCapped
+      ? t('explain.qty.shelfLifeCap', {
+          days: n(facts.shelfLifeDays),
+          cap: n(facts.orderQty),
+          uncapped: n(facts.uncappedOrderQty),
+        })
+      : null,
+  ].filter(Boolean).join(' ')
 
   // ── 2. Why now ──────────────────────────────────────────────────────
   const timingParts = [
@@ -93,6 +104,17 @@ export function renderReorderExplanation(facts, t, n = (value) => String(value))
     unsure.push(t('explain.unsure.censored', { days: n(facts.censoredDays) }))
   }
   if (facts.leadTimeAssumed) unsure.push(t('explain.unsure.leadAssumed'))
+  if (facts.shelfLifeDays !== null && facts.shelfLifeSource === 'config_default') {
+    unsure.push(t('explain.unsure.shelfLifeDefault', { days: n(facts.shelfLifeDays) }))
+  }
+  // Ordering cannot solve this one — worth naming rather than quietly capping.
+  if (facts.shelfLifeDays !== null && facts.leadTimeDays > facts.shelfLifeDays) {
+    unsure.push(
+      t('explain.unsure.leadExceedsShelfLife', {
+        lead: n(facts.leadTimeDays), days: n(facts.shelfLifeDays),
+      }),
+    )
+  }
   if (facts.stockReconciles === false) unsure.push(t('explain.unsure.stockBroken'))
   if (facts.availabilityState === 'NEVER_STOCKED') unsure.push(t('explain.unsure.neverStocked'))
   const uncertainty = unsure.join(' ')

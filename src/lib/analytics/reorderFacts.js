@@ -49,6 +49,24 @@ export function resolveDailyRate(product, fallbackRate) {
 }
 
 /**
+ * Shelf life for this product's category, in days, or null for no cap.
+ *
+ * Read from the pipeline's published table (public/data/market-context.json), so
+ * the browser caps against exactly the numbers configs/shelf_life.yaml holds. An
+ * unlisted category falls through to the configured default, which is itself null
+ * by design: capping an unknown category on a guess would suppress real orders.
+ */
+export function resolveShelfLifeDays(product, marketContext = {}) {
+  const table = marketContext.shelfLife
+  if (!table) return null
+  const categories = table.categories ?? {}
+  const value = Object.prototype.hasOwnProperty.call(categories, product?.category)
+    ? categories[product.category]
+    : table.defaultDays
+  return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : null
+}
+
+/**
  * Build the fact record for one reorder decision.
  *
  * `metrics` must be the object that produced `metrics.recommendedOrder` — this
@@ -75,6 +93,13 @@ export function buildReorderFacts(product, metrics, marketContext = {}) {
     expectedDemandDuringLeadTime: metrics.expectedDemandDuringLeadTime,
     safetyStock: metrics.safetyStock,
     orderQty: metrics.recommendedOrder,
+    // What the order would have been without the shelf-life cap, and the cap that
+    // reduced it. Both carried so the explanation can show the owner the working.
+    uncappedOrderQty: metrics.uncappedOrder ?? metrics.recommendedOrder,
+    shelfLifeDays: metrics.shelfLifeDays ?? null,
+    shelfLifeCapped: Boolean(metrics.shelfLifeCapped),
+    // Shelf life is a category default, never a per-product measurement.
+    shelfLifeSource: metrics.shelfLifeDays == null ? null : 'config_default',
     // Units per case is not recorded anywhere in the POS export, so the quantity
     // is in single units and the explanation says so rather than inventing a case.
     caseSize: null,

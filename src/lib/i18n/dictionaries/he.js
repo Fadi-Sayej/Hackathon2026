@@ -696,4 +696,10 @@ export const he = {
   'explain.driver.chametz_stop_reorder': 'חמץ — לקראת פסח',
   'explain.driver.chametz_clear_stock': 'חמץ — חיסול מלאי',
   'explain.driver.chametz_pesach': 'פסח',
+  'explain.qty.shelfLifeCap': 'הכמות הוגבלה: הפריט נשמר כ-{days} ימים בלבד, ולכן ניתן למכור עד {cap} יחידות לפני שיתקלקל — במקום {uncapped} שהחישוב הרגיל היה מזמין.',
+  'explain.unsure.shelfLifeDefault': 'חיי המדף ({days} ימים) הם ברירת מחדל לפי קטגוריה ולא מדידה של המוצר עצמו — ניתן לתקן אותם.',
+  'explain.unsure.leadExceedsShelfLife': 'זמן האספקה ({lead} ימים) ארוך מחיי המדף ({days} ימים) — כדאי אספקה תכופה יותר ולא הזמנה גדולה יותר.',
+  'explain.orderCost': 'עלות ההזמנה',
+  'explain.urgency': 'דחיפות',
+  'explain.orderQty': 'הזמן',
 }

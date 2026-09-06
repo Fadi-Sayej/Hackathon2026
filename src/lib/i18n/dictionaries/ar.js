@@ -701,4 +701,10 @@ export const ar = {
   'explain.driver.chametz_stop_reorder': 'الحامض — قبيل الفصح',
   'explain.driver.chametz_clear_stock': 'الحامض — تصفية المخزون',
   'explain.driver.chametz_pesach': 'الفصح',
+  'explain.qty.shelfLifeCap': 'قُلِّصت الكمية: الصنف يبقى نحو {days} أيام فقط، فيمكن بيع {cap} وحدة قبل أن يفسد — بدل {uncapped} التي كان الحساب العادي سيطلبها.',
+  'explain.unsure.shelfLifeDefault': 'مدّة الصلاحية ({days} أيام) قيمة افتراضية حسب الفئة لا قياس للمنتج نفسه — ويمكن تصحيحها.',
+  'explain.unsure.leadExceedsShelfLife': 'زمن التوريد ({lead} أيام) أطول من مدّة الصلاحية ({days} أيام) — الحل توريد أكثر تواتراً لا طلب أكبر.',
+  'explain.orderCost': 'تكلفة الطلب',
+  'explain.urgency': 'الأولوية',
+  'explain.orderQty': 'اطلب',
 }

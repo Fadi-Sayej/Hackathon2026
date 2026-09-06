@@ -15,7 +15,7 @@ import {
 } from './recommendationTypes.js'
 import { credibleLoss } from './actionPriority.js'
 import { isAssumedLeadTime } from '../receiving/leadTimeResolver.js'
-import { buildReorderFacts, resolveDailyRate } from './reorderFacts.js'
+import { buildReorderFacts, resolveDailyRate, resolveShelfLifeDays } from './reorderFacts.js'
 
 const FAST_MOVER_THRESHOLD = 5
 const SLOW_MOVER_SALES_30D = 5
@@ -104,7 +104,23 @@ export function computeMetrics(product, marketContext = {}) {
   const rawRecommendedOrder = Math.ceil(
     expectedDemandDuringLeadTime + safetyStock - product.currentStock,
   )
-  const recommendedOrder = Math.max(0, rawRecommendedOrder)
+  const uncappedOrder = Math.max(0, rawRecommendedOrder)
+
+  // Ordering more than can be sold within the product's own shelf life is not a
+  // stockout fix, it is waste with extra steps: the engine used to put 51 chocolate
+  // croissants (about six days' worth) on the list. Nothing in the POS export
+  // records shelf life, so this caps against crude per-category defaults the owner
+  // can correct — see configs/shelf_life.yaml. An unknown category is left uncapped,
+  // because suppressing a real order on a guess is the worse error.
+  const shelfLifeDays = resolveShelfLifeDays(product, marketContext)
+  const sellableWithinShelfLife =
+    shelfLifeDays === null ? null : Math.floor(weightedAvgDailySales * shelfLifeDays)
+  const shelfLifeCap =
+    sellableWithinShelfLife === null
+      ? null
+      : Math.max(0, sellableWithinShelfLife - Math.max(0, product.currentStock))
+  const recommendedOrder =
+    shelfLifeCap === null ? uncappedOrder : Math.min(uncappedOrder, shelfLifeCap)
   const margin = product.price - product.cost
   const marginRate = product.price > 0 ? margin / product.price : 0
   const nearExpiry = isNearExpiry(product.expiryDate, marketContext.currentDate)
@@ -127,6 +143,11 @@ export function computeMetrics(product, marketContext = {}) {
     safetyStock: round(safetyStock),
     expectedDemandDuringLeadTime: round(expectedDemandDuringLeadTime),
     recommendedOrder,
+    uncappedOrder,
+    shelfLifeDays,
+    // True only when the cap actually reduced the order, so the explanation can
+    // stay silent about shelf life when it made no difference.
+    shelfLifeCapped: shelfLifeCap !== null && recommendedOrder < uncappedOrder,
     margin: round(margin),
     marginRate: round(marginRate),
     nearExpiry,

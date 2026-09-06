@@ -1,0 +1,60 @@
+# Shelf life by category — CRUDE DEFAULTS, for the store owner to correct.
+#
+# WHY THIS EXISTS
+#   The reorder engine ordered about five to six days of stock for everything,
+#   because nothing in the POS export records shelf life. That put 51 chocolate
+#   croissants and ten days of eggs on the order list — quantities that spoil
+#   before they sell. Ordering more than can be sold in the product's life is not
+#   a stockout fix, it is waste with extra steps.
+#
+# WHAT THESE NUMBERS ARE
+#   Category-level starting guesses, NOT measurements, and NOT per-product truth.
+#   No shelf-life data exists anywhere in the POS export, so nothing here has been
+#   verified against a single physical product. They are deliberately conservative
+#   for fresh goods, because over-ordering a perishable is the error that costs
+#   money. Every explanation that uses one says it is a default.
+#
+#   Correct any line and the pipeline picks it up on the next run. No code edit.
+#   `null` means "not perishable" — no cap is applied at all.
+#
+# HOW IT IS USED
+#   The order is capped at what can be sold within one shelf life:
+#       cap = daily demand x shelf_life_days
+#   A capped order says so, and says why, in the owner's language.
+
+categories:
+  # ── Fresh: hours-to-days. The cap matters most here. ──────────────
+  'מחלקת -barista': 2          # fresh bakery, pastries, coffee counter
+  'פירות וירקות': 4            # fruit and vegetables
+  'מוצרי מקרר': 7              # chilled dairy and ready foods
+  'משקאות טבעיות': 14          # fresh/natural drinks
+
+  # ── Medium ────────────────────────────────────────────────────────
+  'מוצרי שימוש מטבח -חנות': 21  # mixed aisle; contains eggs, hence conservative
+  'חטיפים מלוחים': 60          # crisps and salty snacks
+  'חטיפים מתוקים': 90          # chocolate and sweet snacks
+  'פיצוחים': 90               # nuts and seeds
+
+  # ── Long ──────────────────────────────────────────────────────────
+  'קפואים מצוננים': 180        # frozen
+  'גלידות': 180               # ice cream
+  'משקאות': 180               # bottled and canned drinks
+  'מוצרי מכולת': 180          # ambient grocery
+  'שמנים': 365                # cooking oils
+
+  # ── Not perishable: no cap. ───────────────────────────────────────
+  'כל הסיגריות': null          # cigarettes
+  'אבזרי עישון': null          # smoking accessories
+  'מוצרי בית': null            # household goods
+  'מוצרי ניקיון ו טיפוח אישי': null
+  'אבזרי סלולר ו חשמל': null
+  'מוצרי יום הולדת ו מתנות': null
+  'תכשיטים לילדות קטנות': null
+  'מוצרי ריח - לרכב': null
+  'מוצרי חצר תחנה': null
+  'מחלקת drive': null
+  'קופה שטיפה (הכל )': null
+
+# Applied when a category is not listed above. null = no cap, which is the safe
+# default: capping an unknown category on a guess would suppress real orders.
+default_days: null
