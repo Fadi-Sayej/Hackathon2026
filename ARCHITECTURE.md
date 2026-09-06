@@ -48,6 +48,8 @@ continues as `partial`.
 | `scripts/refresh_pipeline.py` | Runs both pipelines in dependency order, then the exporter. |
 | `scripts/rehydrate_silver.py` | Rebuilds `data/external/silver/` from the committed snapshots so a clone has market data. |
 | `src/context/build.py` | Fetches weather + both calendars once per run → `public/data/market-context.json`. |
+| `src/context/owner_answers.py` | Loads `configs/owner_answers.yaml` — what the owner told the system; overrides every guess. |
+| `src/lib/questions/openQuestions.js` | Decides what to ask him, ranked by money × products affected, capped at three. |
 | `src/snapshots/censored_demand.py` | Corrects demand for months a product was off the shelf, so stockouts stop hiding reorders. |
 | `src/internal_pos/pos_importer.py` | POS CSV → the four silver parquet tables. The **live** importer. |
 | `src/recommendations/operational_recommendations.py` | Silver POS + expiry → the 5 operational recommendation types. |
@@ -94,6 +96,14 @@ continues as `partial`.
 8. **`market_context` must run before `product_recommendations`** in
    `refresh_pipeline.py` — the recommender reads the artifact, so the wrong order
    decides today's orders on yesterday's context.
+
+9. **Owner answers override guesses, and travel by file.** The browser writes
+   answers to localStorage and exports YAML; `configs/owner_answers.yaml` is what
+   the pipeline reads on the next run. He must be able to read and change what he
+   told it, which a Firestore document he cannot open would not allow.
+10. **A model may group products; it may never produce a number.** Shelf life,
+   quantities and lead times come from rules over data he can check. Grouping falls
+   back to the catalog category field when the LLM is off — degraded, not absent.
 
 ## npm scripts — product path
 

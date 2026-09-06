@@ -19,6 +19,7 @@ from typing import Any, Dict, Optional
 import yaml
 
 from src.common.paths import PROJECT_ROOT
+from src.context.owner_answers import SOURCE_OWNER, load_owner_answers
 
 CONFIG_PATH = PROJECT_ROOT / "configs" / "shelf_life.yaml"
 
@@ -36,10 +37,22 @@ def load_shelf_life(path: Optional[Path] = None) -> Dict[str, Any]:
         return {"categories": {}, "defaultDays": None, "source": SOURCE_CONFIG_DEFAULT}
 
     categories = loaded.get("categories") or {}
+    answers = load_owner_answers()
+    # What he told us beats what we guessed, and is published separately so the
+    # explanation can say "you told us" rather than "system default".
     return {
         "categories": {str(k): v for k, v in categories.items()},
         "defaultDays": loaded.get("default_days"),
         "source": SOURCE_CONFIG_DEFAULT,
+        "ownerCategories": {
+            k: (v.get("days") if isinstance(v, dict) else v)
+            for k, v in (answers.get("shelfLifeCategories") or {}).items()
+        },
+        "ownerProducts": {
+            k: (v.get("days") if isinstance(v, dict) else v)
+            for k, v in (answers.get("shelfLifeDays") or {}).items()
+        },
+        "ownerSource": SOURCE_OWNER,
     }
 
 

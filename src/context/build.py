@@ -30,6 +30,7 @@ from src.common.paths import PROJECT_ROOT
 from src.context.demand_signals import build_demand_signals
 from src.context.hebrew import get_hebrew_context
 from src.context.islamic import get_islamic_context
+from src.context.owner_answers import load_owner_answers
 from src.context.shelf_life import load_shelf_life
 from src.context.weather import get_weather
 
@@ -79,6 +80,8 @@ def build_market_context(
         # Category shelf-life defaults, published so the browser caps order
         # quantities against the same numbers the pipeline holds.
         "shelfLife": load_shelf_life(),
+        # What he has already told us, so the UI never asks a question twice.
+        "ownerAnswers": load_owner_answers(),
     }
 
 

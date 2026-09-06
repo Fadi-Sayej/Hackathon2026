@@ -14,6 +14,7 @@ from src.common.paths import PROJECT_ROOT, MATCHING_ROOT, RECOMMENDATIONS_ROOT, 
 
 
 REPORTS_ROOT = Path(__file__).resolve().parents[2] / "reports" / "recommendations"
+from src.context.owner_answers import is_orderable, load_owner_answers
 from src.snapshots.censored_demand import (
     STATE_DELISTED,
     STATE_NEVER_STOCKED,
@@ -213,6 +214,10 @@ def generate_product_recommendations() -> dict[str, Any]:
 
     recommendations: list[dict[str, Any]] = []
     demand_signals = _load_demand_signals()
+    # He has told us some of these were dropped on purpose, or are out of season.
+    # Recommending 80 units of a line the shop walked away from is the single
+    # fastest way to lose his trust in the list.
+    owner_answers = load_owner_answers()
 
     for match in matching_rows:
         internal_barcode = str(match.get(matching_columns["internal_barcode"]) or "")
@@ -273,7 +278,10 @@ def generate_product_recommendations() -> dict[str, Any]:
         # A car wash or an espresso pulled to order sells without ever being
         # delivered; a dropped line stops for good. Neither is a stockout, and
         # "you are running out, reorder" is nonsense for both.
-        reorderable = availability not in (STATE_NEVER_STOCKED, STATE_DELISTED, None)
+        reorderable = (
+            availability not in (STATE_NEVER_STOCKED, STATE_DELISTED, None)
+            and is_orderable(internal_barcode, owner_answers)
+        )
         margin_pct = margin.get("margin_pct") if margin else None
 
         recommendation_type = None

@@ -1,0 +1,36 @@
+# What the store owner told the system — the one place his answers live.
+#
+# WHY THIS FILE EXISTS
+#   The system knows precisely where it is guessing: shelf life, whether a product
+#   is still carried, case size, lead time. Guesses drive real orders — we were
+#   recommending 80 units of things he may have dropped on purpose. Rather than
+#   guess harder, the product asks him, and his answers land here.
+#
+#   This file is the durable store the pipeline reads on the next run. The browser
+#   writes answers through src/lib/persistence (localStorage, synced to Firestore
+#   when configured); scripts/import_owner_answers.py folds them in here. It is
+#   plain YAML on purpose: he can read what he told it, and change his mind, without
+#   the app.
+#
+# PRECEDENCE
+#   Anything here overrides the category defaults in configs/shelf_life.yaml, and
+#   an answer marked `owner` is never described as a system default in the UI.
+
+# "Is this still something you carry?" — per barcode.
+#   yes      → keep recommending it
+#   no       → stop: it was delisted on purpose, not a stockout
+#   seasonal → out of season now; do not order, do not treat as a stockout either
+carried: {}
+#   Example:
+#   '7290000066318': { answer: 'no', answered_at: '2026-09-06' }
+
+# "How many days do you keep this before it's no good?" — per barcode, in days.
+shelf_life_days: {}
+#   Example:
+#   '7290000066318': { days: 3, answered_at: '2026-09-06' }
+
+# The same question answered for a whole category, after he confirmed a proposed
+# group. Applies to every product in the category that has no per-product answer.
+shelf_life_categories: {}
+#   Example:
+#   'מחלקת -barista': { days: 2, answered_at: '2026-09-06', confirmed_products: 47 }

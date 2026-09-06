@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import './App.css'
 import {
   generateCrossMerchandisingSuggestions,
@@ -38,6 +38,9 @@ import { computeDemand } from './lib/analytics/demandEngine.js'
 import { MARKET_PARAM_REGISTRY, PRODUCT_ARCHETYPES } from './data/marketParams.js'
 import { fallbackMarketContext } from './lib/context/fallbackMarketContext.js'
 import { useI18n } from './lib/i18n/index.js'
+import { QuestionPanel } from './components/questions/QuestionPanel.jsx'
+import { buildOpenQuestions } from './lib/questions/openQuestions.js'
+import { loadAnswers, saveAnswer, summariseChange } from './lib/questions/answerStore.js'
 import { loadDemoStoreData } from './lib/dataAdapters/loadDemoStoreData.js'
 import {
   CONNECTOR_MODES,
@@ -336,6 +339,52 @@ function App() {
   )
   const [upgradedRecommendations, setUpgradedRecommendations] = useState(null)
 
+  // What the owner has told the system, merged over what the pipeline published.
+  const [ownerAnswers, setOwnerAnswers] = useState(() =>
+    loadAnswers(marketContext.ownerAnswers ?? {}),
+  )
+  const [lastAnswerChange, setLastAnswerChange] = useState(null)
+
+  // Where the system is still guessing, ranked by money x products affected.
+  const openQuestions = useMemo(
+    () =>
+      buildOpenQuestions(analyzedProducts, generatedRecommendations, {
+        shelfLife: marketContext.shelfLife,
+        ownerAnswers,
+      }),
+    [analyzedProducts, generatedRecommendations, marketContext.shelfLife, ownerAnswers],
+  )
+
+  // An answer that changes nothing visible is an answer he will not give twice, so
+  // the effect is measured against the real list rather than predicted.
+  const handleAnswer = useCallback(
+    (answer) => {
+      const before = generatedRecommendations.filter((r) => r.type === 'REORDER')
+      const next = loadAnswers({
+        ...(marketContext.ownerAnswers ?? {}),
+        ...saveAnswer(answer),
+      })
+      setOwnerAnswers(next)
+      const shelfLife = marketContext.shelfLife
+        ? {
+            ...marketContext.shelfLife,
+            categories: {
+              ...marketContext.shelfLife.categories,
+              ...Object.fromEntries(
+                Object.entries(next.shelfLifeCategories ?? {}).map(([k, v]) => [k, v.days]),
+              ),
+            },
+          }
+        : marketContext.shelfLife
+      const after = generateReorderRecommendations(analyzedProducts, {
+        ...enrichedMarketContext,
+        shelfLife,
+      }).filter((r) => r.type === 'REORDER')
+      setLastAnswerChange(summariseChange(before, after))
+    },
+    [analyzedProducts, enrichedMarketContext, generatedRecommendations, marketContext],
+  )
+
   useEffect(() => {
     let cancelled = false
     const controller = new AbortController()
@@ -585,7 +634,17 @@ function App() {
       {activePage === 'dashboard' && <DashboardPage {...pageProps} />}
       {activePage === 'products' && <ProductsPage {...pageProps} />}
       {activePage === 'recommendations' && <RecommendationsPage {...pageProps} />}
-      {activePage === 'operational' && <OperationalPage {...pageProps} />}
+      {activePage === 'operational' && (
+        <>
+          <QuestionPanel
+            questions={openQuestions}
+            products={analyzedProducts}
+            onAnswer={handleAnswer}
+            lastChange={lastAnswerChange}
+          />
+          <OperationalPage {...pageProps} />
+        </>
+      )}
       {activePage === 'expiry' && <ExpiryPage {...pageProps} />}
       {activePage === 'prices' && <PriceGapPage {...pageProps} />}
       {activePage === 'assortment' && <AssortmentGapPage {...pageProps} />}
