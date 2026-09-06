@@ -1,10 +1,10 @@
 {
   "meta": {
-    "generatedAt": "2026-09-05T13:16:56.024199+00:00",
+    "generatedAt": "2026-09-06T14:36:58.042857+00:00",
     "status": "ok",
-    "competitorSignals": 504397,
+    "competitorSignals": 505247,
     "scrapingStatus": "complete",
-    "competitorRecommendations": 619
+    "competitorRecommendations": 618
   },
   "posHealth": {
     "totalProducts": 7674,
@@ -34,12 +34,12 @@
     "CHECK_NEGATIVE_STOCK": 625,
     "CHECK_MARGIN": 104,
     "VERIFY_UNKNOWN_BARCODE": 307,
-    "WATCH_PRODUCT": 526,
-    "REORDER": 93
+    "WATCH_PRODUCT": 527,
+    "REORDER": 91
   },
   "byFamily": {
     "operational": 2554,
-    "competitor": 619
+    "competitor": 618
   },
   "sources": [
     {
@@ -47,7 +47,7 @@
       "label": "YomYom POS",
       "kind": "internal_pos",
       "status": "complete",
-      "last_updated": "2026-09-05T13:17:01.628640+00:00",
+      "last_updated": "2026-09-06T14:37:03.580293+00:00",
       "row_count": 7674,
       "schema_version": "1"
     },
@@ -56,7 +56,7 @@
       "label": "Expiry scans",
       "kind": "expiry",
       "status": "not_started",
-      "last_updated": "2026-09-05T13:16:56.021954+00:00",
+      "last_updated": "2026-09-06T14:36:58.040807+00:00",
       "row_count": 0,
       "schema_version": "1"
     },
@@ -65,7 +65,7 @@
       "label": "Dor Alon (Kaggle)",
       "kind": "competitor",
       "status": "complete",
-      "last_updated": "2026-09-05T13:17:01.154754+00:00",
+      "last_updated": "2026-09-06T14:37:03.096173+00:00",
       "row_count": 33094,
       "schema_version": "1"
     },
@@ -74,7 +74,7 @@
       "label": "Rami Levy (Kaggle)",
       "kind": "competitor",
       "status": "complete",
-      "last_updated": "2026-09-05T13:17:01.159015+00:00",
+      "last_updated": "2026-09-06T14:37:03.100351+00:00",
       "row_count": 43698,
       "schema_version": "1"
     },
@@ -83,7 +83,7 @@
       "label": "Shufersal (Kaggle)",
       "kind": "competitor",
       "status": "complete",
-      "last_updated": "2026-09-05T13:17:01.163239+00:00",
+      "last_updated": "2026-09-06T14:37:03.104563+00:00",
       "row_count": 45518,
       "schema_version": "1"
     },
@@ -92,8 +92,8 @@
       "label": "Wolt delivery catalog",
       "kind": "competitor",
       "status": "complete",
-      "last_updated": "2026-09-05T13:17:01.308756+00:00",
-      "row_count": 125696,
+      "last_updated": "2026-09-06T14:37:03.254450+00:00",
+      "row_count": 130915,
       "schema_version": "1"
     },
     {
@@ -101,8 +101,8 @@
       "label": "Alonit price file",
       "kind": "competitor",
       "status": "complete",
-      "last_updated": "2026-09-05T13:17:01.628098+00:00",
-      "row_count": 13484878,
+      "last_updated": "2026-09-06T14:37:03.579802+00:00",
+      "row_count": 13999064,
       "schema_version": "1"
     }
   ],
@@ -54220,14 +54220,14 @@
       "competitorBarcode": "7290001594155"
     },
     {
-      "id": "f97edfa8a70f5bba",
+      "id": "708994a55d05aba0",
       "family": "competitor",
-      "type": "REORDER",
+      "type": "WATCH_PRODUCT",
       "barcode": "7290001594179",
       "productName": "פאנטה אורנג' 500",
       "category": "משקאות",
-      "confidence": 0.84,
-      "reason": "Stock is low and corrected demand clears the reorder threshold. Raw sales understate it because the product spent part of the period out of stock.",
+      "confidence": 0.69,
+      "reason": "Competitor catalog presence is strong, but internal demand evidence is still weak.",
       "severity": null,
       "metricValue": 8.9,
       "sellingPrice": 8.9,
@@ -55142,27 +55142,6 @@
       "expiryDate": null,
       "competitorPrice": 23.9,
       "competitorBarcode": "7290011723200"
-    },
-    {
-      "id": "8a58498f2e81064a",
-      "family": "competitor",
-      "type": "REORDER",
-      "barcode": "7290012525452",
-      "productName": "אקסטרים שוקו וניל",
-      "category": "גלידות",
-      "confidence": 0.76,
-      "reason": "Stock is low and corrected demand clears the reorder threshold. Raw sales understate it because the product spent part of the period out of stock.",
-      "severity": null,
-      "metricValue": 10.9,
-      "sellingPrice": 14.9,
-      "woltPrice": null,
-      "costPrice": null,
-      "currentStock": 0,
-      "marginPct": null,
-      "daysToExpiry": null,
-      "expiryDate": null,
-      "competitorPrice": 10.9,
-      "competitorBarcode": "7290012525452"
     },
     {
       "id": "85e9504598502e58",
