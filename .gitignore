@@ -112,3 +112,6 @@ data/internal/receiving/
 
 # UI audit output (screenshots + findings). Regenerated on demand.
 audit/
+
+# Playwright MCP browser session artifacts
+.playwright-mcp/

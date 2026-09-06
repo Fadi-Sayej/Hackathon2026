@@ -1,0 +1,363 @@
+# configs/pos_schema_mapping.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+# Schema mapping for YomYom POS CSV exports.
+#
+# PURPOSE
+# -------
+# Decouples the physical CSV column names from the canonical internal names
+# used throughout the pipeline.  When the real Comax/Priority POS export
+# arrives with different header names, only this file needs updating —
+# no Python code changes required.
+#
+# STRUCTURE
+# ---------
+#   source_name   : logical identifier for this POS source
+#   columns[]     : one entry per column in the raw CSV
+#     raw_name      : exact header string as it appears in the CSV
+#     canonical_name: internal name used in Parquet, signals, and schemas
+#     dtype         : string | decimal | integer | date | boolean
+#     required      : if true, rows missing this field are rejected
+#     normalizers   : ordered list of transforms (applied before type cast)
+#   validation    : cross-field and range rules
+#   silver_tables : which canonical columns land in each output Parquet
+#   signals       : thresholds for the signal engine
+# ─────────────────────────────────────────────────────────────────────────────
+
+source_name: yomyom_pos
+description: "YomYom market, Kafr Qasim — POS CSV export (real inventory, 7,678 products)"
+encoding: utf-8-sig          # BOM-aware; Excel exports often add BOM
+
+# ── Column mapping ─────────────────────────────────────────────────────────────
+#
+# COLUMN RESOLUTION ORDER (per field, tried in order until a match is found)
+# ──────────────────────────────────────────────────────────────────────────
+# 1. raw_name         — exact match
+# 2. raw_name         — case-insensitive match
+# 3. candidate_names  — each candidate: exact, then case-insensitive
+#
+# The first CSV header that satisfies any step is used and "consumed"
+# (cannot be claimed by a later canonical field).
+# Any CSV column not consumed → reported as UNMAPPED.
+# Any required canonical with no match → reported as MISSING REQUIRED.
+#
+columns:
+  - raw_name:       barcode
+    canonical_name: barcode
+    dtype:          string
+    required:       false
+    normalizers:    [strip_whitespace, null_if_empty]
+    candidate_names:
+      - ברקוד            # Hebrew: barcode
+      - מקט              # Hebrew: SKU / item code
+      - item_code
+      - sku
+      - upc
+      - gtin
+      - product_code
+
+  - raw_name:       product_name
+    canonical_name: product_name
+    dtype:          string
+    required:       true
+    normalizers:    [strip_whitespace, null_if_empty]
+    candidate_names:
+      - תאור פריט        # Hebrew: item description (yomyom-inventory.csv)
+      - שם מוצר          # Hebrew: product name
+      - שם פריט          # Hebrew: item name
+      - תאור פריט        # Hebrew: item description (All4Shop export)
+      - description
+      - item_name
+      - item_description
+      - product_desc
+      - name
+
+  - raw_name:       category
+    canonical_name: category
+    dtype:          string
+    required:       false
+    normalizers:    [strip_whitespace, lowercase, null_if_empty]
+    candidate_names:
+      - שם מחלקה         # Hebrew: department name (yomyom-inventory.csv)
+      - קטגוריה          # Hebrew: category
+      - מחלקה            # Hebrew: department
+      - שם מחלקה         # Hebrew: department name (All4Shop export)
+      - קבוצה            # Hebrew: group
+      - department
+      - group
+      - product_group
+      - item_group
+
+  - raw_name:       brand
+    canonical_name: brand
+    dtype:          string
+    required:       false
+    normalizers:    [strip_whitespace, null_if_empty]
+    candidate_names:
+      - מותג             # Hebrew: brand
+      - יצרן             # Hebrew: manufacturer
+      - manufacturer
+      - brand_name
+      - make
+
+  - raw_name:       supplier
+    canonical_name: supplier
+    dtype:          string
+    required:       false
+    normalizers:    [strip_whitespace, null_if_empty]
+    candidate_names:
+      - ספק              # Hebrew: supplier
+      - vendor
+      - supplier_name
+      - vendor_name
+      - distributor
+
+  - raw_name:       selling_price
+    canonical_name: selling_price
+    dtype:          decimal
+    required:       true
+    normalizers:    [strip_whitespace, null_if_empty]
+    candidate_names:
+      - מחיר מכירה       # Hebrew: selling price
+      - מחיר             # Hebrew: price
+      - price
+      - retail_price
+      - unit_price
+      - sale_price
+      - price_ils
+
+  - raw_name:       WOLT
+    canonical_name: wolt_price
+    dtype:          decimal
+    required:       false
+    normalizers:    [strip_whitespace, null_if_empty]
+    candidate_names:
+      - Wolt
+      - wolt
+      - wolt_price
+      - delivery_price
+
+  - raw_name:       cost_price
+    canonical_name: cost_price
+    dtype:          decimal
+    required:       false
+    normalizers:    [strip_whitespace, null_if_empty]
+    candidate_names:
+      - מחיר קניה        # Hebrew: purchase price
+      - עלות             # Hebrew: cost
+      - cost
+      - purchase_price
+      - cost_ils
+      - landed_cost
+
+  - raw_name:       current_stock
+    canonical_name: current_stock
+    dtype:          integer
+    required:       false
+    normalizers:    [strip_whitespace, null_if_empty]
+    candidate_names:
+      - מלאי נוכחי       # Hebrew: current stock (yomyom-inventory.csv)
+      - מלאי             # Hebrew: inventory / stock
+      - מלאי נוכחי       # Hebrew: current inventory (All4Shop export)
+      - כמות במלאי       # Hebrew: quantity in stock
+      - stock
+      - quantity_on_hand
+      - qty_on_hand
+      - on_hand
+      - inventory
+      - stock_qty
+
+  - raw_name:       units_sold_7d
+    canonical_name: units_sold_7d
+    dtype:          integer
+    required:       false
+    normalizers:    [strip_whitespace, null_if_empty]
+    candidate_names:
+      - נמכר 7 ימים      # Hebrew: sold 7 days
+      - sold_7d
+      - sales_7d
+      - qty_sold_7d
+      - weekly_sold
+
+  - raw_name:       units_sold_30d
+    canonical_name: units_sold_30d
+    dtype:          integer
+    required:       false
+    normalizers:    [strip_whitespace, null_if_empty]
+    candidate_names:
+      - כמות נמכרת       # Hebrew: quantity sold
+      - נמכר 30 ימים     # Hebrew: sold 30 days
+      - units_sold
+      - quantity_sold
+      - qty_sold
+      - sold_30d
+      - sales_30d
+      - monthly_sold
+
+  - raw_name:       sales_amount_30d
+    canonical_name: sales_amount_30d
+    dtype:          decimal
+    required:       false
+    normalizers:    [strip_whitespace, null_if_empty]
+    candidate_names:
+      - מחזור 30 ימים    # Hebrew: turnover 30 days
+      - revenue_30d
+      - total_sales
+      - turnover_30d
+      - sales_total
+
+  - raw_name:       gross_profit_30d
+    canonical_name: gross_profit_30d
+    dtype:          decimal
+    required:       false
+    normalizers:    [strip_whitespace, null_if_empty]
+    candidate_names:
+      - רווח גולמי 30 ימים  # Hebrew: gross profit 30 days
+      - profit_30d
+      - gross_profit
+      - gp_30d
+
+  - raw_name:       margin_pct
+    canonical_name: margin_pct
+    dtype:          decimal
+    required:       false
+    normalizers:    [strip_whitespace, null_if_empty]
+    candidate_names:
+      - רווחיות           # Hebrew: profitability / margin
+      - אחוז רווח         # Hebrew: profit percentage
+      - margin
+      - gross_margin_pct
+      - margin_percent
+      - gp_pct
+
+  - raw_name:       last_sale_date
+    canonical_name: last_sale_date
+    dtype:          date
+    required:       false
+    normalizers:    [strip_whitespace, null_if_empty]
+    candidate_names:
+      - תאריך מכירה אחרון  # Hebrew: last sale date
+      - last_sold
+      - last_sale
+      - last_transaction_date
+      - date_last_sold
+
+  - raw_name:       last_purchase_date
+    canonical_name: last_purchase_date
+    dtype:          date
+    required:       false
+    normalizers:    [strip_whitespace, null_if_empty]
+    candidate_names:
+      - תאריך קנייה אחרון  # Hebrew: last purchase date
+      - last_purchase
+      - last_received
+      - date_last_received
+      - last_order_date
+
+
+# ── Validation rules ───────────────────────────────────────────────────────────
+validation:
+  # Rows where ANY required field is null after normalisation → rejected
+  required_fields:
+    - product_name
+    - selling_price
+
+  # Numeric fields that must be > 0 when present
+  positive_fields: []
+
+  # Numeric fields that must be >= 0 when present
+  non_negative_fields:
+    - selling_price
+    - cost_price
+    - units_sold_7d
+    - units_sold_30d
+    - sales_amount_30d
+    - gross_profit_30d
+    # NOTE: current_stock intentionally excluded — yomyom-inventory.csv has 627
+    # rows with negative stock values (POS artifact). These are clamped to 0
+    # during import rather than rejected.
+
+  # Field-level range checks
+  range_checks:
+    - field: margin_pct
+      min:   0.0
+      max:   100.0
+
+  # Cross-field logic checks  (emit warning, do NOT reject row)
+  warnings:
+    - rule:    units_sold_7d_le_30d
+      message: "units_sold_7d should be <= units_sold_30d"
+    - rule:    cost_lt_sell
+      message: "cost_price should be < selling_price (negative margin)"
+    - rule:          margin_consistency
+      message:       "Recomputed margin differs from CSV margin_pct by more than tolerance"
+      tolerance_pct: 2.0        # warn if recomputed margin differs > 2 pp
+
+
+# ── Silver table definitions ───────────────────────────────────────────────────
+# Each table lists which canonical columns to include.
+# The importer adds _imported_at and _source_file to every table automatically.
+silver_tables:
+  products:
+    filename: yomyom_products.parquet
+    columns:
+      - barcode
+      - product_name
+      - category
+      - brand
+      - supplier
+      - selling_price
+      - wolt_price
+      - cost_price
+
+  sales:
+    filename: yomyom_sales.parquet
+    columns:
+      - barcode
+      - product_name
+      - category
+      - units_sold_7d
+      - units_sold_30d
+      - sales_amount_30d
+      - last_sale_date
+
+  inventory:
+    filename: yomyom_inventory.parquet
+    columns:
+      - barcode
+      - product_name
+      - category
+      - current_stock
+      - last_purchase_date
+
+  margins:
+    filename: yomyom_margins.parquet
+    columns:
+      - barcode
+      - product_name
+      - category
+      - selling_price
+      - wolt_price
+      - cost_price
+      - gross_profit_30d
+      - margin_pct
+
+
+# ── Signal thresholds ──────────────────────────────────────────────────────────
+signals:
+  top_n: 10
+
+  low_stock_fast_movers:
+    max_stock:          15      # current_stock <= this
+    min_sold_30d:       30      # units_sold_30d >= this
+
+  slow_movers:
+    max_sold_30d:       10      # units_sold_30d <= this
+
+  high_margin_impulse:
+    min_margin_pct:     35.0    # margin_pct >= this
+    categories:                 # only these categories qualify
+      - energy_drinks
+      - snacks
+      - candy_gum
+      - chocolate
+      - bakery
