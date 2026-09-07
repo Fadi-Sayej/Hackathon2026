@@ -59,6 +59,12 @@ export function normalizeProduct(rawProduct, rowIndex = 0) {
     // true = restocked at least once; false = sells but is never delivered
     // (services, made-to-order, staff consumption); null = unknown.
     isStocked: typeof rawProduct.isStocked === 'boolean' ? rawProduct.isStocked : null,
+    // Carried through so the browser can join to anything the pipeline publishes
+    // by barcode: competitor stockouts, and the owner's own answers.
+    barcode:
+      rawProduct.barcode === undefined || rawProduct.barcode === null
+        ? null
+        : String(rawProduct.barcode),
     // Availability-corrected demand rate (units/day) and how much it rests on.
     // null = never measured, in which case the engine falls back to raw sales and
     // the explanation must say which of the two it used.

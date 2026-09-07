@@ -6,6 +6,10 @@ import { formatCurrency, formatDays, percent, urgencyTone } from '../components/
 import { dirProps } from '../lib/utils/rtl.js'
 import { useT } from '../lib/i18n/index.js'
 
+// Top-N by money at stake. Thirty covers ~86% of the total order value on the
+// current catalogue, which is the point where more rows stop buying much.
+const MAX_VISIBLE_RECOMMENDATIONS = 30
+
 export function RecommendationsPage({
   approvedOrders,
   onApprove,
@@ -15,9 +19,16 @@ export function RecommendationsPage({
   recommendations,
 }) {
   const t = useT()
-  const pendingRecommendations = recommendations.filter(
+  // Opening reorder to the whole catalogue rather than only competitor-matched
+  // products raises the candidate count, and a list nobody reaches the end of is
+  // worth less than a short one. So: rank by money at stake, cap, and SAY SO.
+  // Silently truncating would let him believe he had seen everything.
+  const allPending = recommendations.filter(
     (recommendation) => recommendation.status !== 'REJECTED',
   )
+  const ranked = [...allPending].sort((a, b) => (b.valueAtStake ?? 0) - (a.valueAtStake ?? 0))
+  const pendingRecommendations = ranked.slice(0, MAX_VISIBLE_RECOMMENDATIONS)
+  const isCapped = ranked.length > pendingRecommendations.length
   const estimatedCost = approvedOrders.reduce((sum, recommendation) => {
     const product = productIndex.get(recommendation.productId)
     return sum + (recommendation.recommendedOrderQuantity ?? 0) * (product?.cost ?? 0)
@@ -33,6 +44,12 @@ export function RecommendationsPage({
         <MetricCard label={t('rec.estCost')} value={formatCurrency(estimatedCost)} detail={t('rec.estCostDetail')} tone="warning" />
         <MetricCard label={t('rec.prevented')} value={preventedStockouts} detail={t('rec.preventedDetail')} tone="danger" />
       </section>
+
+      <p className="recommendation-count">
+        {isCapped
+          ? t('rec.showingTopOf', { shown: pendingRecommendations.length, total: ranked.length })
+          : t('rec.showingAll', { total: ranked.length })}
+      </p>
 
       <section className="recommendation-grid">
         {pendingRecommendations.length === 0 ? (

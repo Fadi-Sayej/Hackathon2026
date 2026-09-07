@@ -734,4 +734,6 @@ export const he = {
   'q.export': 'הצג את מה שסיפרת למערכת',
   'explain.now.competitorOut': 'החנויות מסביב אזלו מהפריט הזה — הביקוש שלהן עובר אליך, והקצב הועלה בכ-{pct}% בהתאם.',
   'explain.unsure.competitorLift': 'תוספת הביקוש בגלל מחסור אצל המתחרים היא הערכה ({pct}%) ולא מדידה — ניתן לשנותה.',
+  'rec.showingTopOf': 'מוצגות {shown} מתוך {total} המלצות — המובילות לפי הסכום בסיכון.',
+  'rec.showingAll': 'מוצגות כל {total} ההמלצות.',
 }

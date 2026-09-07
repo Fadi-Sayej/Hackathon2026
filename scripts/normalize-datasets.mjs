@@ -186,6 +186,11 @@ function loadYomYomSilver() {
           // Base key only. It is NOT unique — see `makeIdsUnique()` below, which
           // runs over the finished list.
           id: baseProductId(row),
+          // The catalogue's own key. Without it the browser cannot match a product
+          // to anything the pipeline publishes by barcode — competitor stockouts
+          // were silently never applied, and owner answers keyed on the synthetic
+          // id instead, so they could never be read back by the Python side.
+          barcode: row.barcode ? String(row.barcode) : null,
           name: row.product_name,
           category: row.category ?? 'Uncategorized',
           price: Number(row.selling_price) || 0,

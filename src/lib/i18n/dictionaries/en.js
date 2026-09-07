@@ -733,4 +733,6 @@ export const en = {
   'q.export': 'Show what you told the system',
   'explain.now.competitorOut': 'The surrounding branches are out of this — their demand comes to you, so the rate was raised by about {pct}%.',
   'explain.unsure.competitorLift': 'The competitor-stockout lift is an estimate ({pct}%), not a measurement — it can be changed.',
+  'rec.showingTopOf': 'Showing {shown} of {total} recommendations — the highest by money at stake.',
+  'rec.showingAll': 'Showing all {total} recommendations.',
 }
