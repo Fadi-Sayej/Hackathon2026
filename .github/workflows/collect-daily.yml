@@ -83,6 +83,65 @@ jobs:
           git pull --rebase --autostash origin main || true
           git push origin HEAD:main
 
+      # ── Rebuild the product from the day we just collected ──────────────
+      #
+      # Until 2026-09-07 nothing ran the pipeline: collection committed snapshots
+      # and stopped. public/data/operational.json therefore only changed when a
+      # human remembered, which is how it sat a month stale while silently
+      # shipping competitorSignals: 0 — the entire market half of the product
+      # absent, with every run reporting success.
+      #
+      # Safe to automate only now: export_dashboard_data.py raises
+      # EmptyExportError BEFORE writing, so a failed rebuild leaves the last good
+      # dashboard on disk instead of replacing it with an empty one.
+      - name: Rebuild silver POS from the committed exports
+        # data/internal/ is gitignored, so a runner starts with no POS tables at
+        # all. Both source files ARE committed; these two importers turn them into
+        # the silver parquet the recommender reads. Skipping the sales import
+        # would cost velocity for 1,565 products and the stock-discrepancy signal.
+        run: |
+          python3 scripts/import_yomyom_pos.py --input yomyom-inventory.csv
+          python3 scripts/import_yomyom_sales.py
+
+      - name: Refresh the dashboard
+        id: refresh
+        # `npm run data:refresh` is a thin alias for this script; calling Python
+        # directly avoids installing Node for every nightly run.
+        # --json-out, not stdout: the pipeline's libraries log to stdout, so the
+        # printed JSON arrives interleaved with log lines and cannot be parsed.
+        run: python3 scripts/refresh_pipeline.py --json-out /tmp/refresh.json
+
+      - name: Fail on a degraded refresh
+        # The pipeline reports `partial` when a step raised and `degraded` when a
+        # step returned successfully having done nothing (readiness_only). Both
+        # mean the dashboard we are about to commit is worse than the one already
+        # there, so neither may pass quietly.
+        run: |
+          STATUS=$(python3 -c "import json;print(json.load(open('/tmp/refresh.json'))['status'])")
+          echo "refresh status: $STATUS"
+          if [ "$STATUS" != "ok" ]; then
+            echo "::error::Dashboard refresh came back '$STATUS', not 'ok'."
+            echo "::error::Refusing to publish a degraded dashboard. See the step log above."
+            python3 -c "import json;d=json.load(open('/tmp/refresh.json'));[print('::error::step',s['step'],s['status'],s.get('error','')) for s in d['steps'] if s['status']!='ok']"
+            exit 1
+          fi
+
+      - name: Commit the rebuilt dashboard
+        # Only public/data — every intermediate parquet stays gitignored and is
+        # rebuilt from the snapshots on the next run.
+        run: |
+          git config user.name  "smartshelf-collector"
+          git config user.email "collector@users.noreply.github.com"
+          git add public/data/operational.json public/data/market-context.json public/data/sources.json
+          if git diff --cached --quiet; then
+            echo "Dashboard unchanged."
+            exit 0
+          fi
+          DAY=$(date -u +%Y-%m-%d)
+          git commit -q -m "refresh: dashboard for ${DAY}"
+          git pull --rebase --autostash origin main || true
+          git push origin HEAD:main
+
       - name: Health check after collecting
         # Now it IS a gate. If the day we just collected is unusable — a short
         # run, an empty source, a failed manifest — the job goes red while the

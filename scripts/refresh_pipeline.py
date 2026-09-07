@@ -115,6 +115,15 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Refresh all dashboard inputs in one run.")
     parser.add_argument("--input", default=None, help="Optional POS CSV to import first.")
     parser.add_argument(
+        "--json-out",
+        default=None,
+        help=(
+            "Write the machine-readable summary to this file. Needed by CI: the "
+            "pipeline's own libraries log to stdout, so the JSON printed there is "
+            "mixed with log lines and cannot be parsed reliably."
+        ),
+    )
+    parser.add_argument(
         "--skip-market",
         action="store_true",
         help="Skip the competitor signal/matching/recommendation chain (POS-only refresh).",
@@ -122,7 +131,10 @@ def main() -> int:
     args = parser.parse_args()
 
     summary = run(args.input, skip_market=args.skip_market)
-    print(json.dumps(summary, ensure_ascii=False, indent=2))
+    payload = json.dumps(summary, ensure_ascii=False, indent=2)
+    if args.json_out:
+        Path(args.json_out).write_text(payload, encoding="utf-8")
+    print(payload)
     return 0 if summary["status"] == "ok" else 1
 
 
