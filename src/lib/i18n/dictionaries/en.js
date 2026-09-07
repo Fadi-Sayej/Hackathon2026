@@ -735,4 +735,5 @@ export const en = {
   'explain.unsure.competitorLift': 'The competitor-stockout lift is an estimate ({pct}%), not a measurement — it can be changed.',
   'rec.showingTopOf': 'Showing {shown} of {total} recommendations — the highest by money at stake.',
   'rec.showingAll': 'Showing all {total} recommendations.',
+  'explain.cost.valueCapped': 'If not ordered: about {units} units of demand go unmet before the next delivery, worth about {amount} ILS at cost. Only {qty} of those can be covered by a single order — the rest needs a second delivery within the shelf life, not a bigger one.',
 }

@@ -252,3 +252,47 @@ describe('the printed arithmetic adds up', () => {
     expect(facts.orderQty).toBeLessThan(facts.uncappedOrderQty)
   })
 })
+
+describe('a capped order explains the gap between demand and one delivery', () => {
+  const shelfLife = { categories: { 'מחלקת -barista': 2 }, defaultDays: null }
+  const croissant = {
+    ...product, name: 'קרואסון', category: 'מחלקת -barista',
+    currentStock: 0, demandPerDayCorrected: 8.38, leadTimeDays: 3, cost: 5.5,
+  }
+
+  it.each(LANGUAGES)('reconciles the two figures in %s', (language) => {
+    const metrics = computeMetrics(croissant, { demandSignals: {}, shelfLife })
+    const facts = buildReorderFacts(croissant, metrics, {})
+    const t = createTranslator(language)
+    const cost = renderReorderExplanation(facts, t).cost
+
+    // Both numbers appear, and the clause that reconciles them is the capped one.
+    expect(facts.shelfLifeCapped).toBe(true)
+    expect(cost).toBe(
+      t('explain.cost.valueCapped', {
+        amount: facts.costToIgnore,
+        units: facts.expectedDemandDuringLeadTime,
+        qty: facts.orderQty,
+      }),
+    )
+  })
+
+  it('uses the plain clause when nothing was capped', () => {
+    const uncapped = { ...croissant, category: 'כל הסיגריות' }
+    const metrics = computeMetrics(uncapped, { demandSignals: {}, shelfLife })
+    const facts = buildReorderFacts(uncapped, metrics, {})
+    const t = createTranslator('en')
+    expect(facts.shelfLifeCapped).toBe(false)
+    expect(renderReorderExplanation(facts, t).cost).toContain('may go unsold')
+  })
+
+  it('still prints only decision values', () => {
+    const metrics = computeMetrics(croissant, { demandSignals: {}, shelfLife })
+    const facts = buildReorderFacts(croissant, metrics, {})
+    const cost = renderReorderExplanation(facts, createTranslator('en')).cost
+    const allowed = new Set([facts.costToIgnore, facts.expectedDemandDuringLeadTime, facts.orderQty])
+    for (const printed of (cost.match(/\d+(?:\.\d+)?/g) ?? []).map(Number)) {
+      expect(allowed.has(printed), `${printed} is not a decision value`).toBe(true)
+    }
+  })
+})

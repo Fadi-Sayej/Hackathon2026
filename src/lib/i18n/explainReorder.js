@@ -131,13 +131,23 @@ export function renderReorderExplanation(facts, t, n = (value) => String(value))
   const uncertainty = unsure.join(' ')
 
   // ── 4. What it costs to ignore ──────────────────────────────────────
+  // Demand over the lead time and what one delivery can carry are different
+  // quantities, and side by side they read as a contradiction: the card says 16
+  // can sell before spoiling, then that ~25 may go unsold. Both are true — the
+  // gap is deliveries, not arithmetic — so when a cap applied, say which is which.
   const cost =
     facts.costToIgnore === null
       ? null
-      : t('explain.cost.value', {
-          amount: n(facts.costToIgnore),
-          units: n(facts.expectedDemandDuringLeadTime),
-        })
+      : facts.shelfLifeCapped
+        ? t('explain.cost.valueCapped', {
+            amount: n(facts.costToIgnore),
+            units: n(facts.expectedDemandDuringLeadTime),
+            qty: n(facts.orderQty),
+          })
+        : t('explain.cost.value', {
+            amount: n(facts.costToIgnore),
+            units: n(facts.expectedDemandDuringLeadTime),
+          })
 
   return { quantity, timing, uncertainty, cost }
 }
