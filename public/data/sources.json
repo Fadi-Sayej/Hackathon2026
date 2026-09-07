@@ -1,13 +1,13 @@
 {
-  "generated_at": "2026-09-07T14:48:42.006201+00:00",
-  "scraping_status": "complete",
+  "generated_at": "2026-09-07T14:52:35.111601+00:00",
+  "scraping_status": "partial",
   "sources": {
     "yomyom_pos": {
       "source_id": "yomyom_pos",
       "label": "YomYom POS",
       "kind": "internal_pos",
       "status": "complete",
-      "last_updated": "2026-09-07T14:48:42.005978+00:00",
+      "last_updated": "2026-09-07T14:52:35.110538+00:00",
       "row_count": 7674,
       "schema_version": "1"
     },
@@ -16,7 +16,7 @@
       "label": "Expiry scans",
       "kind": "expiry",
       "status": "not_started",
-      "last_updated": "2026-09-07T14:48:36.096630+00:00",
+      "last_updated": "2026-09-07T14:52:23.871342+00:00",
       "row_count": 0,
       "schema_version": "1"
     },
@@ -24,27 +24,27 @@
       "source_id": "kaggle_dor_alon",
       "label": "Dor Alon (Kaggle)",
       "kind": "competitor",
-      "status": "complete",
-      "last_updated": "2026-09-07T14:48:41.429166+00:00",
-      "row_count": 33094,
+      "status": "not_started",
+      "last_updated": "2026-09-07T14:52:29.261103+00:00",
+      "row_count": 0,
       "schema_version": "1"
     },
     "kaggle_rami_levy": {
       "source_id": "kaggle_rami_levy",
       "label": "Rami Levy (Kaggle)",
       "kind": "competitor",
-      "status": "complete",
-      "last_updated": "2026-09-07T14:48:41.433386+00:00",
-      "row_count": 43698,
+      "status": "not_started",
+      "last_updated": "2026-09-07T14:52:29.261451+00:00",
+      "row_count": 0,
       "schema_version": "1"
     },
     "kaggle_shufersal": {
       "source_id": "kaggle_shufersal",
       "label": "Shufersal (Kaggle)",
       "kind": "competitor",
-      "status": "complete",
-      "last_updated": "2026-09-07T14:48:41.437794+00:00",
-      "row_count": 45518,
+      "status": "not_started",
+      "last_updated": "2026-09-07T14:52:29.261749+00:00",
+      "row_count": 0,
       "schema_version": "1"
     },
     "wolt_delivery": {
@@ -52,8 +52,8 @@
       "label": "Wolt delivery catalog",
       "kind": "competitor",
       "status": "complete",
-      "last_updated": "2026-09-07T14:48:41.640699+00:00",
-      "row_count": 136062,
+      "last_updated": "2026-09-07T14:52:29.685878+00:00",
+      "row_count": 135777,
       "schema_version": "1"
     },
     "alonit_prices": {
@@ -61,7 +61,7 @@
       "label": "Alonit price file",
       "kind": "competitor",
       "status": "complete",
-      "last_updated": "2026-09-07T14:48:42.005718+00:00",
+      "last_updated": "2026-09-07T14:52:35.110171+00:00",
       "row_count": 14526983,
       "schema_version": "1"
     }
