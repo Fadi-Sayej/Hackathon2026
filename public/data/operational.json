@@ -1,10 +1,10 @@
 {
   "meta": {
-    "generatedAt": "2026-09-07T10:32:58.548793+00:00",
+    "generatedAt": "2026-09-07T14:48:36.098385+00:00",
     "status": "ok",
-    "competitorSignals": 505247,
+    "competitorSignals": 513779,
     "scrapingStatus": "complete",
-    "competitorRecommendations": 534
+    "competitorRecommendations": 535
   },
   "posHealth": {
     "totalProducts": 7674,
@@ -34,11 +34,11 @@
     "CHECK_NEGATIVE_STOCK": 625,
     "CHECK_MARGIN": 104,
     "VERIFY_UNKNOWN_BARCODE": 307,
-    "WATCH_PRODUCT": 534
+    "WATCH_PRODUCT": 535
   },
   "byFamily": {
     "operational": 2554,
-    "competitor": 534
+    "competitor": 535
   },
   "sources": [
     {
@@ -46,7 +46,7 @@
       "label": "YomYom POS",
       "kind": "internal_pos",
       "status": "complete",
-      "last_updated": "2026-09-07T10:33:04.325382+00:00",
+      "last_updated": "2026-09-07T14:48:42.005978+00:00",
       "row_count": 7674,
       "schema_version": "1"
     },
@@ -55,7 +55,7 @@
       "label": "Expiry scans",
       "kind": "expiry",
       "status": "not_started",
-      "last_updated": "2026-09-07T10:32:58.546591+00:00",
+      "last_updated": "2026-09-07T14:48:36.096630+00:00",
       "row_count": 0,
       "schema_version": "1"
     },
@@ -64,7 +64,7 @@
       "label": "Dor Alon (Kaggle)",
       "kind": "competitor",
       "status": "complete",
-      "last_updated": "2026-09-07T10:33:03.828033+00:00",
+      "last_updated": "2026-09-07T14:48:41.429166+00:00",
       "row_count": 33094,
       "schema_version": "1"
     },
@@ -73,7 +73,7 @@
       "label": "Rami Levy (Kaggle)",
       "kind": "competitor",
       "status": "complete",
-      "last_updated": "2026-09-07T10:33:03.832527+00:00",
+      "last_updated": "2026-09-07T14:48:41.433386+00:00",
       "row_count": 43698,
       "schema_version": "1"
     },
@@ -82,7 +82,7 @@
       "label": "Shufersal (Kaggle)",
       "kind": "competitor",
       "status": "complete",
-      "last_updated": "2026-09-07T10:33:03.836706+00:00",
+      "last_updated": "2026-09-07T14:48:41.437794+00:00",
       "row_count": 45518,
       "schema_version": "1"
     },
@@ -91,8 +91,8 @@
       "label": "Wolt delivery catalog",
       "kind": "competitor",
       "status": "complete",
-      "last_updated": "2026-09-07T10:33:03.989942+00:00",
-      "row_count": 130915,
+      "last_updated": "2026-09-07T14:48:41.640699+00:00",
+      "row_count": 136062,
       "schema_version": "1"
     },
     {
@@ -100,8 +100,8 @@
       "label": "Alonit price file",
       "kind": "competitor",
       "status": "complete",
-      "last_updated": "2026-09-07T10:33:04.324836+00:00",
-      "row_count": 13999064,
+      "last_updated": "2026-09-07T14:48:42.005718+00:00",
+      "row_count": 14526983,
       "schema_version": "1"
     }
   ],
@@ -49923,7 +49923,7 @@
       "confidence": 0.69,
       "reason": "Competitor catalog presence is strong, but internal demand evidence is still weak.",
       "severity": null,
-      "metricValue": 16.7,
+      "metricValue": 15.5,
       "sellingPrice": 14.9,
       "woltPrice": null,
       "costPrice": null,
@@ -49931,7 +49931,7 @@
       "marginPct": null,
       "daysToExpiry": null,
       "expiryDate": null,
-      "competitorPrice": 16.7,
+      "competitorPrice": 15.5,
       "competitorBarcode": "7290116932842"
     },
     {
@@ -50859,6 +50859,27 @@
       "competitorBarcode": "7290110115272"
     },
     {
+      "id": "f87a2d5e6ce008c7",
+      "family": "competitor",
+      "type": "WATCH_PRODUCT",
+      "barcode": "7290110117689",
+      "productName": "ספרייט ZERO לימון נענע 1.5 ליטר",
+      "category": "משקאות",
+      "confidence": 0.69,
+      "reason": "Competitor catalog presence is strong, but internal demand evidence is still weak.",
+      "severity": null,
+      "metricValue": 10.9,
+      "sellingPrice": 12.9,
+      "woltPrice": null,
+      "costPrice": null,
+      "currentStock": 28,
+      "marginPct": null,
+      "daysToExpiry": null,
+      "expiryDate": null,
+      "competitorPrice": 10.9,
+      "competitorBarcode": "7290110117689"
+    },
+    {
       "id": "938a44f536bf1ad7",
       "family": "competitor",
       "type": "WATCH_PRODUCT",
@@ -51330,7 +51351,7 @@
       "confidence": 0.69,
       "reason": "Competitor catalog presence is strong, but internal demand evidence is still weak.",
       "severity": null,
-      "metricValue": 20.9,
+      "metricValue": 16.9,
       "sellingPrice": 22.9,
       "woltPrice": null,
       "costPrice": null,
@@ -51338,7 +51359,7 @@
       "marginPct": null,
       "daysToExpiry": null,
       "expiryDate": null,
-      "competitorPrice": 20.9,
+      "competitorPrice": 16.9,
       "competitorBarcode": "7290119380206"
     },
     {
@@ -53304,7 +53325,7 @@
       "confidence": 0.69,
       "reason": "Competitor catalog presence is strong, but internal demand evidence is still weak.",
       "severity": null,
-      "metricValue": 25.9,
+      "metricValue": 24.9,
       "sellingPrice": 21.9,
       "woltPrice": null,
       "costPrice": null,
@@ -53312,7 +53333,7 @@
       "marginPct": null,
       "daysToExpiry": null,
       "expiryDate": null,
-      "competitorPrice": 25.9,
+      "competitorPrice": 24.9,
       "competitorBarcode": "7290000525969"
     },
     {
@@ -53367,7 +53388,7 @@
       "confidence": 0.69,
       "reason": "Competitor catalog presence is strong, but internal demand evidence is still weak.",
       "severity": null,
-      "metricValue": 16.9,
+      "metricValue": 11.9,
       "sellingPrice": 11.9,
       "woltPrice": null,
       "costPrice": null,
@@ -53375,7 +53396,7 @@
       "marginPct": null,
       "daysToExpiry": null,
       "expiryDate": null,
-      "competitorPrice": 16.9,
+      "competitorPrice": 11.9,
       "competitorBarcode": "7290001045688"
     },
     {
@@ -57732,10 +57753,10 @@
       "barcode": "7290115208009",
       "productName": "ויטמינציק ענבים 1 ל",
       "category": "משקאות",
-      "confidence": 0.69,
+      "confidence": 0.77,
       "reason": "Competitor catalog presence is strong, but internal demand evidence is still weak.",
       "severity": null,
-      "metricValue": 18.9,
+      "metricValue": 17.9,
       "sellingPrice": 21.9,
       "woltPrice": null,
       "costPrice": null,
@@ -57743,7 +57764,7 @@
       "marginPct": null,
       "daysToExpiry": null,
       "expiryDate": null,
-      "competitorPrice": 18.9,
+      "competitorPrice": 17.9,
       "competitorBarcode": "7290115208009"
     },
     {
@@ -58656,7 +58677,7 @@
       "barcode": "8000500009673",
       "productName": "פררו רושה 24 יח שוקולד חלב אגוזי לוז",
       "category": "חטיפים מתוקים",
-      "confidence": 0.69,
+      "confidence": 0.77,
       "reason": "Competitor catalog presence is strong, but internal demand evidence is still weak.",
       "severity": null,
       "metricValue": 54.9,
@@ -59016,7 +59037,7 @@
       "confidence": 0.69,
       "reason": "Competitor catalog presence is strong, but internal demand evidence is still weak.",
       "severity": null,
-      "metricValue": 22.9,
+      "metricValue": 28.9,
       "sellingPrice": 27.9,
       "woltPrice": null,
       "costPrice": null,
@@ -59024,7 +59045,7 @@
       "marginPct": null,
       "daysToExpiry": null,
       "expiryDate": null,
-      "competitorPrice": 22.9,
+      "competitorPrice": 28.9,
       "competitorBarcode": "8076809523738"
     },
     {
@@ -59454,10 +59475,10 @@
       "barcode": "8850389105849",
       "productName": "משקה אלוורה אפרסק ליטר",
       "category": "משקאות",
-      "confidence": 0.77,
+      "confidence": 0.69,
       "reason": "Competitor catalog presence is strong, but internal demand evidence is still weak.",
       "severity": null,
-      "metricValue": 15.2,
+      "metricValue": 14.9,
       "sellingPrice": 14.9,
       "woltPrice": null,
       "costPrice": null,
@@ -59465,7 +59486,7 @@
       "marginPct": null,
       "daysToExpiry": null,
       "expiryDate": null,
-      "competitorPrice": 15.2,
+      "competitorPrice": 14.9,
       "competitorBarcode": "8850389105849"
     },
     {

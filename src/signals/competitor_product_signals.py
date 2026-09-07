@@ -185,29 +185,45 @@ def _load_all_parquets(base_dir: Path, label: str) -> pl.DataFrame:
         return pl.DataFrame()
 
     logger.info("Loading {} Parquet files for {}", len(files), label)
-    frames: list[pl.DataFrame] = []
+
+    # Dedup incrementally instead of concatenating everything first.
+    #
+    # The result keeps only the most recent row per (barcode, store_id), so the
+    # older days contribute almost nothing — but holding all of them in memory at
+    # once is what actually decided whether this runs. On a GitHub runner the
+    # all-at-once concat of 31 days was killed with SIGTERM (exit 143) before it
+    # ever reached the dedup. Folding each file in and deduping immediately keeps
+    # peak memory at roughly one file plus the deduped frame, and grows with the
+    # catalogue rather than with the length of history.
+    #
+    # Semantics are unchanged: the same sort-by-ingestion and unique-by-pair runs,
+    # just repeatedly rather than once at the end.
+    def _dedup(frame: pl.DataFrame) -> pl.DataFrame:
+        ts_col = "_ingested_at" if "_ingested_at" in frame.columns else None
+        if ts_col and "barcode" in frame.columns and "store_id" in frame.columns:
+            return (
+                frame.sort(ts_col, descending=True)
+                     .unique(subset=["barcode", "store_id"], keep="first", maintain_order=True)
+            )
+        return frame
+
+    df: pl.DataFrame | None = None
     for f in files:
         try:
-            frames.append(pl.read_parquet(f))
+            chunk = pl.read_parquet(f)
         except Exception as exc:
             logger.warning("Skipping unreadable Parquet {}: {}", f, exc)
+            continue
+        if df is None:
+            df = _dedup(chunk)
+            continue
+        try:
+            df = _dedup(pl.concat([df, chunk], how="diagonal_relaxed"))
+        except Exception as exc:
+            logger.warning("concat failed for {} ({}); keeping what we have", f, exc)
 
-    if not frames:
+    if df is None:
         return pl.DataFrame()
-
-    try:
-        df = pl.concat(frames, how="diagonal_relaxed")
-    except Exception as exc:
-        logger.warning("concat failed ({}); using latest file only", exc)
-        df = frames[-1]
-
-    # Deduplicate: keep most-recent ingestion per (barcode, store_id)
-    ts_col = "_ingested_at" if "_ingested_at" in df.columns else None
-    if ts_col and "barcode" in df.columns and "store_id" in df.columns:
-        df = (
-            df.sort(ts_col, descending=True)
-              .unique(subset=["barcode", "store_id"], keep="first", maintain_order=True)
-        )
 
     logger.info("  {} rows after dedup for {}", len(df), label)
     return df

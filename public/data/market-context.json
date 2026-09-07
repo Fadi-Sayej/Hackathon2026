@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-07T10:32:04.184134+00:00",
+  "generatedAt": "2026-09-07T14:47:40.573209+00:00",
   "date": "2026-09-07",
   "status": "ok",
   "sources": {
@@ -9,12 +9,12 @@
     "islamic": "computed_hijri"
   },
   "weather": {
-    "temperatureC": 32.8,
+    "temperatureC": 29.1,
     "precipitation": 0.0,
-    "windSpeed": 16.1,
+    "windSpeed": 12.7,
     "weatherCode": 1,
-    "label": "hot",
-    "observedAt": "2026-09-07T13:30",
+    "label": "warm",
+    "observedAt": "2026-09-07T17:45",
     "lat": 32.114,
     "lon": 34.976,
     "source": "open-meteo"
@@ -58,29 +58,9 @@
     },
     "source": "computed_hijri"
   },
-  "demandSignals": {
-    "משקאות": 1.2,
-    "מחלקת -barista": 1.2,
-    "גלידות": 1.15,
-    "קפואים מצוננים": 1.15
-  },
-  "demandBasis": {
-    "משקאות": [
-      "hot_weather"
-    ],
-    "מחלקת -barista": [
-      "hot_weather"
-    ],
-    "גלידות": [
-      "hot_weather"
-    ],
-    "קפואים מצוננים": [
-      "hot_weather"
-    ]
-  },
-  "activeReasons": [
-    "hot_weather"
-  ],
+  "demandSignals": {},
+  "demandBasis": {},
+  "activeReasons": [],
   "shelfLife": {
     "categories": {
       "מחלקת -barista": 2,
@@ -346,6 +326,7 @@
       "613008753290",
       "613008753320",
       "613008753382",
+      "6253504180394",
       "64144090020",
       "64144090051",
       "651080647519",
@@ -571,6 +552,7 @@
       "7290000311715",
       "7290000313184",
       "7290000313290",
+      "7290000318189",
       "7290000327242",
       "7290000334684",
       "7290000334745",
@@ -2392,7 +2374,7 @@
       "9780201321029",
       "9800800056"
     ],
-    "days": 27,
+    "days": 28,
     "status": "ok",
     "lift": 1.15
   }
