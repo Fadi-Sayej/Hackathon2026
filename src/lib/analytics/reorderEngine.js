@@ -15,7 +15,12 @@ import {
 } from './recommendationTypes.js'
 import { credibleLoss } from './actionPriority.js'
 import { isAssumedLeadTime } from '../receiving/leadTimeResolver.js'
-import { buildReorderFacts, resolveDailyRate, resolveShelfLifeDays } from './reorderFacts.js'
+import {
+  buildReorderFacts,
+  resolveCompetitorLift,
+  resolveDailyRate,
+  resolveShelfLifeDays,
+} from './reorderFacts.js'
 
 const FAST_MOVER_THRESHOLD = 5
 const SLOW_MOVER_SALES_30D = 5
@@ -93,7 +98,9 @@ export function computeMetrics(product, marketContext = {}) {
   const { dailyRate: baseRate, rateBasis, rateConfidence, censoredDays } =
     resolveDailyRate(product, observedWeightedAvg)
   const baseWeightedAvg = baseRate
-  const weightedAvgDailySales = baseWeightedAvg * demandMultiplier
+  // Competitor stockouts adjust the RATE; they never decide whether to order.
+  const competitorLift = resolveCompetitorLift(product, marketContext)
+  const weightedAvgDailySales = baseWeightedAvg * demandMultiplier * competitorLift
   const daysUntilStockout =
     weightedAvgDailySales > 0
       ? product.currentStock / weightedAvgDailySales
@@ -138,6 +145,7 @@ export function computeMetrics(product, marketContext = {}) {
     rateConfidence,
     censoredDays,
     demandMultiplier,
+    competitorLift,
     daysUntilStockout: Number.isFinite(daysUntilStockout) ? round(daysUntilStockout) : null,
     isFastMover,
     safetyStock: round(safetyStock),

@@ -56,6 +56,7 @@ export function toEngineContext(artifact, fallback) {
     // test passed, because those hand the table straight to computeMetrics and never
     // cross this boundary.
     shelfLife: artifact.shelfLife ?? null,
+    competitorStockouts: artifact.competitorStockouts ?? null,
     ownerAnswers: artifact.ownerAnswers ?? {},
     demandBasis: artifact.demandBasis ?? {},
     activeReasons: artifact.activeReasons ?? [],

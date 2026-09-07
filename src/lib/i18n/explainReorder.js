@@ -85,6 +85,12 @@ export function renderReorderExplanation(facts, t, n = (value) => String(value))
   ]
   const drivers = renderDrivers(facts.drivers ?? [], t)
   if (drivers.length) timingParts.push(t('explain.now.drivers', { drivers: drivers.join('، ') }))
+  // Why the rate moved, stated where the owner is deciding whether to act.
+  if (facts.competitorLift > 1) {
+    timingParts.push(
+      t('explain.now.competitorOut', { pct: n(Math.round((facts.competitorLift - 1) * 100)) }),
+    )
+  }
   if (facts.demandMultiplier > 1) {
     timingParts.push(
       t('explain.now.multiplier', {
@@ -104,6 +110,11 @@ export function renderReorderExplanation(facts, t, n = (value) => String(value))
     unsure.push(t('explain.unsure.censored', { days: n(facts.censoredDays) }))
   }
   if (facts.leadTimeAssumed) unsure.push(t('explain.unsure.leadAssumed'))
+  if (facts.competitorLift > 1) {
+    unsure.push(
+      t('explain.unsure.competitorLift', { pct: n(Math.round((facts.competitorLift - 1) * 100)) }),
+    )
+  }
   if (facts.shelfLifeDays !== null && facts.shelfLifeSource === 'config_default') {
     unsure.push(t('explain.unsure.shelfLifeDefault', { days: n(facts.shelfLifeDays) }))
   }

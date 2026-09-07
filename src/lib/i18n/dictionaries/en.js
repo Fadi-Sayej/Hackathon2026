@@ -731,4 +731,6 @@ export const en = {
   'q.changed.none': 'The recommendations did not change from this answer.',
   'q.saved': 'Answer saved. It enters the pipeline on the next run.',
   'q.export': 'Show what you told the system',
+  'explain.now.competitorOut': 'The surrounding branches are out of this — their demand comes to you, so the rate was raised by about {pct}%.',
+  'explain.unsure.competitorLift': 'The competitor-stockout lift is an estimate ({pct}%), not a measurement — it can be changed.',
 }

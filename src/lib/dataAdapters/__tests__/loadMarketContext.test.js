@@ -47,3 +47,42 @@ describe('artifact fields survive the crossing into engine context', () => {
     expect(toEngineContext(null, fallback)).toBe(fallback)
   })
 })
+
+describe('competitor data adjusts the rate, never gates the decision', () => {
+  const artifactWithStockout = {
+    ...artifact,
+    competitorStockouts: { status: 'ok', days: 27, lift: 1.15, barcodes: ['777'] },
+  }
+  const base = {
+    id: 'p', name: 'חלב', category: 'מוצרי מקרר', price: 7, cost: 4,
+    currentStock: 2, salesLast7Days: 0, salesLast30Days: 0,
+    demandPerDayCorrected: 4, demandConfidence: 'high',
+    leadTimeDays: 3, leadTimeSource: 'default', isStocked: true,
+  }
+
+  it('lifts the rate when the surrounding branches are out of it', () => {
+    const ctx = toEngineContext(artifactWithStockout, fallback)
+    const withLift = computeMetrics({ ...base, barcode: '777' }, ctx)
+    const without = computeMetrics({ ...base, barcode: '999' }, ctx)
+    expect(withLift.competitorLift).toBe(1.15)
+    expect(without.competitorLift).toBe(1)
+    expect(withLift.dailyRate).toBeGreaterThan(without.dailyRate)
+  })
+
+  it('still recommends a product no competitor sells at all', () => {
+    // The regression this whole change exists to prevent: no competitor match
+    // must never mean no reorder.
+    const ctx = toEngineContext({ ...artifact, competitorStockouts: null }, fallback)
+    const metrics = computeMetrics({ ...base, barcode: 'unmatched', currentStock: 0 }, ctx)
+    expect(metrics.competitorLift).toBe(1)
+    expect(metrics.recommendedOrder).toBeGreaterThan(0)
+  })
+
+  it('ignores a lift when history is too short to classify', () => {
+    const ctx = toEngineContext(
+      { ...artifact, competitorStockouts: { status: 'insufficient_history', days: 1, barcodes: [], lift: 1.15 } },
+      fallback,
+    )
+    expect(computeMetrics({ ...base, barcode: '777' }, ctx).competitorLift).toBe(1)
+  })
+})

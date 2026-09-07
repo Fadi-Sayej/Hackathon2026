@@ -33,3 +33,15 @@ jewish:
   chametz_stop_reorder_days: 30
   chametz_clear_stock_days: 14
   pesach_length_days: 8
+
+competitor:
+  # When the surrounding branches are out of something he sells, their customers
+  # have nowhere else to buy it today — so his demand rises. This is a demand
+  # ADJUSTMENT, never a gate: whether to reorder is decided from his own stock and
+  # sales, and this only nudges the rate.
+  #
+  # 1.15 = 15% lift. A starting recommendation, not a measurement: no competitor
+  # stockout has yet been observed alongside his till data to calibrate it. Only
+  # statistically-classified STOCKOUT counts (src/market/concentration.py); a
+  # DELISTING is the market walking away and must never lift anything.
+  stockout_demand_lift: 1.15

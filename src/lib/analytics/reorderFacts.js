@@ -67,6 +67,24 @@ export function resolveShelfLifeDays(product, marketContext = {}) {
 }
 
 /**
+ * Demand lift because the surrounding branches are out of this product.
+ *
+ * An ADJUSTMENT, never a gate: whether to reorder is already decided from his own
+ * stock and sales. Only statistically-classified STOCKOUT lifts anything — a
+ * DELISTING means the market is walking away, and following it would be the wrong
+ * move. Returns 1 when there is nothing to say.
+ */
+export function resolveCompetitorLift(product, marketContext = {}) {
+  const table = marketContext.competitorStockouts
+  if (!table || table.status !== 'ok' || !Array.isArray(table.barcodes)) return 1
+  const lift = Number(table.lift)
+  if (!Number.isFinite(lift) || lift <= 1) return 1
+  const barcode = product?.barcode == null ? null : String(product.barcode)
+  if (!barcode) return 1
+  return table.barcodes.includes(barcode) ? lift : 1
+}
+
+/**
  * Build the fact record for one reorder decision.
  *
  * `metrics` must be the object that produced `metrics.recommendedOrder` — this
@@ -108,6 +126,8 @@ export function buildReorderFacts(product, metrics, marketContext = {}) {
     coverDays: metrics.daysUntilStockout,
     drivers: Array.isArray(marketContext.activeReasons) ? marketContext.activeReasons : [],
     demandMultiplier: metrics.demandMultiplier ?? 1,
+    // Set when the surrounding branches are out of it — demand arriving from them.
+    competitorLift: metrics.competitorLift ?? 1,
 
     // 3 — what we are unsure about
     // false = the stock figure fails its own arithmetic, so anything derived from
