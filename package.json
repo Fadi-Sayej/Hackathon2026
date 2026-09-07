@@ -37,7 +37,8 @@
     "test:e2e": "playwright test",
     "test:all": "npm run lint && npm run test && npm run test:e2e",
     "doctor": "vite-node scripts/doctor.mjs",
-    "audit:ui": "node scripts/ui-audit.mjs"
+    "audit:ui": "node scripts/ui-audit.mjs",
+    "check:signals": "node scripts/check_signals_live.mjs"
   },
   "dependencies": {
     "firebase": "^12.13.0",

@@ -44,6 +44,10 @@ jobs:
           python-version: '3.11'
           cache: pip
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - run: pip install -r requirements.txt
 
       - name: Health check before collecting
@@ -125,6 +129,14 @@ jobs:
             python3 -c "import json;d=json.load(open('/tmp/refresh.json'));[print('::error::step',s['step'],s['status'],s.get('error','')) for s in d['steps'] if s['status']!='ok']"
             exit 1
           fi
+
+      - name: Is every signal still reaching an output?
+        # The refresh can succeed while a signal quietly stops applying — that has
+        # happened four times in this project, each time with unit tests green.
+        # Runs against the dashboard we are about to commit, so an inert signal
+        # blocks the commit instead of shipping. Node only; the script imports
+        # nothing from node_modules.
+        run: node scripts/check_signals_live.mjs
 
       - name: Commit the rebuilt dashboard
         # Only public/data — every intermediate parquet stays gitignored and is

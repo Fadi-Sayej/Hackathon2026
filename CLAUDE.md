@@ -8,7 +8,7 @@ of how the pipelines fit together. This file is the rules; that file is the map.
 Anything in `docs/archive/` is retained for history and is **out of date** — it
 describes modules that no longer exist. Do not act on it.
 
-## The 11 rules
+## The 12 rules
 
 1. **Run Python from the repo root.** Scripts insert the repo root into `sys.path`
    themselves (`sys.path.insert(0, ROOT)`); `src` is a namespace package with no
@@ -69,6 +69,18 @@ describes modules that no longer exist. Do not act on it.
     14,406 barcode matches where the artifact holds 2,848, and 2,183 recommendations
     where the exporter emits 3,035. Read the parquet or the JSON, never another
     markdown file.
+
+12. **A new signal is not done until it has moved something.** Four times now a
+    signal has been built, unit-tested, labelled working, and changed nothing:
+    the market pipeline nobody ran, demand multipliers keyed in English against a
+    Hebrew catalogue, owner answers keyed on the product id while Python keys on
+    barcode, and the shelf-life table dropped by the context adapter. Every unit
+    test passed through all four, because each supplied the input directly and
+    never crossed the boundary where it was lost. Run `npm run check:signals`: it
+    diffs real recommendations with the signal on and off and fails when a present
+    input changes nothing. When the input is legitimately absent today it injects
+    a synthetic probe instead, so the wiring is proven before the real data
+    arrives. It runs in `collect-daily.yml` before the dashboard is committed.
 
 ## Layout
 
