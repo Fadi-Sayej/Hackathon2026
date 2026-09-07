@@ -50,6 +50,13 @@ export function toEngineContext(artifact, fallback) {
     // category in the catalog is Hebrew, so it silently matched nothing and every
     // multiplier was 1. reorderEngine.js renders this; it no longer decides it.
     demandSignals: artifact.demandSignals ?? {},
+    // The shelf-life table and the owner's answers must reach the engine, not just
+    // the browser. Omitting them here silently disabled the perishability cap in the
+    // running app — the croissant ordered 51 units instead of 16 — while every unit
+    // test passed, because those hand the table straight to computeMetrics and never
+    // cross this boundary.
+    shelfLife: artifact.shelfLife ?? null,
+    ownerAnswers: artifact.ownerAnswers ?? {},
     demandBasis: artifact.demandBasis ?? {},
     activeReasons: artifact.activeReasons ?? [],
     sourceLabel: artifact.status === 'ok' ? 'live' : artifact.status,
