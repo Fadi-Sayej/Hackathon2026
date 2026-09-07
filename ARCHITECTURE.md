@@ -20,8 +20,8 @@ data/internal/silver_pos/*.parquet          │
     │                                   data/matching/product_matches.parquet
     ▼ src/recommendations/                  │
       operational_recommendations.py        ▼ src/recommendations/product_recommendations.py
-data/recommendations/                   data/recommendations/
-  operational_recommendations/*.parquet   product_recommendations/*.parquet
+data/recommendations/                   data/recommendations/     (WATCH_PRODUCT only —
+  operational_recommendations/*.parquet   product_recommendations/  no REORDER: see seam 11)
     │                                       │
     └───────────────┬───────────────────────┘
                     ▼  scripts/export_dashboard_data.py   ← globs NEWEST of each, by mtime
@@ -29,6 +29,12 @@ data/recommendations/                   data/recommendations/
                     ▼  src/lib/dataAdapters/loadOperationalData.js  (fetch)
             src/App.jsx ──► src/pages/OperationalPage.jsx
                     ▼  src/lib/analytics/actionPriority.js          ← ranks by ₪; money vs data-hygiene
+
+REORDER — decided from HIS data only, never gated by competitors
+src/lib/analytics/reorderEngine.js  (all 7,451 products)
+   ← stock · corrected demand · lead time · shelf life · owner answers   [decide]
+   ← demandSignals · competitorStockouts lift                            [adjust only]
+   ─► ranked by ₪, capped at 30, "showing 30 of 101" stated on screen
 
 MARKET CONTEXT (decided once, in Python)
 src/context/{weather,hebrew,islamic}.py ─► src/context/demand_signals.py
@@ -104,6 +110,16 @@ continues as `partial`.
 10. **A model may group products; it may never produce a number.** Shelf life,
    quantities and lead times come from rules over data he can check. Grouping falls
    back to the catalog category field when the LLM is off — degraded, not absent.
+
+11. **Competitor data adjusts reorder; it must never gate it.** REORDER used to be
+   produced inside the competitor pipeline, which iterates competitor-MATCHED
+   products — so 5,669 of 7,674 products could never be ordered, and the answer
+   moved when competitor listings refreshed. It now lives solely in
+   `reorderEngine.js`. `WATCH_PRODUCT` stays in the competitor pipeline because it
+   genuinely is a competitor signal.
+12. **The browser joins to the pipeline by barcode.** `normalize-datasets.mjs` must
+   emit `barcode`; without it the competitor lift is silently inert and owner
+   answers key on the synthetic product id, which Python cannot read back.
 
 ## npm scripts — product path
 
