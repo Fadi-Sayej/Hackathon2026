@@ -43,9 +43,10 @@ const n = (v) => i18n.formatNumber(v, lang)
 const L = []
 const rule = (ch) => L.push(ch.repeat(78))
 
-L.push(`הסברי הזמנה — ${top} ההמלצות המובילות`)
+L.push(`הסברי הזמנה — ${top} המובילות מתוך ${recs.length} המלצות`)
 L.push(`נוצר: ${ctx.generatedAt} · מזג אוויר: ${ctx.weather?.label} ${ctx.weather?.temperatureC}°C`)
 L.push(`גורמים פעילים היום: ${(ctx.activeReasons ?? []).join(', ') || 'אין'}`)
+L.push(`מקור ההחלטה: המלאי והמכירות של החנות עצמה — לא נדרשת התאמה למתחרה.`)
 rule('='); L.push('')
 
 const block = (r, index) => {
