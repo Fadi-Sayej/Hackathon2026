@@ -15,11 +15,7 @@ from src.common.paths import PROJECT_ROOT, MATCHING_ROOT, RECOMMENDATIONS_ROOT, 
 
 REPORTS_ROOT = Path(__file__).resolve().parents[2] / "reports" / "recommendations"
 from src.context.owner_answers import is_orderable, load_owner_answers
-from src.snapshots.censored_demand import (
-    STATE_DELISTED,
-    STATE_NEVER_STOCKED,
-    corrected_monthly_demand,
-)
+from src.snapshots.censored_demand import corrected_monthly_demand
 
 PRODUCT_RECOMMENDATION_DIR = RECOMMENDATIONS_ROOT / "product_recommendations"
 
@@ -275,13 +271,10 @@ def generate_product_recommendations() -> dict[str, Any]:
             demand_30d *= demand_multiplier
         availability = sales.get("availability_state") if sales else None
         demand_confidence = sales.get("demand_confidence") if sales else None
-        # A car wash or an espresso pulled to order sells without ever being
-        # delivered; a dropped line stops for good. Neither is a stockout, and
-        # "you are running out, reorder" is nonsense for both.
-        reorderable = (
-            availability not in (STATE_NEVER_STOCKED, STATE_DELISTED, None)
-            and is_orderable(internal_barcode, owner_answers)
-        )
+        # If he has told us he no longer carries a line, or that it is out of
+        # season, we must not put it in front of him at all — not as an order and
+        # not as something to watch. His answer outranks every number we hold.
+        owner_dropped = not is_orderable(internal_barcode, owner_answers)
         margin_pct = margin.get("margin_pct") if margin else None
 
         recommendation_type = None
@@ -292,24 +285,28 @@ def generate_product_recommendations() -> dict[str, Any]:
             recommendation_type = "PRICE_CHECK"
             reason = "Competitor price is materially below YomYom shelf price while local margin data exists."
             confidence = _confidence(0.55 + 0.1 * min(len(evidence), 4))
+        # REORDER deliberately does NOT live here any more.
+        #
+        # This loop iterates over competitor-MATCHED products, so a product with no
+        # competitor listing could never produce an ordering recommendation —
+        # 5,669 of 7,674 products, 74% of the catalogue, were structurally
+        # unreachable. Worse, the answer moved for the wrong reason: the
+        # 2026-09-06 refresh moved REORDER 93 -> 91 purely because competitor
+        # matching changed. Whether the shop should reorder milk must not depend
+        # on whether a competitor happens to list it.
+        #
+        # The decision now belongs solely to src/lib/analytics/reorderEngine.js,
+        # which runs on his own stock, corrected demand, lead time and shelf life
+        # across the whole catalogue and never consults a competitor to decide
+        # WHETHER to order. Competitor data adjusts the rate there; it does not
+        # gate it. WATCH_PRODUCT stays below because it genuinely is a competitor
+        # signal.
         elif (
-            stock is not None
-            and stock <= 10
-            and reorderable
-            and demand_30d is not None
-            and demand_30d >= 20
+            competitor.get("appears_in_delivery_catalog")
+            and sold_30d in (None, 0)
+            and stock not in (None, 0)
+            and not owner_dropped
         ):
-            recommendation_type = "REORDER"
-            if (sold_30d or 0) < 20:
-                reason = (
-                    "Stock is low and corrected demand clears the reorder threshold. "
-                    "Raw sales understate it because the product spent part of the "
-                    "period out of stock."
-                )
-            else:
-                reason = "Local stock is low relative to recent sales and the product also appears in competitor signals."
-            confidence = _confidence(0.6 + 0.08 * min(len(evidence), 4))
-        elif competitor.get("appears_in_delivery_catalog") and sold_30d in (None, 0) and stock not in (None, 0):
             recommendation_type = "WATCH_PRODUCT"
             reason = "Competitor catalog presence is strong, but internal demand evidence is still weak."
             confidence = _confidence(0.45 + 0.08 * min(len(evidence), 4))
