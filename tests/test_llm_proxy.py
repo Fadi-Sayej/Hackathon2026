@@ -172,11 +172,28 @@ class _ConfigRecordingModel:
 
 
 def test_default_model_is_the_cheapest_tier_that_fits_the_task(monkeypatch):
-    # gemini-2.5-flash bills output at $2.50/1M and thinks by default (thinking
-    # tokens are billed as output, and the pinned SDK cannot switch that off).
-    # flash-lite is $0.40/1M with thinking off — ample for a 4-field JSON answer.
+    # The full flash tier bills output at $2.50/1M and thinks by default (thinking
+    # tokens bill as output, and the pinned SDK cannot switch that off). flash-lite
+    # is $0.40/1M with thinking off — ample for a 4-field JSON answer.
+    #
+    # Asserts the TIER, not a version string. Pinning 'gemini-2.5-flash-lite' meant
+    # this test failed for a routine model bump on 2026-09-08 while the property it
+    # exists to protect — never silently defaulting to the expensive tier — was
+    # never in danger. Model names move; the cost argument does not.
     proxy = _load_proxy(monkeypatch)
-    assert proxy.GEMINI_MODEL == "gemini-2.5-flash-lite"
+    assert proxy.GEMINI_MODEL.endswith("-flash-lite"), proxy.GEMINI_MODEL
+
+
+def test_default_model_is_not_a_vite_prefixed_variable(monkeypatch):
+    """VITE_GEMINI_MODEL must not steer the server.
+
+    It exists only to be compiled into the browser bundle; letting it win here had
+    the proxy following a client-side variable.
+    """
+    monkeypatch.setenv("VITE_GEMINI_MODEL", "gemini-should-not-win")
+    monkeypatch.setenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
+    proxy = _load_proxy(monkeypatch)
+    assert proxy.GEMINI_MODEL == "gemini-3.5-flash-lite"
 
 
 def test_explain_asks_for_bounded_json_instead_of_free_text(monkeypatch):
