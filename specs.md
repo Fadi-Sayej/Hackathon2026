@@ -1,6 +1,6 @@
 # SmartShelf — Specification Layer
 
-**Status:** Draft · **Version:** 0.3 · **Updated:** 2026-09-08
+**Status:** Draft · **Version:** 1.0 · **Updated:** 2026-09-08
 **Intent layer:** [`intent.md`](intent.md) — the source this specification is derived from.
 
 The reasoning layers are kept strictly separate:
@@ -20,16 +20,22 @@ coding agent working in a repository whose code and technical documents are
 English. The intent layer stays in Arabic because its audience includes the store
 owner.
 
-**Design-readiness: NOT READY FOR SYSTEM DESIGN** — one P0 question remains, not five. Version 0.2 removed the monetary figure from stock reconciliation entirely
+**Design-readiness: READY FOR SYSTEM DESIGN.** No P0 question remains. Version 0.2 removed the monetary figure from stock reconciliation entirely
 (SPEC-002 FR-023), because a positive recorded stock proved no more trustworthy than a
 negative one in a file the owner has never reviewed. That single change left V1 with one
 monetary kind, which dissolved the ordering conflict on the daily surface. Version 0.3
 then settled catalogue withdrawal: it is not a one-time event but a rule re-evaluated on
 every ingestion, whose strength follows the evidence window (SPEC-004 FR-060a, FR-063a–c).
 
-What still blocks design: **OQ-301** — whether a competitor of a different store format
-may drive a surfaced signal. Under existing protected behavior it may not, and only 4 of
-165 candidate items survive.
+Version 1.0 then settled competitor pricing: a cross-format price never stands alone but
+forms half a balanced reference, judgement is made against a pricing policy the owner
+declares rather than against a rival's price, and — the constraint that changed the
+capability most — no recommendation may leave the owner below a stated margin over his
+own purchase cost. In the pilot data that last rule removes 43 of 144 breaches that would
+otherwise have recommended selling at a loss.
+
+Twenty-nine questions remain at P1 and P2. None blocks design; each is noted where the
+requirement it affects is stated.
 
 ---
 
@@ -911,9 +917,9 @@ removed.)*
 
 ## SPEC-003 — Competitor Price Position
 
-**Status:** **Draft — BLOCKED.** See GAP-001. The requirements below are stated so the
-blocking conflict is precise, but this specification MUST NOT be handed to system
-design until OQ-301 is answered.
+**Status:** Draft. GAP-001 and OQ-301 are resolved (2026-09-08): the capability is
+governed by a declared pricing policy measured against a balanced reference, and gated by
+a cost floor that precedes every comparison.
 **Version:** 0.1 (2026-09-08)
 **Related Intents:** INT-003, INT-NS, INT-PROV
 
@@ -974,7 +980,10 @@ legitimate forecourt premium is not reported as a fault.
 | **Context-only source** | An observation from a store with affinity above zero but below the floor. Existing behavior permits display but forbids driving a recommendation |
 | **Excluded source** | An observation from a store with affinity zero. Existing behavior drops it before any engine sees it |
 | **Statistical outlier threshold** | The point at which the observed distribution of differences breaks (derived, not assumed) |
-| **Commercial threshold** | A lower, product-chosen bound expressing what premium is acceptable regardless of format |
+| **Pricing policy** | The maximum premium over the reference price the owner accepts, declared by him rather than derived from the observed distribution. Currently **+60%** |
+| **Balanced reference** | The midpoint of the cheapest supermarket price and the cheapest same-format price for a product. Where no same-format price exists, the supermarket price plus a **format allowance** |
+| **Format allowance** | The typical premium of same-format stores over supermarkets, measured from products for which both prices are held. Measured, never assumed |
+| **Cost floor** | The minimum margin a reference price must leave over our purchase cost before it may be used to recommend a price reduction. Currently **10%** |
 
 ---
 
@@ -995,25 +1004,66 @@ format.
 **FR-043** — The system MUST record, per surfaced item, which source drove it, so that
 compliance with FR-040 and FR-041 is verifiable.
 
-#### Thresholds
+#### The cost floor — evaluated before any comparison
 
-**FR-044** — The statistical outlier threshold MUST be derived from the observed
-distribution of differences, not assumed.
+**FR-043a** — The system MUST NOT surface a price-reduction signal for a product whose
+reference price fails to exceed our purchase cost by at least the cost floor.
 
-**FR-045** — The commercial threshold MUST be expressed as a stated multiple of the
-observed median difference against comparable sources, so that it moves with the market
-rather than being a fixed percentage.
+*Rationale: a competitor's price is not evidence that our price is wrong. The competitor
+may buy at a lower cost, or may be selling at a loss deliberately. In the pilot data, 43
+of 144 products exceeding the policy would have produced a recommendation that puts the
+owner below or barely above cost — one where the reference price is a third of our own
+purchase cost.*
 
-**FR-046** — Both thresholds MUST be reportable alongside any count that depends on
+**FR-043b** — The cost floor MUST be evaluated before the policy comparison, and a
+product failing it MUST NOT be reinstated by any magnitude of price difference.
+
+**FR-043c** — A product failing the cost floor MUST be re-characterised as a **purchase
+cost** finding — the competitor sells below our cost — and MUST NOT be presented as a
+pricing fault.
+
+**FR-043d** — Where a product has no purchase cost, the system MUST NOT evaluate it
+against the policy at all, and MUST NOT substitute an assumed cost (D-3).
+
+#### The reference price
+
+**FR-044** — The reference price MUST be the midpoint of the cheapest supermarket price
+and the cheapest same-format price where both are held.
+
+**FR-044a** — Where no same-format price is held, the reference MUST be the supermarket
+price increased by the format allowance, and the substitution MUST be visible on the
+resulting signal.
+
+**FR-044b** — The format allowance MUST be measured from products for which both a
+supermarket and a same-format price are held. It MUST NOT be an assumed constant, and
+MUST be reportable.
+
+**FR-044c** — Where neither price is held, no comparison MUST be produced (D-3).
+
+#### The policy
+
+**FR-045** — The policy threshold MUST be a declared maximum premium over the reference
+price, settable as a product decision, and MUST NOT be derived from the observed
+distribution.
+
+**FR-045a** — Every product exceeding the policy MUST be recorded as a policy breach,
+whatever the surface it is later shown on.
+
+**FR-045b** — The system MUST separate policy breaches into those warranting same-day
+attention and those for unhurried review, and the separating threshold MUST be stated.
+This separation governs **where** a breach appears, never **whether** it is a breach.
+
+**FR-046** — The policy threshold, the cost floor, the format allowance and the
+attention-separating threshold MUST all be reportable alongside any count that depends on
 them.
 
 #### Characterisation
 
-**FR-047** — An item exceeding the statistical outlier threshold MUST be characterised
-as an anomaly warranting verification of the price, not as overcharging.
+**FR-047** — A policy breach warranting same-day attention MUST be characterised as a
+price to verify, not as overcharging.
 
-**FR-048** — An item exceeding the commercial threshold but not the statistical one
-MUST be characterised as a question about intent.
+**FR-048** — A policy breach for unhurried review MUST be characterised as a departure
+from the owner's declared policy, and MUST state the policy it departs from.
 
 **FR-049** — The system MUST NOT characterise any difference as an error without owner
 confirmation.
@@ -1046,6 +1096,12 @@ against each comparable source, including when the store is cheaper.
 **INV-022** — A difference explained by format alone MUST NOT be characterised as a
 fault.
 
+**INV-025** — The system MUST NEVER recommend a price that fails to exceed our purchase
+cost by at least the cost floor. No difference, however large, may override this.
+
+**INV-026** — A reference price MUST NEVER be a single competitor's price where a
+balanced reference is obtainable.
+
 **INV-023** — Coverage claims MUST always be expressed against the full catalogue, not
 against the matched subset.
 
@@ -1054,6 +1110,31 @@ against the matched subset.
 ---
 
 ### 8. Behavioral Scenarios
+
+**SCN-039a — The cost floor blocks a losing recommendation**
+GIVEN a product we sell at ₪158.21 and buy at ₪147.11, whose cheapest competitor price is ₪54.00
+WHEN the comparison runs
+THEN no price-reduction signal is produced, and the product is re-characterised as a purchase-cost finding.
+
+**SCN-039b — A thin margin is treated as a failure of the floor**
+GIVEN a reference price exceeding our cost by less than the cost floor
+WHEN the comparison runs
+THEN the product is excluded from the policy comparison exactly as if the reference were below cost.
+
+**SCN-039c — Missing cost blocks judgement entirely**
+GIVEN a product with no recorded purchase cost
+WHEN the comparison runs
+THEN it is not evaluated against the policy, and no assumed cost is substituted.
+
+**SCN-039d — Balanced reference from two sources**
+GIVEN a product priced ₪3.90 at the cheapest supermarket and ₪4.90 at the cheapest same-format store
+WHEN the reference is computed
+THEN it is their midpoint, and the policy is measured against that.
+
+**SCN-039e — Same-format price unavailable**
+GIVEN a product with a supermarket price and no same-format price
+WHEN the reference is computed
+THEN it is the supermarket price plus the measured format allowance, and the signal shows that the allowance was applied.
 
 **SCN-040 — Same-format comparison drives a signal**
 GIVEN a product priced above the same product at a comparable-format store beyond both thresholds
@@ -1169,6 +1250,9 @@ a recommendation. The bound itself is **OQ-306**.
   knowledge of a branch and desk knowledge of a chain; a manually decided
   classification is final and MUST NOT be overwritten by inference.
 - **C-23** — D-5: the store's own price is never its own benchmark.
+- **C-24** — No recommendation produced anywhere in the system may direct the owner to a
+  price that fails to exceed his purchase cost by the stated floor. This binds every
+  capability, present and future, not only this one.
 
 ---
 
@@ -1198,6 +1282,25 @@ when favourable. *(FR-053, SCN-043)*
 **AC-047** — No output characterises a difference as an error without owner
 confirmation. *(FR-049)*
 
+**AC-049** — No price-reduction signal exists whose reference price fails to exceed our
+purchase cost by the cost floor. *(FR-043a, INV-025, SCN-039a, SCN-039b)*
+
+**AC-050** — A product failing the cost floor appears as a purchase-cost finding, not as
+a pricing fault, whatever the size of the difference. *(FR-043b, FR-043c)*
+
+**AC-051** — A product without a purchase cost is absent from the policy comparison, and
+no assumed cost appears anywhere. *(FR-043d, SCN-039c)*
+
+**AC-052** — Where both a supermarket and a same-format price are held, the reference is
+their midpoint. *(FR-044, SCN-039d)*
+
+**AC-053** — Where no same-format price is held, the applied format allowance is visible
+on the signal and is reproducible from the products holding both prices. *(FR-044a,
+FR-044b, SCN-039e)*
+
+**AC-054** — Every product exceeding the policy is recorded as a breach regardless of
+which surface displays it. *(FR-045a, FR-045b)*
+
 **AC-048** — An observation beyond the freshness bound drives no recommendation.
 *(NFR-022, SCN-047)*
 
@@ -1219,18 +1322,44 @@ this is true.
 **ASM-023** — Observation sets refresh often enough that the freshness bound is rarely
 binding. Unverified.
 
+**ASM-024** — The recorded purchase cost is the true cost of acquiring the product,
+excluding rebates, volume terms and supplier credits that would lower it. If cost is
+overstated, the cost floor suppresses recommendations that would in fact be profitable.
+
+**ASM-025** — The format allowance measured from products holding both prices
+generalises to products holding only a supermarket price. Those 426 products may not be
+representative of the 1,215 they stand in for.
+
+**ASM-026** — A competitor's observed price reflects its own cost structure rather than a
+temporary promotion. Where it is a promotion, the cost floor still protects the owner,
+but the reference is understated.
+
 ---
 
 ### 17. Open Questions
 
-**OQ-301 (P0) — May a context-only source drive a surfaced signal when the difference
-is extreme?**
-This is the blocking question; see GAP-001. Existing behavior says no. The intent's
-analysis derives thresholds from a population dominated by context-only and excluded
-sources. Under current behavior, **4 of 165** items above the commercial threshold and
-**1 of 24** above the statistical threshold may be surfaced. Either the intent's
-thresholds describe a signal that cannot be shown, or the affinity policy must change.
-Both the requirement set and the value of the capability depend on the answer.
+**OQ-301 — RESOLVED (2026-09-08).**
+The question was whether a source of a different store format may drive a signal, given
+that existing behavior forbids it and only 4 of 165 candidates survived.
+
+**Decision: it may, but never alone and never as a bare price.** A cross-format price
+enters only as one half of a balanced reference (FR-044), paired with a same-format price
+or adjusted by a measured format allowance (FR-044a). The comparison is then made against
+a declared policy the owner sets, not against another store's price.
+
+This preserves what the format rule protects — the owner is never told he is expensive
+because a hypermarket is cheaper — while letting a genuine outlier through, because a
+product priced at more than double a balanced reference is not explained by format.
+
+**A stronger constraint arrived with it, and it changes the capability more than the
+format question did:** FR-043a's cost floor. A competitor's price is not evidence that
+ours is wrong — the competitor may buy cheaper, or sell at a loss. In the pilot data 43
+of 144 policy breaches would have recommended a price at or below our own purchase cost.
+Those are now excluded before any comparison and re-characterised as purchase-cost
+findings.
+
+**Net effect on the pilot data:** 1,970 compared → 144 exceed the policy → **97 survive
+the cost floor**, of which roughly 15 warrant same-day attention.
 
 **OQ-302 (P1) — When several stores observe the same product, which is the benchmark?**
 Cheapest, nearest, most comparable by format, or a central value. Changes every
@@ -3021,16 +3150,18 @@ the capability is far smaller than the intent implies, or the format policy must
 The entire content of SPEC-003 turns on this, and so does whether INT-003 belongs in V1
 at all.
 
-**Recommended resolution:**
-Split the capability. Keep the same-format comparison as the recommendation-driving
-signal — it is small but defensible, and it carries the genuinely strong finding that
-the store is 11% cheaper than its true peer. Treat cross-format differences as a
-distinct, clearly labelled observation that never drives an action, and decide
-separately whether an extreme cross-format difference (the 90% band) may be promoted to
-an action with its format stated. Do not silently lower the comparability floor: it was
-introduced precisely to stop absurd comparisons reaching the owner.
+**Status: RESOLVED (2026-09-08).** Not by choosing between the two positions, but by
+changing what a comparison is. A cross-format price never stands alone: it forms one half
+of a balanced reference, or is adjusted by a measured format allowance where no
+same-format price exists. The judgement is then made against the owner's declared policy
+rather than against a competitor's price — so the format rule's purpose survives while
+genuine outliers are no longer invisible.
 
-**Confidence:** High — the numbers are measured, not estimated.
+The resolution also brought a constraint nobody had stated: a recommendation must leave a
+margin over our own purchase cost. That removes 43 of the 144 breaches — a larger effect
+than the format question itself, and it would have shipped as a defect.
+
+**Confidence:** High — every figure is measured from the pilot data.
 
 ---
 
@@ -3058,8 +3189,12 @@ the rest going to recurring value. An explicit allocation is defensible to the o
 ("two of your ten are counting tasks"), whereas an implicit conversion between kinds
 would breach D-2 by the back door.
 
-**Confidence:** High on the gap; Medium on the specific allocation, which is a product
-decision.
+**Status: RESOLVED (2026-09-08).** Not by choosing an allocation between kinds, but by
+removing one kind. SPEC-002 no longer produces a monetary figure (FR-023), so V1 holds a
+single monetary kind and FR-104 alone orders it. What survives is the smaller question of
+how many places unvalued work receives — OQ-602, now P1.
+
+**Confidence:** High.
 
 ---
 
@@ -3139,6 +3274,11 @@ a V1 intent.
 Either bring the derivation within reproduction, or remove the coverage figures from
 owner-facing material until it is. Do not state them from the document.
 
+**Status: OPEN — narrowed, and a release condition rather than a design blocker.** The
+competitor capability now also states counts derived from the same artefact (SPEC-003
+FR-046), so the obligation grew rather than shrank. What it blocks is stating these
+figures to the owner, not designing the system.
+
 **Confidence:** High — verified by inspection.
 
 ---
@@ -3160,7 +3300,12 @@ entirely. Left unresolved, it will be built and then never seen.
 Resolve with GAP-002 as one allocation decision. Reserving a small number of places is
 consistent with the intent treating hygiene as real work rather than as noise.
 
-**Confidence:** High on the gap; the resolution follows GAP-002.
+**Status: RESOLVED (2026-09-08) in principle.** SPEC-006 FR-106 settles that unvalued
+entries receive a stated allocation rather than competing on money. Only the size of that
+allocation remains open, as OQ-602 (P1). Note that INT-002 has since joined INT-002B in
+carrying no money, so the reserved allocation now serves both.
+
+**Confidence:** High.
 
 ---
 
@@ -3181,6 +3326,10 @@ wrong.
 **Recommended resolution:**
 Measure it during the pilot rather than asserting it. Until measured, treat ten as a
 provisional bound and state it as provisional in owner-facing material.
+
+**Status: OPEN — only measurement closes it.** No decision taken now can settle a claim
+about how long the owner actually takes. It does not block design: the bound is a stated
+number that can change without restructuring anything.
 
 **Confidence:** Medium.
 
@@ -3214,9 +3363,11 @@ that this does not block V1.
 
 #### P0 — blocks system design
 
-| ID | Question | Spec |
-|---|---|---|
-| **OQ-301** | May a context-only competitor source drive a surfaced signal when the difference is extreme? | SPEC-003 |
+**None.** All five questions that blocked system design have been resolved.
+
+| ID | Resolution |
+|---|---|
+| ~~OQ-301~~ | A cross-format price forms half a balanced reference, never a standalone benchmark; judgement is against a declared policy, gated by a cost floor |
 
 **Resolved or downgraded since version 0.1**, all by one decision — SPEC-002 no longer
 produces a monetary figure:
@@ -3228,6 +3379,12 @@ produces a monetary figure:
 | ~~OQ-201~~ | **P1.** Period alignment governed the magnitude, which is no longer stated. Detection does not depend on it |
 | ~~OQ-401~~ | **Resolved.** Withdrawal is re-evaluated on every ingestion and its strength follows the evidence window; a full annual cycle triggers re-examination of earlier withdrawals. Narrowed to OQ-407 (P1) |
 | ~~OQ-406~~ | **Resolved.** The window follows available evidence. Narrowed to OQ-408 (P2) |
+
+The five resolutions came from four decisions, each taken because a rule that read
+correctly on paper failed against the pilot data: no money on any stock-derived signal;
+withdrawal as a standing rule whose strength follows the evidence window; a declared
+pricing policy measured against a balanced reference; and a cost floor beneath every
+price recommendation.
 
 #### P1 — important, but design can begin
 
