@@ -2,11 +2,16 @@
 
 Guidance for Claude Code working in this repo.
 
-**Read [ARCHITECTURE.md](ARCHITECTURE.md) first.** It is the only traced description
-of how the pipelines fit together. This file is the rules; that file is the map.
+**Read [design.md](design.md) first.** It is the authoritative System Design: the
+reasoning chain is `intent.md` → `specs.md` → `design.md` → implementation. Its §3 is
+the verified current-state trace (superseding [ARCHITECTURE.md](ARCHITECTURE.md), which is
+kept only as the pre-design trace); §6 onward is the target. This file is the rules; that
+file is the map.
 
 Anything in `docs/archive/` is retained for history and is **out of date** — it
-describes modules that no longer exist. Do not act on it.
+describes modules that no longer exist or designs that `design.md` superseded on
+2026-09-08 (`TECH_*.md`, `UI_DATA_CONTRACT.md`, `RECOMMENDATION_FAMILIES.md`,
+`PRODUCT_REQUIREMENTS.md`, `SAAS_*.md`, `SPRINT*.md`, `PLANOGRAM_ROADMAP.md`). Do not act on it.
 
 ## The 13 rules
 

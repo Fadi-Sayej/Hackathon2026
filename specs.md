@@ -1,6 +1,6 @@
 # SmartShelf — Specification Layer
 
-**Status:** Draft · **Version:** 1.0 · **Updated:** 2026-09-08
+**Status:** Draft · **Version:** 1.1 · **Updated:** 2026-09-08
 **Intent layer:** [`intent.md`](intent.md) — the source this specification is derived from.
 
 The reasoning layers are kept strictly separate:
@@ -34,7 +34,23 @@ capability most — no recommendation may leave the owner below a stated margin 
 own purchase cost. In the pilot data that last rule removes 43 of 144 breaches that would
 otherwise have recommended selling at a loss.
 
-Twenty-nine questions remain at P1 and P2. None blocks design; each is noted where the
+Version 1.1 closed a conformance gate. Two defects were found and corrected. The first:
+SPEC-004 valued idle stock in money (`quantity × cost`) — precisely what D-1 forbids — and
+SPEC-006 then asserted that no such value existed in V1, so the daily surface's ordering
+rule rested on a false premise and GAP-002 had been closed on half the evidence. Idle
+stock now carries no money and is ordered by **unit cost**, which is a product property
+rather than a quantity (D-11), and FR-105 requires the single-kind premise to be derived
+rather than asserted. The second: SPEC-002's revision to remove money had reached its
+requirements but not its acceptance criteria, which still demanded the two monetary tiers
+the revision abolished — AC-020 was unsatisfiable and was the only criterion covering the
+detection behaviour.
+
+Version 1.1 also recorded three things the intent layer stated and the specifications had
+lost: the single-store scope ceiling (D-12), the permanent exclusion of fixed sensors and
+cameras (D-13), and the intent's stated future expansion of automatic withdrawal, which
+had been hardened into an unconditional invariant (INV-030, now scoped, with OQ-409).
+
+Thirty questions remain at P1 and P2. None blocks design; each is noted where the
 requirement it affects is stated.
 
 ---
@@ -74,7 +90,7 @@ owner.
 | ID | Intent (owner's words, from `intent.md` §1) | Release | Specified in |
 |---|---|---|---|
 | **INT-001** | "I do not want to lose money on every sale" — shelf price against the store's own delivery-platform price | V1 | SPEC-001 |
-| **INT-002** | "Where is my stock disappearing?" — **the money** | V1 | SPEC-002 |
+| **INT-002** | "Where is my stock disappearing?" — **products whose quantities cannot reconcile**, deliberately carrying no money figure | V1 | SPEC-002 |
 | **INT-002B** | "Where is my stock disappearing?" — **data hygiene**, deliberately carrying no money figure | V1 | SPEC-002 |
 | **INT-003** | "Are my prices reasonable against my neighbours?" | V1 | SPEC-003 |
 | **INT-004** | "What do I order today, and how much?" | V2 | Not specified — see §4 |
@@ -86,6 +102,11 @@ owner.
 | **INT-010** | "Complete my missing data — with minimum disturbance" | V1 | SPEC-005 |
 | **INT-NS** | The fixed north star: one morning screen, actions ranked by money, **no more than 10** | V1 | SPEC-006 |
 | **INT-PROV** | Every figure must be recomputable on demand; no figure asserted from a stale document | V1 | SPEC-007 |
+| **INT-MEAS** | The pilot's decision criterion: after 30 days of V1, how much ₪ recovered — corrected prices, explained stock, cleaned catalogue — measured automatically | V1 | Not specified — see §4 |
+
+`INT-MEAS` is stated in `intent.md` §11.1, which describes it as measured automatically by
+an existing surface. It is registered here rather than left unnamed, because a capability
+the intent layer relies on must be traceable even when it is not newly specified.
 
 `INT-NS` and `INT-PROV` are not numbered in `intent.md`. They are stated there as
 cross-cutting rules — the "fixed north star" in the preamble, and the boxed warning
@@ -101,7 +122,7 @@ specification.
 |---|---|---|
 | **SPEC-001** | Delivery-Platform Price Consistency | Draft |
 | **SPEC-002** | Stock Reconciliation and Data Hygiene | Draft |
-| **SPEC-003** | Competitor Price Position | **Draft — blocked**, see GAP-001 |
+| **SPEC-003** | Competitor Price Position | Draft — GAP-001 resolved (2026-09-08) |
 | **SPEC-004** | Catalogue Lifecycle | Draft |
 | **SPEC-005** | Owner Knowledge Capture | Draft |
 | **SPEC-006** | Daily Action Surface | Draft |
@@ -116,7 +137,7 @@ These are settled. A specification may operationalize them; it may not reopen th
 
 | # | Decision | Source |
 |---|---|---|
-| D-1 | No monetary figure may be attached to a signal derived from a stock quantity — **including our own derivations** | `intent.md` §1, §12 rule 1 |
+| D-1 | No monetary figure may be attached to a signal derived from a stock quantity — **including our own derivations**. A *unit* cost or price, which is not a quantity, is unaffected | `intent.md` §1, §12 rule 1, §4ب |
 | D-2 | A recurring per-sale amount and a standing one-time amount are never summed | `intent.md` §2 |
 | D-3 | Where a figure cannot be stated honestly, the surface shows **no figure** — not zero | `intent.md` §12 rule 3 |
 | D-4 | A shelf price below ₪0.50, or a cost above twice the price, is a data-entry artefact and not a loss | `intent.md` §12 rule 2 |
@@ -126,6 +147,9 @@ These are settled. A specification may operationalize them; it may not reopen th
 | D-8 | At most three questions are put to the owner on screen at once | `intent.md` §5 |
 | D-9 | The daily surface shows at most 10 actions | `intent.md` preamble |
 | D-10 | An uncertain figure is labelled uncertain **before** it is questioned, not after | `intent.md` §2, §4 |
+| D-11 | Idle stock carries **no** monetary figure and is ordered by **unit cost**, descending. The aggregate value of idle stock is never stated | `intent.md` §4ب |
+| D-12 | The product is **single-store, single-user, single-POS-import**. Multiple stores, user accounts and further point-of-sale integrations are out of scope until one store has proven value | `intent.md` §9.2 |
+| D-13 | Real-time shelf monitoring by fixed sensors or cameras is **permanently excluded**, not deferred | `intent.md` §9.1 |
 
 ---
 
@@ -149,7 +173,19 @@ answers rather than surfacing them:
 - **INT-008** depends on three deliveries per supplier being observed; the intent notes
   its timeline is calendar-bound, not engineering-bound.
 - **INT-006** depends on three inputs that do not exist yet (shelf photographs with
-  dimensions, real demand from V2, the owner's own arrangement rules).
+  dimensions, real demand from V2, the owner's own arrangement rules). Its deferral does
+  **not** reopen D-13: when INT-006 is specified, the sensor and fixed-camera approach
+  remains excluded permanently, not merely postponed.
+
+**INT-MEAS** is not specified here for a different reason: `intent.md` §11.1 states it is
+already measured by an existing surface, so no new capability is being designed. Two
+obligations follow and are recorded rather than assumed:
+
+- Whatever that surface states is a figure, so SPEC-007 governs it in full — provenance,
+  reproduction, and no figure rather than zero (FR-120, FR-124, FR-128, C-62).
+- Its money component «مخزون مفسّر» ("stock explained") cannot be expressed in money under
+  D-1 and SPEC-002 FR-023. What that component may contain instead — a count of products
+  counted and closed, rather than an amount — is **OQ-801 (P1)**.
 
 These are tracked as open questions in SPEC-GAPS at P1/P2. They must be specified
 before their releases are designed, not before V1 is designed.
@@ -551,7 +587,8 @@ records that are merely wrong are separated from records that indicate missing v
 
 ### 2. Intent Traceability
 
-- **INT-002** — "Where is my stock disappearing?" — the money.
+- **INT-002** — "Where is my stock disappearing?" — products whose recorded quantities
+  cannot all be true. Carries no money figure (FR-023).
 - **INT-002B** — the same question as data hygiene, deliberately carrying no money.
 - **INT-NS** — contributes ranked entries to the daily surface (SPEC-006).
 - **INT-PROV** — every figure recomputable (SPEC-007).
@@ -583,7 +620,7 @@ records that are merely wrong are separated from records that indicate missing v
 |---|---|
 | **Primary actor** | Store owner or a staff member performing a shelf count |
 | **Trigger** | A new point-of-sale export is ingested |
-| **Precondition** | For the money signal: the product has a recorded receipt quantity greater than zero |
+| **Precondition** | The product has a recorded receipt quantity greater than zero (FR-021) |
 
 ---
 
@@ -670,7 +707,8 @@ specification (D-1, applied without exception).
 **INV-011** — No aggregate produced by this specification may be expressed in currency.
 
 **INV-012** — The detection claim ("these quantities cannot all be true") MUST remain
-valid regardless of which tier a product falls in.
+valid regardless of the sign or magnitude of any input, and MUST NOT be weakened by the
+absence of a monetary figure.
 
 **INV-013** — No hygiene signal may ever carry a monetary figure (D-1).
 
@@ -738,8 +776,8 @@ units sold over the period, cost price (optional), department.
 
 **Outputs (semantic):**
 - The flagged set, each with its unaccounted quantity and the arithmetic that produced it.
-- Tier membership per flagged product.
-- Two monetary totals, separately labelled: confirmed and estimated.
+- The gap ratio per flagged product, which is the ordering key (FR-024).
+- **No monetary figure and no monetary total, for any flagged product or for the set** (FR-023, FR-025).
 - The hygiene set, with a reason per record and **no** monetary figure.
 - An action per flagged product: count this product.
 
@@ -760,11 +798,10 @@ survive the product ceasing to be flagged (SCN-028).
 
 | Condition | Required behavior |
 |---|---|
-| Receipts data unavailable for the period | The money signal is unavailable; report it as unavailable, not as zero. Hygiene signals are unaffected |
+| Receipts data unavailable for the period | The detection signal is unavailable; report it as unavailable, not as zero findings. Hygiene signals are unaffected |
 | Sales data unavailable | Same as above |
-| Cost price missing for a flagged product | FR-027 — quantity without money |
-| Cost price missing for the entire flagged set | Report the flagged count and no total; do not report ₪0 |
-| Recorded stock absent (not zero) | Exclude from the money signal; treat as a hygiene record |
+| Cost price missing for a flagged product | Irrelevant here — no capability of this specification consumes cost (ASM-012) |
+| Recorded stock absent (not zero) | Exclude from the detection signal; treat as a hygiene record |
 | Period boundaries of stock, receipts and sales do not align | The arithmetic is unsound — **OQ-201**, unresolved |
 
 ---
@@ -787,11 +824,11 @@ survive the product ceasing to be flagged (SCN-028).
 **NFR-010 (Explainability)** — Every flagged product MUST show the three quantities and
 the resulting arithmetic, in a form the owner can check against his own records.
 
-**NFR-011 (Determinism)** — The same inputs MUST produce the same flags, tiers and
-totals.
+**NFR-011 (Determinism)** — The same inputs MUST produce the same flagged set and the
+same gap-ratio ordering.
 
-**NFR-012 (Honesty of aggregation)** — No aggregate presented anywhere may mix the two
-tiers without labelling, nor mix this specification's total with a recurring total.
+**NFR-012 (Honesty of aggregation)** — The only aggregate this specification may publish
+is a **count**. No aggregate it produces may be expressed in currency (INV-011).
 
 ---
 
@@ -808,8 +845,11 @@ tiers without labelling, nor mix this specification's total with a recurring tot
 
 ### 15. Acceptance Criteria
 
-**AC-020** — Every flagged product belongs to exactly one tier, and the two tier totals
-sum to the combined total. *(INV-011)*
+**AC-020** — A product whose implied opening balance is negative is flagged; a product
+whose implied opening balance is non-negative is not; and a product with no recorded
+receipts in the period is not flagged whatever its recorded stock. The flagged set is
+ordered by gap ratio, descending. *(FR-020, FR-021, FR-022, FR-024, SCN-020, SCN-021,
+SCN-023)*
 
 **AC-021** — No product flagged by this specification carries a monetary figure anywhere
 in the output, whatever the sign of its recorded stock. *(FR-023, INV-010, SCN-021,
@@ -832,8 +872,8 @@ quantity. *(FR-027, NFR-010)*
 **AC-027** — No output states or implies a cause for the missing stock. *(INV-015,
 SCN-027)*
 
-**AC-028** — Recomputation from the same data reproduces flags, tiers and both totals.
-*(NFR-011)*
+**AC-028** — Recomputation from the same data reproduces the flagged set and its
+gap-ratio ordering. *(NFR-011)*
 
 **AC-029** — A decision recorded against a flagged product is still retrievable after
 the product ceases to be flagged. *(C-13, SCN-028)*
@@ -979,7 +1019,7 @@ legitimate forecourt premium is not reported as a fault.
 | **Comparable source** | An observation from a store whose affinity to this store is at or above the comparability floor. Existing behavior permits only such a source to drive a recommendation |
 | **Context-only source** | An observation from a store with affinity above zero but below the floor. Existing behavior permits display but forbids driving a recommendation |
 | **Excluded source** | An observation from a store with affinity zero. Existing behavior drops it before any engine sees it |
-| **Statistical outlier threshold** | The point at which the observed distribution of differences breaks (derived, not assumed) |
+| **Attention threshold** | The premium over the reference at which a policy breach warrants same-day attention rather than unhurried review. Declared, not derived. Currently **+100%** |
 | **Pricing policy** | The maximum premium over the reference price the owner accepts, declared by him rather than derived from the observed distribution. Currently **+60%** |
 | **Balanced reference** | The midpoint of the cheapest supermarket price and the cheapest same-format price for a product. Where no same-format price exists, the supermarket price plus a **format allowance** |
 | **Format allowance** | The typical premium of same-format stores over supermarkets, measured from products for which both prices are held. Measured, never assumed |
@@ -1050,8 +1090,11 @@ distribution.
 whatever the surface it is later shown on.
 
 **FR-045b** — The system MUST separate policy breaches into those warranting same-day
-attention and those for unhurried review, and the separating threshold MUST be stated.
-This separation governs **where** a breach appears, never **whether** it is a breach.
+attention and those for unhurried review. The separating threshold is the **attention
+threshold**, currently a premium of **+100%** over the reference price, and it MUST be
+stated wherever the separation is presented. Like the policy threshold it is declared,
+not derived (FR-045). This separation governs **where** a breach appears, never
+**whether** it is a breach.
 
 **FR-046** — The policy threshold, the cost floor, the format allowance and the
 attention-separating threshold MUST all be reportable alongside any count that depends on
@@ -1187,7 +1230,8 @@ its affinity to this store's format.
 **Outputs (semantic):**
 - Per surfaced product: the store's price, the compared price, the difference, the
   observing store with its format, and which characterisation applies.
-- Both thresholds in force.
+- The four declared values in force: the pricing policy, the attention threshold, the
+  cost floor and the measured format allowance (FR-046).
 - Coverage: comparable population, matched count, and the structurally uncomparable
   count, all expressed against the full catalogue.
 - Overall position per comparable source.
@@ -1209,7 +1253,7 @@ freshness is a property of the input, not a state of the product.
 | Observation set stale beyond the freshness bound | Do not drive recommendations from it; mark age where displayed (SCN-047) |
 | Product identifier matched but products differ in size or pack | Comparison invalid — **OQ-303**, unresolved |
 | A store's format is unknown | Treat as the existing unknown-format affinity; do not assume comparability |
-| Threshold underivable from the distribution | Suppress the derived-threshold signal and report it as undetermined (D-3) |
+| Format allowance not measurable — no product holds both a supermarket and a same-format price | No reference may be substituted for a product lacking a same-format price; report those products as having no comparison (FR-044c, D-3) |
 | Competitor data absent entirely | Report the whole capability as unavailable; other specifications unaffected |
 
 ---
@@ -1267,8 +1311,10 @@ while OQ-301 is unresolved. *(FR-041, C-21)*
 **AC-042** — Every displayed competitor observation shows the observing store's format.
 *(FR-042, INV-021)*
 
-**AC-043** — Both thresholds are reported with any count derived from them, and
-recomputation reproduces them. *(FR-046, NFR-021)*
+**AC-043** — All four values named in FR-046 — the pricing policy, the attention
+threshold, the cost floor and the measured format allowance — are reported with any count
+derived from them, and recomputation reproduces both the values and the counts.
+*(FR-046, FR-045b, NFR-021)*
 
 **AC-044** — Coverage is stated against the full catalogue and separates structurally
 uncomparable items. *(FR-050, FR-052, INV-023)*
@@ -1280,7 +1326,14 @@ difference. *(FR-051, SCN-044)*
 when favourable. *(FR-053, SCN-043)*
 
 **AC-047** — No output characterises a difference as an error without owner
-confirmation. *(FR-049)*
+confirmation, and every unhurried-review breach names the declared policy it departs
+from. *(FR-048, FR-049)*
+
+**AC-047a** — A difference wholly attributable to store format is not characterised as a
+fault anywhere in the output. *(INV-022)*
+
+**AC-047b** — No reference price, and no figure any recommendation is measured against,
+is the store's own price. *(INV-024, C-23, D-5)*
 
 **AC-049** — No price-reduction signal exists whose reference price fails to exceed our
 purchase cost by the cost floor. *(FR-043a, INV-025, SCN-039a, SCN-039b)*
@@ -1361,9 +1414,11 @@ findings.
 **Net effect on the pilot data:** 1,970 compared → 144 exceed the policy → **97 survive
 the cost floor**, of which roughly 15 warrant same-day attention.
 
-**OQ-302 (P1) — When several stores observe the same product, which is the benchmark?**
-Cheapest, nearest, most comparable by format, or a central value. Changes every
-difference and therefore every count. Affects FR-044, FR-045.
+**OQ-302 — RESOLVED (2026-09-08) by FR-044.** The benchmark is never one store: it is
+the midpoint of the cheapest supermarket price and the cheapest same-format price, or the
+cheapest supermarket price plus the measured format allowance where no same-format price
+exists. "Cheapest within each format" settles which observation is used; nothing else is
+selected between.
 
 **OQ-303 (P1) — How are pack-size mismatches handled?**
 A shared identifier may denote different sellable units. A false match produces a
@@ -1402,6 +1457,8 @@ recommendations.
 | INT-003 | FR-042, FR-043 | SCN-040 | AC-042 |
 | INT-003 | FR-044, FR-045, FR-046 | SCN-040 | AC-043 |
 | INT-003 | FR-047, FR-048, FR-049 | SCN-040 | AC-047 |
+| INT-003 (D-5) | INV-024, C-23 | — | AC-047b |
+| INT-003 | INV-022 | SCN-042 | AC-047a |
 | INT-003 | FR-050, FR-052 | SCN-045 | AC-044 |
 | INT-003 (D-3) | FR-051 | SCN-044, SCN-046 | AC-045 |
 | INT-003 | FR-053 | SCN-043 | AC-046 |
@@ -1539,8 +1596,16 @@ decision on the next ingestion.)*
 
 #### Idle entries
 
-**FR-069** — Idle entries MUST be presented for the owner's judgement, ranked by the
-value of the stock recorded against them.
+**FR-069** — Idle entries MUST be presented for the owner's judgement, ranked by **unit
+cost price**, descending (D-11). The unit cost is a property of the product, not a
+quantity, so this ordering does not breach D-1.
+
+**FR-069a** — The system MUST NOT attach a monetary figure to an idle entry that is
+derived from its recorded stock quantity, and MUST NOT state an aggregate value for the
+idle set (D-1, D-11). The unit cost MAY be shown, labelled as a per-unit figure.
+
+**FR-069b** — The system MUST NOT display the recorded stock quantity of an idle entry as
+a justification for its rank, since that quantity is the input D-1 distrusts.
 
 **FR-070** — For each idle entry the system MUST offer distinguishable outcomes
 covering at least: the stock is genuinely present and unsold; the recorded quantity is
@@ -1550,9 +1615,11 @@ wrong; the product is no longer carried.
 
 #### Implausible quantities
 
-**FR-072** — The system MUST identify idle entries whose recorded stock valuation is
+**FR-072** — The system MUST identify idle entries whose recorded stock **quantity** is
 implausible against the store's scale and MUST present them as a **question** to the
-owner.
+owner. The implausibility test MAY use a valuation internally to select the question; the
+resulting question MUST NOT state that valuation as a fact about the owner's capital
+(FR-073, D-11).
 
 **FR-073** — An implausible quantity MUST NOT be asserted as a fact about the owner's
 capital or as an accusation of mismanagement (D-10).
@@ -1575,8 +1642,13 @@ wherever the dead count is presented.
 
 ### 7. Behavioral Invariants
 
-**INV-030** — An entry with recorded stock above zero MUST NEVER be withdrawn
-automatically (D-6).
+**INV-030** — While the available evidence is shorter than a full annual cycle
+(FR-060b), an entry with recorded stock above zero MUST NEVER be withdrawn automatically
+(D-6). The restriction exists because such an entry may be seasonal, which short evidence
+cannot rule out; `intent.md` §4 states that automatic withdrawal extends to
+stock-carrying entries once a full annual cycle is available. Extending it is **not**
+authorised by this specification and is tracked as OQ-409; until that question is
+answered the restriction holds unconditionally in practice.
 
 **INV-031** — Withdrawal MUST NEVER be irreversible.
 
@@ -1612,7 +1684,7 @@ THEN it is withdrawn without an owner decision, and remains listable with its ev
 **SCN-062 — Idle product is never auto-withdrawn**
 GIVEN a product with no sales in the window and recorded stock above zero
 WHEN classification runs
-THEN it is not withdrawn, and is presented for the owner's judgement ranked by stock value.
+THEN it is not withdrawn, and is presented for the owner's judgement ranked by unit cost price, with no monetary figure derived from its stock quantity.
 
 **SCN-063 — Automatic revival**
 GIVEN a withdrawn product
@@ -1680,7 +1752,8 @@ prior manual revivals.
 **Outputs (semantic):**
 - A classification per entry, with the evidence behind it.
 - The withdrawn set, listable and reversible.
-- The idle set, ranked by recorded stock value, each with the available outcomes.
+- The idle set, ranked by unit cost price, each with the available outcomes and **no**
+  stock-derived monetary figure.
 - Implausible quantities, framed as questions.
 - Counts per class, with the observation window stated.
 - A handover list on request.
@@ -1700,7 +1773,8 @@ Behavioral states: **in catalogue** ↔ **withdrawn**.
 | withdrawn → in catalogue | A recorded sale | Yes, automatic (FR-066) |
 | withdrawn → in catalogue | Owner action | Yes (FR-067) |
 | in catalogue → withdrawn | Owner action | **OQ-403**, unresolved |
-| in catalogue → withdrawn | Dead with stock above zero | **Illegal** (INV-030) |
+| in catalogue → withdrawn | Dead with stock above zero, evidence under a full annual cycle | **Illegal** (INV-030) |
+| in catalogue → withdrawn | Dead with stock above zero, evidence spanning a full annual cycle | **OQ-409**, unresolved — not permitted until answered |
 | withdrawn → withdrawn again | Automatic, after a manual revival in the same window | **Illegal** (FR-067) |
 
 If ingestion is interrupted, no partial withdrawal set may take effect: the prior state
@@ -1716,7 +1790,7 @@ remains authoritative until a complete classification is produced.
 | Sales evidence covers a shorter window than configured | Classify against the actual window and state it (FR-061), with the seasonal caveat (FR-076) |
 | Entry has no usable product identifier | Out of the classified population; it is a hygiene record (SPEC-002) |
 | Recorded stock absent (not zero) | Not withdrawable; absence is not zero |
-| Cost price absent for an idle entry | Rank without a value and show no value — not zero (D-3) |
+| Cost price absent for an idle entry | Rank last, show no value — not zero (D-3). In the pilot this affects 5 of 1,718 idle entries |
 | Ingestion interrupted | Prior state remains authoritative |
 
 ---
@@ -1730,7 +1804,7 @@ remains authoritative until a complete classification is produced.
 | A product both dead and carrying unaccounted value (SPEC-002) | Precedence undefined — **OQ-203** (shared) |
 | Owner revives a product that then never sells | Stays living for the window (FR-067); a repeated-revival policy is **OQ-404** |
 | Very large withdrawn set on first run | Volume is expected; it is why withdrawal is automatic. Requires that the withdrawn list stay reviewable rather than being presented item by item |
-| Idle entry with implausible quantity **and** no cost price | Cannot be valued or ranked; present without value (D-3) |
+| Idle entry with implausible quantity **and** no cost price | Cannot be ranked by unit cost; present last, without value (D-3) |
 
 ---
 
@@ -1810,8 +1884,14 @@ appears. *(FR-072, FR-073, INV-035, SCN-065)*
 
 **AC-070** — A negative-stock dead entry is never withdrawn. *(FR-062, C-32, SCN-066)*
 
-**AC-071** — Idle entries are ranked by recorded stock value, and an entry without a cost
-price is ranked without a value rather than as zero. *(FR-069, D-3)*
+**AC-071** — Idle entries are ranked by unit cost price, descending; an entry without a
+cost price is ranked last and shows no value rather than zero. *(FR-069, D-3)*
+
+**AC-071a** — No idle entry, and no aggregate over the idle set, carries a monetary figure
+derived from a recorded stock quantity. *(FR-069a, FR-069b, D-1, D-11)*
+
+**AC-071b** — Each idle entry offers the outcomes required by FR-070, and no output states
+which of them is correct. *(FR-070, FR-071)*
 
 ---
 
@@ -1890,6 +1970,15 @@ available, and FR-060b makes the full-annual-cycle test the switch that governs 
 strongly a withdrawal is stated. What remains open is only the threshold's exact
 definition — whether "a full annual cycle" means twelve consecutive months of evidence or
 coverage of every calendar month — tracked as **OQ-408** (P2).
+
+**OQ-409 (P1) — Once the evidence spans a full annual cycle, does automatic withdrawal
+extend to entries carrying stock?**
+`intent.md` §4 states that it does: the zero-stock restriction is justified there by the
+seven-month window, and the intent says the rule "expands to include what carries stock"
+when the two-year reports arrive. This specification does not implement that expansion,
+and INV-030 forbids it. The question must be answered before the longer evidence is
+ingested, not before V1 is designed — under a seven-month window the two readings are
+indistinguishable. Affects INV-030, FR-064 and D-6.
 
 **OQ-408 (P2) — What exactly constitutes a full annual cycle?**
 Twelve consecutive months of evidence, or evidence covering each calendar month however
@@ -2004,6 +2093,11 @@ available data.
 **FR-082** — Before a question is presented, the system MUST suppress it if another
 capability has already made it moot — in particular, a question about a product that
 has been withdrawn from the working catalogue (SPEC-004) MUST NOT be asked.
+
+**FR-082a** — A question about a product classified **idle** (SPEC-004) MUST NOT be
+presented while it remains idle. It is neither answered nor discarded: it returns to the
+answerable population if the product sells again. *(In the pilot this defers 5 of the 17
+non-living cost questions, leaving the 12 the intent names.)*
 
 **FR-083** — The system MUST be able to report, for any question class, how many
 candidate questions were suppressed and how many remain, so the reduction in owner
@@ -2205,8 +2299,8 @@ be lost by ordinary use of the application.
 **AC-080** — No more than three questions are presented at once, under any input volume.
 *(FR-084, INV-040)*
 
-**AC-081** — No question is presented about a withdrawn product. *(FR-082, INV-041,
-SCN-080)*
+**AC-081** — No question is presented about a withdrawn product, and none about an idle
+one. *(FR-082, FR-082a, INV-041, SCN-080)*
 
 **AC-082** — The suppressed and remaining counts are reportable for any question class.
 *(FR-083)*
@@ -2396,14 +2490,32 @@ deliberately, on a surface other than this one.
 #### Admission and ordering
 
 **FR-103** — An entry MUST NOT be admitted unless its producing capability has stated it
-is actionable today.
+is **actionable today**. A capability states an entry actionable today when all of the
+following hold, and each producing specification MUST expose the flag:
+
+1. the entry's condition is present in the most recent complete ingestion;
+2. every piece of evidence its own specification requires is available for it, so the
+   owner can verify it without leaving the surface (FR-110);
+3. no owner outcome recorded against it still stands (FR-114);
+4. it clears any materiality floor its own specification defines. Where a specification
+   defines none, no floor applies and the omission is that specification's open question
+   (OQ-101, OQ-202), not a licence for the surface to invent one.
+
+An entry that fails any of these is not admitted and is not counted as unshown (FR-101).
 
 **FR-104** — Entries carrying a monetary value MUST be ordered by that value, descending.
 
 **FR-105** — A recurring value and a standing value MUST NOT be compared as if
-equivalent, and MUST NOT be summed to produce an ordering key (D-2). In V1 no capability
-produces a standing value, so a single monetary ordering is well defined; this
-requirement binds any capability that later introduces one.
+equivalent, and MUST NOT be summed to produce an ordering key (D-2).
+
+Whether a single monetary ordering is well defined is a **derived** fact, not an
+assertion, and MUST be re-derived whenever a capability changes: it holds only while
+exactly one value kind is produced across all admitted capabilities. As of version 1.1 it
+holds — SPEC-002 produces no monetary figure (FR-023) and SPEC-004 produces none either,
+its idle set being ordered by unit cost with no stock-derived amount (FR-069, FR-069a,
+D-11) — leaving SPEC-001's recurring per-sale figure as the only monetary value in V1. A
+capability that later introduces a standing value re-opens the allocation question
+(GAP-002), and FR-106's explicit allocation is the mechanism that answers it.
 
 **FR-106** — Unvalued entries MUST be admissible, and MUST NOT compete on the monetary
 ordering. The surface MUST allocate places to unvalued entries explicitly rather than
@@ -2659,6 +2771,17 @@ appears, distinguishable from an error. *(FR-118, SCN-107)*
 **AC-110** — The full set per capability remains reachable away from this surface.
 *(FR-102, C-51, SCN-109)*
 
+**AC-110a** — No admitted entry fails any of FR-103's four conditions, and an entry whose
+required evidence is unavailable is absent from the surface rather than shown without it.
+*(FR-103, FR-110)*
+
+**AC-110b** — Every entry names the capability that produced it, so a confirmed loss is
+distinguishable from a question. *(FR-107, SCN-108)*
+
+**AC-110c** — Every entry states an action the owner can physically perform, and carries
+on the surface itself the evidence its producing specification requires. *(FR-109,
+FR-110, NFR-051)*
+
 **AC-111** — No entry displays a velocity claim absent sales evidence. *(INV-055, C-54)*
 
 **AC-112** — The surface renders in all three supported languages with no untranslated
@@ -2687,10 +2810,13 @@ changes nothing in his own system.
 
 ### 17. Open Questions
 
-**OQ-601 — RESOLVED (2026-09-08).** The question asked how recurring and standing values
-rank against one another. It is moot: SPEC-002 no longer produces a monetary figure, so
-V1 has one monetary kind and FR-104 alone orders it. FR-105 is retained to bind any
-future standing-value capability.
+**OQ-601 — RESOLVED (2026-09-08, re-verified 1.1).** The question asked how recurring and
+standing values rank against one another. It is moot **for V1 only, and only because two
+capabilities were changed**: SPEC-002 produces no monetary figure (FR-023), and SPEC-004's
+idle set carries none either (FR-069a, D-11). Version 1.0 closed this question on the
+first change alone and was wrong to — the idle set was a standing monetary value that
+nobody had counted. FR-105 now requires the single-kind premise to be re-derived rather
+than asserted, so the same error cannot recur silently.
 
 **OQ-602 (P1, reduced from P0) — How many of the ten places are allocated to unvalued
 entries, and by what key are they ordered among themselves?**
@@ -2745,6 +2871,8 @@ forbids.
 | INT-NS (D-3) | FR-117, FR-118 | SCN-106, SCN-107 | AC-107, AC-108 |
 | INT-NS | FR-108 | SCN-108 | AC-109 |
 | INT-NS | FR-102 | SCN-109 | AC-110 |
+| INT-NS | FR-103 | — | AC-110a |
+| INT-NS | FR-107, FR-109, FR-110 | SCN-108 | AC-110b, AC-110c |
 | INT-002B | FR-106, INV-054 | — | AC-103 |
 | Protected behavior | INV-055, C-54 | — | AC-111 |
 | Protected behavior | C-53 | — | AC-112 |
@@ -2981,8 +3109,10 @@ object. Nothing here is a lifecycle.
 
 ### 13. Non-Functional Requirements
 
-**NFR-060 (Reproduction latency)** — Reproduction MUST complete quickly enough to be
-performed during a conversation without the participants waiting on it.
+**NFR-060 (Reproduction latency)** — Reproduction MUST complete within **two minutes**
+on the pilot dataset, so it can be performed in front of the owner without the
+conversation stopping. The bound is a stated product choice, not a measurement; if it
+proves wrong it changes without restructuring anything.
 
 **NFR-061 (Determinism)** — The same data and rules MUST produce the same figures.
 
@@ -3359,6 +3489,49 @@ that this does not block V1.
 
 ---
 
+#### GAP-009 — "Sold nothing" is, for every classified product in the pilot, "has no sales row"
+
+**Source:** `intent.md` §4 (INT-009) and SPEC-004 ASM-030, measured against the pilot data
+on 2026-09-08.
+
+**Problem:**
+SPEC-004 classifies on sales evidence over the observation window. Measured against
+`data/internal/silver_pos/`:
+
+| Class | Count | Present in the sales reports | Absent entirely |
+|---|---:|---:|---:|
+| Living (sold > 0) | 1,614 | 1,614 | 0 |
+| Withdrawable (0 sales, 0 stock) | 3,932 | **0** | 3,932 |
+| Idle (0 sales, stock > 0) | 1,674 | **0** | 1,674 |
+| Negative stock, 0 sales | 243 | 1 | 242 |
+
+Exactly **one** product in the whole catalogue appears in the sales reports with an
+observed zero. Every other "dead" product is dead only in the sense that the seven monthly
+reports contain no row for it. Consequently `observed_days`, `last_sale_date`,
+`total_receipts_all_months` and `last_purchase_date` are null for 100% of the idle set —
+which is why every non-monetary ordering key other than unit cost was found unbuildable,
+and why `data/internal/receiving/` (absent) cannot supply one either.
+
+**Why it matters:**
+ASM-030 names this as "the strongest assumption in this specification", which understates
+it: it is not an assumption at the margin but the entire load-bearing wall under 78% of
+the classification, including all 3,932 automatic withdrawals. The project's own rule —
+that products with no sales rows are reported as `none`, never as zero — is in direct
+tension with labelling them «صفر مبيعات». Note this is *not* a breach of INV-036, which
+governs the sales evidence being absent as a whole rather than a product being absent from
+it.
+
+**Status: OPEN — a release condition and a measurement, not a design blocker.** The
+reading that a monthly POS sales report lists everything that sold, so absence means zero,
+is defensible and is what ASM-030 records. Nothing in the design changes if it is right.
+What changes if it is wrong is the entire catalogue-cleanup capability, so it must be
+established with the owner before 3,932 products are withdrawn in front of him — the
+cheapest test being to name twenty absent products and ask whether any of them sold.
+
+**Confidence:** High — measured directly from the pilot artefacts.
+
+---
+
 ### Part 2 — Open Questions by Priority
 
 #### P0 — blocks system design
@@ -3397,6 +3570,7 @@ price recommendation.
 | OQ-302 | When several stores observe one product, which is the benchmark? | SPEC-003 |
 | OQ-303 | How are pack-size mismatches on a shared identifier handled? | SPEC-003 |
 | OQ-402 | Is there an introduction grace period for new products? | SPEC-004 |
+| OQ-409 | Once evidence spans a full annual cycle, does automatic withdrawal extend to stock-carrying entries? | SPEC-004 |
 | OQ-407 | Should a withdrawn entry stay visible on ordering surfaces while the evidence is short? | SPEC-004 |
 | OQ-403 | May the owner withdraw a product manually? | SPEC-004 |
 | OQ-501 | Is "I don't know" distinct from a deferral? | SPEC-005 |
@@ -3406,6 +3580,7 @@ price recommendation.
 | OQ-604 | When does a deferral lapse? | SPEC-006 |
 | OQ-605 | Does declining suppress an entry permanently? | SPEC-006 |
 | OQ-701 | Which figures must be reproducible — owner-facing, or all? | SPEC-007 |
+| OQ-801 | What may the 30-day recovered-₪ measurement contain, given that its "stock explained" component cannot be stated in money (D-1)? | INT-MEAS / SPEC-000 §4 |
 | OQ-702 | When reproduction and a surface disagree, which is shown? | SPEC-007 |
 
 #### P2 — safely deferred
@@ -3441,15 +3616,15 @@ coherent, and each is a candidate to be confirmed with the owner.
 | ASM-002 | A markup within the observed ceiling is deliberate policy, not drift | SPEC-001 | Real pricing drift is suppressed as policy |
 | ASM-003 | Platform commission is unavailable, so the ceiling is inferred from behaviour | SPEC-001 | The ceiling encodes habit rather than economics |
 | ASM-004 | Both prices in one export are contemporaneous | SPEC-001 | Stale pairs produce phantom differences |
-| ASM-010 | Flow quantities are more reliable than stock levels | SPEC-002 | The two-tier split has no basis |
+| ASM-010 | Flow quantities are more reliable than stock levels | SPEC-002 | Detection cannot be claimed as certain |
 | ASM-011 | Stock, receipts and sales cover the same period | SPEC-002 | See GAP-004 — magnitudes wrong |
-| ASM-012 | One cost price per product is adequate for valuation | SPEC-002 | Valuations drift with cost changes |
+| ASM-012 | Cost price is not used by this specification, since no valuation is produced | SPEC-002 | Only matters if a monetary figure is ever reinstated (OQ-204) |
 | ASM-013 | Quantity unreliability is catalogue-wide, not departmental | SPEC-002 | Over- or under-flagging by department |
 | ASM-020 | A shared identifier denotes the same sellable unit | SPEC-003 | False matches produce spurious extremes |
 | ASM-021 | Observed competitor prices were actually charged | SPEC-003 | Comparison against list prices |
 | ASM-022 | Format affinity encodes product judgement, not data quality | SPEC-003 | GAP-001's resolution changes |
 | ASM-023 | Observations refresh often enough that freshness rarely binds | SPEC-003 | Stale comparisons drive actions |
-| ASM-030 | Absence from sales evidence means the product did not sell | SPEC-004 | Withdrawal removes selling products |
+| ASM-030 | Absence from sales evidence means the product did not sell | SPEC-004 | Withdrawal removes selling products. **Measured 2026-09-08: this is not a marginal assumption — it carries 5,848 of 7,463 classifications. Exactly one product in the catalogue appears in the sales reports with an observed zero. See GAP-009** |
 | ASM-031 | Zero stock plus no sales means already absent from the shelf | SPEC-004 | The justification for automatic withdrawal fails |
 | ASM-032 | Product identifiers are stable across the window | SPEC-004 | Re-coded products appear dead |
 | ASM-033 | The owner needs no notice before automatic withdrawal | SPEC-004 | Withdrawal feels like data loss |
@@ -3459,6 +3634,7 @@ coherent, and each is a candidate to be confirmed with the owner.
 | ASM-042 | The owner's answer beats any inference | SPEC-005 | Wrong answers become authoritative |
 | ASM-043 | A product not worth keeping is not worth asking about | SPEC-005 | Inherits GAP-003 |
 | ASM-050 | Ten is the right bound | SPEC-006 | The core V1 decision is wrong |
+| ASM-035 | Unit cost price is available for enough idle entries to order them | SPEC-004 | Measured: 1,713 of 1,718 carry a cost above zero. The remaining 5 rank last without a value (D-3) |
 | ASM-051 | Money is the right ordering principle | SPEC-006 | Urgent low-value work is never done |
 | ASM-052 | The owner reviews roughly daily | SPEC-006 | Entries stale between reviews |
 | ASM-053 | Ten entries take about ten minutes | SPEC-006 | See GAP-007 |
@@ -3489,6 +3665,27 @@ surfaces meanwhile is OQ-407.
 
 **CON-004 — "Every figure is reproducible" against a V1 figure that is not.**
 INT-PROV and INT-003. Tracked as GAP-005.
+
+**CON-005 — "No money on a stock-derived signal" against "idle stock, ranked by money."**
+`intent.md` §12 rule 1 forbids a shekel figure on any signal derived from a stock
+quantity, "including our own derivations, in full and not by half". `intent.md` §4 valued
+the idle set at ₪919,170 and ranked it by money. Both were carried into the
+specifications — the money into SPEC-004 FR-069, the claim that no such money existed into
+SPEC-006 FR-105 — and neither noticed the other.
+
+**Resolved (2026-09-08):** rule 1 governs. The idle set carries no monetary figure and no
+aggregate, and is ordered by **unit cost**, which is a property of the product rather than
+a quantity and therefore outside rule 1 (D-11, `intent.md` §4ب). The distinction once
+offered in defence of the money — that reconciliation claimed a *loss* while the idle set
+described *standing inventory* — was rejected as a post-hoc justification: both read the
+same unreviewed column, and ₪919,170 is the more fragile of the two at fourteen times the
+size and ₪554 per product in a forecourt shop. The figure is not deleted but moved to the
+12/9 agenda as a question to the owner: "we computed this from your column — do you trust
+it?" His answer governs whether it may ever return (OQ-204's counterpart for SPEC-004).
+
+**Why it survived two reviews:** SPEC-002's removal of money was treated as sufficient to
+close GAP-002, and nobody re-derived the premise afterwards. FR-105 now forbids asserting
+it.
 
 ---
 

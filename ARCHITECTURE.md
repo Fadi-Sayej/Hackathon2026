@@ -1,4 +1,9 @@
-# SmartShelf — Architecture
+# SmartShelf — Architecture (pre-design trace)
+
+> **Superseded as design authority on 2026-09-08 by [`design.md`](design.md).**
+> This file is retained only as the *pre-design current-state trace* of the pipelines as
+> they existed on 2026-09-05. It describes what runs today, not what should be built.
+> `design.md` §3 restates and extends this trace; §6 onward is the target architecture.
 
 Two pipelines that never import each other. They meet only as **files on disk**,
 globbed by mtime. Traced from real imports and file reads on 2026-09-05; anything
