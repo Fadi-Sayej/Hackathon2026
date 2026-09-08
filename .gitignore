@@ -118,3 +118,12 @@ audit/
 
 # Playwright MCP browser session artifacts
 .playwright-mcp/
+
+# Ad-hoc screenshot driver for the UI audit. Walks the dev server at :5174 and
+# dumps pg-*.png into whatever output dir you pass as argv[2] — i.e. it is the
+# thing that produces the ignored audit/ above, so it is scratch by the same
+# argument. Rewritten by hand whenever the page list changes; not a build step.
+.cap.mjs
+
+# Local agent tooling scratch (brainstorm session HTML, ports, tokens).
+.superpowers/
