@@ -1,6 +1,6 @@
 # SmartShelf — Specification Layer
 
-**Status:** Draft · **Version:** 0.1 · **Generated:** 2026-09-08
+**Status:** Draft · **Version:** 0.2 · **Updated:** 2026-09-08
 **Intent layer:** [`intent.md`](intent.md) — the source this specification is derived from.
 
 The reasoning layers are kept strictly separate:
@@ -20,9 +20,13 @@ coding agent working in a repository whose code and technical documents are
 English. The intent layer stays in Arabic because its audience includes the store
 owner.
 
-**Design-readiness: NOT READY FOR SYSTEM DESIGN.** Five open questions are marked
-P0; two of them (OQ-601, OQ-602) block the design of the daily surface the whole
-product is organised around. They are listed in the final section.
+**Design-readiness: NOT READY FOR SYSTEM DESIGN** — but two P0 questions remain, not
+five. Version 0.2 removed the monetary figure from stock reconciliation entirely
+(SPEC-002 FR-023), because a positive recorded stock proved no more trustworthy than a
+negative one in a file the owner has never reviewed. That single change left V1 with one
+monetary kind, which dissolved the ordering conflict on the daily surface. What still
+blocks design: **OQ-301** (may a cross-format competitor source drive a signal) and
+**OQ-401** (how a withdrawn seasonal product ever returns).
 
 ---
 
@@ -583,8 +587,7 @@ records that are merely wrong are separated from records that indicate missing v
 | **Units sold** | Quantity recorded as sold over the same period |
 | **Implied opening balance** | `recorded stock − receipts + units sold`. A negative value is physically impossible and therefore proves inconsistency |
 | **Unaccounted quantity** | The absolute size of a negative implied opening balance |
-| **Confirmed magnitude** | An unaccounted quantity computed where recorded stock is non-negative |
-| **Estimated magnitude** | An unaccounted quantity computed where recorded stock is itself negative, and therefore rests on an impossible input |
+| **Gap ratio** | The unaccounted quantity as a proportion of receipts over the period. The ordering key for this capability, replacing money |
 
 ---
 
@@ -601,24 +604,29 @@ observed period. Without receipts, there is no arithmetic to close.
 **FR-022** — The detection MUST be presented as arithmetically certain, independently
 of the reliability of any single input.
 
-#### Magnitude, and its two tiers
+#### Magnitude, and why it carries no money
 
-**FR-023** — The system MUST partition flagged products into **confirmed magnitude**
-and **estimated magnitude** according to whether the recorded stock used in the
-computation is non-negative or negative.
+**FR-023** — The system MUST NOT attach a monetary figure to any product flagged by this
+specification, whatever the sign of its recorded stock.
 
-**FR-024** — The system MUST report the monetary total of each tier separately, and
-MUST label the estimated tier as an estimate.
+*Rationale, and the reason this replaces an earlier two-tier rule: the arithmetic uses
+the recorded stock in every case, not only where it is negative. A positive recorded
+stock is not thereby a trustworthy one. In the pilot data the highest-valued flagged
+product records 1,533 units on hand while the arithmetic claims 4,274 units
+unaccounted — positive, and impossible. The underlying file has never been reviewed by
+the owner, so no partition of it yields a defensible figure.*
 
-**FR-025** — The system MUST NOT present a single combined monetary total without the
-two tiers being visible alongside it.
+**FR-024** — The system MUST order flagged products by gap ratio, descending.
 
-**FR-026** — The estimate label MUST be presented before the owner questions the
-figure, not in response to being questioned (D-10).
+**FR-025** — The system MUST NOT present any monetary total for the flagged set, whether
+combined, partitioned, or bounded.
 
-**FR-027** — Where a flagged product has no cost price, the system MUST report the
-unaccounted quantity without a monetary figure, and MUST NOT substitute zero or an
-inferred cost (D-3).
+**FR-026** — Where the owner asks the size of the loss, the system MUST state that the
+amount is not determinable before a physical count, and MUST NOT offer a figure as an
+upper bound or an illustration.
+
+**FR-027** — The system MUST report, per flagged product, the three quantities and the
+resulting unaccounted quantity, so the finding is verifiable without a monetary figure.
 
 #### Hygiene signals — no money, by decision
 
@@ -633,11 +641,12 @@ signals, so that neither is presented as the other.
 
 #### Money semantics
 
-**FR-031** — Monetary figures from this specification MUST be expressed as a standing
-one-time amount and labelled as such.
+**FR-031** — This specification produces no monetary figures (FR-023). Consequently it
+contributes no standing amount to any surface.
 
-**FR-032** — A figure from this specification MUST NOT be summed with any recurring
-per-sale figure (D-2).
+**FR-032** — Because no figure is produced, the prohibition on summing a standing amount
+with a recurring one (D-2) cannot be breached by this capability. The prohibition itself
+remains in force for any capability that later produces a standing amount.
 
 **FR-033** — The action attached to a flagged product MUST be to count the product
 physically. The system MUST NOT state what the correct quantity is.
@@ -646,12 +655,10 @@ physically. The system MUST NOT state what the correct quantity is.
 
 ### 7. Behavioral Invariants
 
-**INV-010** — A monetary figure MUST NOT be attached to a product whose recorded stock
-is negative **without** that figure being in the estimated tier.
+**INV-010** — A monetary figure MUST NEVER be attached to any product flagged by this
+specification (D-1, applied without exception).
 
-**INV-011** — The confirmed and estimated tiers MUST partition the flagged set exactly:
-every flagged product belongs to exactly one, and their monetary totals sum to the
-combined total.
+**INV-011** — No aggregate produced by this specification may be expressed in currency.
 
 **INV-012** — The detection claim ("these quantities cannot all be true") MUST remain
 valid regardless of which tier a product falls in.
@@ -673,15 +680,15 @@ GIVEN a product whose implied opening balance is non-negative
 WHEN reconciliation runs
 THEN the product is not flagged.
 
-**SCN-021 — Confirmed magnitude**
-GIVEN a product with non-negative recorded stock whose implied opening balance is negative
+**SCN-021 — Positive recorded stock earns no money figure**
+GIVEN a product recording 1,533 units on hand whose arithmetic claims 4,274 unaccounted
 WHEN reconciliation runs
-THEN it is flagged, placed in the confirmed tier, and its value contributes to the confirmed total.
+THEN it is flagged and ordered by gap ratio, and no monetary figure is attached despite the stock being positive.
 
-**SCN-022 — Estimated magnitude**
+**SCN-022 — Negative recorded stock is treated identically**
 GIVEN a product with recorded stock of −716, receipts of 62 and sales of 663
 WHEN reconciliation runs
-THEN it is flagged, placed in the estimated tier, and its magnitude is labelled an estimate before any challenge.
+THEN it is flagged on the same basis as SCN-021, with no monetary figure and no separate tier.
 
 **SCN-023 — No receipts**
 GIVEN a product with no recorded receipts in the period
@@ -758,7 +765,7 @@ survive the product ceasing to be flagged (SCN-028).
 | Edge case | Resolution |
 |---|---|
 | Unaccounted quantity is 1–2 units | Rounding-sized. Needs a materiality floor — **OQ-202** |
-| Product sold more than ever received, stock zero | Flagged, confirmed tier; the arithmetic is exactly what the signal is for |
+| Product sold more than ever received, stock zero | Flagged; the arithmetic is exactly what the signal is for |
 | Recorded stock negative **and** no receipts | Not flagged (FR-021); appears as hygiene (FR-028) |
 | Cost price present but implausible (a carton cost against a unit price) | Excluded by D-4 from carrying money, consistent with SPEC-001 FR-010 |
 | Product later archived as dead (SPEC-004) while flagged | Both signals are true; precedence undefined — **OQ-203** |
@@ -782,7 +789,7 @@ tiers without labelling, nor mix this specification's total with a recurring tot
 ### 14. Compatibility and External Constraints
 
 - **C-10** — D-1 binds our own derivations, not only the owner's numbers. This is the
-  reason the two tiers exist.
+  reason no monetary figure is produced at all (FR-023).
 - **C-11** — D-7: no correction is written to any external system.
 - **C-12** — Existing behavior treats negative stock as a reported, money-free hygiene
   count. That behavior MUST be preserved (FR-028, FR-029).
@@ -795,16 +802,18 @@ tiers without labelling, nor mix this specification's total with a recurring tot
 **AC-020** — Every flagged product belongs to exactly one tier, and the two tier totals
 sum to the combined total. *(INV-011)*
 
-**AC-021** — No product with negative recorded stock contributes to the confirmed
-total. *(FR-023, INV-010)*
+**AC-021** — No product flagged by this specification carries a monetary figure anywhere
+in the output, whatever the sign of its recorded stock. *(FR-023, INV-010, SCN-021,
+SCN-022)*
 
-**AC-022** — The estimated total is labelled an estimate in every place it appears,
-including summaries. *(FR-024, FR-026)*
+**AC-022** — No aggregate produced by this specification is expressed in currency.
+*(FR-025, INV-011)*
 
-**AC-023** — The combined total never appears without both tiers visible. *(FR-025)*
+**AC-023** — Asked the size of the loss, the system states it is not determinable before
+a count and offers no figure as a bound or an illustration. *(FR-026)*
 
-**AC-024** — A flagged product without a cost price shows a quantity and no monetary
-figure — not ₪0. *(FR-027, SCN-024, D-3)*
+**AC-024** — Every flagged product shows the three quantities and the unaccounted
+quantity. *(FR-027, NFR-010)*
 
 **AC-025** — No hygiene record anywhere carries a monetary figure. *(FR-029, INV-013)*
 
@@ -826,14 +835,15 @@ the product ceases to be flagged. *(C-13, SCN-028)*
 
 **ASM-010** — Receipts and sales quantities are more reliable than recorded stock
 levels, because they are flows recorded at the moment of an event rather than a running
-balance. This asymmetry is the basis of the two-tier split and has not been confirmed
-with the owner.
+balance. This asymmetry is why detection is claimed as certain while magnitude is not
+claimed at all. It has not been confirmed with the owner.
 
 **ASM-011** — The observed period for receipts and sales is the same period the
 recorded stock reflects. If not, the arithmetic is unsound (OQ-201).
 
-**ASM-012** — A single cost price per product is adequate for valuation; cost changes
-within the period are not modelled.
+**ASM-012** — Cost price is not used by this specification, since no valuation is
+produced. Should a monetary figure ever be reinstated, cost stability within the period
+would become an assumption again.
 
 **ASM-013** — The owner's stated unreliability of quantities ("the report may say 8, the
 shelf has 1") applies across the catalogue rather than to particular departments.
@@ -842,11 +852,14 @@ shelf has 1") applies across the catalogue rather than to particular departments
 
 ### 17. Open Questions
 
-**OQ-201 (P0) — Do recorded stock, receipts and sales cover the same period?**
-The implied-opening-balance arithmetic is only valid if they do. Recorded stock is a
-current snapshot; receipts and sales come from monthly reports covering January–July.
-If the snapshot post-dates the reports, every magnitude in this specification is wrong
-by the intervening activity. This blocks the money signal entirely.
+**OQ-201 (P1, reduced from P0) — Do recorded stock, receipts and sales cover the same
+period?**
+Recorded stock is a current snapshot; receipts and sales come from monthly reports
+covering January–July. Misalignment would distort the unaccounted *quantity*. Since
+FR-023 no longer states a monetary figure and FR-024 orders by gap ratio, a distortion
+affects ordering rather than a published amount — so this no longer blocks design. It
+still matters: severe misalignment could flag consistent products, so it must be
+established before the flagged list is put in front of the owner.
 
 **OQ-202 (P1) — What is the materiality floor for an unaccounted quantity?**
 Without one, rounding-sized mismatches compete for slots on a 10-item surface. Affects
@@ -857,11 +870,13 @@ governs?**
 A dead product scheduled for automatic archiving may also carry unaccounted value.
 Archiving it would remove a money-bearing signal. Affects both specifications.
 
-**OQ-204 (P2) — Should the estimated tier be surfaced to the owner at all, or held
-back as internal evidence?**
-The intent argues that volunteering the weakness buys trust. An alternative is to
-surface only the confirmed tier and mention the estimate only if asked. Affects FR-024
-and what SPEC-006 ranks.
+**OQ-204 (P2) — After a physical count establishes real quantities, may a monetary
+figure be reinstated?**
+FR-023 forbids money because the recorded quantities are unreviewed. Once the owner has
+counted a product, that objection no longer applies to it. Whether counted products
+graduate into a money-bearing signal affects FR-023 and what SPEC-006 ranks.
+*(This question replaces an earlier one about which tier to surface; the tiers were
+removed.)*
 
 ---
 
@@ -880,8 +895,8 @@ and what SPEC-006 ranks.
 | Intent | Requirement | Scenario | Acceptance |
 |---|---|---|---|
 | INT-002 | FR-020, FR-021, FR-022 | SCN-020, SCN-021, SCN-023 | AC-020 |
-| INT-002 (D-1) | FR-023, FR-024 | SCN-022 | AC-021, AC-022 |
-| INT-002 | FR-025 | SCN-026 | AC-023 |
+| INT-002 (D-1) | FR-023, FR-024, INV-010 | SCN-021, SCN-022 | AC-021 |
+| INT-002 | FR-025, FR-026, INV-011 | SCN-027 | AC-022, AC-023 |
 | INT-002 (D-3) | FR-027 | SCN-024 | AC-024 |
 | INT-002 (D-2) | FR-031, FR-032 | SCN-026 | AC-026 |
 | INT-002 | FR-033, INV-015 | SCN-027 | AC-027 |
@@ -2175,11 +2190,16 @@ is actionable today.
 **FR-104** — Entries carrying a monetary value MUST be ordered by that value, descending.
 
 **FR-105** — A recurring value and a standing value MUST NOT be compared as if
-equivalent, and MUST NOT be summed to produce an ordering key (D-2). The rule for
-ordering them relative to one another is **OQ-601**, unresolved.
+equivalent, and MUST NOT be summed to produce an ordering key (D-2). In V1 no capability
+produces a standing value, so a single monetary ordering is well defined; this
+requirement binds any capability that later introduces one.
 
-**FR-106** — Unvalued entries MUST be admissible. Their position relative to valued
-entries is **OQ-602**, unresolved.
+**FR-106** — Unvalued entries MUST be admissible, and MUST NOT compete on the monetary
+ordering. The surface MUST allocate places to unvalued entries explicitly rather than
+ranking them against valued ones, and the allocation MUST be stated.
+
+**FR-106a** — Unvalued entries MUST be ordered among themselves by a stated key
+appropriate to their capability, and that key MUST NOT be a monetary proxy.
 
 **FR-107** — Where an entry is admitted, the surface MUST show which capability produced
 it, so that a confirmed loss is distinguishable from a question.
@@ -2456,16 +2476,17 @@ changes nothing in his own system.
 
 ### 17. Open Questions
 
-**OQ-601 (P0) — How are recurring and standing values ranked against one another?**
-D-2 forbids summing them, and FR-104 orders by value — but the surface must produce one
-ordered list from both. Without a rule, the bound cannot be applied and the surface
-cannot be built. This is the single most blocking question in the V1 set.
+**OQ-601 — RESOLVED (2026-09-08).** The question asked how recurring and standing values
+rank against one another. It is moot: SPEC-002 no longer produces a monetary figure, so
+V1 has one monetary kind and FR-104 alone orders it. FR-105 is retained to bind any
+future standing-value capability.
 
-**OQ-602 (P0) — Where do unvalued entries rank?**
-Hygiene entries carry no value by decision (D-1). Ordering strictly by value would
-exclude them permanently, which contradicts INT-002B's inclusion in V1. A reserved
-allocation, an interleaving rule, or an explicit exclusion from this surface must be
-chosen.
+**OQ-602 (P1, reduced from P0) — How many of the ten places are allocated to unvalued
+entries, and by what key are they ordered among themselves?**
+FR-106 settles that unvalued entries do not compete on money and require an explicit
+allocation; it does not fix the number. Design can proceed on the allocation mechanism
+while the number is decided from observation of the owner. SPEC-002 supplies gap ratio
+as its own ordering key (FR-024); other unvalued capabilities need one under FR-106a.
 
 **OQ-603 (P1) — May staff act on entries, or only the owner?**
 Counting stock is plausibly a staff task; changing a price is plausibly not. Affects
@@ -3004,9 +3025,10 @@ implied opening balance still indicates something is wrong), but the *magnitude*
 therefore both the confirmed and the estimated figure — may not.
 
 **Recommended resolution:**
-Establish the vintage of each input before either figure is stated to the owner. Where
-the periods do not align, state the detection count and withhold the magnitude, under
-the existing rule that no figure is preferable to a wrong one.
+Establish the vintage of each input before the flagged list is shown. **Partly overtaken
+(2026-09-08):** the magnitude is no longer stated at all, so the exposure is now confined
+to ordering and to the risk of flagging a consistent product. Establish the vintages;
+where they cannot be aligned, state the window the flags rest on.
 
 **Confidence:** Medium — the misalignment is plausible from the data vintages but has
 not been confirmed.
@@ -3109,11 +3131,17 @@ that this does not block V1.
 
 | ID | Question | Spec |
 |---|---|---|
-| **OQ-601** | How are recurring and standing values ranked against one another on the daily surface? | SPEC-006 |
-| **OQ-602** | Where do unvalued (hygiene) entries rank on that surface? | SPEC-006 |
 | **OQ-301** | May a context-only competitor source drive a surfaced signal when the difference is extreme? | SPEC-003 |
-| **OQ-201** | Do recorded stock, receipts and sales cover the same period? | SPEC-002 |
 | **OQ-401** | How does a withdrawn seasonal product ever sell again, given revival requires a sale? | SPEC-004 |
+
+**Resolved or downgraded since version 0.1**, all by one decision — SPEC-002 no longer
+produces a monetary figure:
+
+| ID | Now |
+|---|---|
+| ~~OQ-601~~ | **Moot.** With no standing amount in V1 there is one monetary kind, and FR-104 alone orders it |
+| ~~OQ-602~~ | **P1.** The principle is settled (FR-106: unvalued work gets a stated allocation, not a rank); only the number of places is open |
+| ~~OQ-201~~ | **P1.** Period alignment governed the magnitude, which is no longer stated. Detection does not depend on it |
 
 #### P1 — important, but design can begin
 
@@ -3142,7 +3170,7 @@ that this does not block V1.
 |---|---|---|
 | OQ-103 | Should the markup ceiling be per department or per store? | SPEC-001 |
 | OQ-104 | Should the delivery-price signal carry a monetary figure at all? | SPEC-001 |
-| OQ-204 | Should the estimated tier be surfaced, or held as internal evidence? | SPEC-002 |
+| OQ-204 | After a physical count, may a monetary figure be reinstated for counted products? | SPEC-002 |
 | OQ-304 | Should a competitor promotion be distinguished from a price change? | SPEC-003 |
 | OQ-305 | Should a distance bound apply in addition to format affinity? | SPEC-003 |
 | OQ-306 | What is the observation freshness bound? | SPEC-003 |

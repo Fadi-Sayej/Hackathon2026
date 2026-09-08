@@ -8,7 +8,7 @@ of how the pipelines fit together. This file is the rules; that file is the map.
 Anything in `docs/archive/` is retained for history and is **out of date** — it
 describes modules that no longer exist. Do not act on it.
 
-## The 12 rules
+## The 13 rules
 
 1. **Run Python from the repo root.** Scripts insert the repo root into `sys.path`
    themselves (`sys.path.insert(0, ROOT)`); `src` is a namespace package with no
@@ -82,6 +82,22 @@ describes modules that no longer exist. Do not act on it.
     a synthetic probe instead, so the wiring is proven before the real data
     arrives. It runs in `collect-daily.yml` before the dashboard is committed.
 
+13. **The seven sales reports are MONTHLY, and that caps what T8 can claim.** One
+    row per product per month, no date column in any of the seven files — so STL
+    decomposition (7 points, needs 2 seasonal cycles) and weekday/payday cycles
+    are **not measurable**, which is different from "measured and not
+    significant". `scripts/analyse_sales_movement.py` reports which of the two it
+    is. Calendar effects are measured on a department's **share** of monthly
+    volume (store-wide volume swings ~40% month to month) and **controlled for a
+    linear time trend** — that control is load-bearing: Ramadan falls in months
+    2-3 of a Jan-Jul series, so exposure is nearly collinear with seasonal drift,
+    and beverages read as a ×0.82 Ramadan suppression when they were simply
+    rising into summer. Windows live in `configs/calendars.yaml`, unverified
+    until someone signs the `verified_by` field. The reports cover **24.3% of the
+    catalogue**; the other 75.7% have no sales rows and are reported as `none`,
+    never as zero.
+
+
 ## Layout
 
 - `src/` (Python) — `internal_pos/` POS import · `signals/` competitor signals ·
@@ -98,9 +114,10 @@ describes modules that no longer exist. Do not act on it.
 ```bash
 npm run dev            # Vite dev server
 npm run data:refresh   # rebuild every dashboard input (see rule 5)
-npm run test           # 377 JS tests
-npm run test:py        # 270 Python tests
+npm run test           # 457 JS tests
+npm run test:py        # 317 Python tests
 npm run lint
+python3 scripts/analyse_sales_movement.py   # T8: measured calendar weights
 git mine               # log without the daily snapshot commits
 ```
 
