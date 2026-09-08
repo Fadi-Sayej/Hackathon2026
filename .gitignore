@@ -110,6 +110,9 @@ playwright-report/
 #     out-of-band backup instead (see Task 8), not by committing it to git.
 data/internal/receiving/
 
+# Test caches.
+.pytest_cache/
+
 # UI audit output (screenshots + findings). Regenerated on demand.
 audit/
 

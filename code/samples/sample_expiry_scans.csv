@@ -1,6 +1,0 @@
-barcode,expiry_date,notes
-250,2026-06-03,sample - arugula expired
-850022543708,2026-06-10,sample - blueberries critical
-332,2026-06-18,sample - pomelo warning
-553212,2026-07-02,sample - strawberry upcoming
-0000000000000,2026-06-12,sample - unknown barcode (not in POS)

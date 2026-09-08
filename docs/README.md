@@ -100,8 +100,39 @@ and must be refreshed against v1.1 before Phase 0 runs.
 - [Phase 0 — Foundations](implementation/phase-0-foundations.md)
 - [Phase 1 — Capabilities](implementation/phase-1-capabilities.md)
 
-## Operational documents (not product authority)
+## Operations (not product authority)
 
-`DEPLOYMENT.md`, `HANDOVER_YOMYOM*.md`, `RECEIVING_LEDGER.md`, `SNAPSHOT_DURABILITY.md`,
-`YOMYOM_QUESTIONS.md`, `QA_CHECKLIST.md`, the demo scripts and checklists. Useful, but they
-sit outside the authority chain above.
+How the system is run and why its data survives. True today, but outside the authority
+chain above.
+
+| Document | What it is |
+|---|---|
+| [Deployment](operations/deployment.md) | Vercel release runbook: build, env, the Basic-Auth gate, what must be committed |
+| [Snapshot durability](operations/snapshot-durability.md) | Why the daily market snapshot is committed and what a lost day costs |
+| [Receiving ledger](operations/receiving-ledger.md) | The `received` term the POS never records: operator flow, CSV shape, lead times |
+
+## Pilot (what reaches the store owner)
+
+| Document | What it is |
+|---|---|
+| [Handover — Arabic](pilot/handover-yomyom-ar.md) | **The version actually handed over.** Arabic is the language of every exchange with the manager |
+| [Handover — English](pilot/handover-yomyom-en.md) | Source text for the Arabic handover; keep the two in sync |
+| [Questions for YomYom](pilot/questions-for-yomyom.md) | What we still need from the owner, each drawn from his own export |
+| [`app-qr.png`](pilot/app-qr.png) · [`app-share-qr.png`](pilot/app-share-qr.png) | QR codes for the deployed pilot app |
+
+## Sources
+
+| Document | What it is |
+|---|---|
+| [Alonit signal source](sources/alonit_signal_source.md) | What the Dor Alon price-transparency feed and the Wolt catalogue provide, and what they cannot prove |
+
+## Archive — LEGACY, NON-AUTHORITATIVE
+
+Nothing under [`archive/`](archive/) is authority; every file carries a banner.
+
+| Folder | What it holds |
+|---|---|
+| [`archive/`](archive/) | The pre-design architecture trace, superseded per-person track notes, sprint plans and audits |
+| [`archive/pre-pivot/`](archive/pre-pivot/) | The hackathon and demo era: demo scripts, judge Q&A, QA checklists, the old PRD and acceptance criteria |
+| [`archive/plans/`](archive/plans/) | Executed implementation plans |
+| [`archive/business-material/`](archive/business-material/) | Pitch deck, incubation-programme material and market research (`.docx`/`.pdf`) |

@@ -19,6 +19,8 @@ PRD  →  Feature Intents  →  Feature Specs  →  System Design + ADRs  →  I
 | ADR-001 … ADR-014 | [`docs/architecture/decisions/`](docs/architecture/decisions/) |
 | Quality gates | [`docs/reviews/`](docs/reviews/) |
 | Implementation plan | [`docs/implementation/plan.md`](docs/implementation/plan.md) |
+| Deploy / run / data durability | [`docs/operations/`](docs/operations/) |
+| What the owner receives | [`docs/pilot/`](docs/pilot/) |
 
 The System Design's §3 is the verified current-state trace; §6 onward is the target. This
 file is the rules; those files are the map.

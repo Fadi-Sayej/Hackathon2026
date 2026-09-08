@@ -7,16 +7,23 @@
 - تنظيم الرفوف بصرياً عبر `Planogram`.
 - شرح التوصيات بصيغة `Agentic AI`.
 
-## Project Docs
+## Documentation
 
-- [design.md](docs/architecture/system-design.md) — the authoritative System Design (intent → specs → design → implementation)
-- [ARCHITECTURE.md](docs/archive/ARCHITECTURE.md) — pre-design trace of the pipelines as they ran on 2026-09-05 (superseded by design.md)
-- [CLAUDE.md](CLAUDE.md) — the rules for working in this repo
-- Older planning docs are in `docs/archive/` and are out of date
+**Start at [docs/README.md](docs/README.md)** — the map, with the authority chain
+PRD → feature intents → feature specs → system design + ADRs → implementation plan.
 
-### Source Semantics
+| Looking for | Go to |
+|---|---|
+| What the product is, and what is out of scope | [PRD](docs/product/PRD.md) |
+| What a feature must observably do | [`docs/features/F#-*/specs/`](docs/features/) |
+| How the system is built, and why | [System Design](docs/architecture/system-design.md) · [ADRs](docs/architecture/decisions/) |
+| What gets built next, in what order | [Implementation plan](docs/implementation/plan.md) |
+| How to deploy and run it | [Operations](docs/operations/deployment.md) |
+| What the store owner receives | [Pilot](docs/pilot/handover-yomyom-ar.md) |
+| Where the competitor data comes from | [Alonit signal source](docs/sources/alonit_signal_source.md) |
+| The rules for working in this repo | [CLAUDE.md](CLAUDE.md) |
 
-- [Alonit / Super Alonit signal source](docs/sources/alonit_signal_source.md) — what the Dor Alon price-transparency and Wolt delivery catalog sources provide, what they cannot prove, confirmed store IDs, and recommended field semantics
+Anything under [`docs/archive/`](docs/archive/) is **legacy and non-authoritative**.
 
 ### Competitor Signal Layer
 
@@ -191,7 +198,7 @@ CSV → schema mapping (`configs/pos_schema_mapping.yaml`) → validation → fo
 Parquet tables + a quality report in `reports/quality/`. To adapt it for a different
 POS export, change only the `columns[].raw_name` fields in the YAML.
 
-Where it sits in the wider flow: [ARCHITECTURE.md](docs/archive/ARCHITECTURE.md).
+Where it sits in the wider flow: [System Design §3](docs/architecture/system-design.md).
 
 ### How a collector uses this layer
 
