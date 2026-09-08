@@ -135,7 +135,25 @@ _cache = OrderedDict()
 
 
 def _cache_key(kind, payload):
-    blob = json.dumps(payload, sort_keys=True, ensure_ascii=False)
+    """Key an explanation on the FACTS it explains, not the whole payload.
+
+    Hashing the entire payload looked like caching but was not: marketContext
+    carries currentDate, so every recommendation missed the cache once a day and
+    was re-billed even when nothing about the decision had moved. Conversely a
+    changed order quantity MUST miss, or the owner reads yesterday's sentence
+    against today's number.
+
+    The facts record is exactly the set of figures the explanation is allowed to
+    contain (see src/lib/ai/factsGuard.js), so it is the correct cache identity:
+    same facts -> same sentence -> no second bill. Payloads without a facts record
+    fall back to hashing the whole thing rather than silently sharing one key.
+    """
+    facts = payload.get("facts") if isinstance(payload, dict) else None
+    if facts:
+        subject = {"facts": facts, "lang": (payload or {}).get("language")}
+    else:
+        subject = payload
+    blob = json.dumps(subject, sort_keys=True, ensure_ascii=False)
     return f"{kind}:{hashlib.sha256(blob.encode('utf-8')).hexdigest()}"
 
 

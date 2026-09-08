@@ -19,6 +19,15 @@
  *   fabrication and rejects the whole response.
  */
 
+/** Every number appearing in a piece of text, Latin or Arabic-Indic digits. */
+export function numbersIn(text) {
+  if (!text) return []
+  const latinised = String(text).replace(/[٠-٩]/g, (d) =>
+    String(d.charCodeAt(0) - 0x0660),
+  )
+  return (latinised.match(/\d+(?:[.,]\d+)?/g) ?? []).map((n) => Number(n.replace(',', '.')))
+}
+
 /** Numbers a rendered explanation is permitted to contain, given its facts. */
 export function allowedNumbers(facts) {
   if (!facts) return new Set()
@@ -43,6 +52,13 @@ export function allowedNumbers(facts) {
   ].filter((v) => typeof v === 'number' && Number.isFinite(v))
 
   const allowed = new Set()
+
+  // Numbers inside the product's own name are not claims — they are the name.
+  // "קוקה קולה זירו 1.5 ליטר" and "ביצים חופשיות 12 יח" carry figures the model
+  // must be able to repeat; rejecting them flagged correct output as fabrication
+  // (observed on 2 of 10 products before this was added).
+  for (const value of numbersIn(facts.productName)) allowed.add(value)
+
   for (const value of raw) {
     allowed.add(value)
     // Prose rounds, so accept the two forms a writer actually reaches for. floor
@@ -69,15 +85,6 @@ export function allowedNumbers(facts) {
  * job. So this is a floor, not a ceiling, and it is a real argument against letting
  * a model near these sentences at all.
  */
-
-/** Every number appearing in a piece of text, Latin or Arabic-Indic digits. */
-export function numbersIn(text) {
-  if (!text) return []
-  const latinised = String(text).replace(/[٠-٩]/g, (d) =>
-    String(d.charCodeAt(0) - 0x0660),
-  )
-  return (latinised.match(/\d+(?:[.,]\d+)?/g) ?? []).map((n) => Number(n.replace(',', '.')))
-}
 
 /**
  * Does this text stay inside the figures the decision actually used?

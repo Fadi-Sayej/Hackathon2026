@@ -123,6 +123,59 @@ const SIGNALS = [
   },
 ]
 
+// The LLM is a signal like any other: if it is switched on and changes no
+// explanation, that is the same bug class as the four above. It is checked
+// separately because it alters the TEXT of a recommendation rather than its
+// quantity, so the fingerprint diff cannot see it.
+async function checkLlmSignal() {
+  const enabled = process.env.VITE_LLM_PROXY_URL || process.env.LLM_PROXY_URL
+  if (!enabled) {
+    return {
+      name: 'LLM explanations',
+      state: 'INACTIVE',
+      detail: 'no proxy URL configured, so the rule-based text is what ships — nothing to verify',
+    }
+  }
+  const sample = eng.generateReorderRecommendations(products, base).find((r) => r.facts)
+  if (!sample) {
+    return { name: 'LLM explanations', state: 'INERT', detail: 'no recommendation carries a facts record' }
+  }
+  try {
+    const res = await fetch(enabled, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ language: 'he', facts: sample.facts }),
+      signal: AbortSignal.timeout(15000),
+    })
+    if (!res.ok) {
+      return { name: 'LLM explanations', state: 'INERT', detail: `proxy answered HTTP ${res.status}` }
+    }
+    const d = await res.json()
+    const { validateExplanationResult } = await import('../src/lib/ai/factsGuard.js')
+    const verdict = validateExplanationResult(
+      {
+        explanation: d.shortExplanation, riskReason: d.riskReason,
+        businessImpact: d.businessImpact, confidenceNote: d.confidenceNote,
+      },
+      sample.facts,
+    )
+    if (!verdict.ok) {
+      return {
+        name: 'LLM explanations',
+        state: 'INERT',
+        detail: `enabled, but its output is rejected by the facts guard (${verdict.invented.join(', ')} in ${verdict.field}) — every card falls back, so it changes nothing while being billed`,
+      }
+    }
+    return {
+      name: 'LLM explanations',
+      state: 'LIVE',
+      detail: `proxy answered and the response passed the facts guard`,
+    }
+  } catch (e) {
+    return { name: 'LLM explanations', state: 'INERT', detail: `enabled but unreachable: ${e.name}` }
+  }
+}
+
 const results = []
 for (const signal of SIGNALS) {
   if (signal.present()) {
@@ -149,6 +202,8 @@ for (const signal of SIGNALS) {
     })
   }
 }
+
+results.push(await checkLlmSignal())
 
 const width = Math.max(...results.map((r) => r.name.length))
 console.log(`baseline: ${baseline.size} REORDER recommendations\n`)

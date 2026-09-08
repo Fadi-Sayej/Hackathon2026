@@ -1,3 +1,5 @@
+import { validateExplanationResult } from './factsGuard.js'
+
 const DEFAULT_TIMEOUT_MS = 3500
 
 export const llmExplanationProvider = {
@@ -14,13 +16,30 @@ export const llmExplanationProvider = {
     }
 
     const response = await postToProxy(payload, options)
-    return {
+    const candidate = {
       provider: 'llm',
       explanation: response.shortExplanation,
       riskReason: response.riskReason,
       businessImpact: response.businessImpact,
       confidenceNote: response.confidenceNote,
     }
+
+    // The model may rephrase around figures it was given; it may not produce one.
+    // Checked here, at the boundary, so nothing unvalidated can reach a screen —
+    // and checked in code rather than asked for in the prompt, because the owner
+    // verifies these numbers against his own shelf.
+    const facts = payload?.facts ?? null
+    const verdict = validateExplanationResult(candidate, facts)
+    if (!verdict.ok) {
+      return {
+        provider: 'llm-rejected',
+        explanation: null,
+        rejected: { invented: verdict.invented, field: verdict.field },
+        error: `Model produced ${verdict.invented.join(', ')} in "${verdict.field}", `
+          + 'which the decision never held. Falling back to the rule-based text.',
+      }
+    }
+    return candidate
   },
 }
 
@@ -31,6 +50,10 @@ export function buildLLMExplanationPayload({
   recommendation,
 }) {
   return {
+    // The authoritative figures. Every number the owner may read comes from here,
+    // and factsGuard validates the response against exactly this record — so it is
+    // sent as the model's whole numeric vocabulary, not as background colour.
+    facts: recommendation?.facts ?? null,
     productMetrics: {
       id: product.id,
       name: product.name,

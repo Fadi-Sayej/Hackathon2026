@@ -123,3 +123,21 @@ describe('allowedNumbers', () => {
     expect(allowedNumbers(null).size).toBe(0)
   })
 })
+
+describe('numbers inside the product name are the name, not a claim', () => {
+  const named = { ...facts, productName: 'קוקה קולה זירו 1.5 ליטר', orderQty: 19 }
+
+  it('lets the model repeat a size that is part of the name', () => {
+    // Before this, 2 of 10 real products were flagged as fabricating "1.5" when
+    // the model had simply written the product's own name correctly.
+    const text = 'מומלץ להזמין 19 יחידות של קוקה קולה זירו 1.5 ליטר.'
+    expect(validateAgainstFacts(text, named).ok).toBe(true)
+  })
+
+  it('still rejects a genuine invention alongside the name', () => {
+    const text = 'מומלץ להזמין 47 יחידות של קוקה קולה זירו 1.5 ליטר.'
+    const result = validateAgainstFacts(text, named)
+    expect(result.ok).toBe(false)
+    expect(result.invented).toContain(47)
+  })
+})
