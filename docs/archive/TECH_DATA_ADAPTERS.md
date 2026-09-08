@@ -1,3 +1,12 @@
+> # ⚠ LEGACY — NON-AUTHORITATIVE
+>
+> Retained for history. Describes modules that no longer exist, or designs superseded
+> on 2026-09-08 by the System Design. Do not act on it.
+>
+> **Canonical sources:** [`docs/README.md`](../README.md)
+
+---
+
 # SmartShelf AI Data Adapters
 
 Sprint C2 adds a small adapter layer so the UI and analytics engines can keep using one normalized product shape while future data may come from local files, CSV imports, or a backend.

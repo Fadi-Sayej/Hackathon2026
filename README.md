@@ -9,8 +9,8 @@
 
 ## Project Docs
 
-- [design.md](design.md) — the authoritative System Design (intent → specs → design → implementation)
-- [ARCHITECTURE.md](ARCHITECTURE.md) — pre-design trace of the pipelines as they ran on 2026-09-05 (superseded by design.md)
+- [design.md](docs/architecture/system-design.md) — the authoritative System Design (intent → specs → design → implementation)
+- [ARCHITECTURE.md](docs/archive/ARCHITECTURE.md) — pre-design trace of the pipelines as they ran on 2026-09-05 (superseded by design.md)
 - [CLAUDE.md](CLAUDE.md) — the rules for working in this repo
 - Older planning docs are in `docs/archive/` and are out of date
 
@@ -191,7 +191,7 @@ CSV → schema mapping (`configs/pos_schema_mapping.yaml`) → validation → fo
 Parquet tables + a quality report in `reports/quality/`. To adapt it for a different
 POS export, change only the `columns[].raw_name` fields in the YAML.
 
-Where it sits in the wider flow: [ARCHITECTURE.md](ARCHITECTURE.md).
+Where it sits in the wider flow: [ARCHITECTURE.md](docs/archive/ARCHITECTURE.md).
 
 ### How a collector uses this layer
 

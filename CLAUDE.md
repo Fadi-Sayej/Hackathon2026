@@ -2,16 +2,35 @@
 
 Guidance for Claude Code working in this repo.
 
-**Read [design.md](design.md) first.** It is the authoritative System Design: the
-reasoning chain is `intent.md` → `specs.md` → `design.md` → implementation. Its §3 is
-the verified current-state trace (superseding [ARCHITECTURE.md](ARCHITECTURE.md), which is
-kept only as the pre-design trace); §6 onward is the target. This file is the rules; that
-file is the map.
+**Read [docs/README.md](docs/README.md) first.** It is the documentation map. The reasoning
+chain is:
 
-Anything in `docs/archive/` is retained for history and is **out of date** — it
-describes modules that no longer exist or designs that `design.md` superseded on
-2026-09-08 (`TECH_*.md`, `UI_DATA_CONTRACT.md`, `RECOMMENDATION_FAMILIES.md`,
-`PRODUCT_REQUIREMENTS.md`, `SAAS_*.md`, `SPRINT*.md`, `PLANOGRAM_ROADMAP.md`). Do not act on it.
+```
+PRD  →  Feature Intents  →  Feature Specs  →  System Design + ADRs  →  Implementation Plan  →  Code
+```
+
+| Layer | Canonical location |
+|---|---|
+| PRD · settled decisions D-1 … D-13 | [`docs/product/PRD.md`](docs/product/PRD.md) · [`docs/product/intent-register.md`](docs/product/intent-register.md) |
+| Feature intents (F1 … F13) | [`docs/features/F#-*/intent.md`](docs/features/) |
+| Feature specs (F1-S1 … F7-S1) | [`docs/features/F#-*/specs/`](docs/features/) |
+| Gaps, open questions, assumptions | [`docs/features/gaps-and-open-questions.md`](docs/features/gaps-and-open-questions.md) |
+| System Design | [`docs/architecture/system-design.md`](docs/architecture/system-design.md) |
+| ADR-001 … ADR-014 | [`docs/architecture/decisions/`](docs/architecture/decisions/) |
+| Quality gates | [`docs/reviews/`](docs/reviews/) |
+| Implementation plan | [`docs/implementation/plan.md`](docs/implementation/plan.md) |
+
+The System Design's §3 is the verified current-state trace; §6 onward is the target. This
+file is the rules; those files are the map.
+
+> **Documentation was restructured on 2026-09-08.** The former root files `intent.md`,
+> `specs.md` and `design.md` no longer exist — their content was split and moved without
+> semantic change into the locations above. See
+> [`docs/reviews/documentation-structure-migration.md`](docs/reviews/documentation-structure-migration.md)
+> for the full old → new mapping.
+
+Anything in `docs/archive/` is retained for history and is **out of date** — every file
+there carries a `LEGACY — NON-AUTHORITATIVE` banner. Do not act on it.
 
 ## The 13 rules
 
@@ -112,7 +131,7 @@ describes modules that no longer exist or designs that `design.md` superseded on
 - `src/` (JS) — `pages/` one file per screen · `lib/analytics/` ranking and money
   rules · `lib/dataAdapters/` reads `public/data/*.json` · `lib/i18n/` he/en · `data/`
   generated, committed.
-- `scripts/` — 57 entry points. Only the handful in ARCHITECTURE.md are the product.
+- `scripts/` — 57 entry points. Only the handful in the System Design §7 are the product.
 
 ## Commands
 

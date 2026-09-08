@@ -1,3 +1,12 @@
+> # ⚠ LEGACY — NON-AUTHORITATIVE
+>
+> Retained for history. Describes modules that no longer exist, or designs superseded
+> on 2026-09-08 by the System Design. Do not act on it.
+>
+> **Canonical sources:** [`docs/README.md`](../README.md)
+
+---
+
 # SmartShelf AI RAG Readiness
 
 Sprint C4 creates a local JSONL knowledge corpus for future retrieval-augmented generation.
