@@ -4,6 +4,14 @@
  * It used to, with a second full palette that overrode index.css because it
  * loads later. Everything below now inherits the single token set, so a colour
  * change happens in one file.
+ *
+ * Weights stop at 700. This file asked for `font-weight: 900` in fifteen places,
+ * but the only faces loaded are Inter 400-700 and Plus Jakarta Sans 600-800, and
+ * `:root` sets `font-synthesis: none` — so the browser had no 900 to use and no
+ * permission to fake one. Every one of those rules already rendered at 700; none
+ * of the fifteen used the heading font. Writing 700 changes nothing on screen
+ * and removes a trap: adding 900 to the font import would otherwise have made
+ * fifteen unrelated elements heavier at once.
  */
 
 * {
@@ -52,14 +60,6 @@ button {
   box-shadow: var(--shadow);
 }
 
-.brand-block {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.brand-mark {
-  display: grid;
 /*
  * `position: sticky` above is a promise this file could not keep.
  *
@@ -96,13 +96,21 @@ button {
   }
 }
 
+.brand-block {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-mark {
+  display: grid;
   place-items: center;
   width: 52px;
   height: 52px;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: var(--radius-lg);
   color: var(--ink-900);
-  font-weight: 900;
+  font-weight: 700;
   background-color: var(--teal-600);
   background-image: linear-gradient(135deg, var(--teal-600), var(--teal-700));
   box-shadow: 0 18px 42px rgba(93, 211, 165, 0.2);
@@ -222,13 +230,27 @@ button {
 }
 
 .topbar h1 {
-  margin: 8px 0 8px;
+  /*
+   * Was clamp(2rem, 4vw, 3.8rem) with line-height 0.96 — a 61px marketing-hero
+   * headline sitting above dense operational tables. It pushed the first row of
+   * actual data below the fold on a laptop and set a scale nothing else on the
+   * page answered.
+   *
+   * The ceiling now lands near 34px: still unmistakably the page title, but in
+   * proportion to the panel headings under it. Line-height goes back above 1 —
+   * 0.96 clipped the descenders of Hebrew and Arabic titles, which sit lower
+   * than the Latin ones this value was eyeballed against.
+   *
+   * There were two `letter-spacing` declarations here; the first was dead. One
+   * remains, loosened because tight tracking hurts legibility once the glyphs
+   * are no longer huge.
+   */
+  margin: 8px 0;
   color: var(--ink);
   font-family: var(--font-heading);
+  font-size: clamp(1.5rem, 2.2vw, 2.125rem);
+  line-height: 1.15;
   letter-spacing: -0.02em;
-  font-size: clamp(2rem, 4vw, 3.8rem);
-  line-height: 0.96;
-  letter-spacing: -0.055em;
 }
 
 .page-description {
@@ -271,7 +293,7 @@ button {
   margin: 0;
   color: var(--forest);
   font-size: 0.76rem;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
@@ -349,7 +371,7 @@ button {
   margin: 0;
   color: var(--ink);
   font-size: clamp(1.8rem, 4vw, 2.6rem);
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: -0.055em;
 }
 
@@ -428,6 +450,7 @@ button {
 .panel-heading h3,
 .recommendation-title h2,
 .empty-state h2,
+.empty-state h3,
 .insight-panel h2 {
   margin: 4px 0 0;
   color: var(--ink);
@@ -596,7 +619,7 @@ button {
   color: var(--ink-600);
   background: rgba(248, 250, 246, 0.96);
   font-size: 0.72rem;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -677,7 +700,7 @@ button {
 .recommendation-product {
   margin: 0 0 4px;
   font-size: 1.02rem;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: -0.02em;
 }
 
@@ -745,11 +768,13 @@ input[type='radio'] {
 }
 
 .btn {
-  min-height: 42px;
+  /* 44px, not 42: the minimum comfortable touch target. Two pixels short is
+     still short, and this control appears on every page. */
+  min-height: 44px;
   padding: 10px 14px;
   border: 1px solid transparent;
   border-radius: var(--radius-md);
-  font-weight: 900;
+  font-weight: 700;
   transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease, border-color 140ms ease;
 }
 
@@ -830,7 +855,7 @@ input[type='radio'] {
   align-content: center;
   gap: 4px;
   color: var(--paper-100);
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .fixture-label span {
@@ -901,7 +926,7 @@ input[type='radio'] {
 .insight-list dd {
   margin: 0;
   color: var(--ink);
-  font-weight: 900;
+  font-weight: 700;
   text-align: end;
 }
 
@@ -923,11 +948,10 @@ input[type='radio'] {
   border-radius: var(--radius-xl);
   color: var(--forest);
   background: var(--forest-soft);
-  font-size: 2rem;
-  font-weight: 900;
 }
 
-.empty-state h2 {
+.empty-state h2,
+.empty-state h3 {
   font-size: 1.35rem;
 }
 
@@ -1305,7 +1329,7 @@ input[type='radio'] {
 .ai-explanation p {
   margin: 0 0 8px;
   font-size: 0.72rem;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--info);
@@ -1392,7 +1416,7 @@ input[type='radio'] {
 .affinity-product-role {
   color: var(--forest);
   font-size: 0.68rem;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -1422,7 +1446,7 @@ input[type='radio'] {
   height: 32px;
   border-radius: var(--radius-pill);
   color: var(--paper-100);
-  font-weight: 900;
+  font-weight: 700;
   background-color: var(--teal-600);
   background-image: linear-gradient(135deg, var(--teal-600), var(--teal-700));
   box-shadow: 0 10px 24px rgba(31, 122, 92, 0.28);
@@ -1455,7 +1479,7 @@ input[type='radio'] {
 .affinity-impact-label {
   color: var(--muted);
   font-size: 0.7rem;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -1541,7 +1565,9 @@ input[type='radio'] {
 }
 
 .supplier-order-header .btn {
-  min-height: 40px;
+  /* Was 40px, overriding the base .btn back under the 44px touch minimum to buy
+     4px of header height. `white-space: nowrap` is what actually keeps this
+     button tidy; the height reduction only made it harder to hit. */
   white-space: nowrap;
 }
 
@@ -1842,7 +1868,7 @@ input[type='radio'] {
   color: var(--forest);
   background: var(--forest-soft);
   font-size: 1.6rem;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .shelf-upload-placeholder p {
@@ -2127,7 +2153,7 @@ input[type='radio'] {
 .report-body li::before {
   content: "•";
   color: var(--forest);
-  font-weight: 900;
+  font-weight: 700;
   margin-inline-end: 8px;
 }
 
@@ -2391,7 +2417,7 @@ input[type='radio'] {
 
 .top-movers-rank {
   color: var(--forest);
-  font-weight: 900;
+  font-weight: 700;
   font-size: 0.86rem;
 }
 
@@ -3795,7 +3821,9 @@ input[type='radio'] {
 
 .question-input {
   width: 100%;
-  min-height: 42px;
+  /* Matches .btn — this input sits directly above one, and two controls in a
+     column at different heights read as a mistake before they read as a size. */
+  min-height: 44px;
   padding: 9px 14px;
   border: 1px solid var(--line);
   border-radius: var(--radius-pill);
