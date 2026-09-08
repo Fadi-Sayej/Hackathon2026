@@ -1,6 +1,6 @@
 # SmartShelf — Specification Layer
 
-**Status:** Draft · **Version:** 0.2 · **Updated:** 2026-09-08
+**Status:** Draft · **Version:** 0.3 · **Updated:** 2026-09-08
 **Intent layer:** [`intent.md`](intent.md) — the source this specification is derived from.
 
 The reasoning layers are kept strictly separate:
@@ -20,13 +20,16 @@ coding agent working in a repository whose code and technical documents are
 English. The intent layer stays in Arabic because its audience includes the store
 owner.
 
-**Design-readiness: NOT READY FOR SYSTEM DESIGN** — but two P0 questions remain, not
-five. Version 0.2 removed the monetary figure from stock reconciliation entirely
+**Design-readiness: NOT READY FOR SYSTEM DESIGN** — one P0 question remains, not five. Version 0.2 removed the monetary figure from stock reconciliation entirely
 (SPEC-002 FR-023), because a positive recorded stock proved no more trustworthy than a
 negative one in a file the owner has never reviewed. That single change left V1 with one
-monetary kind, which dissolved the ordering conflict on the daily surface. What still
-blocks design: **OQ-301** (may a cross-format competitor source drive a signal) and
-**OQ-401** (how a withdrawn seasonal product ever returns).
+monetary kind, which dissolved the ordering conflict on the daily surface. Version 0.3
+then settled catalogue withdrawal: it is not a one-time event but a rule re-evaluated on
+every ingestion, whose strength follows the evidence window (SPEC-004 FR-060a, FR-063a–c).
+
+What still blocks design: **OQ-301** — whether a competitor of a different store format
+may drive a surfaced signal. Under existing protected behavior it may not, and only 4 of
+165 candidate items survive.
 
 ---
 
@@ -1356,6 +1359,14 @@ owner; and how a withdrawn product returns.
 identifier as living, withdrawable, or idle, using sales evidence over the observation
 window.
 
+**FR-060a** — Classification MUST be re-evaluated on every ingestion of new sales
+evidence, against the window then available. It MUST NOT be a one-time event whose
+result is thereafter fixed.
+
+**FR-060b** — The system MUST determine whether the available sales evidence spans a
+**full annual cycle**, and MUST make that determination available to every requirement
+that depends on it (FR-063a, FR-076).
+
 **FR-061** — The observation window MUST be stated wherever a classification or count is
 presented.
 
@@ -1366,6 +1377,20 @@ withdrawable. It belongs to data hygiene (SPEC-002).
 
 **FR-063** — The system MUST withdraw withdrawable entries without requiring an owner
 decision.
+
+**FR-063a** — Where the available evidence does **not** span a full annual cycle, every
+withdrawal MUST be accompanied by a statement that the evidence is insufficient to
+distinguish a seasonal product from a dead one, and that a product may therefore have
+been withdrawn wrongly. The statement MUST accompany the withdrawal itself, not only a
+summary of it (D-10).
+
+**FR-063b** — Where the evidence **does** span a full annual cycle, withdrawal MUST be
+made on that basis and the insufficiency statement MUST NOT be shown.
+
+**FR-063c** — When newly ingested evidence extends the window across a full annual
+cycle, the system MUST re-evaluate every existing withdrawal against the longer window,
+and MUST return any entry that the longer evidence shows to be seasonal rather than
+dead.
 
 **FR-064** — The system MUST NOT automatically withdraw an idle entry (D-6).
 
@@ -1426,6 +1451,9 @@ automatically (D-6).
 
 **INV-031** — Withdrawal MUST NEVER be irreversible.
 
+**INV-031a** — A withdrawal made on evidence shorter than a full annual cycle MUST NEVER
+be presented as settled. Its provisional character MUST travel with it.
+
 **INV-032** — A withdrawn entry that records a sale MUST NEVER remain withdrawn.
 
 **INV-033** — Withdrawal MUST NEVER change anything outside this system (D-7).
@@ -1461,6 +1489,21 @@ THEN it is not withdrawn, and is presented for the owner's judgement ranked by s
 GIVEN a withdrawn product
 WHEN a subsequent ingestion records a sale of it
 THEN it returns to the working catalogue without an owner decision.
+
+**SCN-064a — Withdrawal on partial evidence is declared provisional**
+GIVEN sales evidence covering seven months, less than a full annual cycle
+WHEN entries are withdrawn
+THEN each withdrawal states that the evidence cannot separate a seasonal product from a dead one.
+
+**SCN-064b — A longer window reverses a wrong withdrawal**
+GIVEN a product withdrawn under a seven-month window, and evidence later extending to two years showing it sold in one season each year
+WHEN the longer evidence is ingested
+THEN the product is returned to the working catalogue without an owner decision, and the withdrawal is not repeated.
+
+**SCN-064c — A longer window confirms a withdrawal**
+GIVEN a product withdrawn under a short window, and longer evidence showing no sales in any season
+WHEN the longer evidence is ingested
+THEN the product remains withdrawn and the insufficiency statement is no longer shown.
 
 **SCN-064 — Manual revival is respected**
 GIVEN the owner manually revived a withdrawn product
@@ -1553,7 +1596,7 @@ remains authoritative until a complete classification is produced.
 
 | Edge case | Resolution |
 |---|---|
-| Seasonal product, zero stock, out of season | Withdrawn by FR-063, revived on its first sale. The exposure is that a withdrawn product may never be reordered and so never sells — **OQ-401**, the most serious open question here |
+| Seasonal product, zero stock, out of season | Withdrawn by FR-063, but the withdrawal is declared provisional while the evidence is short (FR-063a) and re-examined when a full annual cycle is available (FR-063c). Residual exposure until then is accepted knowingly; whether to keep such entries visible on ordering surfaces meanwhile is OQ-407 |
 | A newly introduced product with no sales yet | Would be withdrawn on the first ingestion. Requires an introduction grace period — **OQ-402** |
 | A product both dead and carrying unaccounted value (SPEC-002) | Precedence undefined — **OQ-203** (shared) |
 | Owner revives a product that then never sells | Stays living for the window (FR-067); a repeated-revival policy is **OQ-404** |
@@ -1608,6 +1651,16 @@ the working catalogue. *(FR-065, NFR-033)*
 **AC-063** — A manually revived entry is not automatically withdrawn again within the
 same window. *(FR-067, SCN-064)*
 
+**AC-063a** — Every withdrawal made on evidence shorter than a full annual cycle carries
+the insufficiency statement at the point of withdrawal. *(FR-063a, INV-031a, SCN-064a)*
+
+**AC-063b** — Extending the evidence across a full annual cycle causes every existing
+withdrawal to be re-evaluated, and returns those the longer evidence shows to be
+seasonal. *(FR-063c, SCN-064b, SCN-064c)*
+
+**AC-063c** — Once the evidence spans a full annual cycle, withdrawals no longer carry
+the insufficiency statement. *(FR-063b, SCN-064c)*
+
 **AC-064** — No external system is modified by any withdrawal. *(FR-068, INV-033)*
 
 **AC-065** — The living, withdrawable and idle sets partition the classified population
@@ -1656,12 +1709,35 @@ observation window.
 
 ### 17. Open Questions
 
-**OQ-401 (P0) — How does a withdrawn seasonal product ever sell again?**
-Revival depends on a sale; a withdrawn product is absent from ordering surfaces, so it
-may not be reordered, so it may not be stocked, so it may never sell. The revival rule
-may be unreachable for exactly the products it is meant to protect. This blocks the
-design of withdrawal, because it determines whether withdrawal may affect ordering
-surfaces at all.
+**OQ-401 — RESOLVED (2026-09-08).**
+The question was how a withdrawn seasonal product ever returns, given that revival
+depends on a sale and a withdrawn product may never be restocked.
+
+**Decision: withdrawal is not settled while the evidence is short, and the evidence
+itself is what changes.** Rather than weakening withdrawal permanently, the rule is
+re-evaluated on every ingestion (FR-060a) and its strength follows the window: below a
+full annual cycle every withdrawal is declared provisional (FR-063a); at a full annual
+cycle the declaration stops (FR-063b) and every earlier withdrawal is re-examined
+against the longer evidence, returning those that prove seasonal (FR-063c).
+
+This is why the resolution is not "hold withdrawal until two years arrive": the
+catalogue cleanup is worth having now, and the two-year evidence is already requested
+from the owner. What the short window costs is certainty, and that cost is stated rather
+than hidden.
+
+**Residual exposure, accepted knowingly:** between now and the longer evidence, a
+seasonal product with zero stock may be withdrawn and, if it is never restocked, may not
+revive on its own. FR-063c repairs this when the evidence arrives. Whether withdrawal
+should additionally remain visible on ordering surfaces in the meantime is **OQ-407**
+(P1) — a narrowing of this question, not a blocker.
+
+**OQ-407 (P1) — Should a withdrawn entry remain visible on ordering and assortment
+surfaces, marked, while the evidence is short?**
+Withdrawal serves attention: it stops the owner reviewing thousands of dead entries. It
+need not also remove a product from the surfaces where he decides what to buy. Keeping
+withdrawn entries visible there, marked with their evidence, would close the residual
+exposure in OQ-401 before the longer evidence arrives. Affects FR-074's scope. Design can
+begin without it, since it narrows an exclusion rather than changing the withdrawal rule.
 
 **OQ-402 (P1) — Is there an introduction grace period for new products?**
 Without one, a product introduced days before ingestion is classified dead and
@@ -1679,10 +1755,16 @@ FR-067.
 FR-072 requires a stated margin against the store's scale; no value exists. Affects
 FR-072 and how many questions reach the owner.
 
-**OQ-406 (P2) — Should the observation window be a product decision or follow the
-available evidence?**
-The intent names seven months because that is what exists, and expects two years. Whether
-the window is fixed or elastic affects FR-061 and FR-076.
+**OQ-406 — RESOLVED (2026-09-08).** The window follows the available evidence, not a
+fixed product choice: FR-060a re-evaluates on every ingestion against the window then
+available, and FR-060b makes the full-annual-cycle test the switch that governs how
+strongly a withdrawal is stated. What remains open is only the threshold's exact
+definition — whether "a full annual cycle" means twelve consecutive months of evidence or
+coverage of every calendar month — tracked as **OQ-408** (P2).
+
+**OQ-408 (P2) — What exactly constitutes a full annual cycle?**
+Twelve consecutive months of evidence, or evidence covering each calendar month however
+gathered. Affects FR-060b and therefore when FR-063a stops applying.
 
 ---
 
@@ -2997,14 +3079,17 @@ It determines whether withdrawal may affect ordering surfaces at all, or only
 attention-facing ones. That is a scope question, not an implementation one, and it
 governs the shape of INT-009 and later INT-004.
 
-**Recommended resolution:**
-Restrict withdrawal's effect to attention surfaces and reporting, and keep withdrawn
-products visible to any ordering or assortment capability with their status shown. This
-preserves the owner-effort benefit — which is about attention, not about data — while
-leaving the revival path open. Revisit once two years of sales history make seasonality
-detectable, which is the condition under which the restriction could safely widen.
+**Status: RESOLVED (2026-09-08).** Not by weakening withdrawal, but by making its
+strength follow the evidence. Withdrawal is re-evaluated on every ingestion (FR-060a);
+while the window is shorter than a full annual cycle every withdrawal is declared
+provisional (FR-063a); when the evidence reaches a full cycle the declaration stops and
+earlier withdrawals are re-examined, returning those that prove seasonal (FR-063c).
 
-**Confidence:** High on the gap; Medium on the resolution.
+The two-year sales evidence that closes this has already been requested from the owner,
+so the gap has a dated resolution rather than an indefinite one. The residual exposure
+in the interim is stated in OQ-401 and accepted.
+
+**Confidence:** High.
 
 ---
 
@@ -3132,7 +3217,6 @@ that this does not block V1.
 | ID | Question | Spec |
 |---|---|---|
 | **OQ-301** | May a context-only competitor source drive a surfaced signal when the difference is extreme? | SPEC-003 |
-| **OQ-401** | How does a withdrawn seasonal product ever sell again, given revival requires a sale? | SPEC-004 |
 
 **Resolved or downgraded since version 0.1**, all by one decision — SPEC-002 no longer
 produces a monetary figure:
@@ -3142,6 +3226,8 @@ produces a monetary figure:
 | ~~OQ-601~~ | **Moot.** With no standing amount in V1 there is one monetary kind, and FR-104 alone orders it |
 | ~~OQ-602~~ | **P1.** The principle is settled (FR-106: unvalued work gets a stated allocation, not a rank); only the number of places is open |
 | ~~OQ-201~~ | **P1.** Period alignment governed the magnitude, which is no longer stated. Detection does not depend on it |
+| ~~OQ-401~~ | **Resolved.** Withdrawal is re-evaluated on every ingestion and its strength follows the evidence window; a full annual cycle triggers re-examination of earlier withdrawals. Narrowed to OQ-407 (P1) |
+| ~~OQ-406~~ | **Resolved.** The window follows available evidence. Narrowed to OQ-408 (P2) |
 
 #### P1 — important, but design can begin
 
@@ -3154,6 +3240,7 @@ produces a monetary figure:
 | OQ-302 | When several stores observe one product, which is the benchmark? | SPEC-003 |
 | OQ-303 | How are pack-size mismatches on a shared identifier handled? | SPEC-003 |
 | OQ-402 | Is there an introduction grace period for new products? | SPEC-004 |
+| OQ-407 | Should a withdrawn entry stay visible on ordering surfaces while the evidence is short? | SPEC-004 |
 | OQ-403 | May the owner withdraw a product manually? | SPEC-004 |
 | OQ-501 | Is "I don't know" distinct from a deferral? | SPEC-005 |
 | OQ-502 | What constitutes a demonstrable change permitting a question to be re-asked? | SPEC-005 |
@@ -3176,7 +3263,7 @@ produces a monetary figure:
 | OQ-306 | What is the observation freshness bound? | SPEC-003 |
 | OQ-404 | What happens to a revived product that still does not sell? | SPEC-004 |
 | OQ-405 | What defines an implausible recorded quantity? | SPEC-004 |
-| OQ-406 | Is the observation window fixed, or does it follow the evidence? | SPEC-004 |
+| OQ-408 | What exactly constitutes a full annual cycle? | SPEC-004 |
 | OQ-504 | Does an owner's answer expire? | SPEC-005 |
 | OQ-505 | May staff answer questions, or only the owner? | SPEC-005 |
 | OQ-606 | Should the surface guarantee variety across capabilities? | SPEC-006 |
@@ -3237,7 +3324,11 @@ INT-002's D-2 and INT-NS's single ordered surface. Tracked as GAP-002 and OQ-601
 
 **CON-003 — "Withdrawal is reversible on the first sale" against "withdrawn products are
 excluded from other capabilities."**
-INT-009 states both. Tracked as GAP-003 and OQ-401.
+INT-009 states both. **Resolved (2026-09-08):** revival no longer depends solely on a
+sale. Extending the evidence to a full annual cycle re-examines every withdrawal and
+returns those that prove seasonal (FR-063c), so the reversal path does not require the
+product to be on a shelf. Whether withdrawn entries should also stay visible on ordering
+surfaces meanwhile is OQ-407.
 
 **CON-004 — "Every figure is reproducible" against a V1 figure that is not.**
 INT-PROV and INT-003. Tracked as GAP-005.
