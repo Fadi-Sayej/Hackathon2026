@@ -239,11 +239,11 @@ export function OperationalPage({
           <div>
             <p className="eyebrow">{t('op.startHere')}</p>
             <h2>{t('op.todaysActions')}</h2>
-            <p className="page-description" style={{ marginTop: '0.25rem' }}>
+            <p className="page-description op-panel-desc">
               {t('op.todaysActionsDesc')}
             </p>
           </div>
-          <div className="recommendation-actions" style={{ gap: '0.5rem' }}>
+          <div className="recommendation-actions op-toolbar">
             <input
               className="operational-search"
               type="search"
@@ -275,7 +275,7 @@ export function OperationalPage({
         )}
 
         {openMoney.length > TOP_N && (
-          <div className="recommendation-actions" style={{ marginTop: '1rem' }}>
+          <div className="recommendation-actions op-showall">
             <Button tone="ghost" onClick={() => setShowAll((value) => !value)}>
               {showAll ? t('op.showTop', { n: TOP_N }) : t('op.showAll', { n: openMoney.length })}
             </Button>
@@ -323,7 +323,7 @@ export function OperationalPage({
           <div>
             <p className="eyebrow">{t('op.notUrgent')}</p>
             <h2>{t('op.dataToFixCount', { n: openData.length })}</h2>
-            <p className="page-description" style={{ marginTop: '0.25rem' }}>
+            <p className="page-description op-panel-desc">
               {t('op.dataToFixDesc')}
             </p>
           </div>
@@ -368,7 +368,7 @@ export function OperationalPage({
               : t('op.staticExport')}
           </span>
         </div>
-        <div className="recommendation-actions" style={{ flexWrap: 'wrap', gap: '0.5rem' }}>
+        <div className="recommendation-actions op-source-list">
           {(sources ?? []).map((src) => (
             <StatusBadge key={src.source_id} tone={SOURCE_STATUS_TONE[src.status] ?? 'neutral'}>
               {src.label}: {t(`op.src.${src.status}`)}
@@ -376,7 +376,7 @@ export function OperationalPage({
             </StatusBadge>
           ))}
         </div>
-        <p className="page-description" style={{ marginTop: '0.75rem' }}>
+        <p className="page-description op-pos-footer">
           {t('op.posFooter', { n: posHealth.totalProducts })}
         </p>
       </section>

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNumbers, useT } from '../../lib/i18n/index.js'
+import { Button } from '../shared/Button.jsx'
 import { dirProps } from '../../lib/utils/rtl.js'
 import {
   MAX_QUESTIONS_ON_SCREEN,
@@ -17,6 +18,16 @@ import { ANSWER_CARRIED, ANSWER_SHELF_LIFE } from '../../lib/questions/answerSto
  * At most three questions, because four makes it a form and a form gets abandoned.
  * Each states why it is being asked and what the answer will change — the same
  * standard the reorder explanations are held to.
+ *
+ * LAYOUT
+ *   This panel sits directly above the daily action list, so it borrows that
+ *   list's shape rather than inventing a second one: `.panel` shell, cards that
+ *   split into content and a decision column, impact on a footer strip. Two card
+ *   languages stacked on one screen is what made the page read as unfinished.
+ *
+ *   Every string here is an existing `q.*` key. New copy would need Hebrew and
+ *   Arabic before it could ship — the interface runs in three languages and the
+ *   e2e suite fails any control left in English.
  */
 export function QuestionPanel({ questions = [], products = [], onAnswer, lastChange }) {
   const t = useT()
@@ -29,9 +40,15 @@ export function QuestionPanel({ questions = [], products = [], onAnswer, lastCha
 
   if (!visible.length && !pendingGroup && !lastChange) {
     return (
-      <section className="question-panel">
-        <h2>{t('q.title')}</h2>
-        <p {...dirProps(t('q.none'))}>{t('q.none')}</p>
+      <section className="panel question-panel">
+        <div className="panel-heading">
+          <div>
+            <h2>{t('q.title')}</h2>
+            <p className="page-description question-subtitle" {...dirProps(t('q.none'))}>
+              {t('q.none')}
+            </p>
+          </div>
+        </div>
       </section>
     )
   }
@@ -69,9 +86,13 @@ export function QuestionPanel({ questions = [], products = [], onAnswer, lastCha
   }
 
   return (
-    <section className="question-panel">
-      <h2>{t('q.title')}</h2>
-      <p className="question-subtitle">{t('q.subtitle')}</p>
+    <section className="panel question-panel">
+      <div className="panel-heading">
+        <div>
+          <h2>{t('q.title')}</h2>
+          <p className="page-description question-subtitle">{t('q.subtitle')}</p>
+        </div>
+      </div>
 
       {lastChange && (
         <div className="question-change" role="status">
@@ -89,14 +110,16 @@ export function QuestionPanel({ questions = [], products = [], onAnswer, lastCha
       {pendingGroup ? (
         <GroupProposal proposal={pendingGroup.proposal} onDecide={resolveGroup} />
       ) : (
-        visible.map((question) => (
-          <QuestionCard
-            key={question.id}
-            question={question}
-            impact={questionImpact(question, products)}
-            onSubmit={(value) => submit(question, value)}
-          />
-        ))
+        <div className="question-list">
+          {visible.map((question) => (
+            <QuestionCard
+              key={question.id}
+              question={question}
+              impact={questionImpact(question, products)}
+              onSubmit={(value) => submit(question, value)}
+            />
+          ))}
+        </div>
       )}
     </section>
   )
@@ -121,42 +144,62 @@ function QuestionCard({ question, impact, onSubmit }) {
 
   return (
     <article className="question-card">
-      <h3 {...dirProps(question.productName)}>{question.productName}</h3>
-      <p className="question-title">{title}</p>
+      <div className="question-card-main">
+        <h3 className="question-product" {...dirProps(question.productName)}>
+          {question.productName}
+        </h3>
+        <p className="question-ask">{title}</p>
 
-      <dl className="question-meta">
-        <dt>{t('q.why')}</dt>
-        <dd {...dirProps(why)}>{why}</dd>
-        <dt>{t('q.willChange')}</dt>
-        <dd {...dirProps(willChange)}>{willChange}</dd>
-      </dl>
+        <dl className="question-meta">
+          <dt>{t('q.why')}</dt>
+          <dd {...dirProps(why)}>{why}</dd>
+          <dt>{t('q.willChange')}</dt>
+          <dd {...dirProps(willChange)}>{willChange}</dd>
+        </dl>
 
-      <p className="question-scale">
-        {t('q.affects', { count: n(impact.productsAffected) })}
-        {impact.moneyAtStake > 0 && ` · ${t('q.atStake', { amount: n(Math.round(impact.moneyAtStake)) })}`}
-      </p>
+        <p className="question-scale">
+          <span>{t('q.affects', { count: n(impact.productsAffected) })}</span>
+          {impact.moneyAtStake > 0 && (
+            <>
+              <span className="question-scale-sep" aria-hidden="true">
+                ·
+              </span>
+              <span>{t('q.atStake', { amount: n(Math.round(impact.moneyAtStake)) })}</span>
+            </>
+          )}
+        </p>
+      </div>
 
-      {isCarried ? (
-        <div className="question-actions">
-          <button type="button" onClick={() => onSubmit('yes')}>{t('q.carried.yes')}</button>
-          <button type="button" onClick={() => onSubmit('no')}>{t('q.carried.no')}</button>
-          <button type="button" onClick={() => onSubmit('seasonal')}>{t('q.carried.seasonal')}</button>
-        </div>
-      ) : (
-        <div className="question-actions">
-          <input
-            type="number"
-            min="1"
-            value={days}
-            placeholder={t('q.shelfLife.placeholder')}
-            onChange={(event) => setDays(event.target.value)}
-            aria-label={t('q.shelfLife.title')}
-          />
-          <button type="button" disabled={!days} onClick={() => onSubmit(Number(days))}>
-            {t('q.answer')}
-          </button>
-        </div>
-      )}
+      <div className="question-card-side">
+        {isCarried ? (
+          <div className="question-actions">
+            <Button tone="primary" onClick={() => onSubmit('yes')}>
+              {t('q.carried.yes')}
+            </Button>
+            <Button tone="secondary" onClick={() => onSubmit('no')}>
+              {t('q.carried.no')}
+            </Button>
+            <Button tone="ghost" onClick={() => onSubmit('seasonal')}>
+              {t('q.carried.seasonal')}
+            </Button>
+          </div>
+        ) : (
+          <div className="question-actions">
+            <input
+              className="question-input"
+              type="number"
+              min="1"
+              value={days}
+              placeholder={t('q.shelfLife.placeholder')}
+              onChange={(event) => setDays(event.target.value)}
+              aria-label={t('q.shelfLife.title')}
+            />
+            <Button tone="primary" disabled={!days} onClick={() => onSubmit(Number(days))}>
+              {t('q.answer')}
+            </Button>
+          </div>
+        )}
+      </div>
     </article>
   )
 }
@@ -167,22 +210,33 @@ function GroupProposal({ proposal, onDecide }) {
   const { n } = useNumbers()
   return (
     <article className="question-card question-group">
-      <h3>{t('q.group.title')}</h3>
-      <p>
-        {t('q.group.body', {
-          count: n(proposal.products.length),
-          category: proposal.category ?? '',
-        })}
-      </p>
-      <p className="question-group-source">{t('q.group.viaCategory')}</p>
-      <ul className="question-group-list">
-        {proposal.products.map((product) => (
-          <li key={product.id} {...dirProps(product.name)}>{product.name}</li>
-        ))}
-      </ul>
-      <div className="question-actions">
-        <button type="button" onClick={() => onDecide(true)}>{t('q.group.confirm')}</button>
-        <button type="button" onClick={() => onDecide(false)}>{t('q.group.reject')}</button>
+      <div className="question-card-main">
+        <h3 className="question-product">{t('q.group.title')}</h3>
+        <p className="question-ask">
+          {t('q.group.body', {
+            count: n(proposal.products.length),
+            category: proposal.category ?? '',
+          })}
+        </p>
+        <p className="question-group-source">{t('q.group.viaCategory')}</p>
+        <ul className="question-group-list">
+          {proposal.products.map((product) => (
+            <li key={product.id} {...dirProps(product.name)}>
+              {product.name}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="question-card-side">
+        <div className="question-actions">
+          <Button tone="primary" onClick={() => onDecide(true)}>
+            {t('q.group.confirm')}
+          </Button>
+          <Button tone="secondary" onClick={() => onDecide(false)}>
+            {t('q.group.reject')}
+          </Button>
+        </div>
       </div>
     </article>
   )
