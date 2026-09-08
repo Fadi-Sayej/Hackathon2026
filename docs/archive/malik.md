@@ -1,3 +1,12 @@
+> # ⚠ LEGACY — NON-AUTHORITATIVE
+>
+> Retained for history. Describes modules that no longer exist, or designs superseded
+> on 2026-09-08 by the System Design. Do not act on it.
+>
+> **Canonical sources:** [`docs/README.md`](../README.md)
+
+---
+
 # Malik — Track D: In-Store Workflows & Customer Handover
 
 > 📋 **Read `PLAN.md` first** — phases, integration gates, go/no-go criteria, and the cut line.

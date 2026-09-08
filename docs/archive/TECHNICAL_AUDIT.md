@@ -1,3 +1,12 @@
+> # ⚠ LEGACY — NON-AUTHORITATIVE
+>
+> Retained for history. Describes modules that no longer exist, or designs superseded
+> on 2026-09-08 by the System Design. Do not act on it.
+>
+> **Canonical sources:** [`docs/README.md`](../README.md)
+
+---
+
 # SmartShelf AI — Deep Technical Audit
 
 *Read and verified June 2026. All claims have been traced to source code.*
