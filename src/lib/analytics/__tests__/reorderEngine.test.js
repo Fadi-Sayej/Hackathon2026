@@ -5,6 +5,7 @@ import {
   generateReorderRecommendations,
 } from '../reorderEngine.js'
 import { RECOMMENDATION_TYPES } from '../recommendationTypes.js'
+import { credibleLoss } from '../credibility.js'
 
 const CURRENT_DATE = '2026-08-12'
 
@@ -428,5 +429,71 @@ describe('never states an assumed lead time as a measured one', () => {
 
   it('treats a product with no lead-time metadata at all as assumed', () => {
     expect(reorderReason({})).toMatch(/assumed/)
+  })
+})
+
+describe('valueAtStake shares the credibility guards (#39)', () => {
+  it('surfaces neither alert nor ₪ for a per-case cost error, on both surfaces', () => {
+    // בראוניז (4*4): sells ₪3.90 against a per-case "cost" of ₪238.00.
+    //
+    // #43 originally asserted the alert still surfaced carrying valueAtStake 0.
+    // main has since moved to suppressing it outright, and that is the policy
+    // kept here: UI_DATA_CONTRACT §1.6 and CLAUDE.md rule 8 both forbid
+    // substituting 0 for a figure that cannot be stated honestly. What #43
+    // actually guarantees — that the action list and the exposure roll-up can
+    // never disagree, because one guard decides for both — is what is asserted.
+    const recommendations = generateReorderRecommendations(
+      [product({ id: 'case-cost-error', currentStock: 10, price: 3.9, cost: 238 })],
+      { currentDate: CURRENT_DATE },
+    )
+    const belowCost = recommendationOfType(recommendations, RECOMMENDATION_TYPES.BELOW_COST)
+
+    expect(credibleLoss(3.9, 238), 'the shared guard rejects a per-case cost').toBeNull()
+    expect(belowCost, 'so no below-cost alert is raised').toBeUndefined()
+    expect(aggregateNetValueAtStake(recommendations)).toBe(0)
+  })
+
+  it('values a genuine below-cost loss, matching credibleLoss per unit', () => {
+    const recommendations = generateReorderRecommendations(
+      [product({ id: 'real-loss', currentStock: 10, price: 24.9, cost: 30 })],
+      { currentDate: CURRENT_DATE },
+    )
+    const belowCost = recommendationOfType(recommendations, RECOMMENDATION_TYPES.BELOW_COST)
+
+    expect(belowCost.valueAtStake).toBeGreaterThan(0)
+    // Exposure = credible per-unit loss × stock: the two surfaces use one guard.
+    expect(belowCost.valueAtStake).toBeCloseTo(credibleLoss(24.9, 30) * 10, 5)
+  })
+
+  it('withholds ₪ for a price gap beyond the credible threshold', () => {
+    const recommendations = generateReorderRecommendations(
+      [
+        product({
+          id: 'wild-gap',
+          currentStock: 10,
+          price: 20,
+          cost: 10, // healthy margin → only PRICE_GAP fires
+          competitor: { cheapestCompetitorPrice: 1 }, // 1900% gap → not credible
+        }),
+      ],
+      { currentDate: CURRENT_DATE },
+    )
+    const gap = recommendationOfType(recommendations, RECOMMENDATION_TYPES.PRICE_GAP)
+
+    expect(gap, 'the price-gap alert should still surface').toBeDefined()
+    expect(gap.valueAtStake).toBe(0)
+  })
+
+  it('attaches no ₪ exposure to a negative-stock data item', () => {
+    const recommendations = generateReorderRecommendations(
+      [product({ id: 'neg-stock', currentStock: -3, cost: 10 })],
+      { currentDate: CURRENT_DATE },
+    )
+    const negative = recommendationOfType(recommendations, RECOMMENDATION_TYPES.NEGATIVE_STOCK)
+
+    // Stock counts are unreliable; actionPriority classes this as data-only, so
+    // the exposure sort must agree and carry no money for it.
+    expect(negative, 'the negative-stock alert should still surface').toBeDefined()
+    expect(negative.valueAtStake).toBe(0)
   })
 })
