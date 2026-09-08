@@ -45,22 +45,39 @@ except Exception:  # pragma: no cover - only hit without the SDK installed
 
 load_dotenv()
 
-# Prefer the un-prefixed name. A VITE_-prefixed variable is inlined by Vite into
-# the browser bundle, so keeping it first invited someone to store the key under a
-# name that publishes it. VITE_GEMINI_API_KEY is still read as a fallback so
-# existing local setups keep working, but it is deprecated — see .env.example.
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY") or os.environ.get("VITE_GEMINI_API_KEY")
+# The key is read ONLY from the un-prefixed name, and the VITE_-prefixed one is a
+# hard startup error rather than a fallback.
+#
+# Vite inlines every VITE_* variable into the client bundle at build time, so a key
+# stored under VITE_GEMINI_API_KEY is compiled into dist/ and served to every
+# visitor. That is not hypothetical: it was verified in this repo on 2026-09-08,
+# with a live key found in plain text in dist/assets/main-*.js. Accepting the name
+# as a fallback is what made storing it there look harmless, so the fallback is
+# gone. The browser talks to this proxy; only this proxy holds the key.
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+
+if not GEMINI_API_KEY and os.environ.get("VITE_GEMINI_API_KEY"):
+    raise RuntimeError(
+        "Refusing to start: the Gemini key is set as VITE_GEMINI_API_KEY. Any "
+        "VITE_-prefixed variable is compiled into the browser bundle, so that name "
+        "publishes your key to every visitor. Move it to GEMINI_API_KEY (no prefix) "
+        "and rotate the old one — it must be treated as compromised."
+    )
 # Cost note. gemini-2.5-flash bills output at $2.50/1M and has thinking ON by
 # default — thinking tokens are billed as output, and the pinned (deprecated)
 # google-generativeai SDK exposes no way to switch it off. flash-lite is $0.10 in
 # / $0.40 out with thinking off by default, which is ample for turning structured
 # product metrics into four short sentences. Override with GEMINI_MODEL if a
 # harder task ever justifies the 6x output price.
-GEMINI_MODEL = (
-    os.environ.get("VITE_GEMINI_MODEL")
-    or os.environ.get("GEMINI_MODEL")
-    or "gemini-2.5-flash-lite"
-)
+# Un-prefixed name wins here too: VITE_GEMINI_MODEL taking precedence meant the
+# server followed a variable that only exists to be shipped to the browser.
+#
+# Default verified against the live model list on 2026-09-08 rather than taken from
+# memory: gemini-2.5-flash-lite still answers, but gemini-3.5-flash-lite is current,
+# answered in ~0.9s, and keeps thinking off by default — thinking tokens bill as
+# output. gemini-3.6-flash was tried and rejected: it spent its budget thinking and
+# returned a 3-token fragment for the same prompt.
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL") or "gemini-3.5-flash-lite"
 UPSTREAM_TIMEOUT_SECONDS = float(os.environ.get("LLM_UPSTREAM_TIMEOUT_SECONDS", "3"))
 
 # Output is the expensive half of the bill. Asking for a JSON mime type drops the
