@@ -18,3 +18,29 @@ malik/c1b-apply-hebrew-rendering 82f9d74 2026-08-03
 nagham/b1-vercel-deployment d66ce97 2026-08-06
 track-d/31-operational-actions f3ad039 2026-08-06
 verify-main 34ee45c 2026-08-06
+
+# ---- تصفية 2026-09-08: كل ما تحت هذا السطر حُذف بعد التحقق من دمجه في main ----
+# main عند الحذف: f4568159292da50c5e3f8cb1fe1aa0a0786200e9
+# استرجاع أي فرع: git branch <الاسم> <SHA>
+agent/14-ui-data-contract d141c3d 2026-08-02
+anas/31-operational-actions-main ea8c0d8 2026-08-06
+anas/b1-vercel-deploy 41ed1e3 2026-08-06
+anas/c0-ui-contract-main 68e3cfe 2026-08-06
+anas/c0-ui-data-contract d141c3d 2026-08-02
+anas/c2c-wire-honest-analytics 8162bd7 2026-08-03
+anas/c3-llm-async-fix ba4b116 2026-08-03
+anas/c30-value-at-stake-semantics 1bc88b0 2026-08-06
+anas/c39-action-priority-reconciliation 808c1ec 2026-08-06
+anas/c4-store-floor-layout f488e55 2026-08-06
+anas/c4-store-floor-layout-main dfa23c9 2026-08-06
+anas/c7b-engine-tests af95ed7 2026-08-03
+feat/planogram-i18n-and-tests a0c7d8a 2026-08-13
+integration/c-wave d60359c 2026-08-03
+integration/release-baseline 2936b99 2026-08-06
+integration/slot2-close fc87837 2026-08-03
+malik/c1b-apply-hebrew-rendering 82f9d74 2026-08-03
+nagham/b1-vercel-deployment d66ce97 2026-08-06
+t2-store-identity ebcf7d1 2026-08-12
+t3-t5-assortment-gap-and-market-params 24a0645 2026-08-12
+track-d/31-operational-actions f3ad039 2026-08-06
+verify-main 34ee45c 2026-08-06
