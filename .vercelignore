@@ -21,5 +21,11 @@
 *.mp4
 *.mov
 /yomyom-inventory.csv
-/smartshelf-vercel-qr.png
-/smartshelf-vercel-share-qr.png
+/docs
+/tests
+/e2e
+/scripts
+/configs
+/schemas
+*.docx
+*.pdf
