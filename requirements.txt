@@ -5,6 +5,9 @@
 pyarrow>=14.0
 polars>=0.20
 
+# DataFrame layer (scripts/measure_baselines.py, src/external/kaggle_supermarket_importer.py)
+pandas>=2.0
+
 # Schema validation
 pydantic>=2.0
 
