@@ -1,4 +1,5 @@
 import { Button } from '../shared/Button.jsx'
+import { navIcons } from './navIcons.jsx'
 import { ErrorBoundary } from '../shared/ErrorBoundary.jsx'
 import { LANGUAGES, useI18n } from '../../lib/i18n/index.js'
 
@@ -19,44 +20,56 @@ const navGroups = [
   {
     id: 'group.daily',
     items: [
-      { id: 'operational', icon: '!' },
-      { id: 'recommendations', icon: 'R' },
-      { id: 'orders', icon: 'O' },
+      { id: 'operational' },
+      { id: 'recommendations' },
+      { id: 'orders' },
     ],
   },
   {
     id: 'group.market',
     items: [
-      { id: 'prices', icon: '₪' },
-      { id: 'assortment', icon: '◫' },
+      { id: 'prices' },
+      { id: 'assortment' },
     ],
   },
   {
     id: 'group.shelves',
     items: [
-      { id: 'store-layout', icon: '▦' },
-      { id: 'shelf-plan', icon: '☰' },
+      { id: 'store-layout' },
+      { id: 'shelf-plan' },
     ],
   },
   {
     id: 'group.inventory',
     items: [
-      { id: 'products', icon: 'P' },
-      { id: 'expiry', icon: 'E' },
+      { id: 'products' },
+      { id: 'expiry' },
     ],
   },
   {
     id: 'group.reports',
     items: [
-      { id: 'dashboard', icon: 'D' },
-      { id: 'report', icon: 'A' },
+      { id: 'dashboard' },
+      { id: 'report' },
     ],
   },
   {
     id: 'group.system',
-    items: [{ id: 'data-source', icon: 'C' }],
+    items: [{ id: 'data-source' }],
   },
 ]
+
+/**
+ * The icon for a nav id, or nothing.
+ *
+ * Falling back to `null` rather than a placeholder glyph is deliberate: a
+ * missing icon should leave a quiet gap, not print a stray letter — which is
+ * exactly the failure this set was written to remove.
+ */
+function renderNavIcon(id) {
+  const Icon = navIcons[id]
+  return Icon ? <Icon /> : null
+}
 
 export function AppShell({
   activePage,
@@ -95,9 +108,7 @@ export function AppShell({
                     className={`nav-item ${isActive ? 'nav-item-active' : ''}`}
                     onClick={() => onNavigate(item.id)}
                   >
-                    <span className="nav-icon" aria-hidden="true">
-                      {item.icon}
-                    </span>
+                    <span className="nav-icon">{renderNavIcon(item.id)}</span>
                     <span className="nav-item-text">
                       <span className="nav-item-name">{t(`page.${item.id}.name`)}</span>
                       {/* The hint is why anyone would open this screen. Without it

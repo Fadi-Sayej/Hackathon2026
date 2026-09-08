@@ -184,3 +184,27 @@ bdi,
   overflow-wrap: break-word;
   word-break: normal;
 }
+
+/* ── Reduced motion ────────────────────────────────────────────────── */
+/*
+ * Honour the OS setting. Nothing in this app animates to convey meaning — the
+ * transitions are hover polish and the toast is a pop — so the whole lot can be
+ * reduced to a near-instant step without losing information.
+ *
+ * `0.01ms` rather than `0`: a duration of exactly zero stops transitionend and
+ * animationend from firing in some engines, and code that waits on those events
+ * would hang rather than degrade. This keeps the events, drops the motion.
+ *
+ * `scroll-behavior: auto` is included because a smooth programmatic scroll is
+ * motion too, and it is the one most likely to provoke nausea.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

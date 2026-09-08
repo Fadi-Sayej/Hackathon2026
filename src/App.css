@@ -4,6 +4,14 @@
  * It used to, with a second full palette that overrode index.css because it
  * loads later. Everything below now inherits the single token set, so a colour
  * change happens in one file.
+ *
+ * Weights stop at 700. This file asked for `font-weight: 900` in fifteen places,
+ * but the only faces loaded are Inter 400-700 and Plus Jakarta Sans 600-800, and
+ * `:root` sets `font-synthesis: none` — so the browser had no 900 to use and no
+ * permission to fake one. Every one of those rules already rendered at 700; none
+ * of the fifteen used the heading font. Writing 700 changes nothing on screen
+ * and removes a trap: adding 900 to the font import would otherwise have made
+ * fifteen unrelated elements heavier at once.
  */
 
 * {
@@ -52,6 +60,42 @@ button {
   box-shadow: var(--shadow);
 }
 
+/*
+ * `position: sticky` above is a promise this file could not keep.
+ *
+ * `html` and `body` carry `overflow-x: hidden` (index.css, to contain a page
+ * that genuinely overflows). Setting overflow-x to hidden forces the used value
+ * of overflow-y to `auto`, which makes both elements scroll containers — and a
+ * sticky element resolves against its nearest scrolling ancestor, not the
+ * viewport. Since neither scrolls internally, the sidebar had nothing to stick
+ * to and behaved as `static`: on every page taller than the viewport the dark
+ * column simply ended 100vh down, leaving an empty gutter, and the navigation
+ * scrolled away with it.
+ *
+ * Fixed positioning does not care about scroll containers, so it survives the
+ * overflow rule. Nothing shifts: the shell's first grid track is a fixed 294px,
+ * so taking the sidebar out of flow leaves the column exactly where it was.
+ *
+ * Removing the overflow rule instead would restore sticky, but it is
+ * load-bearing — with it gone the assortment page overflows by up to 398px.
+ * That is a separate bug and this is not the place to fix it.
+ */
+@media (min-width: 861px) {
+  .sidebar {
+    position: fixed;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 294px;
+  }
+
+  /* Out of flow, the sidebar is no longer a grid item — so the main panel
+     becomes the only one, and auto-placement drops it into the 294px first
+     track. Pin it to the second track explicitly. */
+  .main-panel {
+    grid-column: 2;
+  }
+}
+
 .brand-block {
   display: flex;
   align-items: center;
@@ -66,7 +110,7 @@ button {
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: var(--radius-lg);
   color: var(--ink-900);
-  font-weight: 900;
+  font-weight: 700;
   background-color: var(--teal-600);
   background-image: linear-gradient(135deg, var(--teal-600), var(--teal-700));
   box-shadow: 0 18px 42px rgba(93, 211, 165, 0.2);
@@ -186,13 +230,27 @@ button {
 }
 
 .topbar h1 {
-  margin: 8px 0 8px;
+  /*
+   * Was clamp(2rem, 4vw, 3.8rem) with line-height 0.96 — a 61px marketing-hero
+   * headline sitting above dense operational tables. It pushed the first row of
+   * actual data below the fold on a laptop and set a scale nothing else on the
+   * page answered.
+   *
+   * The ceiling now lands near 34px: still unmistakably the page title, but in
+   * proportion to the panel headings under it. Line-height goes back above 1 —
+   * 0.96 clipped the descenders of Hebrew and Arabic titles, which sit lower
+   * than the Latin ones this value was eyeballed against.
+   *
+   * There were two `letter-spacing` declarations here; the first was dead. One
+   * remains, loosened because tight tracking hurts legibility once the glyphs
+   * are no longer huge.
+   */
+  margin: 8px 0;
   color: var(--ink);
   font-family: var(--font-heading);
+  font-size: clamp(1.5rem, 2.2vw, 2.125rem);
+  line-height: 1.15;
   letter-spacing: -0.02em;
-  font-size: clamp(2rem, 4vw, 3.8rem);
-  line-height: 0.96;
-  letter-spacing: -0.055em;
 }
 
 .page-description {
@@ -235,7 +293,7 @@ button {
   margin: 0;
   color: var(--forest);
   font-size: 0.76rem;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
@@ -313,7 +371,7 @@ button {
   margin: 0;
   color: var(--ink);
   font-size: clamp(1.8rem, 4vw, 2.6rem);
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: -0.055em;
 }
 
@@ -392,6 +450,7 @@ button {
 .panel-heading h3,
 .recommendation-title h2,
 .empty-state h2,
+.empty-state h3,
 .insight-panel h2 {
   margin: 4px 0 0;
   color: var(--ink);
@@ -560,7 +619,7 @@ button {
   color: var(--ink-600);
   background: rgba(248, 250, 246, 0.96);
   font-size: 0.72rem;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -641,7 +700,7 @@ button {
 .recommendation-product {
   margin: 0 0 4px;
   font-size: 1.02rem;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: -0.02em;
 }
 
@@ -709,11 +768,13 @@ input[type='radio'] {
 }
 
 .btn {
-  min-height: 42px;
+  /* 44px, not 42: the minimum comfortable touch target. Two pixels short is
+     still short, and this control appears on every page. */
+  min-height: 44px;
   padding: 10px 14px;
   border: 1px solid transparent;
   border-radius: var(--radius-md);
-  font-weight: 900;
+  font-weight: 700;
   transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease, border-color 140ms ease;
 }
 
@@ -794,7 +855,7 @@ input[type='radio'] {
   align-content: center;
   gap: 4px;
   color: var(--paper-100);
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .fixture-label span {
@@ -865,7 +926,7 @@ input[type='radio'] {
 .insight-list dd {
   margin: 0;
   color: var(--ink);
-  font-weight: 900;
+  font-weight: 700;
   text-align: end;
 }
 
@@ -887,11 +948,10 @@ input[type='radio'] {
   border-radius: var(--radius-xl);
   color: var(--forest);
   background: var(--forest-soft);
-  font-size: 2rem;
-  font-weight: 900;
 }
 
-.empty-state h2 {
+.empty-state h2,
+.empty-state h3 {
   font-size: 1.35rem;
 }
 
@@ -1269,7 +1329,7 @@ input[type='radio'] {
 .ai-explanation p {
   margin: 0 0 8px;
   font-size: 0.72rem;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--info);
@@ -1356,7 +1416,7 @@ input[type='radio'] {
 .affinity-product-role {
   color: var(--forest);
   font-size: 0.68rem;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -1386,7 +1446,7 @@ input[type='radio'] {
   height: 32px;
   border-radius: var(--radius-pill);
   color: var(--paper-100);
-  font-weight: 900;
+  font-weight: 700;
   background-color: var(--teal-600);
   background-image: linear-gradient(135deg, var(--teal-600), var(--teal-700));
   box-shadow: 0 10px 24px rgba(31, 122, 92, 0.28);
@@ -1419,7 +1479,7 @@ input[type='radio'] {
 .affinity-impact-label {
   color: var(--muted);
   font-size: 0.7rem;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -1505,7 +1565,9 @@ input[type='radio'] {
 }
 
 .supplier-order-header .btn {
-  min-height: 40px;
+  /* Was 40px, overriding the base .btn back under the 44px touch minimum to buy
+     4px of header height. `white-space: nowrap` is what actually keeps this
+     button tidy; the height reduction only made it harder to hit. */
   white-space: nowrap;
 }
 
@@ -1806,7 +1868,7 @@ input[type='radio'] {
   color: var(--forest);
   background: var(--forest-soft);
   font-size: 1.6rem;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .shelf-upload-placeholder p {
@@ -2091,7 +2153,7 @@ input[type='radio'] {
 .report-body li::before {
   content: "•";
   color: var(--forest);
-  font-weight: 900;
+  font-weight: 700;
   margin-inline-end: 8px;
 }
 
@@ -2355,7 +2417,7 @@ input[type='radio'] {
 
 .top-movers-rank {
   color: var(--forest);
-  font-weight: 900;
+  font-weight: 700;
   font-size: 0.86rem;
 }
 
@@ -3629,4 +3691,267 @@ input[type='radio'] {
    push the table sideways. */
 .page-body :is(td, th):has(> .numeric, > .price-cell, > .money) {
   white-space: nowrap;
+}
+
+/* ── Owner questions ─────────────────────────────────────────────────────────
+ * The panel that sits directly above the daily action list.
+ *
+ * Every class below was referenced by QuestionPanel.jsx and defined nowhere, so
+ * the whole section rendered on browser defaults: an indented <dl>, naked
+ * inputs, no card. It looked broken because it was unstyled, not because it was
+ * badly styled.
+ *
+ * The shape deliberately mirrors `.action-card` — content column, decision
+ * column, impact on a footer strip. Two different card languages stacked on one
+ * screen is what made this page read as unfinished.
+ */
+
+.question-panel .question-subtitle {
+  margin-top: 6px;
+}
+
+.question-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.question-card {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--paper-strong);
+  color: var(--ink);
+  box-shadow: var(--shadow-soft);
+}
+
+.question-card-main {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+/* Shrink-to-fit, which is the whole trick.
+ *
+ * A Hebrew product name carries `dir="auto"`, so as a full-width block it
+ * resolves right-to-left and parks itself at the far edge — half a card away
+ * from the question it belongs to, on an English screen. Sized to its own text
+ * instead, the box sits at the container's start edge in either language while
+ * the name keeps its correct right-to-left glyph order. This is the same reason
+ * `.action-card-title` makes its <strong> a flex item. */
+.question-product {
+  display: inline-block;
+  max-width: 100%;
+  margin: 0 0 2px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+.question-ask {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* A default <dl> indents every <dd> by 40px, which turned "Why we ask" and its
+   answer into an outline instead of a label/value pair. */
+.question-meta {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 5px 16px;
+  margin: 0;
+}
+
+.question-meta dt {
+  padding-top: 2px;
+  color: var(--forest);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.question-meta dd {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.question-scale {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: baseline;
+  margin: 0.75rem 0 0;
+  padding-top: 0.625rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.question-scale-sep {
+  color: var(--ink-400);
+}
+
+.question-card-side {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 190px;
+}
+
+.question-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.question-actions .btn {
+  width: 100%;
+}
+
+.question-input {
+  width: 100%;
+  /* Matches .btn — this input sits directly above one, and two controls in a
+     column at different heights read as a mistake before they read as a size. */
+  min-height: 44px;
+  padding: 9px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--paper-strong);
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+
+.question-input:focus-visible {
+  outline: none;
+  border-color: var(--forest);
+  box-shadow: 0 0 0 3px var(--forest-soft);
+}
+
+.question-change {
+  margin-bottom: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(15, 107, 99, 0.2);
+  border-inline-start: 3px solid var(--forest);
+  border-radius: var(--radius-md);
+  background: var(--forest-soft);
+  color: var(--ink);
+  font-size: 0.86rem;
+}
+
+.question-change strong {
+  color: var(--teal-700);
+}
+
+.question-group-source {
+  margin: 0.5rem 0 0;
+  color: var(--ink-400);
+  font-size: 0.75rem;
+}
+
+.question-group-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin: 0.625rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.question-group-list li {
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--paper-200);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 720px) {
+  .question-card {
+    flex-direction: column;
+  }
+
+  .question-card-side {
+    width: 100%;
+  }
+
+  .question-meta {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+
+  .question-meta dt {
+    padding-top: 6px;
+  }
+}
+
+/* ── Operational page rhythm ─────────────────────────────────────────────────
+ * These replace five inline `style={{…}}` objects that set the same spacing by
+ * hand on each section. Same result, but the page's rhythm is now readable in
+ * one place instead of scattered through the JSX.
+ */
+
+.op-panel-desc {
+  margin-top: 0.25rem;
+}
+
+.op-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.op-showall {
+  margin-top: 1rem;
+}
+
+.op-source-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.op-pos-footer {
+  margin-top: 0.75rem;
+}
+
+/* ── Metric card tones ───────────────────────────────────────────────────────
+ * `MetricCard` builds its class as `metric-card-${tone}` and every caller passes
+ * a semantic tone — success, warning, danger, info, neutral. The only tone rules
+ * that existed were named for colours (`-green`, `-blue`, `-amber`), so not one
+ * of them ever matched and every card rendered with no accent at all: the
+ * `::after` wash paints with `currentColor`, which fell back to inherited ink.
+ *
+ * The colour names are kept below for callers that still use them.
+ */
+
+.metric-card-success {
+  color: var(--ok);
+}
+
+.metric-card-warning {
+  color: var(--warn);
+}
+
+.metric-card-danger {
+  color: var(--danger);
+}
+
+.metric-card-info {
+  color: var(--info);
+}
+
+.metric-card-neutral {
+  color: var(--ink-600);
 }
