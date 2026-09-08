@@ -9,7 +9,8 @@
 
 ## Project Docs
 
-- [ARCHITECTURE.md](ARCHITECTURE.md) — how the two pipelines fit together, and every seam between them
+- [design.md](design.md) — the authoritative System Design (intent → specs → design → implementation)
+- [ARCHITECTURE.md](ARCHITECTURE.md) — pre-design trace of the pipelines as they ran on 2026-09-05 (superseded by design.md)
 - [CLAUDE.md](CLAUDE.md) — the rules for working in this repo
 - Older planning docs are in `docs/archive/` and are out of date
 
