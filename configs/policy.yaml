@@ -1,0 +1,53 @@
+# configs/policy.yaml — every declared constant in one place (design.md §10.4).
+# Published verbatim into dashboard.json → meta.thresholds. Change a value here,
+# never in code. Provisional values are marked with the open question they await.
+version: 1
+
+# SPEC-003 — declared, never derived (FR-045, FR-045b, FR-043a)
+price_policy_pct: 60          # owner's stated maximum premium over the balanced reference
+attention_pct: 100            # same-day attention above this premium
+cost_floor_pct: 10            # reference must exceed our cost by this margin
+freshness_days: 14            # OQ-306 provisional: observations older than this drive nothing
+
+# D-4 data-entry artefacts (SPEC-001 FR-010)
+artefact_min_price: 0.5
+artefact_cost_ratio: 2
+max_credible_gap_pct: 300     # legacy credibility.js guard, kept as a COUNTED exclusion (design §22.2)
+
+# SPEC-006
+surface:
+  bound: 10
+  unvalued_places: 3          # OQ-602 provisional
+  # OQ-601 provisional. Hygiene ranks last on purpose: 1,155 records of finite one-time
+  # cleanup would otherwise hold the three reserved places for weeks (design §9.2).
+  unvalued_order: [reconciliation, competitor_position, catalogue_lifecycle, hygiene]
+
+# SPEC-005 D-8
+question_limit: 3
+
+# ARCH-GATE-002 provisional — the basis for "money at stake" on a cost question.
+# FR-085 orders questions by money x yield and never defines the money. This names what the
+# engine computes so the figure can state its own basis and a change is a policy edit, not a
+# silent code change. The alternatives, should the owner disagree: margin_at_risk (needs the
+# cost we are asking for — circular), or units_only (drops price entirely).
+# C-41's existing behaviour does NOT transfer: it ranked by a per-product loss that only exists
+# once a cost is known, which is precisely what is missing here.
+question_money_basis: window_revenue_at_shelf_price   # units sold in the window x current shelf price
+question_yield_factor: 1.0    # an answer is assumed to unlock the whole amount until the pilot says otherwise
+
+# ARCH-GATE-004 provisional — what makes a product structurally uncomparable (SPEC-003 FR-052).
+# A barcode shorter than this is an internal code or a service (car wash, barista coffee), not a
+# retail identifier, so no other shop can carry it and its absence from the comparison is a fact
+# about the catalogue rather than a gap in our data. 1,628 of the 7,674 items are such records.
+uncomparable_min_barcode_digits: 8
+
+# SPEC-001 FR-004 ceiling derivation (reproduces 18% on the pilot distribution)
+ceiling_derivation:
+  band_pct: 2
+  drop_ratio: 0.75
+  min_band_count: 20
+
+# SPEC-004
+implausible_revenue_share: 0.10   # OQ-405 provisional
+full_annual_cycle_months: 12      # OQ-408 provisional
+withdraw_with_stock: false        # OQ-409 — must stay false; the loader refuses true

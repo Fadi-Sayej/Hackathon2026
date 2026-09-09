@@ -263,8 +263,6 @@ def load_policy(path: Path | str | None = None) -> Policy:
         raise ValueError("question_limit may not exceed 3 (D-8)")
     if policy.surface_bound > 10:
         raise ValueError("surface.bound may not exceed 10 (D-9)")
-    from src.engine.registry import check_unvalued_order      # local: registry imports nothing
-    check_unvalued_order(policy.surface_unvalued_order)          # a validator nobody calls is a comment
     if len(set(policy.surface_unvalued_order)) != len(policy.surface_unvalued_order):
         raise ValueError("surface.unvalued_order repeats a capability")
     if policy.question_money_basis not in QUESTION_MONEY_BASES:
@@ -799,15 +797,27 @@ def check_unvalued_order(order) -> None:
         )
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [ ] **Step 4: Arm the validator in `load_policy`**
 
-Run: `python3 -m pytest tests/engine/test_registry.py -q`
-Expected: 8 passed
+`check_unvalued_order` is worth nothing until something calls it. Task 0.1 could not — the
+registry did not exist yet. It does now, so add to `src/engine/policy.py`, immediately before
+the duplicate check:
 
-- [ ] **Step 5: Commit**
+```python
+    from src.engine.registry import check_unvalued_order   # local: registry imports nothing
+    check_unvalued_order(policy.surface_unvalued_order)     # a validator nobody calls is a comment
+```
+
+- [ ] **Step 5: Run both suites**
+
+Run: `python3 -m pytest tests/engine/test_registry.py tests/engine/test_policy.py -q`
+Expected: 13 passed — the policy tests must still pass now that loading a policy also
+checks it against the registry.
+
+- [ ] **Step 6: Commit**
 
 ```bash
-git add src/engine/registry.py tests/engine/test_registry.py
+git add src/engine/registry.py src/engine/policy.py tests/engine/test_registry.py
 git commit -m "Register the seven capabilities, what each needs, and what each may publish
 
 A capability is the smallest unit that can independently become unavailable, so
