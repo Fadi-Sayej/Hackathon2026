@@ -53,7 +53,7 @@ See [`2026-09-08-v1-00-index.md`](plan.md) — applies in full. Additionally for
 - Test: `tests/engine/test_policy.py`
 
 **Interfaces:**
-- Produces: `load_policy(path: Path | None = None) -> Policy`; `Policy` fields: `version: int`, `price_policy_pct: float`, `attention_pct: float`, `cost_floor_pct: float`, `freshness_days: int`, `artefact_min_price: float`, `artefact_cost_ratio: float`, `max_credible_gap_pct: float`, `surface_bound: int`, `surface_unvalued_places: int`, `surface_unvalued_order: tuple[str, ...]`, `question_limit: int`, `ceiling_band_pct: float`, `ceiling_drop_ratio: float`, `ceiling_min_band_count: int`, `implausible_revenue_share: float`, `full_annual_cycle_months: int`, `withdraw_with_stock: bool`, `as_dict() -> dict` (for `meta.thresholds`).
+- Produces: `load_policy(path: Path | None = None) -> Policy`; `QUESTION_MONEY_BASES`; `Policy` fields: `version: int`, `price_policy_pct: float`, `attention_pct: float`, `cost_floor_pct: float`, `freshness_days: int`, `artefact_min_price: float`, `artefact_cost_ratio: float`, `max_credible_gap_pct: float`, `surface_bound: int`, `surface_unvalued_places: int`, `surface_unvalued_order: tuple[str, ...]`, `question_limit: int`, `ceiling_band_pct: float`, `ceiling_drop_ratio: float`, `ceiling_min_band_count: int`, `implausible_revenue_share: float`, `full_annual_cycle_months: int`, `withdraw_with_stock: bool`, `as_dict() -> dict` (for `meta.thresholds`).
 
 - [ ] **Step 1: Write the failing test**
 
@@ -75,6 +75,8 @@ def test_policy_loads_declared_constants():
     assert p.surface_unvalued_places == 3
     assert p.surface_unvalued_order == ("reconciliation", "competitor_position", "catalogue_lifecycle", "hygiene")
     assert p.question_limit == 3
+    assert p.question_money_basis == "window_revenue_at_shelf_price"
+    assert p.uncomparable_min_barcode_digits == 8
     assert p.withdraw_with_stock is False
 
 
@@ -92,6 +94,18 @@ def test_policy_refuses_withdraw_with_stock(tmp_path):
 def test_policy_as_dict_is_json_serialisable():
     import json
     json.dumps(load_policy().as_dict())
+
+
+def test_policy_refuses_an_unimplemented_money_basis():
+    """ARCH-GATE-002: the questions would be ordered by a rule nobody wrote."""
+    import pytest
+    from pathlib import Path as _P
+    bad = _P("/tmp/policy_bad_basis.yaml")
+    bad.write_text("version: 1\nquestion_money_basis: margin_at_risk\n"
+                   "surface:\n  unvalued_order: [reconciliation, competitor_position, "
+                   "catalogue_lifecycle, hygiene]\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="question_money_basis"):
+        load_policy(bad)
 
 
 def test_policy_refuses_an_empty_unvalued_order():
@@ -139,6 +153,22 @@ surface:
 # SPEC-005 D-8
 question_limit: 3
 
+# ARCH-GATE-002 provisional — the basis for "money at stake" on a cost question.
+# FR-085 orders questions by money x yield and never defines the money. This names what the
+# engine computes so the figure can state its own basis and a change is a policy edit, not a
+# silent code change. The alternatives, should the owner disagree: margin_at_risk (needs the
+# cost we are asking for — circular), or units_only (drops price entirely).
+# C-41's existing behaviour does NOT transfer: it ranked by a per-product loss that only exists
+# once a cost is known, which is precisely what is missing here.
+question_money_basis: window_revenue_at_shelf_price   # units sold in the window x current shelf price
+question_yield_factor: 1.0    # an answer is assumed to unlock the whole amount until the pilot says otherwise
+
+# ARCH-GATE-004 provisional — what makes a product structurally uncomparable (SPEC-003 FR-052).
+# A barcode shorter than this is an internal code or a service (car wash, barista coffee), not a
+# retail identifier, so no other shop can carry it and its absence from the comparison is a fact
+# about the catalogue rather than a gap in our data. 1,628 of the 7,674 items are such records.
+uncomparable_min_barcode_digits: 8
+
 # SPEC-001 FR-004 ceiling derivation (reproduces 18% on the pilot distribution)
 ceiling_derivation:
   band_pct: 2
@@ -164,6 +194,10 @@ import yaml
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_PATH = ROOT / "configs" / "policy.yaml"
 
+# The bases the engine actually implements. A policy naming anything else is a
+# misconfiguration, not a fallback: the questions would be ordered by a rule nobody wrote.
+QUESTION_MONEY_BASES = ("window_revenue_at_shelf_price",)
+
 
 @dataclass(frozen=True)
 class Policy:
@@ -179,6 +213,9 @@ class Policy:
     surface_unvalued_places: int
     surface_unvalued_order: tuple
     question_limit: int
+    question_money_basis: str
+    question_yield_factor: float
+    uncomparable_min_barcode_digits: int
     ceiling_band_pct: float
     ceiling_drop_ratio: float
     ceiling_min_band_count: int
@@ -207,6 +244,9 @@ def load_policy(path: Path | str | None = None) -> Policy:
         surface_unvalued_places=int(surface.get("unvalued_places", 3)),
         surface_unvalued_order=tuple(surface.get("unvalued_order") or ()),
         question_limit=int(raw.get("question_limit", 3)),
+        question_money_basis=str(raw.get("question_money_basis", "window_revenue_at_shelf_price")),
+        question_yield_factor=float(raw.get("question_yield_factor", 1.0)),
+        uncomparable_min_barcode_digits=int(raw.get("uncomparable_min_barcode_digits", 8)),
         ceiling_band_pct=float(ceiling.get("band_pct", 2)),
         ceiling_drop_ratio=float(ceiling.get("drop_ratio", 0.75)),
         ceiling_min_band_count=int(ceiling.get("min_band_count", 20)),
@@ -227,6 +267,11 @@ def load_policy(path: Path | str | None = None) -> Policy:
     check_unvalued_order(policy.surface_unvalued_order)          # a validator nobody calls is a comment
     if len(set(policy.surface_unvalued_order)) != len(policy.surface_unvalued_order):
         raise ValueError("surface.unvalued_order repeats a capability")
+    if policy.question_money_basis not in QUESTION_MONEY_BASES:
+        raise ValueError(
+            f"question_money_basis {policy.question_money_basis!r} is not implemented; "
+            f"the engine knows {QUESTION_MONEY_BASES} (ARCH-GATE-002)"
+        )
     if not policy.surface_unvalued_order:
         raise ValueError(
             "surface.unvalued_order must list every unvalued capability in precedence order: "
@@ -238,7 +283,7 @@ def load_policy(path: Path | str | None = None) -> Policy:
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `python3 -m pytest tests/engine/test_policy.py -q`
-Expected: 4 passed
+Expected: 5 passed
 
 - [ ] **Step 5: Commit**
 

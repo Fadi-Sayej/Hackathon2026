@@ -638,11 +638,17 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
               "above": None if ceiling_pct is None else sum(1 for s in states.values() if s == "above"),
               "inverted": sum(1 for s in states.values() if s == "inverted"),
               "excluded_artefact": len(excluded_artefact), "excluded_gap": len(excluded_gap)}
+    # ARCH-GATE-006: the ceiling is derived AFTER the FR-074 withdrawn exclusion — `paired`
+    # already dropped them — so the published population is the live catalogue, not the whole
+    # export, and a withdrawal moves the ceiling. The population travels with the figure.
     thresholds = {"ceiling_pct": ceiling_pct, "ceiling_method": ceiling.method, "ceiling_bands": ceiling.bands,
+                  "ceiling_population": len(kept), "ceiling_population_excludes_withdrawn": True,
                   "artefact_min_price": policy.artefact_min_price, "artefact_cost_ratio": policy.artefact_cost_ratio,
                   "max_credible_gap_pct": policy.max_credible_gap_pct}
     figures = [Figure(k, v, "products", ["pos"], {"ceiling_pct": ceiling_pct}) for k, v in counts.items()]
-    figures.append(Figure("ceiling_pct", ceiling_pct, "percent", ["pos"], {"method": ceiling.method}))
+    figures.append(Figure("ceiling_pct", ceiling_pct, "percent", ["pos"],
+                          {"method": ceiling.method, "population": len(kept),
+                           "excludes_withdrawn": True}))
     return CapabilityOutput(id=CAP, spec=SPEC, status="available", thresholds=thresholds, counts=counts,
                             entries=entries, figures=figures, notes=notes)
 ```
@@ -946,7 +952,7 @@ carries its provisional statement, and 'no row' is recorded as such."
 - Test: `tests/engine/test_owner_questions.py`
 
 **Interfaces:**
-- Consumes: `EngineInputs.products`, `.withdrawn`, `.idle`, `.owner`, `.policy`, and `inputs.sales_summary` (for money at stake).
+- Consumes: `EngineInputs.products`, `.withdrawn`, `.idle`, `.owner`, `.policy`, and `inputs.sales_summary` (for money at stake — basis declared in `policy.question_money_basis`, ARCH-GATE-002).
 - Produces: `run(inputs) -> CapabilityOutput` (`id='owner_questions'`, `admitted=False`) with an extra attribute `questions: dict` = `{status, limit, items: [...], suppressed: {withdrawn, idle, answered, no_effect}}`. Each item: `{question_id, barcode, product_name, department, fact: 'cost_price', why: {products_affected, money_at_stake}, expected_value}`. `counts: {open, suppressed_withdrawn, suppressed_idle, suppressed_answered, suppressed_no_effect}`.
 - Expected value = `money_at_stake × products_affected`; in V1 a cost question resolves exactly one product, so `products_affected = 1` and `money_at_stake` = the product's seven-month revenue (`units_total × selling_price` from the summary, else `units_total × shelf_price`). Ordering is expected value descending, then barcode.
 - A question exists only for a **living** product with no cost price and no recorded answer (FR-080, FR-082, FR-082a).
@@ -1110,12 +1116,15 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
         units = float(s["units_total"]) if s else 0.0
         if units <= 0:
             suppressed["no_effect"] += 1; continue     # not living: answering changes nothing today
+        # ARCH-GATE-002: the basis is declared in policy.yaml and published with the figure,
+        # because FR-085 orders by money and never says which money.
         money = units * (p["shelf_price"] or 0.0)
         items.append({"question_id": _question_id(b), "barcode": b, "product_name": p["product_name"],
                       "department": p["department"], "fact": FACT,
                       "why": {"products_affected": 1, "money_at_stake": round(money, 2),
+                              "money_basis": inputs.policy.question_money_basis,
                               "units_sold": units, "window_id": inputs.window.window_id if inputs.window else None},
-                      "expected_value": round(money * 1, 2)})
+                      "expected_value": round(money * inputs.policy.question_yield_factor, 2)})
     items.sort(key=lambda i: (-i["expected_value"], i["barcode"]))
     counts = {"open": len(items), "suppressed_withdrawn": suppressed["withdrawn"], "suppressed_idle": suppressed["idle"],
               "suppressed_answered": suppressed["answered"], "suppressed_no_effect": suppressed["no_effect"]}
@@ -1349,11 +1358,14 @@ def _fresh(observed_at: Optional[str], run_at: datetime, days: int) -> bool:
     return seen >= run_at - timedelta(days=days)
 
 
-def _is_structurally_uncomparable(p: dict) -> bool:
-    """Services and internal codes: a barcode shorter than 8 digits is not a retail
-    identifier, so no other retailer can carry it (FR-052)."""
+def _is_structurally_uncomparable(p: dict, policy) -> bool:
+    """Services and internal codes: a barcode shorter than the declared length is not a retail
+    identifier, so no other shop can carry it and no comparison is possible (FR-052).
+
+    The length is declared in configs/policy.yaml, not here: ARCH-GATE-004 left the predicate
+    to the spec layer, so it is provisional and must move without a code change."""
     b = p["barcode"]
-    return not b or len(b) < 8
+    return not b or len(b) < policy.uncomparable_min_barcode_digits
 
 
 def run(inputs: EngineInputs) -> CapabilityOutput:
@@ -1398,7 +1410,7 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
         b = p["barcode"]
         if b in withdrawn:
             continue
-        if _is_structurally_uncomparable(p):
+        if _is_structurally_uncomparable(p, policy):
             counts["structurally_uncomparable"] += 1
             continue
         counts["comparable_population"] += 1
