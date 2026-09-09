@@ -611,8 +611,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from src.engine.policy import load_policy
 from src.engine.registry import (
-    CAPABILITIES, INPUT_REASONS, UNVALUED_CAPABILITIES, check_unvalued_order, derive_status,
-    value_policy_for,
+    CAPABILITIES, UNVALUED_CAPABILITIES, check_unvalued_order, derive_status, value_policy_for,
 )
 
 
@@ -665,19 +664,6 @@ def test_status_is_derived_from_requires_not_declared():
     assert derive_status("hygiene", no_pos) == ("unavailable", "no_pos_data")
     # The reason names the input that is missing, not the capability that wanted it.
     assert derive_status("catalogue_lifecycle", no_pos) == ("unavailable", "no_pos_data")
-
-
-def test_every_requires_key_names_a_real_engine_inputs_field():
-    """A misspelt key reads as "input missing" through getattr(), so the capability would
-    publish as unavailable for ever — or KeyError in INPUT_REASONS. Nothing else binds the
-    two files together, and this is the test that settles what `inventory` is."""
-    from dataclasses import fields
-    from src.engine.inputs import EngineInputs
-    names = {f.name for f in fields(EngineInputs)}
-    for cap in CAPABILITIES.values():
-        for key in cap.requires:
-            assert key in names, f"{cap.id} requires {key!r}, absent from EngineInputs"
-            assert key in INPUT_REASONS, f"{key!r} has no reason in INPUT_REASONS"
 
 
 def test_the_unvalued_order_in_policy_covers_every_unvalued_capability():
@@ -811,7 +797,7 @@ the duplicate check:
 - [ ] **Step 5: Run both suites**
 
 Run: `python3 -m pytest tests/engine/test_registry.py tests/engine/test_policy.py -q`
-Expected: 13 passed — the policy tests must still pass now that loading a policy also
+Expected: 12 passed — the policy tests must still pass now that loading a policy also
 checks it against the registry.
 
 - [ ] **Step 6: Commit**
@@ -2116,6 +2102,20 @@ def _silver(tmp_path):
     return silver
 
 
+def test_every_requires_key_names_a_real_engine_inputs_field():
+    """A misspelt key reads as "input missing" through getattr(), so the capability would
+    publish as unavailable for ever — or KeyError in INPUT_REASONS. Nothing else binds the
+    two files together, and this is the test that settles what `inventory` is."""
+    from dataclasses import fields
+    from src.engine.inputs import EngineInputs
+    from src.engine.registry import CAPABILITIES, INPUT_REASONS
+    names = {f.name for f in fields(EngineInputs)}
+    for cap in CAPABILITIES.values():
+        for key in cap.requires:
+            assert key in names, f"{cap.id} requires {key!r}, absent from EngineInputs"
+            assert key in INPUT_REASONS, f"{key!r} has no reason in INPUT_REASONS"
+
+
 def test_products_are_shaped_and_owner_cost_wins(tmp_path):
     silver = _silver(tmp_path)
     owner = OwnerState.from_dict({"status": "available", "pulled_at": "t",
@@ -2282,7 +2282,7 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
 - [ ] **Step 4: Run tests**
 
 Run: `python3 -m pytest tests/engine/test_inputs.py -q`
-Expected: 2 passed
+Expected: 3 passed
 
 - [ ] **Step 5: Commit**
 

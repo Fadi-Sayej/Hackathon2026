@@ -83,6 +83,8 @@ def load_policy(path: Path | str | None = None) -> Policy:
             f"question_money_basis {policy.question_money_basis!r} is not implemented; "
             f"the engine knows {QUESTION_MONEY_BASES} (ARCH-GATE-002)"
         )
+    from src.engine.registry import check_unvalued_order   # local: registry imports nothing
+    check_unvalued_order(policy.surface_unvalued_order)     # a validator nobody calls is a comment
     if len(set(policy.surface_unvalued_order)) != len(policy.surface_unvalued_order):
         raise ValueError("surface.unvalued_order repeats a capability")
     if not policy.surface_unvalued_order:
