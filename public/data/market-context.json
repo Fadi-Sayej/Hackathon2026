@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-08T02:35:21.933913+00:00",
-  "date": "2026-09-08",
+  "generatedAt": "2026-09-09T02:36:53.424524+00:00",
+  "date": "2026-09-09",
   "status": "ok",
   "sources": {
     "weather": "open-meteo",
@@ -9,18 +9,18 @@
     "islamic": "computed_hijri"
   },
   "weather": {
-    "temperatureC": 22.5,
+    "temperatureC": 20.7,
     "precipitation": 0.0,
-    "windSpeed": 6.0,
-    "weatherCode": 2,
+    "windSpeed": 6.7,
+    "weatherCode": 0,
     "label": "warm",
-    "observedAt": "2026-09-08T05:30",
+    "observedAt": "2026-09-09T05:30",
     "lat": 32.114,
     "lon": 34.976,
     "source": "open-meteo"
   },
   "hebrew": {
-    "date": "2026-09-08",
+    "date": "2026-09-09",
     "holidays": [],
     "isErevChag": false,
     "isFastDay": false,
@@ -35,11 +35,11 @@
     "source": "hebcal"
   },
   "islamic": {
-    "date": "2026-09-08",
+    "date": "2026-09-09",
     "hijri": {
       "year": 1448,
       "month": 3,
-      "day": 25
+      "day": 26
     },
     "isRamadan": false,
     "ramadanDay": null,
@@ -47,8 +47,8 @@
     "isEidAlFitr": false,
     "isEidAlAdha": false,
     "ramadanStart": "2027-02-08",
-    "daysToRamadan": 153,
-    "daysToEidAlFitr": 183,
+    "daysToRamadan": 152,
+    "daysToEidAlFitr": 182,
     "phase": null,
     "windows": {
       "ramadan_build_up_days": 21,
@@ -179,6 +179,7 @@
       "4011800617714",
       "4011800628512",
       "4011800630515",
+      "4011800632519",
       "4011800633516",
       "4011800636517",
       "4014400901191",
@@ -1521,6 +1522,7 @@
       "7290110117788",
       "7290110117795",
       "7290110117801",
+      "7290110117818",
       "7290110117849",
       "7290110117856",
       "7290110117863",
@@ -2383,7 +2385,7 @@
       "9780201321029",
       "9800800056"
     ],
-    "days": 29,
+    "days": 30,
     "status": "ok",
     "lift": 1.15
   }
