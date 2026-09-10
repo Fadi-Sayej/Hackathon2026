@@ -27,137 +27,40 @@ rather than a milestone.
 > «رقم مفترض يُثبَّت في اجتماع 12/9» — an assumption to be fixed at the 12/9 meeting, with every
 > date moving with it. This is the input to that conversation.
 
-## Why there is a delivery two weeks out
+## The feature list he is shown
 
-The first version of this plan had him waiting from 12/9 to 23/10 — six weeks — while sending
-daily exports, answering twelve questions and having his staff log every delivery. In return,
-nothing new. That is not a roadmap, it is a request for patience, and he would have read it
-that way.
+One line per feature, one date. No stages, no narrative — that framing was ours, and he does not
+buy stages. Names are the PRD §3 feature register in his vocabulary.
 
-Three things can ship inside two weeks because the hard part already runs:
+| Feature | Register | Date | Bound by |
+|---|---|---|---|
+| مقارنة أسعارك مع المنافسين | F3 | works now | — |
+| كشف فروقات السعر مع Wolt | F1 | works now | — |
+| أصناف تُباع تحت التكلفة | SPEC-GAP-A | works now | — |
+| تدقيق المخزون والسجلات الخاطئة | F2 | works now | — |
+| تسجيل الصلاحية عند الاستلام | — | works now | — |
+| شاشة الصباح — 10 إجراءات فقط | F6 | **27/09** | effort — `rankActions` already orders the set |
+| تنظيف الكتالوج + ملف للـPOS | F4 | **27/09** | effort — the ghost/idle split already runs |
+| أسئلة التكلفة داخل التطبيق | F5 | **27/09** | effort — one missing import path |
+| توصيات الطلب — كم تطلب من كل صنف | F8 | **25/10** | **his two-year reports** |
+| أصناف يبيعها السوق ولا تبيعها | F9 | **25/10** | effort |
+| تتبّع كل رقم — من أين جاء | F7 | **30/10** | effort — the engine rebuild |
+| الطلب حسب الصلاحية | F10 | **20/11** | **30 days of receipt logs from 12/09** |
+| مهل الموردين الحقيقية | F11 | **20/11** | **3 observed deliveries per supplier** |
+| البلانوغرام — ترتيب الرفوف | F12 | **27/11** | shelf photos + F8 + an hour of his rules |
 
-| Deliverable | Why it is cheap | Evidence |
-|---|---|---|
-| The daily list capped at **10** | `rankActions` already orders the whole set; this is a cap and a UI change | `src/lib/analytics/actionPriority.js`, `src/pages/OperationalPage.jsx:157` |
-| The **cleanup list** as a CSV he hands to his POS person | The classification already runs — ghost (no sales, zero stock) vs idle (no sales, has stock) | `scripts/print_figures.py:216-233` |
-| His **twelve answers actually changing tomorrow's numbers** | `product_recommendations.py` already reads `configs/owner_answers.yaml`; what is missing is the path from the browser into it | `src/lib/questions/answerStore.js:82` exports YAML to **paste by hand**; `scripts/import_owner_answers.py` **does not exist** |
+### Two consequences of these dates, recorded rather than hidden
 
-The third is the one that matters most on the day. Asking him for twelve cost answers while the
-only way to use them is for one of us to hand-paste a downloaded file is precisely the bargain
-he is right to be suspicious of. It is roughly a day of work and it converts the ask into an
-exchange.
+**F8 ships before F7.** Order recommendations land 25/10, five days before the engine that makes
+every figure reproducible. So the first ordering recommendations he sees are computed by the
+existing pipeline, not by the rebuilt engine — they are honest, but not yet recomputable in
+front of him, and the two must agree when F7 lands. If they disagree on 30/10, F7 wins and the
+numbers move; say that on the day rather than after.
 
-**The cost, stated honestly:** this is a parallel track on the old pipeline while the engine is
-rebuilt, so about 25–30 hours are spent on code that implementation Phase 1 later replaces
-(`catalogue_lifecycle` supersedes the CSV, `owner_questions` supersedes the import). That is why
-Phase 2 moved from 23/10 to 30/10. Deliberate duplication, bought to remove a six-week silence
-in the middle of a pilot whose whole thesis is that he keeps opening the app.
-
-## The arithmetic behind the dates
-
-Two people, **~15 h/week each = 30 h/week combined** (PRD §5's own assumption). The
-implementation plan has 37 tasks left across four phases, at roughly 4–5 hours each:
-
-| Work | Tasks | Hours |
-|---|---|---|
-| Phase 0 foundations, remaining (0.4 … 0.13) | 10 | 40–50 |
-| Phase 1 capabilities (1.0 … 1.9) | 10 | 40–50 |
-| Phase 2 browser cut-over — **not yet planned** | ~12 | 48–60 |
-| Phase 3 reproduction and gates | 5 | 20–25 |
-| Visible track shipping 27/9 (above) | — | 25–30 |
-| **Total** | **37 +** | **173–215** |
-
-At 30 h/week that is **5.8–7.2 weeks**: 21–31 October. **The dates take the top of that band**,
-because a date the customer can hold us to is worth more than an ambitious one we miss. Tasks
-0.1–0.3 are done and are not in the count.
-
-**No gap between deliveries now exceeds 33 days**, and the first is 17.
-
-## Phase 1 — «ما يعمل اليوم» · What works today
-
-**Present: 12 September 2026 (the meeting).** Nothing to build. This is the app he already has.
-
-| He can | Today |
-|---|---|
-| Open one screen each morning and work down a ranked list | **Today** screen |
-| See where his shelf price and his own Wolt price disagree | 1,147 flagged products |
-| See how his prices sit against Dor Alon, Rami Levy and Shufersal | 1,857 comparisons, each with the date it was seen |
-| See products sold below cost | 104 products |
-| See records that are simply wrong — negative stock, unknown barcode | 625 + 307 records |
-| See stock that cannot reconcile | 458 products |
-| Record expiry dates as goods arrive | **Expiry** screen |
-
-Figures are from `public/data/operational.json`, regenerated by CI on 2026-09-10. **Run
-`npm run figures` on the morning of the meeting** — the collector runs nightly and a number
-written on Thursday is wrong by Saturday (PRD §9).
-
-**What we say plainly, because it is the honest half:** these numbers are not yet reproducible on
-demand, and the daily list is not yet capped at ten. Phase 2 is exactly that work.
-
-**What we need from him on the day** — each of these gates something later:
-
-- The daily POS export, and the rhythm agreed (daily or weekly, and who sends it).
-- Answers to the **12 cost questions**. Without them 1,270 products stay financially invisible.
-- Staff start logging **receipts and expiry that same day** — this starts the 30-day counter and
-  is the only source of the shelf-life data Phase 3 needs. It is calendar-bound: no amount of
-  engineering shortens it.
-- **The two-year sales reports.** Seven months cannot separate seasonal from dead, so until they
-  arrive every catalogue withdrawal is labelled provisional.
-- The waste baseline — roughly how much he throws away monthly. Without a "before", nothing we
-  report at the end can be attributed to us.
-- The two numbers of PRD §8: **what ₪ figure after 30 days makes this a success**, and **the
-  subscription price if it hits**. Agreed now, not later — a free trial with no agreed price
-  measures politeness, not value.
-
----
-
-## Phase 2 — «كل رقم مسنود» · Every number stands up
-
-**Present: 23 October 2026.** This is PRD V1 (intents 1, 2, 2ب, 3, 9, 10) and implementation
-Phases 0–3.
-
-| He gets | Why it matters to him |
-|---|---|
-| **At most 10 actions a day**, ranked by money, one place per product | Ten minutes means ten minutes. Today's list is 4,498 rows |
-| **Every figure recomputable with one command**, in front of him | A number computed while he watches ends an argument; a number quoted off a page starts one |
-| **A cleaned catalogue** — 7,674 items down to ~1,535 live, with a CSV for his POS person | We never write to his POS. He hands the list over himself |
-| **Cost questions inside the app**, at most 3 at a time, and his answers change the next day's numbers | His knowledge stops being lost |
-| **Honest absence** — "unavailable because the sales report did not arrive", never a silent zero | The difference between "nothing to do" and "we could not tell" |
-| **His decisions remembered** — Done and Dismiss stick across devices and days | He is not asked the same question twice |
-
-**What moves this date:** the four things that are not code and not ours —
-Firebase configured end to end, a read-only service-account secret in CI, Vercel preview
-deployments unblocked on account `fadi19`, and the Basic Auth credentials set (unset, the app
-answers 503 to everyone). Every one is a prerequisite of implementation Phase 0 and none is on
-the critical path *after* it, so they are cheap now and expensive in three weeks.
-
-**Then the clock starts.** 30 days of use → **verdict meeting ~22 November**: the ₪ figure was
-reached (subscribe and continue), or it was not but he opens it daily (review the intents with
-him), or he does not open it (we stop honourably, having lost a month rather than a year).
-
-> **One thing to settle before this ships:** the 30-day figure does not compute itself. The
-> System Design removed the telemetry surface that was assumed to measure it, and nothing has
-> been built in its place (ARCH-GATE-003). Either it gets specified before Phase 2 ships, or we
-> say so on 12/9 and count it by hand. Not saying anything is the one option that is not available.
-
----
-
-## Phase 3 — «ماذا أطلب، وكم» · What to order, and how much
-
-**Present: 27 November 2026**, after the verdict meeting. Built during the trial month; shipped
-only if Phase 2's verdict says continue. This is PRD V2 (intents 4, 5, 7).
-
-| He gets | Depends on |
-|---|---|
-| **Order quantities** from market movement and his own sales | The two-year reports, and the sales rhythm holding |
-| **What the market sells that he does not** — 527 products observed today | Competitor coverage, which we already collect nightly |
-| **Quantities bounded by shelf life** — "order 6, not 12; the rest will spoil" | **30 days of his staff's receipt logs**, starting 12/9. This is why the logging matters from day one |
-
-**What moves this date:** the receipt logs. If logging starts on 12/9 the shelf-life data is
-ready around 12/10 and this phase is engineering-bound. If it starts in October, the date moves
-by exactly as long as the delay — no engineering can compress it.
-
----
+**Three dates are not ours to hold.** F8 waits on the two-year reports, F10 on thirty days of
+receipt logging that starts 12/09, F11 on three deliveries per supplier actually happening. No
+amount of engineering compresses any of them, which is why the logging matters from the day of
+the meeting and not from the day we need the data.
 
 ## After the three phases
 
