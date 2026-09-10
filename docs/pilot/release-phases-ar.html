@@ -7,363 +7,175 @@
   @font-face{font-family:'Reem Kufi';font-style:normal;font-weight:700;font-display:swap;src:url(data:font/woff2;base64,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) format('woff2');}
 
   :root {
-    --ground:        #F1F4F1;
-    --surface:       #FBFCFB;
-    --ink:           #15201C;
-    --ink-soft:      #4A5A53;
-    --ink-faint:     #7A8A82;
-    --rule:          #D3DBD5;
-    --rule-strong:   #B3BFB8;
-    --now:           #0E5C4A;
-    --now-wash:      #DDEAE4;
-    --build:         #A76A15;
-    --build-wash:    #F0E4D2;
-    --later:         #4F6373;
-    --later-wash:    #DFE5E9;
-    --font-display: "Reem Kufi", "Cairo", "SF Arabic", "Geeza Pro", sans-serif;
-    --font-body: "Cairo", "SF Arabic", "Noto Sans Arabic", "Geeza Pro", system-ui, sans-serif;
-    --font-num: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --ground:      #F2F4F2;
+    --surface:     #FFFFFF;
+    --ink:         #16211D;
+    --ink-soft:    #52625A;
+    --ink-faint:   #8A9891;
+    --rule:        #D6DED8;
+    --now:         #0D5B49;
+    --now-wash:    #DCEAE4;
+    --build:       #9E6512;
+    --build-wash:  #F2E6D3;
+    --later:       #4C6172;
+    --later-wash:  #DFE6EA;
+    --font-display: "Reem Kufi", "Cairo", "SF Arabic", sans-serif;
+    --font-body: "Cairo", "SF Arabic", "Noto Sans Arabic", system-ui, sans-serif;
+    --font-num: ui-monospace, "SF Mono", Menlo, monospace;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --ground:      #0E1513;
-      --surface:     #151E1B;
-      --ink:         #E6ECE8;
-      --ink-soft:    #A3B2AB;
-      --ink-faint:   #74857D;
-      --rule:        #263330;
-      --rule-strong: #3A4A45;
-      --now:         #59BFA2;
-      --now-wash:    #16302A;
-      --build:       #D69A44;
-      --build-wash:  #2E2417;
-      --later:       #8FA6B5;
-      --later-wash:  #1B252B;
+      --ground: #0D1412; --surface: #16201D; --ink: #E8EEEA; --ink-soft: #AAB8B1;
+      --ink-faint: #7B8B84; --rule: #27332F;
+      --now: #5CC3A5; --now-wash: #15302A;
+      --build: #D89C46; --build-wash: #2F2517;
+      --later: #92A9B8; --later-wash: #1C262C;
     }
   }
   :root[data-theme="dark"] {
-    --ground:      #0E1513;
-    --surface:     #151E1B;
-    --ink:         #E6ECE8;
-    --ink-soft:    #A3B2AB;
-    --ink-faint:   #74857D;
-    --rule:        #263330;
-    --rule-strong: #3A4A45;
-    --now:         #59BFA2;
-    --now-wash:    #16302A;
-    --build:       #D69A44;
-    --build-wash:  #2E2417;
-    --later:       #8FA6B5;
-    --later-wash:  #1B252B;
+    --ground: #0D1412; --surface: #16201D; --ink: #E8EEEA; --ink-soft: #AAB8B1;
+    --ink-faint: #7B8B84; --rule: #27332F;
+    --now: #5CC3A5; --now-wash: #15302A;
+    --build: #D89C46; --build-wash: #2F2517;
+    --later: #92A9B8; --later-wash: #1C262C;
   }
 
   html { direction: rtl; }
   body {
-    background: var(--ground);
-    color: var(--ink);
-    font-family: var(--font-body);
-    font-size: 17.5px;
-    line-height: 1.95;
-    text-rendering: optimizeLegibility;
-    margin: 0;
-    padding: 0 5vw 5rem;
+    background: var(--ground); color: var(--ink);
+    font-family: var(--font-body); font-size: 18px; line-height: 1.9;
+    margin: 0; padding: 0 5vw 4rem;
     -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 46rem; margin: 0 auto; }
+  .wrap { max-width: 40rem; margin: 0 auto; }
 
-  /* ---------- masthead ---------- */
-  header { padding: 3.5rem 0 2rem; border-bottom: 2px solid var(--ink); }
-  .eyebrow {
-    font-family: var(--font-num);
-    font-size: .74rem;
-    letter-spacing: .14em;
-    color: var(--ink-faint);
-    margin: 0 0 1.2rem;
-    direction: ltr;
-    text-align: right;
-  }
-  .eyebrow .ar {
-    font-family: var(--font-body);
-    font-weight: 600;
-    letter-spacing: normal;   /* Arabic joins; tracking breaks the script */
-    font-size: .84rem;
-  }
+  header { padding: 3.5rem 0 2.5rem; text-align: center; }
   h1 {
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 6.2vw, 2.95rem);
-    line-height: 1.5;
-    font-weight: 700;
-    margin: 0 0 1rem;
-    text-wrap: balance;
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(2rem, 7vw, 2.9rem); line-height: 1.5;
+    margin: 0 0 .6rem; text-wrap: balance;
   }
-  .standfirst { font-size: 1.06rem; color: var(--ink-soft); margin: 0; max-width: 34rem; }
+  .sub { color: var(--ink-soft); margin: 0; font-size: 1.05rem; }
 
-  /* ---------- the assumption strip ---------- */
-  .assumption {
-    display: flex; gap: .9rem; align-items: flex-start;
-    background: var(--surface);
-    border: 1px solid var(--rule);
-    border-right: 3px solid var(--ink-faint);
-    padding: 1rem 1.1rem;
-    margin: 2rem 0 0;
-    font-size: .95rem;
-    color: var(--ink-soft);
+  .stage {
+    background: var(--surface); border: 1px solid var(--rule);
+    border-top: 4px solid var(--tone);
+    padding: 1.6rem 1.5rem 1.4rem; margin-bottom: 1.6rem;
   }
-  .assumption b { color: var(--ink); font-weight: 700; }
+  .stage[data-tone="now"]   { --tone: var(--now);   --wash: var(--now-wash); }
+  .stage[data-tone="build"] { --tone: var(--build); --wash: var(--build-wash); }
+  .stage[data-tone="later"] { --tone: var(--later); --wash: var(--later-wash); }
 
-  /* ---------- phases ---------- */
-  .phases { margin: 0; padding: 0; list-style: none; }
-  .phase {
-    position: relative;
-    padding: 3rem 2.2rem 2.6rem 0;
-    border-right: 1px solid var(--rule-strong);
+  .when { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; margin-bottom: .2rem; }
+  .day {
+    font-family: var(--font-num); font-variant-numeric: tabular-nums;
+    font-size: clamp(2rem, 7vw, 2.7rem); font-weight: 700;
+    color: var(--tone); direction: ltr; line-height: 1.2;
   }
-  .phase:last-child { border-right-color: transparent; }
-  .marker {
-    position: absolute; top: 3.4rem; right: -7px;
-    width: 13px; height: 13px; border-radius: 50%;
-    background: var(--ground);
-    border: 3px solid var(--tone);
+  .tag {
+    font-size: .85rem; font-weight: 700; color: var(--tone);
+    background: var(--wash); padding: .25rem .8rem; border-radius: 999px;
   }
-  .phase[data-state="now"] .marker { background: var(--tone); }
-  .phase[data-state="later"] .marker { border-color: var(--rule-strong); }
+  h2 { font-size: 1.25rem; font-weight: 700; margin: .1rem 0 1.1rem; line-height: 1.5; }
 
-  .phase[data-tone="now"]   { --tone: var(--now);   --wash: var(--now-wash); }
-  .phase[data-tone="build"] { --tone: var(--build); --wash: var(--build-wash); }
-  .phase[data-tone="later"] { --tone: var(--later); --wash: var(--later-wash); }
-
-  .head { display: flex; flex-wrap: wrap; align-items: baseline; gap: .75rem 1rem; }
-  .date {
-    font-family: var(--font-num);
-    font-size: clamp(1.6rem, 4.6vw, 2.1rem);
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-    color: var(--tone);
-    direction: ltr;
-    letter-spacing: -.01em;
+  ul.f { list-style: none; margin: 0; padding: 0; }
+  ul.f li {
+    display: grid; grid-template-columns: 1.6rem 1fr; gap: .6rem;
+    align-items: baseline; padding: .5rem 0; font-size: 1.06rem;
   }
-  .state {
-    font-size: .82rem;
-    font-weight: 700;
-    padding: .22rem .7rem;
-    border-radius: 2px;
-    background: var(--wash);
-    color: var(--tone);
-    white-space: nowrap;
+  ul.f li::before {
+    content: "✓"; color: var(--tone); font-weight: 700; font-size: 1.1rem;
+    line-height: 1.7;
   }
-  h2 {
-    font-family: var(--font-body);
-    font-size: clamp(1.35rem, 4.1vw, 1.72rem);
-    font-weight: 700;
-    margin: .55rem 0 1.5rem;
-    line-height: 1.6;
-    text-wrap: balance;
+  ul.f li b { font-weight: 700; }
+  .n {
+    font-family: var(--font-num); font-variant-numeric: tabular-nums;
+    direction: ltr; unicode-bidi: isolate; font-weight: 600; color: var(--tone);
   }
 
-  /* ---------- what he gets ---------- */
-  .gets { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .1rem; }
-  .gets li {
-    display: grid;
-    grid-template-columns: 6.5rem 1fr;
-    gap: 0 1rem;
-    align-items: baseline;
-    padding: .7rem 0;
-    border-bottom: 1px solid var(--rule);
+  .need {
+    margin-top: 1.2rem; padding-top: 1rem; border-top: 1px dashed var(--rule);
+    font-size: .98rem; color: var(--ink-soft);
   }
-  .gets li:first-child { border-top: 1px solid var(--rule); }
-  .fig {
-    font-family: var(--font-num);
-    font-variant-numeric: tabular-nums;
-    font-size: 1.02rem;
-    font-weight: 600;
-    color: var(--tone);
-    direction: ltr;
-    text-align: left;
+  .need b { color: var(--ink); }
+
+  .after {
+    background: transparent; border: 1px dashed var(--rule);
+    padding: 1.3rem 1.5rem; margin-top: 2rem;
   }
-  .fig.none { color: var(--ink-faint); font-weight: 400; font-size: .82rem; }
-  .gets p { margin: 0; }
-  .gets .sub { display: block; font-size: .86rem; color: var(--ink-faint); margin-top: .15rem; }
+  .after .when { margin-bottom: .4rem; }
+  .after .day { font-size: 1.7rem; color: var(--ink-faint); }
+  .after h2 { font-size: 1.1rem; margin: 0 0 .5rem; }
+  .after p { margin: 0; color: var(--ink-soft); font-size: .98rem; }
 
-  /* ---------- asks / risks ---------- */
-  .block { margin-top: 1.8rem; background: var(--surface); border: 1px solid var(--rule); padding: 1.1rem 1.2rem; }
-  .block h3 {
-    font-size: .92rem;
-    color: var(--tone, var(--ink-faint));
-    margin: 0 0 .8rem;
-    font-weight: 700;
-    line-height: 1.5;
+  footer {
+    margin-top: 2.5rem; padding-top: 1.4rem; border-top: 1px solid var(--rule);
+    font-size: .95rem; color: var(--ink-soft); text-align: center;
   }
-  .block ul { margin: 0; padding-right: 1.1rem; }
-  .block li { margin-bottom: .6rem; font-size: .97rem; color: var(--ink-soft); line-height: 1.85; }
-  .block li:last-child { margin-bottom: 0; }
-  .block li b { color: var(--ink); }
-  .block.risk { border-right: 3px solid var(--tone); }
+  footer b { color: var(--ink); }
 
-  /* ---------- closing ---------- */
-  .closing { margin-top: 3.5rem; padding-top: 2rem; border-top: 2px solid var(--ink); }
-  .closing h2 { font-family: var(--font-display); font-size: 1.35rem; line-height: 1.55; margin-bottom: 1.2rem; }
-  .out { list-style: none; margin: 0 0 2rem; padding: 0; }
-  .out li { padding: .8rem 0; border-bottom: 1px solid var(--rule); font-size: .97rem; color: var(--ink-soft); }
-  .out li b { color: var(--ink); display: block; font-weight: 700; font-size: 1.06rem; margin-bottom: .15rem; }
-  .rule-note { font-size: .97rem; color: var(--ink-soft); background: var(--surface); border: 1px solid var(--rule); padding: 1.1rem 1.2rem; }
-  .rule-note b { color: var(--ink); }
-
-  @media (max-width: 34rem) {
-    .gets li { grid-template-columns: 1fr; gap: .2rem; }
-    .fig { text-align: right; direction: ltr; }
-    .phase { padding-left: 0; }
+  @media (max-width: 30rem) {
+    body { font-size: 17px; padding: 0 4vw 3rem; }
+    .stage { padding: 1.3rem 1.1rem 1.1rem; }
   }
 </style>
 
 <div class="wrap">
 
   <header>
-    <p class="eyebrow">SmartShelf · YomYom <span class="ar">كفر قاسم</span> · 2026-09-10</p>
-    <h1>ثلاث مراحل، وثلاثة تواريخ</h1>
-    <p class="standfirst">
-      ما الذي تحصل عليه في كل مرحلة، ومتى بالضبط. كل مرحلة منتج يعمل بيدك — لا خطوة داخلية عندنا.
-    </p>
+    <h1>ماذا تحصل عليه، ومتى</h1>
+    <p class="sub">ثلاث محطّات. في كل واحدة أشياء تعمل بيدك، لا وعود.</p>
   </header>
 
-  <div class="assumption">
-    <div>
-      كل تاريخ هنا مبنيّ على <b>ساعتَي عمل: 30 ساعة أسبوعياً لشخصين</b>. هذا الرقم مفترض، ونثبّته
-      معك يوم 12/9. إن كان الواقع 20 ساعة، تتأخّر المرحلتان الثانية والثالثة أسبوعين إلى ثلاثة —
-      وتسمع ذلك منّا اليوم، لا يوم الاستحقاق.
-    </div>
-  </div>
-
-  <ol class="phases">
-
-    <!-- ============ PHASE 1 ============ -->
-    <li class="phase" data-tone="now" data-state="now">
-      <span class="marker"></span>
-      <div class="head">
-        <span class="date">12/09/2026</span>
-        <span class="state">متاح اليوم</span>
-      </div>
-      <h2>ما يعمل الآن — تفتحه من هذا الاجتماع</h2>
-
-      <ul class="gets">
-        <li><span class="fig">1,147</span><p>صنفاً سعر الرف عندك يخالف سعر Wolt عندك
-          <span class="sub">بياناتك أنت، لا بيانات منافس</span></p></li>
-        <li><span class="fig">1,857</span><p>مقارنة سعر مع دور ألون ورامي ليفي وشوفرسال
-          <span class="sub">كل سعر معه تاريخ رؤيته — تحقّق قبل أن تتصرّف بسعر قديم</span></p></li>
-        <li><span class="fig">104</span><p>أصناف تُباع تحت تكلفتها</p></li>
-        <li><span class="fig">625 · 307</span><p>مخزون سالب · باركود مجهول
-          <span class="sub">سجلات خاطئة تُصلَح، بلا مبلغ — الأرقام مشتقّة من كميات لا نثق بها</span></p></li>
-        <li><span class="fig">458</span><p>صنفاً حسابه لا يُغلق: المخزون والوارد والمباع لا تتّسق</p></li>
-        <li><span class="fig none">شاشة</span><p>تسجيل تاريخ الصلاحية لحظة الاستلام</p></li>
-      </ul>
-
-      <div class="block">
-        <h3>ما نحتاجه منك يوم 12/9 — كل بند يفتح ما بعده</h3>
-        <ul>
-          <li><b>تصدير الجرد</b> يومياً أو أسبوعياً، ومَن يرسله.</li>
-          <li><b>إجابات الـ12 سؤال تكلفة.</b> بدونها يبقى 1,270 صنفاً أعمى مالياً.</li>
-          <li><b>يبدأ الطاقم بتسجيل الاستلام والصلاحية اليوم نفسه.</b> هذا يشغّل عدّاد الـ30 يوماً،
-            وهو المصدر الوحيد لبيانات المرحلة الثالثة. لا تختصره برمجة.</li>
-          <li><b>تقارير مبيعات سنتين.</b> سبعة أشهر لا تفرّق بين الموسمي والميت، فيبقى كل حذف مؤقّتاً.</li>
-          <li><b>كم تهدر شهرياً تقريباً.</b> بلا رقم «قبل»، لا يُنسب إلينا شيء بعد شهر.</li>
-          <li><b>رقمان يُتّفق عليهما اليوم:</b> كم ₪ مستردّة بعد 30 يوماً تجعلها ناجحة، وسعر الاشتراك
-            إن تحقّقت. تجربة مجانية بلا سعر متّفق عليه تقيس المجاملة لا القيمة.</li>
-        </ul>
-      </div>
-
-      <div class="block risk">
-        <h3>وما لا يفعله بعد — نقولها بصراحة</h3>
-        <ul>
-          <li>القائمة اليوم <b>4,498 سطراً</b>، لا عشرة. الترتيب صحيح، لكنّ الحدّ لم يُطبَّق بعد.</li>
-          <li>الأرقام <b>لا يُعاد حسابها أمامك بأمر واحد</b> بعد. هذا بالضبط عمل المرحلة الثانية.</li>
-          <li>لا يقول لك ما الذي سينفد: أنت أخبرتنا أنّ أرقام المخزون غير موثوقة، فحذفنا كل ما يقوم عليها.</li>
-        </ul>
-      </div>
-    </li>
-
-    <!-- ============ PHASE 2 ============ -->
-    <li class="phase" data-tone="build" data-state="build">
-      <span class="marker"></span>
-      <div class="head">
-        <span class="date">23/10/2026</span>
-        <span class="state">قيد البناء</span>
-      </div>
-      <h2>كل رقم مسنود — عشر دقائق تعني عشر دقائق</h2>
-
-      <ul class="gets">
-        <li><span class="fig">10</span><p>إجراءات كحدّ أقصى في اليوم، مرتّبة بالمال، وصنف واحد لا يتكرّر
-          <span class="sub">بدل 4,498 سطراً اليوم</span></p></li>
-        <li><span class="fig none">أمر واحد</span><p>يعيد حساب أي رقم أمامك
-          <span class="sub">رقم يُحسب أمام صاحبه ينهي النقاش؛ رقم منقول عن ورقة يبدأ نقاشاً</span></p></li>
-        <li><span class="fig">7,674 ← 1,535</span><p>كتالوج منظّف، ومعه ملف CSV تسلّمه لمسؤول الـPOS
-          <span class="sub">لا نكتب في نظامك ولا ندّعي ذلك — القائمة بيدك</span></p></li>
-        <li><span class="fig">3</span><p>أسئلة تكلفة كحدّ أقصى على الشاشة، وجوابك يغيّر أرقام الغد</p></li>
-        <li><span class="fig none">«غير متاح»</span><p>حين لا يصل تقرير، تقول الشاشة إنّه لم يصل
-          <span class="sub">الفرق بين «لا يوجد ما تفعله» و«لم نستطع أن نعرف»</span></p></li>
-        <li><span class="fig none">محفوظ</span><p>«تمّ» و«تجاهل» يبقيان عبر الأجهزة والأيام — لا يُسأل عن الشيء مرّتين</p></li>
-      </ul>
-
-      <div class="block risk">
-        <h3>ما قد يؤخّر هذا التاريخ</h3>
-        <ul>
-          <li>أربعة إعدادات ليست برمجة — حساب قاعدة البيانات، ومفتاح للقراءة في التشغيل الآلي،
-            وفكّ الحجب عن النشر التجريبي، وكلمة مرور التطبيق. <b>رخيصة اليوم، غالية بعد ثلاثة أسابيع.</b></li>
-          <li>تأخّر تقارير السنتين يُبقي الحذف مؤقّتاً — يعمل، لكنّه يُعرض بعلامة «مؤقّت».</li>
-        </ul>
-      </div>
-
-      <div class="block">
-        <h3>ثم يبدأ العدّاد</h3>
-        <ul>
-          <li><b>30 يوماً من الاستخدام، واجتماع الحكم في 22/11.</b> ثلاثة أجوبة لا رابع لها:
-            الرقم تحقّق فنكمل باشتراك · لم يتحقّق لكنك تفتحه يومياً فنراجع معك ما تحتاجه فعلاً ·
-            لا تفتحه فنتوقّف بشرف، وقد خسرنا شهراً لا سنة.</li>
-        </ul>
-      </div>
-    </li>
-
-    <!-- ============ PHASE 3 ============ -->
-    <li class="phase" data-tone="later" data-state="later">
-      <span class="marker"></span>
-      <div class="head">
-        <span class="date">27/11/2026</span>
-        <span class="state">بعد قرار الاستمرار</span>
-      </div>
-      <h2>ماذا أطلب، وكم — يُبنى خلال شهر التجربة</h2>
-
-      <ul class="gets">
-        <li><span class="fig none">كمية</span><p>«اطلب N وحدة» من حركة السوق حولك ومن مبيعاتك أنت</p></li>
-        <li><span class="fig">527</span><p>صنفاً يبيعها السوق ولا تبيعها أنت — نرصدها اليوم فعلاً</p></li>
-        <li><span class="fig none">حدّ</span><p>كمية مقيّدة بالصلاحية: «اطلب 6 لا 12، الباقي سيتلف»</p></li>
-      </ul>
-
-      <div class="block risk">
-        <h3>ما يحكم هذا التاريخ — وليس بيدنا</h3>
-        <ul>
-          <li><b>سجلات الاستلام.</b> إن بدأ التسجيل يوم 12/9، تجهز بيانات الصلاحية حوالي 12/10
-            ويصير التاريخ رهن البرمجة وحدها. إن بدأ في تشرين الأول، يتأخّر بمقدار التأخير نفسه بالضبط.
-            <b>لا توجد برمجة تختصر ثلاثين يوماً.</b></li>
-        </ul>
-      </div>
-    </li>
-  </ol>
-
-  <!-- ============ OUT OF SCOPE ============ -->
-  <div class="closing">
-    <h2>ما هو خارج المراحل الثلاث — عمداً</h2>
-    <ul class="out">
-      <li><b>مهل الموردين الحقيقية</b>
-        تُقاس بعد ثلاث تسليمات لكل مورّد. رهن التقويم لا البرمجة: تصل حين تكون التسليمات قد حدثت.</li>
-      <li><b>البلانوغرام — ترتيب الرفوف</b>
-        يحتاج صور رفوفك بأبعادها، وطلباً حقيقياً من المرحلة الثالثة، وساعة من قواعدك أنت.
-        يُعرض كخطة مؤرّخة بشروطها، لا كميزة جاهزة.</li>
-      <li><b>مراقبة الرفوف بحسّاسات أو كاميرات مثبّتة</b>
-        مستبعدة نهائياً، لا مؤجّلة. مشروع عتاد لا يحمله فريق من اثنين، ولن نعِد به لاحقاً.</li>
+  <section class="stage" data-tone="now">
+    <div class="when"><span class="day">12/09</span><span class="tag">يعمل اليوم</span></div>
+    <h2>تفتحه من هذا الاجتماع</h2>
+    <ul class="f">
+      <li>قائمة إجراءات كل صباح، مرتّبة بالأهم</li>
+      <li>مقارنة أسعارك مع ثلاثة منافسين — <span class="n">1,857</span> صنفاً</li>
+      <li>أصناف تُباع تحت التكلفة — <span class="n">104</span></li>
+      <li>فروقات سعر الرف مع Wolt — <span class="n">1,147</span></li>
+      <li>سجلات خاطئة تحتاج تصحيحاً — <span class="n">932</span></li>
+      <li>تسجيل تاريخ الصلاحية عند الاستلام</li>
     </ul>
+    <p class="need"><b>نحتاج منك:</b> تصدير الجرد · إجابات الـ12 سؤال تكلفة ·
+      يبدأ الطاقم بتسجيل الاستلام من اليوم</p>
+  </section>
 
-    <p class="rule-note">
-      <b>القاعدة تحت كل ما سبق:</b> حين لا نستطيع ذكر رقم بصدق، تعرض الشاشة <b>لا رقم</b> — لا صفراً.
-      وهذه القاعدة تنطبق علينا نحن أيضاً: لا مبلغ بالشيكل على أي إشارة مشتقّة من كميات المخزون التي
-      أخبرتنا أنت أنّها غير موثوقة.
-    </p>
-  </div>
+  <section class="stage" data-tone="build">
+    <div class="when"><span class="day">23/10</span><span class="tag">شاشة الصباح كاملة</span></div>
+    <h2>عشر دقائق، وتكون انتهيت</h2>
+    <ul class="f">
+      <li><b>عشرة إجراءات فقط</b> في اليوم، مرتّبة بالمال</li>
+      <li>كتالوج منظّف: <span class="n">7,674 ← 1,535</span> صنفاً، مع ملف جاهز لمسؤول الـPOS</li>
+      <li>أسئلة التكلفة داخل التطبيق، ثلاثة كحدّ أقصى</li>
+      <li>أي رقم يُعاد حسابه أمامك في ثوانٍ</li>
+      <li>«تمّ» و«تجاهل» محفوظة على كل أجهزتك</li>
+    </ul>
+    <p class="need"><b>نحتاج منك:</b> تقارير مبيعات سنتين للوراء</p>
+  </section>
+
+  <section class="stage" data-tone="later">
+    <div class="when"><span class="day">27/11</span><span class="tag">الطلبيات تعمل</span></div>
+    <h2>ماذا أطلب، وكم</h2>
+    <ul class="f">
+      <li><b>كم تطلب</b> من كل صنف</li>
+      <li>ما يبيعه السوق ولا تبيعه أنت — <span class="n">527</span> صنفاً</li>
+      <li>كمية مقيّدة بالصلاحية: «اطلب <span class="n">6</span> لا <span class="n">12</span>»</li>
+      <li>مهل الموردين الحقيقية بدل التخمين</li>
+    </ul>
+    <p class="need"><b>يتوقّف على:</b> ثلاثين يوماً من تسجيل الاستلام — تبدأ 12/09</p>
+  </section>
+
+  <section class="after">
+    <div class="when"><span class="day">15/12</span></div>
+    <h2>البلانوغرام — ترتيب الرفوف</h2>
+    <p>يأتي أخيراً لأنّه يقوم على طلبيات المرحلة السابقة: قبلها ترتيبٌ على تخمين، وبعدها ترتيبٌ
+      على مبيعاتك أنت. يحتاج صور رفوفك بأبعادها وساعة من قواعدك.</p>
+  </section>
+
+  <footer>
+    التواريخ مبنيّة على <b>30 ساعة عمل أسبوعياً لشخصين</b>. نثبّت هذا الرقم معك اليوم،
+    وإن تغيّر تتغيّر التواريخ معه — تسمعها منّا اليوم لا يوم الاستحقاق.
+  </footer>
 </div>

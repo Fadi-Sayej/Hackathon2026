@@ -11,7 +11,13 @@ Related: [Implementation plan](../implementation/plan.md) · [System Design](../
 
 The customer-facing view of [PRD §5](PRD.md#5-releases-and-dates). Same features, regrouped
 into **three things the owner can actually use**, each with a date and each a working product
-rather than a milestone. The Arabic version is what he is shown.
+rather than a milestone.
+
+> **The Arabic page is what he is shown, and it is deliberately thinner than this document.**
+> He wants to read a date and a feature name — «23/10: عشرة إجراءات فقط في اليوم» — not our
+> reasoning about provenance, availability semantics or capacity arithmetic. All of that stays
+> here, where it is for us. The page carries 225 words; this file carries the why behind each
+> of them. If the two ever disagree, this one is wrong: he was told the page.
 
 > **This proposes a change to PRD §5's dates and does not take it.** The PRD is the authority
 > on when we ship. Its table (V1 ~20/9, V2 ~15/10, V4 ~late October) was assembled on 2026-09-08
@@ -127,13 +133,16 @@ by exactly as long as the delay — no engineering can compress it.
 
 ---
 
-## What is deliberately not in the three phases
+## After the three phases
 
-- **Supplier lead times** (PRD V3) needs three observed deliveries per supplier. Calendar-bound,
-  not engineering-bound; it lands when the deliveries have happened.
-- **Planogram** (PRD V4) needs shelf photographs with dimensions, real demand from V2, and an
-  hour of his own arrangement rules. Presented as a dated plan with its conditions, never as a
-  ready feature — and the demo stays hidden until then.
+- **Planogram — 15 December.** PRD V4. It comes last because it rests on Phase 3's ordering:
+  before it, a shelf layout is built on guessed demand and he can tell; after it, the
+  justification is "on your own sales" — a number that can be defended. Needs shelf photographs
+  with dimensions and an hour of his own arrangement rules. **This is on the page he is shown,
+  with a date**, because it is the feature he asks about; the working demo stays hidden until
+  the date, because showing it early turns a dated plan back into a promise.
+- **Supplier lead times** ship inside Phase 3 once three deliveries per supplier have been
+  observed. Calendar-bound, not engineering-bound.
 - **Fixed sensors or cameras** are permanently excluded (D-13). Not deferred. If the shelf-photo
   trial succeeds we promise the photo method with confidence; if it fails we know *before*
   promising.
