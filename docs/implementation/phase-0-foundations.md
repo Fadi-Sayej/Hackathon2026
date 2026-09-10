@@ -6,7 +6,7 @@
 
 **Architecture:** New package `src/engine/` (pure functions over `EngineInputs`), new package `src/owner_state/` (read-only in Python), refactored ingestion under `src/internal_pos/` and `scripts/run_engine.py` as the single orchestrator. At the end of this phase a run publishes a schema-valid `public/data/dashboard.json` whose `capabilities` block is empty — the frame the capabilities plug into.
 
-**Tech Stack:** Python 3.9 (`.venv/bin/python`), pyarrow, pyyaml, jsonschema, firebase-admin, pytest; GitHub Actions.
+**Tech Stack:** Python 3.9+ run as `python3` — there is no virtualenv in this repository (CLAUDE.md rule 2) — pyarrow, pyyaml, jsonschema 4.25.1, firebase-admin, pytest; GitHub Actions. All are installed already; do not run `pip install --break-system-packages`, which this pip (21.2.4) rejects.
 
 **Spec:** [`docs/architecture/system-design.md`](../architecture/system-design.md) §7.1–7.3, §10, §11, §12, §13, §20.2, §23 Phase 0.
 
@@ -15,7 +15,7 @@
 See [`2026-09-08-v1-00-index.md`](plan.md) — applies in full. Additionally for this phase:
 
 - New Python modules use plain `list[dict]` rows read with `pyarrow.parquet.read_table(...).to_pylist()` (the existing engine convention), not polars.
-- Every new module gets a test under `tests/` before its implementation (TDD), run with `.venv/bin/python -m pytest tests/<file> -q`.
+- Every new module gets a test under `tests/` before its implementation (TDD), run with `python3 -m pytest tests/<file> -q`.
 - Barcode normalisation is one function, `src/engine/model.py::norm_barcode`, used everywhere: `str(value or '').strip().lstrip('0')`; empty → `None`.
 
 ## File structure (this phase)
@@ -25,8 +25,8 @@ See [`2026-09-08-v1-00-index.md`](plan.md) — applies in full. Additionally for
 | `configs/policy.yaml` | Every declared constant (design §10.4) |
 | `src/engine/__init__.py` | empty |
 | `src/engine/policy.py` | `Policy` dataclass + `load_policy()` |
-| `src/engine/model.py` | `Value`, `Entry`, `Figure`, `EvidenceWindow`, `CapabilityOutput`, `entry_id`, `norm_barcode` |
-| `src/engine/registry.py` | capability ids, spec ids, value policies |
+| `src/engine/model.py` | `Value`, `Entry`, `Figure`, `EvidenceWindow`, `CapabilityOutput`, `SIGNAL_FAMILIES`, `entry_id`, `norm_barcode` |
+| `src/engine/registry.py` | the seven capability ids, their specs, `requires`, value policies, unvalued order, `derive_status` |
 | `schemas/dashboard.schema.json` | artefact contract (shared with JS) |
 | `src/engine/publish.py` | `build_artefact`, `validate_artefact`, `PublishRefused`, `write_atomic` |
 | `src/engine/inputs.py` | `EngineInputs` + `load_inputs()` |
@@ -53,7 +53,7 @@ See [`2026-09-08-v1-00-index.md`](plan.md) — applies in full. Additionally for
 - Test: `tests/engine/test_policy.py`
 
 **Interfaces:**
-- Produces: `load_policy(path: Path | None = None) -> Policy`; `Policy` fields: `version: int`, `price_policy_pct: float`, `attention_pct: float`, `cost_floor_pct: float`, `freshness_days: int`, `artefact_min_price: float`, `artefact_cost_ratio: float`, `max_credible_gap_pct: float`, `surface_bound: int`, `surface_unvalued_places: int`, `question_limit: int`, `ceiling_band_pct: float`, `ceiling_drop_ratio: float`, `ceiling_min_band_count: int`, `implausible_revenue_share: float`, `full_annual_cycle_months: int`, `withdraw_with_stock: bool`, `as_dict() -> dict` (for `meta.thresholds`).
+- Produces: `load_policy(path: Path | None = None) -> Policy`; `QUESTION_MONEY_BASES`; `Policy` fields: `version: int`, `price_policy_pct: float`, `attention_pct: float`, `cost_floor_pct: float`, `freshness_days: int`, `artefact_min_price: float`, `artefact_cost_ratio: float`, `max_credible_gap_pct: float`, `surface_bound: int`, `surface_unvalued_places: int`, `surface_unvalued_order: tuple[str, ...]`, `question_limit: int`, `ceiling_band_pct: float`, `ceiling_drop_ratio: float`, `ceiling_min_band_count: int`, `implausible_revenue_share: float`, `full_annual_cycle_months: int`, `withdraw_with_stock: bool`, `as_dict() -> dict` (for `meta.thresholds`).
 
 - [ ] **Step 1: Write the failing test**
 
@@ -73,7 +73,10 @@ def test_policy_loads_declared_constants():
     assert p.cost_floor_pct == 10
     assert p.surface_bound == 10
     assert p.surface_unvalued_places == 3
+    assert p.surface_unvalued_order == ("reconciliation", "competitor_position", "catalogue_lifecycle", "hygiene")
     assert p.question_limit == 3
+    assert p.question_money_basis == "window_revenue_at_shelf_price"
+    assert p.uncomparable_min_barcode_digits == 8
     assert p.withdraw_with_stock is False
 
 
@@ -91,11 +94,33 @@ def test_policy_refuses_withdraw_with_stock(tmp_path):
 def test_policy_as_dict_is_json_serialisable():
     import json
     json.dumps(load_policy().as_dict())
+
+
+def test_policy_refuses_an_unimplemented_money_basis():
+    """ARCH-GATE-002: the questions would be ordered by a rule nobody wrote."""
+    import pytest
+    from pathlib import Path as _P
+    bad = _P("/tmp/policy_bad_basis.yaml")
+    bad.write_text("version: 1\nquestion_money_basis: margin_at_risk\n"
+                   "surface:\n  unvalued_order: [reconciliation, competitor_position, "
+                   "catalogue_lifecycle, hygiene]\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="question_money_basis"):
+        load_policy(bad)
+
+
+def test_policy_refuses_an_empty_unvalued_order():
+    """Without an order, the three reserved places are filled by dict chance (OQ-601)."""
+    import pytest
+    from pathlib import Path as _P
+    bad = _P("/tmp/policy_no_order.yaml")
+    bad.write_text("version: 1\nsurface:\n  bound: 10\n  unvalued_places: 3\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="unvalued_order"):
+        load_policy(bad)
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `.venv/bin/python -m pytest tests/engine/test_policy.py -q`
+Run: `python3 -m pytest tests/engine/test_policy.py -q`
 Expected: FAIL — `ModuleNotFoundError: No module named 'src.engine'`
 
 - [ ] **Step 3: Write the policy file and loader**
@@ -121,9 +146,28 @@ max_credible_gap_pct: 300     # legacy credibility.js guard, kept as a COUNTED e
 surface:
   bound: 10
   unvalued_places: 3          # OQ-602 provisional
+  # OQ-601 provisional. Hygiene ranks last on purpose: 1,155 records of finite one-time
+  # cleanup would otherwise hold the three reserved places for weeks (design §9.2).
+  unvalued_order: [reconciliation, competitor_position, catalogue_lifecycle, hygiene]
 
 # SPEC-005 D-8
 question_limit: 3
+
+# ARCH-GATE-002 provisional — the basis for "money at stake" on a cost question.
+# FR-085 orders questions by money x yield and never defines the money. This names what the
+# engine computes so the figure can state its own basis and a change is a policy edit, not a
+# silent code change. The alternatives, should the owner disagree: margin_at_risk (needs the
+# cost we are asking for — circular), or units_only (drops price entirely).
+# C-41's existing behaviour does NOT transfer: it ranked by a per-product loss that only exists
+# once a cost is known, which is precisely what is missing here.
+question_money_basis: window_revenue_at_shelf_price   # units sold in the window x current shelf price
+question_yield_factor: 1.0    # an answer is assumed to unlock the whole amount until the pilot says otherwise
+
+# ARCH-GATE-004 provisional — what makes a product structurally uncomparable (SPEC-003 FR-052).
+# A barcode shorter than this is an internal code or a service (car wash, barista coffee), not a
+# retail identifier, so no other shop can carry it and its absence from the comparison is a fact
+# about the catalogue rather than a gap in our data. 1,628 of the 7,674 items are such records.
+uncomparable_min_barcode_digits: 8
 
 # SPEC-001 FR-004 ceiling derivation (reproduces 18% on the pilot distribution)
 ceiling_derivation:
@@ -150,6 +194,10 @@ import yaml
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_PATH = ROOT / "configs" / "policy.yaml"
 
+# The bases the engine actually implements. A policy naming anything else is a
+# misconfiguration, not a fallback: the questions would be ordered by a rule nobody wrote.
+QUESTION_MONEY_BASES = ("window_revenue_at_shelf_price",)
+
 
 @dataclass(frozen=True)
 class Policy:
@@ -163,7 +211,11 @@ class Policy:
     max_credible_gap_pct: float
     surface_bound: int
     surface_unvalued_places: int
+    surface_unvalued_order: tuple
     question_limit: int
+    question_money_basis: str
+    question_yield_factor: float
+    uncomparable_min_barcode_digits: int
     ceiling_band_pct: float
     ceiling_drop_ratio: float
     ceiling_min_band_count: int
@@ -190,7 +242,11 @@ def load_policy(path: Path | str | None = None) -> Policy:
         max_credible_gap_pct=float(raw.get("max_credible_gap_pct", 300)),
         surface_bound=int(surface.get("bound", 10)),
         surface_unvalued_places=int(surface.get("unvalued_places", 3)),
+        surface_unvalued_order=tuple(surface.get("unvalued_order") or ()),
         question_limit=int(raw.get("question_limit", 3)),
+        question_money_basis=str(raw.get("question_money_basis", "window_revenue_at_shelf_price")),
+        question_yield_factor=float(raw.get("question_yield_factor", 1.0)),
+        uncomparable_min_barcode_digits=int(raw.get("uncomparable_min_barcode_digits", 8)),
         ceiling_band_pct=float(ceiling.get("band_pct", 2)),
         ceiling_drop_ratio=float(ceiling.get("drop_ratio", 0.75)),
         ceiling_min_band_count=int(ceiling.get("min_band_count", 20)),
@@ -207,13 +263,25 @@ def load_policy(path: Path | str | None = None) -> Policy:
         raise ValueError("question_limit may not exceed 3 (D-8)")
     if policy.surface_bound > 10:
         raise ValueError("surface.bound may not exceed 10 (D-9)")
+    if len(set(policy.surface_unvalued_order)) != len(policy.surface_unvalued_order):
+        raise ValueError("surface.unvalued_order repeats a capability")
+    if policy.question_money_basis not in QUESTION_MONEY_BASES:
+        raise ValueError(
+            f"question_money_basis {policy.question_money_basis!r} is not implemented; "
+            f"the engine knows {QUESTION_MONEY_BASES} (ARCH-GATE-002)"
+        )
+    if not policy.surface_unvalued_order:
+        raise ValueError(
+            "surface.unvalued_order must list every unvalued capability in precedence order: "
+            "it decides which unvalued work reaches the three reserved places (OQ-601, design §9.2)."
+        )
     return policy
 ```
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `.venv/bin/python -m pytest tests/engine/test_policy.py -q`
-Expected: 3 passed
+Run: `python3 -m pytest tests/engine/test_policy.py -q`
+Expected: 5 passed
 
 - [ ] **Step 5: Commit**
 
@@ -222,8 +290,9 @@ git add configs/policy.yaml src/engine/__init__.py src/engine/policy.py tests/en
 git commit -m "Declare every engine constant in configs/policy.yaml
 
 The loader refuses withdraw_with_stock=true (OQ-409), a question limit above
-three (D-8) and a surface bound above ten (D-9), so a config edit cannot
-silently reopen a settled decision."
+three (D-8), a surface bound above ten (D-9) and an empty unvalued order, so a
+config edit cannot silently reopen a settled decision or leave the precedence of
+unvalued work to dict order."
 ```
 
 ---
@@ -237,12 +306,13 @@ silently reopen a settled decision."
 **Interfaces:**
 - Produces:
   - `norm_barcode(value) -> str | None`
-  - `entry_id(capability: str, barcode: str | None, variant: str = '') -> str` (16 hex chars)
+  - `SIGNAL_FAMILIES: tuple[str, ...]` — the eleven permanent identity strings (design §10.1), frozen here and never renamed or reused
+  - `entry_id(signal_family: str, barcode: str | None, variant: str = '') -> str` (16 hex chars); raises on a family outside `SIGNAL_FAMILIES` (ADR-009)
   - `@dataclass Value(amount: float, kind: str, certainty: str)`; `VALUE_KINDS = ('per_sale',)`; `CERTAINTIES = ('confirmed', 'estimated')`
-  - `@dataclass Entry(id, capability, barcode, product_name, department, action, characterisation, evidence: dict, value: Value | None, ordering_key: dict, actionable: bool, not_actionable_reason: str | None, attention: str)` with `to_dict()`
+  - `@dataclass Entry(id, signal_family, capability, barcode, product_name, department, action, characterisation, evidence: dict, value: Value | None, ordering_key: dict, actionable: bool, not_actionable_reason: str | None, attention: str)` with `to_dict()` — `signal_family` is permanent identity, `capability` is mutable routing (ADR-009)
   - `@dataclass Figure(name, value, unit, inputs: list[str], thresholds: dict)` with `to_dict()`
   - `@dataclass EvidenceWindow(months: list[str], first, last, count, full_annual_cycle: bool)` with `to_dict()`, `window_id` property (`f"{first}..{last}"`)
-  - `@dataclass CapabilityOutput(id, spec, status, unavailable_reason, window, thresholds, counts, entries, figures, notes)` with `to_dict()` (figures excluded) and classmethod `unavailable(id, spec, reason)`
+  - `@dataclass CapabilityOutput(id, spec, requires, status, unavailable_reason, window, thresholds, counts, entries, figures, notes, extras)` with `to_dict()` (figures excluded; `extras` merged in) and classmethod `unavailable(id, spec, reason)`. `extras` carries the capability-specific fields design §11.4 names — `catalogue_lifecycle`'s `provisional`/`withdrawn`/`statement`, `owner_questions`' `limit`/`items`/`suppressed`, `competitor_position`'s `position` — and may never shadow a contract key. `requires` is copied from the registry and published, so a reader can see what the status was derived from (design §11.2)
 
 - [ ] **Step 1: Write the failing test**
 
@@ -266,10 +336,30 @@ def test_norm_barcode_strips_leading_zeros_and_blanks():
 
 
 def test_entry_id_is_stable_and_independent_of_thresholds():
-    a = entry_id("price_consistency", "7290000041445")
-    b = entry_id("price_consistency", "07290000041445")
+    a = entry_id("price.inverted", "7290000041445")
+    b = entry_id("price.inverted", "07290000041445")
     assert a == b and len(a) == 16
-    assert entry_id("reconciliation", "1", "negative_stock") != entry_id("reconciliation", "1", "no_identifier")
+    assert entry_id("hygiene.negative_stock", "1") != entry_id("hygiene.no_identifier", "1")
+
+
+def test_entry_id_is_pinned_to_the_family_and_nothing_else():
+    """ADR-009: the owner's recorded outcomes must not be orphaned by a taxonomy change.
+
+    The digest is pinned deliberately. These sixteen characters are a key in the owner's
+    Firestore document: any edit to the formula, the separator or the family string changes
+    them, and an unmatched key does not error — it silently stops suppressing an entry he
+    already declined. If this test fails, the change is a data migration, not a refactor."""
+    assert entry_id("hygiene.negative_stock", "9") == "6713c7fd75250c38"
+    assert entry_id("hygiene.negative_stock", "0009") == "6713c7fd75250c38"     # leading zeros stripped
+
+
+def test_entry_id_refuses_an_unregistered_signal_family():
+    try:
+        entry_id("hygiene.typo", "1")
+    except ValueError as err:
+        assert "signal_family" in str(err)
+    else:
+        raise AssertionError("an unenumerated family would create ids nothing can ever match")
 
 
 def test_value_rejects_unknown_kind():
@@ -297,7 +387,7 @@ def test_window_id_and_serialisation():
 
 
 def test_entry_to_dict_serialises_value_and_none():
-    e = Entry(id="x", capability="price_consistency", barcode="1", product_name="n", department="d",
+    e = Entry(id="x", signal_family="price.inverted", capability="price_consistency", barcode="1", product_name="n", department="d",
               action="verify_price", characterisation="confirmed_loss", evidence={"shelf": 10.0},
               value=Value(2.0, "per_sale", "confirmed"), ordering_key={"name": "loss", "value": 2.0},
               actionable=True, not_actionable_reason=None, attention="today")
@@ -309,7 +399,7 @@ def test_entry_to_dict_serialises_value_and_none():
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `.venv/bin/python -m pytest tests/engine/test_model.py -q`
+Run: `python3 -m pytest tests/engine/test_model.py -q`
 Expected: FAIL — `ImportError`
 
 - [ ] **Step 3: Write the model**
@@ -328,14 +418,43 @@ CERTAINTIES = ("confirmed", "estimated")
 STATUSES = ("available", "unavailable")
 ACTIONS = ("verify_price", "count_product", "fix_record", "decide_idle", "review_policy", "check_purchase_cost")
 
+# Permanent identity strings (design §10.1, ADR-009). FROZEN: never rename, never reuse,
+# never delete one that has reached a run. The owner's outcomes in Firestore are keyed on
+# hashes of these, so a change here silently orphans his recorded decisions. Adding a new
+# family is safe; editing an existing one is not.
+#
+# What this key deliberately does NOT carry: an episode. A record that is fixed, breaks again
+# and returns keeps the same id, so a `declined` recorded in the first episode still suppresses
+# the second one. That is OQ-605, left open by both runs of the readiness gate (§19, "Two things
+# the peer review raised that neither run resolved"), and it is a spec-layer question — not a
+# licence to add a dimension here without one.
+SIGNAL_FAMILIES = (
+    "recon.impossible_opening",
+    "hygiene.negative_stock",
+    "hygiene.no_identifier",
+    "hygiene.absent_price",
+    "price.inverted",
+    "price.above_ceiling",
+    "competitor.policy_breach",
+    "competitor.purchase_cost",
+    "catalogue.idle",
+    "catalogue.implausible_quantity",
+    "margin.below_cost",
+)
+
 
 def norm_barcode(value: Any) -> Optional[str]:
     text = str(value or "").strip().lstrip("0")
     return text or None
 
 
-def entry_id(capability: str, barcode: Optional[str], variant: str = "") -> str:
-    key = "|".join([capability, norm_barcode(barcode) or "", variant])
+def entry_id(signal_family: str, barcode: Optional[str], variant: str = "") -> str:
+    """Identity of one finding about one product, stable across runs, thresholds and any
+    future re-carving of the capabilities (ADR-009). The capability id is deliberately
+    NOT part of the key: it is a routing label and may change."""
+    if signal_family not in SIGNAL_FAMILIES:
+        raise ValueError(f"unknown signal_family {signal_family!r}; enumerate it in SIGNAL_FAMILIES first")
+    key = "|".join([signal_family, norm_barcode(barcode) or "", variant])
     return hashlib.sha256(key.encode("utf-8")).hexdigest()[:16]
 
 
@@ -358,6 +477,7 @@ class Value:
 @dataclass
 class Entry:
     id: str
+    signal_family: str
     capability: str
     barcode: Optional[str]
     product_name: Optional[str]
@@ -411,6 +531,7 @@ class CapabilityOutput:
     id: str
     spec: str
     status: str
+    requires: list = field(default_factory=list)
     unavailable_reason: Optional[str] = None
     window: Optional[EvidenceWindow] = None
     thresholds: dict = field(default_factory=dict)
@@ -418,57 +539,96 @@ class CapabilityOutput:
     entries: list = field(default_factory=list)
     figures: list = field(default_factory=list)
     notes: list = field(default_factory=list)
+    extras: dict = field(default_factory=dict)      # capability-specific fields (design §11.4)
+
+    def __post_init__(self) -> None:
+        # `requires` is published beside the status so a reader can see what it was derived
+        # from. It comes from the registry, never from the module: a capability that could
+        # state its own dependencies could state them wrongly.
+        if not self.requires:
+            from src.engine.registry import CAPABILITIES    # local: registry imports nothing
+            if self.id in CAPABILITIES:
+                self.requires = list(CAPABILITIES[self.id].requires)
 
     @classmethod
     def unavailable(cls, id: str, spec: str, reason: str) -> "CapabilityOutput":
         return cls(id=id, spec=spec, status="unavailable", unavailable_reason=reason)
 
     def to_dict(self) -> dict:
-        return {
-            "id": self.id, "spec": self.spec, "status": self.status,
+        d = {
+            "id": self.id, "spec": self.spec, "requires": list(self.requires), "status": self.status,
             "unavailable_reason": self.unavailable_reason,
             "window": self.window.to_dict() if self.window else None,
             "thresholds": dict(self.thresholds), "counts": dict(self.counts),
             "entries": [e.to_dict() for e in self.entries], "notes": list(self.notes),
         }
+        for key, value in self.extras.items():
+            if key in d:
+                raise ValueError(f"extra {key!r} would shadow a contract field of {self.id}")
+            d[key] = value
+        return d
 ```
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `.venv/bin/python -m pytest tests/engine/test_model.py -q`
-Expected: 6 passed
+Run: `python3 -m pytest tests/engine/test_model.py -q`
+Expected: 8 passed
 
 - [ ] **Step 5: Commit**
 
 ```bash
 git add src/engine/model.py tests/engine/test_model.py
-git commit -m "Add the engine vocabulary: typed values, entries, windows, stable entry ids"
+git commit -m "Add the engine vocabulary: typed values, entries, windows, stable entry ids
+
+entry_id hashes a permanent signal_family, never the capability id: a capability
+is a routing label we may re-carve later, and hashing it would orphan every
+outcome the owner has recorded in Firestore — silently, because an unmatched key
+just stops suppressing an entry he already declined (ADR-009)."
 ```
 
 ---
 
-### Task 0.3: Capability registry with value policies
+### Task 0.3: Capability registry — the seven ids, what each needs, what each may publish
 
 **Files:**
 - Create: `src/engine/registry.py`
 - Test: `tests/engine/test_registry.py`
 
 **Interfaces:**
-- Produces: `CAPABILITIES: dict[str, CapabilitySpec]` with `CapabilitySpec(id, spec, value_policy: 'per_sale' | 'none', admitted: bool, ordering_key: str)`; `value_policy_for(capability_id) -> str`; `ADMITTED_ORDER: list[str]` (unvalued precedence: `reconciliation`, `catalogue_lifecycle`).
+- Produces: `CAPABILITIES: dict[str, CapabilitySpec]` with `CapabilitySpec(id, spec, value_policy: 'per_sale' | 'none', admitted: bool, ordering_key: str, requires: tuple[str, ...])`; `INPUT_REASONS: dict[str, str]`; `value_policy_for(capability_id) -> str`; `derive_status(capability_id, inputs) -> (status, reason | None)`; `UNVALUED_CAPABILITIES: tuple[str, ...]`; `check_unvalued_order(order) -> None`.
+- **This registry is the complete capability list** — `capabilities{}` in the artefact is exactly these ids (ADR-014, design §10.2). `hygiene` is one of them: it is the smallest unit that can independently become unavailable, and SPEC-002 §11 requires it to keep emitting when the sales reports do not arrive.
+- `status` is **derived** from `requires` against the inputs that landed. No capability may declare itself available; `derive_status` is the only producer of the value.
 
 - [ ] **Step 1: Write the failing test**
 
 ```python
 # tests/engine/test_registry.py
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from src.engine.registry import CAPABILITIES, value_policy_for
+from src.engine.policy import load_policy
+from src.engine.registry import (
+    CAPABILITIES, UNVALUED_CAPABILITIES, check_unvalued_order, derive_status, value_policy_for,
+)
+
+
+@dataclass
+class _Inputs:
+    """Just enough of EngineInputs to derive a status from."""
+    products: Any = None
+    inventory: Any = None
+    sales_summary: Any = None
+    window: Any = None
+    observations: Any = None
+    matches: Any = None
 
 
 def test_stock_derived_capabilities_carry_no_value():
     assert value_policy_for("reconciliation") == "none"
+    assert value_policy_for("hygiene") == "none"
     assert value_policy_for("catalogue_lifecycle") == "none"
     assert value_policy_for("competitor_position") == "none"
 
@@ -484,59 +644,173 @@ def test_margin_below_cost_is_not_admitted_to_the_surface():
 def test_every_capability_names_its_spec():
     for cap in CAPABILITIES.values():
         assert cap.spec.startswith("SPEC-") or cap.spec == "UNSPECIFIED"
+
+
+def test_hygiene_is_a_capability_of_its_own_and_spec_002_produces_two():
+    """ADR-014: the smallest independently-unavailable unit. SPEC-002 yields two."""
+    assert set(CAPABILITIES) == {"price_consistency", "reconciliation", "hygiene",
+                                 "competitor_position", "catalogue_lifecycle",
+                                 "owner_questions", "margin_below_cost"}
+    assert CAPABILITIES["hygiene"].spec == CAPABILITIES["reconciliation"].spec == "SPEC-002"
+    assert "sales_summary" not in CAPABILITIES["hygiene"].requires
+
+
+def test_status_is_derived_from_requires_not_declared():
+    """SPEC-002 §11 — the seven monthly reports never arrive; hygiene is unaffected."""
+    no_sales = _Inputs(products=[{"barcode": "1"}], inventory=[{"barcode": "1"}], sales_summary=None, window=None)
+    assert derive_status("reconciliation", no_sales) == ("unavailable", "no_sales_evidence")
+    assert derive_status("hygiene", no_sales) == ("available", None)
+    no_pos = _Inputs(products=None, inventory=None)
+    assert derive_status("hygiene", no_pos) == ("unavailable", "no_pos_data")
+    # The reason names the input that is missing, not the capability that wanted it.
+    assert derive_status("catalogue_lifecycle", no_pos) == ("unavailable", "no_pos_data")
+
+
+def test_the_unvalued_order_in_policy_covers_every_unvalued_capability():
+    """A capability missing from the order would never reach a reserved place (FR-106)."""
+    check_unvalued_order(load_policy().surface_unvalued_order)
+    assert set(UNVALUED_CAPABILITIES) == {"reconciliation", "competitor_position",
+                                          "catalogue_lifecycle", "hygiene"}
+    try:
+        check_unvalued_order(("reconciliation", "competitor_position", "catalogue_lifecycle"))
+    except ValueError as err:
+        assert "hygiene" in str(err)
+    else:
+        raise AssertionError("an unlisted unvalued capability must be refused, not silently dropped")
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `.venv/bin/python -m pytest tests/engine/test_registry.py -q`
+Run: `python3 -m pytest tests/engine/test_registry.py -q`
 Expected: FAIL — `ImportError`
 
 - [ ] **Step 3: Write the registry**
 
 ```python
 # src/engine/registry.py
-"""What each capability is allowed to publish (design.md §10.2, ADR-012)."""
+"""The complete capability list: what each needs, and what each may publish.
+
+A capability is the smallest unit that can independently become unavailable (ADR-014).
+That is why `hygiene` is here and not a characterisation inside `reconciliation`: the
+inventory CSV always arrives, the seven monthly sales reports may not, so the two fail
+on different days. Everything else the word "capability" does — a badge, a page, a
+precedence slot, a value policy — follows this unit; none of them defines it.
+
+`status` is derived from `requires` (§11.2), so SPEC-002 §11 — detection unavailable,
+hygiene unaffected — is computed from two lists rather than written by hand."""
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any, Optional, Tuple
 
 
 @dataclass(frozen=True)
 class CapabilitySpec:
     id: str
-    spec: str
-    value_policy: str      # 'per_sale' | 'none'
-    admitted: bool         # may its entries reach the daily surface?
-    ordering_key: str      # name of the per-capability ordering key
+    spec: str                  # many-to-one: SPEC-002 yields reconciliation AND hygiene
+    value_policy: str          # 'per_sale' | 'none'
+    admitted: bool             # may its entries reach the daily surface?
+    ordering_key: str          # name of the per-capability ordering key
+    requires: Tuple[str, ...]  # EngineInputs fields it cannot compute without, most fundamental first
 
 
 CAPABILITIES = {
-    "price_consistency":   CapabilitySpec("price_consistency",   "SPEC-001", "per_sale", True,  "loss_per_sale"),
-    "reconciliation":      CapabilitySpec("reconciliation",      "SPEC-002", "none",     True,  "gap_ratio"),
-    "competitor_position": CapabilitySpec("competitor_position", "SPEC-003", "none",     True,  "premium_pct"),
-    "catalogue_lifecycle": CapabilitySpec("catalogue_lifecycle", "SPEC-004", "none",     True,  "unit_cost"),
-    "owner_questions":     CapabilitySpec("owner_questions",     "SPEC-005", "none",     False, "expected_value"),
-    "margin_below_cost":   CapabilitySpec("margin_below_cost",   "UNSPECIFIED", "per_sale", False, "loss_per_sale"),
+    "price_consistency":   CapabilitySpec("price_consistency",   "SPEC-001", "per_sale", True,  "loss_per_sale",
+                                          ("products",)),
+    "reconciliation":      CapabilitySpec("reconciliation",      "SPEC-002", "none",     True,  "gap_ratio",
+                                          ("products", "inventory", "sales_summary", "window")),
+    "hygiene":             CapabilitySpec("hygiene",             "SPEC-002", "none",     True,  "hygiene_order",
+                                          ("products", "inventory")),
+    "competitor_position": CapabilitySpec("competitor_position", "SPEC-003", "none",     True,  "premium_pct",
+                                          ("products", "observations", "matches")),
+    "catalogue_lifecycle": CapabilitySpec("catalogue_lifecycle", "SPEC-004", "none",     True,  "unit_cost",
+                                          ("products", "inventory", "sales_summary", "window")),
+    "owner_questions":     CapabilitySpec("owner_questions",     "SPEC-005", "none",     False, "expected_value",
+                                          ("products",)),
+    "margin_below_cost":   CapabilitySpec("margin_below_cost",   "UNSPECIFIED", "per_sale", False, "loss_per_sale",
+                                          ("products",)),
 }
 
-# Unvalued precedence for one-product-one-place and interleaving (OQ-601 provisional).
-UNVALUED_PRECEDENCE = ["reconciliation", "catalogue_lifecycle", "competitor_position"]
+# The reason belongs to the missing input, not to the capability: catalogue_lifecycle with
+# no POS file is 'no_pos_data'; the same capability with no monthly reports is
+# 'no_sales_evidence'. Rule-level reasons ('ceiling_degenerate', 'answer_storage_unavailable',
+# 'no_delivery_prices', 'no_comparable_source') are published by the modules themselves.
+INPUT_REASONS = {
+    "products": "no_pos_data",
+    "inventory": "no_inventory_data",
+    "sales_summary": "no_sales_evidence",
+    "window": "no_sales_evidence",
+    "observations": "no_competitor_data",
+    "matches": "no_competitor_data",
+}
+
+# Admitted capabilities that may never carry money (D-1). Their precedence for the three
+# reserved places lives in configs/policy.yaml (surface.unvalued_order, OQ-601), not here:
+# it is a product decision and must move without a code change.
+UNVALUED_CAPABILITIES = tuple(c.id for c in CAPABILITIES.values() if c.admitted and c.value_policy == "none")
 
 
 def value_policy_for(capability_id: str) -> str:
     return CAPABILITIES[capability_id].value_policy
+
+
+def derive_status(capability_id: str, inputs: Any) -> Tuple[str, Optional[str]]:
+    """The only producer of a capability's status (design §11.2, ADR-014).
+
+    This is the only producer of an *input-level* status. A capability may still publish a
+    **rule-level** unavailability of its own — `no_delivery_prices` (no product is price-paired),
+    `no_comparable_source` (every source was format-gated away), `answer_storage_unavailable`
+    (Firestore is unreachable, SPEC-005 §11), `ceiling_degenerate` — because those are facts about
+    the data's content, not about which files landed, and no `requires` list can express them.
+    The rule is: a capability may make itself *more* unavailable, never more available.
+
+    A missing input is None — never an empty frame."""
+    for key in CAPABILITIES[capability_id].requires:
+        if getattr(inputs, key, None) is None:
+            return "unavailable", INPUT_REASONS[key]
+    return "available", None
+
+
+def check_unvalued_order(order) -> None:
+    """Refuse an order that does not cover every unvalued capability exactly once."""
+    missing = set(UNVALUED_CAPABILITIES) - set(order)
+    unknown = set(order) - set(UNVALUED_CAPABILITIES)
+    if missing or unknown:
+        raise ValueError(
+            f"surface.unvalued_order must list exactly {sorted(UNVALUED_CAPABILITIES)}; "
+            f"missing {sorted(missing)}, unknown {sorted(unknown)}. An unlisted capability "
+            "would never reach one of the three reserved places (FR-106)."
+        )
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [ ] **Step 4: Arm the validator in `load_policy`**
 
-Run: `.venv/bin/python -m pytest tests/engine/test_registry.py -q`
-Expected: 4 passed
+`check_unvalued_order` is worth nothing until something calls it. Task 0.1 could not — the
+registry did not exist yet. It does now, so add to `src/engine/policy.py`, immediately before
+the duplicate check:
 
-- [ ] **Step 5: Commit**
+```python
+    from src.engine.registry import check_unvalued_order   # local: registry imports nothing
+    check_unvalued_order(policy.surface_unvalued_order)     # a validator nobody calls is a comment
+```
+
+- [ ] **Step 5: Run both suites**
+
+Run: `python3 -m pytest tests/engine/test_registry.py tests/engine/test_policy.py -q`
+Expected: 12 passed — the policy tests must still pass now that loading a policy also
+checks it against the registry.
+
+- [ ] **Step 6: Commit**
 
 ```bash
-git add src/engine/registry.py tests/engine/test_registry.py
-git commit -m "Register the six capabilities with their value policies and admission"
+git add src/engine/registry.py src/engine/policy.py tests/engine/test_registry.py
+git commit -m "Register the seven capabilities, what each needs, and what each may publish
+
+A capability is the smallest unit that can independently become unavailable, so
+data hygiene is one of them and not a characterisation inside reconciliation: the
+inventory CSV always arrives, the monthly sales reports may not (ADR-014). Status
+is derived from requires, so SPEC-002 §11 falls out of two lists instead of being
+written by hand and getting it wrong."
 ```
 
 ---
@@ -550,12 +824,19 @@ git commit -m "Register the six capabilities with their value policies and admis
 - Test: `tests/engine/test_publish.py`
 
 **Interfaces:**
-- Produces: `build_artefact(outputs: list[CapabilityOutput], *, vintages: dict, thresholds: dict, run: dict, catalogue: dict | None, questions: dict | None, generated_at: str, run_id: str) -> dict`; `validate_artefact(artefact: dict) -> None` (raises `PublishRefused`); `write_atomic(path: Path, artefact: dict) -> Path`; `PublishRefused(RuntimeError)`.
+- Produces: `build_artefact(outputs: list[CapabilityOutput], *, vintages: dict, thresholds: dict, run: dict, extra_figures: list[Figure] | None = None, generated_at: str, run_id: str) -> dict`; `validate_artefact(artefact: dict, *, require_complete_registry: bool = False) -> None` (raises `PublishRefused`); `write_atomic(path: Path, artefact: dict, *, require_complete_registry: bool = False) -> Path`; `PublishRefused(RuntimeError)`.
 - The schema is the contract both sides validate (design §11.4).
+- **`capabilities{}` is exactly the registry id set** (ADR-014). There is no top-level `catalogue` or `questions` block: `catalogue_lifecycle` and `owner_questions` publish inside `capabilities{}` like every other capability, and their extra fields (`withdrawn`, `statement`, `provisional`; `limit`, `items`, `suppressed`) travel as capability-specific extras. Without this, the publisher's "refuse any capability without a status" rule cannot run over them.
+- Completeness is asserted only when the engine ran its full default runner set — a test injecting two capabilities is not a broken artefact, but a production run missing one is. It turns on by itself in Phase 1.8, when `DEFAULT_RUNNERS` stops being empty.
 
 - [ ] **Step 1: Install jsonschema and write the failing test**
 
-Run: `echo 'jsonschema>=4.0' >> requirements.txt && .venv/bin/pip install -q 'jsonschema>=4.0'`
+Run: `echo 'jsonschema>=4.0' >> requirements.txt && python3 -c 'import jsonschema; print(jsonschema.__name__)'`
+Expected: `jsonschema` — it is already installed (4.25.1). If the import fails, install it with
+`python3 -m pip install -q 'jsonschema>=4.0'`. **Do not add `--break-system-packages`**: this
+machine's pip is 21.2.4 and the flag arrived in pip 23.0.1, so the command exits 2 and the `&&`
+chain makes that fatal. (CLAUDE.md rule 2 quotes the flag from `setup.sh`, which has the same
+defect and has evidently not been run on this interpreter.)
 
 ```python
 # tests/engine/test_publish.py
@@ -578,8 +859,7 @@ RUN = {"status": "ok", "steps": []}
 
 def _artefact(outputs):
     return build_artefact(outputs, vintages=VINTAGES, thresholds={"surface": {"bound": 10, "unvalued_places": 3}},
-                          run=RUN, catalogue=None, questions=None,
-                          generated_at="2026-09-08T00:00:00+00:00", run_id="r1")
+                          run=RUN, generated_at="2026-09-08T00:00:00+00:00", run_id="r1")
 
 
 def test_empty_capability_set_is_a_valid_artefact():
@@ -597,20 +877,33 @@ def test_refuses_a_capability_without_status():
 
 
 def test_refuses_value_on_a_none_policy_capability():
-    e = Entry(id="a", capability="reconciliation", barcode="1", product_name=None, department=None,
+    e = Entry(id="a1b2c3d4e5f60718", signal_family="recon.impossible_opening", capability="reconciliation", barcode="1",
+              product_name=None, department=None,
               action="count_product", characterisation="inconsistent", evidence={},
               value=Value(5.0, "per_sale", "confirmed"), ordering_key={"name": "gap_ratio", "value": 1.0})
     out = CapabilityOutput(id="reconciliation", spec="SPEC-002", status="available", entries=[e])
+    # The id must be a real 16-hex entry id, or the schema refuses first and this test
+    # passes for the wrong reason — it would never exercise the money rule at all.
     with pytest.raises(PublishRefused, match="value_policy"):
         validate_artefact(_artefact([out]))
 
 
 def test_value_kinds_present_is_derived():
-    e = Entry(id="a", capability="price_consistency", barcode="1", product_name=None, department=None,
+    e = Entry(id="b1c2d3e4f5061728", signal_family="price.inverted", capability="price_consistency", barcode="1",
+              product_name=None, department=None,
               action="verify_price", characterisation="confirmed_loss", evidence={},
               value=Value(5.0, "per_sale", "confirmed"), ordering_key={"name": "loss_per_sale", "value": 5.0})
     out = CapabilityOutput(id="price_consistency", spec="SPEC-001", status="available", entries=[e])
     assert _artefact([out])["value_kinds_present"] == ["per_sale"]
+
+
+def test_a_full_run_missing_a_registry_id_is_refused():
+    """ADR-014: capabilities{} is exactly the registry. A capability that silently stops
+    being published reads on the page as "nothing to act on", not as "unavailable"."""
+    art = _artefact([CapabilityOutput.unavailable("reconciliation", "SPEC-002", "no_sales_evidence")])
+    validate_artefact(art)                                   # a partial run is fine
+    with pytest.raises(PublishRefused, match="hygiene"):
+        validate_artefact(art, require_complete_registry=True)
 
 
 def test_write_atomic_never_leaves_a_torn_file(tmp_path):
@@ -623,7 +916,7 @@ def test_write_atomic_never_leaves_a_torn_file(tmp_path):
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `.venv/bin/python -m pytest tests/engine/test_publish.py -q`
+Run: `python3 -m pytest tests/engine/test_publish.py -q`
 Expected: FAIL — `ImportError`
 
 - [ ] **Step 3: Write the schema**
@@ -635,7 +928,7 @@ Expected: FAIL — `ImportError`
   "title": "SmartShelf dashboard artefact v2",
   "type": "object",
   "required": ["schema_version", "generated_at", "run_id", "run", "vintages", "thresholds",
-               "value_kinds_present", "capabilities", "catalogue", "questions", "figures"],
+               "value_kinds_present", "capabilities", "figures"],
   "additionalProperties": false,
   "properties": {
     "schema_version": { "const": 2 },
@@ -673,8 +966,6 @@ Expected: FAIL — `ImportError`
       "type": "object",
       "additionalProperties": { "$ref": "#/$defs/capability" }
     },
-    "catalogue": { "type": ["object", "null"] },
-    "questions": { "type": ["object", "null"] },
     "figures": {
       "type": "object",
       "additionalProperties": { "type": "object", "required": ["value", "unit", "inputs", "thresholds"],
@@ -691,10 +982,15 @@ Expected: FAIL — `ImportError`
     },
     "entry": {
       "type": "object",
-      "required": ["id", "capability", "barcode", "product_name", "department", "action", "characterisation",
-                   "evidence", "value", "ordering_key", "actionable", "not_actionable_reason", "attention"],
+      "required": ["id", "signal_family", "capability", "barcode", "product_name", "department", "action",
+                   "characterisation", "evidence", "value", "ordering_key", "actionable",
+                   "not_actionable_reason", "attention"],
       "properties": {
         "id": { "type": "string", "pattern": "^[0-9a-f]{16}$" },
+        "signal_family": { "enum": ["recon.impossible_opening", "hygiene.negative_stock", "hygiene.no_identifier",
+                                    "hygiene.absent_price", "price.inverted", "price.above_ceiling",
+                                    "competitor.policy_breach", "competitor.purchase_cost", "catalogue.idle",
+                                    "catalogue.implausible_quantity", "margin.below_cost"] },
         "capability": { "type": "string" },
         "barcode": { "type": ["string", "null"] },
         "product_name": { "type": ["string", "null"] },
@@ -711,11 +1007,13 @@ Expected: FAIL — `ImportError`
       }
     },
     "capability": {
+      "comment": "Extra properties are allowed: catalogue_lifecycle adds withdrawn/statement/provisional and owner_questions adds limit/items/suppressed (design §11.4).",
       "type": "object",
-      "required": ["id", "spec", "status", "unavailable_reason", "window", "thresholds", "counts", "entries", "notes"],
+      "required": ["id", "spec", "requires", "status", "unavailable_reason", "window", "thresholds", "counts", "entries", "notes"],
       "properties": {
         "id": { "type": "string" },
         "spec": { "type": "string" },
+        "requires": { "type": "array", "items": { "type": "string" } },
         "status": { "enum": ["available", "unavailable"] },
         "unavailable_reason": { "type": ["string", "null"] },
         "window": { "type": ["object", "null"] },
@@ -767,11 +1065,13 @@ def value_kinds_present(outputs: list[CapabilityOutput]) -> list[str]:
     return sorted(kinds)
 
 
-def build_artefact(outputs, *, vintages, thresholds, run, catalogue, questions, generated_at, run_id) -> dict:
+def build_artefact(outputs, *, vintages, thresholds, run, generated_at, run_id, extra_figures=None) -> dict:
     figures = {}
     for out in outputs:
         for f in out.figures:
             figures[f"{out.id}.{f.name}"] = f.to_dict()
+    for f in extra_figures or []:                 # provenance vintages: figures, not a capability
+        figures[f"provenance.{f.name}"] = f.to_dict()
     return {
         "schema_version": 2,
         "generated_at": generated_at,
@@ -781,17 +1081,22 @@ def build_artefact(outputs, *, vintages, thresholds, run, catalogue, questions, 
         "thresholds": thresholds,
         "value_kinds_present": value_kinds_present(outputs),
         "capabilities": {out.id: out.to_dict() for out in outputs},
-        "catalogue": catalogue,
-        "questions": questions,
         "figures": figures,
     }
 
 
-def validate_artefact(artefact: dict) -> None:
+def validate_artefact(artefact: dict, *, require_complete_registry: bool = False) -> None:
     try:
         jsonschema.validate(artefact, _schema())
     except jsonschema.ValidationError as err:
         raise PublishRefused(f"artefact violates schema: {err.message} at {list(err.absolute_path)}") from err
+    if require_complete_registry:
+        missing = sorted(set(CAPABILITIES) - set(artefact["capabilities"]))
+        if missing:
+            raise PublishRefused(
+                f"capabilities{{}} must be exactly the registry (ADR-014); missing {missing}. "
+                "An absent capability renders as 'nothing to act on', not as 'unavailable'."
+            )
     for cap_id, cap in artefact["capabilities"].items():
         if cap.get("status") not in ("available", "unavailable"):
             raise PublishRefused(f"capability {cap_id} has no status")
@@ -807,8 +1112,8 @@ def validate_artefact(artefact: dict) -> None:
         raise PublishRefused("more than one value kind present; FR-106 allocation must be re-derived (GAP-002)")
 
 
-def write_atomic(path: Path, artefact: dict) -> Path:
-    validate_artefact(artefact)
+def write_atomic(path: Path, artefact: dict, *, require_complete_registry: bool = False) -> Path:
+    validate_artefact(artefact, require_complete_registry=require_complete_registry)
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
     tmp.write_text(json.dumps(artefact, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -818,8 +1123,8 @@ def write_atomic(path: Path, artefact: dict) -> Path:
 
 - [ ] **Step 5: Run test to verify it passes**
 
-Run: `.venv/bin/python -m pytest tests/engine/test_publish.py -q`
-Expected: 5 passed
+Run: `python3 -m pytest tests/engine/test_publish.py -q`
+Expected: 6 passed
 
 - [ ] **Step 6: Commit**
 
@@ -827,8 +1132,10 @@ Expected: 5 passed
 git add schemas/dashboard.schema.json src/engine/publish.py tests/engine/test_publish.py requirements.txt
 git commit -m "Add the artefact schema and a publisher that refuses before writing
 
-Missing status, a value on a stock-derived capability, or more than one value
-kind all refuse the publish. The write is tmp+rename so a reader never sees a
+Missing status, a value on a stock-derived capability, more than one value kind,
+or — on a full run — a registry id absent from capabilities{} all refuse the
+publish. catalogue and questions live inside capabilities{} so the status rule
+runs over them too (ADR-014). The write is tmp+rename so a reader never sees a
 torn file and the last good artefact survives every failure."
 ```
 
@@ -969,7 +1276,7 @@ def test_missing_mirror_is_unavailable(tmp_path):
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `.venv/bin/python -m pytest tests/owner_state -q`
+Run: `python3 -m pytest tests/owner_state -q`
 Expected: FAIL — `ImportError`
 
 - [ ] **Step 3: Write the model**
@@ -1111,7 +1418,7 @@ def read_mirror(path: Path = MIRROR_PATH) -> OwnerState:
 
 - [ ] **Step 5: Run tests to verify they pass**
 
-Run: `.venv/bin/python -m pytest tests/owner_state -q`
+Run: `python3 -m pytest tests/owner_state -q`
 Expected: 9 passed
 
 - [ ] **Step 6: Add the mirror path to git's force-add rule and commit**
@@ -1211,7 +1518,7 @@ def test_no_reports_means_no_window(tmp_path):
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `.venv/bin/python -m pytest tests/internal_pos/test_sales_importer.py -q`
+Run: `python3 -m pytest tests/internal_pos/test_sales_importer.py -q`
 Expected: FAIL — `ImportError`
 
 - [ ] **Step 3: Write the importer**
@@ -1360,7 +1667,7 @@ def import_sales(directory: Path, *, inventory_as_of: Optional[date], full_cycle
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `.venv/bin/python -m pytest tests/internal_pos/test_sales_importer.py -q`
+Run: `python3 -m pytest tests/internal_pos/test_sales_importer.py -q`
 Expected: 4 passed
 
 - [ ] **Step 5: Replace the CLI body with a wrapper**
@@ -1474,7 +1781,7 @@ def test_missing_silver_has_no_vintage(tmp_path):
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `.venv/bin/python -m pytest tests/internal_pos/test_pos_importer.py -q`
+Run: `python3 -m pytest tests/internal_pos/test_pos_importer.py -q`
 Expected: FAIL — `TypeError: unexpected keyword 'as_of'`
 
 - [ ] **Step 3: Implement**
@@ -1522,7 +1829,7 @@ In `scripts/import_yomyom_pos.py`, add `parser.add_argument("--as-of", default=N
 
 - [ ] **Step 4: Run tests**
 
-Run: `.venv/bin/python -m pytest tests/internal_pos -q`
+Run: `python3 -m pytest tests/internal_pos -q`
 Expected: all pass (6)
 
 - [ ] **Step 5: Commit**
@@ -1605,7 +1912,7 @@ def test_barcode_exact_ignores_leading_zeros():
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `.venv/bin/python -m pytest tests/signals tests/matching -q`
+Run: `python3 -m pytest tests/signals tests/matching -q`
 Expected: FAIL (barcode `0007290000041445` kept as-is; dedupe drops `("1","s2")`; `competitor_store_id` missing)
 
 - [ ] **Step 3: Implement**
@@ -1640,7 +1947,7 @@ In `_pass_barcode_exact`, build the index as `by_barcode: dict[str, list[dict]]`
 
 - [ ] **Step 4: Run tests**
 
-Run: `.venv/bin/python -m pytest tests/signals tests/matching -q`
+Run: `python3 -m pytest tests/signals tests/matching -q`
 Expected: 3 passed
 
 - [ ] **Step 5: Commit**
@@ -1686,7 +1993,7 @@ def test_context_only_and_comparable_partition_the_non_excluded():
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `.venv/bin/python -m pytest tests/test_store_types.py -q`
+Run: `python3 -m pytest tests/test_store_types.py -q`
 Expected: FAIL — `AttributeError: client_store_ids`
 
 - [ ] **Step 3: Implement**
@@ -1716,7 +2023,7 @@ Expected: FAIL — `AttributeError: client_store_ids`
 
 - [ ] **Step 4: Run tests**
 
-Run: `.venv/bin/python -m pytest tests/test_store_types.py -q`
+Run: `python3 -m pytest tests/test_store_types.py -q`
 Expected: all pass
 
 - [ ] **Step 5: Commit**
@@ -1745,6 +2052,7 @@ know which observations are ours."
 @dataclass
 class EngineInputs:
     products: list[dict] | None      # barcode (normalised), product_name, department, shelf_price, delivery_price, cost_price, cost_source, recorded_stock, has_identifier
+    inventory: list[dict] | None     # the stock table itself — present/absent independently of the product table
     sales_monthly: list[dict] | None
     sales_summary: dict[str, dict] | None   # by barcode
     window: EvidenceWindow | None
@@ -1759,7 +2067,9 @@ class EngineInputs:
 ```
 
 - `load_inputs(*, policy, owner, run_at, silver_dir=SILVER_POS_ROOT, signals_dir=..., matches_path=..., stores=None) -> EngineInputs`
+- `inventory` is carried as its own field as well as merged into `products` (design §11.1). Without it, a missing `yomyom_inventory.parquet` shapes every product with `recorded_stock: None` and `hygiene` publishes `negative_stock: 0` — absence rendered as zero, the one thing ARCH-DRIVER-002 and INV-057 forbid. With it, `derive_status` makes hygiene *unavailable* instead.
 - Product shaping rules: `delivery_price = wolt_price if wolt_price > 0 else None`; `cost_price = owner answer if answered else (pos cost if > 0 else None)`, `cost_source ∈ {'owner','pos',None}`; `recorded_stock` raw float or `None`; `department` = `category`.
+- **`inputs.py` is the single producer of the effective cost price** (ARCH-GATE-007, readiness gate §18 action 6). Four capabilities consume it — `owner_questions`, `competitor_position`'s cost floor, `catalogue_lifecycle`'s idle ordering and `margin_below_cost` — and none of them may re-derive it: a capability that recomputed the owner-over-POS precedence would answer a question the owner has already answered. `cost_source` travels with the value so every consumer can state which it used (INV-042).
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1792,6 +2102,20 @@ def _silver(tmp_path):
     return silver
 
 
+def test_every_requires_key_names_a_real_engine_inputs_field():
+    """A misspelt key reads as "input missing" through getattr(), so the capability would
+    publish as unavailable for ever — or KeyError in INPUT_REASONS. Nothing else binds the
+    two files together, and this is the test that settles what `inventory` is."""
+    from dataclasses import fields
+    from src.engine.inputs import EngineInputs
+    from src.engine.registry import CAPABILITIES, INPUT_REASONS
+    names = {f.name for f in fields(EngineInputs)}
+    for cap in CAPABILITIES.values():
+        for key in cap.requires:
+            assert key in names, f"{cap.id} requires {key!r}, absent from EngineInputs"
+            assert key in INPUT_REASONS, f"{key!r} has no reason in INPUT_REASONS"
+
+
 def test_products_are_shaped_and_owner_cost_wins(tmp_path):
     silver = _silver(tmp_path)
     owner = OwnerState.from_dict({"status": "available", "pulled_at": "t",
@@ -1818,7 +2142,7 @@ def test_missing_silver_yields_none_products(tmp_path):
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `.venv/bin/python -m pytest tests/engine/test_inputs.py -q`
+Run: `python3 -m pytest tests/engine/test_inputs.py -q`
 Expected: FAIL — `ImportError`
 
 - [ ] **Step 3: Implement**
@@ -1848,6 +2172,7 @@ OUR_FORMAT = "gas_convenience"
 @dataclass
 class EngineInputs:
     products: Optional[list]
+    inventory: Optional[list]        # design §11.1: its own field, so its absence is statable
     sales_monthly: Optional[list]
     sales_summary: Optional[dict]
     window: Optional[EvidenceWindow]
@@ -1948,15 +2273,16 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
         "owner_state": {"pulled_at": owner.pulled_at, "status": owner.status},
     }
     vintages["sales"] = {k: vintages["sales"][k] for k in ("months", "first", "last", "full_annual_cycle")}
-    return EngineInputs(products=products, sales_monthly=monthly, sales_summary=summary, window=window,
+    return EngineInputs(products=products, inventory=inventory or None,
+                        sales_monthly=monthly, sales_summary=summary, window=window,
                         observations=observations, matches=matches, stores=stores, withdrawn=None,
                         vintages=vintages, owner=owner, policy=policy, run_at=run_at)
 ```
 
 - [ ] **Step 4: Run tests**
 
-Run: `.venv/bin/python -m pytest tests/engine/test_inputs.py -q`
-Expected: 2 passed
+Run: `python3 -m pytest tests/engine/test_inputs.py -q`
+Expected: 3 passed
 
 - [ ] **Step 5: Commit**
 
@@ -1979,9 +2305,9 @@ before any capability can see them; an owner's cost answer beats the export."
 - Test: `tests/engine/test_run.py`
 
 **Interfaces:**
-- Produces: `run_engine(*, mode: str = 'publish', input_csv: Path | None = None, skip_market: bool = False, artefact_path: Path = ARTEFACT_PATH, capability_runners: dict | None = None, now: datetime | None = None) -> dict` returning `{"status": "ok"|"partial"|"degraded", "steps": [...], "artefact": dict | None, "published": bool}`.
+- Produces: `run_engine(*, mode: str = 'publish', input_csv: Path | None = None, skip_market: bool = False, artefact_path: Path = ARTEFACT_PATH, capability_runners: dict | None = None, now: datetime | None = None, silver_dir: Path = SILVER_DIR, sales_dir: Path = SALES_DIR) -> dict`. The two directories are parameters, not constants, so a caller can run the whole engine over a copy of the data with an input withheld — which is what Task 1.9 does. Nothing else in V1 passes them returning `{"status": "ok"|"partial"|"degraded", "steps": [...], "artefact": dict | None, "published": bool}`.
 - Step order: `owner_state_pull` → `pos_import` (only with `--input`) → `sales_import` → `market_context` (V2, kept) → `rehydrate_silver` → `competitor_signals` → `product_matching` → `load_inputs` → `capabilities` (each isolated) → `publish`.
-- `capability_runners` maps capability id → `callable(inputs) -> CapabilityOutput`; default is the registry's modules (empty in this phase). A runner that raises is recorded as `error` and its capability published as `unavailable: capability_error`.
+- `capability_runners` maps capability id → `callable(inputs) -> CapabilityOutput`; default is the registry's modules (empty in this phase). One module may serve two ids — `reconciliation.py` provides both `reconciliation` and `hygiene` (ADR-014) — and each is stepped, isolated and reported separately, which is what lets one fail while the other keeps emitting. A runner that raises is recorded as `error` and its capability published as `unavailable: capability_error`.
 - Verdict: `partial` if any step `error`; `degraded` if owner state unavailable or any capability `unavailable` due to `capability_error`; else `ok`. Publish happens in `publish` mode unless every capability is unavailable (then `PublishRefused`, recorded, `partial`).
 
 - [ ] **Step 1: Write the failing test**
@@ -2042,7 +2368,7 @@ def test_print_mode_writes_nothing(tmp_path, monkeypatch):
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `.venv/bin/python -m pytest tests/engine/test_run.py -q`
+Run: `python3 -m pytest tests/engine/test_run.py -q`
 Expected: FAIL — `ImportError`
 
 - [ ] **Step 3: Implement**
@@ -2090,13 +2416,13 @@ def _pull_owner_state() -> OwnerState:
     return state
 
 
-def _sales_import() -> dict:
+def _sales_import(sales_dir: Path = SALES_DIR, silver_dir: Path = SILVER_DIR) -> dict:
     from datetime import date
     from src.internal_pos.pos_importer import read_pos_vintage
     from src.internal_pos.sales_importer import import_sales
-    vintage = read_pos_vintage(SILVER_DIR)
+    vintage = read_pos_vintage(silver_dir)
     as_of = date.fromisoformat(vintage["as_of"][:10]) if vintage and vintage.get("as_of") else None
-    return import_sales(SALES_DIR, inventory_as_of=as_of, silver_dir=SILVER_DIR)
+    return import_sales(sales_dir, inventory_as_of=as_of, silver_dir=silver_dir)
 
 
 def _market_chain(skip: bool) -> list:
@@ -2126,7 +2452,8 @@ def _step(steps: list, name: str, fn: Callable):
 
 def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_market: bool = False,
                artefact_path: Path = ARTEFACT_PATH, capability_runners: Optional[dict] = None,
-               now: Optional[datetime] = None) -> dict:
+               now: Optional[datetime] = None, silver_dir: Path = SILVER_DIR,
+               sales_dir: Path = SALES_DIR) -> dict:
     now = now or datetime.now(timezone.utc)
     runners = DEFAULT_RUNNERS if capability_runners is None else capability_runners
     steps: list = []
@@ -2136,13 +2463,12 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
     if input_csv:
         from src.internal_pos.pos_importer import import_pos_file
         _step(steps, "pos_import", lambda: import_pos_file(Path(input_csv)))
-    _step(steps, "sales_import", _sales_import)
+    _step(steps, "sales_import", lambda: _sales_import(sales_dir, silver_dir))
     for name, fn in _market_chain(skip_market):
         _step(steps, name, fn)
 
-    inputs = _step(steps, "load_inputs", lambda: load_inputs(policy=policy, owner=owner, run_at=now, silver_dir=SILVER_DIR))
+    inputs = _step(steps, "load_inputs", lambda: load_inputs(policy=policy, owner=owner, run_at=now, silver_dir=silver_dir))
     outputs: list[CapabilityOutput] = []
-    catalogue = questions = None
     if inputs is not None:
         # catalogue_lifecycle runs first so its withdrawn set reaches the others (FR-074).
         order = ["catalogue_lifecycle"] + [c for c in runners if c != "catalogue_lifecycle"]
@@ -2150,15 +2476,12 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
             if cap_id not in runners:
                 continue
             spec = CAPABILITIES[cap_id].spec
-            out = _step(steps, f"capability:{cap_id}", lambda cap_id=cap_id: runners[cap_id](#inputs))
+            out = _step(steps, f"capability:{cap_id}", lambda cap_id=cap_id: runners[cap_id](inputs))
             if out is None:
                 out = CapabilityOutput.unavailable(cap_id, spec, "capability_error")
             outputs.append(out)
             if cap_id == "catalogue_lifecycle" and out.status == "available":
                 inputs.withdrawn = set(out.counts.get("_withdrawn_barcodes", []) or [])
-                catalogue = getattr(out, "catalogue", None)
-            if cap_id == "owner_questions":
-                questions = getattr(out, "questions", None)
 
     status = "ok"
     if any(s["status"] == "error" for s in steps):
@@ -2168,20 +2491,23 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
 
     artefact = build_artefact(outputs, vintages=inputs.vintages if inputs else _no_inputs_vintages(owner),
                               thresholds=policy.as_dict(), run={"status": status, "steps": steps},
-                              catalogue=catalogue, questions=questions, generated_at=now.isoformat(),
-                              run_id=uuid.uuid4().hex[:12])
+                              generated_at=now.isoformat(), run_id=uuid.uuid4().hex[:12])
+    # Completeness is asserted for a real run only: a test that injects two capabilities is
+    # not a broken artefact, but a production run missing one is. Turns itself on in Phase 1.8
+    # when DEFAULT_RUNNERS stops being empty — nobody has to remember to flip it.
+    complete = capability_runners is None and bool(runners)
     published = False
     if mode == "publish":
         try:
             if outputs and all(o.status == "unavailable" for o in outputs):
                 raise PublishRefused("every capability is unavailable — refusing to overwrite the last good artefact")
-            write_atomic(artefact_path, artefact)
+            write_atomic(artefact_path, artefact, require_complete_registry=complete)
             published = True
         except PublishRefused as exc:
             steps.append({"step": "publish", "status": "error", "ms": 0, "error": str(exc)})
             status = "partial"
     else:
-        validate_artefact(artefact)
+        validate_artefact(artefact, require_complete_registry=complete)
     artefact["run"]["status"] = status
     return {"status": status, "steps": steps, "artefact": artefact, "published": published}
 
@@ -2239,8 +2565,8 @@ if __name__ == "__main__":
 
 - [ ] **Step 4: Run tests and the CLI in print mode**
 
-Run: `.venv/bin/python -m pytest tests/engine/test_run.py -q` → 3 passed
-Run: `.venv/bin/python scripts/run_engine.py --print --skip-market | tail -5` → prints a summary; exit code may be 1 (`degraded`, no credentials) — that is the honest state.
+Run: `python3 -m pytest tests/engine/test_run.py -q` → 3 passed
+Run: `python3 scripts/run_engine.py --print --skip-market | tail -5` → prints a summary; exit code may be 1 (`degraded`, no credentials) — that is the honest state.
 
 - [ ] **Step 5: Commit**
 
@@ -2306,7 +2632,7 @@ jobs:
 
 - [ ] **Step 2: Verify locally that each command passes**
 
-Run: `npm run lint && npx vitest run && .venv/bin/python -m pytest tests -q && npm run build`
+Run: `npm run lint && npx vitest run && python3 -m pytest tests -q && npm run build`
 Expected: all green
 
 - [ ] **Step 3: Commit**
@@ -2334,10 +2660,22 @@ Expected: `STEP 1 anonymous sign-in : ✅` and `STEP 2 write + read back : ✅`.
 
 - [ ] **Step 3: The engine can pull with the service account**
 
-Run (with the service-account path exported): `FIREBASE_SERVICE_ACCOUNT_PATH=./secrets/firebase-service-account.json .venv/bin/python -c "import sys; sys.path.insert(0,'.'); from src.engine.run import _pull_owner_state; s=_pull_owner_state(); print(s.status, s.reason, s.pulled_at)"`
+Run (with the service-account path exported): `FIREBASE_SERVICE_ACCOUNT_PATH=./secrets/firebase-service-account.json python3 -c "import sys; sys.path.insert(0,'.'); from src.engine.run import _pull_owner_state; s=_pull_owner_state(); print(s.status, s.reason, s.pulled_at)"`
 Expected: `available None 2026-…` and `data/owner/owner_state.json` written.
 
-- [ ] **Step 4: CI secret present**
+- [ ] **Step 4: Basic Auth credentials set in Vercel**
+
+`middleware.ts` fails closed: with `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD` unset it answers
+503 for every request (design §11.7). Unset credentials therefore take the pilot app down on
+12/9 rather than exposing it — the failure is safe but total, and it is invisible until
+someone opens the URL. ARCH-GATE-011, readiness gate §18 action 10.
+
+Run: `vercel env ls | grep BASIC_AUTH`
+Expected: `BASIC_AUTH_USER` and `BASIC_AUTH_PASSWORD` present for Production **and** Preview.
+Then open the deployed URL and confirm the browser asks for credentials once and the app
+loads after them.
+
+- [ ] **Step 5: CI secret present**
 
 Run: `gh secret list | grep FIREBASE_SERVICE_ACCOUNT_JSON`
 Expected: one line. Then add to `collect-daily.yml` (Phase 3 finalises this workflow) the env for the refresh step:
@@ -2349,7 +2687,7 @@ Expected: one line. Then add to `collect-daily.yml` (Phase 3 finalises this work
           VITE_STORE_ID: yomyom-kafr-qasim
 ```
 
-- [ ] **Step 5: Checkpoint 0-B**
+- [ ] **Step 6: Checkpoint 0-B**
 
-Run: `.venv/bin/python scripts/run_engine.py --skip-market`
-Expected: `public/data/dashboard.json` written, `schema_version: 2`, `capabilities: {}`, `run.status: ok` (or `degraded` with `owner_state.status: unavailable` if Step 3 was skipped). Commit nothing from `public/data` yet — the artefact is committed by CI from Phase 3 on.
+Run: `python3 scripts/run_engine.py --skip-market`
+Expected: `public/data/dashboard.json` written, `schema_version: 2`, `capabilities: {}`, `run.status: ok` (or `degraded` with `owner_state.status: unavailable` if Step 3 was skipped). `capabilities: {}` is valid **only in this phase**: `DEFAULT_RUNNERS` is still empty, so the registry-completeness assertion is off. It turns itself on in Task 1.8. Commit nothing from `public/data` yet — the artefact is committed by CI from Phase 3 on.
