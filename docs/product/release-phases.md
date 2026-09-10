@@ -27,6 +27,32 @@ rather than a milestone.
 > «رقم مفترض يُثبَّت في اجتماع 12/9» — an assumption to be fixed at the 12/9 meeting, with every
 > date moving with it. This is the input to that conversation.
 
+## Why there is a delivery two weeks out
+
+The first version of this plan had him waiting from 12/9 to 23/10 — six weeks — while sending
+daily exports, answering twelve questions and having his staff log every delivery. In return,
+nothing new. That is not a roadmap, it is a request for patience, and he would have read it
+that way.
+
+Three things can ship inside two weeks because the hard part already runs:
+
+| Deliverable | Why it is cheap | Evidence |
+|---|---|---|
+| The daily list capped at **10** | `rankActions` already orders the whole set; this is a cap and a UI change | `src/lib/analytics/actionPriority.js`, `src/pages/OperationalPage.jsx:157` |
+| The **cleanup list** as a CSV he hands to his POS person | The classification already runs — ghost (no sales, zero stock) vs idle (no sales, has stock) | `scripts/print_figures.py:216-233` |
+| His **twelve answers actually changing tomorrow's numbers** | `product_recommendations.py` already reads `configs/owner_answers.yaml`; what is missing is the path from the browser into it | `src/lib/questions/answerStore.js:82` exports YAML to **paste by hand**; `scripts/import_owner_answers.py` **does not exist** |
+
+The third is the one that matters most on the day. Asking him for twelve cost answers while the
+only way to use them is for one of us to hand-paste a downloaded file is precisely the bargain
+he is right to be suspicious of. It is roughly a day of work and it converts the ask into an
+exchange.
+
+**The cost, stated honestly:** this is a parallel track on the old pipeline while the engine is
+rebuilt, so about 25–30 hours are spent on code that implementation Phase 1 later replaces
+(`catalogue_lifecycle` supersedes the CSV, `owner_questions` supersedes the import). That is why
+Phase 2 moved from 23/10 to 30/10. Deliberate duplication, bought to remove a six-week silence
+in the middle of a pilot whose whole thesis is that he keeps opening the app.
+
 ## The arithmetic behind the dates
 
 Two people, **~15 h/week each = 30 h/week combined** (PRD §5's own assumption). The
@@ -38,14 +64,14 @@ implementation plan has 37 tasks left across four phases, at roughly 4–5 hours
 | Phase 1 capabilities (1.0 … 1.9) | 10 | 40–50 |
 | Phase 2 browser cut-over — **not yet planned** | ~12 | 48–60 |
 | Phase 3 reproduction and gates | 5 | 20–25 |
-| **Total** | **37** | **148–185** |
+| Visible track shipping 27/9 (above) | — | 25–30 |
+| **Total** | **37 +** | **173–215** |
 
-At 30 h/week that is **5–6 weeks**: 14–23 October. At 20 h/week — the honest figure if either of
-us has a bad fortnight — it is 31 October–13 November. **The dates below take the pessimistic end
-of the 30 h/week band**, because a date the customer can hold us to is worth more than an
-ambitious one we miss. Tasks 0.1–0.3 are already done and are not in the count.
+At 30 h/week that is **5.8–7.2 weeks**: 21–31 October. **The dates take the top of that band**,
+because a date the customer can hold us to is worth more than an ambitious one we miss. Tasks
+0.1–0.3 are done and are not in the count.
 
----
+**No gap between deliveries now exceeds 33 days**, and the first is 17.
 
 ## Phase 1 — «ما يعمل اليوم» · What works today
 

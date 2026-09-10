@@ -13,12 +13,9 @@
     --ink-soft:    #52625A;
     --ink-faint:   #8A9891;
     --rule:        #D6DED8;
-    --now:         #0D5B49;
-    --now-wash:    #DCEAE4;
-    --build:       #9E6512;
-    --build-wash:  #F2E6D3;
-    --later:       #4C6172;
-    --later-wash:  #DFE6EA;
+    --now:         #0D5B49;  --now-wash:   #DCEAE4;
+    --build:       #9E6512;  --build-wash: #F2E6D3;
+    --later:       #4C6172;  --later-wash: #DFE6EA;
     --font-display: "Reem Kufi", "Cairo", "SF Arabic", sans-serif;
     --font-body: "Cairo", "SF Arabic", "Noto Sans Arabic", system-ui, sans-serif;
     --font-num: ui-monospace, "SF Mono", Menlo, monospace;
@@ -44,49 +41,59 @@
   body {
     background: var(--ground); color: var(--ink);
     font-family: var(--font-body); font-size: 18px; line-height: 1.9;
-    margin: 0; padding: 0 5vw 4rem;
-    -webkit-font-smoothing: antialiased;
+    margin: 0; padding: 0 5vw 4rem; -webkit-font-smoothing: antialiased;
   }
   .wrap { max-width: 40rem; margin: 0 auto; }
 
-  header { padding: 3.5rem 0 2.5rem; text-align: center; }
+  header { padding: 3.2rem 0 2rem; text-align: center; }
   h1 {
     font-family: var(--font-display); font-weight: 700;
-    font-size: clamp(2rem, 7vw, 2.9rem); line-height: 1.5;
+    font-size: clamp(1.9rem, 6.6vw, 2.7rem); line-height: 1.5;
     margin: 0 0 .6rem; text-wrap: balance;
   }
   .sub { color: var(--ink-soft); margin: 0; font-size: 1.05rem; }
 
+  /* the start — a strip, not a stage: he is already holding it */
+  .start {
+    border: 1px solid var(--rule); border-right: 4px solid var(--now);
+    background: var(--surface); padding: 1.2rem 1.3rem; margin-bottom: 2.2rem;
+  }
+  .start .row { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; margin-bottom: .5rem; }
+  .start .d {
+    font-family: var(--font-num); font-weight: 700; font-size: 1.5rem;
+    color: var(--now); direction: ltr;
+  }
+  .start .t { font-weight: 700; font-size: 1.05rem; }
+  .start p { margin: 0; color: var(--ink-soft); font-size: .99rem; }
+
   .stage {
     background: var(--surface); border: 1px solid var(--rule);
     border-top: 4px solid var(--tone);
-    padding: 1.6rem 1.5rem 1.4rem; margin-bottom: 1.6rem;
+    padding: 1.5rem 1.5rem 1.3rem; margin-bottom: 1.5rem;
   }
   .stage[data-tone="now"]   { --tone: var(--now);   --wash: var(--now-wash); }
   .stage[data-tone="build"] { --tone: var(--build); --wash: var(--build-wash); }
   .stage[data-tone="later"] { --tone: var(--later); --wash: var(--later-wash); }
 
-  .when { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; margin-bottom: .2rem; }
+  .when { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; }
   .day {
     font-family: var(--font-num); font-variant-numeric: tabular-nums;
-    font-size: clamp(2rem, 7vw, 2.7rem); font-weight: 700;
-    color: var(--tone); direction: ltr; line-height: 1.2;
+    font-size: clamp(1.9rem, 6.6vw, 2.5rem); font-weight: 700;
+    color: var(--tone); direction: ltr; line-height: 1.25;
   }
   .tag {
     font-size: .85rem; font-weight: 700; color: var(--tone);
     background: var(--wash); padding: .25rem .8rem; border-radius: 999px;
   }
-  h2 { font-size: 1.25rem; font-weight: 700; margin: .1rem 0 1.1rem; line-height: 1.5; }
+  .gap { font-size: .9rem; color: var(--ink-faint); }
+  h2 { font-size: 1.22rem; font-weight: 700; margin: .35rem 0 1rem; line-height: 1.5; }
 
   ul.f { list-style: none; margin: 0; padding: 0; }
   ul.f li {
     display: grid; grid-template-columns: 1.6rem 1fr; gap: .6rem;
-    align-items: baseline; padding: .5rem 0; font-size: 1.06rem;
+    align-items: baseline; padding: .45rem 0; font-size: 1.05rem;
   }
-  ul.f li::before {
-    content: "✓"; color: var(--tone); font-weight: 700; font-size: 1.1rem;
-    line-height: 1.7;
-  }
+  ul.f li::before { content: "✓"; color: var(--tone); font-weight: 700; font-size: 1.1rem; line-height: 1.7; }
   ul.f li b { font-weight: 700; }
   .n {
     font-family: var(--font-num); font-variant-numeric: tabular-nums;
@@ -94,29 +101,26 @@
   }
 
   .need {
-    margin-top: 1.2rem; padding-top: 1rem; border-top: 1px dashed var(--rule);
-    font-size: .98rem; color: var(--ink-soft);
+    margin-top: 1.1rem; padding-top: .9rem; border-top: 1px dashed var(--rule);
+    font-size: .96rem; color: var(--ink-soft);
   }
   .need b { color: var(--ink); }
 
-  .after {
-    background: transparent; border: 1px dashed var(--rule);
-    padding: 1.3rem 1.5rem; margin-top: 2rem;
-  }
-  .after .when { margin-bottom: .4rem; }
-  .after .day { font-size: 1.7rem; color: var(--ink-faint); }
-  .after h2 { font-size: 1.1rem; margin: 0 0 .5rem; }
-  .after p { margin: 0; color: var(--ink-soft); font-size: .98rem; }
+  .after { border: 1px dashed var(--rule); padding: 1.2rem 1.4rem; margin-top: 2rem; }
+  .after .when { margin-bottom: .3rem; }
+  .after .day { font-size: 1.6rem; color: var(--ink-faint); }
+  .after h2 { font-size: 1.06rem; margin: 0 0 .4rem; }
+  .after p { margin: 0; color: var(--ink-soft); font-size: .96rem; }
 
   footer {
-    margin-top: 2.5rem; padding-top: 1.4rem; border-top: 1px solid var(--rule);
+    margin-top: 2.4rem; padding-top: 1.3rem; border-top: 1px solid var(--rule);
     font-size: .95rem; color: var(--ink-soft); text-align: center;
   }
   footer b { color: var(--ink); }
 
   @media (max-width: 30rem) {
     body { font-size: 17px; padding: 0 4vw 3rem; }
-    .stage { padding: 1.3rem 1.1rem 1.1rem; }
+    .stage { padding: 1.2rem 1.1rem 1rem; }
   }
 </style>
 
@@ -124,39 +128,51 @@
 
   <header>
     <h1>ماذا تحصل عليه، ومتى</h1>
-    <p class="sub">ثلاث محطّات. في كل واحدة أشياء تعمل بيدك، لا وعود.</p>
+    <p class="sub">شيء جديد كل أسبوعين إلى ثلاثة. لا انتظار طويل بلا مقابل.</p>
   </header>
 
+  <div class="start">
+    <div class="row"><span class="d">12/09</span><span class="t">تبدأ من اليوم</span></div>
+    <p>تفتح التطبيق كما هو الآن: قائمة الإجراءات، ومقارنة أسعارك مع ثلاثة منافسين،
+      وتسجيل الصلاحية. ونتفق اليوم على رقم النجاح بعد ثلاثين يوماً، وعلى السعر إن تحقّق.</p>
+  </div>
+
   <section class="stage" data-tone="now">
-    <div class="when"><span class="day">12/09</span><span class="tag">يعمل اليوم</span></div>
-    <h2>تفتحه من هذا الاجتماع</h2>
+    <div class="when">
+      <span class="day">27/09</span><span class="tag">المرحلة الأولى</span>
+      <span class="gap">بعد أسبوعين</span>
+    </div>
+    <h2>شاشة قصيرة، وكتالوج نظيف بيدك</h2>
     <ul class="f">
-      <li>قائمة إجراءات كل صباح، مرتّبة بالأهم</li>
-      <li>مقارنة أسعارك مع ثلاثة منافسين — <span class="n">1,857</span> صنفاً</li>
-      <li>أصناف تُباع تحت التكلفة — <span class="n">104</span></li>
-      <li>فروقات سعر الرف مع Wolt — <span class="n">1,147</span></li>
-      <li>سجلات خاطئة تحتاج تصحيحاً — <span class="n">932</span></li>
-      <li>تسجيل تاريخ الصلاحية عند الاستلام</li>
+      <li><b>عشرة إجراءات في اليوم</b>، لا <span class="n">4,498</span> سطراً</li>
+      <li><b>قائمة التنظيف جاهزة للتسليم:</b> <span class="n">7,674 ← 1,535</span> صنفاً،
+        ملف تعطيه لمسؤول الـPOS كما هو</li>
+      <li>إجاباتك على أسئلة التكلفة <b>تغيّر أرقام الغد فعلاً</b></li>
     </ul>
-    <p class="need"><b>نحتاج منك:</b> تصدير الجرد · إجابات الـ12 سؤال تكلفة ·
-      يبدأ الطاقم بتسجيل الاستلام من اليوم</p>
+    <p class="need"><b>نحتاج منك:</b> تصدير الجرد · إجابات الـ12 سؤال ·
+      يبدأ الطاقم بتسجيل الاستلام من 12/09</p>
   </section>
 
   <section class="stage" data-tone="build">
-    <div class="when"><span class="day">23/10</span><span class="tag">شاشة الصباح كاملة</span></div>
-    <h2>عشر دقائق، وتكون انتهيت</h2>
+    <div class="when">
+      <span class="day">30/10</span><span class="tag">المرحلة الثانية</span>
+      <span class="gap">بعد شهر</span>
+    </div>
+    <h2>كل رقم على الشاشة تستطيع أن تسأل عنه</h2>
     <ul class="f">
-      <li><b>عشرة إجراءات فقط</b> في اليوم، مرتّبة بالمال</li>
-      <li>كتالوج منظّف: <span class="n">7,674 ← 1,535</span> صنفاً، مع ملف جاهز لمسؤول الـPOS</li>
-      <li>أسئلة التكلفة داخل التطبيق، ثلاثة كحدّ أقصى</li>
-      <li>أي رقم يُعاد حسابه أمامك في ثوانٍ</li>
+      <li>أي رقم <b>يُعاد حسابه أمامك في ثوانٍ</b></li>
+      <li>أسعارك مقابل المنافسين، وكل سعر معه تاريخ رؤيته</li>
+      <li>حين لا يصل تقرير تقول الشاشة <b>«غير متاح»</b> — لا صفراً صامتاً</li>
       <li>«تمّ» و«تجاهل» محفوظة على كل أجهزتك</li>
     </ul>
     <p class="need"><b>نحتاج منك:</b> تقارير مبيعات سنتين للوراء</p>
   </section>
 
   <section class="stage" data-tone="later">
-    <div class="when"><span class="day">27/11</span><span class="tag">الطلبيات تعمل</span></div>
+    <div class="when">
+      <span class="day">27/11</span><span class="tag">المرحلة الثالثة</span>
+      <span class="gap">بعد شهر</span>
+    </div>
     <h2>ماذا أطلب، وكم</h2>
     <ul class="f">
       <li><b>كم تطلب</b> من كل صنف</li>
@@ -170,12 +186,12 @@
   <section class="after">
     <div class="when"><span class="day">15/12</span></div>
     <h2>البلانوغرام — ترتيب الرفوف</h2>
-    <p>يأتي أخيراً لأنّه يقوم على طلبيات المرحلة السابقة: قبلها ترتيبٌ على تخمين، وبعدها ترتيبٌ
-      على مبيعاتك أنت. يحتاج صور رفوفك بأبعادها وساعة من قواعدك.</p>
+    <p>يأتي أخيراً لأنّه يقوم على طلبيات المرحلة الثالثة: قبلها ترتيبٌ على تخمين،
+      وبعدها ترتيبٌ على مبيعاتك أنت. يحتاج صور رفوفك بأبعادها وساعة من قواعدك.</p>
   </section>
 
   <footer>
-    التواريخ مبنيّة على <b>30 ساعة عمل أسبوعياً لشخصين</b>. نثبّت هذا الرقم معك اليوم،
-    وإن تغيّر تتغيّر التواريخ معه — تسمعها منّا اليوم لا يوم الاستحقاق.
+    التواريخ مبنيّة على <b>30 ساعة عمل أسبوعياً لشخصين</b>. نثبّتها معك اليوم،
+    وإن تغيّرت تسمع ذلك منّا فوراً لا يوم الاستحقاق.
   </footer>
 </div>
