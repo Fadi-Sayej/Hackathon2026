@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-09T02:36:53.424524+00:00",
-  "date": "2026-09-09",
+  "generatedAt": "2026-09-10T02:35:43.032512+00:00",
+  "date": "2026-09-10",
   "status": "ok",
   "sources": {
     "weather": "open-meteo",
@@ -9,18 +9,18 @@
     "islamic": "computed_hijri"
   },
   "weather": {
-    "temperatureC": 20.7,
+    "temperatureC": 20.3,
     "precipitation": 0.0,
-    "windSpeed": 6.7,
+    "windSpeed": 7.4,
     "weatherCode": 0,
     "label": "warm",
-    "observedAt": "2026-09-09T05:30",
+    "observedAt": "2026-09-10T05:30",
     "lat": 32.114,
     "lon": 34.976,
     "source": "open-meteo"
   },
   "hebrew": {
-    "date": "2026-09-09",
+    "date": "2026-09-10",
     "holidays": [],
     "isErevChag": false,
     "isFastDay": false,
@@ -35,11 +35,11 @@
     "source": "hebcal"
   },
   "islamic": {
-    "date": "2026-09-09",
+    "date": "2026-09-10",
     "hijri": {
       "year": 1448,
       "month": 3,
-      "day": 26
+      "day": 27
     },
     "isRamadan": false,
     "ramadanDay": null,
@@ -47,8 +47,8 @@
     "isEidAlFitr": false,
     "isEidAlAdha": false,
     "ramadanStart": "2027-02-08",
-    "daysToRamadan": 152,
-    "daysToEidAlFitr": 182,
+    "daysToRamadan": 151,
+    "daysToEidAlFitr": 181,
     "phase": null,
     "windows": {
       "ramadan_build_up_days": 21,
@@ -342,6 +342,7 @@
       "6955292105008",
       "6955292106005",
       "6955292107002",
+      "6955292108009",
       "6955292109006",
       "6955292113003",
       "6955292114000",
@@ -688,6 +689,7 @@
       "7290002371533",
       "7290002371854",
       "7290002374312",
+      "7290002385455",
       "7290002551003",
       "7290002564928",
       "7290002692768",
@@ -845,6 +847,7 @@
       "7290006374738",
       "7290006376626",
       "7290006376695",
+      "7290006390806",
       "7290006492616",
       "7290006511157",
       "7290006567048",
@@ -1236,6 +1239,7 @@
       "7290019621737",
       "7290019635383",
       "7290019644330",
+      "7290019644699",
       "7290019644743",
       "7290019766018",
       "7290019766025",
@@ -2385,7 +2389,7 @@
       "9780201321029",
       "9800800056"
     ],
-    "days": 30,
+    "days": 31,
     "status": "ok",
     "lift": 1.15
   }
