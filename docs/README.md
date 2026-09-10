@@ -33,6 +33,7 @@ carries a banner saying so.
 | Document | What it is |
 |---|---|
 | [PRD](product/PRD.md) | Problem · user · feature register (F1–F13) · releases · not-in-scope · owner commitments · decision criterion · figures · open decisions |
+| [Release phases](product/release-phases.md) | Three customer-facing delivery phases with dates · **proposes a change to PRD §5's dates, does not take it** |
 | [Intent register (SPEC-000)](product/intent-register.md) | INT-id ↔ spec map · **settled decisions D-1 … D-13** · why F8–F13 are deliberately unspecified |
 
 ## Features
@@ -118,6 +119,7 @@ chain above.
 | [Handover — Arabic](pilot/handover-yomyom-ar.md) | **The version actually handed over.** Arabic is the language of every exchange with the manager |
 | [Handover — English](pilot/handover-yomyom-en.md) | Source text for the Arabic handover; keep the two in sync |
 | [Questions for YomYom](pilot/questions-for-yomyom.md) | What we still need from the owner, each drawn from his own export |
+| [Release phases — Arabic](pilot/release-phases-ar.html) | **The version shown to the owner on 12/9.** Three dated phases, each a working product |
 | [`app-qr.png`](pilot/app-qr.png) · [`app-share-qr.png`](pilot/app-share-qr.png) | QR codes for the deployed pilot app |
 
 ## Sources

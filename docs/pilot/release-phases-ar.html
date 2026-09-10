@@ -1,0 +1,353 @@
+<title>خطة تسليم YomYom</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --ground:        #F1F4F1;
+    --surface:       #FBFCFB;
+    --ink:           #15201C;
+    --ink-soft:      #4A5A53;
+    --ink-faint:     #7A8A82;
+    --rule:          #D3DBD5;
+    --rule-strong:   #B3BFB8;
+    --now:           #0E5C4A;
+    --now-wash:      #DDEAE4;
+    --build:         #A76A15;
+    --build-wash:    #F0E4D2;
+    --later:         #4F6373;
+    --later-wash:    #DFE5E9;
+    --font-display: "Diwan Kufi", "Kufi Standard GK", "Noto Kufi Arabic", "SF Arabic", "Geeza Pro", sans-serif;
+    --font-body: "SF Arabic", "Geeza Pro", "Noto Sans Arabic", "Al Bayan", system-ui, sans-serif;
+    --font-num: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:      #0E1513;
+      --surface:     #151E1B;
+      --ink:         #E6ECE8;
+      --ink-soft:    #A3B2AB;
+      --ink-faint:   #74857D;
+      --rule:        #263330;
+      --rule-strong: #3A4A45;
+      --now:         #59BFA2;
+      --now-wash:    #16302A;
+      --build:       #D69A44;
+      --build-wash:  #2E2417;
+      --later:       #8FA6B5;
+      --later-wash:  #1B252B;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:      #0E1513;
+    --surface:     #151E1B;
+    --ink:         #E6ECE8;
+    --ink-soft:    #A3B2AB;
+    --ink-faint:   #74857D;
+    --rule:        #263330;
+    --rule-strong: #3A4A45;
+    --now:         #59BFA2;
+    --now-wash:    #16302A;
+    --build:       #D69A44;
+    --build-wash:  #2E2417;
+    --later:       #8FA6B5;
+    --later-wash:  #1B252B;
+  }
+
+  html { direction: rtl; }
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.75;
+    margin: 0;
+    padding: 0 5vw 5rem;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 46rem; margin: 0 auto; }
+
+  /* ---------- masthead ---------- */
+  header { padding: 3.5rem 0 2rem; border-bottom: 2px solid var(--ink); }
+  .eyebrow {
+    font-family: var(--font-num);
+    font-size: .74rem;
+    letter-spacing: .16em;
+    color: var(--ink-faint);
+    margin: 0 0 1.1rem;
+    direction: ltr;
+    text-align: right;
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.1rem, 6.5vw, 3.1rem);
+    line-height: 1.25;
+    font-weight: 700;
+    margin: 0 0 .9rem;
+    text-wrap: balance;
+  }
+  .standfirst { font-size: 1.06rem; color: var(--ink-soft); margin: 0; max-width: 34rem; }
+
+  /* ---------- the assumption strip ---------- */
+  .assumption {
+    display: flex; gap: .9rem; align-items: flex-start;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-right: 3px solid var(--ink-faint);
+    padding: 1rem 1.1rem;
+    margin: 2rem 0 0;
+    font-size: .95rem;
+    color: var(--ink-soft);
+  }
+  .assumption b { color: var(--ink); font-weight: 700; }
+
+  /* ---------- phases ---------- */
+  .phases { margin: 0; padding: 0; list-style: none; }
+  .phase {
+    position: relative;
+    padding: 3rem 2.2rem 2.6rem 0;
+    border-right: 1px solid var(--rule-strong);
+  }
+  .phase:last-child { border-right-color: transparent; }
+  .marker {
+    position: absolute; top: 3.4rem; right: -7px;
+    width: 13px; height: 13px; border-radius: 50%;
+    background: var(--ground);
+    border: 3px solid var(--tone);
+  }
+  .phase[data-state="now"] .marker { background: var(--tone); }
+  .phase[data-state="later"] .marker { border-color: var(--rule-strong); }
+
+  .phase[data-tone="now"]   { --tone: var(--now);   --wash: var(--now-wash); }
+  .phase[data-tone="build"] { --tone: var(--build); --wash: var(--build-wash); }
+  .phase[data-tone="later"] { --tone: var(--later); --wash: var(--later-wash); }
+
+  .head { display: flex; flex-wrap: wrap; align-items: baseline; gap: .75rem 1rem; }
+  .date {
+    font-family: var(--font-num);
+    font-size: clamp(1.6rem, 4.6vw, 2.1rem);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--tone);
+    direction: ltr;
+    letter-spacing: -.01em;
+  }
+  .state {
+    font-size: .78rem;
+    font-weight: 700;
+    padding: .22rem .7rem;
+    border-radius: 2px;
+    background: var(--wash);
+    color: var(--tone);
+    white-space: nowrap;
+  }
+  h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.45rem, 4.4vw, 1.9rem);
+    font-weight: 700;
+    margin: .5rem 0 1.4rem;
+    line-height: 1.35;
+  }
+
+  /* ---------- what he gets ---------- */
+  .gets { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .1rem; }
+  .gets li {
+    display: grid;
+    grid-template-columns: 6.5rem 1fr;
+    gap: 0 1rem;
+    align-items: baseline;
+    padding: .7rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .gets li:first-child { border-top: 1px solid var(--rule); }
+  .fig {
+    font-family: var(--font-num);
+    font-variant-numeric: tabular-nums;
+    font-size: 1.02rem;
+    font-weight: 600;
+    color: var(--tone);
+    direction: ltr;
+    text-align: left;
+  }
+  .fig.none { color: var(--ink-faint); font-weight: 400; font-size: .82rem; }
+  .gets p { margin: 0; }
+  .gets .sub { display: block; font-size: .86rem; color: var(--ink-faint); margin-top: .15rem; }
+
+  /* ---------- asks / risks ---------- */
+  .block { margin-top: 1.8rem; background: var(--surface); border: 1px solid var(--rule); padding: 1.1rem 1.2rem; }
+  .block h3 {
+    font-size: .8rem; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-faint); margin: 0 0 .7rem; font-weight: 700;
+  }
+  .block ul { margin: 0; padding-right: 1.1rem; }
+  .block li { margin-bottom: .45rem; font-size: .96rem; color: var(--ink-soft); }
+  .block li:last-child { margin-bottom: 0; }
+  .block li b { color: var(--ink); }
+  .block.risk { border-right: 3px solid var(--tone); }
+
+  /* ---------- closing ---------- */
+  .closing { margin-top: 3.5rem; padding-top: 2rem; border-top: 2px solid var(--ink); }
+  .closing h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+  .out { list-style: none; margin: 0 0 2rem; padding: 0; }
+  .out li { padding: .8rem 0; border-bottom: 1px solid var(--rule); font-size: .97rem; color: var(--ink-soft); }
+  .out li b { color: var(--ink); display: block; font-family: var(--font-display); font-size: 1.02rem; }
+  .rule-note { font-size: .97rem; color: var(--ink-soft); background: var(--surface); border: 1px solid var(--rule); padding: 1.1rem 1.2rem; }
+  .rule-note b { color: var(--ink); }
+
+  @media (max-width: 34rem) {
+    .gets li { grid-template-columns: 1fr; gap: .2rem; }
+    .fig { text-align: right; direction: ltr; }
+    .phase { padding-left: 0; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">SmartShelf · YomYom كفر قاسم · 2026-09-10</p>
+    <h1>ثلاث مراحل، وثلاثة تواريخ</h1>
+    <p class="standfirst">
+      ما الذي تحصل عليه في كل مرحلة، ومتى بالضبط. كل مرحلة منتج يعمل بيدك — لا خطوة داخلية عندنا.
+    </p>
+  </header>
+
+  <div class="assumption">
+    <div>
+      كل تاريخ هنا مبنيّ على <b>ساعتَي عمل: 30 ساعة أسبوعياً لشخصين</b>. هذا الرقم مفترض، ونثبّته
+      معك يوم 12/9. إن كان الواقع 20 ساعة، تتأخّر المرحلتان الثانية والثالثة أسبوعين إلى ثلاثة —
+      وتسمع ذلك منّا اليوم، لا يوم الاستحقاق.
+    </div>
+  </div>
+
+  <ol class="phases">
+
+    <!-- ============ PHASE 1 ============ -->
+    <li class="phase" data-tone="now" data-state="now">
+      <span class="marker"></span>
+      <div class="head">
+        <span class="date">12/09/2026</span>
+        <span class="state">متاح اليوم</span>
+      </div>
+      <h2>ما يعمل الآن — تفتحه من هذا الاجتماع</h2>
+
+      <ul class="gets">
+        <li><span class="fig">1,147</span><p>صنفاً سعر الرف عندك يخالف سعر Wolt عندك
+          <span class="sub">بياناتك أنت، لا بيانات منافس</span></p></li>
+        <li><span class="fig">1,857</span><p>مقارنة سعر مع دور ألون ورامي ليفي وشوفرسال
+          <span class="sub">كل سعر معه تاريخ رؤيته — تحقّق قبل أن تتصرّف بسعر قديم</span></p></li>
+        <li><span class="fig">104</span><p>أصناف تُباع تحت تكلفتها</p></li>
+        <li><span class="fig">625 · 307</span><p>مخزون سالب · باركود مجهول
+          <span class="sub">سجلات خاطئة تُصلَح، بلا مبلغ — الأرقام مشتقّة من كميات لا نثق بها</span></p></li>
+        <li><span class="fig">458</span><p>صنفاً حسابه لا يُغلق: المخزون والوارد والمباع لا تتّسق</p></li>
+        <li><span class="fig none">شاشة</span><p>تسجيل تاريخ الصلاحية لحظة الاستلام</p></li>
+      </ul>
+
+      <div class="block">
+        <h3>ما نحتاجه منك يوم 12/9 — كل بند يفتح ما بعده</h3>
+        <ul>
+          <li><b>تصدير الجرد</b> يومياً أو أسبوعياً، ومَن يرسله.</li>
+          <li><b>إجابات الـ12 سؤال تكلفة.</b> بدونها يبقى 1,270 صنفاً أعمى مالياً.</li>
+          <li><b>يبدأ الطاقم بتسجيل الاستلام والصلاحية اليوم نفسه.</b> هذا يشغّل عدّاد الـ30 يوماً،
+            وهو المصدر الوحيد لبيانات المرحلة الثالثة. لا تختصره برمجة.</li>
+          <li><b>تقارير مبيعات سنتين.</b> سبعة أشهر لا تفرّق بين الموسمي والميت، فيبقى كل حذف مؤقّتاً.</li>
+          <li><b>كم تهدر شهرياً تقريباً.</b> بلا رقم «قبل»، لا يُنسب إلينا شيء بعد شهر.</li>
+          <li><b>رقمان يُتّفق عليهما اليوم:</b> كم ₪ مستردّة بعد 30 يوماً تجعلها ناجحة، وسعر الاشتراك
+            إن تحقّقت. تجربة مجانية بلا سعر متّفق عليه تقيس المجاملة لا القيمة.</li>
+        </ul>
+      </div>
+
+      <div class="block risk">
+        <h3>وما لا يفعله بعد — نقولها بصراحة</h3>
+        <ul>
+          <li>القائمة اليوم <b>4,498 سطراً</b>، لا عشرة. الترتيب صحيح، لكنّ الحدّ لم يُطبَّق بعد.</li>
+          <li>الأرقام <b>لا يُعاد حسابها أمامك بأمر واحد</b> بعد. هذا بالضبط عمل المرحلة الثانية.</li>
+          <li>لا يقول لك ما الذي سينفد: أنت أخبرتنا أنّ أرقام المخزون غير موثوقة، فحذفنا كل ما يقوم عليها.</li>
+        </ul>
+      </div>
+    </li>
+
+    <!-- ============ PHASE 2 ============ -->
+    <li class="phase" data-tone="build" data-state="build">
+      <span class="marker"></span>
+      <div class="head">
+        <span class="date">23/10/2026</span>
+        <span class="state">قيد البناء</span>
+      </div>
+      <h2>كل رقم مسنود — عشر دقائق تعني عشر دقائق</h2>
+
+      <ul class="gets">
+        <li><span class="fig">10</span><p>إجراءات كحدّ أقصى في اليوم، مرتّبة بالمال، وصنف واحد لا يتكرّر
+          <span class="sub">بدل 4,498 سطراً اليوم</span></p></li>
+        <li><span class="fig none">أمر واحد</span><p>يعيد حساب أي رقم أمامك
+          <span class="sub">رقم يُحسب أمام صاحبه ينهي النقاش؛ رقم منقول عن ورقة يبدأ نقاشاً</span></p></li>
+        <li><span class="fig">7,674 ← 1,535</span><p>كتالوج منظّف، ومعه ملف CSV تسلّمه لمسؤول الـPOS
+          <span class="sub">لا نكتب في نظامك ولا ندّعي ذلك — القائمة بيدك</span></p></li>
+        <li><span class="fig">3</span><p>أسئلة تكلفة كحدّ أقصى على الشاشة، وجوابك يغيّر أرقام الغد</p></li>
+        <li><span class="fig none">«غير متاح»</span><p>حين لا يصل تقرير، تقول الشاشة إنّه لم يصل
+          <span class="sub">الفرق بين «لا يوجد ما تفعله» و«لم نستطع أن نعرف»</span></p></li>
+        <li><span class="fig none">محفوظ</span><p>«تمّ» و«تجاهل» يبقيان عبر الأجهزة والأيام — لا يُسأل عن الشيء مرّتين</p></li>
+      </ul>
+
+      <div class="block risk">
+        <h3>ما قد يؤخّر هذا التاريخ</h3>
+        <ul>
+          <li>أربعة إعدادات ليست برمجة — حساب قاعدة البيانات، ومفتاح للقراءة في التشغيل الآلي،
+            وفكّ الحجب عن النشر التجريبي، وكلمة مرور التطبيق. <b>رخيصة اليوم، غالية بعد ثلاثة أسابيع.</b></li>
+          <li>تأخّر تقارير السنتين يُبقي الحذف مؤقّتاً — يعمل، لكنّه يُعرض بعلامة «مؤقّت».</li>
+        </ul>
+      </div>
+
+      <div class="block">
+        <h3>ثم يبدأ العدّاد</h3>
+        <ul>
+          <li><b>30 يوماً من الاستخدام، واجتماع الحكم في 22/11.</b> ثلاثة أجوبة لا رابع لها:
+            الرقم تحقّق فنكمل باشتراك · لم يتحقّق لكنك تفتحه يومياً فنراجع معك ما تحتاجه فعلاً ·
+            لا تفتحه فنتوقّف بشرف، وقد خسرنا شهراً لا سنة.</li>
+        </ul>
+      </div>
+    </li>
+
+    <!-- ============ PHASE 3 ============ -->
+    <li class="phase" data-tone="later" data-state="later">
+      <span class="marker"></span>
+      <div class="head">
+        <span class="date">27/11/2026</span>
+        <span class="state">بعد قرار الاستمرار</span>
+      </div>
+      <h2>ماذا أطلب، وكم — يُبنى خلال شهر التجربة</h2>
+
+      <ul class="gets">
+        <li><span class="fig none">كمية</span><p>«اطلب N وحدة» من حركة السوق حولك ومن مبيعاتك أنت</p></li>
+        <li><span class="fig">527</span><p>صنفاً يبيعها السوق ولا تبيعها أنت — نرصدها اليوم فعلاً</p></li>
+        <li><span class="fig none">حدّ</span><p>كمية مقيّدة بالصلاحية: «اطلب 6 لا 12، الباقي سيتلف»</p></li>
+      </ul>
+
+      <div class="block risk">
+        <h3>ما يحكم هذا التاريخ — وليس بيدنا</h3>
+        <ul>
+          <li><b>سجلات الاستلام.</b> إن بدأ التسجيل يوم 12/9، تجهز بيانات الصلاحية حوالي 12/10
+            ويصير التاريخ رهن البرمجة وحدها. إن بدأ في تشرين الأول، يتأخّر بمقدار التأخير نفسه بالضبط.
+            <b>لا توجد برمجة تختصر ثلاثين يوماً.</b></li>
+        </ul>
+      </div>
+    </li>
+  </ol>
+
+  <!-- ============ OUT OF SCOPE ============ -->
+  <div class="closing">
+    <h2>ما هو خارج المراحل الثلاث — عمداً</h2>
+    <ul class="out">
+      <li><b>مهل الموردين الحقيقية</b>
+        تُقاس بعد ثلاث تسليمات لكل مورّد. رهن التقويم لا البرمجة: تصل حين تكون التسليمات قد حدثت.</li>
+      <li><b>البلانوغرام — ترتيب الرفوف</b>
+        يحتاج صور رفوفك بأبعادها، وطلباً حقيقياً من المرحلة الثالثة، وساعة من قواعدك أنت.
+        يُعرض كخطة مؤرّخة بشروطها، لا كميزة جاهزة.</li>
+      <li><b>مراقبة الرفوف بحسّاسات أو كاميرات مثبّتة</b>
+        مستبعدة نهائياً، لا مؤجّلة. مشروع عتاد لا يحمله فريق من اثنين، ولن نعِد به لاحقاً.</li>
+    </ul>
+
+    <p class="rule-note">
+      <b>القاعدة تحت كل ما سبق:</b> حين لا نستطيع ذكر رقم بصدق، تعرض الشاشة <b>لا رقم</b> — لا صفراً.
+      وهذه القاعدة تنطبق علينا نحن أيضاً: لا مبلغ بالشيكل على أي إشارة مشتقّة من كميات المخزون التي
+      أخبرتنا أنت أنّها غير موثوقة.
+    </p>
+  </div>
+</div>
