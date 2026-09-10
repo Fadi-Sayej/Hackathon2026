@@ -27,40 +27,40 @@ rather than a milestone.
 > «رقم مفترض يُثبَّت في اجتماع 12/9» — an assumption to be fixed at the 12/9 meeting, with every
 > date moving with it. This is the input to that conversation.
 
-## The feature list he is shown
+## What he is shown: his own ten sentences
 
-One line per feature, one date. No stages, no narrative — that framing was ours, and he does not
-buy stages. Names are the PRD §3 feature register in his vocabulary.
+The page is the PRD §3 intent table, verbatim, with a date on each line. Nothing else.
 
-| Feature | Register | Date | Bound by |
+| His words (PRD §3, verbatim) | Intent | Date | Bound by |
 |---|---|---|---|
-| مقارنة أسعارك مع المنافسين | F3 | works now | — |
-| كشف فروقات السعر مع Wolt | F1 | works now | — |
-| أصناف تُباع تحت التكلفة | SPEC-GAP-A | works now | — |
-| تدقيق المخزون والسجلات الخاطئة | F2 | works now | — |
-| تسجيل الصلاحية عند الاستلام | — | works now | — |
-| شاشة الصباح — 10 إجراءات فقط | F6 | **27/09** | effort — `rankActions` already orders the set |
-| تنظيف الكتالوج + ملف للـPOS | F4 | **27/09** | effort — the ghost/idle split already runs |
-| أسئلة التكلفة داخل التطبيق | F5 | **27/09** | effort — one missing import path |
-| توصيات الطلب — كم تطلب من كل صنف | F8 | **25/10** | **his two-year reports** |
-| أصناف يبيعها السوق ولا تبيعها | F9 | **25/10** | effort |
-| تتبّع كل رقم — من أين جاء | F7 | **30/10** | effort — the engine rebuild |
-| الطلب حسب الصلاحية | F10 | **20/11** | **30 days of receipt logs from 12/09** |
-| مهل الموردين الحقيقية | F11 | **20/11** | **3 observed deliveries per supplier** |
-| البلانوغرام — ترتيب الرفوف | F12 | **27/11** | shelf photos + F8 + an hour of his rules |
+| «لا أريد أن أخسر في كل عملية بيع» | INT-001 | works now | — |
+| «هل أسعاري معقولة مقابل الجيران؟» | INT-003 | works now | — |
+| «أين يختفي مخزوني؟» | INT-002 | works now | — |
+| «نظّف كتالوجي من الأصناف الميتة» | INT-009 | **27/09** | effort — the ghost/idle split already runs |
+| «أكمل بياناتي الناقصة، بأقل إزعاج» | INT-010 | **27/09** | effort — one missing import path |
+| «ماذا أطلب اليوم وبأي كمية؟» | INT-004 | **30/10** | **his two-year reports** |
+| «ماذا يبيع السوق ولا أبيعه أنا؟» | INT-005 | **30/10** | effort |
+| «كم أطلب حتى لا يتلف؟» | INT-007 | **20/11** | **30 days of receipt logs from 12/09** |
+| «متى يصل كل مورّد فعلاً؟» | INT-008 | **20/11** | **3 observed deliveries per supplier** |
+| «رتّب رفوفي لأربح أكثر» | INT-006 | **15/12** | shelf photos + INT-004 + an hour of his rules |
 
-### Two consequences of these dates, recorded rather than hidden
+### What was taken off the page, and why
 
-**F8 ships before F7.** Order recommendations land 25/10, five days before the engine that makes
-every figure reproducible. So the first ordering recommendations he sees are computed by the
-existing pipeline, not by the rebuilt engine — they are honest, but not yet recomputable in
-front of him, and the two must agree when F7 lands. If they disagree on 30/10, F7 wins and the
-numbers move; say that on the day rather than after.
+Earlier drafts listed data hygiene, the ten-action cap, figure provenance and the cost
+questions as features. They are not. They are **how we deliver his ten**, and three of them are
+things we need *from* him rather than things he gets:
 
-**Three dates are not ours to hold.** F8 waits on the two-year reports, F10 on thirty days of
-receipt logging that starts 12/09, F11 on three deliveries per supplier actually happening. No
-amount of engineering compresses any of them, which is why the logging matters from the day of
-the meeting and not from the day we need the data.
+| Removed | What it actually is |
+|---|---|
+| «تدقيق المخزون والسجلات الخاطئة» | Part of INT-002. He asked where his stock goes, not for a list of broken records |
+| «شاشة الصباح — 10 إجراءات» | INT-NS, our own design rule. He asked for answers, not for a bounded list |
+| «تتبّع كل رقم — من أين جاء» | INT-PROV, our rule for keeping ourselves honest. He will use it; he did not ask for it |
+| «أسئلة التكلفة داخل التطبيق» | INT-010 is *his* intent — completing his data. The questions are the mechanism, and they are work we ask of him |
+
+The test each line has to pass: **did he say it?** If the sentence is ours, it belongs in this
+file, not on his page. INT-NS and INT-PROV are registered as intents in
+[the intent register](intent-register.md) precisely because they are cross-cutting rules we
+imposed — SPEC-000 §1 says so in as many words.
 
 ## After the three phases
 
