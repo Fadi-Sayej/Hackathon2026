@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-10T02:35:43.032512+00:00",
-  "date": "2026-09-10",
+  "generatedAt": "2026-09-11T02:36:20.995773+00:00",
+  "date": "2026-09-11",
   "status": "ok",
   "sources": {
     "weather": "open-meteo",
@@ -9,22 +9,28 @@
     "islamic": "computed_hijri"
   },
   "weather": {
-    "temperatureC": 20.3,
+    "temperatureC": 21.7,
     "precipitation": 0.0,
-    "windSpeed": 7.4,
-    "weatherCode": 0,
+    "windSpeed": 6.6,
+    "weatherCode": 2,
     "label": "warm",
-    "observedAt": "2026-09-10T05:30",
+    "observedAt": "2026-09-11T05:30",
     "lat": 32.114,
     "lon": 34.976,
     "source": "open-meteo"
   },
   "hebrew": {
-    "date": "2026-09-10",
-    "holidays": [],
-    "isErevChag": false,
+    "date": "2026-09-11",
+    "holidays": [
+      {
+        "title": "Erev Rosh Hashana",
+        "hebrew": "ערב ראש השנה",
+        "category": "holiday"
+      }
+    ],
+    "isErevChag": true,
     "isFastDay": false,
-    "isShabbatEve": false,
+    "isShabbatEve": true,
     "chametz": null,
     "pesachStart": "2027-04-22",
     "windows": {
@@ -35,11 +41,11 @@
     "source": "hebcal"
   },
   "islamic": {
-    "date": "2026-09-10",
+    "date": "2026-09-11",
     "hijri": {
       "year": 1448,
       "month": 3,
-      "day": 27
+      "day": 28
     },
     "isRamadan": false,
     "ramadanDay": null,
@@ -47,8 +53,8 @@
     "isEidAlFitr": false,
     "isEidAlAdha": false,
     "ramadanStart": "2027-02-08",
-    "daysToRamadan": 151,
-    "daysToEidAlFitr": 181,
+    "daysToRamadan": 150,
+    "daysToEidAlFitr": 180,
     "phase": null,
     "windows": {
       "ramadan_build_up_days": 21,
@@ -58,9 +64,21 @@
     },
     "source": "computed_hijri"
   },
-  "demandSignals": {},
-  "demandBasis": {},
-  "activeReasons": [],
+  "demandSignals": {
+    "מוצרי מכולת": 1.1,
+    "מוצרי מקרר": 1.1
+  },
+  "demandBasis": {
+    "מוצרי מכולת": [
+      "shabbat_eve"
+    ],
+    "מוצרי מקרר": [
+      "shabbat_eve"
+    ]
+  },
+  "activeReasons": [
+    "shabbat_eve"
+  ],
   "shelfLife": {
     "categories": {
       "מחלקת -barista": 2,
@@ -649,6 +667,7 @@
       "7290001780800",
       "7290001817377",
       "7290001817728",
+      "7290001902776",
       "7290001985007",
       "7290002008224",
       "7290002019787",
@@ -2389,7 +2408,7 @@
       "9780201321029",
       "9800800056"
     ],
-    "days": 31,
+    "days": 32,
     "status": "ok",
     "lift": 1.15
   }
