@@ -143,16 +143,20 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
               "above": None if ceiling_pct is None else sum(1 for s in states.values() if s == "above"),
               "inverted": sum(1 for s in states.values() if s == "inverted"),
               "excluded_artefact": len(excluded_artefact), "excluded_gap": len(excluded_gap)}
-    # ARCH-GATE-006: the ceiling is derived AFTER the FR-074 withdrawn exclusion — `paired`
-    # already dropped them — so the published population is the live catalogue, not the whole
-    # export, and a withdrawal moves the ceiling. The population travels with the figure.
+    # ARCH-GATE-006: the ceiling is derived AFTER the FR-074 withdrawn exclusion, so a
+    # withdrawal moves the ceiling and the population must travel with the figure.
+    #
+    # Reported, not asserted. ADR-020 makes the published population a policy setting, so
+    # this run may have been given no withdrawn set at all — claiming the exclusion happened
+    # when it did not is the kind of unearned label the whole provenance layer exists to stop.
+    excludes_withdrawn = bool(inputs.withdrawn)
     thresholds = {"ceiling_pct": ceiling_pct, "ceiling_method": ceiling.method, "ceiling_bands": ceiling.bands,
-                  "ceiling_population": len(kept), "ceiling_population_excludes_withdrawn": True,
+                  "ceiling_population": len(kept), "ceiling_population_excludes_withdrawn": excludes_withdrawn,
                   "artefact_min_price": policy.artefact_min_price, "artefact_cost_ratio": policy.artefact_cost_ratio,
                   "max_credible_gap_pct": policy.max_credible_gap_pct}
     figures = [Figure(k, v, "products", ["pos"], {"ceiling_pct": ceiling_pct}) for k, v in counts.items()]
     figures.append(Figure("ceiling_pct", ceiling_pct, "percent", ["pos"],
                           {"method": ceiling.method, "population": len(kept),
-                           "excludes_withdrawn": True}))
+                           "excludes_withdrawn": excludes_withdrawn}))
     return CapabilityOutput(id=CAP, spec=SPEC, status="available", thresholds=thresholds, counts=counts,
                             entries=entries, figures=figures, notes=notes)

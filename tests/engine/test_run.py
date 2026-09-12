@@ -76,3 +76,22 @@ def test_adr_017_a_run_whose_reports_arrived_is_not_degraded_for_that(tmp_path, 
     sales_step = next(s for s in result["steps"] if s["step"] == "sales_import")
     assert sales_step["status"] == "ok"
     assert result["artefact"]["vintages"]["sales"]["imported_this_run"] is True
+
+
+def test_adr_020_the_published_population_comes_from_policy(tmp_path, monkeypatch):
+    """ADR-020. The cut-over was blocked because the artefact happened to count over the
+    living catalogue, which D-14 forbids showing the owner while GAP-009 is open. That was a
+    default, not a fact: the population is a policy setting and the artefact states it."""
+    _isolate(monkeypatch, tmp_path)
+    result = run_mod.run_engine(mode="print", capability_runners={},
+                                now=datetime(2026, 9, 8, tzinfo=timezone.utc))
+    from src.engine.policy import load_policy
+    assert result["artefact"]["population"] == load_policy().published_population
+
+
+def test_an_explicit_population_still_wins(tmp_path, monkeypatch):
+    """npm run figures:whole must be able to ask for a population regardless of policy."""
+    _isolate(monkeypatch, tmp_path)
+    result = run_mod.run_engine(mode="print", capability_runners={}, population="living",
+                                now=datetime(2026, 9, 8, tzinfo=timezone.utc))
+    assert result["artefact"]["population"] == "living"

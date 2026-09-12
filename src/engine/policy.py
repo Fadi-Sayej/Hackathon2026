@@ -37,6 +37,7 @@ class Policy:
     implausible_revenue_share: float
     full_annual_cycle_months: int
     withdraw_with_stock: bool
+    published_population: str
 
     def as_dict(self) -> dict:
         """The artefact's `thresholds` block, grouped as design §11.4 defines it.
@@ -82,6 +83,7 @@ class Policy:
                 "cost_ratio": self.artefact_cost_ratio,
             },
             "question_limit": self.question_limit,
+            "published_population": self.published_population,
         }
 
 
@@ -111,6 +113,7 @@ def load_policy(path: Path | str | None = None) -> Policy:
         implausible_revenue_share=float(raw.get("implausible_revenue_share", 0.10)),
         full_annual_cycle_months=int(raw.get("full_annual_cycle_months", 12)),
         withdraw_with_stock=bool(raw.get("withdraw_with_stock", False)),
+        published_population=str(raw.get("published_population", "living")),
     )
     if policy.withdraw_with_stock:
         raise ValueError(

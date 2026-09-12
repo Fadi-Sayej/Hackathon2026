@@ -106,7 +106,7 @@ def _sales_verdict(result) -> tuple:
 def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_market: bool = False,
                artefact_path: Path = ARTEFACT_PATH, capability_runners: Optional[dict] = None,
                now: Optional[datetime] = None, silver_dir: Optional[Path] = None,
-               sales_dir: Optional[Path] = None, population: str = "living") -> dict:
+               sales_dir: Optional[Path] = None, population: Optional[str] = None) -> dict:
     # Resolved here, not in the signature: a default bound at import time cannot be
     # redirected by a caller that patches the module global, which is how Task 1.9
     # runs the engine over a copy of the data with an input withheld.
@@ -116,6 +116,10 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
     runners = _runners() if capability_runners is None else capability_runners
     steps: list = []
     policy = load_policy()
+    # ADR-020: which catalogue the published artefact counts over is a policy setting,
+    # not a constant. GAP-009 is open, so it is 'whole' — no published figure depends
+    # on automatic withdrawal, which is what D-14 requires.
+    population = population or policy.published_population
 
     owner = _step(steps, "owner_state_pull", _pull_owner_state) or OwnerState.unavailable("pull_step_failed")
     if input_csv:
@@ -172,7 +176,7 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
     if isinstance(vintages.get("sales"), dict):
         vintages["sales"] = {**vintages["sales"], "imported_this_run": imported_this_run}
 
-    artefact = build_artefact(outputs, vintages=vintages,
+    artefact = build_artefact(outputs, vintages=vintages, population=population,
                               thresholds=policy.as_dict(), run={"status": status, "steps": steps},
                               extra_figures=extra_figures, generated_at=now.isoformat(),
                               run_id=uuid.uuid4().hex[:12],

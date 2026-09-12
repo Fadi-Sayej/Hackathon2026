@@ -8,6 +8,7 @@
     "generated_at",
     "run_id",
     "inputs_digest",
+    "population",
     "run",
     "vintages",
     "thresholds",
@@ -243,6 +244,13 @@
     "inputs_digest": {
       "type": "string",
       "description": "Hex digest over the content of every input the run read. Two runs over identical inputs produce an identical digest; a changed policy constant changes it, because a figure computed under a different threshold is a different figure."
+    },
+    "population": {
+      "enum": [
+        "living",
+        "whole"
+      ],
+      "description": "ADR-020. Which catalogue every count was taken over. 'whole' includes automatically withdrawn products, which is what D-14 requires while GAP-009 is open."
     }
   },
   "$defs": {

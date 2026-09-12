@@ -34,7 +34,7 @@ def value_kinds_present(outputs: list[CapabilityOutput]) -> list[str]:
 
 
 def build_artefact(outputs, *, vintages, thresholds, run, generated_at, run_id, extra_figures=None,
-                   inputs_digest: str = "") -> dict:
+                   inputs_digest: str = "", population: str = "living") -> dict:
     figures = {}
     for out in outputs:
         for f in out.figures:
@@ -44,6 +44,7 @@ def build_artefact(outputs, *, vintages, thresholds, run, generated_at, run_id, 
     return {
         "schema_version": 2,
         "inputs_digest": inputs_digest,
+        "population": population,
         "generated_at": generated_at,
         "run_id": run_id,
         "run": run,
