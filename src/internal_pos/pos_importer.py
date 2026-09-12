@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -36,6 +36,7 @@ def _build_table_rows(
     imported_at: str,
     source_file: str,
     source_kind: str,
+    as_of: str,
 ) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for row in normalized_rows:
@@ -43,6 +44,7 @@ def _build_table_rows(
         subset["_imported_at"] = imported_at
         subset["_source_file"] = source_file
         subset["_source_kind"] = source_kind
+        subset["_as_of"] = as_of
         rows.append(subset)
     return rows
 
@@ -51,8 +53,12 @@ def import_pos_file(
     input_path: Path,
     config_path: Path = CONFIG_PATH,
     imported_at: str | None = None,
+    as_of: str | None = None,
 ) -> dict[str, Any]:
     imported_at = imported_at or datetime.now(timezone.utc).isoformat()
+    # The POS vintage is the day the export was taken, not the day we imported it
+    # (SPEC-007 FR-120). Default: the file's modification date.
+    as_of = as_of or date.fromtimestamp(input_path.stat().st_mtime).isoformat()
     config = load_schema_config(config_path)
     inspection = inspect_pos_file(input_path, config_path)
     source_kind = classify_source_file(input_path)
@@ -98,6 +104,7 @@ def import_pos_file(
             imported_at,
             input_path.name,
             source_kind,
+            as_of,
         )
         path = _write_fixed_parquet(rows, SILVER_POS_DIR / table_spec["filename"])
         output_paths[table_name] = str(path)
@@ -136,3 +143,13 @@ def import_pos_file(
         "inspection": inspection,
     }
 
+
+
+def read_pos_vintage(silver_dir: Path = SILVER_POS_DIR) -> dict[str, Any] | None:
+    path = silver_dir / "yomyom_inventory.parquet"
+    if not path.exists():
+        return None
+    rows = pq.read_table(path, columns=["_source_file", "_as_of"]).slice(0, 1).to_pylist()
+    if not rows:
+        return None
+    return {"file": rows[0].get("_source_file"), "as_of": rows[0].get("_as_of")}

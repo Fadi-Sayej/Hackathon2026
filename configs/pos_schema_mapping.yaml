@@ -272,9 +272,10 @@ validation:
     - units_sold_30d
     - sales_amount_30d
     - gross_profit_30d
-    # NOTE: current_stock intentionally excluded — yomyom-inventory.csv has 627
-    # rows with negative stock values (POS artifact). These are clamped to 0
-    # during import rather than rejected.
+    # NOTE: current_stock intentionally excluded from this check.
+    # Negative stock is PRESERVED as recorded. Nothing in the importer clamps it:
+    # SPEC-004 C-32 requires the lifecycle rule to see the raw value, and SPEC-002
+    # reports negative stock as a hygiene record with no money attached.
 
   # Field-level range checks
   range_checks:
@@ -308,17 +309,6 @@ silver_tables:
       - selling_price
       - wolt_price
       - cost_price
-
-  sales:
-    filename: yomyom_sales.parquet
-    columns:
-      - barcode
-      - product_name
-      - category
-      - units_sold_7d
-      - units_sold_30d
-      - sales_amount_30d
-      - last_sale_date
 
   inventory:
     filename: yomyom_inventory.parquet

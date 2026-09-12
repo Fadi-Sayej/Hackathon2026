@@ -17,6 +17,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--input", required=True, type=Path, help="Path to the POS CSV file.")
     parser.add_argument("--config", default=CONFIG_PATH, type=Path, help="Schema mapping YAML.")
     parser.add_argument("--imported-at", default=None, help="Optional ISO timestamp override.")
+    parser.add_argument("--as-of", default=None, help="YYYY-MM-DD the export was taken (default: file mtime)")
     return parser.parse_args()
 
 
@@ -29,7 +30,7 @@ def main() -> int:
         print(f"Config file not found: {args.config}", file=sys.stderr)
         return 1
 
-    result = import_pos_file(args.input, args.config, imported_at=args.imported_at)
+    result = import_pos_file(args.input, args.config, imported_at=args.imported_at, as_of=args.as_of)
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0 if result["status"] in {"ok", "not_ready"} else 2
 
