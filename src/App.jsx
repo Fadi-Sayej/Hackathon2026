@@ -2,10 +2,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import './App.css'
 
 import { AppShell } from './components/layout/AppShell.jsx'
-import { ExpiryPage } from './pages/ExpiryPage.jsx'
+import { ReceivingPage } from './pages/ReceivingPage.jsx'
 import { SmoothScrollProvider } from './lib/motion/SmoothScrollProvider.jsx'
 import { loadDashboard } from './lib/dataAdapters/loadDashboard.js'
-import { loadOperationalData, EMPTY_OPERATIONAL_DATA } from './lib/dataAdapters/loadOperationalData.js'
 import { loadOwnerState, recordAnswer, recordOutcome } from './owner/ownerState.js'
 import { CapabilityPage } from './pages/CapabilityPage.jsx'
 import { DataPage } from './pages/DataPage.jsx'
@@ -22,15 +21,15 @@ import { useI18n } from './lib/i18n/index.js'
  * Every figure on every page now comes from `dashboard.json`, so a number the owner asks
  * about has exactly one place it could have come from.
  *
- * `operational.json` is still fetched, and only for the receiving page's expiry buckets,
- * which no capability publishes yet. It keeps being written for one release so a rolled-back
- * browser still works (§20.2); Phase 4 removes both it and this import.
+ * `operational.json` is no longer read at all. It was fetched for the receiving page's
+ * expiry buckets, and those are every one of them zero — nothing has been recorded yet — so
+ * the summary came off under D-3 and the fetch with it. The file keeps being WRITTEN for one
+ * release so a rolled-back browser still works (§20.2); Phase 4 stops that too.
  */
 export default function App() {
   const { t } = useI18n()
   const [activePage, setActivePage] = useState('daily')
   const [load, setLoad] = useState({ status: 'loading', artefact: null, reason: null })
-  const [operationalData, setOperationalData] = useState(EMPTY_OPERATIONAL_DATA)
   const [ownerState, setOwnerState] = useState(() => loadOwnerState())
 
   // The clock is read once, here, and passed down. A component that reads it renders
@@ -41,9 +40,6 @@ export default function App() {
   useEffect(() => {
     let live = true
     loadDashboard().then((next) => { if (live) setLoad(next) })
-    loadOperationalData()
-      .then((data) => { if (live && data) setOperationalData(data) })
-      .catch(() => {})
     return () => { live = false }
   }, [])
 
@@ -97,7 +93,7 @@ export default function App() {
       return <DataPage artefact={artefact} />
     }
     if (activePage === 'receiving') {
-      return <ExpiryPage operationalData={operationalData} />
+      return <ReceivingPage />
     }
     if (CAPABILITY_PAGES.has(activePage)) {
       return <CapabilityPage artefact={artefact} capabilityId={activePage} />
