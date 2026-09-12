@@ -134,8 +134,19 @@ so this task turns that display on rather than requiring a browser change.
 ### Task 3.3: V1 signal probes
 
 **Files:**
-- Modify: `scripts/check_signals_live.mjs` — V1 probes over the artefact
-- Test: `scripts/__tests__/check_signals_live.test.mjs`
+- Create: `scripts/check_v1_signals.py`
+- Modify: `package.json` — adds `"check:signals:v1"`; `check:signals` keeps pointing at
+  the reorder probes, the only cover the reorder engine has until Phase 4 removes it.
+  Both run nightly.
+- Retire: `scripts/check_signals_live.mjs` (deleted with the reorder engine at Phase 4)
+
+> **Deviation, 2026-09-12.** The plan said to refactor `check_signals_live.mjs` in place.
+> It is a JS harness that imports `reorderEngine.js` and fingerprints its recommendations —
+> the engine §20.1 removes at Phase 4 — and driving the Python engine from it would mean a
+> shim whose only purpose is to survive until the file is deleted. The probe is written in
+> Python beside `check_independence.py`, which already has the harness for running the
+> engine over a copy of the data. The `.mjs` keeps running its reorder probes until Phase 4
+> removes both.
 
 **Interfaces:** the mechanism is kept (§20.1 REFACTOR) and the probes are replaced. Today
 it probes the reorder engine, which leaves the build at Phase 4. The V1 probes ask the same

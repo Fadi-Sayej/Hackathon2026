@@ -41,6 +41,7 @@
     "doctor": "vite-node scripts/doctor.mjs",
     "audit:ui": "node scripts/ui-audit.mjs",
     "check:signals": "node scripts/check_signals_live.mjs",
+    "check:signals:v1": "python3 scripts/check_v1_signals.py",
     "check:independence": "python3 scripts/check_independence.py",
     "check:surface": "vitest run src/surface/__tests__/checkpoint2.test.jsx",
     "figures": "python3 scripts/figures.py",
