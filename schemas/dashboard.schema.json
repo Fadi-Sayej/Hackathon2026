@@ -113,7 +113,8 @@
             "months",
             "first",
             "last",
-            "full_annual_cycle"
+            "full_annual_cycle",
+            "imported_this_run"
           ],
           "properties": {
             "months": {
@@ -136,6 +137,13 @@
             },
             "full_annual_cycle": {
               "type": "boolean"
+            },
+            "imported_this_run": {
+              "type": [
+                "boolean",
+                "null"
+              ],
+              "description": "ADR-017. True when this run imported sales rows; false when it continued on evidence already on disk; null when the import step failed and the question is unanswered."
             }
           }
         },

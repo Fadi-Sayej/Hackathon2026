@@ -51,3 +51,28 @@ def test_print_mode_writes_nothing(tmp_path, monkeypatch):
     result = run_mod.run_engine(mode="print", artefact_path=target, capability_runners={},
                                 now=datetime(2026, 9, 8, tzinfo=timezone.utc))
     assert result["published"] is False and not target.exists() and result["artefact"] is not None
+
+
+def test_adr_017_a_run_with_no_reports_says_so(tmp_path, monkeypatch):
+    """ADR-017. Measured behaviour before this: import_sales writes nothing, the previous
+    silver tables survive, and the run published 460 flagged products with the sales_import
+    step reporting 'ok' and vintages.sales listing all seven months as this run's. The
+    artefact was indistinguishable from a run where the reports arrived."""
+    _isolate(monkeypatch, tmp_path)
+    monkeypatch.setattr(run_mod, "_sales_import", lambda *a, **k: {"window": None, "monthly_rows": 0})
+    result = run_mod.run_engine(mode="print", capability_runners={},
+                                now=datetime(2026, 9, 8, tzinfo=timezone.utc))
+    sales_step = next(s for s in result["steps"] if s["step"] == "sales_import")
+    assert sales_step["status"] == "degraded"
+    assert result["status"] == "degraded"
+    assert result["artefact"]["vintages"]["sales"]["imported_this_run"] is False
+
+
+def test_adr_017_a_run_whose_reports_arrived_is_not_degraded_for_that(tmp_path, monkeypatch):
+    _isolate(monkeypatch, tmp_path)
+    monkeypatch.setattr(run_mod, "_sales_import", lambda *a, **k: {"window": None, "monthly_rows": 42})
+    result = run_mod.run_engine(mode="print", capability_runners={},
+                                now=datetime(2026, 9, 8, tzinfo=timezone.utc))
+    sales_step = next(s for s in result["steps"] if s["step"] == "sales_import")
+    assert sales_step["status"] == "ok"
+    assert result["artefact"]["vintages"]["sales"]["imported_this_run"] is True

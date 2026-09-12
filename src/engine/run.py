@@ -73,16 +73,34 @@ def _market_chain(skip: bool) -> list:
     return steps
 
 
-def _step(steps: list, name: str, fn: Callable):
+def _step(steps: list, name: str, fn: Callable, verdict: Optional[Callable] = None):
+    """`verdict` lets a step that succeeded still report that it did nothing.
+
+    ADR-017: a sales import that contributes no rows has not failed — it has nothing to
+    import — but calling that 'ok' makes a day the reports never arrived indistinguishable
+    from a day they did.
+    """
     t0 = time.monotonic()
     try:
         result = fn()
-        steps.append({"step": name, "status": "ok", "ms": int((time.monotonic() - t0) * 1000), "error": None})
+        status, error = ("ok", None) if verdict is None else verdict(result)
+        steps.append({"step": name, "status": status, "ms": int((time.monotonic() - t0) * 1000),
+                      "error": error})
         return result
     except Exception as exc:  # noqa: BLE001 — isolate, record, continue
         steps.append({"step": name, "status": "error", "ms": int((time.monotonic() - t0) * 1000),
                       "error": f"{type(exc).__name__}: {exc}"})
         return None
+
+
+def _sales_verdict(result) -> tuple:
+    """ADR-017. Contributing no rows is not an error and is not ok either: import_sales
+    writes nothing and the previous silver tables survive, so the run continues on older
+    evidence. Detection keeps publishing — a July discrepancy is still a discrepancy in
+    September — and the run says the evidence is older."""
+    if result and result.get("monthly_rows"):
+        return "ok", None
+    return "degraded", "no_rows_imported: the run continued on evidence already on disk"
 
 
 def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_market: bool = False,
@@ -103,7 +121,11 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
     if input_csv:
         from src.internal_pos.pos_importer import import_pos_file
         _step(steps, "pos_import", lambda: import_pos_file(Path(input_csv)))
-    _step(steps, "sales_import", lambda: _sales_import(sales_dir, silver_dir))
+    sales = _step(steps, "sales_import", lambda: _sales_import(sales_dir, silver_dir),
+                  verdict=_sales_verdict)
+    # ADR-017: None when the step raised — unknown, not false. A failed import is already
+    # reported as an error; asserting the reports did not arrive would add a claim.
+    imported_this_run = None if sales is None else bool(sales.get("monthly_rows"))
     for name, fn in _market_chain(skip_market):
         _step(steps, name, fn)
 
@@ -134,7 +156,9 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
     status = "ok"
     if any(s["status"] == "error" for s in steps):
         status = "partial"
-    elif owner.status != "available" or any(o.unavailable_reason == "capability_error" for o in outputs):
+    elif (owner.status != "available"
+          or imported_this_run is False
+          or any(o.unavailable_reason == "capability_error" for o in outputs)):
         status = "degraded"
 
     extra_figures = []
@@ -144,7 +168,11 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
         stamp(outputs, inputs)
         extra_figures = vintage_figures(inputs)      # figures, NOT a capability
 
-    artefact = build_artefact(outputs, vintages=inputs.vintages if inputs else _no_inputs_vintages(owner),
+    vintages = inputs.vintages if inputs else _no_inputs_vintages(owner)
+    if isinstance(vintages.get("sales"), dict):
+        vintages["sales"] = {**vintages["sales"], "imported_this_run": imported_this_run}
+
+    artefact = build_artefact(outputs, vintages=vintages,
                               thresholds=policy.as_dict(), run={"status": status, "steps": steps},
                               extra_figures=extra_figures, generated_at=now.isoformat(),
                               run_id=uuid.uuid4().hex[:12],
