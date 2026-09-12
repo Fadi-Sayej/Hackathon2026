@@ -108,7 +108,11 @@ answers rather than surfacing them:
 
 - **INT-004** depends on how market movement and the store's own movement combine into
   one quantity, and on what geographic radius defines "the market". Both open —
-  `intent.md` §6 states the ordering of inputs, not the rule.
+  `intent.md` §6 states the ordering of inputs, not the rule. The three decisions are
+  posed as answerable questions, with the options the data supports, in
+  [open-decisions/F8-ordering.md](open-decisions/F8-ordering.md). **That brief is not
+  authority** — when the decisions are taken they are recorded as `D-14 …` in §3 above,
+  and the brief is set `Superseded`.
 - **INT-005** depends on what the owner is expected to *do* with a "strong in the
   market, weak here" finding. `intent.md` §6 phrases it as a conversation opener, which
   is not yet a decision the system can record.

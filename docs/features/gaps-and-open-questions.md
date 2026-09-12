@@ -265,6 +265,14 @@ that this does not block V1.
 
 **Confidence:** High.
 
+> **Added 2026-09-12 (not part of the migrated content).** The three decisions are now
+> posed as answerable questions, with the options the data supports, in
+> [F8 — the three decisions](../product/open-decisions/F8-ordering.md). That document
+> resolves nothing; it exists so the decisions can be taken in one sitting. It raises
+> four new open questions, **GAP-008a … GAP-008d**, one of which is blocking: the
+> `WATCH_PRODUCT` population is 527 in F8's intent and 1,857 in `public/data/operational.json`
+> (2026-09-10).
+
 ---
 
 #### GAP-009 — "Sold nothing" is, for every classified product in the pilot, "has no sales row"
