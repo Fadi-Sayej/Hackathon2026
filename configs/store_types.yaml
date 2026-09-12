@@ -134,6 +134,7 @@ stores:
   # -- our store, and the static chains in CHAIN_META --------------------------
   yomyom-kq-01:
     store_type: gas_convenience
+    role: client
     verified: manual
     basis: branch_known
     name: "YomYom Kafr Qasim"
@@ -203,8 +204,15 @@ stores:
     name: "Shufersal | Rosh Ha'ayin"
     chain: "Shufersal"
     note: "Standard Shufersal branch, not a Deal box — supermarket, not hypermarket."
+  689d9d1ea1357c9968d6850f:
+    name: Super Alonit Einat (Wolt)
+    store_type: gas_convenience
+    verified: manual
+    basis: branch_known
+    notes: Dor Alon forecourt shop, the reference venue in delivery_targets.yaml; collected daily since 2026-08-11 but unclassified until 2026-09-08.
   68e64a15ddc7ae17b6279458:
     store_type: gas_convenience
+    role: client
     verified: manual
     basis: branch_known
     name: "Yom Yom"
