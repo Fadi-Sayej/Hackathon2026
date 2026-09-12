@@ -1195,6 +1195,7 @@ elsewhere in this document resolves to the file below.
 | [ADR-011](decisions/ADR-011-evidence-semantics-no-row-is-recorded.md) | Evidence semantics: `no_row` is recorded, and classification states it | Easy |
 | [ADR-012](decisions/ADR-012-money-is-a-typed-value-with-a-declared-policy.md) | Money is a typed value with a declared per-capability policy | Easy |
 | [ADR-014](decisions/ADR-014-a-capability-is-the-smallest-independently-unavailable-unit.md) | A capability is the smallest independently-unavailable unit; data hygiene is one | Easy |
+| [ADR-015](decisions/ADR-015-ceiling-is-the-densest-qualifying-collapse.md) | The markup ceiling is the densest qualifying collapse, not the last; ties take the higher edge | Easy |
 | [ADR-013](decisions/ADR-013-tests-run-before-merge.md) | Tests run before merge | Easy |
 
 ---
