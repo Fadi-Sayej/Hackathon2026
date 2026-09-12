@@ -88,7 +88,7 @@ def _step(steps: list, name: str, fn: Callable):
 def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_market: bool = False,
                artefact_path: Path = ARTEFACT_PATH, capability_runners: Optional[dict] = None,
                now: Optional[datetime] = None, silver_dir: Optional[Path] = None,
-               sales_dir: Optional[Path] = None) -> dict:
+               sales_dir: Optional[Path] = None, population: str = "living") -> dict:
     # Resolved here, not in the signature: a default bound at import time cannot be
     # redirected by a caller that patches the module global, which is how Task 1.9
     # runs the engine over a copy of the data with an input withheld.
@@ -121,8 +121,15 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
                 out = CapabilityOutput.unavailable(cap_id, spec, "capability_error")
             outputs.append(out)
             if cap_id == "catalogue_lifecycle" and out.status == "available":
-                inputs.withdrawn = getattr(out, "withdrawn_barcodes", set())
-                inputs.idle = getattr(out, "idle_barcodes", set())
+                # population='whole' suppresses the hand-off, so every other capability
+                # counts over the entire catalogue. D-14 forbids putting a figure that
+                # depends on automatic withdrawal in front of the owner until GAP-009
+                # closes, and those figures must come from THIS implementation under a
+                # different population — not from a second script that computes them its
+                # own way, which is the defect Phase 3 exists to remove.
+                if population != "whole":
+                    inputs.withdrawn = getattr(out, "withdrawn_barcodes", set())
+                    inputs.idle = getattr(out, "idle_barcodes", set())
 
     status = "ok"
     if any(s["status"] == "error" for s in steps):

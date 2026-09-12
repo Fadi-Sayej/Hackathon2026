@@ -193,6 +193,6 @@ finding** — record it rather than importing and re-running.
 
 | id | Question | Owner | Blocks |
 |---|---|---|---|
-| P3-OQ-1 | `print_figures.py` counts over the whole catalogue; the engine counts over the living one. Deleting it removes the only source of the D-14 figures the owner is to be shown on 12/9. Does `figures.py` need a `--whole-catalogue` mode until GAP-009 closes? | smartshelf-pm | Task 3.0 Step 3 |
+| ~~P3-OQ-1~~ | **Answered 2026-09-12.** `run_engine(population='whole')` suppresses the catalogue hand-off, so every figure counts over the entire catalogue from the same implementation. `npm run figures:whole` is the D-14 source. It reproduces F1's published **68 inverted** exactly; `above` comes out 131 against the intent's 136, the difference being ADR-019's 42 conflicting duplicates and the D-4 artefact exclusions | smartshelf-architect | — |
 | P3-OQ-2 | Checkpoint 3 requires a fresh clone to reproduce the figures, but a fresh clone has no `data/**`. Is the checkpoint "reproduces from the committed snapshots after a POS import", or does the POS export need committing? | smartshelf-architect | Task 3.5 |
 | P3-OQ-3 | The CI secret is still unset, so no nightly artefact can carry owner state. Task 3.4 can land without it, but the nightly is then permanently `degraded` | smartshelf-platform | the pilot, not the task |
