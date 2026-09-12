@@ -1,6 +1,6 @@
 ---
 ID: PHASE-0-1-EXECUTION
-Title: What executing the Phase 0 and Phase 1 plan found
+Title: What executing the Phase 0, 1 and 2 plans found
 Status: Ready for review
 Owner: smartshelf-engineer
 Parent: [Implementation Plan](../implementation/plan.md)
@@ -124,3 +124,46 @@ Two counts sit outside the plan's §3.5 expectations and are **not explained**:
 vintage differences — the silver tables were re-imported from `yomyom-inventory.csv` during
 this work — but that was not verified, and it should be before any of these numbers is
 quoted to the owner.
+
+---
+
+## Phase 2 — what building the browser found
+
+Tasks 2.0 – 2.9 built. 590 JS tests, lint, build, bundle guard and `check:surface` green.
+**Task 2.7's cut-over is deliberately not done** — see below.
+
+### Three defects, each caught by running against something real
+
+| # | Where | What | Caught by |
+|---|---|---|---|
+| 14 | `policy.py` | `as_dict()` returned a flat `asdict()` dump, so the artefact carried `surface_bound` where design §11.4 specifies `thresholds.surface.bound`. Not cosmetic: F7-S1 requires a count rendered with the thresholds that governed it, which needs the per-capability grouping | writing `compose` against the documented shape |
+| 15 | `compose` | Ranking unvalued entries after valued ones gave `price_consistency` **all ten places** on the pilot data. FR-106 requires places to be *allocated*, and F6-S1 §12 names the consequence: "hygiene work would otherwise never surface" | running against the real artefact, not the fixture |
+| 16 | the dictionaries | **99 missing translations.** Every dynamic key family — seven capability names, 39 count labels, 20 thresholds, 27 evidence fields, ten characterisations — was unresolved. The translator falls back to the key, so the pilot would have shown `count.suppressed_no_effect` to the owner | Checkpoint 2, against the real artefact |
+
+Defect 16 is the one worth remembering: **no fixture test could have found it.** The fixture
+carries one entry per characterisation; the vocabulary gap only appears when the real
+artefact's 39 distinct counts are rendered.
+
+### The cut-over is deferred, and why
+
+Task 2.7 would have the browser read `dashboard.json` only. Every price figure in it is
+computed over the living catalogue — 3,903 products withdrawn — and **D-14** forbids putting
+a figure that depends on automatic withdrawal in front of the owner until GAP-009 closes.
+
+`src/surface/V1Spine.jsx` wires all ten pages and is covered end to end; it is simply not
+the app's default. The owner's screen keeps reading `operational.json`. The cut-over is a
+one-line change once GAP-009 is answered.
+
+### Two guards added to CI
+
+- `check:bundle` — a ratchet at 5,200 KB against today's 5,012 KB, to 500 KB at Checkpoint 4.
+  ADR-018 declined a validator on a budget nothing was enforcing.
+- `check:surface` — the Checkpoint 2 crossing, against the committed artefact.
+
+### Carried forward
+
+- **Task 2.7's cut-over** — blocked on GAP-009, then one line.
+- **`imported_this_run`** — ADR-017, Phase 3. The data page renders "unknown" until then.
+- **AC-103 is unfalsifiable on real data.** V1's schema permits one value kind, so the
+  never-sum-two-kinds rule is enforced structurally and tested with a synthetic second kind.
+

@@ -1,7 +1,7 @@
 ---
 ID: PLAN
 Title: SmartShelf V1 Implementation Plan
-Status: Partial — Phases 0, 1 and 2 written; Phases 3–4 NOT YET CREATED
+Status: Partial — Phases 0, 1 and 2 built (Task 2.7's cut-over deferred on D-14); Phases 3–4 NOT YET CREATED
 Version: 1.1 (written 2026-09-08 against System Design v1.0; refreshed the same day against v1.1)
 Parent: [System Design](../architecture/system-design.md)
 Related Specs: F1-S1 … F7-S1 (see the System Design's §21 traceability matrix)
@@ -71,7 +71,7 @@ Copied verbatim from `docs/architecture/system-design.md`; every task's requirem
 |---|---|---|---|
 | Phase 0 — Foundations | [`2026-09-08-v1-01-foundations.md`](phase-0-foundations.md) | — | Contract, policy, owner-state model + pull, ingestion fixes, orchestrator + publisher, CI. **Checkpoint 0-B:** a run publishes a valid artefact with no capabilities; CI green |
 | Phase 1 — Capabilities | [`2026-09-08-v1-02-capabilities.md`](phase-1-capabilities.md) | Phase 0 | Seven capabilities in six modules, surface producer, provenance, the rule-12 independence probe. Tasks 1a/1b/1c/1d are independent of each other. **Checkpoint 1:** AC tests for SPEC-001…005 pass; publisher assertions hold on real data; the probe passes with `sales_monthly` withheld |
-| Phase 2 — Browser | [`phase-2-browser.md`](phase-2-browser.md) | Phase 1 artefact | `loadDashboard`, owner state, `compose`, DailyPage, capability pages, questions, data page, migrations. **Checkpoint 2:** AC-100…AC-112 and e2e invariants pass |
+| Phase 2 — Browser ✅ *(cut-over deferred)* | [`phase-2-browser.md`](phase-2-browser.md) | Phase 1 artefact | `loadDashboard`, owner state, `compose`, DailyPage, capability pages, questions, data page, migrations. **Checkpoint 2:** AC-100…AC-112 and e2e invariants pass |
 | Phase 3 — Reproduction & gates | **NOT YET CREATED** | Phases 1–2 | `figures.py` as engine print mode, content addressing, V1 signal probes, nightly workflow. **Checkpoint 3:** fresh clone `npm run figures` ≤ 2 min and equals the artefact's `figures{}` |
 | Phase 4 — Removal | **NOT YET CREATED** | Checkpoint 3 | Tag `v1-attic`; delete §5.4's list; stop `operational.json`; drop migrations. **Checkpoint 4:** bundle < 500 KB; CI green |
 
