@@ -130,13 +130,49 @@ jobs:
             exit 1
           fi
 
+      - name: Run the engine and publish the artefact
+        id: engine
+        # The V1 engine, alongside refresh_pipeline.py rather than instead of it.
+        # operational.json keeps being written for one release so a rolled-back
+        # browser still works (§20.2), and the owner's screen still reads it —
+        # Task 2.7's cut-over waits on D-14 / GAP-009.
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          FIREBASE_PROJECT_ID: hackathon26-a6ebd
+          VITE_STORE_ID: yomyom-kafr-qasim
+        run: python3 scripts/run_engine.py --json-out /tmp/engine.json
+
+      - name: Say plainly what the engine run was
+        # ADR-017: a run that continued on older sales evidence is never 'ok'. This
+        # does NOT fail the build — a late report is a normal day for an owner
+        # emailing CSVs by hand — but it must be visible in the log rather than
+        # discovered later from a stale window.
+        run: |
+          python3 - <<'PY'
+          import json
+          d = json.load(open('/tmp/engine.json'))
+          print(f"engine status: {d['status']}")
+          for s in d['steps']:
+              if s['status'] != 'ok':
+                  print(f"::warning::step {s['step']} {s['status']} {s.get('error') or ''}")
+          PY
+
       - name: Is every signal still reaching an output?
         # The refresh can succeed while a signal quietly stops applying — that has
         # happened four times in this project, each time with unit tests green.
         # Runs against the dashboard we are about to commit, so an inert signal
-        # blocks the commit instead of shipping. Node only; the script imports
-        # nothing from node_modules.
+        # blocks the commit instead of shipping.
         run: node scripts/check_signals_live.mjs
+
+      - name: Does each capability depend on what it declares?
+        # The V1 equivalent, over the engine's artefact (Task 3.3). Withholds each
+        # input at source and reads the published statuses, so a capability that
+        # reads something it did not declare is caught before the artefact is
+        # committed. Five engine runs; nightly is where it belongs, not on push.
+        run: python3 scripts/check_v1_signals.py
+
+      - name: Do detection and hygiene still fail independently?
+        run: python3 scripts/check_independence.py
 
       - name: Commit the rebuilt dashboard
         # Only public/data — every intermediate parquet stays gitignored and is
