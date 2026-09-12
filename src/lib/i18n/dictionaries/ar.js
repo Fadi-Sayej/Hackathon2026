@@ -758,4 +758,6 @@ export const ar = {
   'characterisation.question': "خارج سياستك — مقصود؟",
   'characterisation.hygiene': "سجل يحتاج تصحيحاً",
   'characterisation.inconsistent': "أرقام لا تتطابق",
+  'capability.missing': "هذه القدرة غير موجودة في هذا التصدير.",
+  'count.undetermined': "غير محدَّد",
 }

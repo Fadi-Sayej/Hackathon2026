@@ -752,4 +752,6 @@ export const en = {
   'characterisation.question': "Outside your policy — intentional?",
   'characterisation.hygiene': "A record to fix",
   'characterisation.inconsistent': "Numbers that do not add up",
+  'capability.missing': "This capability is not present in this export.",
+  'count.undetermined': "undetermined",
 }

@@ -753,4 +753,6 @@ export const he = {
   'characterisation.question': "מחוץ למדיניות שלך — בכוונה?",
   'characterisation.hygiene': "רשומה לתיקון",
   'characterisation.inconsistent': "מספרים שלא מסתדרים",
+  'capability.missing': "היכולת הזו לא קיימת בייצוא הזה.",
+  'count.undetermined': "לא נקבע",
 }
