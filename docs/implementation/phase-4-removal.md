@@ -74,6 +74,34 @@ LLM layer (`src/lib/ai/*`, `src/api/llm_proxy.py`), telemetry, the MCP server, a
 - [ ] **Step 1: Prove each is unread.** For every path, `git grep` for importers **outside
       the removal set**. Anything with a live reader comes off the list and is reported —
       it is not dead, it is unfinished.
+
+> **Step 1 run 2026-09-12, after the cut-over.** All ten V2/V4 pages are unreachable from
+> the app: `RecommendationsPage`, `ApprovedOrdersPage`, `DashboardPage`, `ReportPage`,
+> `PriceGapPage`, `ProductsPage`, `AssortmentGapPage`, `PlanogramPage`, `StoreLayoutPage`,
+> and `ShelfPlanPage` (referenced only by `StoreLayoutPage`, which is itself unreachable —
+> the pair is dead together). The LLM layer's only importer outside itself is `ReportPage`,
+> so it goes with that group.
+>
+> **Two came off the list.**
+>
+> `src/telemetry/` is **not dead**. `docs/operations/deployment.md` §"Internal telemetry
+> page (B-3)" documents it as the live internal pilot dashboard — alerts shown against
+> acted-on, acceptance by type, ₪ impact — reading decisions from Firestore. It is the only
+> thing that measures the pilot, and PRD §8's entire go/no-go rests on measuring it. This is
+> ARCH-GATE-003, which the readiness gate already raised and the System Design has not
+> recorded: *"the design removes the telemetry surface that SPEC-000 §4 relied on and builds
+> nothing in its place."* Deleting it would remove the pilot's own instrument. **Raised as
+> P4-OQ-3.**
+>
+> `.mcp.json` and `src/mcp_server/` stay pending **P4-OQ-2** — `.mcp.json` launches the
+> local price server, so removing it is a developer-workflow change.
+
+**Not started, and deliberately.** The deletions are proven safe but the phase's own
+precondition is not met: the cut-over has not been deployed, so the old spine is still the
+only thing that has ever served this pilot in production. Deleting the fallback before the
+replacement has run for a day is the risk this phase's three rules exist to prevent, and
+`vercel rollback` restores a deployment rather than a source tree. Task 4.1 starts when the
+cut-over has been live for one release and Checkpoint 3 is green.
 - [ ] **Step 2: Delete, in groups, one commit per group** — demo spine, V2/V4 analytics,
       LLM, telemetry, MCP, scripts. A single 200-file commit cannot be reviewed or
       reverted selectively.
@@ -146,3 +174,4 @@ a quarter has passed".
 |---|---|---|---|
 | P4-OQ-1 | Task 4.3 needs to know every pilot device has opened the app since the cut-over. Nothing measures that today — the outcome store is per-device and the engine only sees what Firestore holds. Is "ask the owner" the answer, or does the artefact need a device count? | smartshelf-pm | Task 4.3 |
 | P4-OQ-2 | §20.1 lists `src/mcp_server/` and `.mcp.json` as REMOVE, but `.mcp.json` is what launches the price server for local development. Removing it is a developer-workflow change, not just a deletion | smartshelf-architect | Task 4.1 |
+| P4-OQ-3 | §20.1 marks `src/telemetry/` dead, but `deployment.md` documents it as the live internal pilot dashboard and PRD §8's 30-day go/no-go depends on measuring what it measures. ARCH-GATE-003 named this and nothing replaced it. Delete it and the pilot loses its own instrument; keep it and §20.1 is wrong | smartshelf-pm, then architect | Task 4.1, and the 12/9 meeting |
