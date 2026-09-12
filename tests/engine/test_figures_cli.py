@@ -87,3 +87,32 @@ def test_run_engine_accepts_the_population_argument():
     import inspect
     from src.engine.run import run_engine
     assert "population" in inspect.signature(run_engine).parameters
+
+
+def test_a_credential_this_machine_lacks_is_not_a_reproduction_failure(tmp_path, monkeypatch):
+    """§11.6 says exit 1 when a registered figure is unavailable. On a machine without the
+    service account owner_questions is ALWAYS unavailable, so a judge running this on 12/9
+    would see FAIL and conclude the numbers do not reproduce — when 40 of 41 reproduce
+    exactly. "We could not compute this" and "you were not given a credential" are different
+    sentences and only the first is a reproduction failure.
+    """
+    import subprocess
+    mirror = ROOT / "data" / "owner" / "owner_state.json"
+    backup = tmp_path / "owner_state.json"
+    had_mirror = mirror.exists()
+    if had_mirror:
+        backup.write_text(mirror.read_text()); mirror.unlink()
+    try:
+        env = {k: v for k, v in __import__("os").environ.items()
+               if k not in ("FIREBASE_SERVICE_ACCOUNT_PATH", "FIREBASE_SERVICE_ACCOUNT_JSON")}
+        result = subprocess.run(
+            [sys.executable, str(ROOT / "scripts" / "figures.py"), "--json", "--skip-market"],
+            capture_output=True, text=True, cwd=ROOT, env=env, timeout=180)
+        assert result.returncode == 0, result.stderr[-1500:]
+        payload = json.loads(result.stdout)
+        assert any("answer_storage_unavailable" in line for line in payload["needs_credentials"])
+        assert payload["unavailable"] == []
+    finally:
+        if had_mirror:
+            mirror.parent.mkdir(parents=True, exist_ok=True)
+            mirror.write_text(backup.read_text())

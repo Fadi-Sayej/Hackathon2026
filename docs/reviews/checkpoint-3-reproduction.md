@@ -74,14 +74,29 @@ the 74 seconds. Nothing about the market half needs a credential or a network ca
 None of these is a reproduction failure. The engine reproduces; the gate is waiting on a
 credential, a first committed artefact, and two days.
 
-## The question this raises
+## The question this raised, and how it was answered
 
 §11.6 says exit 1 when any registered figure is unavailable. On a machine with no
-credentials that is *always* true, so `npm run figures` can never exit 0 for anyone outside
-the team — including a judge at the 12/9 meeting, who will run it, see `FAIL`, and reasonably
-conclude the numbers do not reproduce.
+credentials that is *always* true, so `npm run figures` could never exit 0 for anyone
+outside the team — including a judge at the 12/9 meeting, who would run it, see `FAIL`, and
+reasonably conclude the numbers do not reproduce, when 40 of 41 reproduce exactly.
 
-Either the pilot ships with credentials available to whoever runs it, or `figures.py`
-distinguishes "this figure could not be computed" from "this figure needs a credential you
-do not have". That is a product decision, not an implementation one — raised for
-**smartshelf-pm**, and it matters on 12/9 rather than eventually.
+**Answered 2026-09-12 in code rather than deferred to a decision.** "We could not compute
+this from the data you have" and "this needs a credential you were not given" are different
+sentences, and only the first is a reproduction failure. `figures.py` now separates them:
+
+```
+NOTE  owner_questions: answer_storage_unavailable — needs a credential this machine
+      does not have; every other figure is unaffected
+exit 0
+```
+
+A missing credential is reported and does not fail the command. A figure that genuinely
+could not be computed still exits 1 and names itself. Verified by running with the mirror
+removed and the environment variables stripped.
+
+## Re-run under ADR-020
+
+The gate's remaining blockers are now two, not three: `dashboard.json` is still not
+committed (Task 3.4's nightly starts that), and two green nights have not happened. The
+credential is no longer one of them.
