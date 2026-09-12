@@ -1,7 +1,7 @@
 ---
 ID: PLAN-PHASE-2
 Title: Phase 2 — Browser
-Status: Ready for review
+Status: Approved
 Owner: smartshelf-architect
 Version: 1.0 (2026-09-12)
 Parent: [Implementation Plan](plan.md)
