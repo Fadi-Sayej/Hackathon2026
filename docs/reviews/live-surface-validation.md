@@ -34,19 +34,27 @@ Two settled decisions are honoured. Two are broken, and one finding is worse tha
 AC-101 exists because a backlog number turns a daily surface into a queue the owner is
 failing. *"Show all 1,639 actions"* is that number, in a button, on the first screen.
 
-## Finding 2 — one capability fills the entire surface
+## Finding 2 — one capability fills the money list (permitted, and worth knowing)
 
-Computed by running `rankActions` over the committed artefact: **the top 20 entries are all
-`CHECK_STOCK_DISCREPANCY`.** Not most — all of them.
+Computed by running `rankActions` over the committed artefact: **every one of the top ten
+money entries is `CHECK_STOCK_DISCREPANCY`.** Not most — all of them. He sees ten stock
+discrepancies and no price gap, no margin finding, nothing else, in that list.
 
-This is the same defect [`compose` was fixed for](phase-0-1-execution-report.md) during
-Phase 2: entries ranked against each other with no allocation, so one family crowds out
-every other. FR-106 and F6-S1 §12 name the consequence — *"hygiene work would otherwise
-never surface"* — and on the live surface it doesn't. The owner sees twenty stock
-discrepancies and no price gap, no catalogue finding, nothing else.
+> **Corrected 2026-09-12.** This was first written as a violation, on the reasoning that it
+> was the FR-106 failure `compose` was fixed for in Phase 2. It is not, on two counts.
+>
+> F6-S1 §12 addresses this case directly: *"All ten places filled by one capability |
+> Permitted by the bound; whether the surface should diversify is **OQ-606**."* It is an
+> open question, not a broken rule.
+>
+> And FR-106 is about **unvalued** entries being allocated places rather than ranked against
+> valued ones. This spine already separates them — a "data to fix" section carries the
+> unvalued work (its own top ten is `CHECK_NEGATIVE_STOCK`), so nothing is crowded out. The
+> defect `compose` had was a single ordered list; this is two lists.
 
-The engine's `compose` already allocates places and produces 7 valued + 3 unvalued. The
-live spine does not.
+So: not a violation, and no fix is owed. It is still worth deciding before 12/9 whether a
+money list that is entirely one family is the first thing he should see — that is OQ-606,
+and it is a product question with no deadline attached to it.
 
 ## Finding 3 — the questions are computed from demo data, under a "REAL POS DATA" badge
 
