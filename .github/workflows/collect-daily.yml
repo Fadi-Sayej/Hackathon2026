@@ -167,11 +167,21 @@ jobs:
       - name: Does each capability depend on what it declares?
         # The V1 equivalent, over the engine's artefact (Task 3.3). Withholds each
         # input at source and reads the published statuses, so a capability that
-        # reads something it did not declare is caught before the artefact is
-        # committed. Five engine runs; nightly is where it belongs, not on push.
+        # reads something it did not declare is caught. Five engine runs; nightly is
+        # where it belongs, not on push.
+        #
+        # continue-on-error, deliberately. These two guard dashboard.json, which
+        # nothing reads yet — the browser cut-over has not happened. The step below
+        # commits operational.json, which the OWNER reads. Letting a probe over an
+        # unread artefact block the commit of the one he depends on would take his
+        # screen stale to protect something nobody is looking at.
+        #
+        # They become blocking at the cut-over, when dashboard.json is what he reads.
+        continue-on-error: true
         run: python3 scripts/check_v1_signals.py
 
       - name: Do detection and hygiene still fail independently?
+        continue-on-error: true
         run: python3 scripts/check_independence.py
 
       - name: Commit the rebuilt dashboard
