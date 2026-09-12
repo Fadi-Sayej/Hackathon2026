@@ -2115,6 +2115,7 @@ capabilities each carrying a status.
 - Modify: `schemas/dashboard.schema.json` — the same value in the `signal_family` enum
 - Modify: `src/engine/inputs.py` — resolve product identity; expose `conflicting`
 - Modify: `src/engine/reconciliation.py` — `run_hygiene` publishes the records
+- Modify: `tests/engine/helpers.py` — `make_inputs` passes the new field
 - Test: `tests/engine/test_inputs.py`, `tests/engine/test_reconciliation.py`
 
 **Interfaces:**

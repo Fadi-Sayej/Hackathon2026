@@ -54,7 +54,7 @@ def make_inputs(**kw):
         sales_monthly=kw.get("sales_monthly"),
         sales_summary={s["barcode"]: s for s in sales_summary} if sales_summary is not None else None,
         window=kw.get("window"), observations=kw.get("observations"), matches=kw.get("matches"),
-        stores=load_store_types(), withdrawn=kw.get("withdrawn"), idle=kw.get("idle"),
+        stores=load_store_types(), withdrawn=kw.get("withdrawn"), conflicting=kw.get("conflicting", []), idle=kw.get("idle"),
         vintages={"pos": {"file": "f", "as_of": "2026-08-02"},
                   "sales": {"months": [], "first": None, "last": None, "full_annual_cycle": False},
                   "competitor": {"snapshot_date": "2026-09-08", "sources": []},

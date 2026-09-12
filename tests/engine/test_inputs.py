@@ -64,3 +64,57 @@ def test_missing_silver_yields_none_products(tmp_path):
                          run_at=datetime(2026, 9, 8, tzinfo=timezone.utc), silver_dir=tmp_path / "none",
                          signals_dir=tmp_path / "nosignals", matches_path=tmp_path / "nomatches.parquet")
     assert inputs.products is None
+
+
+def _dup_silver(tmp_path, rows):
+    silver = tmp_path / "silver"; silver.mkdir()
+    base = {"_source_file": "inv.csv", "_as_of": "2026-08-02"}
+    prod = [{**base, **r} for r in rows]
+    inv = [{"barcode": r.get("barcode"), "product_name": r.get("product_name"),
+            "current_stock": 1.0, **base} for r in rows]
+    pq.write_table(pa.Table.from_pylist(prod), silver / "yomyom_products.parquet")
+    pq.write_table(pa.Table.from_pylist(inv), silver / "yomyom_inventory.parquet")
+    pq.write_table(pa.Table.from_pylist(prod), silver / "yomyom_margins.parquet")
+    return silver
+
+
+def _load(silver, tmp_path):
+    return load_inputs(policy=load_policy(), owner=OwnerState.unavailable("x"),
+                       run_at=datetime(2026, 9, 8, tzinfo=timezone.utc), silver_dir=silver,
+                       signals_dir=tmp_path / "nosig", matches_path=tmp_path / "nomatch.parquet")
+
+
+def test_identical_duplicate_rows_collapse_into_one_product(tmp_path):
+    """Seven of the pilot's 48 duplicates are byte-identical. Nothing is lost by
+    collapsing them and there is nothing to tell the owner (ADR-019)."""
+    row = {"barcode": "7290105362377", "product_name": "כיף כף", "category": "c",
+           "selling_price": 5.9, "wolt_price": 7.9, "cost_price": 3.0}
+    inputs = _load(_dup_silver(tmp_path, [row, dict(row)]), tmp_path)
+    assert [p["barcode"] for p in inputs.products] == ["7290105362377"]
+    assert inputs.conflicting == []
+
+
+def test_disagreeing_duplicate_rows_are_excluded_and_reported(tmp_path):
+    """4062139003150 carries both 15.90 and 16.90. Neither is the shelf price, so the
+    product leaves every population and the disagreement is published (ADR-019, D-3)."""
+    a = {"barcode": "4062139003150", "product_name": "לייס", "category": "c",
+         "selling_price": 15.9, "wolt_price": 15.9, "cost_price": 10.95}
+    b = {**a, "selling_price": 16.9, "wolt_price": 16.9}
+    inputs = _load(_dup_silver(tmp_path, [a, b]), tmp_path)
+    assert inputs.products == []
+    assert len(inputs.conflicting) == 1
+    c = inputs.conflicting[0]
+    assert c["barcode"] == "4062139003150"
+    # the shaped domain names, not the POS column names — these are what reach the owner
+    assert sorted(c["fields"]) == ["delivery_price", "shelf_price"]
+    assert sorted(c["fields"]["shelf_price"]) == [15.9, 16.9]
+
+
+def test_a_conflict_on_category_alone_still_excludes(tmp_path):
+    """Partial presence is not a state the artefact can express (ADR-019, ADR-014)."""
+    a = {"barcode": "838948000444", "product_name": "מסטיק", "category": "חטיפים מתוקים",
+         "selling_price": 6.9, "wolt_price": 6.9, "cost_price": 4.66}
+    b = {**a, "category": "מוצרי אלקטרונים"}
+    inputs = _load(_dup_silver(tmp_path, [a, b]), tmp_path)
+    assert inputs.products == []
+    assert list(inputs.conflicting[0]["fields"]) == ["department"]

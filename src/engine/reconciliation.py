@@ -20,7 +20,8 @@ from src.engine.registry import derive_status
 
 SPEC = "SPEC-002"
 RECON, HYGIENE = "reconciliation", "hygiene"
-HYGIENE_ORDER = {"negative_stock": 0, "no_identifier": 1, "absent_price": 2}
+HYGIENE_ORDER = {"negative_stock": 0, "no_identifier": 1, "absent_price": 2,
+                 "conflicting_duplicate": 3}
 
 
 def _hygiene_entries(inputs: EngineInputs) -> list:
@@ -45,7 +46,25 @@ def _hygiene_entries(inputs: EngineInputs) -> list:
                 evidence={"reason": reason,
                           "recorded_stock": p["recorded_stock"] if reason == "negative_stock" else None},
                 value=None, ordering_key={"name": "hygiene_order", "value": HYGIENE_ORDER[reason]}))
+    out.extend(_conflicting_entries(inputs))
     return sorted(out, key=lambda e: (e.ordering_key["value"], e.product_name or "", e.barcode or ""))
+
+
+def _conflicting_entries(inputs: EngineInputs) -> list:
+    """ADR-019. A barcode whose rows disagree never reaches inputs.products, so it cannot be
+    found by walking them — it arrives on its own field. The record carries the disagreeing
+    fields and both values and no money: the prices are precisely what is in doubt (D-1)."""
+    family = "hygiene.conflicting_duplicate"
+    out = []
+    for c in inputs.conflicting or []:
+        out.append(Entry(
+            id=entry_id(family, c["barcode"]), signal_family=family,
+            capability=HYGIENE, barcode=c["barcode"], product_name=c.get("product_name"),
+            department=None, action="fix_record", characterisation="hygiene",
+            evidence={"reason": "conflicting_duplicate", "fields": c["fields"]},
+            value=None,
+            ordering_key={"name": "hygiene_order", "value": HYGIENE_ORDER["conflicting_duplicate"]}))
+    return out
 
 
 def _detection_entries(inputs: EngineInputs) -> list:

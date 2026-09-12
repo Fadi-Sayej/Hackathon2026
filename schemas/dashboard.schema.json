@@ -3,100 +3,447 @@
   "$id": "smartshelf/dashboard.schema.json",
   "title": "SmartShelf dashboard artefact v2",
   "type": "object",
-  "required": ["schema_version", "generated_at", "run_id", "run", "vintages", "thresholds",
-               "value_kinds_present", "capabilities", "figures"],
+  "required": [
+    "schema_version",
+    "generated_at",
+    "run_id",
+    "run",
+    "vintages",
+    "thresholds",
+    "value_kinds_present",
+    "capabilities",
+    "figures"
+  ],
   "additionalProperties": false,
   "properties": {
-    "schema_version": { "const": 2 },
-    "generated_at": { "type": "string" },
-    "run_id": { "type": "string" },
+    "schema_version": {
+      "const": 2
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "run_id": {
+      "type": "string"
+    },
     "run": {
-      "type": "object", "required": ["status", "steps"],
+      "type": "object",
+      "required": [
+        "status",
+        "steps"
+      ],
       "properties": {
-        "status": { "enum": ["ok", "partial", "degraded"] },
-        "steps": { "type": "array", "items": { "type": "object", "required": ["step", "status"],
-          "properties": { "step": {"type": "string"}, "status": {"enum": ["ok", "error", "skipped", "degraded"]},
-                          "ms": {"type": ["number", "null"]}, "error": {"type": ["string", "null"]} } } }
+        "status": {
+          "enum": [
+            "ok",
+            "partial",
+            "degraded"
+          ]
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "step",
+              "status"
+            ],
+            "properties": {
+              "step": {
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "ok",
+                  "error",
+                  "skipped",
+                  "degraded"
+                ]
+              },
+              "ms": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "error": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
       }
     },
     "vintages": {
-      "type": "object", "required": ["pos", "sales", "competitor", "owner_state"],
+      "type": "object",
+      "required": [
+        "pos",
+        "sales",
+        "competitor",
+        "owner_state"
+      ],
       "properties": {
-        "pos": { "type": "object", "required": ["file", "as_of"],
-                 "properties": { "file": {"type": ["string", "null"]}, "as_of": {"type": ["string", "null"]} } },
-        "sales": { "type": "object", "required": ["months", "first", "last", "full_annual_cycle"],
-                   "properties": { "months": {"type": "array", "items": {"type": "string"}},
-                                   "first": {"type": ["string", "null"]}, "last": {"type": ["string", "null"]},
-                                   "full_annual_cycle": {"type": "boolean"} } },
-        "competitor": { "type": "object", "required": ["snapshot_date", "sources"],
-                        "properties": { "snapshot_date": {"type": ["string", "null"]},
-                                        "sources": {"type": "array", "items": {"type": "string"}} } },
-        "owner_state": { "type": "object", "required": ["pulled_at", "status"],
-                         "properties": { "pulled_at": {"type": ["string", "null"]},
-                                         "status": {"enum": ["available", "unavailable"]} } }
+        "pos": {
+          "type": "object",
+          "required": [
+            "file",
+            "as_of"
+          ],
+          "properties": {
+            "file": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "as_of": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "sales": {
+          "type": "object",
+          "required": [
+            "months",
+            "first",
+            "last",
+            "full_annual_cycle"
+          ],
+          "properties": {
+            "months": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "first": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "last": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "full_annual_cycle": {
+              "type": "boolean"
+            }
+          }
+        },
+        "competitor": {
+          "type": "object",
+          "required": [
+            "snapshot_date",
+            "sources"
+          ],
+          "properties": {
+            "snapshot_date": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "sources": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "owner_state": {
+          "type": "object",
+          "required": [
+            "pulled_at",
+            "status"
+          ],
+          "properties": {
+            "pulled_at": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "status": {
+              "enum": [
+                "available",
+                "unavailable"
+              ]
+            }
+          }
+        }
       }
     },
-    "thresholds": { "type": "object" },
-    "value_kinds_present": { "type": "array", "items": { "enum": ["per_sale"] } },
+    "thresholds": {
+      "type": "object"
+    },
+    "value_kinds_present": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "per_sale"
+        ]
+      }
+    },
     "capabilities": {
       "type": "object",
-      "additionalProperties": { "$ref": "#/$defs/capability" }
+      "additionalProperties": {
+        "$ref": "#/$defs/capability"
+      }
     },
     "figures": {
       "type": "object",
-      "additionalProperties": { "type": "object", "required": ["value", "unit", "inputs", "thresholds"],
-        "properties": { "value": {"type": ["number", "null"]}, "unit": {"type": "string"},
-                        "inputs": {"type": "array", "items": {"type": "string"}}, "thresholds": {"type": "object"} } }
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "value",
+          "unit",
+          "inputs",
+          "thresholds"
+        ],
+        "properties": {
+          "value": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "unit": {
+            "type": "string"
+          },
+          "inputs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "thresholds": {
+            "type": "object"
+          }
+        }
+      }
     }
   },
   "$defs": {
     "value": {
-      "type": ["object", "null"],
-      "required": ["amount", "kind", "certainty"],
-      "properties": { "amount": {"type": "number"}, "kind": {"enum": ["per_sale"]},
-                      "certainty": {"enum": ["confirmed", "estimated"]} }
+      "type": [
+        "object",
+        "null"
+      ],
+      "required": [
+        "amount",
+        "kind",
+        "certainty"
+      ],
+      "properties": {
+        "amount": {
+          "type": "number"
+        },
+        "kind": {
+          "enum": [
+            "per_sale"
+          ]
+        },
+        "certainty": {
+          "enum": [
+            "confirmed",
+            "estimated"
+          ]
+        }
+      }
     },
     "entry": {
       "type": "object",
-      "required": ["id", "signal_family", "capability", "barcode", "product_name", "department", "action",
-                   "characterisation", "evidence", "value", "ordering_key", "actionable",
-                   "not_actionable_reason", "attention"],
+      "required": [
+        "id",
+        "signal_family",
+        "capability",
+        "barcode",
+        "product_name",
+        "department",
+        "action",
+        "characterisation",
+        "evidence",
+        "value",
+        "ordering_key",
+        "actionable",
+        "not_actionable_reason",
+        "attention"
+      ],
       "properties": {
-        "id": { "type": "string", "pattern": "^[0-9a-f]{16}$" },
-        "signal_family": { "enum": ["recon.impossible_opening", "hygiene.negative_stock", "hygiene.no_identifier",
-                                    "hygiene.absent_price", "price.inverted", "price.above_ceiling",
-                                    "competitor.policy_breach", "competitor.purchase_cost", "catalogue.idle",
-                                    "catalogue.implausible_quantity", "margin.below_cost"] },
-        "capability": { "type": "string" },
-        "barcode": { "type": ["string", "null"] },
-        "product_name": { "type": ["string", "null"] },
-        "department": { "type": ["string", "null"] },
-        "action": { "enum": ["verify_price", "count_product", "fix_record", "decide_idle", "review_policy", "check_purchase_cost"] },
-        "characterisation": { "type": "string" },
-        "evidence": { "type": "object" },
-        "value": { "$ref": "#/$defs/value" },
-        "ordering_key": { "type": "object", "required": ["name", "value"],
-                          "properties": { "name": {"type": "string"}, "value": {"type": ["number", "null"]} } },
-        "actionable": { "type": "boolean" },
-        "not_actionable_reason": { "type": ["string", "null"] },
-        "attention": { "enum": ["today", "review"] }
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{16}$"
+        },
+        "signal_family": {
+          "enum": [
+            "recon.impossible_opening",
+            "hygiene.negative_stock",
+            "hygiene.no_identifier",
+            "hygiene.absent_price",
+            "hygiene.conflicting_duplicate",
+            "price.inverted",
+            "price.above_ceiling",
+            "competitor.policy_breach",
+            "competitor.purchase_cost",
+            "catalogue.idle",
+            "catalogue.implausible_quantity",
+            "margin.below_cost"
+          ]
+        },
+        "capability": {
+          "type": "string"
+        },
+        "barcode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "product_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "department": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "action": {
+          "enum": [
+            "verify_price",
+            "count_product",
+            "fix_record",
+            "decide_idle",
+            "review_policy",
+            "check_purchase_cost"
+          ]
+        },
+        "characterisation": {
+          "type": "string"
+        },
+        "evidence": {
+          "type": "object"
+        },
+        "value": {
+          "$ref": "#/$defs/value"
+        },
+        "ordering_key": {
+          "type": "object",
+          "required": [
+            "name",
+            "value"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "value": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          }
+        },
+        "actionable": {
+          "type": "boolean"
+        },
+        "not_actionable_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "attention": {
+          "enum": [
+            "today",
+            "review"
+          ]
+        }
       }
     },
     "capability": {
-      "comment": "Extra properties are allowed: catalogue_lifecycle adds withdrawn/statement/provisional and owner_questions adds limit/items/suppressed (design §11.4).",
+      "comment": "Extra properties are allowed: catalogue_lifecycle adds withdrawn/statement/provisional and owner_questions adds limit/items/suppressed (design \u00a711.4).",
       "type": "object",
-      "required": ["id", "spec", "requires", "status", "unavailable_reason", "window", "thresholds", "counts", "entries", "notes"],
+      "required": [
+        "id",
+        "spec",
+        "requires",
+        "status",
+        "unavailable_reason",
+        "window",
+        "thresholds",
+        "counts",
+        "entries",
+        "notes"
+      ],
       "properties": {
-        "id": { "type": "string" },
-        "spec": { "type": "string" },
-        "requires": { "type": "array", "items": { "type": "string" } },
-        "status": { "enum": ["available", "unavailable"] },
-        "unavailable_reason": { "type": ["string", "null"] },
-        "window": { "type": ["object", "null"] },
-        "thresholds": { "type": "object" },
-        "counts": { "type": "object", "additionalProperties": { "type": ["integer", "null"] } },
-        "entries": { "type": "array", "items": { "$ref": "#/$defs/entry" } },
-        "notes": { "type": "array", "items": { "type": "string" } }
+        "id": {
+          "type": "string"
+        },
+        "spec": {
+          "type": "string"
+        },
+        "requires": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "status": {
+          "enum": [
+            "available",
+            "unavailable"
+          ]
+        },
+        "unavailable_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "window": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "thresholds": {
+          "type": "object"
+        },
+        "counts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/entry"
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
     }
   }

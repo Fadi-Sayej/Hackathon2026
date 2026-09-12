@@ -58,7 +58,10 @@ def test_ac_025_hygiene_records_without_money_and_with_reasons():
     out = run_hygiene(inputs)
     hyg = {(e.barcode, e.evidence["reason"]) for e in out.entries}
     assert hyg == {("9", "negative_stock"), (None, "no_identifier"), ("8", "absent_price")}
-    assert out.counts == {"negative_stock": 1, "no_identifier": 1, "absent_price": 1}
+    # conflicting_duplicate joins the reasons under ADR-019; zero here is a measurement
+    # (we looked and found none), which is why it is present rather than omitted
+    assert out.counts == {"negative_stock": 1, "no_identifier": 1, "absent_price": 1,
+                          "conflicting_duplicate": 0}
     assert all(e.action == "fix_record" for e in out.entries)
 
 
@@ -100,3 +103,18 @@ def test_a_missing_stock_table_makes_hygiene_unavailable_not_zero():
     out = run_hygiene(make_inputs(products=[product("9", shelf=2.0)], inventory=None))
     assert out.status == "unavailable" and out.unavailable_reason == "no_inventory_data"
     assert out.counts == {}
+
+
+def test_adr_019_a_conflicting_duplicate_is_a_hygiene_record_with_no_money():
+    """The barcode never reaches inputs.products (it has no statable price), so hygiene
+    cannot find it by walking them — it arrives on its own field and is reported with the
+    fields that disagree and both values, carrying no money (D-1)."""
+    inputs = make_inputs(products=[product("9", stock=-1.0, shelf=2.0)], sales_summary=[], window=W)
+    inputs.conflicting = [{"barcode": "4062139003150", "product_name": "לייס",
+                           "fields": {"shelf_price": [15.9, 16.9]}}]
+    out = run_hygiene(inputs)
+    e = next(x for x in out.entries if x.signal_family == "hygiene.conflicting_duplicate")
+    assert e.barcode == "4062139003150" and e.value is None and e.action == "fix_record"
+    assert e.evidence["fields"]["shelf_price"] == [15.9, 16.9]
+    assert out.counts["conflicting_duplicate"] == 1
+    assert out.counts["negative_stock"] == 1          # the others are untouched

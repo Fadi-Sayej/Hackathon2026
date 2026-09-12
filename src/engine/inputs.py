@@ -31,6 +31,7 @@ class EngineInputs:
     stores: StoreTypeConfig
     withdrawn: Optional[set]
     idle: Optional[set]
+    conflicting: Optional[list]   # ADR-019: barcodes whose rows disagree
     vintages: dict
     owner: OwnerState
     policy: Policy
@@ -66,7 +67,47 @@ def _shape_products(products, inventory, owner: OwnerState) -> list:
             "cost_source": "owner" if owner_cost is not None else ("pos" if pos_cost is not None else None),
             "recorded_stock": stock.get((barcode, r.get("product_name"))),
         })
-    return sorted(out, key=lambda p: (p["barcode"] or "", p["product_name"] or ""))
+    return _resolve_identity(sorted(out, key=lambda p: (p["barcode"] or "", p["product_name"] or "")))
+
+
+# Fields whose disagreement makes a barcode unusable. Everything a capability reads.
+_IDENTITY_FIELDS = ("product_name", "department", "shelf_price", "delivery_price",
+                    "cost_price", "recorded_stock")
+
+
+def _resolve_identity(shaped: list) -> tuple:
+    """ADR-019. Rows sharing a barcode that agree on every field are the same row twice and
+    collapse. Rows that disagree leave the population entirely and are reported: a product
+    listed at two shelf prices has no shelf price the system can state (D-3), and picking
+    one by arrival order would compute a markup from a number nobody chose.
+
+    Returns (products, conflicting). A barcode-less row cannot be grouped and is kept as
+    itself — `hygiene.no_identifier` already reports it.
+    """
+    groups: dict = {}
+    out, conflicting = [], []
+    for p in shaped:
+        if p["barcode"] is None:
+            out.append(p)
+            continue
+        groups.setdefault(p["barcode"], []).append(p)
+    for barcode in sorted(groups):
+        rows = groups[barcode]
+        if len(rows) == 1:
+            out.append(rows[0])
+            continue
+        fields = {}
+        for f in _IDENTITY_FIELDS:
+            values = {r[f] for r in rows}
+            if len(values) > 1:
+                fields[f] = sorted(values, key=lambda v: (v is None, str(v)))
+        if not fields:
+            out.append(rows[0])                      # the same row twice
+            continue
+        conflicting.append({"barcode": barcode,
+                            "product_name": rows[0]["product_name"],
+                            "fields": fields})
+    return sorted(out, key=lambda p: (p["barcode"] or "", p["product_name"] or "")), conflicting
 
 
 def _window_from_summary(monthly, policy: Policy) -> Optional[EvidenceWindow]:
@@ -102,7 +143,8 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
     stores = stores or load_store_types()
     products_raw = _rows(silver_dir / "yomyom_products.parquet")
     inventory = _rows(silver_dir / "yomyom_inventory.parquet")
-    products = _shape_products(products_raw, inventory, owner) if products_raw else None
+    products, conflicting = (_shape_products(products_raw, inventory, owner)
+                            if products_raw else (None, None))
     monthly = _rows(silver_dir / "sales_monthly.parquet")
     summary_rows = _rows(silver_dir / "sales_summary.parquet")
     summary = {r["barcode"]: r for r in summary_rows} if summary_rows else None
@@ -126,5 +168,5 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
     vintages["sales"] = {k: vintages["sales"][k] for k in ("months", "first", "last", "full_annual_cycle")}
     return EngineInputs(products=products, inventory=inventory or None,
                         sales_monthly=monthly, sales_summary=summary, window=window,
-                        observations=observations, matches=matches, stores=stores, withdrawn=None, idle=None,
+                        observations=observations, matches=matches, stores=stores, withdrawn=None, idle=None, conflicting=conflicting,
                         vintages=vintages, owner=owner, policy=policy, run_at=run_at)
