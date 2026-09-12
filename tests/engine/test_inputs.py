@@ -67,7 +67,7 @@ def test_missing_silver_yields_none_products(tmp_path):
 
 
 def _dup_silver(tmp_path, rows):
-    silver = tmp_path / "silver"; silver.mkdir()
+    silver = tmp_path / "silver"; silver.mkdir(parents=True, exist_ok=True)
     base = {"_source_file": "inv.csv", "_as_of": "2026-08-02"}
     prod = [{**base, **r} for r in rows]
     inv = [{"barcode": r.get("barcode"), "product_name": r.get("product_name"),
@@ -118,3 +118,87 @@ def test_a_conflict_on_category_alone_still_excludes(tmp_path):
     inputs = _load(_dup_silver(tmp_path, [a, b]), tmp_path)
     assert inputs.products == []
     assert list(inputs.conflicting[0]["fields"]) == ["department"]
+
+
+def test_the_digest_is_over_content_not_over_files(tmp_path):
+    """Task 3.1. Identical content must digest identically however it arrived, and a changed
+    policy constant must change it — a figure computed under a different threshold is a
+    different figure."""
+    row = {"barcode": "0012", "product_name": "מים", "category": "c", "selling_price": 4.0,
+           "wolt_price": 5.0, "cost_price": 1.0}
+    a = _load(_dup_silver(tmp_path / "a", [row]), tmp_path)
+    b = _load(_dup_silver(tmp_path / "b", [dict(row)]), tmp_path)
+    assert a.inputs_digest == b.inputs_digest
+    assert len(a.inputs_digest) == 64
+
+
+def test_a_changed_policy_changes_the_digest(tmp_path):
+    from dataclasses import replace
+    row = {"barcode": "0012", "product_name": "מים", "category": "c", "selling_price": 4.0,
+           "wolt_price": 5.0, "cost_price": 1.0}
+    silver = _dup_silver(tmp_path, [row])
+    base = load_policy()
+    one = load_inputs(policy=base, owner=OwnerState.unavailable("x"),
+                      run_at=datetime(2026, 9, 8, tzinfo=timezone.utc), silver_dir=silver,
+                      signals_dir=tmp_path / "n", matches_path=tmp_path / "n.parquet")
+    two = load_inputs(policy=replace(base, surface_bound=99), owner=OwnerState.unavailable("x"),
+                      run_at=datetime(2026, 9, 8, tzinfo=timezone.utc), silver_dir=silver,
+                      signals_dir=tmp_path / "n", matches_path=tmp_path / "n.parquet")
+    assert one.inputs_digest != two.inputs_digest
+
+
+def test_the_digest_ignores_when_the_owner_state_was_fetched(tmp_path):
+    """The owner's answers are an input; the moment we fetched them is not. Hashing
+    pulled_at made two runs over identical data disagree, which would have made the digest
+    detect nothing at all."""
+    row = {"barcode": "0012", "product_name": "מים", "category": "c", "selling_price": 4.0,
+           "wolt_price": 5.0, "cost_price": 1.0}
+    silver = _dup_silver(tmp_path, [row])
+    answers = {"0012": {"cost_price": {"value": 2.5, "at": 1, "status": "answered"}}}
+    early = OwnerState.from_dict({"status": "available", "pulled_at": "2026-09-12T08:00:00Z", "answers": answers})
+    later = OwnerState.from_dict({"status": "available", "pulled_at": "2026-09-12T23:59:59Z", "answers": answers})
+    common = dict(run_at=datetime(2026, 9, 8, tzinfo=timezone.utc), silver_dir=silver,
+                  signals_dir=tmp_path / "n", matches_path=tmp_path / "n.parquet",
+                  policy=load_policy())
+    assert load_inputs(owner=early, **common).inputs_digest == load_inputs(owner=later, **common).inputs_digest
+
+
+def test_a_changed_owner_answer_does_change_the_digest(tmp_path):
+    row = {"barcode": "0012", "product_name": "מים", "category": "c", "selling_price": 4.0,
+           "wolt_price": 5.0, "cost_price": 1.0}
+    silver = _dup_silver(tmp_path, [row])
+    common = dict(run_at=datetime(2026, 9, 8, tzinfo=timezone.utc), silver_dir=silver,
+                  signals_dir=tmp_path / "n", matches_path=tmp_path / "n.parquet",
+                  policy=load_policy())
+    a = OwnerState.from_dict({"status": "available", "pulled_at": "t", "answers": {"0012": {"cost_price": {"value": 2.5, "at": 1, "status": "answered"}}}})
+    b = OwnerState.from_dict({"status": "available", "pulled_at": "t", "answers": {"0012": {"cost_price": {"value": 9.9, "at": 1, "status": "answered"}}}})
+    assert load_inputs(owner=a, **common).inputs_digest != load_inputs(owner=b, **common).inputs_digest
+
+
+def test_reimporting_the_same_data_does_not_change_the_digest(tmp_path):
+    """The failure the first digest shipped with, and which the unit tests above all
+    missed: sales_import rewrites its tables on every run with a fresh `_imported_at`, so
+    two runs over identical data disagreed. A digest that changes every run reports a change
+    every run and therefore reports nothing.
+
+    `_as_of` is deliberately NOT excluded — the POS vintage is content, and a different
+    export day is a different input.
+    """
+    row = {"barcode": "0012", "product_name": "מים", "category": "c", "selling_price": 4.0,
+           "wolt_price": 5.0, "cost_price": 1.0}
+    first = _dup_silver(tmp_path / "first", [{**row, "_imported_at": "2026-09-12T08:00:00Z"}])
+    again = _dup_silver(tmp_path / "again", [{**row, "_imported_at": "2026-09-12T23:59:59Z"}])
+    assert _load(first, tmp_path).inputs_digest == _load(again, tmp_path).inputs_digest
+
+def test_identical_rows_from_different_export_days_are_the_same_input(tmp_path):
+    """Deliberate. The digest is over CONTENT: if two POS exports carry identical rows they
+    are the same input, whichever day they were taken. The export day is not lost — it is
+    published in vintages.pos.as_of, where a reader can see it."""
+    row = {"barcode": "0012", "product_name": "מים", "category": "c", "selling_price": 4.0,
+           "wolt_price": 5.0, "cost_price": 1.0}
+    import pyarrow as pa_, pyarrow.parquet as pq_
+    a = _dup_silver(tmp_path / "a", [row])
+    b = _dup_silver(tmp_path / "b", [row])
+    pq_.write_table(pa_.Table.from_pylist([{**row, "_source_file": "inv.csv", "_as_of": "2026-09-01"}]),
+                    b / "yomyom_products.parquet")
+    assert _load(a, tmp_path).inputs_digest == _load(b, tmp_path).inputs_digest

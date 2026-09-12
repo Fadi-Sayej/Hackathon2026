@@ -147,7 +147,8 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
     artefact = build_artefact(outputs, vintages=inputs.vintages if inputs else _no_inputs_vintages(owner),
                               thresholds=policy.as_dict(), run={"status": status, "steps": steps},
                               extra_figures=extra_figures, generated_at=now.isoformat(),
-                              run_id=uuid.uuid4().hex[:12])
+                              run_id=uuid.uuid4().hex[:12],
+                              inputs_digest=getattr(inputs, "inputs_digest", "") if inputs else "")
     # Completeness is asserted for a real run only: a test that injects two capabilities is
     # not a broken artefact, but a production run missing one is. Turns itself on in Phase 1.8
     # when DEFAULT_RUNNERS stops being empty — nobody has to remember to flip it.

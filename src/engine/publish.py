@@ -33,7 +33,8 @@ def value_kinds_present(outputs: list[CapabilityOutput]) -> list[str]:
     return sorted(kinds)
 
 
-def build_artefact(outputs, *, vintages, thresholds, run, generated_at, run_id, extra_figures=None) -> dict:
+def build_artefact(outputs, *, vintages, thresholds, run, generated_at, run_id, extra_figures=None,
+                   inputs_digest: str = "") -> dict:
     figures = {}
     for out in outputs:
         for f in out.figures:
@@ -42,6 +43,7 @@ def build_artefact(outputs, *, vintages, thresholds, run, generated_at, run_id, 
         figures[f"provenance.{f.name}"] = f.to_dict()
     return {
         "schema_version": 2,
+        "inputs_digest": inputs_digest,
         "generated_at": generated_at,
         "run_id": run_id,
         "run": run,

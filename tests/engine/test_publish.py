@@ -18,7 +18,8 @@ RUN = {"status": "ok", "steps": []}
 
 def _artefact(outputs):
     return build_artefact(outputs, vintages=VINTAGES, thresholds={"surface": {"bound": 10, "unvalued_places": 3}},
-                          run=RUN, generated_at="2026-09-08T00:00:00+00:00", run_id="r1")
+                          run=RUN, generated_at="2026-09-08T00:00:00+00:00", run_id="r1",
+                          inputs_digest="0" * 64)
 
 
 def test_empty_capability_set_is_a_valid_artefact():
@@ -71,3 +72,21 @@ def test_write_atomic_never_leaves_a_torn_file(tmp_path):
     write_atomic(target, _artefact([]))
     assert json.loads(target.read_text(encoding="utf-8"))["schema_version"] == 2
     assert not (tmp_path / "dashboard.json.tmp").exists()
+
+
+def test_the_artefact_says_what_it_was_built_from():
+    """Task 3.1. AC-127 asks whether a fresh clone reproduces the committed figures.
+    Without a digest the only answer is "the numbers look the same", which is how 14,406
+    became 2,848 in the documents with nobody noticing."""
+    art = build_artefact([], vintages=VINTAGES, thresholds={"surface": {"bound": 10}},
+                         run=RUN, generated_at="2026-09-08T00:00:00+00:00", run_id="r1",
+                         inputs_digest="a" * 64)
+    validate_artefact(art)
+    assert art["inputs_digest"] == "a" * 64
+
+
+def test_an_artefact_without_a_digest_is_refused():
+    art = _artefact([])
+    art.pop("inputs_digest", None)
+    with pytest.raises(PublishRefused, match="inputs_digest"):
+        validate_artefact(art)

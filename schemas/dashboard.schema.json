@@ -7,6 +7,7 @@
     "schema_version",
     "generated_at",
     "run_id",
+    "inputs_digest",
     "run",
     "vintages",
     "thresholds",
@@ -230,6 +231,10 @@
           }
         }
       }
+    },
+    "inputs_digest": {
+      "type": "string",
+      "description": "Hex digest over the content of every input the run read. Two runs over identical inputs produce an identical digest; a changed policy constant changes it, because a figure computed under a different threshold is a different figure."
     }
   },
   "$defs": {

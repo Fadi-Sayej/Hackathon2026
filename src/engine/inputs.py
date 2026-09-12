@@ -32,6 +32,7 @@ class EngineInputs:
     withdrawn: Optional[set]
     idle: Optional[set]
     conflicting: Optional[list]   # ADR-019: barcodes whose rows disagree
+    inputs_digest: str            # Task 3.1: content addressing over what was read
     vintages: dict
     owner: OwnerState
     policy: Policy
@@ -166,7 +167,66 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
         "owner_state": {"pulled_at": owner.pulled_at, "status": owner.status},
     }
     vintages["sales"] = {k: vintages["sales"][k] for k in ("months", "first", "last", "full_annual_cycle")}
+    digest = _digest(products, summary_rows, monthly, observations, matches, policy, owner)
     return EngineInputs(products=products, inventory=inventory or None,
                         sales_monthly=monthly, sales_summary=summary, window=window,
                         observations=observations, matches=matches, stores=stores, withdrawn=None, idle=None, conflicting=conflicting,
+                        inputs_digest=digest,
                         vintages=vintages, owner=owner, policy=policy, run_at=run_at)
+
+
+# When a row was imported is not what the row says. `sales_import` rewrites its tables on
+# every run, so hashing `_imported_at` made two runs over identical data disagree — the
+# digest would have reported a change on every run and therefore reported nothing.
+#
+# Note that products reach this function already shaped, so their provenance columns are
+# gone before the exclusion list is consulted: two exports carrying identical rows are the
+# same input whichever day they were taken. The export day is not lost, it is published in
+# vintages.pos.as_of.
+_NOT_CONTENT = frozenset({"_imported_at", "_source_kind", "created_at"})
+
+
+def _content_only(row):
+    if not isinstance(row, dict):
+        return row
+    return {k: v for k, v in row.items() if k not in _NOT_CONTENT}
+
+
+def _digest(products, summary_rows, monthly, observations, matches, policy, owner) -> str:
+    """A hex digest over the CONTENT the run read, not over the files it read them from.
+
+    Content, because a parquet rewritten with identical rows is the same input and must
+    produce the same digest; and because the policy is an input — a figure computed under a
+    different threshold is a different figure, even from identical data.
+
+    Fed in sorted order so two runs over the same inputs agree regardless of how the rows
+    arrived (§ determinism).
+    """
+    import hashlib
+    import json as _json
+
+    h = hashlib.sha256()
+
+    def feed(label: str, rows) -> None:
+        h.update(label.encode("utf-8"))
+        if rows is None:
+            h.update(b"\x00absent")      # absent is not empty, and must not hash alike
+            return
+        if isinstance(rows, dict):
+            rows = [{"k": k, "v": v} for k, v in sorted(rows.items(), key=lambda kv: str(kv[0]))]
+        cleaned = [_content_only(row) for row in rows]
+        for row in sorted(cleaned, key=lambda r: _json.dumps(r, sort_keys=True, default=str)):
+            h.update(_json.dumps(row, sort_keys=True, default=str).encode("utf-8"))
+
+    feed("products", products)
+    feed("sales_summary", summary_rows)
+    feed("sales_monthly", monthly)
+    feed("observations", observations)
+    feed("matches", matches)
+    feed("policy", policy.as_dict())
+    # NOT pulled_at. The owner's ANSWERS are an input; the moment we fetched them is not,
+    # and hashing it made two runs over identical data disagree — which is precisely the
+    # failure this digest exists to detect, so it would have detected nothing.
+    feed("owner", {"status": owner.status,
+                   "answers": _json.dumps(owner.answers, sort_keys=True, default=str)})
+    return h.hexdigest()
