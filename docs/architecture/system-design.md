@@ -872,7 +872,7 @@ OwnerState (Firestore: stores/{storeId}/ownerState/{doc}; mirror: data/owner/own
   answers:   { [barcode]: { cost_price: { value, at, status: answered | deferred, reason?: unknown } } }
   outcomes:  { [entry_id]: { status: acted | declined | deferred, reason?: wrong_data | not_worth_it | already_handled,
                              deferred_until?, at, snapshot: { signal_family, capability, barcode,
-                                                              value?, kind?, characterisation } } }
+                                                              value?, kind?, certainty?, characterisation } } }
   revivals:  { [barcode]: { at, window_id } }
   meta:      { schema: 1, updated_at }
 ```

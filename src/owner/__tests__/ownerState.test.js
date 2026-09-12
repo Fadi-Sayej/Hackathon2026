@@ -96,6 +96,9 @@ describe('recordOutcome', () => {
     // design §10.3: value and kind are flat fields on the snapshot, not a nested object
     expect(stored.snapshot.value).toBe(16)
     expect(stored.snapshot.kind).toBe('per_sale')
+    // D-10: a total that cannot separate confirmed from estimated recovery is not
+    // defensible. Costs nothing while every entry is confirmed; unrecoverable afterwards.
+    expect(stored.snapshot.certainty).toBe('confirmed')
   })
 
   it('refuses an entry with no signal family', async () => {

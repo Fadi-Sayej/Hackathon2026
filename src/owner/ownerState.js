@@ -147,7 +147,15 @@ export async function recordOutcome(entry, { status, reason = null, deferredUnti
           capability: entry.capability ?? null,
           barcode: entry.barcode ?? null,
           characterisation: entry.characterisation ?? null,
-          ...(entry.value ? { value: entry.value.amount, kind: entry.value.kind } : {}),
+          // certainty travels with the amount, for the same reason signal_family does
+          // (ADR-016): the snapshot is the only durable record, and a ₪ total that mixes
+          // confirmed and estimated recovery without being able to separate them is not a
+          // defensible number. D-10 — an uncertain figure is labelled uncertain BEFORE it
+          // is questioned, not after. Every valued entry is `confirmed` today, which is
+          // exactly why adding it costs nothing now and is unrecoverable later.
+          ...(entry.value
+            ? { value: entry.value.amount, kind: entry.value.kind, certainty: entry.value.certainty }
+            : {}),
         },
       },
     },

@@ -58,8 +58,16 @@ pilot has accumulated outcomes it cannot be backfilled at all.
 **The outcome snapshot carries `signal_family`.**
 
 ```
-snapshot: { signal_family, capability, barcode, value?, kind?, characterisation }
+snapshot: { signal_family, capability, barcode, value?, kind?, certainty?, characterisation }
 ```
+
+**`certainty` too, added 2026-09-12.** Caught in review after the first implementation
+dropped it: an entry's value is `{amount, kind, certainty}` and the snapshot took only the
+first two. A ₪ total that mixes confirmed and estimated recovery without being able to
+separate them is not a defensible number, and D-10 requires an uncertain figure to be
+labelled uncertain **before** it is questioned. Every valued entry is `confirmed` today —
+which is precisely why it costs nothing now and is unrecoverable once the pilot has
+accumulated outcomes. The same argument as the family, on a second field.
 
 `signal_family` is the durable grouping key and comes from the entry being acted on.
 `capability` stays: it records where the finding was routed *on the day the owner saw it*,
