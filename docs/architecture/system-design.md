@@ -732,10 +732,13 @@ DailyPage    ownerState.js           localStorage      Firestore
  │ re-compose → entry gone                                          │
 ```
 
-Entry recorded: `{entry_id, status, reason?, deferred_until?, at, snapshot:{capability,
-barcode, value?, kind?, characterisation}}`. The snapshot is what INT-MEAS will need
-later (§10.3); it is captured now because it cannot be reconstructed after thresholds
-move (FR-115).
+Entry recorded: `{entry_id, status, reason?, deferred_until?, at,
+snapshot:{signal_family, capability, barcode, value?, kind?, characterisation}}`. The
+snapshot is what INT-MEAS will need later (§10.3); it is captured now because it cannot be
+reconstructed after thresholds move (FR-115). `signal_family` is mandatory and is the
+durable grouping key — `entry_id` is a hash and cannot be read backwards into a family,
+and `capability` is the routing label ADR-009 kept out of the id precisely because it
+moves ([ADR-016](decisions/ADR-016-outcome-snapshot-carries-the-signal-family.md)).
 
 **Failure — cache write fails.** The UI rolls back and shows the error; the outcome is
 not presented as recorded (SPEC-006 §11). **Failure — Firestore write fails.** The cache
@@ -868,7 +871,8 @@ ship unlabelled (INV-052/INV-063).
 OwnerState (Firestore: stores/{storeId}/ownerState/{doc}; mirror: data/owner/owner_state.json)
   answers:   { [barcode]: { cost_price: { value, at, status: answered | deferred, reason?: unknown } } }
   outcomes:  { [entry_id]: { status: acted | declined | deferred, reason?: wrong_data | not_worth_it | already_handled,
-                             deferred_until?, at, snapshot: { capability, barcode, value?, kind?, characterisation } } }
+                             deferred_until?, at, snapshot: { signal_family, capability, barcode,
+                                                              value?, kind?, characterisation } } }
   revivals:  { [barcode]: { at, window_id } }
   meta:      { schema: 1, updated_at }
 ```
@@ -1196,6 +1200,7 @@ elsewhere in this document resolves to the file below.
 | [ADR-012](decisions/ADR-012-money-is-a-typed-value-with-a-declared-policy.md) | Money is a typed value with a declared per-capability policy | Easy |
 | [ADR-014](decisions/ADR-014-a-capability-is-the-smallest-independently-unavailable-unit.md) | A capability is the smallest independently-unavailable unit; data hygiene is one | Easy |
 | [ADR-015](decisions/ADR-015-ceiling-is-the-densest-qualifying-collapse.md) | The markup ceiling is the densest qualifying collapse, not the last; ties take the higher edge | Easy |
+| [ADR-016](decisions/ADR-016-outcome-snapshot-carries-the-signal-family.md) | The owner-outcome snapshot carries signal_family, the only durable grouping key for INT-MEAS | Easy |
 | [ADR-013](decisions/ADR-013-tests-run-before-merge.md) | Tests run before merge | Easy |
 
 ---
