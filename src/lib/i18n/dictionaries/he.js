@@ -737,4 +737,20 @@ export const he = {
   'rec.showingTopOf': 'מוצגות {shown} מתוך {total} המלצות — המובילות לפי הסכום בסיכון.',
   'rec.showingAll': 'מוצגות כל {total} ההמלצות.',
   'explain.cost.valueCapped': 'אם לא יוזמן: כ-{units} יחידות ביקוש לא ייענו עד האספקה הבאה, בשווי עלות של כ-{amount} ₪. מתוכן ניתן לכסות {qty} בלבד במשלוח אחד — היתר דורש משלוח נוסף בתוך חיי המדף, לא הזמנה גדולה יותר.',
+
+  // ── Daily surface (Phase 2) ─────────────────────────────────────────
+  'daily.title': "עבודת היום",
+  'daily.unavailable': "מה שלא הצלחנו לחשב היום",
+  'daily.nothingToDo': "אין מה שדורש את החלטתך היום.",
+  'entry.unnamed': "פריט ללא שם",
+  'value.estimated': "הערכה",
+  'value.kind.per_sale': "בכל מכירה",
+  'outcome.acted': "טיפלתי",
+  'outcome.declined': "לא שווה",
+  'outcome.deferred': "אחר כך",
+  'outcome.failed': "לא הצלחנו לשמור — לא נרשם.",
+  'characterisation.confirmed_loss': "הפסד ודאי",
+  'characterisation.question': "מחוץ למדיניות שלך — בכוונה?",
+  'characterisation.hygiene': "רשומה לתיקון",
+  'characterisation.inconsistent': "מספרים שלא מסתדרים",
 }

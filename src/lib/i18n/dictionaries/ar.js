@@ -742,4 +742,20 @@ export const ar = {
   'rec.showingTopOf': 'تُعرض {shown} من أصل {total} توصية — الأعلى حسب المبلغ المعرّض.',
   'rec.showingAll': 'تُعرض جميع التوصيات الـ{total}.',
   'explain.cost.valueCapped': 'إن لم يُطلب: نحو {units} وحدة من الطلب لن تُلبّى حتى التوريد التالي، بقيمة تكلفة نحو {amount} ₪. لا يمكن تغطية سوى {qty} منها بشحنة واحدة — والباقي يحتاج شحنة ثانية ضمن مدّة الصلاحية، لا طلباً أكبر.',
+
+  // ── Daily surface (Phase 2) ─────────────────────────────────────────
+  'daily.title': "شغل اليوم",
+  'daily.unavailable': "ما لم نستطع حسابه اليوم",
+  'daily.nothingToDo': "لا شيء يحتاج قرارك اليوم.",
+  'entry.unnamed': "صنف بلا اسم",
+  'value.estimated': "تقدير",
+  'value.kind.per_sale': "في كل عملية بيع",
+  'outcome.acted': "عالجته",
+  'outcome.declined': "لا يستحق",
+  'outcome.deferred': "لاحقاً",
+  'outcome.failed': "لم نستطع حفظ قرارك — لم يُسجَّل.",
+  'characterisation.confirmed_loss': "خسارة مؤكدة",
+  'characterisation.question': "خارج سياستك — مقصود؟",
+  'characterisation.hygiene': "سجل يحتاج تصحيحاً",
+  'characterisation.inconsistent': "أرقام لا تتطابق",
 }

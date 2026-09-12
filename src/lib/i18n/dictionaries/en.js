@@ -736,4 +736,20 @@ export const en = {
   'rec.showingTopOf': 'Showing {shown} of {total} recommendations — the highest by money at stake.',
   'rec.showingAll': 'Showing all {total} recommendations.',
   'explain.cost.valueCapped': 'If not ordered: about {units} units of demand go unmet before the next delivery, worth about {amount} ILS at cost. Only {qty} of those can be covered by a single order — the rest needs a second delivery within the shelf life, not a bigger one.',
+
+  // ── Daily surface (Phase 2) ─────────────────────────────────────────
+  'daily.title': "Today’s work",
+  'daily.unavailable': "What we could not compute today",
+  'daily.nothingToDo': "Nothing needs your decision today.",
+  'entry.unnamed': "Unnamed product",
+  'value.estimated': "estimate",
+  'value.kind.per_sale': "per sale",
+  'outcome.acted': "Done",
+  'outcome.declined': "Not worth it",
+  'outcome.deferred': "Later",
+  'outcome.failed': "We could not save your decision — it was not recorded.",
+  'characterisation.confirmed_loss': "Confirmed loss",
+  'characterisation.question': "Outside your policy — intentional?",
+  'characterisation.hygiene': "A record to fix",
+  'characterisation.inconsistent': "Numbers that do not add up",
 }
