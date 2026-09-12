@@ -412,8 +412,15 @@ English follows it.
 ### Task 2.9: Checkpoint 2 — the e2e invariants
 
 **Files:**
-- Create: `e2e/daily-surface.spec.js`
-- Modify: `package.json` — `"check:surface": "playwright test e2e/daily-surface.spec.js"`
+- Create: `src/surface/__tests__/checkpoint2.test.jsx`
+- Modify: `package.json` — `"check:surface": "vitest run src/surface/__tests__/checkpoint2.test.jsx"`
+- Modify: `.github/workflows/ci.yml`
+
+> **Not Playwright, for now.** Task 2.7's cut-over is deferred (D-14 / GAP-009), so the
+> spine is not the app's default and there is no URL to drive. The check runs the same
+> crossing — `loadDashboard → compose → DailyPage → ownerState` — in jsdom against
+> `public/data/dashboard.json`, the file the engine actually produced, and runs in CI.
+> When the cut-over happens it becomes `e2e/daily-surface.spec.js` unchanged in substance.
 
 **Why e2e and not unit.** Every test above hands its unit a fixture. None of them crosses
 `loadDashboard` → `compose` → `DailyPage` → `ownerState` with a real artefact, and that is

@@ -42,6 +42,7 @@
     "audit:ui": "node scripts/ui-audit.mjs",
     "check:signals": "node scripts/check_signals_live.mjs",
     "check:independence": "python3 scripts/check_independence.py",
+    "check:surface": "vitest run src/surface/__tests__/checkpoint2.test.jsx",
     "figures": "python3 scripts/print_figures.py"
   },
   "dependencies": {
