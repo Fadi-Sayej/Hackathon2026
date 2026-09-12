@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-11T02:36:20.995773+00:00",
-  "date": "2026-09-11",
+  "generatedAt": "2026-09-12T02:40:42.354767+00:00",
+  "date": "2026-09-12",
   "status": "ok",
   "sources": {
     "weather": "open-meteo",
@@ -9,28 +9,28 @@
     "islamic": "computed_hijri"
   },
   "weather": {
-    "temperatureC": 21.7,
+    "temperatureC": 22.1,
     "precipitation": 0.0,
-    "windSpeed": 6.6,
+    "windSpeed": 4.9,
     "weatherCode": 2,
     "label": "warm",
-    "observedAt": "2026-09-11T05:30",
+    "observedAt": "2026-09-12T05:30",
     "lat": 32.114,
     "lon": 34.976,
     "source": "open-meteo"
   },
   "hebrew": {
-    "date": "2026-09-11",
+    "date": "2026-09-12",
     "holidays": [
       {
-        "title": "Erev Rosh Hashana",
-        "hebrew": "ערב ראש השנה",
+        "title": "Rosh Hashana 5787",
+        "hebrew": "ראש השנה 5787",
         "category": "holiday"
       }
     ],
-    "isErevChag": true,
+    "isErevChag": false,
     "isFastDay": false,
-    "isShabbatEve": true,
+    "isShabbatEve": false,
     "chametz": null,
     "pesachStart": "2027-04-22",
     "windows": {
@@ -41,11 +41,11 @@
     "source": "hebcal"
   },
   "islamic": {
-    "date": "2026-09-11",
+    "date": "2026-09-12",
     "hijri": {
       "year": 1448,
       "month": 3,
-      "day": 28
+      "day": 29
     },
     "isRamadan": false,
     "ramadanDay": null,
@@ -53,8 +53,8 @@
     "isEidAlFitr": false,
     "isEidAlAdha": false,
     "ramadanStart": "2027-02-08",
-    "daysToRamadan": 150,
-    "daysToEidAlFitr": 180,
+    "daysToRamadan": 149,
+    "daysToEidAlFitr": 179,
     "phase": null,
     "windows": {
       "ramadan_build_up_days": 21,
@@ -64,21 +64,9 @@
     },
     "source": "computed_hijri"
   },
-  "demandSignals": {
-    "מוצרי מכולת": 1.1,
-    "מוצרי מקרר": 1.1
-  },
-  "demandBasis": {
-    "מוצרי מכולת": [
-      "shabbat_eve"
-    ],
-    "מוצרי מקרר": [
-      "shabbat_eve"
-    ]
-  },
-  "activeReasons": [
-    "shabbat_eve"
-  ],
+  "demandSignals": {},
+  "demandBasis": {},
+  "activeReasons": [],
   "shelfLife": {
     "categories": {
       "מחלקת -barista": 2,
@@ -2408,7 +2396,7 @@
       "9780201321029",
       "9800800056"
     ],
-    "days": 32,
+    "days": 33,
     "status": "ok",
     "lift": 1.15
   }
