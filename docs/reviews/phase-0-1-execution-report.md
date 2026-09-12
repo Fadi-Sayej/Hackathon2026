@@ -91,8 +91,9 @@ product question for **smartshelf-pm**, and it changes what the 12/9 meeting is 
 - **The live dashboard still shows 1,147 F1 entries** where the engine produces 161.
   Nothing reads `dashboard.json` yet; Phases 2–4 are not written. Recorded in
   [F1-validation](F1-validation.md).
-- **Task 0.13 steps 2–5** need Firebase, Vercel and GitHub credentials — **smartshelf-platform**.
-  `owner_questions` publishes `unavailable: answer_storage_unavailable` without them.
+- **Task 0.13 steps 4–5** remain — **smartshelf-platform**. Steps 1–3 pass; the two left
+  are console actions (Vercel Basic Auth, the CI secret) and are recorded with their cost
+  in [deployment.md](../operations/deployment.md).
 
 ---
 
@@ -106,11 +107,17 @@ product question for **smartshelf-pm**, and it changes what the 12/9 meeting is 
 | `catalogue_lifecycle` | available | 1,300 living · 3,916 withdrawable · 1,658 idle |
 | `competitor_position` | available | 3,186 comparable · 1,768 matched |
 | `margin_below_cost` | available | 17 below cost · 15 thin |
-| `owner_questions` | unavailable | `answer_storage_unavailable` |
+| `owner_questions` | **available** | limit 3 · 12 candidates · suppressed: 1,206 withdrawn, 6,143 no-effect |
 
-`value_kinds_present: ['per_sale']`. Run status `degraded`, correctly — the owner state is
-unreachable without credentials and the artefact says so rather than publishing an empty
-answer set.
+`value_kinds_present: ['per_sale']`. Run status **`ok`**.
+
+> **Corrected 2026-09-12.** This table was first recorded from a run made without
+> `FIREBASE_SERVICE_ACCOUNT_PATH`, which reported `degraded` and `owner_questions:
+> unavailable`. That was an artefact of the environment, not of the build: with the
+> credential path exported the run is `ok` and all seven capabilities are available. The
+> engine was right both times — it said why it was degraded rather than publishing an
+> empty answer set — but the first reading understated the result, and a figure read in a
+> degraded environment is exactly what rule 11 exists to stop. Re-measured and replaced.
 
 Two counts sit outside the plan's §3.5 expectations and are **not explained**:
 `absent_price` 61 against ~223, and `living` 1,300 against ~1,565. Both are plausibly POS
