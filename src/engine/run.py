@@ -22,7 +22,16 @@ SILVER_DIR = SILVER_POS_ROOT
 SALES_DIR = Path(__file__).resolve().parents[2] / "data" / "internal" / "raw_pos" / "yomyom" / "sales"
 
 # Filled by Phase 1: capability id -> callable(inputs) -> CapabilityOutput
-DEFAULT_RUNNERS: dict[str, Callable] = {}
+def _runners() -> dict:
+    from src.engine import (catalogue_lifecycle, competitor_position, margin_below_cost,
+                            owner_questions, price_consistency, reconciliation)
+    return {"catalogue_lifecycle": catalogue_lifecycle.run, "price_consistency": price_consistency.run,
+            "reconciliation": reconciliation.run, "hygiene": reconciliation.run_hygiene,
+            "competitor_position": competitor_position.run,
+            "margin_below_cost": margin_below_cost.run, "owner_questions": owner_questions.run}
+
+
+DEFAULT_RUNNERS: dict = {}          # populated lazily by run_engine
 
 
 def _pull_owner_state() -> OwnerState:
@@ -80,10 +89,13 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
                artefact_path: Path = ARTEFACT_PATH, capability_runners: Optional[dict] = None,
                now: Optional[datetime] = None, silver_dir: Optional[Path] = None,
                sales_dir: Optional[Path] = None) -> dict:
+    # Resolved here, not in the signature: a default bound at import time cannot be
+    # redirected by a caller that patches the module global, which is how Task 1.9
+    # runs the engine over a copy of the data with an input withheld.
     silver_dir = silver_dir or SILVER_DIR
     sales_dir = sales_dir or SALES_DIR
     now = now or datetime.now(timezone.utc)
-    runners = DEFAULT_RUNNERS if capability_runners is None else capability_runners
+    runners = _runners() if capability_runners is None else capability_runners
     steps: list = []
     policy = load_policy()
 
@@ -109,7 +121,8 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
                 out = CapabilityOutput.unavailable(cap_id, spec, "capability_error")
             outputs.append(out)
             if cap_id == "catalogue_lifecycle" and out.status == "available":
-                inputs.withdrawn = set(out.counts.get("_withdrawn_barcodes", []) or [])
+                inputs.withdrawn = getattr(out, "withdrawn_barcodes", set())
+                inputs.idle = getattr(out, "idle_barcodes", set())
 
     status = "ok"
     if any(s["status"] == "error" for s in steps):
@@ -117,9 +130,17 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
     elif owner.status != "available" or any(o.unavailable_reason == "capability_error" for o in outputs):
         status = "degraded"
 
+    extra_figures = []
+    if inputs is not None:
+        from src.engine.provenance import vintage_figures
+        from src.engine.surface_candidates import stamp
+        stamp(outputs, inputs)
+        extra_figures = vintage_figures(inputs)      # figures, NOT a capability
+
     artefact = build_artefact(outputs, vintages=inputs.vintages if inputs else _no_inputs_vintages(owner),
                               thresholds=policy.as_dict(), run={"status": status, "steps": steps},
-                              generated_at=now.isoformat(), run_id=uuid.uuid4().hex[:12])
+                              extra_figures=extra_figures, generated_at=now.isoformat(),
+                              run_id=uuid.uuid4().hex[:12])
     # Completeness is asserted for a real run only: a test that injects two capabilities is
     # not a broken artefact, but a production run missing one is. Turns itself on in Phase 1.8
     # when DEFAULT_RUNNERS stops being empty — nobody has to remember to flip it.
