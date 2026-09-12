@@ -362,7 +362,10 @@ derived from a duplicated barcode should be put in front of the owner.
 
 **Confidence:** High — measured, with the rows quoted above.
 
-**Owner:** smartshelf-architect (the rule), then smartshelf-engineer (the change).
+**Resolved 2026-09-12** by [ADR-019](../architecture/decisions/ADR-019-a-conflicting-duplicate-barcode-is-a-hygiene-record.md),
+accepted and implemented. The count is **42**, not the 41 above: the engine compares the
+shaped fields, which include `recorded_stock`, and one pair agrees on every product field
+while disagreeing on stock.
 
 ---
 

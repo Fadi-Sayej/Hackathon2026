@@ -1,7 +1,7 @@
 ---
 ID: ADR-019
 Title: A conflicting duplicate barcode is a hygiene record, never a silent pick
-Status: Draft
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-09-12
 Parent: [System Design](../system-design.md) §19
@@ -12,7 +12,7 @@ Updated: 2026-09-12
 
 # ADR-019 — A conflicting duplicate barcode is a hygiene record, never a silent pick
 
-**Status:** Draft · **Recorded in:** [System Design](../system-design.md) §19
+**Status:** Accepted (2026-09-12) · **Recorded in:** [System Design](../system-design.md) §19
 
 ## Context
 
@@ -76,7 +76,14 @@ the artefact can express honestly.
 
 ## Consequences
 
-**We accept:** 41 products (0.5% of the catalogue) leave every capability population until
+**Measured after implementation: 42, not 41.** The hand count compared the POS columns;
+the implementation compares the *shaped* fields, which include `recorded_stock`. One pair
+agrees on every product field and disagrees on stock. That is kept deliberately — a barcode
+with two recorded stocks is as unusable as one with two prices, and D-6 restricts automatic
+withdrawal to zero recorded stock, so the wrong row could withdraw a product that is on the
+shelf.
+
+**We accept:** 42 products (0.5% of the catalogue) leave every capability population until
 the owner fixes them, and one new hygiene reason appears on his screen. The seven identical
 pairs collapse invisibly, which is correct — there is nothing to tell him.
 
