@@ -24,6 +24,7 @@
     "pilot:daily": "bash scripts/pilot_daily.sh",
     "test": "vitest run",
     "test:py": "python3 -m pytest tests -q",
+    "test:py:fast": "python3 -m pytest tests -q -m \"not slow\"",
     "data:store-types": "python3 scripts/export_store_types.py",
     "classify:store-types": "python3 scripts/classify_store_types.py",
     "audit:store-format": "node scripts/audit-store-format.mjs",

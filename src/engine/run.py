@@ -20,6 +20,13 @@ from src.owner_state.pull import MIRROR_PATH, pull, read_mirror, write_mirror
 
 SILVER_DIR = SILVER_POS_ROOT
 SALES_DIR = Path(__file__).resolve().parents[2] / "data" / "internal" / "raw_pos" / "yomyom" / "sales"
+# The market half, named here for the same reason the two above are: a caller must be
+# able to run the whole engine over a copy of the data with an input withheld. Without
+# them, a run that isolates silver still reads production signals and matches — which is
+# both slower and less isolated than it claims to be.
+from src.common.paths import MATCHING_ROOT, SIGNALS_ROOT  # noqa: E402
+SIGNALS_DIR = SIGNALS_ROOT / "competitor_product_signals"
+MATCHES_PATH = MATCHING_ROOT / "product_matches.parquet"
 
 # Filled by Phase 1: capability id -> callable(inputs) -> CapabilityOutput
 def _runners() -> dict:
@@ -106,12 +113,15 @@ def _sales_verdict(result) -> tuple:
 def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_market: bool = False,
                artefact_path: Path = ARTEFACT_PATH, capability_runners: Optional[dict] = None,
                now: Optional[datetime] = None, silver_dir: Optional[Path] = None,
-               sales_dir: Optional[Path] = None, population: Optional[str] = None) -> dict:
+               sales_dir: Optional[Path] = None, population: Optional[str] = None,
+               signals_dir: Optional[Path] = None, matches_path: Optional[Path] = None) -> dict:
     # Resolved here, not in the signature: a default bound at import time cannot be
     # redirected by a caller that patches the module global, which is how Task 1.9
     # runs the engine over a copy of the data with an input withheld.
     silver_dir = silver_dir or SILVER_DIR
     sales_dir = sales_dir or SALES_DIR
+    signals_dir = signals_dir or SIGNALS_DIR
+    matches_path = matches_path or MATCHES_PATH
     now = now or datetime.now(timezone.utc)
     runners = _runners() if capability_runners is None else capability_runners
     steps: list = []
@@ -133,7 +143,8 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
     for name, fn in _market_chain(skip_market):
         _step(steps, name, fn)
 
-    inputs = _step(steps, "load_inputs", lambda: load_inputs(policy=policy, owner=owner, run_at=now, silver_dir=silver_dir))
+    inputs = _step(steps, "load_inputs", lambda: load_inputs(policy=policy, owner=owner, run_at=now, silver_dir=silver_dir,
+                                                           signals_dir=signals_dir, matches_path=matches_path))
     outputs: list[CapabilityOutput] = []
     if inputs is not None:
         # catalogue_lifecycle runs first so its withdrawn set reaches the others (FR-074).

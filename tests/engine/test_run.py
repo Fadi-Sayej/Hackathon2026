@@ -18,6 +18,11 @@ def _isolate(monkeypatch, tmp_path):
     monkeypatch.setattr(run_mod, "_sales_import", lambda *a, **k: {"window": None})
     monkeypatch.setattr(run_mod, "_market_chain", lambda skip: [])
     monkeypatch.setattr(run_mod, "SILVER_DIR", tmp_path / "silver")
+    # …and the market half. Isolating only silver left load_inputs reading the real
+    # competitor signals and matches — 12 seconds per test, and not the isolation the
+    # test claims.
+    monkeypatch.setattr(run_mod, "SIGNALS_DIR", tmp_path / "signals")
+    monkeypatch.setattr(run_mod, "MATCHES_PATH", tmp_path / "matches.parquet")
 
 
 def test_empty_capability_set_publishes_a_valid_artefact(tmp_path, monkeypatch):

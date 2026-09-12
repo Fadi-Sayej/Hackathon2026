@@ -26,12 +26,14 @@ def cli_json():
     return result
 
 
+@pytest.mark.slow
 def test_figures_needs_no_arguments_beyond_the_run_mode(cli_json):
     """NFR-062. A stranger runs it without knowing the flags, or it is not a reproduction
     tool. Exit 0 when every registered figure has a value."""
     assert cli_json.returncode == 0, cli_json.stderr[-2000:]
 
 
+@pytest.mark.slow
 def test_it_prints_the_engines_figures_and_recomputes_nothing(cli_json):
     """Task 3.0's whole purpose. print_figures.py computed all 46 figures a second time and
     disagreed with the engine on F1's ceiling — 18% against 26% — until ADR-015. One number,
@@ -45,6 +47,7 @@ def test_it_prints_the_engines_figures_and_recomputes_nothing(cli_json):
     assert "price_consistency.inverted" in payload["figures"]
 
 
+@pytest.mark.slow
 def test_a_capability_that_could_not_run_makes_the_command_fail(cli_json):
     """§11.6: exit 1 naming the missing input. A reproduction tool that exits 0 with a
     shorter list is how a count drifts unnoticed."""
@@ -89,6 +92,7 @@ def test_run_engine_accepts_the_population_argument():
     assert "population" in inspect.signature(run_engine).parameters
 
 
+@pytest.mark.slow
 def test_a_credential_this_machine_lacks_is_not_a_reproduction_failure(tmp_path, monkeypatch):
     """§11.6 says exit 1 when a registered figure is unavailable. On a machine without the
     service account owner_questions is ALWAYS unavailable, so a judge running this on 12/9
