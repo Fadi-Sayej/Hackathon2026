@@ -21,6 +21,48 @@ Vercel was chosen because this repository is a static Vite app, the Vercel CLI i
 on the deployment machine, and Vercel supports Vite builds, SPA rewrites, environment variables,
 HTTPS, deployment URLs, and rollbacks.
 
+## Pilot prerequisites — verified status
+
+Task 0.13's checkpoint, run 2026-09-12. Three of five pass; the two that do not are
+console actions, not code, and both take the pilot down rather than degrading it quietly.
+
+| # | Prerequisite | Verified | Evidence |
+|---|---|---|---|
+| 1 | Six `VITE_FIREBASE_*` values present; `VITE_STORE_ID` matches `firestore.rules` | **pass** | `npm run check:firebase` exits 0, store id `yomyom-kafr-qasim` |
+| 2 | Anonymous sign-in enabled; rules allow a write and read-back | **pass** | `npm run check:firebase-live` — sign-in ✅, write+read ✅, probe cleaned up |
+| 3 | The engine pulls owner state with the service account | **pass** | `_pull_owner_state()` → `available`, `data/owner/owner_state.json` written |
+| 4 | `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD` set in Vercel for Production **and** Preview | **NOT VERIFIED** | `npx vercel env ls` → *"The specified token is not valid"*. Needs `vercel login` on the deployment machine |
+| 5 | GitHub secret `FIREBASE_SERVICE_ACCOUNT_JSON` for a read-only service account | **NOT SET** | `gh api repos/Fadi-Sayej/Hackathon2026/actions/secrets` → `total_count: 0`, with admin permission — so this is an absence, not a permissions failure |
+
+### What each unmet item costs
+
+**4 — Basic Auth.** `middleware.ts` fails closed: with either variable unset every request
+returns HTTP 503 (design §11.7). The failure is safe but **total**, and invisible until
+someone opens the URL. An unset pair takes the pilot app down on the day it is shown.
+
+**5 — the CI secret.** Without it the nightly workflow cannot pull owner state, so every
+CI-produced artefact carries `owner_state: unavailable` and `owner_questions` publishes
+`unavailable: answer_storage_unavailable`. The engine is honest about it — it does not
+invent an empty answer set — but the owner is never asked a cost question by anything CI
+builds. Locally, with `FIREBASE_SERVICE_ACCOUNT_PATH` exported, the same run publishes
+`owner_questions: available` with 12 candidates against a limit of 3.
+
+**Neither is code.** Both are a console action by someone with access to the Vercel project
+and the GitHub repository, and both must be done before the pilot URL is shown to anyone.
+
+### Running the engine with credentials
+
+`scripts/run_engine.py` reads `FIREBASE_SERVICE_ACCOUNT_PATH`. Without it the run is
+`degraded` and says why; with it the run is `ok`:
+
+```bash
+FIREBASE_SERVICE_ACCOUNT_PATH=./secrets/firebase-service-account.json \
+  python3 scripts/run_engine.py --skip-market
+```
+
+`secrets/` is gitignored and stays that way. The path is never committed, and the CI
+equivalent is the `FIREBASE_SERVICE_ACCOUNT_JSON` secret in item 5.
+
 ## Required Vercel Environment Variables
 
 Set these in Vercel before any preview or production deployment:

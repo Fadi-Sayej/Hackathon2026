@@ -265,6 +265,14 @@ that this does not block V1.
 
 **Confidence:** High.
 
+> **Added 2026-09-12 (not part of the migrated content).** The three decisions are now
+> posed as answerable questions, with the options the data supports, in
+> [F8 — the three decisions](../product/open-decisions/F8-ordering.md). That document
+> resolves nothing; it exists so the decisions can be taken in one sitting. It raises
+> four new open questions, **GAP-008a … GAP-008d**, one of which is blocking: the
+> `WATCH_PRODUCT` population is 527 in F8's intent and 1,857 in `public/data/operational.json`
+> (2026-09-10).
+
 ---
 
 #### GAP-009 — "Sold nothing" is, for every classified product in the pilot, "has no sales row"
@@ -307,6 +315,98 @@ established with the owner before 3,932 products are withdrawn in front of him �
 cheapest test being to name twenty absent products and ask whether any of them sold.
 
 **Confidence:** High — measured directly from the pilot artefacts.
+
+---
+
+#### GAP-010 — A barcode identifies two different products, and the engine believes both
+
+**Source:** measured against `data/internal/silver_pos/yomyom_products.parquet` and
+`public/data/dashboard.json` on 2026-09-12, while verifying the figures for P2-OQ-3.
+
+**Problem:**
+48 barcodes appear twice in the POS export. Seven pairs are identical rows; **41 disagree**:
+
+| Barcode | Disagreement |
+|---|---|
+| `838948000444` | «מסטיק שפורפרת תות» filed under both `חטיפים מתוקים` and `מוצרי אלקטרונים` |
+| `838948002271` | same product under `חטיפים מתוקים` and `חטיפים מלוחים` |
+| `4062139003150` | same product at **₪15.90 and ₪16.90** |
+
+The engine shapes one product per **row**, so a duplicated barcode becomes two products.
+In today's artefact `price_consistency` publishes **108 entries for 107 products**, two of
+them byte-identical and sharing one `entry_id` — so the capability's own `counts.above`
+(107) disagrees with its own entry list (108).
+
+**Why it matters:**
+Three separate consequences, and only the first is cosmetic.
+
+1. **A capability's counts and entries disagree**, in an artefact whose entire purpose is
+   that every figure is recomputable and traceable (F7-S1).
+2. **AC-109 — "no product appears twice at once"** — is currently satisfied only because
+   `compose` has not been built yet. Phase 2 Task 2.2 must deduplicate, but that hides the
+   underlying conflict rather than reporting it.
+3. **A product with two shelf prices has no price the system can state honestly.**
+   `4062139003150` is either ₪15.90 or ₪16.90; the engine currently picks whichever row it
+   read last and computes a markup, a ceiling contribution and possibly a surfaced finding
+   from it. That is a number stated without evidence, which D-3 forbids.
+
+A duplicate barcode with conflicting data is a **fourth hygiene reason** — alongside
+`negative_stock`, `no_identifier` and `absent_price` — and it does not exist yet.
+
+**Recommended resolution:**
+Not a code fix to be chosen by whoever gets there first. It needs an architecture decision
+naming (a) where duplicate identity is resolved — `inputs.py` is the single producer of the
+product list and the natural place — and (b) what happens to a conflicting pair: a hygiene
+record the owner can fix, never a silent pick. Until that decision exists, no figure
+derived from a duplicated barcode should be put in front of the owner.
+
+**Confidence:** High — measured, with the rows quoted above.
+
+**Resolved 2026-09-12** by [ADR-019](../architecture/decisions/ADR-019-a-conflicting-duplicate-barcode-is-a-hygiene-record.md),
+accepted and implemented. The count is **42**, not the 41 above: the engine compares the
+shaped fields, which include `recorded_stock`, and one pair agrees on every product field
+while disagreeing on stock.
+
+---
+
+#### GAP-011 — The 18% ceiling is derived from his behaviour, not confirmed as his policy
+
+**Source:** [ADR-015](../architecture/decisions/ADR-015-ceiling-is-the-densest-qualifying-collapse.md),
+accepted 2026-09-12 with this condition.
+
+**Problem:**
+`derive_ceiling` reads 18.0% from the pilot export: the owner's markups collapse from 81
+products in the 16–18% band to 7 in 18–20%. That is strong evidence of where his pricing
+stops. It is **not** a statement that he believes his ceiling is 18%.
+
+F1's entire correction rests on that distinction. The intent's argument is that 1,124
+products inside 0–18% are «سياسته السليمة» — his sound policy — and must never be surfaced.
+If his actual policy is 15% or 25%, the same data supports a different silent band, and the
+surfaced set changes with it.
+
+**Why it matters:**
+Every figure F1 puts in front of him is partitioned by this number. Showing him 136
+"above your policy" items presumes we know what his policy is.
+
+**Recommended resolution:**
+One question at the 12/9 meeting, before the figures: *«فوق كم بالمئة تعتبر سعر Wolt خارج
+سياستك؟»* — above what percentage do you consider a Wolt price outside your policy? Then
+compare his answer with the derived 18%.
+
+A divergence is not a defect in the rule. It means his behaviour and his stated policy have
+parted, and saying so is more valuable than either number alone.
+
+**Confidence:** High that the derivation is sound; unknown whether it matches his intent —
+which is the gap.
+
+**No longer blocking, 2026-09-12.** `configs/policy.yaml` carries
+`owner_declared_ceiling_pct: null`. Null means the derived ceiling is used and the artefact
+says it was derived; a number means he stated one, his is used, and the artefact says so —
+while still publishing the derived figure beside it and noting when the two differ by a
+point or more. The system runs today on the derivation; his answer is one line when it
+comes, and the divergence stays visible rather than being resolved silently.
+
+**Owner:** the store owner, via smartshelf-pm — as an input, not a gate.
 
 ---
 

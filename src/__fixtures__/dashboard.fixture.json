@@ -1,0 +1,1489 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-09-12T11:38:54.482942+00:00",
+  "run_id": "594824b9cc49",
+  "run": {
+    "status": "degraded",
+    "steps": [
+      {
+        "step": "owner_state_pull",
+        "status": "ok",
+        "ms": 0,
+        "error": null
+      },
+      {
+        "step": "sales_import",
+        "status": "ok",
+        "ms": 211,
+        "error": null
+      },
+      {
+        "step": "market_context",
+        "status": "ok",
+        "ms": 42064,
+        "error": null
+      },
+      {
+        "step": "load_inputs",
+        "status": "ok",
+        "ms": 7340,
+        "error": null
+      },
+      {
+        "step": "capability:catalogue_lifecycle",
+        "status": "ok",
+        "ms": 11,
+        "error": null
+      },
+      {
+        "step": "capability:price_consistency",
+        "status": "ok",
+        "ms": 3,
+        "error": null
+      },
+      {
+        "step": "capability:reconciliation",
+        "status": "ok",
+        "ms": 1,
+        "error": null
+      },
+      {
+        "step": "capability:hygiene",
+        "status": "ok",
+        "ms": 2,
+        "error": null
+      },
+      {
+        "step": "capability:competitor_position",
+        "status": "ok",
+        "ms": 633,
+        "error": null
+      },
+      {
+        "step": "capability:margin_below_cost",
+        "status": "ok",
+        "ms": 0,
+        "error": null
+      },
+      {
+        "step": "capability:owner_questions",
+        "status": "ok",
+        "ms": 0,
+        "error": null
+      }
+    ]
+  },
+  "vintages": {
+    "pos": {
+      "file": "yomyom-inventory.csv",
+      "as_of": "2026-08-02"
+    },
+    "sales": {
+      "months": [
+        "2026-01",
+        "2026-02",
+        "2026-03",
+        "2026-04",
+        "2026-05",
+        "2026-06",
+        "2026-07"
+      ],
+      "first": "2026-01",
+      "last": "2026-07",
+      "full_annual_cycle": false
+    },
+    "competitor": {
+      "snapshot_date": "2026-09-10",
+      "sources": [
+        "401",
+        "402",
+        "403",
+        "404",
+        "415",
+        "501",
+        "503",
+        "504",
+        "505",
+        "506",
+        "507",
+        "508",
+        "509",
+        "510",
+        "511",
+        "512",
+        "513",
+        "514",
+        "517",
+        "518",
+        "519",
+        "524",
+        "529",
+        "531",
+        "533",
+        "534",
+        "535",
+        "536",
+        "537",
+        "540",
+        "542",
+        "544",
+        "545",
+        "548",
+        "549",
+        "551",
+        "554",
+        "556",
+        "558",
+        "560",
+        "563",
+        "564",
+        "566",
+        "568",
+        "570",
+        "571",
+        "576",
+        "577",
+        "578",
+        "579",
+        "580",
+        "581",
+        "582",
+        "583",
+        "591",
+        "594",
+        "595",
+        "596",
+        "597",
+        "599",
+        "631480ca6741954d25cf2611",
+        "6315c7a3f00f9e43ec812476",
+        "644",
+        "645",
+        "647",
+        "6475f16879b711f39a180292",
+        "648",
+        "649",
+        "650",
+        "651",
+        "652",
+        "653",
+        "654",
+        "655",
+        "656",
+        "657",
+        "6576d161608e6c09be0c0e54",
+        "658",
+        "65af9c58e895c470fe3eb763",
+        "65daeb8779ca7f0a9bf964f3",
+        "661",
+        "666",
+        "668",
+        "689d9d1ea1357c9968d6850f",
+        "702",
+        "706",
+        "707",
+        "709",
+        "710",
+        "711",
+        "715",
+        "717",
+        "719",
+        "721",
+        "722",
+        "723",
+        "724",
+        "725",
+        "726",
+        "727",
+        "730",
+        "733",
+        "734",
+        "801",
+        "804",
+        "807",
+        "808",
+        "811",
+        "814",
+        "815",
+        "820",
+        "823",
+        "824",
+        "832",
+        "834",
+        "839",
+        "843",
+        "850",
+        "852",
+        "853",
+        "860",
+        "861",
+        "870",
+        "871",
+        "878",
+        "901",
+        "902",
+        "903",
+        "904",
+        "905",
+        "906",
+        "908",
+        "910",
+        "911",
+        "912",
+        "913",
+        "914",
+        "918",
+        "921",
+        "922",
+        "925",
+        "927",
+        "928",
+        "930",
+        "933",
+        "935",
+        "940",
+        "941",
+        "944",
+        "947",
+        "948",
+        "949",
+        "951",
+        "952",
+        "955",
+        "958",
+        "960",
+        "961",
+        "968",
+        "969",
+        "976",
+        "978",
+        "981",
+        "992"
+      ]
+    },
+    "owner_state": {
+      "pulled_at": null,
+      "status": "unavailable"
+    }
+  },
+  "thresholds": {
+    "version": 1,
+    "price_consistency": {
+      "band_pct": 2.0,
+      "drop_ratio": 0.75,
+      "min_band_count": 20,
+      "max_credible_gap_pct": 300.0
+    },
+    "competitor_position": {
+      "policy_pct": 60.0,
+      "attention_pct": 100.0,
+      "cost_floor_pct": 10.0,
+      "freshness_days": 14,
+      "uncomparable_min_barcode_digits": 8
+    },
+    "catalogue_lifecycle": {
+      "implausible_revenue_share": 0.1,
+      "full_annual_cycle_months": 12,
+      "withdraw_with_stock": false
+    },
+    "owner_questions": {
+      "limit": 3,
+      "money_basis": "window_revenue_at_shelf_price",
+      "yield_factor": 1.0
+    },
+    "surface": {
+      "bound": 10,
+      "unvalued_places": 3,
+      "unvalued_order": [
+        "reconciliation",
+        "competitor_position",
+        "catalogue_lifecycle",
+        "hygiene"
+      ]
+    },
+    "artefact": {
+      "min_price": 0.5,
+      "cost_ratio": 2.0
+    },
+    "question_limit": 3
+  },
+  "value_kinds_present": [
+    "per_sale"
+  ],
+  "capabilities": {
+    "catalogue_lifecycle": {
+      "id": "catalogue_lifecycle",
+      "spec": "SPEC-004",
+      "requires": [
+        "products",
+        "inventory",
+        "sales_summary",
+        "window"
+      ],
+      "status": "available",
+      "unavailable_reason": null,
+      "window": {
+        "months": [
+          "2026-01",
+          "2026-02",
+          "2026-03",
+          "2026-04",
+          "2026-05",
+          "2026-06",
+          "2026-07"
+        ],
+        "first": "2026-01",
+        "last": "2026-07",
+        "count": 7,
+        "full_annual_cycle": false,
+        "window_id": "2026-01..2026-07"
+      },
+      "thresholds": {
+        "implausible_revenue_share": 0.1,
+        "full_annual_cycle_months": 12,
+        "withdraw_with_stock": false
+      },
+      "counts": {
+        "living": 1257,
+        "withdrawable": 3903,
+        "idle": 1631,
+        "excluded_negative_stock": 483,
+        "excluded_no_identifier": 308,
+        "excluded_stock_absent": 1,
+        "revived_manually": 0,
+        "implausible": 1
+      },
+      "entries": [
+        {
+          "id": "c062297cd5cf48a5",
+          "signal_family": "catalogue.implausible_quantity",
+          "capability": "catalogue_lifecycle",
+          "barcode": "8350",
+          "product_name": "כוס חד פעמי 8 OZ  (יח 1000)",
+          "department": "מוצרי קפה (סאשה )",
+          "action": "decide_idle",
+          "characterisation": "implausible_quantity",
+          "evidence": {
+            "recorded_stock": 4005.0,
+            "unit_cost": 170.0,
+            "evidence_state": "no_row",
+            "window_id": "2026-01..2026-07",
+            "question": "is_this_quantity_right"
+          },
+          "value": null,
+          "ordering_key": {
+            "name": "unit_cost",
+            "value": 170.0
+          },
+          "actionable": true,
+          "not_actionable_reason": null,
+          "attention": "today"
+        },
+        {
+          "id": "705cb1e63ae42192",
+          "signal_family": "catalogue.idle",
+          "capability": "catalogue_lifecycle",
+          "barcode": "513109",
+          "product_name": "כלוב מגן למיכלים חד פעמיים",
+          "department": "מוצרי חצר תחנה",
+          "action": "decide_idle",
+          "characterisation": "idle",
+          "evidence": {
+            "unit_cost": 941.95,
+            "cost_source": "pos",
+            "evidence_state": "no_row",
+            "window_id": "2026-01..2026-07"
+          },
+          "value": null,
+          "ordering_key": {
+            "name": "unit_cost",
+            "value": 941.95
+          },
+          "actionable": true,
+          "not_actionable_reason": null,
+          "attention": "today"
+        }
+      ],
+      "notes": [
+        "window:2026-01..2026-07",
+        "provisional_window",
+        "seasonal_misclassification_possible"
+      ],
+      "provisional": true,
+      "withdrawn": [
+        {
+          "barcode": "1013",
+          "product_name": "שקית נייר 25/50 בתאבון (2000)",
+          "department": "מוצרי שימוש מטבח -חנות",
+          "evidence_state": "no_row",
+          "recorded_stock": 0,
+          "window_id": "2026-01..2026-07",
+          "months": 7,
+          "provisional": true,
+          "statement": "Withdrawn on 7 months of evidence (2026-01..2026-07), less than a full annual cycle: the evidence cannot separate a seasonal product from a dead one, so this withdrawal may be wrong and will be re-examined when longer evidence arrives."
+        },
+        {
+          "barcode": "101927",
+          "product_name": "אוכמניות כחולות קפוא300ג",
+          "department": "קפואים מצוננים",
+          "evidence_state": "no_row",
+          "recorded_stock": 0,
+          "window_id": "2026-01..2026-07",
+          "months": 7,
+          "provisional": true,
+          "statement": "Withdrawn on 7 months of evidence (2026-01..2026-07), less than a full annual cycle: the evidence cannot separate a seasonal product from a dead one, so this withdrawal may be wrong and will be re-examined when longer evidence arrives."
+        }
+      ],
+      "statement": "Classified on 7 months (2026-01..2026-07). Seasonal products may be misclassified as dead; every withdrawal is provisional until a full annual cycle of evidence exists."
+    },
+    "price_consistency": {
+      "id": "price_consistency",
+      "spec": "SPEC-001",
+      "requires": [
+        "products"
+      ],
+      "status": "available",
+      "unavailable_reason": null,
+      "window": null,
+      "thresholds": {
+        "ceiling_pct": 18.0,
+        "ceiling_method": "densest_density_collapse",
+        "ceiling_bands": [
+          {
+            "from": 0.0,
+            "to": 2.0,
+            "count": 3
+          },
+          {
+            "from": 2.0,
+            "to": 4.0,
+            "count": 73
+          },
+          {
+            "from": 4.0,
+            "to": 6.0,
+            "count": 141
+          },
+          {
+            "from": 6.0,
+            "to": 8.0,
+            "count": 171
+          }
+        ],
+        "ceiling_population": 2453,
+        "ceiling_population_excludes_withdrawn": true,
+        "artefact_min_price": 0.5,
+        "artefact_cost_ratio": 2.0,
+        "max_credible_gap_pct": 300.0
+      },
+      "counts": {
+        "population": 2466,
+        "identical": 1504,
+        "within": 790,
+        "above": 106,
+        "inverted": 53,
+        "excluded_artefact": 13,
+        "excluded_gap": 0
+      },
+      "entries": [
+        {
+          "id": "c8355c49b7d8155a",
+          "signal_family": "price.inverted",
+          "capability": "price_consistency",
+          "barcode": "7613030979647",
+          "product_name": "טריקס דגני בוקר 480גר",
+          "department": "מוצרי בית",
+          "action": "verify_price",
+          "characterisation": "confirmed_loss",
+          "evidence": {
+            "shelf_price": 29.9,
+            "delivery_price": 22.9,
+            "difference": -7.0,
+            "markup_pct": -23.41,
+            "ceiling_pct": 18.0,
+            "commission_compounds": true
+          },
+          "value": {
+            "amount": 7.0,
+            "kind": "per_sale",
+            "certainty": "confirmed"
+          },
+          "ordering_key": {
+            "name": "loss_per_sale",
+            "value": 7.0
+          },
+          "actionable": true,
+          "not_actionable_reason": null,
+          "attention": "today"
+        },
+        {
+          "id": "834cd70628bab3a0",
+          "signal_family": "price.above_ceiling",
+          "capability": "price_consistency",
+          "barcode": "710497377171",
+          "product_name": "סוכריה על מקל",
+          "department": "חטיפים מתוקים",
+          "action": "verify_price",
+          "characterisation": "question",
+          "evidence": {
+            "shelf_price": 1.0,
+            "delivery_price": 2.9,
+            "difference": 1.9,
+            "markup_pct": 190.0,
+            "ceiling_pct": 18.0
+          },
+          "value": null,
+          "ordering_key": {
+            "name": "markup_pct",
+            "value": 190.0
+          },
+          "actionable": true,
+          "not_actionable_reason": null,
+          "attention": "today"
+        }
+      ],
+      "notes": []
+    },
+    "reconciliation": {
+      "id": "reconciliation",
+      "spec": "SPEC-002",
+      "requires": [
+        "products",
+        "inventory",
+        "sales_summary",
+        "window"
+      ],
+      "status": "available",
+      "unavailable_reason": null,
+      "window": {
+        "months": [
+          "2026-01",
+          "2026-02",
+          "2026-03",
+          "2026-04",
+          "2026-05",
+          "2026-06",
+          "2026-07"
+        ],
+        "first": "2026-01",
+        "last": "2026-07",
+        "count": 7,
+        "full_annual_cycle": false,
+        "window_id": "2026-01..2026-07"
+      },
+      "thresholds": {},
+      "counts": {
+        "flagged": 439
+      },
+      "entries": [
+        {
+          "id": "83384c732f5d1d67",
+          "signal_family": "recon.impossible_opening",
+          "capability": "reconciliation",
+          "barcode": "7622210638021",
+          "product_name": "אוראו קראנצ'י בייטס מצופים 110 גרם",
+          "department": "חטיפים מתוקים",
+          "action": "count_product",
+          "characterisation": "inconsistent",
+          "evidence": {
+            "recorded_stock": -71.0,
+            "receipts": 8.0,
+            "units_sold": 3.0,
+            "unaccounted": 76.0,
+            "window_id": "2026-01..2026-07",
+            "reconcile_months": 1
+          },
+          "value": null,
+          "ordering_key": {
+            "name": "gap_ratio",
+            "value": 9.5
+          },
+          "actionable": true,
+          "not_actionable_reason": null,
+          "attention": "today"
+        }
+      ],
+      "notes": []
+    },
+    "hygiene": {
+      "id": "hygiene",
+      "spec": "SPEC-002",
+      "requires": [
+        "products",
+        "inventory"
+      ],
+      "status": "available",
+      "unavailable_reason": null,
+      "window": null,
+      "thresholds": {},
+      "counts": {
+        "negative_stock": 614,
+        "no_identifier": 308,
+        "absent_price": 61,
+        "conflicting_duplicate": 42
+      },
+      "entries": [
+        {
+          "id": "0c0edfbb14cd4cdf",
+          "signal_family": "hygiene.negative_stock",
+          "capability": "hygiene",
+          "barcode": "7290114100502",
+          "product_name": "- Cycle Car 2A 2USBמטען רכב",
+          "department": "אבזרי סלולר ו חשמל",
+          "action": "fix_record",
+          "characterisation": "hygiene",
+          "evidence": {
+            "reason": "negative_stock",
+            "recorded_stock": -3.0
+          },
+          "value": null,
+          "ordering_key": {
+            "name": "hygiene_order",
+            "value": 0
+          },
+          "actionable": true,
+          "not_actionable_reason": null,
+          "attention": "today"
+        },
+        {
+          "id": "f386872b9dea6b00",
+          "signal_family": "hygiene.no_identifier",
+          "capability": "hygiene",
+          "barcode": null,
+          "product_name": "אבוקדו",
+          "department": "פירות וירקות",
+          "action": "fix_record",
+          "characterisation": "hygiene",
+          "evidence": {
+            "reason": "no_identifier",
+            "recorded_stock": null
+          },
+          "value": null,
+          "ordering_key": {
+            "name": "hygiene_order",
+            "value": 1
+          },
+          "actionable": true,
+          "not_actionable_reason": null,
+          "attention": "today"
+        },
+        {
+          "id": "370406e4abcfe0d5",
+          "signal_family": "hygiene.absent_price",
+          "capability": "hygiene",
+          "barcode": "139",
+          "product_name": "אבוקדו קפוא",
+          "department": "מוצרי שימוש מטבח -חנות",
+          "action": "fix_record",
+          "characterisation": "hygiene",
+          "evidence": {
+            "reason": "absent_price",
+            "recorded_stock": null
+          },
+          "value": null,
+          "ordering_key": {
+            "name": "hygiene_order",
+            "value": 2
+          },
+          "actionable": true,
+          "not_actionable_reason": null,
+          "attention": "today"
+        },
+        {
+          "id": "2a58915a83f1d50d",
+          "signal_family": "hygiene.conflicting_duplicate",
+          "capability": "hygiene",
+          "barcode": "4009900420129",
+          "product_name": "אורביט פרופשנל",
+          "department": null,
+          "action": "fix_record",
+          "characterisation": "hygiene",
+          "evidence": {
+            "reason": "conflicting_duplicate",
+            "fields": {
+              "cost_price": [
+                6.32,
+                7.24
+              ]
+            }
+          },
+          "value": null,
+          "ordering_key": {
+            "name": "hygiene_order",
+            "value": 3
+          },
+          "actionable": true,
+          "not_actionable_reason": null,
+          "attention": "today"
+        }
+      ],
+      "notes": []
+    },
+    "competitor_position": {
+      "id": "competitor_position",
+      "spec": "SPEC-003",
+      "requires": [
+        "products",
+        "observations",
+        "matches"
+      ],
+      "status": "available",
+      "unavailable_reason": null,
+      "window": null,
+      "thresholds": {
+        "policy_pct": 60.0,
+        "attention_pct": 100.0,
+        "cost_floor_pct": 10.0,
+        "format_allowance_pct": 7.892,
+        "format_allowance_basis_count": 414,
+        "freshness_days": 14,
+        "comparability_floor": 0.3
+      },
+      "counts": {
+        "catalogue": 7583,
+        "comparable_population": 3108,
+        "matched": 1709,
+        "structurally_uncomparable": 572,
+        "no_comparison": 2481,
+        "evaluated": 620,
+        "breaches": 2,
+        "attention": 0,
+        "review": 2,
+        "purchase_cost_findings": 2,
+        "no_cost_skipped": 7,
+        "stale_skipped": 738
+      },
+      "entries": [
+        {
+          "id": "8f6ebc2c4a19e4f4",
+          "signal_family": "competitor.policy_breach",
+          "capability": "competitor_position",
+          "barcode": "7290017888729",
+          "product_name": "שופס סודה ליטר",
+          "department": "משקאות",
+          "action": "review_policy",
+          "characterisation": "policy_breach_review",
+          "evidence": {
+            "shelf_price": 9.9,
+            "cost_price": 2.59,
+            "reference": {
+              "value": 5.6104,
+              "kind": "supermarket_plus_allowance",
+              "same_format": null,
+              "supermarket": 5.2,
+              "allowance_pct": 7.892
+            },
+            "premium_pct": 76.46,
+            "policy_pct": 60.0,
+            "attention_pct": 100.0,
+            "cost_floor_pct": 10.0,
+            "sources": [
+              {
+                "store_id": "401",
+                "store_name": "AM-PMדרך השלום",
+                "format": "unknown",
+                "price": 4.9,
+                "observed_at": "2026-09-10T02:22:54+00:00",
+                "role": "context"
+              },
+              {
+                "store_id": "402",
+                "store_name": "AM-PMקרית ביאליק",
+                "format": "unknown",
+                "price": 4.9,
+                "observed_at": "2026-09-10T02:22:54+00:00",
+                "role": "context"
+              }
+            ],
+            "format_note": "part of any difference is attributable to store format"
+          },
+          "value": null,
+          "ordering_key": {
+            "name": "premium_pct",
+            "value": 76.46
+          },
+          "actionable": true,
+          "not_actionable_reason": null,
+          "attention": "review"
+        },
+        {
+          "id": "e2322c455080c056",
+          "signal_family": "competitor.purchase_cost",
+          "capability": "competitor_position",
+          "barcode": "7290000072753",
+          "product_name": "טייסטרס צוייס",
+          "department": "מוצרי בית",
+          "action": "check_purchase_cost",
+          "characterisation": "purchase_cost",
+          "evidence": {
+            "shelf_price": 45.9,
+            "cost_price": 34.57,
+            "reference": {
+              "value": 37.4,
+              "kind": "midpoint",
+              "same_format": 38.9,
+              "supermarket": 35.9,
+              "allowance_pct": null
+            },
+            "premium_pct": 22.73,
+            "policy_pct": 60.0,
+            "attention_pct": 100.0,
+            "cost_floor_pct": 10.0,
+            "sources": [
+              {
+                "store_id": "401",
+                "store_name": "AM-PMדרך השלום",
+                "format": "unknown",
+                "price": 38.9,
+                "observed_at": "2026-09-10T02:22:54+00:00",
+                "role": "context"
+              },
+              {
+                "store_id": "402",
+                "store_name": "AM-PMקרית ביאליק",
+                "format": "unknown",
+                "price": 38.9,
+                "observed_at": "2026-09-10T02:22:54+00:00",
+                "role": "context"
+              }
+            ],
+            "format_note": "part of any difference is attributable to store format"
+          },
+          "value": null,
+          "ordering_key": {
+            "name": "premium_pct",
+            "value": 22.73
+          },
+          "actionable": true,
+          "not_actionable_reason": null,
+          "attention": "review"
+        }
+      ],
+      "notes": [],
+      "position": [
+        {
+          "store_id": "689d9d1ea1357c9968d6850f",
+          "store_name": "Super Alonit | Kibbutz Einat",
+          "format": "gas_convenience",
+          "affinity": 1.0,
+          "matched": 2,
+          "cheaper_here": 2,
+          "dearer_here": 0,
+          "median_diff_pct": -35.24
+        },
+        {
+          "store_id": "6315c7a3f00f9e43ec812476",
+          "store_name": "Rami Levy In The Neighborhood | Rosh Haayin",
+          "format": "urban_minimarket",
+          "affinity": 0.7,
+          "matched": 178,
+          "cheaper_here": 45,
+          "dearer_here": 112,
+          "median_diff_pct": 8.69
+        },
+        {
+          "store_id": "65daeb8779ca7f0a9bf964f3",
+          "store_name": "Wolt Market | Lev Haaretz",
+          "format": "urban_minimarket",
+          "affinity": 0.7,
+          "matched": 116,
+          "cheaper_here": 61,
+          "dearer_here": 34,
+          "median_diff_pct": -2.87
+        }
+      ]
+    },
+    "margin_below_cost": {
+      "id": "margin_below_cost",
+      "spec": "UNSPECIFIED",
+      "requires": [
+        "products"
+      ],
+      "status": "available",
+      "unavailable_reason": null,
+      "window": null,
+      "thresholds": {
+        "thin_margin_pct": 10.0
+      },
+      "counts": {
+        "below_cost": 17,
+        "thin_margin": 15,
+        "excluded_artefact": 17
+      },
+      "entries": [
+        {
+          "id": "1d828261d8e6b490",
+          "signal_family": "margin.below_cost",
+          "capability": "margin_below_cost",
+          "barcode": "2090301",
+          "product_name": "אננס",
+          "department": "פירות וירקות",
+          "action": "verify_price",
+          "characterisation": "below_cost",
+          "evidence": {
+            "shelf_price": 25.9,
+            "cost_price": 40.0,
+            "margin_pct": -54.44,
+            "cost_source": "pos"
+          },
+          "value": {
+            "amount": 14.1,
+            "kind": "per_sale",
+            "certainty": "confirmed"
+          },
+          "ordering_key": {
+            "name": "loss_per_sale",
+            "value": 14.1
+          },
+          "actionable": false,
+          "not_actionable_reason": "no_producing_specification",
+          "attention": "today"
+        },
+        {
+          "id": "59a9dcecf72d2701",
+          "signal_family": "margin.below_cost",
+          "capability": "margin_below_cost",
+          "barcode": "776",
+          "product_name": "מילון",
+          "department": "מוצרי שימוש מטבח -חנות",
+          "action": "verify_price",
+          "characterisation": "thin_margin",
+          "evidence": {
+            "shelf_price": 7.0,
+            "cost_price": 6.5,
+            "margin_pct": 7.14,
+            "cost_source": "pos"
+          },
+          "value": null,
+          "ordering_key": {
+            "name": "loss_per_sale",
+            "value": 7.14
+          },
+          "actionable": false,
+          "not_actionable_reason": "no_producing_specification",
+          "attention": "today"
+        }
+      ],
+      "notes": [
+        "not_admitted:no_producing_specification"
+      ]
+    },
+    "owner_questions": {
+      "id": "owner_questions",
+      "spec": "SPEC-005",
+      "requires": [
+        "products"
+      ],
+      "status": "unavailable",
+      "unavailable_reason": "answer_storage_unavailable",
+      "window": null,
+      "thresholds": {},
+      "counts": {},
+      "entries": [],
+      "notes": [],
+      "limit": 3,
+      "items": [],
+      "suppressed": {
+        "withdrawn": 0,
+        "idle": 0,
+        "answered": 0,
+        "no_effect": 0
+      }
+    }
+  },
+  "figures": {
+    "catalogue_lifecycle.living": {
+      "value": 1257,
+      "unit": "products",
+      "inputs": [
+        "pos",
+        "sales"
+      ],
+      "thresholds": {
+        "window": "2026-01..2026-07"
+      }
+    },
+    "catalogue_lifecycle.withdrawable": {
+      "value": 3903,
+      "unit": "products",
+      "inputs": [
+        "pos",
+        "sales"
+      ],
+      "thresholds": {
+        "window": "2026-01..2026-07"
+      }
+    },
+    "catalogue_lifecycle.idle": {
+      "value": 1631,
+      "unit": "products",
+      "inputs": [
+        "pos",
+        "sales"
+      ],
+      "thresholds": {
+        "window": "2026-01..2026-07"
+      }
+    },
+    "catalogue_lifecycle.excluded_negative_stock": {
+      "value": 483,
+      "unit": "products",
+      "inputs": [
+        "pos",
+        "sales"
+      ],
+      "thresholds": {
+        "window": "2026-01..2026-07"
+      }
+    },
+    "catalogue_lifecycle.excluded_no_identifier": {
+      "value": 308,
+      "unit": "products",
+      "inputs": [
+        "pos",
+        "sales"
+      ],
+      "thresholds": {
+        "window": "2026-01..2026-07"
+      }
+    },
+    "catalogue_lifecycle.excluded_stock_absent": {
+      "value": 1,
+      "unit": "products",
+      "inputs": [
+        "pos",
+        "sales"
+      ],
+      "thresholds": {
+        "window": "2026-01..2026-07"
+      }
+    },
+    "catalogue_lifecycle.revived_manually": {
+      "value": 0,
+      "unit": "products",
+      "inputs": [
+        "pos",
+        "sales"
+      ],
+      "thresholds": {
+        "window": "2026-01..2026-07"
+      }
+    },
+    "catalogue_lifecycle.implausible": {
+      "value": 1,
+      "unit": "products",
+      "inputs": [
+        "pos",
+        "sales"
+      ],
+      "thresholds": {
+        "window": "2026-01..2026-07"
+      }
+    },
+    "price_consistency.population": {
+      "value": 2466,
+      "unit": "products",
+      "inputs": [
+        "pos"
+      ],
+      "thresholds": {
+        "ceiling_pct": 18.0
+      }
+    },
+    "price_consistency.identical": {
+      "value": 1504,
+      "unit": "products",
+      "inputs": [
+        "pos"
+      ],
+      "thresholds": {
+        "ceiling_pct": 18.0
+      }
+    },
+    "price_consistency.within": {
+      "value": 790,
+      "unit": "products",
+      "inputs": [
+        "pos"
+      ],
+      "thresholds": {
+        "ceiling_pct": 18.0
+      }
+    },
+    "price_consistency.above": {
+      "value": 106,
+      "unit": "products",
+      "inputs": [
+        "pos"
+      ],
+      "thresholds": {
+        "ceiling_pct": 18.0
+      }
+    },
+    "price_consistency.inverted": {
+      "value": 53,
+      "unit": "products",
+      "inputs": [
+        "pos"
+      ],
+      "thresholds": {
+        "ceiling_pct": 18.0
+      }
+    },
+    "price_consistency.excluded_artefact": {
+      "value": 13,
+      "unit": "products",
+      "inputs": [
+        "pos"
+      ],
+      "thresholds": {
+        "ceiling_pct": 18.0
+      }
+    },
+    "price_consistency.excluded_gap": {
+      "value": 0,
+      "unit": "products",
+      "inputs": [
+        "pos"
+      ],
+      "thresholds": {
+        "ceiling_pct": 18.0
+      }
+    },
+    "price_consistency.ceiling_pct": {
+      "value": 18.0,
+      "unit": "percent",
+      "inputs": [
+        "pos"
+      ],
+      "thresholds": {
+        "method": "densest_density_collapse",
+        "population": 2453,
+        "excludes_withdrawn": true
+      }
+    },
+    "reconciliation.flagged": {
+      "value": 439,
+      "unit": "products",
+      "inputs": [
+        "pos",
+        "sales"
+      ],
+      "thresholds": {
+        "window": "2026-01..2026-07"
+      }
+    },
+    "hygiene.negative_stock": {
+      "value": 614,
+      "unit": "records",
+      "inputs": [
+        "pos"
+      ],
+      "thresholds": {}
+    },
+    "hygiene.no_identifier": {
+      "value": 308,
+      "unit": "records",
+      "inputs": [
+        "pos"
+      ],
+      "thresholds": {}
+    },
+    "hygiene.absent_price": {
+      "value": 61,
+      "unit": "records",
+      "inputs": [
+        "pos"
+      ],
+      "thresholds": {}
+    },
+    "hygiene.conflicting_duplicate": {
+      "value": 42,
+      "unit": "records",
+      "inputs": [
+        "pos"
+      ],
+      "thresholds": {}
+    },
+    "competitor_position.catalogue": {
+      "value": 7583,
+      "unit": "products",
+      "inputs": [
+        "pos",
+        "competitor"
+      ],
+      "thresholds": {
+        "policy_pct": 60.0,
+        "attention_pct": 100.0,
+        "cost_floor_pct": 10.0,
+        "format_allowance_pct": 7.892,
+        "format_allowance_basis_count": 414,
+        "freshness_days": 14,
+        "comparability_floor": 0.3
+      }
+    },
+    "competitor_position.comparable_population": {
+      "value": 3108,
+      "unit": "products",
+      "inputs": [
+        "pos",
+        "competitor"
+      ],
+      "thresholds": {
+        "policy_pct": 60.0,
+        "attention_pct": 100.0,
+        "cost_floor_pct": 10.0,
+        "format_allowance_pct": 7.892,
+        "format_allowance_basis_count": 414,
+        "freshness_days": 14,
+        "comparability_floor": 0.3
+      }
+    },
+    "competitor_position.matched": {
+      "value": 1709,
+      "unit": "products",
+      "inputs": [
+        "pos",
+        "competitor"
+      ],
+      "thresholds": {
+        "policy_pct": 60.0,
+        "attention_pct": 100.0,
+        "cost_floor_pct": 10.0,
+        "format_allowance_pct": 7.892,
+        "format_allowance_basis_count": 414,
+        "freshness_days": 14,
+        "comparability_floor": 0.3
+      }
+    },
+    "competitor_position.structurally_uncomparable": {
+      "value": 572,
+      "unit": "products",
+      "inputs": [
+        "pos",
+        "competitor"
+      ],
+      "thresholds": {
+        "policy_pct": 60.0,
+        "attention_pct": 100.0,
+        "cost_floor_pct": 10.0,
+        "format_allowance_pct": 7.892,
+        "format_allowance_basis_count": 414,
+        "freshness_days": 14,
+        "comparability_floor": 0.3
+      }
+    },
+    "competitor_position.no_comparison": {
+      "value": 2481,
+      "unit": "products",
+      "inputs": [
+        "pos",
+        "competitor"
+      ],
+      "thresholds": {
+        "policy_pct": 60.0,
+        "attention_pct": 100.0,
+        "cost_floor_pct": 10.0,
+        "format_allowance_pct": 7.892,
+        "format_allowance_basis_count": 414,
+        "freshness_days": 14,
+        "comparability_floor": 0.3
+      }
+    },
+    "competitor_position.evaluated": {
+      "value": 620,
+      "unit": "products",
+      "inputs": [
+        "pos",
+        "competitor"
+      ],
+      "thresholds": {
+        "policy_pct": 60.0,
+        "attention_pct": 100.0,
+        "cost_floor_pct": 10.0,
+        "format_allowance_pct": 7.892,
+        "format_allowance_basis_count": 414,
+        "freshness_days": 14,
+        "comparability_floor": 0.3
+      }
+    },
+    "competitor_position.breaches": {
+      "value": 2,
+      "unit": "products",
+      "inputs": [
+        "pos",
+        "competitor"
+      ],
+      "thresholds": {
+        "policy_pct": 60.0,
+        "attention_pct": 100.0,
+        "cost_floor_pct": 10.0,
+        "format_allowance_pct": 7.892,
+        "format_allowance_basis_count": 414,
+        "freshness_days": 14,
+        "comparability_floor": 0.3
+      }
+    },
+    "competitor_position.attention": {
+      "value": 0,
+      "unit": "products",
+      "inputs": [
+        "pos",
+        "competitor"
+      ],
+      "thresholds": {
+        "policy_pct": 60.0,
+        "attention_pct": 100.0,
+        "cost_floor_pct": 10.0,
+        "format_allowance_pct": 7.892,
+        "format_allowance_basis_count": 414,
+        "freshness_days": 14,
+        "comparability_floor": 0.3
+      }
+    },
+    "competitor_position.review": {
+      "value": 2,
+      "unit": "products",
+      "inputs": [
+        "pos",
+        "competitor"
+      ],
+      "thresholds": {
+        "policy_pct": 60.0,
+        "attention_pct": 100.0,
+        "cost_floor_pct": 10.0,
+        "format_allowance_pct": 7.892,
+        "format_allowance_basis_count": 414,
+        "freshness_days": 14,
+        "comparability_floor": 0.3
+      }
+    },
+    "competitor_position.purchase_cost_findings": {
+      "value": 2,
+      "unit": "products",
+      "inputs": [
+        "pos",
+        "competitor"
+      ],
+      "thresholds": {
+        "policy_pct": 60.0,
+        "attention_pct": 100.0,
+        "cost_floor_pct": 10.0,
+        "format_allowance_pct": 7.892,
+        "format_allowance_basis_count": 414,
+        "freshness_days": 14,
+        "comparability_floor": 0.3
+      }
+    },
+    "competitor_position.no_cost_skipped": {
+      "value": 7,
+      "unit": "products",
+      "inputs": [
+        "pos",
+        "competitor"
+      ],
+      "thresholds": {
+        "policy_pct": 60.0,
+        "attention_pct": 100.0,
+        "cost_floor_pct": 10.0,
+        "format_allowance_pct": 7.892,
+        "format_allowance_basis_count": 414,
+        "freshness_days": 14,
+        "comparability_floor": 0.3
+      }
+    },
+    "competitor_position.stale_skipped": {
+      "value": 738,
+      "unit": "products",
+      "inputs": [
+        "pos",
+        "competitor"
+      ],
+      "thresholds": {
+        "policy_pct": 60.0,
+        "attention_pct": 100.0,
+        "cost_floor_pct": 10.0,
+        "format_allowance_pct": 7.892,
+        "format_allowance_basis_count": 414,
+        "freshness_days": 14,
+        "comparability_floor": 0.3
+      }
+    },
+    "competitor_position.format_allowance_pct": {
+      "value": 7.892,
+      "unit": "percent",
+      "inputs": [
+        "competitor"
+      ],
+      "thresholds": {
+        "basis_count": 414
+      }
+    },
+    "margin_below_cost.below_cost": {
+      "value": 17,
+      "unit": "products",
+      "inputs": [
+        "pos"
+      ],
+      "thresholds": {}
+    },
+    "margin_below_cost.thin_margin": {
+      "value": 15,
+      "unit": "products",
+      "inputs": [
+        "pos"
+      ],
+      "thresholds": {}
+    },
+    "margin_below_cost.excluded_artefact": {
+      "value": 17,
+      "unit": "products",
+      "inputs": [
+        "pos"
+      ],
+      "thresholds": {}
+    },
+    "provenance.pos_as_of": {
+      "value": null,
+      "unit": "date",
+      "inputs": [
+        "pos"
+      ],
+      "thresholds": {
+        "value": "2026-08-02"
+      }
+    },
+    "provenance.sales_months": {
+      "value": 7,
+      "unit": "months",
+      "inputs": [
+        "sales"
+      ],
+      "thresholds": {
+        "first": "2026-01",
+        "last": "2026-07",
+        "full_annual_cycle": false
+      }
+    },
+    "provenance.competitor_snapshot_age_days": {
+      "value": 2,
+      "unit": "days",
+      "inputs": [
+        "competitor"
+      ],
+      "thresholds": {
+        "snapshot_date": "2026-09-10"
+      }
+    },
+    "provenance.owner_state_available": {
+      "value": 0,
+      "unit": "boolean",
+      "inputs": [
+        "owner_state"
+      ],
+      "thresholds": {
+        "pulled_at": null
+      }
+    }
+  }
+}

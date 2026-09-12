@@ -732,10 +732,13 @@ DailyPage    ownerState.js           localStorage      Firestore
  │ re-compose → entry gone                                          │
 ```
 
-Entry recorded: `{entry_id, status, reason?, deferred_until?, at, snapshot:{capability,
-barcode, value?, kind?, characterisation}}`. The snapshot is what INT-MEAS will need
-later (§10.3); it is captured now because it cannot be reconstructed after thresholds
-move (FR-115).
+Entry recorded: `{entry_id, status, reason?, deferred_until?, at,
+snapshot:{signal_family, capability, barcode, value?, kind?, characterisation}}`. The
+snapshot is what INT-MEAS will need later (§10.3); it is captured now because it cannot be
+reconstructed after thresholds move (FR-115). `signal_family` is mandatory and is the
+durable grouping key — `entry_id` is a hash and cannot be read backwards into a family,
+and `capability` is the routing label ADR-009 kept out of the id precisely because it
+moves ([ADR-016](decisions/ADR-016-outcome-snapshot-carries-the-signal-family.md)).
 
 **Failure — cache write fails.** The UI rolls back and shows the error; the outcome is
 not presented as recorded (SPEC-006 §11). **Failure — Firestore write fails.** The cache
@@ -868,7 +871,8 @@ ship unlabelled (INV-052/INV-063).
 OwnerState (Firestore: stores/{storeId}/ownerState/{doc}; mirror: data/owner/owner_state.json)
   answers:   { [barcode]: { cost_price: { value, at, status: answered | deferred, reason?: unknown } } }
   outcomes:  { [entry_id]: { status: acted | declined | deferred, reason?: wrong_data | not_worth_it | already_handled,
-                             deferred_until?, at, snapshot: { capability, barcode, value?, kind?, characterisation } } }
+                             deferred_until?, at, snapshot: { signal_family, capability, barcode,
+                                                              value?, kind?, characterisation } } }
   revivals:  { [barcode]: { at, window_id } }
   meta:      { schema: 1, updated_at }
 ```
@@ -1195,6 +1199,12 @@ elsewhere in this document resolves to the file below.
 | [ADR-011](decisions/ADR-011-evidence-semantics-no-row-is-recorded.md) | Evidence semantics: `no_row` is recorded, and classification states it | Easy |
 | [ADR-012](decisions/ADR-012-money-is-a-typed-value-with-a-declared-policy.md) | Money is a typed value with a declared per-capability policy | Easy |
 | [ADR-014](decisions/ADR-014-a-capability-is-the-smallest-independently-unavailable-unit.md) | A capability is the smallest independently-unavailable unit; data hygiene is one | Easy |
+| [ADR-015](decisions/ADR-015-ceiling-is-the-densest-qualifying-collapse.md) | The markup ceiling is the densest qualifying collapse, not the last; ties take the higher edge | Easy |
+| [ADR-016](decisions/ADR-016-outcome-snapshot-carries-the-signal-family.md) | The owner-outcome snapshot carries signal_family, the only durable grouping key for INT-MEAS | Easy |
+| [ADR-017](decisions/ADR-017-a-run-states-whether-its-sales-evidence-arrived.md) | A run that continued on older sales evidence is never ok; vintages.sales states whether the reports arrived | Easy |
+| [ADR-018](decisions/ADR-018-the-browser-does-not-ship-a-schema-validator.md) | The browser checks four preconditions it cannot render without; the schema is enforced at publish and in CI | Easy |
+| [ADR-019](decisions/ADR-019-a-conflicting-duplicate-barcode-is-a-hygiene-record.md) | A duplicate barcode whose rows disagree is excluded and reported as hygiene; no field is picked | Easy |
+| [ADR-020](decisions/ADR-020-the-published-population-is-a-policy-not-a-constant.md) | The published population is a policy setting; the artefact states it, so D-14 no longer blocks the cut-over | Easy |
 | [ADR-013](decisions/ADR-013-tests-run-before-merge.md) | Tests run before merge | Easy |
 
 ---

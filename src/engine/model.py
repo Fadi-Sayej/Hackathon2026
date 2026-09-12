@@ -26,6 +26,7 @@ SIGNAL_FAMILIES = (
     "hygiene.negative_stock",
     "hygiene.no_identifier",
     "hygiene.absent_price",
+    "hygiene.conflicting_duplicate",
     "price.inverted",
     "price.above_ceiling",
     "competitor.policy_breach",

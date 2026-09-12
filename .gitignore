@@ -127,3 +127,7 @@ audit/
 
 # Local agent tooling scratch (brainstorm session HTML, ports, tokens).
 .superpowers/
+
+# The owner-state mirror is committed by CI, like the market snapshots (ADR-003).
+!data/owner/
+!data/owner/owner_state.json

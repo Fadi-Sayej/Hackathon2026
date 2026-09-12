@@ -43,3 +43,4 @@ google-generativeai>=0.7
 
 # Testing (velocity engine correctness gates — see PLAN.md §3)
 pytest>=8.0
+jsonschema>=4.0

@@ -94,6 +94,7 @@ These are settled. A specification may operationalize them; it may not reopen th
 | D-11 | Idle stock carries **no** monetary figure and is ordered by **unit cost**, descending. The aggregate value of idle stock is never stated | `intent.md` §4ب |
 | D-12 | The product is **single-store, single-user, single-POS-import**. Multiple stores, user accounts and further point-of-sale integrations are out of scope until one store has proven value | `intent.md` §9.2 |
 | D-13 | Real-time shelf monitoring by fixed sensors or cameras is **permanently excluded**, not deferred | `intent.md` §9.1 |
+| D-14 | **No figure put in front of the owner may depend on automatic withdrawal until GAP-009 is closed.** Withdrawal rests on "absent from the monthly reports" meaning "sold nothing" — true of 3,932 of 3,932 withdrawable products, of which exactly one appears in the reports with an observed zero. That is the none-vs-zero conflation rule 13 and D-3 forbid, applied to 51% of the catalogue | GAP-009; decided 2026-09-12 |
 
 ---
 
@@ -108,7 +109,11 @@ answers rather than surfacing them:
 
 - **INT-004** depends on how market movement and the store's own movement combine into
   one quantity, and on what geographic radius defines "the market". Both open —
-  `intent.md` §6 states the ordering of inputs, not the rule.
+  `intent.md` §6 states the ordering of inputs, not the rule. The three decisions are
+  posed as answerable questions, with the options the data supports, in
+  [open-decisions/F8-ordering.md](open-decisions/F8-ordering.md). **That brief is not
+  authority** — when the decisions are taken they are recorded as `D-14 …` in §3 above,
+  and the brief is set `Superseded`.
 - **INT-005** depends on what the owner is expected to *do* with a "strong in the
   market, weak here" finding. `intent.md` §6 phrases it as a conversation opener, which
   is not yet a decision the system can record.

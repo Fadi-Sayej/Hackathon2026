@@ -7,6 +7,7 @@ Parent: [F1 — Delivery-Platform Price Consistency](../intent.md)
 Related Intents: INT-001
 Legacy ID: SPEC-001 (in the pre-migration monolithic `specs.md` v1.1)
 Answered by: [System Design](../../../architecture/system-design.md) §21
+Bound by: ADR-015 (ceiling selection rule — FR-004, FR-005, AC-004, AC-005)
 ---
 
 > **Identifier note.** The requirement identifiers inside this document (`FR-…`, `INV-…`,

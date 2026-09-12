@@ -80,6 +80,7 @@ from src.common.paths import (
     INTERNAL_ROOT, SIGNALS_ROOT, EXTERNAL_SILVER_ROOT,
     MATCHING_ROOT, QUALITY_ROOT,
 )
+from src.engine.model import norm_barcode
 
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -252,34 +253,21 @@ def load_competitor_signals() -> pl.DataFrame:
 
 
 def _dedup_competitors(df: pl.DataFrame) -> list[dict]:
-    """
-    Deduplicate competitor signals to one representative row per unique product.
-
-    Priority: barcode (first seen), then external_product_key, then skip.
-    Returns a flat list of dicts for the matching corpus.
-    """
-    seen_bc:  set[str] = set()
-    seen_epk: set[str] = set()
-    deduped:  list[dict] = []
-
+    """One row per (product key, store) — every store's price must survive to the
+    reference step (SPEC-003 FR-044 needs the cheapest per format)."""
+    seen: set[tuple[str, str]] = set()
+    deduped: list[dict] = []
     for row in df.to_dicts():
-        bc  = row.get("barcode")
-        epk = row.get("external_product_key") or bc
-
-        if bc:
-            if bc in seen_bc:
-                continue
-            seen_bc.add(bc)
-        elif epk:
-            if epk in seen_epk:
-                continue
-            seen_epk.add(epk)
-        else:
-            continue   # no usable key → skip
-
+        key = norm_barcode(row.get("barcode")) or row.get("external_product_key")
+        if not key:
+            continue
+        store = str(row.get("competitor_store_id") or "")
+        if (key, store) in seen:
+            continue
+        seen.add((key, store))
+        row["barcode"] = norm_barcode(row.get("barcode"))
         deduped.append(row)
-
-    logger.info("Competitor corpus: {} unique products (from {} signals)", len(deduped), len(df))
+    logger.info("Competitor corpus: {} (product, store) rows (from {} signals)", len(deduped), len(df))
     return deduped
 
 
@@ -357,6 +345,7 @@ def _make_match(
         "external_product_name":  cx.get("raw_product_name") or cx.get("product_name"),
         "external_category":      cx.get("category"),
         "external_source_types":  source_types,
+        "competitor_store_id":    cx.get("competitor_store_id"),
         "match_method":           method,
         "match_confidence":       round(confidence, 4),
         "approved":               approved,
@@ -369,23 +358,35 @@ def _make_match(
 
 def _pass_barcode_exact(
     yy_rows:  list[dict],
-    bc_index: dict[str, dict],
+    competitors: list[dict],
     created_at: str,
 ) -> tuple[list[dict], set[str]]:
-    """Return (matches, matched_internal_ids)."""
+    """Return (matches, matched_internal_ids).
+
+    One match per (internal product, competitor store): SPEC-003 FR-044 needs every
+    store's price to reach the reference step, so a barcode present in five stores
+    yields five rows, not one.
+    """
     matches: list[dict] = []
     matched: set[str]   = set()
 
+    by_barcode: dict[str, list[dict]] = {}
+    for cx in competitors:
+        bc = norm_barcode(cx.get("barcode"))
+        if bc:
+            by_barcode.setdefault(bc, []).append(cx)
+
     for yy in yy_rows:
-        bc = yy.get("barcode")
-        if not bc or bc not in bc_index:
+        bc = norm_barcode(yy.get("barcode"))
+        if not bc or bc not in by_barcode:
             continue
-        cx = bc_index[bc]
-        rec = _make_match(yy, cx, "barcode_exact", 1.0, created_at)
-        if rec:
-            matches.append(rec)
-            matched.add(_internal_id(yy))
-            logger.debug("barcode_exact: {} ↔ {}", bc, cx.get("raw_product_name"))
+        for cx in by_barcode[bc]:
+            rec = _make_match(yy, cx, "barcode_exact", 1.0, created_at)
+            if rec:
+                matches.append(rec)
+                matched.add(_internal_id(yy))
+                logger.debug("barcode_exact: {} ↔ {} @ {}", bc,
+                             cx.get("raw_product_name"), cx.get("competitor_store_id"))
 
     logger.info("Pass 1 barcode_exact:    {} matches", len(matches))
     return matches, matched
@@ -677,7 +678,7 @@ def run_product_matching(run_at: Optional[datetime] = None) -> dict:
     # ── 5–7. Three-pass matching ───────────────────────────────────────────────
     all_matches: list[dict] = []
 
-    bc_matches, matched_ids = _pass_barcode_exact(yy_rows, bc_index, created_at)
+    bc_matches, matched_ids = _pass_barcode_exact(yy_rows, comp_list, created_at)
     all_matches.extend(bc_matches)
 
     nn_matches, nn_ids = _pass_name_normalized(yy_rows, name_index, matched_ids, created_at)

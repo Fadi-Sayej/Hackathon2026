@@ -67,6 +67,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from src.common.paths import EXTERNAL_SILVER_ROOT, SIGNALS_ROOT, QUALITY_ROOT
+from src.engine.model import norm_barcode
 
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
@@ -242,7 +243,7 @@ def _col(row: dict, *keys, default=None):
 
 def _map_alonit_row(row: dict, created_at: str) -> dict:
     """Map one Alonit price-file row to the signal schema."""
-    barcode   = _col(row, "barcode", "sku")
+    barcode   = norm_barcode(_col(row, "barcode", "sku"))
     chain_raw = _col(row, "store_chain", default="")
     chain_n   = _normalize_chain(chain_raw)
     name_raw  = _col(row, "product_name", default="")
@@ -289,7 +290,7 @@ def _map_alonit_row(row: dict, created_at: str) -> dict:
 
 def _map_wolt_row(row: dict, created_at: str) -> dict:
     """Map one Wolt delivery-catalog row to the signal schema."""
-    barcode   = _col(row, "barcode")
+    barcode   = norm_barcode(_col(row, "barcode"))
     sku       = _col(row, "sku")
     chain_raw = _col(row, "store_chain", default="")
     chain_n   = _normalize_chain(chain_raw)

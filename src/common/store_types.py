@@ -52,6 +52,7 @@ class StoreRecord:
     store_id: str
     store_type: str
     verified: str
+    role: str = "competitor"
     basis: str | None = None
     name: str | None = None
     chain: str | None = None
@@ -127,6 +128,14 @@ class StoreTypeConfig:
         scored = [pair for pair in scored if pair[1] >= threshold]
         scored.sort(key=lambda pair: (-pair[1], pair[0]))
         return [store_id for store_id, _ in scored]
+
+    def client_store_ids(self) -> list[str]:
+        return sorted(s.store_id for s in self.stores.values() if s.role == "client")
+
+    def context_only_stores(self, our_type: str) -> list[str]:
+        floor = self.min_affinity
+        return sorted(s.store_id for s in self.stores.values()
+                      if 0.0 < self.affinity(our_type, s.store_type) < floor)
 
     def excluded_stores(self, our_type: str) -> list[str]:
         """Store IDs at affinity 0.0 — the ones that must never reach an engine."""
@@ -206,6 +215,7 @@ def load_store_types(path: Path | str | None = None) -> StoreTypeConfig:
             store_id=str(store_id),
             store_type=store_type,
             verified=meta.get("verified") or "inferred",
+            role=meta.get("role") or "competitor",
             basis=meta.get("basis") or ("sku_count" if meta.get("distinct_skus") else None),
             name=meta.get("name"),
             chain=meta.get("chain"),

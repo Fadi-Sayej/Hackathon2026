@@ -198,3 +198,21 @@ def test_chain_meta_store_ids_match_the_config():
     assert CONFIG.store(OUR_STORE["storeId"]) is not None
     for meta in CHAIN_META.values():
         assert CONFIG.store(meta["storeId"]) is not None, meta["storeId"]
+
+
+def test_client_stores_are_never_references():
+    cfg = load_store_types()
+    assert set(cfg.client_store_ids()) == {"yomyom-kq-01", "68e64a15ddc7ae17b6279458"}
+
+
+def test_einat_venue_is_classified_same_format():
+    cfg = load_store_types()
+    assert cfg.store_type("689d9d1ea1357c9968d6850f") == "gas_convenience"
+
+
+def test_context_only_and_comparable_partition_the_non_excluded():
+    cfg = load_store_types()
+    ctx = set(cfg.context_only_stores("gas_convenience"))
+    comp = set(cfg.comparable_stores("gas_convenience"))
+    assert ctx.isdisjoint(comp)
+    assert "rami-levy-pt-01" in ctx and "dor-alon-kq-01" in comp
