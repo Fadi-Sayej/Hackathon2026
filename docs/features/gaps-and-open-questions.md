@@ -399,7 +399,14 @@ parted, and saying so is more valuable than either number alone.
 **Confidence:** High that the derivation is sound; unknown whether it matches his intent —
 which is the gap.
 
-**Owner:** the store owner, via smartshelf-pm.
+**No longer blocking, 2026-09-12.** `configs/policy.yaml` carries
+`owner_declared_ceiling_pct: null`. Null means the derived ceiling is used and the artefact
+says it was derived; a number means he stated one, his is used, and the artefact says so —
+while still publishing the derived figure beside it and noting when the two differ by a
+point or more. The system runs today on the derivation; his answer is one line when it
+comes, and the divergence stays visible rather than being resolved silently.
+
+**Owner:** the store owner, via smartshelf-pm — as an input, not a gate.
 
 ---
 

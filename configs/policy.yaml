@@ -61,3 +61,17 @@ withdraw_with_stock: false        # OQ-409 — must stay false; the loader refus
 #
 # When GAP-009 closes, change this to `living`. Nothing else changes.
 published_population: whole
+
+# ── The owner's own ceiling, if he has stated one (GAP-011) ───────────────────
+# derive_ceiling reads 18% from his behaviour: 81 products in the 16-18% band collapsing
+# to 7 in 18-20%. That is strong evidence of where his pricing stops. It is NOT a statement
+# that he believes his ceiling is 18% — and F1's whole correction rests on the difference,
+# because 1,124 products are kept silent for being inside "his sound policy".
+#
+# null  = use the derived ceiling, and say it was derived.
+# a number = he stated it; use his, and say it was his.
+#
+# Setting this does not delete the derivation: both travel with the figure, so a divergence
+# between what he says and what he does stays visible. That divergence is more useful than
+# either number alone.
+owner_declared_ceiling_pct: null

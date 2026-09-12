@@ -29,8 +29,12 @@ def _stub_inputs(monkeypatch):
 
 
 def test_the_withdrawn_set_reaches_the_other_capabilities(tmp_path, monkeypatch):
+    """FR-074's hand-off is a `living` behaviour, so the population is pinned rather than
+    left to policy. ADR-020 makes the published population a setting, and it is `whole`
+    while GAP-009 is open — this test is about the mechanism, not about today's default."""
     _stub_inputs(monkeypatch)
     result = run_mod.run_engine(mode="publish", artefact_path=tmp_path / "d.json",
+                                population="living",
                                 now=datetime(2026, 9, 8, tzinfo=timezone.utc))
     caps = result["artefact"]["capabilities"]
     assert caps["catalogue_lifecycle"]["counts"]["withdrawable"] == 1
@@ -53,3 +57,15 @@ def test_the_artefact_carries_every_capability_with_its_extras_and_vintages(tmp_
     assert set(caps) == {"catalogue_lifecycle", "price_consistency", "reconciliation", "hygiene",
                          "competitor_position", "margin_below_cost", "owner_questions"}
     assert all(c["status"] in ("available", "unavailable") for c in caps.values())
+
+
+def test_adr_020_the_whole_population_hands_nothing_off(tmp_path, monkeypatch):
+    """The other half of the same mechanism, and the one D-14 depends on: under `whole` no
+    capability is given a withdrawn set, so no published figure can depend on withdrawal."""
+    _stub_inputs(monkeypatch)
+    art = run_mod.run_engine(mode="publish", artefact_path=tmp_path / "d.json",
+                             population="whole",
+                             now=datetime(2026, 9, 8, tzinfo=timezone.utc))["artefact"]
+    assert art["population"] == "whole"
+    assert art["capabilities"]["owner_questions"]["suppressed"]["withdrawn"] == 0
+    assert art["capabilities"]["price_consistency"]["thresholds"]["ceiling_population_excludes_withdrawn"] is False

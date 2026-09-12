@@ -130,3 +130,32 @@ def test_pilot_ceiling_reproduces_18_percent():
         if shelf >= 0.5 and wolt > shelf + 0.005:
             markups.append((wolt / shelf - 1) * 100)
     assert derive_ceiling(markups, **P).pct == 18.0
+
+
+def test_gap_011_the_owners_stated_ceiling_wins_and_the_derivation_survives():
+    """GAP-011. derive_ceiling reads where his pricing stops; it does not establish what he
+    believes his policy is. If he states one, his is used — and the derived figure is still
+    published, because a divergence between what he says and what he does is the most
+    interesting thing F1 can tell him."""
+    from dataclasses import replace
+    from src.engine.policy import load_policy
+
+    inputs = _inputs()
+    derived = run(inputs).thresholds
+    assert derived["ceiling_source"] == "derived"
+    assert derived["ceiling_pct"] == 18.0
+
+    inputs.policy = replace(load_policy(), owner_declared_ceiling_pct=25.0)
+    stated = run(inputs)
+    assert stated.thresholds["ceiling_source"] == "owner_declared"
+    assert stated.thresholds["ceiling_pct"] == 25.0
+    assert stated.thresholds["ceiling_pct_derived"] == 18.0     # not lost
+    assert "owner_ceiling_differs_from_behaviour" in stated.notes
+
+
+def test_gap_011_agreement_raises_no_note():
+    from dataclasses import replace
+    from src.engine.policy import load_policy
+    inputs = _inputs()
+    inputs.policy = replace(load_policy(), owner_declared_ceiling_pct=18.0)
+    assert "owner_ceiling_differs_from_behaviour" not in run(inputs).notes

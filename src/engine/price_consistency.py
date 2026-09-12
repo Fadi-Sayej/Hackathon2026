@@ -93,7 +93,16 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
     ceiling = derive_ceiling(markups, band_pct=policy.ceiling_band_pct, drop_ratio=policy.ceiling_drop_ratio,
                              min_band_count=policy.ceiling_min_band_count)
     notes: list[str] = []
-    ceiling_pct = ceiling.pct
+    # GAP-011. The derivation reads where his pricing stops; it does not establish what he
+    # believes his policy is. If he has stated one, his wins — and BOTH travel with the
+    # figure, so a divergence between what he says and what he does stays visible. That
+    # divergence is more useful than either number alone.
+    declared = policy.owner_declared_ceiling_pct
+    ceiling_pct = ceiling.pct if declared is None else float(declared)
+    ceiling_source = "derived" if declared is None else "owner_declared"
+    if declared is not None and ceiling.pct is not None and abs(ceiling.pct - float(declared)) >= 1.0:
+        # Not an error. It is the most interesting thing F1 can tell him.
+        notes.append("owner_ceiling_differs_from_behaviour")
     if ceiling_pct is None:
         notes.append("ceiling_undetermined")
         # INV-003 again, on the other path. "No ceiling could be derived" and "the
@@ -150,7 +159,9 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
     # this run may have been given no withdrawn set at all — claiming the exclusion happened
     # when it did not is the kind of unearned label the whole provenance layer exists to stop.
     excludes_withdrawn = bool(inputs.withdrawn)
-    thresholds = {"ceiling_pct": ceiling_pct, "ceiling_method": ceiling.method, "ceiling_bands": ceiling.bands,
+    thresholds = {"ceiling_pct": ceiling_pct, "ceiling_source": ceiling_source,
+                  "ceiling_pct_derived": ceiling.pct,
+                  "ceiling_method": ceiling.method, "ceiling_bands": ceiling.bands,
                   "ceiling_population": len(kept), "ceiling_population_excludes_withdrawn": excludes_withdrawn,
                   "artefact_min_price": policy.artefact_min_price, "artefact_cost_ratio": policy.artefact_cost_ratio,
                   "max_credible_gap_pct": policy.max_credible_gap_pct}

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional
 
 import yaml
 
@@ -38,6 +39,7 @@ class Policy:
     full_annual_cycle_months: int
     withdraw_with_stock: bool
     published_population: str
+    owner_declared_ceiling_pct: Optional[float]
 
     def as_dict(self) -> dict:
         """The artefact's `thresholds` block, grouped as design §11.4 defines it.
@@ -84,6 +86,7 @@ class Policy:
             },
             "question_limit": self.question_limit,
             "published_population": self.published_population,
+            "owner_declared_ceiling_pct": self.owner_declared_ceiling_pct,
         }
 
 
@@ -114,6 +117,8 @@ def load_policy(path: Path | str | None = None) -> Policy:
         full_annual_cycle_months=int(raw.get("full_annual_cycle_months", 12)),
         withdraw_with_stock=bool(raw.get("withdraw_with_stock", False)),
         published_population=str(raw.get("published_population", "living")),
+        owner_declared_ceiling_pct=(None if raw.get("owner_declared_ceiling_pct") is None
+                                   else float(raw["owner_declared_ceiling_pct"])),
     )
     if policy.withdraw_with_stock:
         raise ValueError(
