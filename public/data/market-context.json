@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-12T02:40:42.354767+00:00",
+  "generatedAt": "2026-09-12T13:58:44.734054+00:00",
   "date": "2026-09-12",
   "status": "ok",
   "sources": {
@@ -9,12 +9,12 @@
     "islamic": "computed_hijri"
   },
   "weather": {
-    "temperatureC": 22.1,
+    "temperatureC": 29.6,
     "precipitation": 0.0,
-    "windSpeed": 4.9,
+    "windSpeed": 15.9,
     "weatherCode": 2,
     "label": "warm",
-    "observedAt": "2026-09-12T05:30",
+    "observedAt": "2026-09-12T16:45",
     "lat": 32.114,
     "lon": 34.976,
     "source": "open-meteo"
