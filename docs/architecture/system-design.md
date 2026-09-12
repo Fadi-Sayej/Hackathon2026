@@ -1203,6 +1203,7 @@ elsewhere in this document resolves to the file below.
 | [ADR-016](decisions/ADR-016-outcome-snapshot-carries-the-signal-family.md) | The owner-outcome snapshot carries signal_family, the only durable grouping key for INT-MEAS | Easy |
 | [ADR-017](decisions/ADR-017-a-run-states-whether-its-sales-evidence-arrived.md) | A run that continued on older sales evidence is never ok; vintages.sales states whether the reports arrived | Easy |
 | [ADR-018](decisions/ADR-018-the-browser-does-not-ship-a-schema-validator.md) | The browser checks four preconditions it cannot render without; the schema is enforced at publish and in CI | Easy |
+| [ADR-019](decisions/ADR-019-a-conflicting-duplicate-barcode-is-a-hygiene-record.md) | A duplicate barcode whose rows disagree is excluded and reported as hygiene; no field is picked | Easy |
 | [ADR-013](decisions/ADR-013-tests-run-before-merge.md) | Tests run before merge | Easy |
 
 ---
