@@ -1,7 +1,7 @@
 ---
 ID: ADR-018
 Title: The browser does not ship a schema validator
-Status: Draft
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-09-12
 Parent: [System Design](../system-design.md) §19
@@ -12,7 +12,7 @@ Updated: 2026-09-12
 
 # ADR-018 — The browser does not ship a schema validator
 
-**Status:** Draft · **Recorded in:** [System Design](../system-design.md) §19
+**Status:** Accepted (2026-09-12) · **Recorded in:** [System Design](../system-design.md) §19
 
 ## Context
 
@@ -88,6 +88,20 @@ instead of two.
 **We will know it was wrong if:** an artefact reaches the browser that passes the four
 checks and renders something false. The first such case is a Phase 3 reproduction concern,
 not an argument for a validator.
+
+## The budget is now enforced
+
+Accepted with one addition: this decision rests on a §16 budget that nothing checked.
+`npm run check:bundle` runs in CI after the build and fails when the bundle grows past a
+ceiling.
+
+The ceiling is set at **5,200 KB**, just above the 5,012 KB measured on 2026-09-12 — not at
+the 500 KB Checkpoint 4 target, which the 4.36 MB demo spine (§20.1 REMOVE) makes
+unreachable until Phase 4. It is a ratchet: lowering it is the point, and raising it needs a
+reason in the commit message.
+
+Without it the argument for declining a validator would have been a sentence in a document
+rather than a constraint.
 
 ## Binds
 

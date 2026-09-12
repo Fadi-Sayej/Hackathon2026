@@ -30,6 +30,8 @@ jobs:
         run: python3 -m pytest tests -q
       - name: Build
         run: npm run build
+      - name: Bundle size (ADR-018 — the budget that decision rests on)
+        run: npm run check:bundle
       - name: Artefact contract (schema validates the committed artefact when present)
         run: |
           if [ -f public/data/dashboard.json ]; then
