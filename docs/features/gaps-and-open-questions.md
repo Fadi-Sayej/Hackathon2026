@@ -318,6 +318,54 @@ cheapest test being to name twenty absent products and ask whether any of them s
 
 ---
 
+#### GAP-010 — A barcode identifies two different products, and the engine believes both
+
+**Source:** measured against `data/internal/silver_pos/yomyom_products.parquet` and
+`public/data/dashboard.json` on 2026-09-12, while verifying the figures for P2-OQ-3.
+
+**Problem:**
+48 barcodes appear twice in the POS export. Seven pairs are identical rows; **41 disagree**:
+
+| Barcode | Disagreement |
+|---|---|
+| `838948000444` | «מסטיק שפורפרת תות» filed under both `חטיפים מתוקים` and `מוצרי אלקטרונים` |
+| `838948002271` | same product under `חטיפים מתוקים` and `חטיפים מלוחים` |
+| `4062139003150` | same product at **₪15.90 and ₪16.90** |
+
+The engine shapes one product per **row**, so a duplicated barcode becomes two products.
+In today's artefact `price_consistency` publishes **108 entries for 107 products**, two of
+them byte-identical and sharing one `entry_id` — so the capability's own `counts.above`
+(107) disagrees with its own entry list (108).
+
+**Why it matters:**
+Three separate consequences, and only the first is cosmetic.
+
+1. **A capability's counts and entries disagree**, in an artefact whose entire purpose is
+   that every figure is recomputable and traceable (F7-S1).
+2. **AC-109 — "no product appears twice at once"** — is currently satisfied only because
+   `compose` has not been built yet. Phase 2 Task 2.2 must deduplicate, but that hides the
+   underlying conflict rather than reporting it.
+3. **A product with two shelf prices has no price the system can state honestly.**
+   `4062139003150` is either ₪15.90 or ₪16.90; the engine currently picks whichever row it
+   read last and computes a markup, a ceiling contribution and possibly a surfaced finding
+   from it. That is a number stated without evidence, which D-3 forbids.
+
+A duplicate barcode with conflicting data is a **fourth hygiene reason** — alongside
+`negative_stock`, `no_identifier` and `absent_price` — and it does not exist yet.
+
+**Recommended resolution:**
+Not a code fix to be chosen by whoever gets there first. It needs an architecture decision
+naming (a) where duplicate identity is resolved — `inputs.py` is the single producer of the
+product list and the natural place — and (b) what happens to a conflicting pair: a hygiene
+record the owner can fix, never a silent pick. Until that decision exists, no figure
+derived from a duplicated barcode should be put in front of the owner.
+
+**Confidence:** High — measured, with the rows quoted above.
+
+**Owner:** smartshelf-architect (the rule), then smartshelf-engineer (the change).
+
+---
+
 ### Part 2 — Open Questions by Priority
 
 #### P0 — blocks system design
