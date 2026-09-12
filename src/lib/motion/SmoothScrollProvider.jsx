@@ -5,6 +5,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 import 'lenis/dist/lenis.css'
 
+import { shouldPreventSmoothScroll } from './preventSmoothScroll.js'
+
 gsap.registerPlugin(ScrollTrigger)
 
 /**
@@ -21,7 +23,10 @@ gsap.registerPlugin(ScrollTrigger)
  * The app scrolls on the window, not on an inner element, so no `wrapper` or
  * `content` option is needed here. If a page ever scrolls inside a div, that
  * page needs its own Lenis instance rather than a change to this one.
+ *
+ * Nested scrollers are a different matter and are handled by `prevent` below.
  */
+
 export function SmoothScrollProvider({ children }) {
   useEffect(() => {
     // Someone who asked the OS to stop animating means it. Native scrolling is
@@ -34,6 +39,7 @@ export function SmoothScrollProvider({ children }) {
       autoRaf: false,
       duration: 1.1,
       smoothWheel: true,
+      prevent: shouldPreventSmoothScroll,
     })
 
     const update = (time) => lenis.raf(time * 1000)
