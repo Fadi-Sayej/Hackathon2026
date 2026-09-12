@@ -60,6 +60,9 @@ def main() -> int:
     payload = {
         "population": args.population,
         "generated_at": artefact.get("generated_at"),
+        # Checkpoint 3 / AC-127: "reproduced" means the same inputs produced the same
+        # output, not that the numbers look similar. Without this the comparison is by eye.
+        "inputs_digest": artefact.get("inputs_digest"),
         "run": artefact.get("run", {}).get("status"),
         "vintages": artefact.get("vintages"),
         "figures": figures,
@@ -97,6 +100,7 @@ def _print_human(payload: dict) -> None:
     print(f"  البيانات وُلّدت:  {payload['generated_at']}")
     print(f"  شهور المبيعات:   {sales.get('first')} … {sales.get('last')}")
     print(f"  حالة التشغيل:    {payload['run']}")
+    print(f"  بصمة المدخلات:   {(payload.get('inputs_digest') or '')[:16]}")
     print("-" * 68)
     by_capability: dict = {}
     for name, figure in payload["figures"].items():
