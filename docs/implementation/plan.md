@@ -1,7 +1,7 @@
 ---
 ID: PLAN
 Title: SmartShelf V1 Implementation Plan
-Status: Partial — Phases 0, 1 and 2 built (Task 2.7's cut-over deferred on D-14); Phases 3–4 NOT YET CREATED
+Status: Partial — Phases 0, 1 and 2 built (Task 2.7's cut-over deferred on D-14); Phase 3 built; Phase 4 written, not started
 Version: 1.1 (written 2026-09-08 against System Design v1.0; refreshed the same day against v1.1)
 Parent: [System Design](../architecture/system-design.md)
 Related Specs: F1-S1 … F7-S1 (see the System Design's §21 traceability matrix)
@@ -73,7 +73,7 @@ Copied verbatim from `docs/architecture/system-design.md`; every task's requirem
 | Phase 1 — Capabilities | [`2026-09-08-v1-02-capabilities.md`](phase-1-capabilities.md) | Phase 0 | Seven capabilities in six modules, surface producer, provenance, the rule-12 independence probe. Tasks 1a/1b/1c/1d are independent of each other. **Checkpoint 1:** AC tests for SPEC-001…005 pass; publisher assertions hold on real data; the probe passes with `sales_monthly` withheld |
 | Phase 2 — Browser ✅ *(cut-over deferred)* | [`phase-2-browser.md`](phase-2-browser.md) | Phase 1 artefact | `loadDashboard`, owner state, `compose`, DailyPage, capability pages, questions, data page, migrations. **Checkpoint 2:** AC-100…AC-112 and e2e invariants pass |
 | Phase 3 — Reproduction & gates | [`phase-3-reproduction.md`](phase-3-reproduction.md) | Phases 1–2 | `figures.py` as engine print mode, content addressing, V1 signal probes, nightly workflow. **Checkpoint 3:** fresh clone `npm run figures` ≤ 2 min and equals the artefact's `figures{}` |
-| Phase 4 — Removal | **NOT YET CREATED** | Checkpoint 3 | Tag `v1-attic`; delete §5.4's list; stop `operational.json`; drop migrations. **Checkpoint 4:** bundle < 500 KB; CI green |
+| Phase 4 — Removal | [`phase-4-removal.md`](phase-4-removal.md) | Checkpoint 3 | Tag `v1-attic`; delete §5.4's list; stop `operational.json`; drop migrations. **Checkpoint 4:** bundle < 500 KB; CI green |
 
 ## Prerequisites that are not code (do before Phase 0, Task 0.13 checks them)
 
@@ -88,8 +88,8 @@ Copied verbatim from `docs/architecture/system-design.md`; every task's requirem
 - **GAP-009** — before withdrawal ships, the owner confirms that absence from a monthly report means no sale (name twenty absent products).
 - **GAP-005** — no coverage figure is stated to the owner until `npm run figures` on a fresh clone reproduces it.
 - **GAP-011** — the 18% ceiling is derived from the owner's behaviour, not confirmed as his
-  policy. He confirms it before F1's figures are shown to him (ADR-015, accepted with this
-  condition).
+  policy. Still worth asking, no longer a gate: `policy.owner_declared_ceiling_pct` accepts
+  his answer when it comes, publishes both numbers, and notes when they differ.
 - ~~**Owner outcomes are keyed on `signal_family`, but the outcome *snapshot* is not.**~~
   **Settled by [ADR-016](../architecture/decisions/ADR-016-outcome-snapshot-carries-the-signal-family.md)**
   on 2026-09-12: the snapshot carries `signal_family`, the System Design §9.3 and §10.3 are
