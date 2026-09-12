@@ -52,7 +52,11 @@ const SOURCE_STATUS_TONE = {
 }
 
 // A manager has ten minutes. Show the shortlist, keep the rest one click away.
-const TOP_N = 20
+//
+// Ten, not twenty: D-9 settles the number and this file had drifted to twice it. The
+// decision is not about screen space — a surface long enough to scroll is a queue, and a
+// queue is a thing you are behind rather than a thing you finish.
+const TOP_N = 10
 
 // Hebrew product names must match a Hebrew query regardless of case and of the
 // final-letter forms, so plain toLowerCase() is not enough — compareHebrew()
@@ -277,7 +281,11 @@ export function OperationalPage({
         {openMoney.length > TOP_N && (
           <div className="recommendation-actions op-showall">
             <Button tone="ghost" onClick={() => setShowAll((value) => !value)}>
-              {showAll ? t('op.showTop', { n: TOP_N }) : t('op.showAll', { n: openMoney.length })}
+              {/* No count of what is not shown (AC-101). "Show all 1,639" is a backlog
+                  number, and a backlog number turns the day's work into a measure of how
+                  far behind he is. The rest stays one click away; it just stops being
+                  counted at him. */}
+              {showAll ? t('op.showTop', { n: TOP_N }) : t('op.showRest')}
             </Button>
           </div>
         )}

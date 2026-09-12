@@ -883,4 +883,5 @@ export const he = {
   'evidence.unit_cost': "unit cost",
   'evidence.units_sold': "יחידות שנמכרו",
   'evidence.window_id': "התקופה",
+  'op.showRest': "שאר הפריטים",
 }

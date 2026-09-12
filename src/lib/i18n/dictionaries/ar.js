@@ -888,4 +888,5 @@ export const ar = {
   'evidence.unit_cost': "unit cost",
   'evidence.units_sold': "وحدات مباعة",
   'evidence.window_id': "الفترة",
+  'op.showRest': "بقية الأصناف",
 }

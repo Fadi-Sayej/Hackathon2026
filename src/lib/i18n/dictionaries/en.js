@@ -882,4 +882,5 @@ export const en = {
   'evidence.unit_cost': "unit cost",
   'evidence.units_sold': "Units sold",
   'evidence.window_id': "Window",
+  'op.showRest': "Show the rest",
 }

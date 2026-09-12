@@ -345,14 +345,25 @@ function App() {
   )
   const [lastAnswerChange, setLastAnswerChange] = useState(null)
 
-  // Where the system is still guessing, ranked by money x products affected.
+  // Where the system is still guessing, ranked by products affected.
+  //
+  // The REAL recommendations, not generatedRecommendations. buildOpenQuestions takes its
+  // money-at-stake from REORDER entries, and those exist only in the demo spine — so the
+  // questions were showing the owner figures like "At stake: 283 ILS" computed from
+  // src/data/demoProducts.js, directly beneath a badge reading REAL POS DATA.
+  //
+  // operational.json has no REORDER rows, so the figure now has no basis and the card
+  // renders none (it already guards `moneyAtStake > 0`). That is D-3: where a figure cannot
+  // be stated honestly the surface shows no figure. "Affects 126 products" is true and
+  // stands on its own; "283 ILS" was not answerable if he asked where it came from, and one
+  // unanswerable number takes every other figure on the page with it.
   const openQuestions = useMemo(
     () =>
-      buildOpenQuestions(analyzedProducts, generatedRecommendations, {
+      buildOpenQuestions(analyzedProducts, operationalData.recommendations, {
         shelfLife: marketContext.shelfLife,
         ownerAnswers,
       }),
-    [analyzedProducts, generatedRecommendations, marketContext.shelfLife, ownerAnswers],
+    [analyzedProducts, operationalData.recommendations, marketContext.shelfLife, ownerAnswers],
   )
 
   // An answer that changes nothing visible is an answer he will not give twice, so
