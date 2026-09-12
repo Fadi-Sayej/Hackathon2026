@@ -30,6 +30,7 @@ class EngineInputs:
     matches: Optional[list]
     stores: StoreTypeConfig
     withdrawn: Optional[set]
+    idle: Optional[set]
     vintages: dict
     owner: OwnerState
     policy: Policy
@@ -125,5 +126,5 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
     vintages["sales"] = {k: vintages["sales"][k] for k in ("months", "first", "last", "full_annual_cycle")}
     return EngineInputs(products=products, inventory=inventory or None,
                         sales_monthly=monthly, sales_summary=summary, window=window,
-                        observations=observations, matches=matches, stores=stores, withdrawn=None,
+                        observations=observations, matches=matches, stores=stores, withdrawn=None, idle=None,
                         vintages=vintages, owner=owner, policy=policy, run_at=run_at)
