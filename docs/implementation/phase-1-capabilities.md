@@ -2105,3 +2105,37 @@ already runs there against real data before the dashboard is committed. Phase 3 
 **Checkpoint 1 is met when:** every AC test for SPEC-001 … SPEC-005 passes, `npm run check:independence`
 passes *and has been seen to fail* on the deliberate break above, and a real run publishes seven
 capabilities each carrying a status.
+
+---
+
+### Task 1.10: Conflicting duplicate barcodes (ADR-019)
+
+**Files:**
+- Modify: `src/engine/model.py` — append `hygiene.conflicting_duplicate` to `SIGNAL_FAMILIES`
+- Modify: `schemas/dashboard.schema.json` — the same value in the `signal_family` enum
+- Modify: `src/engine/inputs.py` — resolve product identity; expose `conflicting`
+- Modify: `src/engine/reconciliation.py` — `run_hygiene` publishes the records
+- Test: `tests/engine/test_inputs.py`, `tests/engine/test_reconciliation.py`
+
+**Interfaces:**
+- `EngineInputs.conflicting: Optional[list]` — one entry per conflicting barcode:
+  `{barcode, product_name, fields: {field: [value_a, value_b]}}`. `None` when products are
+  absent; `[]` when there are none.
+- `products` **excludes** every conflicting barcode, so no capability sees it (ADR-019).
+- Identical rows collapse silently; only a disagreement is reported.
+- `run_hygiene` gains `conflicting_duplicate` in its counts and one entry per record,
+  action `fix_record`, **no value** (D-1 — and the prices are what is in doubt).
+
+- [ ] **Step 1: Write the failing tests**
+  - two identical rows for one barcode produce **one** product and **no** conflict
+  - two rows disagreeing on `selling_price` produce **no** product, one conflict naming
+    `selling_price` with both values, and `counts["conflicting_duplicate"] == 1`
+  - a conflicting barcode appears in no other capability's population
+  - the hygiene entry carries `value is None` and `signal_family == "hygiene.conflicting_duplicate"`
+- [ ] **Step 2: Run** → FAIL.
+- [ ] **Step 3: Implement.** Group by `norm_barcode`; compare the shaped fields; collapse or
+  divert. Sorted iteration so the record order is deterministic.
+- [ ] **Step 4:** `python3 -m pytest tests/engine -q` → all pass, then
+  `FIREBASE_SERVICE_ACCOUNT_PATH=./secrets/firebase-service-account.json python3 scripts/run_engine.py --skip-market`
+  and confirm `price_consistency` `counts.above` now equals its entry count.
+- [ ] **Step 5: Commit.**
