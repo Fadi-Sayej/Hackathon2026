@@ -760,4 +760,11 @@ export const ar = {
   'characterisation.inconsistent': "أرقام لا تتطابق",
   'capability.missing': "هذه القدرة غير موجودة في هذا التصدير.",
   'count.undetermined': "غير محدَّد",
+  'questions.title': "أسئلة التكلفة",
+  'questions.none': "لا أسئلة اليوم — كل ما يغيّر رقماً معروف.",
+  'questions.costOf': "كم تشتري {product}؟",
+  'questions.save': "حفظ",
+  'questions.why': "يخص {money} ₪ خلال {window}",
+  'questions.failed': "لم نستطع حفظ الإجابة — لم تُسجَّل.",
+  'unavailable.answer_storage_unavailable': "لا نستطيع الوصول إلى مكان حفظ إجاباتك.",
 }

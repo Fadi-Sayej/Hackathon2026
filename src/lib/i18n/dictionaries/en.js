@@ -754,4 +754,11 @@ export const en = {
   'characterisation.inconsistent': "Numbers that do not add up",
   'capability.missing': "This capability is not present in this export.",
   'count.undetermined': "undetermined",
+  'questions.title': "Cost questions",
+  'questions.none': "No questions today — everything that would change a figure is known.",
+  'questions.costOf': "What do you pay for {product}?",
+  'questions.save': "Save",
+  'questions.why': "Affects ₪{money} across {window}",
+  'questions.failed': "We could not save the answer — it was not recorded.",
+  'unavailable.answer_storage_unavailable': "We cannot reach where your answers are stored.",
 }
