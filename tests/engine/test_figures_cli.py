@@ -16,6 +16,19 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "tests" / "engine"))
 
+# These drive the real CLI over the pilot data. A clean checkout has none: data/** is
+# gitignored except the committed snapshots (CLAUDE.md rule 6), and ci.yml runs without it
+# on purpose. Checkpoint 3 measured exactly this — a fresh clone needs a POS import first.
+#
+# So they skip rather than fail. A test that cannot run in an environment should say so;
+# failing there tells you about the environment, not the code, and teaches everyone to
+# ignore a red suite.  The nightly has the data and runs them.
+_PILOT_DATA = ROOT / "data" / "internal" / "silver_pos" / "yomyom_products.parquet"
+pytestmark = pytest.mark.skipif(
+    not _PILOT_DATA.exists(),
+    reason="no pilot data in this checkout: run scripts/import_yomyom_pos.py --input yomyom-inventory.csv",
+)
+
 
 @pytest.fixture(scope="module")
 def cli_json():
