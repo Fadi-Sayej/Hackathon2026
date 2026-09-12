@@ -81,11 +81,27 @@ particular: no role quotes a figure it has not read from the artifact that produ
    the export succeeds and silently reports `competitorSignals: 0`. If the dashboard
    looks thin, check the directories exist before debugging the code.
 
-5. **`npm run data:refresh` is the one command** after new POS data or a scrape. It
-   runs the competitor-signal → matching → product-recommendation chain, then expiry,
-   then the exporter — in dependency order, because each stage reads the previous
-   stage's parquet. `--skip-market` does a POS-only refresh. `data:dashboard` runs the
-   exporter alone and leaves the market half stale.
+5. **There are two pipelines now, and `npm run data:refresh` is the new one.**
+   Phase 0 Task 0.11 repointed it from `scripts/refresh_pipeline.py` to
+   `scripts/run_engine.py`. They write different files and are not interchangeable:
+
+   | | writes | read by | run by |
+   |---|---|---|---|
+   | `npm run data:refresh` → `run_engine.py` | `public/data/dashboard.json` (schema 2) | nothing yet — the front end still reads the old artefact | a human |
+   | `python3 scripts/refresh_pipeline.py` | `public/data/operational.json` and friends | **the live dashboard** | `collect-daily.yml` nightly |
+
+   So after new POS data or a scrape, `npm run data:refresh` rebuilds the **engine**
+   artefact and leaves what the owner actually sees untouched. To refresh the live
+   dashboard, call `python3 scripts/refresh_pipeline.py` directly — it still runs the
+   competitor-signal → matching → product-recommendation chain, then expiry, then the
+   exporter, in dependency order because each stage reads the previous stage's parquet.
+   `--skip-market` does a POS-only refresh; `data:dashboard` runs the exporter alone and
+   leaves the market half stale.
+
+   **This split is temporary and nobody has decided how it ends.** The front end moving
+   onto `dashboard.json` is not planned work — Phases 2–4 are not written. Until it is,
+   the engine's figures and the owner's screen disagree, and
+   [`docs/reviews/F1-validation.md`](docs/reviews/F1-validation.md) records by how much.
 
 6. **`data/**` is gitignored; `public/data/operational.json` is committed.** A fresh
    clone has the dashboard JSON and nothing to rebuild it from. Regenerating requires
