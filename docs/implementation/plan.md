@@ -87,6 +87,9 @@ Copied verbatim from `docs/architecture/system-design.md`; every task's requirem
 - **SPEC-GAP-A** — margin-below-cost has no producing specification; it is built as a browse-only capability and is *not admitted* to the daily surface until SPEC-008 exists.
 - **GAP-009** — before withdrawal ships, the owner confirms that absence from a monthly report means no sale (name twenty absent products).
 - **GAP-005** — no coverage figure is stated to the owner until `npm run figures` on a fresh clone reproduces it.
+- **GAP-011** — the 18% ceiling is derived from the owner's behaviour, not confirmed as his
+  policy. He confirms it before F1's figures are shown to him (ADR-015, accepted with this
+  condition).
 - ~~**Owner outcomes are keyed on `signal_family`, but the outcome *snapshot* is not.**~~
   **Settled by [ADR-016](../architecture/decisions/ADR-016-outcome-snapshot-carries-the-signal-family.md)**
   on 2026-09-12: the snapshot carries `signal_family`, the System Design §9.3 and §10.3 are

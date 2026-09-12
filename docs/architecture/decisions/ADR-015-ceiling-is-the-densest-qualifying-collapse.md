@@ -1,7 +1,7 @@
 ---
 ID: ADR-015
 Title: The markup ceiling is the densest qualifying collapse, not the last
-Status: Draft
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-09-12
 Parent: [System Design](../system-design.md) §19
@@ -12,7 +12,7 @@ Updated: 2026-09-12
 
 # ADR-015 — The markup ceiling is the densest qualifying collapse, not the last
 
-**Status:** Draft · **Recorded in:** [System Design](../system-design.md) §19
+**Status:** Accepted (2026-09-12) · **Recorded in:** [System Design](../system-design.md) §19
 
 ## Related Specs
 
@@ -100,6 +100,18 @@ where a price file is noisiest.
 **We will know it was wrong if:** a pilot store's derived ceiling sits visibly above the
 band where the bulk of its markups stop, or the owner says the surfaced "above policy"
 set contains prices he set deliberately.
+
+## Confirmation owed before the pilot
+
+Accepted with one condition. The rule derives 18% from the owner's distribution; it does
+not establish that 18% is the policy **he believes he has**. The derivation is evidence of
+his behaviour, not a statement of his intent, and F1's whole correction rests on the
+difference between the two.
+
+Before the figures are put in front of him, he confirms the ceiling — tracked as
+[GAP-011](../../features/gaps-and-open-questions.md). If he names a different number, that
+is not a defect in this rule: it means his behaviour and his policy have diverged, which is
+itself the most useful thing F1 could tell him.
 
 ## Binds
 

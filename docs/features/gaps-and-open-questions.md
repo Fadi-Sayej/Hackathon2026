@@ -366,6 +366,40 @@ derived from a duplicated barcode should be put in front of the owner.
 
 ---
 
+#### GAP-011 — The 18% ceiling is derived from his behaviour, not confirmed as his policy
+
+**Source:** [ADR-015](../architecture/decisions/ADR-015-ceiling-is-the-densest-qualifying-collapse.md),
+accepted 2026-09-12 with this condition.
+
+**Problem:**
+`derive_ceiling` reads 18.0% from the pilot export: the owner's markups collapse from 81
+products in the 16–18% band to 7 in 18–20%. That is strong evidence of where his pricing
+stops. It is **not** a statement that he believes his ceiling is 18%.
+
+F1's entire correction rests on that distinction. The intent's argument is that 1,124
+products inside 0–18% are «سياسته السليمة» — his sound policy — and must never be surfaced.
+If his actual policy is 15% or 25%, the same data supports a different silent band, and the
+surfaced set changes with it.
+
+**Why it matters:**
+Every figure F1 puts in front of him is partitioned by this number. Showing him 136
+"above your policy" items presumes we know what his policy is.
+
+**Recommended resolution:**
+One question at the 12/9 meeting, before the figures: *«فوق كم بالمئة تعتبر سعر Wolt خارج
+سياستك؟»* — above what percentage do you consider a Wolt price outside your policy? Then
+compare his answer with the derived 18%.
+
+A divergence is not a defect in the rule. It means his behaviour and his stated policy have
+parted, and saying so is more valuable than either number alone.
+
+**Confidence:** High that the derivation is sound; unknown whether it matches his intent —
+which is the gap.
+
+**Owner:** the store owner, via smartshelf-pm.
+
+---
+
 ### Part 2 — Open Questions by Priority
 
 #### P0 — blocks system design
