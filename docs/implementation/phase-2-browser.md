@@ -91,9 +91,13 @@ every page. 2.9 needs 2.7.
 - **Never throws and never falls back.** An unreachable or invalid artefact is a *state the
   UI renders*, not an exception and not a reason to show older data. `loadOperationalData.js`
   is not modified and not deleted here — Task 2.7 removes its last caller.
-- Validation is the **same** `schemas/dashboard.schema.json` the publisher uses (§11.4). A
-  second, hand-written check in JS would drift from the Python one, and the drift would be
-  invisible until an artefact passed one and failed the other.
+- **No schema validation, and no validator dependency**
+  ([ADR-018](../architecture/decisions/ADR-018-the-browser-does-not-ship-a-schema-validator.md)).
+  The schema is enforced where the artefact is produced (`publish.py`) and again in CI, so
+  a third copy in the browser would spend the §16 bundle budget on a case the first two
+  refuse to produce. `loadDashboard` checks four preconditions it cannot render without:
+  the response parses, `schema_version === 2`, `capabilities` is an object, and every
+  capability carries a `status` — the last because AC-107 is unachievable without it.
 
 - [ ] **Step 1: Build the fixture from a real artefact**
 
@@ -157,9 +161,9 @@ describe('loadDashboard', () => {
 ```
 
 - [ ] **Step 3: Run the test** → FAIL, module not found.
-- [ ] **Step 4: Implement.** Validate with `ajv` if it is already a dependency; if it is
-  not, **stop and raise it** rather than adding one — a JSON-schema validator in the bundle
-  is a size decision (§16) and belongs in an ADR, not in a task.
+- [ ] **Step 4: Implement** the four checks of ADR-018. Add no dependency: `ajv` and `zod`
+  appear in `node_modules` only as transitive build-tool dependencies and may vanish on any
+  unrelated install.
 - [ ] **Step 5:** `npx vitest run src/lib/dataAdapters` → 5 passed. Commit.
 
 ---
@@ -431,6 +435,6 @@ Against a **real** artefact produced by `python3 scripts/run_engine.py --skip-ma
 
 | id | Question | Owner | Blocks |
 |---|---|---|---|
-| P2-OQ-1 | Is a JSON-schema validator already in the bundle, or does Task 2.0 add one? A validator is a §16 size decision and needs an ADR if it is new | smartshelf-architect | Task 2.0 Step 4 |
+| ~~P2-OQ-1~~ | **Answered 2026-09-12.** Neither `ajv` nor `zod` is a direct dependency — both are transitive build-tool deps. [ADR-018](../architecture/decisions/ADR-018-the-browser-does-not-ship-a-schema-validator.md): the browser ships no validator and checks four preconditions instead | smartshelf-architect | — |
 | P2-OQ-2 | `owner_questions` is `unavailable: answer_storage_unavailable` without Firebase credentials (Task 0.13 steps 2–5 are unmet). Task 2.5 renders that honestly, but the pilot needs the credentials | smartshelf-platform | the pilot, not the task |
 | P2-OQ-3 | The daily surface shows entries over the **living** catalogue, so F1's published 68/136 become 53/108. Which figures does the owner see on 12/9? | smartshelf-pm | what the meeting is told, not the build |
