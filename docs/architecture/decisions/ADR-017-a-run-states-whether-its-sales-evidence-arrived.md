@@ -1,7 +1,7 @@
 ---
 ID: ADR-017
 Title: A run states whether its sales evidence arrived
-Status: Draft
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-09-12
 Parent: [System Design](../system-design.md) §19
@@ -12,7 +12,7 @@ Updated: 2026-09-12
 
 # ADR-017 — A run states whether its sales evidence arrived
 
-**Status:** Draft · **Recorded in:** [System Design](../system-design.md) §19
+**Status:** Accepted (2026-09-12) · **Recorded in:** [System Design](../system-design.md) §19
 
 ## Related Specs
 
