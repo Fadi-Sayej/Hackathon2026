@@ -46,7 +46,10 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          # .nvmrc, for the same reason as ci.yml. This workflow survived Node 20 only
+          # because check_signals_live.mjs imports nothing from node_modules; the moment it
+          # does, it would fail the way ci.yml did.
+          node-version-file: '.nvmrc'
 
       - run: pip install -r requirements.txt
 

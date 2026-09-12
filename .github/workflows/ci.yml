@@ -17,7 +17,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '20', cache: npm }
+        # node-version-file, not a pinned string: .nvmrc is the one place the version
+        # lives, so CI and a developer's machine cannot drift apart silently. Pinning '20'
+        # here is what broke this workflow's second run — jsdom's undici needs >= 22.14 and
+        # fails with "webidl.util.markAsUncloneable is not a function", which names neither
+        # Node nor a version.
+        with: { node-version-file: '.nvmrc', cache: npm }
       - uses: actions/setup-python@v5
         with: { python-version: '3.11', cache: pip }
       - run: npm ci
