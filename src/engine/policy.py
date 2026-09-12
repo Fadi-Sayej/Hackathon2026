@@ -1,7 +1,7 @@
 """Declared constants for the engine. One file, published with every figure."""
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
 
 import yaml
@@ -39,7 +39,50 @@ class Policy:
     withdraw_with_stock: bool
 
     def as_dict(self) -> dict:
-        return asdict(self)
+        """The artefact's `thresholds` block, grouped as design §11.4 defines it.
+
+        Not `asdict(self)`. A flat dump is convenient here and useless at the other end:
+        F7-S1 requires every count to be rendered with the thresholds that governed it, and
+        that is only possible if the reader can tell which knobs belong to which capability.
+        The dataclass stays flat because a policy file is edited as a list; the contract is
+        grouped because an artefact is read per finding.
+        """
+        return {
+            "version": self.version,
+            "price_consistency": {
+                "band_pct": self.ceiling_band_pct,
+                "drop_ratio": self.ceiling_drop_ratio,
+                "min_band_count": self.ceiling_min_band_count,
+                "max_credible_gap_pct": self.max_credible_gap_pct,
+            },
+            "competitor_position": {
+                "policy_pct": self.price_policy_pct,
+                "attention_pct": self.attention_pct,
+                "cost_floor_pct": self.cost_floor_pct,
+                "freshness_days": self.freshness_days,
+                "uncomparable_min_barcode_digits": self.uncomparable_min_barcode_digits,
+            },
+            "catalogue_lifecycle": {
+                "implausible_revenue_share": self.implausible_revenue_share,
+                "full_annual_cycle_months": self.full_annual_cycle_months,
+                "withdraw_with_stock": self.withdraw_with_stock,
+            },
+            "owner_questions": {
+                "limit": self.question_limit,
+                "money_basis": self.question_money_basis,
+                "yield_factor": self.question_yield_factor,
+            },
+            "surface": {
+                "bound": self.surface_bound,
+                "unvalued_places": self.surface_unvalued_places,
+                "unvalued_order": list(self.surface_unvalued_order),
+            },
+            "artefact": {
+                "min_price": self.artefact_min_price,
+                "cost_ratio": self.artefact_cost_ratio,
+            },
+            "question_limit": self.question_limit,
+        }
 
 
 def load_policy(path: Path | str | None = None) -> Policy:

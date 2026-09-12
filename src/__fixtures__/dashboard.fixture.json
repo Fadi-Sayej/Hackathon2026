@@ -268,31 +268,44 @@
   },
   "thresholds": {
     "version": 1,
-    "price_policy_pct": 60.0,
-    "attention_pct": 100.0,
-    "cost_floor_pct": 10.0,
-    "freshness_days": 14,
-    "artefact_min_price": 0.5,
-    "artefact_cost_ratio": 2.0,
-    "max_credible_gap_pct": 300.0,
-    "surface_bound": 10,
-    "surface_unvalued_places": 3,
-    "surface_unvalued_order": [
-      "reconciliation",
-      "competitor_position",
-      "catalogue_lifecycle",
-      "hygiene"
-    ],
-    "question_limit": 3,
-    "question_money_basis": "window_revenue_at_shelf_price",
-    "question_yield_factor": 1.0,
-    "uncomparable_min_barcode_digits": 8,
-    "ceiling_band_pct": 2.0,
-    "ceiling_drop_ratio": 0.75,
-    "ceiling_min_band_count": 20,
-    "implausible_revenue_share": 0.1,
-    "full_annual_cycle_months": 12,
-    "withdraw_with_stock": false
+    "price_consistency": {
+      "band_pct": 2.0,
+      "drop_ratio": 0.75,
+      "min_band_count": 20,
+      "max_credible_gap_pct": 300.0
+    },
+    "competitor_position": {
+      "policy_pct": 60.0,
+      "attention_pct": 100.0,
+      "cost_floor_pct": 10.0,
+      "freshness_days": 14,
+      "uncomparable_min_barcode_digits": 8
+    },
+    "catalogue_lifecycle": {
+      "implausible_revenue_share": 0.1,
+      "full_annual_cycle_months": 12,
+      "withdraw_with_stock": false
+    },
+    "owner_questions": {
+      "limit": 3,
+      "money_basis": "window_revenue_at_shelf_price",
+      "yield_factor": 1.0
+    },
+    "surface": {
+      "bound": 10,
+      "unvalued_places": 3,
+      "unvalued_order": [
+        "reconciliation",
+        "competitor_position",
+        "catalogue_lifecycle",
+        "hygiene"
+      ]
+    },
+    "artefact": {
+      "min_price": 0.5,
+      "cost_ratio": 2.0
+    },
+    "question_limit": 3
   },
   "value_kinds_present": [
     "per_sale"
