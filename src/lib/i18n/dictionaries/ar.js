@@ -783,4 +783,8 @@ export const ar = {
   'data.run.partial': "خطوة فشلت في هذا التشغيل.",
   'common.yes': "نعم",
   'common.no': "لا",
+  'spine.loading': "نقرأ أرقام اليوم…",
+  'spine.unreadable.title': "لم نستطع قراءة أرقام اليوم",
+  'spine.unreadable.unreachable': "الملف لم يصل. لا نعرض أرقام الأمس مكانه.",
+  'spine.unreadable.invalid': "الملف وصل بشكل لا نعرفه. لا نخمّن ما فيه.",
 }

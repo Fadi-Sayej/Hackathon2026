@@ -777,4 +777,8 @@ export const en = {
   'data.run.partial': "A step failed in this run.",
   'common.yes': "yes",
   'common.no': "no",
+  'spine.loading': "Reading today’s numbers…",
+  'spine.unreadable.title': "We could not read today’s numbers",
+  'spine.unreadable.unreachable': "The file did not arrive. We are not showing yesterday’s numbers in its place.",
+  'spine.unreadable.invalid': "The file arrived in a shape we do not know. We are not guessing at its contents.",
 }

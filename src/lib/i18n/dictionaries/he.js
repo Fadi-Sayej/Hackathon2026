@@ -778,4 +778,8 @@ export const he = {
   'data.run.partial': "שלב נכשל בהרצה הזו.",
   'common.yes': "כן",
   'common.no': "לא",
+  'spine.loading': "קוראים את המספרים של היום…",
+  'spine.unreadable.title': "לא הצלחנו לקרוא את המספרים של היום",
+  'spine.unreadable.unreachable': "הקובץ לא הגיע. איננו מציגים את המספרים של אתמול במקומו.",
+  'spine.unreadable.invalid': "הקובץ הגיע בפורמט שאיננו מכירים. איננו מנחשים את תוכנו.",
 }

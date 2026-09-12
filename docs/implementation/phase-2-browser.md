@@ -355,6 +355,20 @@ It must show, plainly:
 
 ### Task 2.7: One spine, ten nav items, and the cut-over
 
+> **Deviation, 2026-09-12 — the spine is built; the cut-over is not done.**
+> Every price figure in `dashboard.json` is computed over the living catalogue (3,903
+> products withdrawn), and **D-14** forbids putting a figure that depends on automatic
+> withdrawal in front of the owner until GAP-009 closes. Cutting the browser over now would
+> breach a settled decision.
+>
+> `src/surface/V1Spine.jsx` wires the artefact and owner state to all ten pages and is
+> covered end to end, but it is **not the app's default**: the owner's screen still reads
+> `operational.json` through the existing spine. The cut-over is a one-line change once
+> GAP-009 is answered, and the four e2e specs covering pages the ten-item nav unroutes stay
+> green until then.
+>
+> The steps below describe the cut-over and remain **not done**.
+
 **Files:**
 - Modify: `src/App.jsx` — one spine: artefact + owner state
 - Modify: `src/components/layout/AppShell.jsx` — nav reduced to ten items
