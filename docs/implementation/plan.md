@@ -1,7 +1,7 @@
 ---
 ID: PLAN
 Title: SmartShelf V1 Implementation Plan
-Status: Partial — Phases 0 and 1 written; Phases 2–4 NOT YET CREATED
+Status: Partial — Phases 0, 1 and 2 written; Phases 3–4 NOT YET CREATED
 Version: 1.1 (written 2026-09-08 against System Design v1.0; refreshed the same day against v1.1)
 Parent: [System Design](../architecture/system-design.md)
 Related Specs: F1-S1 … F7-S1 (see the System Design's §21 traceability matrix)
@@ -71,7 +71,7 @@ Copied verbatim from `docs/architecture/system-design.md`; every task's requirem
 |---|---|---|---|
 | Phase 0 — Foundations | [`2026-09-08-v1-01-foundations.md`](phase-0-foundations.md) | — | Contract, policy, owner-state model + pull, ingestion fixes, orchestrator + publisher, CI. **Checkpoint 0-B:** a run publishes a valid artefact with no capabilities; CI green |
 | Phase 1 — Capabilities | [`2026-09-08-v1-02-capabilities.md`](phase-1-capabilities.md) | Phase 0 | Seven capabilities in six modules, surface producer, provenance, the rule-12 independence probe. Tasks 1a/1b/1c/1d are independent of each other. **Checkpoint 1:** AC tests for SPEC-001…005 pass; publisher assertions hold on real data; the probe passes with `sales_monthly` withheld |
-| Phase 2 — Browser | **NOT YET CREATED** | Phase 1 artefact | `loadDashboard`, owner state, `compose`, DailyPage, capability pages, questions, data page, migrations. **Checkpoint 2:** AC-100…AC-112 and e2e invariants pass |
+| Phase 2 — Browser | [`phase-2-browser.md`](phase-2-browser.md) | Phase 1 artefact | `loadDashboard`, owner state, `compose`, DailyPage, capability pages, questions, data page, migrations. **Checkpoint 2:** AC-100…AC-112 and e2e invariants pass |
 | Phase 3 — Reproduction & gates | **NOT YET CREATED** | Phases 1–2 | `figures.py` as engine print mode, content addressing, V1 signal probes, nightly workflow. **Checkpoint 3:** fresh clone `npm run figures` ≤ 2 min and equals the artefact's `figures{}` |
 | Phase 4 — Removal | **NOT YET CREATED** | Checkpoint 3 | Tag `v1-attic`; delete §5.4's list; stop `operational.json`; drop migrations. **Checkpoint 4:** bundle < 500 KB; CI green |
 
@@ -87,12 +87,10 @@ Copied verbatim from `docs/architecture/system-design.md`; every task's requirem
 - **SPEC-GAP-A** — margin-below-cost has no producing specification; it is built as a browse-only capability and is *not admitted* to the daily surface until SPEC-008 exists.
 - **GAP-009** — before withdrawal ships, the owner confirms that absence from a monthly report means no sale (name twenty absent products).
 - **GAP-005** — no coverage figure is stated to the owner until `npm run figures` on a fresh clone reproduces it.
-- **Owner outcomes are keyed on `signal_family`, but the outcome *snapshot* is not.** Design
-  §10.3 and §9.3 record `snapshot: {capability, barcode, value?, kind?, characterisation}` — the
-  mutable routing label ADR-009 deliberately removed from `entry_id`, kept in the one durable
-  record §9.3 says INT-MEAS will read later. Adding `signal_family` to the snapshot costs one
-  line in Phase 2 and is unrecoverable once the pilot has accumulated outcomes. It needs a
-  System Design edit; raised here because Phase 2 is not yet written.
+- ~~**Owner outcomes are keyed on `signal_family`, but the outcome *snapshot* is not.**~~
+  **Settled by [ADR-016](../architecture/decisions/ADR-016-outcome-snapshot-carries-the-signal-family.md)**
+  on 2026-09-12: the snapshot carries `signal_family`, the System Design §9.3 and §10.3 are
+  edited, and Phase 2 Task 2.1 refuses an outcome without it.
 - **ARCH-GATE-003 (INT-MEAS)** — the pilot's own 30-day go/no-go number (PRD §8) has no V1
   delivery: the design removes the telemetry surface that SPEC-000 §4 relied on and builds
   nothing in its place. Either F13 is specified before V1 ships, or the team states on 12/9
