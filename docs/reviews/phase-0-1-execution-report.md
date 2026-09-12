@@ -1,6 +1,6 @@
 ---
 ID: PHASE-0-1-EXECUTION
-Title: What executing the Phase 0, 1 and 2 plans found
+Title: What executing the Phase 0–4 plans found
 Status: Ready for review
 Owner: smartshelf-engineer
 Parent: [Implementation Plan](../implementation/plan.md)
@@ -167,3 +167,42 @@ one-line change once GAP-009 is answered.
 - **AC-103 is unfalsifiable on real data.** V1's schema permits one value kind, so the
   never-sum-two-kinds rule is enforced structurally and tested with a synthetic second kind.
 
+---
+
+## Phase 3 — what building reproduction found
+
+Tasks 3.0 – 3.5 built; Phase 4 written, not started. 467 Python tests, 590 JS, lint, build,
+bundle guard and surface check green.
+
+| # | Where | What | Caught by |
+|---|---|---|---|
+| 17 | `print_figures.py` | A **second implementation** of all 46 V1 figures. It disagreed with the engine on F1's ceiling (18% vs 26%) until ADR-015 and nothing said which was right | writing Task 3.0 |
+| 18 | `inputs.py` | `inputs_digest` hashed `owner.pulled_at` — the Firestore fetch time — so every run differed. A digest that changes on every run reports a change on every run | running the engine three times and comparing |
+| 19 | `inputs.py` | Then it hashed `_imported_at`, which `sales_import` rewrites on every run. Same failure, second cause | the same comparison |
+| 20 | `figures.py` | Exited 1 whenever a figure was unavailable, which on a machine without credentials is always — a judge would see FAIL when 40 of 41 figures reproduce | Checkpoint 3 on a real fresh clone |
+| 21 | `price_consistency.py` | Asserted `ceiling_population_excludes_withdrawn: true` as a constant, so under ADR-020 it claimed an exclusion that had not happened | ADR-020's first real run |
+| 22 | `run.py` + tests | "Isolated" tests patched `SILVER_DIR` only, so every one read production signals and matches — 12s per test, and not the isolation they claimed | `--durations` on a suite that had grown to 3m13s |
+
+Defects 18 and 19 are the same lesson twice: **a fixture that writes each input once cannot
+catch a value that changes between runs.** Both escaped unit tests and both were found by
+running the real thing repeatedly and comparing.
+
+Defect 22 is the one worth generalising. The suite got slow, and the slowness was a symptom:
+the tests were reading production data. Profiling for speed found a correctness problem.
+
+### The three dependencies removed
+
+The build was waiting on a meeting — GAP-009, a question only the store owner can answer.
+None of it needed to be:
+
+- **ADR-020** — the published population is a policy line, not a constant. The artefact
+  carries `population: whole`, so no published figure depends on withdrawal and D-14 is
+  satisfied. GAP-009 still matters and no longer holds the build.
+- **`figures.py`** separates "could not compute" from "needs a credential you were not
+  given". Only the first is a reproduction failure.
+- **GAP-011** became an input: `owner_declared_ceiling_pct` accepts the owner's answer when
+  it comes, publishes both numbers, and notes when they differ.
+
+What remains genuinely external is three console actions — Vercel Basic Auth, the CI
+secret, deployment protection — and the browser cut-over, which is now an engineering
+decision rather than a blocked one.
