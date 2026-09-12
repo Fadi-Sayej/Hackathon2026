@@ -1,6 +1,21 @@
 import { expect, test } from '@playwright/test'
 
 /**
+ * SKIPPED AT THE CUT-OVER (2026-09-12).
+ *
+ * The browser now reads the engine's artefact and the nav carries the ten V1 pages
+ * (design §20.1). The pages this file drives — store layout and shelf plan — are no longer reachable.
+ *
+ * Their code is still in the tree: §20.2 keeps one release of overlap so a rollback has
+ * somewhere to land, and Phase 4 Task 4.1 deletes the pages and this file together. Skipped
+ * rather than deleted so that removal is one commit with its subject, not a test quietly
+ * disappearing ahead of the code it covered.
+ */
+test.describe.configure({ mode: 'serial' })
+test.skip(true, 'pages removed from the nav at the cut-over; deleted with them in Phase 4')
+
+
+/**
  * The shelf-planning journey, end to end, as the manager performs it:
  * draw the store, pick a fixture, read what goes on it, approve, take the
  * build sheet to the aisle.

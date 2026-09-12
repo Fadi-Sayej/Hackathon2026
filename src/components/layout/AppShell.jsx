@@ -16,46 +16,42 @@ import { LANGUAGES, useI18n } from '../../lib/i18n/index.js'
  * real data it put all 7,451 products on the bottom shelf with 2 facings each.
  * `store-layout` and `shelf-plan` replace it.
  */
+/**
+ * The ten V1 pages (design §20.1: "nav reduced to 10 items"), grouped as the owner would
+ * group them rather than as the codebase does.
+ *
+ * The V2/V4 entries — reorder, approved orders, assortment gaps, store layout, shelf plan,
+ * dashboard, report — are gone from here at the cut-over. Their code stays until Phase 4 so
+ * a rollback still has somewhere to land; it is simply no longer reachable.
+ */
 const navGroups = [
   {
     id: 'group.daily',
     items: [
-      { id: 'operational' },
-      { id: 'recommendations' },
-      { id: 'orders' },
+      { id: 'daily' },
+      { id: 'questions' },
     ],
   },
   {
     id: 'group.market',
     items: [
-      { id: 'prices' },
-      { id: 'assortment' },
-    ],
-  },
-  {
-    id: 'group.shelves',
-    items: [
-      { id: 'store-layout' },
-      { id: 'shelf-plan' },
+      { id: 'price_consistency' },
+      { id: 'competitor_position' },
     ],
   },
   {
     id: 'group.inventory',
     items: [
-      { id: 'products' },
-      { id: 'expiry' },
-    ],
-  },
-  {
-    id: 'group.reports',
-    items: [
-      { id: 'dashboard' },
-      { id: 'report' },
+      { id: 'reconciliation' },
+      { id: 'hygiene' },
+      { id: 'catalogue_lifecycle' },
+      { id: 'margin_below_cost' },
+      { id: 'receiving' },
     ],
   },
   {
     id: 'group.system',
-    items: [{ id: 'data-source' }],
+    items: [{ id: 'data' }],
   },
 ]
 

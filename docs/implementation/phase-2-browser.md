@@ -355,7 +355,16 @@ It must show, plainly:
 
 ### Task 2.7: One spine, ten nav items, and the cut-over
 
-> **Deviation, 2026-09-12 — the spine is built; the cut-over is not done.**
+> **Done 2026-09-12.** The cut-over happened once [ADR-020](../architecture/decisions/ADR-020-the-published-population-is-a-policy-not-a-constant.md)
+> removed D-14 as a blocker: the published artefact counts over the whole catalogue, so no
+> figure in it depends on automatic withdrawal. App.jsx is one spine (730 lines → 122), the
+> nav carries the ten V1 pages, and the four e2e specs covering unrouted pages are skipped
+> with their reasons, to be deleted alongside their subjects in Phase 4 Task 4.1.
+>
+> The demo spine tree-shook out with its last caller: **the bundle went 5,016 KB → 930 KB**,
+> and `check:bundle`'s ceiling came down with it.
+
+> ~~**Deviation, 2026-09-12 — the spine is built; the cut-over is not done.**~~
 > Every price figure in `dashboard.json` is computed over the living catalogue (3,903
 > products withdrawn), and **D-14** forbids putting a figure that depends on automatic
 > withdrawal in front of the owner until GAP-009 closes. Cutting the browser over now would

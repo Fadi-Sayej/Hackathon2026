@@ -1,6 +1,23 @@
 import { expect, test } from '@playwright/test'
 
 /**
+ * SKIPPED AT THE CUT-OVER (2026-09-12).
+ *
+ * This drives the pre-cut-over operational page — `.topbar h1` reading "Today's tasks",
+ * `.operational-search`, the pill row. The daily surface is now DailyPage over the engine's
+ * artefact and none of those selectors exist.
+ *
+ * Its coverage is not lost. `npm run check:surface`
+ * (src/surface/__tests__/checkpoint2.test.jsx) asserts the same invariants — AC-100, AC-101,
+ * AC-103, AC-107, AC-109 — against the artefact the engine actually produced, and runs in CI
+ * where this never did.
+ *
+ * Deleted with the old page in Phase 4 Task 4.1.
+ */
+test.skip(true, 'drives the pre-cut-over surface; replaced by npm run check:surface')
+
+
+/**
  * The daily journey: what the manager does before opening the shop.
  */
 

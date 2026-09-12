@@ -14,7 +14,7 @@
 import { readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const CEILING_KB = 5200        // measured 5,016 KB on 2026-09-12
+const CEILING_KB = 1000        // measured 930 KB after the cut-over, 2026-09-12 (was 5,016)
 const TARGET_KB = 500          // Checkpoint 4 (design §22)
 const DIR = 'dist/assets'
 
