@@ -777,6 +777,7 @@ export const ar = {
   'data.ownerState': "إجاباتك",
   'data.ownerState.available': "متاحة",
   'data.ownerState.unavailable': "غير متاحة",
+  'data.ownerState.fromMirror': "من النسخة المحفوظة، لم تُجلب الآن",
   'data.available': "تعمل",
   'data.run.ok': "التشغيل اكتمل.",
   'data.run.degraded': "التشغيل اكتمل، لكن شيئاً لم يكن كما يجب.",

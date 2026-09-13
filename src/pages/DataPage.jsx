@@ -67,9 +67,20 @@ export function DataPage({ artefact }) {
         <Field id="competitor" label={t('data.competitor')} empty={none}>
           {vintages.competitor?.snapshot_date}
         </Field>
+        {/* `from_mirror` means the engine could not reach Firestore and replayed the
+            committed replica instead. Without saying so, this line reads "available" under
+            a timestamp that belongs to whoever last ran with a credential — which is
+            exactly what the pilot would show if FIREBASE_SERVICE_ACCOUNT_JSON were ever
+            unset in CI. Design §13: unavailable honestly, never silently local. */}
         <Field id="owner_state" label={t('data.ownerState')} empty={none}>
           {vintages.owner_state
-            ? `${t(`data.ownerState.${vintages.owner_state.status}`)}${vintages.owner_state.pulled_at ? ` · ${vintages.owner_state.pulled_at}` : ''}`
+            ? [
+                t(`data.ownerState.${vintages.owner_state.status}`),
+                vintages.owner_state.reason === 'from_mirror' ? t('data.ownerState.fromMirror') : null,
+                vintages.owner_state.pulled_at,
+              ]
+                .filter(Boolean)
+                .join(' · ')
             : null}
         </Field>
       </dl>

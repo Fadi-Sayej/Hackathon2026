@@ -184,7 +184,15 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
         "pos": read_pos_vintage(silver_dir) or {"file": None, "as_of": None},
         "sales": (window.to_dict() if window else {"months": [], "first": None, "last": None, "full_annual_cycle": False}),
         "competitor": _competitor_vintage(observations),
-        "owner_state": {"pulled_at": owner.pulled_at, "status": owner.status},
+        # `reason` travels, because without it a replayed mirror reads as a live pull.
+        # _pull_owner_state() falls back to the committed replica when there is no
+        # credential — deliberately, so reproduction works on a laptop — and both
+        # read_mirror() and the caller flag it. Publishing only status and pulled_at
+        # dropped every flag: the Checkpoint 3 clone, with no credential at all, still
+        # said `status: available` under a pulled_at from another machine. Design §13
+        # requires that the system be unavailable honestly rather than silently local.
+        "owner_state": {"pulled_at": owner.pulled_at, "status": owner.status,
+                        "reason": owner.reason},
     }
     vintages["sales"] = {k: vintages["sales"][k] for k in ("months", "first", "last", "full_annual_cycle")}
     digest = _digest(products, summary_rows, monthly, observations, matches, policy, owner)

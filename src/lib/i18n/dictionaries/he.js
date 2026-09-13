@@ -772,6 +772,7 @@ export const he = {
   'data.ownerState': "התשובות שלך",
   'data.ownerState.available': "זמינות",
   'data.ownerState.unavailable': "לא זמינות",
+  'data.ownerState.fromMirror': "מהעותק השמור, לא נטען עכשיו",
   'data.available': "פעיל",
   'data.run.ok': "ההרצה הושלמה.",
   'data.run.degraded': "ההרצה הושלמה, אבל משהו לא היה כשורה.",

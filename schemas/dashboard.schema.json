@@ -187,6 +187,13 @@
                 "available",
                 "unavailable"
               ]
+            },
+            "reason": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Why this owner state is what it is: 'from_mirror' when replayed from the committed replica rather than pulled live, an unavailability reason when status is unavailable, null on a live pull."
             }
           }
         }
@@ -396,7 +403,7 @@
       }
     },
     "capability": {
-      "comment": "Extra properties are allowed: catalogue_lifecycle adds withdrawn/statement/provisional and owner_questions adds limit/items/suppressed (design \u00a711.4).",
+      "comment": "Extra properties are allowed: catalogue_lifecycle adds withdrawn/statement/provisional and owner_questions adds limit/items/suppressed (design §11.4).",
       "type": "object",
       "required": [
         "id",

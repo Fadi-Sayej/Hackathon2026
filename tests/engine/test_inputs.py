@@ -59,6 +59,43 @@ def test_products_are_shaped_and_owner_cost_wins(tmp_path):
     assert inputs.vintages["owner_state"]["status"] == "available"
 
 
+def test_owner_state_vintage_says_when_it_came_from_the_committed_mirror(tmp_path):
+    """A replayed mirror must not read as a live pull.
+
+    `_pull_owner_state()` falls back to the committed replica when no credential is
+    present — that is deliberate, so reproduction works on a laptop. It is flagged twice
+    on the way: `read_mirror()` sets reason='from_mirror', and `_pull_owner_state()` would
+    set 'no_credentials'. Then the vintage published only `pulled_at` and `status`, so
+    both flags were dropped and nothing reached the artefact.
+
+    Measured on the Checkpoint 3 run-2 clone: no service account, every FIREBASE_*
+    variable stripped, and the published provenance still said
+    `owner_state: {status: available}` with a `pulled_at` from a different machine 22
+    hours earlier, and `provenance.owner_state_available: 1`. Design §13 says the system
+    behaves as unavailable *honestly* and is "not silently local"; this was silently
+    local.
+
+    Rule 12 in miniature — a flag set carefully and carried nowhere.
+    """
+    owner = OwnerState.from_dict({"status": "available", "pulled_at": "2026-09-12T13:50:57+00:00",
+                                  "reason": "from_mirror"})
+    inputs = load_inputs(policy=load_policy(), owner=owner,
+                         run_at=datetime(2026, 9, 13, tzinfo=timezone.utc),
+                         silver_dir=tmp_path / "nosilver", signals_dir=tmp_path / "nosignals",
+                         matches_path=tmp_path / "nomatches.parquet")
+    v = inputs.vintages["owner_state"]
+    assert v["status"] == "available"
+    assert v["pulled_at"] == "2026-09-12T13:50:57+00:00"
+    assert v["reason"] == "from_mirror", "a replayed mirror must be distinguishable from a live pull"
+
+    live = OwnerState.from_dict({"status": "available", "pulled_at": "2026-09-13T10:55:30+00:00"})
+    lv = load_inputs(policy=load_policy(), owner=live,
+                     run_at=datetime(2026, 9, 13, tzinfo=timezone.utc),
+                     silver_dir=tmp_path / "nosilver", signals_dir=tmp_path / "nosignals",
+                     matches_path=tmp_path / "nomatches.parquet").vintages["owner_state"]
+    assert lv["reason"] is None, "a live pull carries no reason, so the field stays falsy"
+
+
 def test_competitor_vintage_names_its_sources_and_counts_its_stores():
     """`vintages.competitor.sources` has to hold sources.
 
