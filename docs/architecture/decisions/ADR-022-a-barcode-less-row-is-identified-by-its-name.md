@@ -1,19 +1,23 @@
 ---
 ID: ADR-022
 Title: A barcode-less row is identified by its name, under ADR-019's rule
-Status: Ready for review
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-09-13
 Parent: [System Design](../system-design.md) §19
 Related Specs: F2-S1, F6-S1
 Inputs: [ADR-009, ADR-019, issue #89, src/engine/inputs.py _resolve_identity, src/engine/reconciliation.py]
 Updated: 2026-09-13
+Accepted: 2026-09-13 — by the repository owner, after the duplicate-id
+  mechanism was verified end to end: entry_id falls back to product_name
+  (reconciliation.py:43) and compose.js skips any entry whose id carries a settled
+  outcome, so two rows sharing a name settle together.
 Amends: ADR-019 — the sentence "A barcode-less row cannot be grouped and is kept as itself"
 ---
 
 # ADR-022 — A barcode-less row is identified by its name, under ADR-019's rule
 
-**Status:** Ready for review · **Recorded in:** [System Design](../system-design.md) §19
+**Status:** Accepted · **Recorded in:** [System Design](../system-design.md) §19
 
 ## Context
 

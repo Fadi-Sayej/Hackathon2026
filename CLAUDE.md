@@ -298,7 +298,7 @@ is `Approved`.
 | Status | Means | May a downstream role start? |
 |---|---|---|
 | `Approved` | Settled. Intents and specs use this. | Yes |
-| `Accepted` | Settled. **ADRs use this instead of `Approved`** — ADR-001 … ADR-021 all do. | Yes |
+| `Accepted` | Settled. **ADRs use this instead of `Approved`** — ADR-001 … ADR-022 all do. | Yes |
 | `Registered — not specified` | The intent is settled, and writing a spec is **deliberately forbidden** until a named decision is taken. F8 … F13 are in this state. | **No** — and not because it is unfinished. Point at the blocking `GAP-` id and stop. |
 | `Living` | Continuously updated by design; never "finished". The gaps register is one. | Yes, as a reference — never cite it as settled |
 | `Partial — <what is missing>` | Part written, part not. The implementation plan is here. | Only for the parts named as written |

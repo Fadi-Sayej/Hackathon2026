@@ -91,9 +91,9 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 | [ADR-019](architecture/decisions/ADR-019-a-conflicting-duplicate-barcode-is-a-hygiene-record.md) | A conflicting duplicate barcode is a hygiene record, never a silent pick |
 | [ADR-020](architecture/decisions/ADR-020-the-published-population-is-a-policy-not-a-constant.md) | The published population is a policy setting, not a constant |
 | [ADR-021](architecture/decisions/ADR-021-the-artefact-states-how-many-devices-wrote-owner-state.md) | The artefact states how many devices have written owner state, and when |
-| [ADR-022](architecture/decisions/ADR-022-a-barcode-less-row-is-identified-by-its-name.md) | A barcode-less row is identified by its name, under ADR-019's rule — **`Ready for review`**; amends one sentence of ADR-019 |
+| [ADR-022](architecture/decisions/ADR-022-a-barcode-less-row-is-identified-by-its-name.md) | A barcode-less row is identified by its name, under ADR-019's rule; amends one sentence of ADR-019 |
 
-ADR-001 … ADR-021 are `Accepted`. ADR-022 is `Ready for review`: it amends a sentence of an Accepted ADR, which is a human's to accept. ADR-020 was accepted on 2026-09-13 **conditional on GAP-009**:
+ADR-001 … ADR-022 are `Accepted`. ADR-022 amends a sentence of ADR-019 and was accepted on 2026-09-13, after the defect it fixes was verified end to end: `entry_id` falls back to `product_name`, and `compose.js` skips any entry whose id carries a settled outcome, so two barcode-less rows sharing a name settled together on the owner's screen. ADR-020 was accepted on 2026-09-13 **conditional on GAP-009**:
 `published_population: whole` is the right value while that question is open, and becomes
 `living` when it closes.
 
