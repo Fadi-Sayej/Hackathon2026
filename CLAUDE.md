@@ -81,31 +81,38 @@ particular: no role quotes a figure it has not read from the artifact that produ
    the export succeeds and silently reports `competitorSignals: 0`. If the dashboard
    looks thin, check the directories exist before debugging the code.
 
-5. **There are two pipelines now, and `npm run data:refresh` is the new one.**
-   Phase 0 Task 0.11 repointed it from `scripts/refresh_pipeline.py` to
-   `scripts/run_engine.py`. They write different files and are not interchangeable:
+5. **One pipeline. `public/data/dashboard.json` is what the owner reads.**
+   The split this rule used to describe is over — it said the front end still read the
+   old artefact and that the cut-over was unplanned work. Task 2.7 cut over on
+   2026-09-12, and `refresh_pipeline.py` stopped running on 2026-09-13.
 
    | | writes | read by | run by |
    |---|---|---|---|
-   | `npm run data:refresh` → `run_engine.py` | `public/data/dashboard.json` (schema 2) | nothing yet — the front end still reads the old artefact | a human |
-   | `python3 scripts/refresh_pipeline.py` | `public/data/operational.json` and friends | **the live dashboard** | `collect-daily.yml` nightly |
+   | `npm run data:refresh` → `run_engine.py` | `public/data/dashboard.json` (schema 2), `market-context.json` | **the owner's screen** — `loadDashboard.js` is the only adapter a V1 page uses | `collect-daily.yml` nightly, which **commits** it; and a human |
+   | `python3 scripts/refresh_pipeline.py` | `public/data/operational.json` | nothing reachable — only `src/telemetry/` imports `loadOperationalData` | **nobody** |
 
-   So after new POS data or a scrape, `npm run data:refresh` rebuilds the **engine**
-   artefact and leaves what the owner actually sees untouched. To refresh the live
-   dashboard, call `python3 scripts/refresh_pipeline.py` directly — it still runs the
-   competitor-signal → matching → product-recommendation chain, then expiry, then the
-   exporter, in dependency order because each stage reads the previous stage's parquet.
-   `--skip-market` does a POS-only refresh; `data:dashboard` runs the exporter alone and
-   leaves the market half stale.
+   So after new POS data or a scrape, `npm run data:refresh` is the whole job.
 
-   **This split is temporary and nobody has decided how it ends.** The front end moving
-   onto `dashboard.json` is not planned work — Phases 2–4 are not written. Until it is,
-   the engine's figures and the owner's screen disagree, and
-   [`docs/reviews/F1-validation.md`](docs/reviews/F1-validation.md) records by how much.
+   `refresh_pipeline.py` is **not** a fallback and must not be restarted. Its
+   `product_recommendations` step requires `silver_pos/yomyom_sales.parquet`, which Task
+   0.6 deleted deliberately: its `units_sold_30d` was synthesised from a monthly mean,
+   which rule 13 forbids. Rebuilding that table re-introduces the invented figure;
+   `--allow-no-competitor` to get a green export is rule 10. `operational.json` is frozen
+   at its last good value as the rollback target (design §20.2), which is also what
+   ADR-009's one-shot outcome-id translation needs. Phase 4 deletes the chain. The whole
+   story is in
+   [`docs/reviews/nightly-2026-09-13-incident.md`](docs/reviews/nightly-2026-09-13-incident.md).
 
-6. **`data/**` is gitignored; `public/data/operational.json` is committed.** A fresh
-   clone has the dashboard JSON and nothing to rebuild it from. Regenerating requires
-   importing the POS CSV first (`scripts/import_yomyom_pos.py --input <csv>`).
+6. **`data/**` is gitignored; `public/data/*.json` is committed.** A fresh clone has the
+   artefacts and nothing to rebuild them from, so regenerating needs the POS import
+   first — `scripts/import_yomyom_pos.py --input yomyom-inventory.csv`, then
+   `npm run data:refresh`. Checkpoint 3 measured that path end to end.
+
+   `data/external/silver/` is the exception worth knowing about: `rehydrate_silver.py`
+   copies committed snapshots into it and never removes anything, so a long-lived working
+   tree accumulates files a clean clone does not have and quietly produces different
+   figures. It now reports those as `orphans` and warns. Believe the clone, not the
+   laptop.
 
 7. **`normalize:data` will overwrite committed frontend data.** With
    `data/internal/silver_pos/` absent (its normal state on a fresh clone) it falls
