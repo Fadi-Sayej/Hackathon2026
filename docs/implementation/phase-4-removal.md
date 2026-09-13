@@ -18,8 +18,9 @@ Updated: 2026-09-13
 §20.1's REMOVE list, stop writing `operational.json`, drop the migrations, and bring the
 bundle inside its budget.
 
-**Checkpoint 4:** bundle **under 500 KB**; CI green; `git grep` finds no reference to
-anything removed.
+**Checkpoint 4:** `index.html` — the owner's entry — **under 500 KB**, and the
+total-output ratchet lowered to the new measured size; CI green; `git grep` finds no
+reference to anything removed.
 
 ---
 
@@ -130,6 +131,13 @@ LLM layer (`src/lib/ai/*`, `src/api/llm_proxy.py`), telemetry, the MCP server, a
 > `src/lib/analytics/explainReorder.js`. Deleting by the listed path would silently remove
 > nothing. **smartshelf-architect.**
 >
+> **Fixed 2026-09-13.** §20.1's row now names `src/lib/i18n/explainReorder.js` directly.
+> The same pass also added `scripts/build-rag-corpus.mjs` and
+> `scripts/run_mcp_price_lookup.py` to their rows — both were readers of REMOVE-listed
+> code (the demo spine and `mcp_price_adapter` respectively) that Step 1 run 2 found above
+> but that were not themselves on the list, so a Task 4.1 deletion would have hit the same
+> "one reader left" trap the demo-spine group already hit.
+>
 > **Task 4.2 is partly done already, by the 09-13 incident fix (`ebbe58f`, `25a3b84`):**
 > the `refresh_pipeline.py` step is out of `collect-daily.yml`, and
 > `public/data/sources.json` is deleted along with its three writers. What remains of 4.2
@@ -187,6 +195,49 @@ reachable afterwards.
 > Whether Checkpoint 4's "bundle < 500 KB" means the owner's entry or the whole build output
 > is a wording question the guard now surfaces but does not answer. **smartshelf-architect.**
 
+> **Answered 2026-09-13 — the target governs the owner's entry; the total is a ratchet.**
+> The 500 KB exists for one reason: what the store owner's phone downloads before he can
+> read today's work. `index.html` is that download. `telemetry.html` is an internal
+> instrument the team opens on a desk, it is a separate Vite entry, and **no browser ever
+> loads both** — so summing them measures a page that does not exist, which is what the
+> guard was doing when it reported 928 KB.
+>
+> Checkpoint 4 therefore reads: **`index.html` under 500 KB.** Measured today it is 496 KB
+> and already passes, which is a consequence of the cut-over, not of any deletion.
+>
+> **That is 4 KB of headroom, and it is worth saying out loud.** 187 KB of the 496 is the
+> shared vendor chunk (React, carried by both entries) and 309 KB is `main`. Now that the
+> target gates rather than prints, the next component added to the owner's app plausibly
+> fails CI. Two honest readings, and the team should pick one deliberately rather than
+> discover it in a red build: either the target is real and the owner's entry needs weight
+> taken off it — which restores some of the argument for Task 4.1 that the bundle
+> measurement took away — or 500 KB was chosen when the number meant something else and
+> should be re-set against what `index.html` actually costs. **This note does not decide
+> that.**
+>
+> The total-output ratchet stays, and is not the same instrument. It catches a regression
+> anywhere in the build — including in `telemetry.html`, which no target governs but which
+> still ships from this repository. A ceiling that only watched `index.html` would let the
+> other entry grow without limit. So: **one target on the owner's entry, one ratchet on
+> everything**, and `check_bundle_size.mjs` already implements both.
+>
+> This does not weaken Checkpoint 4. Task 4.1's deletions must still move the ratchet —
+> the phase's rule 3 is unchanged: a group that deletes nothing that shipped did not do
+> what it claimed.
+>
+> **And the target is now enforced, which it was not.** `check_bundle_size.mjs` printed
+> `under` / `OVER` per entry and failed only on the total: `index.html` could have crossed
+> 500 KB and the guard would still have exited 0 while the ratchet had room. A criterion
+> that only prints is the failure this repository keeps finding — rule 12, in a guard
+> rather than in a signal. It now exits 1 when the owner's entry is over target, and when
+> `index.html` is missing from the build altogether. Verified in all three directions:
+> 496 KB against a 500 KB target exits 0; the same build against a 400 KB target exits 1;
+> a build with no `index.html` exits 1.
+>
+> Status of this answer: it is written by `smartshelf-architect` into an artefact that is
+> `Ready for review`. It is not approved, and Checkpoint 4's wording is not settled until a
+> human accepts it (handover rule 2).
+
 ---
 
 ### Task 4.2: Stop writing `operational.json`
@@ -230,7 +281,9 @@ a quarter has passed".
 
 ### Task 4.4: Checkpoint 4
 
-- [ ] `npm run check:bundle` — **under 500 KB**, and `CEILING_KB` lowered to match
+- [ ] `npm run check:bundle` — **`index.html` under 500 KB** (the owner's entry; see the
+      2026-09-13 answer under Task 4.1), and `CEILING_KB` — the ratchet on total build
+      output — lowered to the new measured size
 - [ ] `npm run lint`, `npx vitest run`, `npm run test:py`, `npm run build` all green
 - [ ] `npm run check:surface`, `check:signals`, `check:independence` green
 - [ ] `git grep` finds no reference to anything removed, in code **or** in docs outside

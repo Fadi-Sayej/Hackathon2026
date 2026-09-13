@@ -16,7 +16,7 @@ PRD  →  Feature Intents  →  Feature Specs  →  System Design + ADRs  →  I
 | Feature specs (F1-S1 … F7-S1) | [`docs/features/F#-*/specs/`](docs/features/) |
 | Gaps, open questions, assumptions | [`docs/features/gaps-and-open-questions.md`](docs/features/gaps-and-open-questions.md) |
 | System Design | [`docs/architecture/system-design.md`](docs/architecture/system-design.md) |
-| ADR-001 … ADR-014 | [`docs/architecture/decisions/`](docs/architecture/decisions/) |
+| ADR-001 … ADR-020 | [`docs/architecture/decisions/`](docs/architecture/decisions/) |
 | Quality gates | [`docs/reviews/`](docs/reviews/) |
 | Implementation plan | [`docs/implementation/plan.md`](docs/implementation/plan.md) |
 | Deploy / run / data durability | [`docs/operations/`](docs/operations/) |
@@ -202,8 +202,8 @@ particular: no role quotes a figure it has not read from the artifact that produ
 ```bash
 npm run dev            # Vite dev server
 npm run data:refresh   # rebuild every dashboard input (see rule 5)
-npm run test           # 457 JS tests
-npm run test:py        # 317 Python tests
+npm run test           # 596 JS tests
+npm run test:py        # 478 Python tests
 npm run lint
 python3 scripts/analyse_sales_movement.py   # T8: measured calendar weights
 git mine               # log without the daily snapshot commits
@@ -298,7 +298,7 @@ is `Approved`.
 | Status | Means | May a downstream role start? |
 |---|---|---|
 | `Approved` | Settled. Intents and specs use this. | Yes |
-| `Accepted` | Settled. **ADRs use this instead of `Approved`** — ADR-001 … ADR-014 all do. | Yes |
+| `Accepted` | Settled. **ADRs use this instead of `Approved`** — ADR-001 … ADR-019 all do; **ADR-020 is still `Draft`** and the pilot is running on it. | Yes |
 | `Registered — not specified` | The intent is settled, and writing a spec is **deliberately forbidden** until a named decision is taken. F8 … F13 are in this state. | **No** — and not because it is unfinished. Point at the blocking `GAP-` id and stop. |
 | `Living` | Continuously updated by design; never "finished". The gaps register is one. | Yes, as a reference — never cite it as settled |
 | `Partial — <what is missing>` | Part written, part not. The implementation plan is here. | Only for the parts named as written |

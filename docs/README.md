@@ -19,7 +19,7 @@ PRD                     what the product is, for whom, and what is out of scope
 2. [**Feature Intents**](features/) — `features/F#-*/intent.md`
 3. [**Approved Feature Specs**](features/) — `features/F#-*/specs/F#-S#-*.md`
 4. [**System Design**](architecture/system-design.md) — the single authoritative architecture
-5. [**ADRs**](architecture/decisions/) — ADR-001 … ADR-014
+5. [**ADRs**](architecture/decisions/) — ADR-001 … ADR-020
 6. [**Implementation Plan**](implementation/plan.md)
 7. **Code** — evidence of what exists, never product authority
 
@@ -66,7 +66,7 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 
 - [**System Design**](architecture/system-design.md) — one document, system-level, answering
   all seven approved specs as one coherent system. Not owned by any feature.
-- [**ADRs**](architecture/decisions/) — ADR-001 … ADR-014, one file each.
+- [**ADRs**](architecture/decisions/) — ADR-001 … ADR-020, one file each.
 
 | ADR | Decision |
 |---|---|
@@ -84,6 +84,17 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 | [ADR-012](architecture/decisions/ADR-012-money-is-a-typed-value-with-a-declared-policy.md) | Money is a typed value with a declared per-capability policy |
 | [ADR-013](architecture/decisions/ADR-013-tests-run-before-merge.md) | Tests run before merge |
 | [ADR-014](architecture/decisions/ADR-014-a-capability-is-the-smallest-independently-unavailable-unit.md) | A capability is the smallest independently-unavailable unit; hygiene is one |
+| [ADR-015](architecture/decisions/ADR-015-ceiling-is-the-densest-qualifying-collapse.md) | The markup ceiling is the densest qualifying collapse, not the last |
+| [ADR-016](architecture/decisions/ADR-016-outcome-snapshot-carries-the-signal-family.md) | The owner-outcome snapshot carries the signal family |
+| [ADR-017](architecture/decisions/ADR-017-a-run-states-whether-its-sales-evidence-arrived.md) | A run states whether its sales evidence arrived |
+| [ADR-018](architecture/decisions/ADR-018-the-browser-does-not-ship-a-schema-validator.md) | The browser does not ship a schema validator |
+| [ADR-019](architecture/decisions/ADR-019-a-conflicting-duplicate-barcode-is-a-hygiene-record.md) | A conflicting duplicate barcode is a hygiene record, never a silent pick |
+| [ADR-020](architecture/decisions/ADR-020-the-published-population-is-a-policy-not-a-constant.md) | The published population is a policy setting, not a constant — **`Draft`**, and the cut-over shipped on it |
+
+ADR-001 … ADR-019 are `Accepted`. **ADR-020 is still `Draft`**, which under the status
+vocabulary means no downstream role may start on it — yet Task 2.7's cut-over shipped on
+it on 2026-09-12 and the pilot has been running on it since. Accepting or rejecting it is
+a human act and is outstanding.
 
 ## Quality gates
 
@@ -97,15 +108,27 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 ## Implementation
 
 [**Plan**](implementation/plan.md) v1.1 — refreshed against System Design v1.1 on
-2026-09-08 and reviewed by a five-advisor council before it was committed. Phases 0 and 1
-written; Phases 2–4 **NOT YET CREATED**.
+2026-09-08 and reviewed by a five-advisor council before it was committed. Phases 0, 1, 2
+and 3 are **built**; Phase 4 is **written, not started** — see its own status header for
+what gates it.
 
-- [Phase 0 — Foundations](implementation/phase-0-foundations.md) — Tasks 0.1–0.3 **done**
-  (policy loader, engine vocabulary with the frozen `signal_family` enumeration, the
-  seven-capability registry); 0.4–0.13 remain. Task 0.13 is blocked on the four
-  non-code prerequisites in the plan's index.
-- [Phase 1 — Capabilities](implementation/phase-1-capabilities.md) — includes Task 1.9, the
+- [Phase 0 — Foundations](implementation/phase-0-foundations.md) — the typed contract,
+  policy loader, owner-state model + Firestore pull, ingestion fixes, the engine
+  orchestrator and atomic publisher, CI.
+- [Phase 1 — Capabilities](implementation/phase-1-capabilities.md) — the seven registered
+  capabilities across six modules, the surface producer, provenance, and Task 1.9's
   rule-12 independence probe.
+- [Phase 2 — Browser](implementation/phase-2-browser.md) — `loadDashboard`, owner state,
+  `compose`, `DailyPage` and the capability pages. Task 2.7's cut-over shipped **2026-09-12**
+  once [ADR-020](architecture/decisions/ADR-020-the-published-population-is-a-policy-not-a-constant.md)
+  removed D-14 as a blocker: the owner's screen has read `dashboard.json` (schema 2) since,
+  not `operational.json`.
+- [Phase 3 — Reproduction & gates](implementation/phase-3-reproduction.md) — `figures.py` as
+  the engine's print mode, content addressing, the V1 signal probes, the nightly workflow.
+- [Phase 4 — Removal](implementation/phase-4-removal.md) — **not started, deliberately.**
+  Deletes the old demo/V2/planogram/LLM/MCP chain and `operational.json` once Checkpoint 3
+  is green (two consecutive clean scheduled nightlies — one so far) and three open
+  questions (P4-OQ-1 … P4-OQ-3) are answered.
 
 ## Operations (not product authority)
 

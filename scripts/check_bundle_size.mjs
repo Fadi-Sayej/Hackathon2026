@@ -15,9 +15,22 @@
  *   the owner's actual download was 496 KB.
  *
  *   So it now resolves each HTML entry to the scripts that entry references and reports
- *   per entry. The gate is unchanged: total against CEILING_KB, a ratchet on everything
- *   the build produces. Whether Checkpoint 4's 500 KB means the owner's entry or the whole
- *   output is not this script's call — it prints both and says which is which.
+ *   per entry.
+ *
+ * TWO INSTRUMENTS, AND THEY ARE NOT THE SAME ONE (2026-09-13)
+ *   Phase 4's Task 4.1 note settled what Checkpoint 4's 500 KB governs: the OWNER'S ENTRY,
+ *   index.html — what his phone downloads before he can read today's work. telemetry.html
+ *   is an internal instrument on a desk, it is a separate entry, and no browser loads both.
+ *
+ *   So this script now gates twice:
+ *     TARGET_KB   index.html only. Checkpoint 4's criterion, and the reason the budget
+ *                 exists at all. Enforced here, because until today it was printed and
+ *                 not enforced — index.html could have crossed 500 KB and this exited 0
+ *                 while the ratchet had room. That is the "built, tested, changes nothing"
+ *                 failure this repository keeps finding, in a guard rather than a signal.
+ *     CEILING_KB  total build output. A ratchet on everything that ships from here,
+ *                 including telemetry.html, which no target governs but which still grows.
+ *                 A ceiling watching only index.html would let the other entry run away.
  *
  * The ceiling is deliberately set just above TODAY's size, not at the target. Lowering it
  * is the point; raising it needs a reason in the commit message.
@@ -69,6 +82,21 @@ if (orphans.length) {
   console.log(`\n  ${orphans.length} chunk(s) referenced by no entry: ${orphans.join(', ')}`)
 }
 
+const OWNER_ENTRY = 'index.html'
+const owner = perEntry.find(({ html }) => html === OWNER_ENTRY)
+
+if (!owner) {
+  console.error(`\nFAIL  ${OWNER_ENTRY} is not in the build. The owner's app is what this`)
+  console.error('      target governs, so its absence is a failure, not a pass.')
+  process.exit(1)
+}
+if (owner.kb > TARGET_KB) {
+  console.error(`\nFAIL  ${OWNER_ENTRY} is ${owner.kb} KB, over Checkpoint 4's ${TARGET_KB} KB target.`)
+  console.error("      That is what the store owner's phone downloads before he can read")
+  console.error("      today's work. Move the weight off this entry, or change the target")
+  console.error('      in the plan first — not here.')
+  process.exit(1)
+}
 if (total > CEILING_KB) {
   console.error(`\nFAIL  build output grew to ${total} KB, over the ${CEILING_KB} KB ceiling.`)
   console.error('      Either the growth is justified and CEILING_KB moves with a reason,')
