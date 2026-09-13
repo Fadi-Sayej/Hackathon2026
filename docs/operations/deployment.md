@@ -130,6 +130,25 @@ Exit codes are three sentences, not two: `0` identical, `1` drifted with the dif
 *"a rule changed"* must never look alike. Verified in all three directions, including by
 loosening the local catch-all to `if true` and confirming the diff names that line.
 
+**Two limits on what a green `check:rules` means. Neither is obvious from the name.**
+
+*It proves the project the engine reads, not the one the browser writes.* The check
+authenticates with the service account and asks `hackathon26-a6ebd` about its own rules. It
+never sees Vercel's `VITE_FIREBASE_PROJECT_ID`, so it cannot tell you the bundle in the
+owner's browser is built against that same project. Only #96 step 2 settles that — the
+document actually appearing under `stores/yomyom-kafr-qasim/ownerState/answers` after a
+real answer. Do not read today's green as covering it.
+
+*It is in the wrong place in the nightly, and is moving.* It currently runs **before**
+"Commit the owner's artefact", so a rules drift would stop the owner getting correct data
+for a reason that has nothing to do with whether that data is correct. That is precisely
+the fault this workflow was restructured to remove on 2026-09-13 — the engine used to sit
+behind a gate for a chain it did not use. The other three probes belong before the commit
+because they establish the artefact is *right*; this one establishes who may write to
+Firestore, which is real and unrelated. Tracked as **#97**, deliberately not changed on the
+night Checkpoint 3's first gate run happens: the ruleset is byte-identical, so the check
+cannot fire for drift, and editing the nightly on gate night buys nothing.
+
 **`npm run check:firebase-live` does not settle this**, and should not be read as though it
 does. It writes, reads and deletes a probe document against the **pilot** store, so it
 exercises the *allow* branch for `yomyom-kafr-qasim` and says nothing about whether any
