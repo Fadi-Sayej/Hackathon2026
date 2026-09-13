@@ -74,7 +74,45 @@ Set these in Vercel before any preview or production deployment:
 | `BASIC_AUTH_PASSWORD` | Preview and Production | Login password for the pilot URL. |
 | `VITE_LLM_PROXY_URL` | Optional | HTTPS URL for the deployed LLM proxy. Leave unset to use rule-based explanations. |
 | `VITE_FIREBASE_*` | Optional (B-2) | Client Firebase web config to activate Firestore persistence + cross-device telemetry. Unset ⇒ localStorage only. Also enable Anonymous sign-in and deploy `firestore.rules` (`firebase deploy --only firestore:rules`). |
-| `VITE_STORE_ID` | Optional (B-2) | Firestore store namespace (default `yomyom-kafr-qasim`). |
+| `VITE_STORE_ID` | **Production `yomyom-kafr-qasim`; Preview `preview-sandbox`** | Firestore store namespace (code default `yomyom-kafr-qasim`). The two environments differ **on purpose** — see below. |
+
+### Preview must not be able to write the pilot's data (2026-09-13)
+
+**Production and Preview carry the same six `VITE_FIREBASE_*` values.** Verified with an
+unfiltered `npx vercel env ls`: every one is set for both environments. A filtered
+`vercel env ls production` looks like Production-only and is not.
+
+`firestore.rules` pins writes to exactly one store — `match /stores/yomyom-kafr-qasim/{document=**}`
+at line 45, with `match /{document=**} allow read, write: if false` at 49–50 catching
+everything else. So while both environments shared a store id, **a preview deployment of any
+branch could write the pilot's owner state.**
+
+Harmless until #94's write-through lands, because nothing wrote at all. The moment #95
+merges it becomes real, and the damage is quiet: a test answer entered on a preview closes a
+real owner question, and the engine uses that cost from then on with nothing on the owner's
+screen to say why.
+
+**Isolation, applied 2026-09-13 on the owner's decision:** Preview's `VITE_STORE_ID` is
+`preview-sandbox`. Writes from a preview no longer match line 45, fall to the catch-all, and
+are **refused by the server** rather than by anyone remembering. Production was not touched —
+it is still the original Secret, created 35 days ago.
+
+```
+VITE_STORE_ID   Config   Preview      preview-sandbox     ← changed
+VITE_STORE_ID   Secret   Production   (unchanged, 35d)
+```
+
+Two things this does **not** prove, and both belong to whoever signs #96:
+
+1. **That the deployed rules match this file.** The isolation rests on it. `firestore.rules`
+   is deployed with `firebase deploy --only firestore:rules`, and nothing in CI checks that
+   the live rules and the committed file agree.
+2. **That Preview and Production point at the same Firebase project.** Likely — the repo
+   names only `hackathon26-a6ebd` — but unproven, and **not checkable from the CLI**: these
+   are Secret-type, and `vercel env pull` returns one identical 11-character placeholder for
+   every Secret value. Comparing those placeholders reports a match for any two secrets, and
+   comparing a placeholder against a real name reports a spurious mismatch. Read the real
+   values in the Vercel or Firebase console, never from `env pull`.
 
 The middleware fails closed: if either Basic Auth variable is absent, every request returns HTTP 503
 instead of serving store data publicly.
