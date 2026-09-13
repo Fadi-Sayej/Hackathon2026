@@ -22,16 +22,28 @@ import { expect, test } from '@playwright/test'
 
 const MOTION_CHUNK = /gsap|lenis|ScrollTrigger/i
 
-test('smooth scrolling still attaches, just later', async ({ page }) => {
-  await page.goto('/')
-  await expect(page.locator('.spine__loading')).toHaveCount(0, { timeout: 30_000 })
+test('smooth scrolling still attaches, just later', async ({ browser }) => {
+  // The context pins `no-preference` rather than inheriting the machine's
+  // setting. Without it this test asserts the opposite of its sibling on any
+  // runner or laptop configured to reduce motion, and fails for being right.
+  const context = await browser.newContext({ reducedMotion: 'no-preference' })
+  const page = await context.newPage()
 
-  // Lenis puts its own class on <html> when it takes over the wheel. If the
-  // dynamic import silently failed, the page would still scroll natively and
-  // every other test would pass — this is the one that would not.
-  await expect
-    .poll(() => page.locator('html').getAttribute('class'), { timeout: 15_000 })
-    .toContain('lenis')
+  try {
+    await page.goto('/')
+    await expect(page.locator('.spine__loading')).toHaveCount(0, { timeout: 30_000 })
+
+    // Lenis puts its own class on <html> when it takes over the wheel. If the
+    // dynamic import silently failed, the page would still scroll natively and
+    // every other test would pass — this is the one that would not.
+    await expect
+      .poll(async () => (await page.locator('html').getAttribute('class')) ?? '', {
+        timeout: 15_000,
+      })
+      .toContain('lenis')
+  } finally {
+    await context.close()
+  }
 })
 
 test('a machine set to reduce motion downloads none of it', async ({ browser }) => {
@@ -40,8 +52,9 @@ test('a machine set to reduce motion downloads none of it', async ({ browser }) 
 
   const motionChunks = []
   page.on('response', (response) => {
-    const name = response.url().split('/').pop()
-    if (MOTION_CHUNK.test(name)) motionChunks.push(name)
+    // Matched against the whole URL, not just the basename: a build that renamed
+    // a chunk into a directory would otherwise slip past.
+    if (MOTION_CHUNK.test(response.url())) motionChunks.push(response.url())
   })
 
   try {

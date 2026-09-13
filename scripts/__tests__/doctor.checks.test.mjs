@@ -191,6 +191,56 @@ describe('flagged-row pricing coherence', () => {
   })
 })
 
+describe('identification — can the owner find what he is asked to act on?', () => {
+  // Untested until review caught it, while being the only check emitting a WARN
+  // on the real artefact. That is the gap this whole file exists to close.
+  it('reports WARN when an entry carries neither a barcode nor a product name', () => {
+    const found = runChecks(
+      artefact({ hygiene: capability([entry({ barcode: null, product_name: null })]) }),
+    )
+    expect(levels(found, 'identification')).toContain(WARN)
+  })
+
+  it('reports WARN when an entry carries no department', () => {
+    const found = runChecks(artefact({ hygiene: capability([entry({ department: null })]) }))
+    expect(levels(found, 'identification')).toContain(WARN)
+  })
+
+  it('stays quiet when every entry is identifiable', () => {
+    const found = runChecks(artefact({ hygiene: capability([entry()]) }))
+    expect(levels(found, 'identification')).not.toContain(WARN)
+  })
+
+  it('does NOT warn on a missing barcode alone, because the name still locates the product', () => {
+    const found = runChecks(artefact({ hygiene: capability([entry({ barcode: null })]) }))
+    expect(levels(found, 'identification')).not.toContain(WARN)
+  })
+})
+
+describe('scope — the denominator the artefact can and cannot supply', () => {
+  it('states the catalogue total when the artefact carries one', () => {
+    const found = runChecks(
+      artefact({
+        hygiene: capability([entry()]),
+        competitor_position: capability([], { counts: { catalogue: 7583 } }),
+      }),
+    )
+    expect(find(found, 'scope')[0].message).toContain('of 7,583 catalogue rows')
+  })
+
+  it('says the total is not stated rather than inventing one when it is absent', () => {
+    const found = runChecks(artefact({ hygiene: capability([entry()]) }))
+    expect(find(found, 'scope')[0].message).toContain('not stated in this artefact')
+  })
+})
+
+describe('retirement is announced, not silent', () => {
+  it('says every run that velocity is no longer checked', () => {
+    const found = runChecks(artefact({ hygiene: capability([entry()]) }))
+    expect(find(found, 'retired')[0].message).toMatch(/velocity/i)
+  })
+})
+
 describe('run health (rule 10)', () => {
   // The schema's step enum is ok | error | skipped | degraded. An earlier version
   // of this fixture used 'failed' — a value the engine never emits and the schema

@@ -29,6 +29,12 @@
  *   - velocity confidence bands have NO successor here. `Entry` carries no
  *     velocity field, deliberately (INV-005/C-3). That check cannot be made from
  *     a fresh clone at all, and saying so is more honest than approximating it.
+ *   - the catalogue-wide pricing census (how many rows have no price, no cost,
+ *     or sell below cost) has NO successor either, and neither does the
+ *     services-and-till-rows count or the department-median margin outlier. All
+ *     three need the whole catalogue: a denominator the artefact does not carry.
+ *     What replaced them asks a narrower question honestly — whether each row
+ *     the engine DID flag agrees with the evidence published beside it.
  *
  * Separated from doctor.mjs so it can be tested. Every check is driven in both
  * directions in `__tests__/doctor.checks.test.mjs` — CLAUDE.md rule 12: a check

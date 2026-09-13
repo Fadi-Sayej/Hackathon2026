@@ -5,12 +5,21 @@
  * WHY THIS EXISTS SEPARATELY FROM THE TEST SUITE
  *   Unit tests assert on fixtures the author chose. This runs its invariants
  *   against the *real* published artefact, where the interesting failures live.
- *   It found, the hard way:
  *
- *     - 83 rows silently dropped by a Map keyed on a non-unique product id
- *     - 625 rows with negative stock from a till artefact
- *     - services (car washes, subscriptions) priced as shelf products
- *     - margins twenty times their department median — miscategorised items
+ *   Four things were found the hard way by the version of this script that read
+ *   the catalogue. Only two of them have a successor here, and it is worth being
+ *   exact about which, because a header that overstates a tool is how people stop
+ *   checking the thing it stopped checking:
+ *
+ *     - 83 rows dropped by a Map keyed on a non-unique id  → `entry-identity`
+ *     - 625 rows with negative stock from a till artefact  → `negative-stock-coherence`
+ *     - services (car washes) priced as shelf products     → NO successor
+ *     - margins twenty times their department median       → NO successor
+ *
+ *   The last two needed a whole catalogue to compute — a department median, and
+ *   a census of which rows are merchandise at all. The artefact carries neither,
+ *   and the catalogue that does is gitignored. They are gone, not relocated, and
+ *   `doctor.checks.mjs` says so in its own header alongside velocity.
  *
  *   Each check states what it found, why it matters, and what to do. Exits
  *   non-zero on an ERROR so it can gate a release; WARN and NOTE never fail the

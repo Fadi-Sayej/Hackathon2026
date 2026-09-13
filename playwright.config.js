@@ -24,10 +24,24 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   projects: [{ name: 'chrome', use: { ...devices['Desktop Chrome'], channel: 'chrome' } }],
+  /**
+   * The BUILT app, not the dev server.
+   *
+   * This ran `npm run dev` until 2026-09-13, so the only tests that exercise what
+   * actually ships were exercising unbundled ESM instead: no chunking, no
+   * minification, different module identity. That gap stopped being theoretical
+   * when the motion layer moved behind a dynamic import — the thing under test is
+   * now a property of the BUILD, and dev mode does not have it.
+   *
+   * `reuseExistingServer` is off in CI, where a stale server can only mean
+   * something went wrong, and on locally, where rebuilding for every spec file
+   * would make the suite unusable. Run `npm run build` yourself after changing
+   * source if you are iterating locally — preview serves dist/, not src/.
+   */
   webServer: {
-    command: 'npm run dev',
+    command: 'npm run build && npx vite preview --port 5173 --strictPort',
     url: 'http://localhost:5173',
-    reuseExistingServer: true,
-    timeout: 60_000,
+    reuseExistingServer: !process.env.CI,
+    timeout: 120_000,
   },
 })

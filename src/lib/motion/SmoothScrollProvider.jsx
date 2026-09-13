@@ -67,23 +67,35 @@ export function SmoothScrollProvider({ children }) {
 
         const update = (time) => lenis.raf(time * 1000)
 
+        // `detach` is assigned BEFORE anything is attached, and each step it
+        // undoes is guarded. Assigning it last looks tidier and leaks: if
+        // `lenis.on` or `ticker.add` throws, the catch below swallows it,
+        // `detach` stays null, and the instance and its ticker callback become
+        // permanently unremovable for the life of the page — silently, because
+        // the catch prints nothing.
+        detach = () => {
+          try {
+            lenis.off('scroll', ScrollTrigger.update)
+            gsap.ticker.remove(update)
+            gsap.ticker.lagSmoothing(500, 33)
+          } finally {
+            lenis.destroy()
+          }
+        }
+
         lenis.on('scroll', ScrollTrigger.update)
         gsap.ticker.add(update)
 
         // GSAP drops to a fixed step after a long frame, which makes scroll
         // position jump when a tab regains focus. Scroll should never lag-smooth.
         gsap.ticker.lagSmoothing(0)
-
-        detach = () => {
-          lenis.off('scroll', ScrollTrigger.update)
-          gsap.ticker.remove(update)
-          gsap.ticker.lagSmoothing(500, 33)
-          lenis.destroy()
-        }
       })
-      .catch(() => {
+      .catch((error) => {
         // A scroll enhancement that fails to load must not take the screen with
-        // it. The document still scrolls natively.
+        // it — the document still scrolls natively. But it must not vanish
+        // either: this catch also covers throws from the body above, and a
+        // silent swallow there is indistinguishable from a network failure.
+        console.warn('[motion] smooth scrolling is not running:', error)
       })
 
     return () => {

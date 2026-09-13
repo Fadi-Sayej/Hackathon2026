@@ -81,19 +81,35 @@ for (const { html, chunks, kb } of perEntry) {
 }
 
 /**
- * A chunk no HTML entry names is not necessarily dead. A dynamic `import()` is
- * referenced from inside another chunk, not from the HTML — that is how the
- * motion layer (gsap, ScrollTrigger, lenis) leaves the owner's entry while
- * staying perfectly reachable. Reporting those as "referenced by no entry"
- * invites someone to delete code that is very much alive, so the two cases are
- * separated by asking whether any shipped chunk names the file.
+ * A chunk no HTML entry names is not necessarily dead — a dynamic `import()` is
+ * referenced from inside another chunk, not from the HTML. That is how the motion
+ * layer (gsap, ScrollTrigger, lenis) leaves the owner's entry while staying
+ * reachable, and calling it "referenced by no entry" invites someone to delete
+ * live code.
+ *
+ * Reachability is walked from the entries rather than asked one hop at a time.
+ * "Is this file named by any shipped chunk?" launders dead code: two unreachable
+ * chunks that import each other each vouch for the other, and both get reported
+ * as healthy on-demand chunks. Only what an entry can actually reach is lazy;
+ * everything else is unreferenced, however much it is mentioned.
  */
 const unnamedByHtml = allJs.filter((n) => !perEntry.some(({ chunks }) => chunks.some(([, c]) => c === n)))
 const contents = new Map(allJs.map((n) => [n, readFileSync(join(DIR, n), 'utf8')]))
-const lazy = unnamedByHtml.filter((n) =>
-  allJs.some((other) => other !== n && contents.get(other).includes(n)),
-)
-const orphans = unnamedByHtml.filter((n) => !lazy.includes(n))
+
+const reachable = new Set(perEntry.flatMap(({ chunks }) => chunks.map(([, name]) => name)))
+for (let added = true; added; ) {
+  added = false
+  for (const name of allJs) {
+    if (reachable.has(name)) continue
+    if ([...reachable].some((from) => contents.get(from).includes(name))) {
+      reachable.add(name)
+      added = true
+    }
+  }
+}
+
+const lazy = unnamedByHtml.filter((n) => reachable.has(n))
+const orphans = unnamedByHtml.filter((n) => !reachable.has(n))
 
 if (lazy.length) {
   const kb = lazy.reduce((sum, n) => sum + kbOf(n), 0)
