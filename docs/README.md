@@ -101,7 +101,7 @@ All twenty-one are `Accepted`. ADR-020 was accepted on 2026-09-13 **conditional 
 | Gate | Verdict |
 |---|---|
 | [Intent → Spec conformance](reviews/intent-spec-conformance.md) | CONDITIONAL PASS (run 2) |
-| [System Design → Implementation readiness](reviews/system-design-readiness.md) | CONDITIONAL PASS (run 2) — 0 blockers, 3 MAJOR open |
+| [System Design → Implementation readiness](reviews/system-design-readiness.md) | CONDITIONAL PASS (run 3, 2026-09-13) — 0 blockers, **1 MAJOR open** (ARCH-GATE-003). GATE-002 and GATE-004 closed against the built artefact |
 | [Documentation structure migration](reviews/documentation-structure-migration.md) | see report |
 | [Nightly incident 2026-09-13](reviews/nightly-2026-09-13-incident.md) | FIXED — the nightly published the owner's artefact and never committed it; all 6 findings closed |
 

@@ -1131,6 +1131,82 @@ before the audit.
 | ARCH-GATE-004 — "structurally uncomparable" predicate undefined | MAJOR | Before Phase 1c |
 | ARCH-GATE-006 … 014 (less GATE-005 partly, GATE-010 partly) | MINOR / INFO | Non-blocking |
 
+### Run 3 — after implementation, 2026-09-13
+
+Runs 1 and 2 audited a design. This one audits **what was built against it**, which is the
+only way two of the three MAJOR findings could ever be answered: both were
+IMPLEMENTATION-DECISION-LEAKs, and a leak is closed by the decision being made explicitly,
+not by the design saying more.
+
+Read from `configs/policy.yaml` and from `public/data/dashboard.json` — never from another
+document (rule 11). Findings below are added; **runs 1 and 2 are not edited**, because a
+gate report is evidence of what was true when it ran.
+
+| Finding | Run 2 | Run 3 |
+|---|---|---|
+| ARCH-GATE-002 — "money at stake" undefined | MAJOR, open | **CLOSED** |
+| ARCH-GATE-004 — "structurally uncomparable" predicate undefined | MAJOR, open | **CLOSED** |
+| ARCH-GATE-003 — INT-MEAS has no V1 delivery | MAJOR, open | **still open, and worse than recorded** |
+
+#### ARCH-GATE-002 — closed
+
+The operand is declared as policy rather than invented in code, and it is **published with
+the figure**, which is what FR-122 and FR-123 actually require:
+
+- `configs/policy.yaml:35` — `question_money_basis: window_revenue_at_shelf_price` , with
+  the basis spelled out in a comment: *units sold in the window × current shelf price*
+- `thresholds.owner_questions` in the artefact — `{limit: 3, money_basis:
+  "window_revenue_at_shelf_price", yield_factor: 1.0}`
+- every item in `capabilities.owner_questions.items` carries its own `money_basis`,
+  `products_affected`, `money_at_stake`, `units_sold` and `window_id`
+
+The `yield_factor: 1.0` is the finding's own observation implemented honestly: V1's only
+question is `cost_price`, keyed per barcode, so yield is 1 for every question and FR-085's
+product collapses to money at stake alone. The design does not pretend otherwise.
+
+**What is closed is the leak, not the choice.** Whether `window_revenue_at_shelf_price` is
+the *right* basis remains a product question — it is a declared, visible, changeable policy
+line, which is exactly what this finding asked for. The gate does not adjudicate it.
+
+#### ARCH-GATE-004 — closed, with a divergence to hand to the owner
+
+- `configs/policy.yaml:42` — `uncomparable_min_barcode_digits: 8`
+- `thresholds.competitor_position.uncomparable_min_barcode_digits: 8` in the artefact, so
+  the rule in force is stated beside the count it produced
+- `capabilities.competitor_position.counts` — `catalogue: 7583`,
+  `structurally_uncomparable: 782`, `comparable_population: 6801` (and 7583 − 782 = 6801,
+  so the arithmetic is internally consistent)
+
+The predicate exists, is declared, and travels with its figure. Closed.
+
+**But the number disagrees with the intent's, and someone should notice.** `intent.md` §9.4
+commits to telling the owner that «**1,628 صنفاً في كتالوجه خدمات ورموز داخلية**» — car
+washes, barista coffee, internal codes. The implemented predicate finds **782**, less than
+half. One of the two is wrong: either a barcode-digit test under-counts services that carry
+a plausible-looking code, or the 1,628 was a looser estimate than the sentence implies.
+
+That is not an architecture defect and does not reopen this finding. It is a **figure the
+team has committed to saying out loud on 12/9**, and rule 11 says it is quoted from the
+artefact that produced it. Recorded for `smartshelf-pm`; belongs with the owner
+conversation, not with this gate.
+
+#### ARCH-GATE-003 — still open, and the ground moved under it
+
+Run 2 recorded it as "the design removes the surface and builds nothing in its place". As
+of 2026-09-13 that understates it: the surface was not removed, and it **stopped working
+anyway**. `src/telemetry/` reads the frozen `operational.json`, joins on the pre-ADR-009 id
+namespace, and reads the pre-V1 decision store — so PRD §8's 30-day go/no-go has had no
+working instrument since the cut-over on 09-12. Evidence in `deployment.md` §Internal
+telemetry page.
+
+This also removes SPEC-000 §4's stated reason for never specifying INT-MEAS — *"already
+measured by an existing surface"*. The surface is there and measures nothing, so the
+justification does not hold and **F13 owes a spec**. The decision to rebuild rather than
+delete was taken on 09-13 (P4-OQ-3).
+
+**Verdict unchanged: CONDITIONAL PASS.** Zero blockers, **one** MAJOR open (ARCH-GATE-003),
+down from three.
+
 ### Two things the peer review raised that neither run resolved
 
 Recorded here rather than fixed, because both are judgement calls the team should take
