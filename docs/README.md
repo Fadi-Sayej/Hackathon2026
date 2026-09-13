@@ -147,7 +147,8 @@ chain above.
 |---|---|
 | [Handover — Arabic](pilot/handover-yomyom-ar.md) | **The version actually handed over.** Arabic is the language of every exchange with the manager |
 | [Handover — English](pilot/handover-yomyom-en.md) | Source text for the Arabic handover; keep the two in sync |
-| [Questions for YomYom](pilot/questions-for-yomyom.md) | What we still need from the owner, each drawn from his own export |
+| [Owner conversation — 2026-09](pilot/owner-conversation-2026-09.md) | **The current one.** Six questions: GAP-009 (and the evidence that its assumption is wrong), GAP-011, and the three numbers F13-S1 is blocked on |
+| [Questions for YomYom](pilot/questions-for-yomyom.md) | The August pilot-setup questions, each drawn from his own export. Superseded for the 09-2026 conversation by the row above |
 | [Release phases — Arabic](pilot/release-phases-ar.html) | **The version shown to the owner on 12/9.** Three dated phases, each a working product |
 | [`app-qr.png`](pilot/app-qr.png) · [`app-share-qr.png`](pilot/app-share-qr.png) | QR codes for the deployed pilot app |
 
