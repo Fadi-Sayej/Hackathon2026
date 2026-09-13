@@ -44,7 +44,10 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const CEILING_KB = 1000        // measured 930 KB after the cut-over, 2026-09-12 (was 5,016)
+const CEILING_KB = 1000        // measured 928 KB, 2026-09-13. Unmoved by the motion split:
+                               // that redistributed bytes off index.html without deleting any,
+                               // so lowering the ratchet here would take headroom Task 4.1's
+                               // deletions are meant to earn. It moves when bytes actually leave.
 const TARGET_KB = 500          // Checkpoint 4 (design §22)
 const DIST = 'dist'
 const DIR = join(DIST, 'assets')
@@ -77,9 +80,44 @@ for (const { html, chunks, kb } of perEntry) {
   for (const [ckb, name] of chunks) console.log(`         ${String(ckb).padStart(4)} KB  ${name}`)
 }
 
-const orphans = allJs.filter((n) => !perEntry.some(({ chunks }) => chunks.some(([, c]) => c === n)))
+/**
+ * A chunk no HTML entry names is not necessarily dead — a dynamic `import()` is
+ * referenced from inside another chunk, not from the HTML. That is how the motion
+ * layer (gsap, ScrollTrigger, lenis) leaves the owner's entry while staying
+ * reachable, and calling it "referenced by no entry" invites someone to delete
+ * live code.
+ *
+ * Reachability is walked from the entries rather than asked one hop at a time.
+ * "Is this file named by any shipped chunk?" launders dead code: two unreachable
+ * chunks that import each other each vouch for the other, and both get reported
+ * as healthy on-demand chunks. Only what an entry can actually reach is lazy;
+ * everything else is unreferenced, however much it is mentioned.
+ */
+const unnamedByHtml = allJs.filter((n) => !perEntry.some(({ chunks }) => chunks.some(([, c]) => c === n)))
+const contents = new Map(allJs.map((n) => [n, readFileSync(join(DIR, n), 'utf8')]))
+
+const reachable = new Set(perEntry.flatMap(({ chunks }) => chunks.map(([, name]) => name)))
+for (let added = true; added; ) {
+  added = false
+  for (const name of allJs) {
+    if (reachable.has(name)) continue
+    if ([...reachable].some((from) => contents.get(from).includes(name))) {
+      reachable.add(name)
+      added = true
+    }
+  }
+}
+
+const lazy = unnamedByHtml.filter((n) => reachable.has(n))
+const orphans = unnamedByHtml.filter((n) => !reachable.has(n))
+
+if (lazy.length) {
+  const kb = lazy.reduce((sum, n) => sum + kbOf(n), 0)
+  console.log(`\n  ${lazy.length} chunk(s) loaded on demand, ${kb} KB, off every entry's critical path:`)
+  for (const name of lazy) console.log(`         ${String(kbOf(name)).padStart(4)} KB  ${name}`)
+}
 if (orphans.length) {
-  console.log(`\n  ${orphans.length} chunk(s) referenced by no entry: ${orphans.join(', ')}`)
+  console.log(`\n  ${orphans.length} chunk(s) referenced by nothing at all: ${orphans.join(', ')}`)
 }
 
 const OWNER_ENTRY = 'index.html'

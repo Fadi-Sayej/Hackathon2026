@@ -39,6 +39,24 @@ jobs:
         run: npm run check:surface
       - name: Bundle size (ADR-018 — the budget that decision rests on)
         run: npm run check:bundle
+      # The e2e layer has never run here. The four pre-cut-over specs are all
+      # test.skip'd, so until daily-surface.spec.js and motion-loading.spec.js
+      # landed there was nothing to run; now the one screen the product exists to
+      # produce is driven in a real browser, and a suite that only runs on
+      # someone's laptop is a suite that rots.
+      #
+      # `--with-deps chrome` because playwright.config.js pins `channel: 'chrome'`
+      # — the installed Google Chrome rather than a downloaded chromium, which is
+      # what keeps a fresh checkout from fetching 150 MB. The runner has no Chrome
+      # until this step puts one there.
+      #
+      # webServer builds and serves dist/, so this re-runs the build above. That
+      # is a few seconds, and the alternative is testing a dev server that does
+      # not have the chunk split the motion tests exist to check.
+      - name: End-to-end (the owner's daily surface, in a browser)
+        run: |
+          npx playwright install --with-deps chrome
+          npm run test:e2e
       - name: Artefact contract (schema validates the committed artefact when present)
         run: |
           if [ -f public/data/dashboard.json ]; then

@@ -889,6 +889,9 @@ export const he = {
   // ── V1 navigation (cut-over) ────────────────────────────────────────
   'page.daily.name': "עבודת היום",
   'page.daily.hint': "מה שדורש החלטה עכשיו",
+  'page.daily.title': "עבודת היום",
+  'page.daily.description':
+    "מה שדורש את ההחלטה שלך היום. רשום מה עשית והוא לא יחזור.",
   'page.questions.name': "שאלות עלות",
   'page.questions.hint': "תשובה אחת משפרת את ההמלצות",
   'page.price_consistency.name': "מחיר משלוח",

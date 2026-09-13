@@ -894,6 +894,9 @@ export const ar = {
   // ── V1 navigation (cut-over) ────────────────────────────────────────
   'page.daily.name': "شغل اليوم",
   'page.daily.hint': "ما يحتاج قرارك الآن",
+  'page.daily.title': "شغل اليوم",
+  'page.daily.description':
+    "ما يحتاج قرارك اليوم. سجِّل ما فعلته ولن يعود.",
   'page.questions.name': "أسئلة التكلفة",
   'page.questions.hint': "جواب واحد يحسّن التوصيات",
   'page.price_consistency.name': "سعر التوصيل",
