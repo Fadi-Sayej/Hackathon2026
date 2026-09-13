@@ -137,12 +137,21 @@ LLM layer (`src/lib/ai/*`, `src/api/llm_proxy.py`), telemetry, the MCP server, a
 > `loadOperationalData.js` and `public/data/operational.json` — and the last of those is
 > still needed by ADR-009's one-shot outcome-id translation until Phase 4 ends.
 
-**Not started, and deliberately.** The deletions are proven safe but the phase's own
-precondition is not met: the cut-over has not been deployed, so the old spine is still the
-only thing that has ever served this pilot in production. Deleting the fallback before the
-replacement has run for a day is the risk this phase's three rules exist to prevent, and
-`vercel rollback` restores a deployment rather than a source tree. Task 4.1 starts when the
-cut-over has been live for one release and Checkpoint 3 is green.
+**Not started, and deliberately.** Deleting the fallback before the replacement has run for
+a day is the risk this phase's three rules exist to prevent, and `vercel rollback` restores
+a deployment rather than a source tree.
+
+Two of the three preconditions are now met and one is not, as of 2026-09-13:
+
+| Precondition | State |
+|---|---|
+| The cut-over has been live for one release | **met** — deployed 2026-09-12; Vercel auto-deploys from `main`, the pilot URL answers 401 |
+| `dashboard.json` committed nightly | **met** — first at `49f9e0c`, `engine: artefact for 2026-09-13` |
+| Checkpoint 3 green | **not met** — one condition left, two consecutive green nightlies. 09-13's scheduled run failed and its re-run was green, so the next chances are 09-14 and 09-15 |
+
+And Step 1 run 2 above adds a fourth, which is code rather than calendar: `check:signals`
+and `doctor` still import the demo spine, so Task 4.1's largest group cannot start until
+they are repointed or removed.
 - [ ] **Step 2: Delete, in groups, one commit per group** — demo spine, V2/V4 analytics,
       LLM, telemetry, MCP, scripts. A single 200-file commit cannot be reviewed or
       reverted selectively.
