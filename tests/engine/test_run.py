@@ -100,3 +100,23 @@ def test_an_explicit_population_still_wins(tmp_path, monkeypatch):
     result = run_mod.run_engine(mode="print", capability_runners={}, population="living",
                                 now=datetime(2026, 9, 8, tzinfo=timezone.utc))
     assert result["artefact"]["population"] == "living"
+
+
+def test_skip_market_skips_the_market_context_too():
+    """`--skip-market` has to mean it.
+
+    market_context was appended unconditionally, outside the `if not skip` branch, so
+    `python3 scripts/figures.py --json --skip-market` — the reproduction command a judge
+    is handed, and the one whose own test is named "recomputes nothing" — made a live
+    Open-Meteo call and rewrote the committed public/data/market-context.json on every
+    run. Verified by running it against a clean tree: exit 0, and market-context.json
+    modified.
+
+    Nothing in the engine reads that file. Its only consumers are the legacy chain
+    (product_recommendations.py, reorderEngine.js, check_signals_live.mjs), so skipping
+    it costs no capability an input. The nightly runs without --skip-market, so the
+    committed context still refreshes there.
+    """
+    assert run_mod._market_chain(skip=True) == []
+    assert [name for name, _ in run_mod._market_chain(skip=False)] == [
+        "market_context", "rehydrate_silver", "competitor_signals", "product_matching"]

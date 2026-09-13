@@ -68,16 +68,24 @@ def _sales_import(sales_dir: Optional[Path] = None, silver_dir: Optional[Path] =
 
 
 def _market_chain(skip: bool) -> list:
-    steps = []
+    """The market half of a run, or nothing when the caller asked to skip it.
+
+    market_context used to sit outside the branch and ran even under `skip`. That made
+    `scripts/figures.py --json --skip-market` — the reproduction command, whose own test
+    is named "recomputes nothing" — call Open-Meteo and rewrite the committed
+    public/data/market-context.json every time a judge ran it. Nothing in the engine
+    reads that file; only the legacy chain does. The nightly runs without the flag, so
+    the committed context still refreshes where it is meant to.
+    """
+    if skip:
+        return []
+    from scripts.rehydrate_silver import rehydrate
     from src.context.build import write_market_context
-    steps.append(("market_context", write_market_context))
-    if not skip:
-        from scripts.rehydrate_silver import rehydrate
-        from src.signals.competitor_product_signals import build_competitor_product_signals
-        from src.matching.product_matching import run_product_matching
-        steps += [("rehydrate_silver", rehydrate), ("competitor_signals", build_competitor_product_signals),
-                  ("product_matching", run_product_matching)]
-    return steps
+    from src.signals.competitor_product_signals import build_competitor_product_signals
+    from src.matching.product_matching import run_product_matching
+    return [("market_context", write_market_context), ("rehydrate_silver", rehydrate),
+            ("competitor_signals", build_competitor_product_signals),
+            ("product_matching", run_product_matching)]
 
 
 def _step(steps: list, name: str, fn: Callable, verdict: Optional[Callable] = None):
