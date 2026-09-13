@@ -193,6 +193,34 @@ Firestore when `VITE_FIREBASE_*` is set, otherwise from that device's localStora
 > decision taken on 09-13 is to rebuild it against the artefact rather than delete it; until
 > that lands, do not read numbers off this page.
 
+## Prerequisite verification, 2026-09-13
+
+Task 0.13's four non-code prerequisites, all re-checked against the live systems rather
+than against this file's previous record of them.
+
+| # | Prerequisite | State | Evidence |
+|---|---|---|---|
+| 1 | Firebase config, anonymous sign-in, rules deployed | **met** | verified live 2026-09-12 (P2-OQ-2); the nightly's `owner_state_pull` step is `ok` |
+| 2 | `FIREBASE_SERVICE_ACCOUNT_JSON` repo secret, read-only role | **met** | present since `2026-09-12T15:09:22Z`. The 09-13 nightly published `vintages.owner_state = {status: "available", pulled_at: …}` with **no `reason`** — a live pull, not the committed replica |
+| 3 | Vercel PR previews build | **met** | `Vercel` and `Vercel Preview Comments` both SUCCESS on PRs #61, #81, #85 |
+| 4 | Basic Auth set in Vercel | **met, production** | `GET /` returns `401` with `www-authenticate: Basic realm="SmartShelf pilot"`. Also `401` on `/telemetry.html` and `/data/dashboard.json` |
+
+**Why the 401 is the proof and not merely a good sign.** `middleware.ts` fails **closed with
+503** when `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD` are unset (design §11.7) — an unset pair
+takes the pilot down rather than exposing it. A `401` with the realm is therefore positive
+evidence that the pair is set, in a way that no amount of reading the Vercel console would
+improve on. This closes ARCH-GATE-011.
+
+**What this does not prove.** Production only. Preview and development environments are not
+observable this way; if a preview deployment ever answers `503`, that is this same pair
+missing on that environment, and it is a console fix rather than a code one.
+
+> **Note on how this was found.** Both items had been recorded as outstanding since 09-12 —
+> Basic Auth "unverified", the secret "confirmed absent". Both were in fact done, the secret
+> within hours of that note. Nobody re-checked; the note was simply carried forward, and it
+> reached an issue tracker from there. Rule 11 is usually invoked about figures. It applies
+> to the state of the world too.
+
 ## Custom Domain
 
 Use the default Vercel deployment URL until the DNS owner confirms a custom subdomain. Do not point

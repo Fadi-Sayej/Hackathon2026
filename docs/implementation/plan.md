@@ -79,7 +79,9 @@ Copied verbatim from `docs/architecture/system-design.md`; every task's requirem
 
 1. Firebase: six `VITE_FIREBASE_*` values in `.env` and in Vercel; Anonymous sign-in enabled; `firestore.rules` deployed; `npm run check:firebase-live` exits 0.
 2. GitHub secret `FIREBASE_SERVICE_ACCOUNT_JSON` for a **read-only** service account (`roles/datastore.viewer`).
-3. Vercel: the PR preview check currently fails with "Deployment was blocked" on account `fadi19` — fix the project's deployment protection so previews build.
+3. ~~Vercel: the PR preview check currently fails with "Deployment was blocked" on account
+   `fadi19`.~~ **Resolved — verified 2026-09-13.** `Vercel` and `Vercel Preview Comments`
+   both report SUCCESS on PRs #61, #81 and #85.
 4. Basic Auth: `BASIC_AUTH_USER` and `BASIC_AUTH_PASSWORD` set in Vercel for every environment. `middleware.ts` fails closed with 503 when they are unset (design §11.7), so an unset pair takes the pilot app down rather than exposing it — ARCH-GATE-011, readiness gate §18 action 10.
 
 ## Release conditions (outside implementation; see design.md §22)
