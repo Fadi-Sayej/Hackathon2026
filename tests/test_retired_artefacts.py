@@ -13,6 +13,9 @@ parquet rows across 33 snapshot days from the legacy exporter. Both were true, w
 is exactly why neither could be published.
 
 Add a line to RETIRED when an artefact is retired. That is the whole maintenance cost.
+
+The same idea covers a command that was retargeted rather than a file that was deleted —
+see the `check:signals` test below.
 """
 from pathlib import Path
 import sys
@@ -36,6 +39,39 @@ def test_a_retired_artefact_is_not_in_the_repository(relpath, authority):
         "Something is writing it again. Find the writer, do not delete the file and "
         "leave the writer in place — that is how it came back the first time."
     )
+
+
+def test_check_signals_points_at_the_v1_probes():
+    """`npm run check:signals` must probe the surface that ships.
+
+    Design §20.2: "`check:signals` runs old (reorder) probes until the reorder engine leaves
+    the build, then only V1 probes"; §649 and §406 say the same, and `check_v1_signals.py`'s
+    own docstring says it "replaces the reorder-era probes in scripts/check_signals_live.mjs".
+
+    The replacement was written, wired into the nightly and made blocking — and the npm
+    script still pointed at the old one. CLAUDE.md rule 12 tells every developer to run
+    `npm run check:signals` to prove a signal moved something, so the one command the rules
+    name was exercising the legacy JS ranking over `market-context.json`, a path no V1 page
+    reads since the Task 2.7 cut-over.
+
+    The legacy probe itself is not deleted here: `collect-daily.yml` still calls it by path
+    while `market-context.json` is still committed, and §20.2 schedules its removal for
+    Phase 4 with the reorder engine it exercises. It keeps a name of its own until then.
+    """
+    import json
+
+    scripts = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))["scripts"]
+
+    assert "check_signals_live" not in scripts["check:signals"], (
+        "check:signals still runs the reorder-era probe; rule 12 points developers here"
+    )
+    for probe in ("check:signals:v1", "check:independence"):
+        assert probe in scripts["check:signals"], f"check:signals must run {probe}"
+    assert "check_v1_signals.py" in scripts["check:signals:v1"]
+    assert "check_independence.py" in scripts["check:independence"]
+
+    # Still reachable by name while the nightly needs it.
+    assert "check_signals_live.mjs" in scripts["check:signals:legacy"]
 
 
 def test_importing_pos_does_not_resurrect_a_retired_artefact(tmp_path, monkeypatch):

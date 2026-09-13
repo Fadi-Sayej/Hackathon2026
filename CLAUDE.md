@@ -150,11 +150,25 @@ particular: no role quotes a figure it has not read from the artifact that produ
     Hebrew catalogue, owner answers keyed on the product id while Python keys on
     barcode, and the shelf-life table dropped by the context adapter. Every unit
     test passed through all four, because each supplied the input directly and
-    never crossed the boundary where it was lost. Run `npm run check:signals`: it
-    diffs real recommendations with the signal on and off and fails when a present
-    input changes nothing. When the input is legitimately absent today it injects
-    a synthetic probe instead, so the wiring is proven before the real data
-    arrives. It runs in `collect-daily.yml` before the dashboard is committed.
+    never crossed the boundary where it was lost.
+
+    Run **`npm run check:signals`**. It drives the real engine over a copy of the
+    data with one input withheld at source and reads the **published artefact** —
+    never a capability's return value. Two failures are caught, both silent
+    otherwise: a capability that declares an input it does not need (withholding it
+    takes a working signal off the owner's screen for nothing), and a capability
+    that needs an input it does not declare (on the day that input is missing it
+    publishes a figure computed from nothing and calls it `available`). It also
+    proves detection and hygiene fail independently — withhold the sales evidence
+    and `reconciliation` must go unavailable while `hygiene` still emits.
+
+    Both probes run in `collect-daily.yml` before `dashboard.json` is committed,
+    and both are **blocking** since the cut-over.
+
+    `npm run check:signals:legacy` is the pre-V1 probe over the reorder ranking.
+    The nightly still calls it while `market-context.json` is committed; §20.2
+    removes it in Phase 4 with the reorder engine it exercises. It is not the one
+    this rule means.
 
 13. **The seven sales reports are MONTHLY, and that caps what T8 can claim.** One
     row per product per month, no date column in any of the seven files — so STL
