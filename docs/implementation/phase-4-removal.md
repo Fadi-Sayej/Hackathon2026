@@ -205,6 +205,16 @@ reachable afterwards.
 > Checkpoint 4 therefore reads: **`index.html` under 500 KB.** Measured today it is 496 KB
 > and already passes, which is a consequence of the cut-over, not of any deletion.
 >
+> **That is 4 KB of headroom, and it is worth saying out loud.** 187 KB of the 496 is the
+> shared vendor chunk (React, carried by both entries) and 309 KB is `main`. Now that the
+> target gates rather than prints, the next component added to the owner's app plausibly
+> fails CI. Two honest readings, and the team should pick one deliberately rather than
+> discover it in a red build: either the target is real and the owner's entry needs weight
+> taken off it — which restores some of the argument for Task 4.1 that the bundle
+> measurement took away — or 500 KB was chosen when the number meant something else and
+> should be re-set against what `index.html` actually costs. **This note does not decide
+> that.**
+>
 > The total-output ratchet stays, and is not the same instrument. It catches a regression
 > anywhere in the build — including in `telemetry.html`, which no target governs but which
 > still ships from this repository. A ceiling that only watched `index.html` would let the
