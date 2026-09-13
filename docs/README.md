@@ -57,7 +57,7 @@ globally unique across the specification layer and were **not** renumbered by th
 | F10 — Expiry-Bounded Ordering | [intent](features/F10-expiry-bounded-ordering/intent.md) | *not specified* | V2 |
 | F11 — Supplier Lead Times | [intent](features/F11-supplier-lead-times/intent.md) | *not specified* | V3 |
 | F12 — Planogram | [intent](features/F12-planogram/intent.md) | *not specified* | V4 |
-| F13 — Pilot Measurement | [intent](features/F13-pilot-measurement/intent.md) | *not specified* | V1 |
+| F13 — Pilot Measurement | [intent](features/F13-pilot-measurement/intent.md) | [F13-S1](features/F13-pilot-measurement/specs/F13-S1-pilot-measurement.md) — **`Blocked`** | V1 |
 
 Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](features/gaps-and-open-questions.md)
 — `GAP-…`, `OQ-…`, `ASM-…`.
@@ -90,9 +90,9 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 | [ADR-018](architecture/decisions/ADR-018-the-browser-does-not-ship-a-schema-validator.md) | The browser does not ship a schema validator |
 | [ADR-019](architecture/decisions/ADR-019-a-conflicting-duplicate-barcode-is-a-hygiene-record.md) | A conflicting duplicate barcode is a hygiene record, never a silent pick |
 | [ADR-020](architecture/decisions/ADR-020-the-published-population-is-a-policy-not-a-constant.md) | The published population is a policy setting, not a constant |
-| [ADR-021](architecture/decisions/ADR-021-the-artefact-states-how-many-devices-wrote-owner-state.md) | The artefact states how many devices have written owner state, and when — **`Ready for review`** |
+| [ADR-021](architecture/decisions/ADR-021-the-artefact-states-how-many-devices-wrote-owner-state.md) | The artefact states how many devices have written owner state, and when |
 
-ADR-001 … ADR-020 are `Accepted`; ADR-021 is `Ready for review`. ADR-020 was accepted on 2026-09-13 **conditional on GAP-009**:
+All twenty-one are `Accepted`. ADR-020 was accepted on 2026-09-13 **conditional on GAP-009**:
 `published_population: whole` is the right value while that question is open, and becomes
 `living` when it closes.
 
@@ -101,7 +101,7 @@ ADR-001 … ADR-020 are `Accepted`; ADR-021 is `Ready for review`. ADR-020 was a
 | Gate | Verdict |
 |---|---|
 | [Intent → Spec conformance](reviews/intent-spec-conformance.md) | CONDITIONAL PASS (run 2) |
-| [System Design → Implementation readiness](reviews/system-design-readiness.md) | CONDITIONAL PASS (run 2) — 0 blockers, 3 MAJOR open |
+| [System Design → Implementation readiness](reviews/system-design-readiness.md) | CONDITIONAL PASS (run 3, 2026-09-13) — 0 blockers, **1 MAJOR open** (ARCH-GATE-003). GATE-002 and GATE-004 closed against the built artefact |
 | [Documentation structure migration](reviews/documentation-structure-migration.md) | see report |
 | [Nightly incident 2026-09-13](reviews/nightly-2026-09-13-incident.md) | FIXED — the nightly published the owner's artefact and never committed it; all 6 findings closed |
 
