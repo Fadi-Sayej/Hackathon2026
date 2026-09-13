@@ -178,12 +178,23 @@ him. Design §13 asks for unavailable *honestly*, never silently local.
 The dirty working tree after `npm run test:py` remains, and is now understood as cosmetic:
 the mirror is a cache that declares itself, and nothing commits it.
 
-**F-3 — `check_signals_live.mjs` guards a path the owner no longer sees.** It reads
-`public/data/market-context.json` and exercises the legacy JS ranking
-(`reorderEngine.js` → REORDER recommendations). It passes, and it still guards a file the
-nightly commits, so it stays for now — but after the cut-over it proves nothing about the
-surface the owner opens. Phase 4 should either repoint it at `dashboard.json` or remove it
-with the rest of the chain.
+**F-3 — `check_signals_live.mjs` guards a path the owner no longer sees. RESOLVED for the
+command; the script itself goes in Phase 4.** Raised here as a soft observation, and Phase
+4's Step 1 re-proof turned it into something sharper: `npm run check:signals` — the one
+command CLAUDE.md rule 12 names as the way to prove a signal moved something — was running
+the legacy JS ranking over `market-context.json`, which no V1 page has read since the
+cut-over.
+
+Not an open question either. Design §20.2 says `check:signals` runs the reorder probes
+"until the reorder engine leaves the build, then only V1 probes", §649 and §406 agree, and
+`check_v1_signals.py`'s docstring says outright that it replaces the reorder-era probes.
+The replacement had been written, wired into the nightly and made blocking — and the npm
+script still pointed at the old one.
+
+Retargeted in `a99e46c`, with a test, and the legacy probe kept under
+`check:signals:legacy` because `collect-daily.yml` still calls it by path while
+`market-context.json` is committed. Deleting the script is Task 4.1's job, together with
+the reorder engine it exercises.
 
 **F-4 — `CLAUDE.md` rule 5 was stale. FIXED.** It said `dashboard.json` is "read by
 nothing yet", that the front end still reads the old artefact, that `refresh_pipeline.py`
