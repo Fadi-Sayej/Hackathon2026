@@ -97,15 +97,27 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 ## Implementation
 
 [**Plan**](implementation/plan.md) v1.1 — refreshed against System Design v1.1 on
-2026-09-08 and reviewed by a five-advisor council before it was committed. Phases 0 and 1
-written; Phases 2–4 **NOT YET CREATED**.
+2026-09-08 and reviewed by a five-advisor council before it was committed. Phases 0, 1, 2
+and 3 are **built**; Phase 4 is **written, not started** — see its own status header for
+what gates it.
 
-- [Phase 0 — Foundations](implementation/phase-0-foundations.md) — Tasks 0.1–0.3 **done**
-  (policy loader, engine vocabulary with the frozen `signal_family` enumeration, the
-  seven-capability registry); 0.4–0.13 remain. Task 0.13 is blocked on the four
-  non-code prerequisites in the plan's index.
-- [Phase 1 — Capabilities](implementation/phase-1-capabilities.md) — includes Task 1.9, the
+- [Phase 0 — Foundations](implementation/phase-0-foundations.md) — the typed contract,
+  policy loader, owner-state model + Firestore pull, ingestion fixes, the engine
+  orchestrator and atomic publisher, CI.
+- [Phase 1 — Capabilities](implementation/phase-1-capabilities.md) — the seven registered
+  capabilities across six modules, the surface producer, provenance, and Task 1.9's
   rule-12 independence probe.
+- [Phase 2 — Browser](implementation/phase-2-browser.md) — `loadDashboard`, owner state,
+  `compose`, `DailyPage` and the capability pages. Task 2.7's cut-over shipped **2026-09-12**
+  once [ADR-020](architecture/decisions/ADR-020-the-published-population-is-a-policy-not-a-constant.md)
+  removed D-14 as a blocker: the owner's screen has read `dashboard.json` (schema 2) since,
+  not `operational.json`.
+- [Phase 3 — Reproduction & gates](implementation/phase-3-reproduction.md) — `figures.py` as
+  the engine's print mode, content addressing, the V1 signal probes, the nightly workflow.
+- [Phase 4 — Removal](implementation/phase-4-removal.md) — **not started, deliberately.**
+  Deletes the old demo/V2/planogram/LLM/MCP chain and `operational.json` once Checkpoint 3
+  is green (two consecutive clean scheduled nightlies — one so far) and three open
+  questions (P4-OQ-1 … P4-OQ-3) are answered.
 
 ## Operations (not product authority)
 
