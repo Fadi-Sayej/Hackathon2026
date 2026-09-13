@@ -42,7 +42,7 @@
     "sprint7": "npm run normalize:data && npm run lint && npm run build",
     "test:e2e": "playwright test",
     "test:all": "npm run lint && npm run test && npm run test:e2e",
-    "doctor": "vite-node scripts/doctor.mjs",
+    "doctor": "node scripts/doctor.mjs",
     "audit:ui": "node scripts/ui-audit.mjs",
     "check:signals": "npm run check:signals:v1 && npm run check:independence",
     "check:signals:legacy": "node scripts/check_signals_live.mjs",

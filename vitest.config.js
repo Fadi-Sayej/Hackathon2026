@@ -16,7 +16,10 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'node',
-    include: ['src/**/*.{test,spec}.{js,jsx}'],
+    // scripts/ is included so `npm run doctor` can be tested. It had no test at all
+    // until 2026-09-13, which is how its negative-stock check stayed dead — reading a
+    // value the adapter had already clamped to zero — while 631 negative rows existed.
+    include: ['src/**/*.{test,spec}.{js,jsx}', 'scripts/**/__tests__/*.{test,spec}.mjs'],
     setupFiles: ['src/test/setup.js'],
   },
 })
