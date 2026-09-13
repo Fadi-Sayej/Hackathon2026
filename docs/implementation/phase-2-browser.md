@@ -220,6 +220,29 @@ task does not attempt it.
 - [ ] **Step 3: Implement**, reusing `src/lib/persistence/*` unchanged (§20.1 REUSE).
 - [ ] **Step 4:** `npx vitest run src/owner` → all pass. Commit.
 
+> **Correction, 2026-09-13 (#94) — this task shipped without its write-through, and the
+> instructions above could not have produced one.** Recorded beside the steps rather than in
+> place of them, because they are what was followed.
+>
+> - **Step 3 could never satisfy §11.5.** `src/lib/persistence/*` syncs `approvedOrders` and
+>   `recommendationDecisions`; §11.5 requires `stores/{store}/ownerState/{answers|outcomes|revivals|meta}`.
+>   Reusing it *unchanged* writes the wrong collections in the wrong shape. The implementation
+>   did not reuse it at all, and `ownerState.js` wrote `localStorage` only — so the engine,
+>   which reads owner state only from Firestore, never saw an answer or an outcome.
+> - **Step 1's required tests could never catch it.** All five are `localStorage`, migrations
+>   and enums. None asserts that anything reaches Firestore, and Checkpoint 2's `check:surface`
+>   runs in jsdom over `localStorage`. Every box here could be ticked with the write missing.
+> - **`meta.schema` was wrong too.** The browser set `2` (the storage *key* is v2); §10.3 and
+>   `pull.py` require `1`. Had write-through existed, the engine would have rejected it as
+>   `owner_state_schema`.
+>
+> Built in #94 as `src/owner/remoteOwnerState.js`, with the missing step this task should have
+> had: **a contract test across the two languages.** `ownerStateContract.test.js` captures the
+> documents the real `recordAnswer` / `recordOutcome` produce into
+> `tests/fixtures/owner_state_firestore_contract.json`, and `test_firestore_contract.py` feeds
+> that same file to the real `pull()`. A task whose output crosses a language boundary is not
+> done until a test crosses it too.
+
 ---
 
 ### Task 2.2: `compose` — the only thing that decides what the owner sees
