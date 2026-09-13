@@ -89,12 +89,11 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 | [ADR-017](architecture/decisions/ADR-017-a-run-states-whether-its-sales-evidence-arrived.md) | A run states whether its sales evidence arrived |
 | [ADR-018](architecture/decisions/ADR-018-the-browser-does-not-ship-a-schema-validator.md) | The browser does not ship a schema validator |
 | [ADR-019](architecture/decisions/ADR-019-a-conflicting-duplicate-barcode-is-a-hygiene-record.md) | A conflicting duplicate barcode is a hygiene record, never a silent pick |
-| [ADR-020](architecture/decisions/ADR-020-the-published-population-is-a-policy-not-a-constant.md) | The published population is a policy setting, not a constant — **`Draft`**, and the cut-over shipped on it |
+| [ADR-020](architecture/decisions/ADR-020-the-published-population-is-a-policy-not-a-constant.md) | The published population is a policy setting, not a constant |
 
-ADR-001 … ADR-019 are `Accepted`. **ADR-020 is still `Draft`**, which under the status
-vocabulary means no downstream role may start on it — yet Task 2.7's cut-over shipped on
-it on 2026-09-12 and the pilot has been running on it since. Accepting or rejecting it is
-a human act and is outstanding.
+All twenty are `Accepted`. ADR-020 was accepted on 2026-09-13 **conditional on GAP-009**:
+`published_population: whole` is the right value while that question is open, and becomes
+`living` when it closes.
 
 ## Quality gates
 
