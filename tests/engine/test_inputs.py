@@ -55,7 +55,11 @@ def test_products_are_shaped_and_owner_cost_wins(tmp_path):
     assert p[None]["has_identifier"] is False
     assert inputs.sales_summary is None and inputs.window is None
     assert inputs.observations is None and inputs.matches is None
-    assert inputs.vintages["pos"] == {"file": "inv.csv", "as_of": "2026-08-02"}
+    # `_silver()` writes the parquet by hand without `_as_of_source`, as tables written
+    # before that column existed do. `None` there reads as "we do not know how this
+    # vintage was arrived at", which is the honest answer rather than a guess.
+    assert inputs.vintages["pos"] == {"file": "inv.csv", "as_of": "2026-08-02",
+                                      "as_of_source": None}
     assert inputs.vintages["owner_state"]["status"] == "available"
 
 

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+import subprocess
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -36,6 +38,7 @@ def _build_table_rows(
     source_file: str,
     source_kind: str,
     as_of: str,
+    as_of_source: str,
 ) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for row in normalized_rows:
@@ -44,8 +47,60 @@ def _build_table_rows(
         subset["_source_file"] = source_file
         subset["_source_kind"] = source_kind
         subset["_as_of"] = as_of
+        # How the vintage was arrived at, beside the vintage itself. Without it a
+        # checkout timestamp is indistinguishable from a declared export date.
+        subset["_as_of_source"] = as_of_source
         rows.append(subset)
     return rows
+
+
+_ISO_DAY = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def _git_committed_date(path: Path) -> str | None:
+    """The day this file last changed in git, or None if that cannot be known.
+
+    Machine-independent, unlike an mtime, and it is a real fact about the data rather
+    than about the checkout that produced it.
+    """
+    try:
+        out = subprocess.run(
+            ["git", "log", "-1", "--format=%ad", "--date=short", "--", path.name],
+            cwd=path.parent, capture_output=True, text=True, timeout=10, check=False)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    day = out.stdout.strip()
+    return day if out.returncode == 0 and _ISO_DAY.match(day) else None
+
+
+def resolve_as_of(input_path: Path, declared: str | None = None) -> tuple[str, str]:
+    """The day this export was taken, and how we know — `(as_of, as_of_source)`.
+
+    SPEC-007 FR-120: the POS vintage is the day the export was TAKEN, not the day we
+    imported it. The default was `date.fromtimestamp(path.stat().st_mtime)`, which does
+    not honour that anywhere it matters. `git clone` stamps every file's mtime with the
+    checkout time, so on a CI runner this resolved to **today, every day, for ever**: the
+    published artefact said `pos.as_of: 2026-09-13` while `yomyom-inventory.csv` had not
+    changed in git since 2026-06-06. The same import on a laptop said 2026-08-02, because
+    that was that machine's mtime. One commit, two machines, two vintages — and the one
+    the owner saw claimed his stock counts were from this morning.
+
+    The file itself carries no date: the export's columns are item code, barcode,
+    description, type, stock, prices and department. So there is nothing to read out of
+    the data, and the answer has to be sourced honestly instead of guessed:
+
+      declared    a human passed --as-of. Always wins; this is the only one that is
+                  certainly the export date.
+      git_commit  the file's last change in git. True and identical on every machine.
+      file_mtime  last resort — a customer's export will not be in our history. Still
+                  published, but labelled, so nobody reads a checkout time as a vintage.
+    """
+    if declared:
+        return declared, "declared"
+    committed = _git_committed_date(input_path)
+    if committed:
+        return committed, "git_commit"
+    return date.fromtimestamp(input_path.stat().st_mtime).isoformat(), "file_mtime"
 
 
 def import_pos_file(
@@ -55,9 +110,7 @@ def import_pos_file(
     as_of: str | None = None,
 ) -> dict[str, Any]:
     imported_at = imported_at or datetime.now(timezone.utc).isoformat()
-    # The POS vintage is the day the export was taken, not the day we imported it
-    # (SPEC-007 FR-120). Default: the file's modification date.
-    as_of = as_of or date.fromtimestamp(input_path.stat().st_mtime).isoformat()
+    as_of, as_of_source = resolve_as_of(input_path, declared=as_of)
     config = load_schema_config(config_path)
     inspection = inspect_pos_file(input_path, config_path)
     source_kind = classify_source_file(input_path)
@@ -104,6 +157,7 @@ def import_pos_file(
             input_path.name,
             source_kind,
             as_of,
+            as_of_source,
         )
         path = _write_fixed_parquet(rows, SILVER_POS_DIR / table_spec["filename"])
         output_paths[table_name] = str(path)
@@ -146,7 +200,12 @@ def read_pos_vintage(silver_dir: Path = SILVER_POS_DIR) -> dict[str, Any] | None
     path = silver_dir / "yomyom_inventory.parquet"
     if not path.exists():
         return None
-    rows = pq.read_table(path, columns=["_source_file", "_as_of"]).slice(0, 1).to_pylist()
+    columns = set(pq.read_schema(path).names)
+    wanted = [c for c in ("_source_file", "_as_of", "_as_of_source") if c in columns]
+    rows = pq.read_table(path, columns=wanted).slice(0, 1).to_pylist()
     if not rows:
         return None
-    return {"file": rows[0].get("_source_file"), "as_of": rows[0].get("_as_of")}
+    return {"file": rows[0].get("_source_file"), "as_of": rows[0].get("_as_of"),
+            # Absent in tables written before this column existed; `None` reads as
+            # "we do not know how this vintage was arrived at", which is the truth.
+            "as_of_source": rows[0].get("_as_of_source")}

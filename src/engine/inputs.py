@@ -181,7 +181,11 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
         for m in matches:
             m["internal_barcode"] = norm_barcode(m.get("internal_barcode"))
     vintages = {
-        "pos": read_pos_vintage(silver_dir) or {"file": None, "as_of": None},
+        # `as_of_source` travels with `as_of` for the same reason `reason` travels with
+        # owner_state below: a date is not provenance until you know how it was arrived
+        # at. Until 2026-09-13 this said "today" on every CI run, because the default was
+        # the file's mtime and `git clone` stamps that with the checkout time.
+        "pos": read_pos_vintage(silver_dir) or {"file": None, "as_of": None, "as_of_source": None},
         "sales": (window.to_dict() if window else {"months": [], "first": None, "last": None, "full_annual_cycle": False}),
         "competitor": _competitor_vintage(observations),
         # `reason` travels, because without it a replayed mirror reads as a live pull.

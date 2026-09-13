@@ -772,6 +772,8 @@ export const en = {
   'data.ownerState.available': "available",
   'data.ownerState.unavailable': "unavailable",
   'data.ownerState.fromMirror': "from the saved copy, not fetched now",
+  'data.pos.git_commit': "dated from when the file last changed",
+  'data.pos.file_mtime': "date not confirmed — taken from the file's timestamp",
   'data.available': "working",
   'data.run.ok': "The run completed.",
   'data.run.degraded': "The run completed, but something was not as it should be.",

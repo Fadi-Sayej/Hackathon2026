@@ -773,6 +773,8 @@ export const he = {
   'data.ownerState.available': "זמינות",
   'data.ownerState.unavailable': "לא זמינות",
   'data.ownerState.fromMirror': "מהעותק השמור, לא נטען עכשיו",
+  'data.pos.git_commit': "לפי השינוי האחרון בקובץ",
+  'data.pos.file_mtime': "התאריך לא אומת — לפי חותמת הקובץ",
   'data.available': "פעיל",
   'data.run.ok': "ההרצה הושלמה.",
   'data.run.degraded': "ההרצה הושלמה, אבל משהו לא היה כשורה.",
