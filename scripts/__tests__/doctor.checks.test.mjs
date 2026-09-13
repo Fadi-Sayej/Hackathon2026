@@ -74,41 +74,28 @@ describe('entry identity (ADR-009)', () => {
     )
     expect(levels(found, 'entry-identity')).not.toContain(ERROR)
   })
-
-  it('reports ERROR when an entry carries no signal_family, because recordOutcome throws on it', () => {
-    const found = runChecks(
-      artefact({ hygiene: capability([entry({ signal_family: null })]) }),
-    )
-    expect(levels(found, 'entry-identity')).toContain(ERROR)
-  })
 })
 
 describe('value discipline (rule 8)', () => {
-  it('reports ERROR when an entry carries a kind the artefact does not declare', () => {
+  // Only the agreement between `value_kinds_present` and the entries is checked.
+  // Which kinds are legal, and that an amount is a number, are pinned by
+  // schemas/dashboard.schema.json and validated in CI — a check for those could
+  // only fire on a file publish.py refused to write.
+  it('reports WARN when an entry carries a kind the artefact does not declare', () => {
     const found = runChecks(
       artefact(
         { hygiene: capability([entry({ value: { amount: 5, kind: 'one_off', certainty: 'confirmed' } })]) },
         { value_kinds_present: ['per_sale'] },
       ),
     )
-    expect(levels(found, 'value-discipline')).toContain(ERROR)
+    expect(levels(found, 'value-discipline')).toContain(WARN)
   })
 
-  it('reports ERROR when a declared kind appears on no entry, because the browser would offer a total nothing backs', () => {
+  it('reports WARN when a declared kind appears on no entry, because the browser would offer a total nothing backs', () => {
     const found = runChecks(
       artefact({ hygiene: capability([entry()]) }, { value_kinds_present: ['per_sale'] }),
     )
-    expect(levels(found, 'value-discipline')).toContain(ERROR)
-  })
-
-  it('reports ERROR on a non-finite amount, because no number must be shown rather than NaN', () => {
-    const found = runChecks(
-      artefact(
-        { hygiene: capability([entry({ value: { amount: null, kind: 'per_sale', certainty: 'confirmed' } })]) },
-        { value_kinds_present: ['per_sale'] },
-      ),
-    )
-    expect(levels(found, 'value-discipline')).toContain(ERROR)
+    expect(levels(found, 'value-discipline')).toContain(WARN)
   })
 
   it('accepts an artefact whose declared kinds match its entries exactly', () => {
@@ -118,7 +105,7 @@ describe('value discipline (rule 8)', () => {
         { value_kinds_present: ['per_sale'] },
       ),
     )
-    expect(levels(found, 'value-discipline')).not.toContain(ERROR)
+    expect(levels(found, 'value-discipline')).not.toContain(WARN)
   })
 })
 
@@ -205,14 +192,28 @@ describe('flagged-row pricing coherence', () => {
 })
 
 describe('run health (rule 10)', () => {
-  it('reports ERROR when a step failed but the run still published', () => {
-    const found = runChecks(
-      artefact(
-        { hygiene: capability([entry()]) },
-        { run: { status: 'ok', steps: [{ step: 'competitor', status: 'failed', ms: 2, error: 'no snapshot' }] } },
-      ),
-    )
-    expect(levels(found, 'run-health')).toContain(ERROR)
+  // The schema's step enum is ok | error | skipped | degraded. An earlier version
+  // of this fixture used 'failed' — a value the engine never emits and the schema
+  // does not allow — so the check passed its test while being wrong about every
+  // real artefact. ADR-017 makes `degraded` a designed outcome, not a fault.
+  const withSteps = (steps) =>
+    artefact({ hygiene: capability([entry()]) }, { run: { status: 'partial', steps } })
+
+  it('reports ERROR when a step errored but the run still published', () => {
+    const found = withSteps([{ step: 'competitor', status: 'error', ms: 2, error: 'no snapshot' }])
+    expect(levels(runChecks(found), 'run-health')).toContain(ERROR)
+  })
+
+  it('does NOT report ERROR for a degraded step — ADR-017 calls that a run on older evidence', () => {
+    const found = withSteps([
+      { step: 'sales_import', status: 'degraded', ms: 2, error: 'no_rows_imported' },
+    ])
+    expect(levels(runChecks(found), 'run-health')).not.toContain(ERROR)
+  })
+
+  it('does NOT report ERROR for a skipped step, which is what --skip-market produces', () => {
+    const found = withSteps([{ step: 'competitor', status: 'skipped', ms: 0, error: null }])
+    expect(levels(runChecks(found), 'run-health')).not.toContain(ERROR)
   })
 
   it('stays quiet when every step succeeded', () => {

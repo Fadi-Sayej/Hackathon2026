@@ -12,9 +12,8 @@
  *   The artefact carries only FLAGGED rows — roughly 3.5k entries over a ~7.6k
  *   catalogue — so no check here can speak for the catalogue, and none of them
  *   pretends to. Every message that states a quantity states its denominator with
- *   it. When the denominator is unavailable the check says so rather than
- *   printing a number that reads as a total (CLAUDE.md rule 8, applied to the
- *   tool that enforces rule 8).
+ *   it, so no figure here can be misread as a catalogue total (CLAUDE.md rule 8,
+ *   applied to the tool that enforces rule 8).
  *
  * WHY IT MOVED HERE FROM THE DEMO SPINE
  *   It read the demo spine's catalogue loader — the committed generated
@@ -51,7 +50,7 @@ export const ARTEFACT_PATH = fileURLToPath(
 const NOT_ENTRIES = new Set(['owner_questions'])
 
 const n = (value) => (typeof value === 'number' && Number.isFinite(value) ? value : null)
-const count = (value) => (value === null ? 'an unknown number of' : value.toLocaleString('en-US'))
+const count = (value) => value.toLocaleString('en-US')
 
 /** Every entry across every capability, tagged with the capability it came from. */
 function allEntries(artefact) {
@@ -141,25 +140,26 @@ export function runChecks(artefact) {
       report(NOTE, 'entry-identity', `${count(entries.length)} published entries, all ids distinct`)
     }
 
-    // recordOutcome() throws without signal_family (ADR-016), so an entry
-    // missing it cannot be acted on at all — the owner clicks and gets an error.
-    const unfamilied = entries.filter((e) => !e.signal_family)
-    if (unfamilied.length) {
-      report(
-        ERROR,
-        'entry-identity',
-        `${count(unfamilied.length)} of ${count(entries.length)} published entries carry no signal_family`,
-        'recordOutcome() rejects these (ADR-016). The owner cannot record an outcome against them.',
-      )
-    }
+    // A missing `signal_family` would also break recordOutcome() (ADR-016), but
+    // it is not checked here: the schema makes it required AND pins it to a
+    // twelve-value enum, and CI validates the committed artefact against that
+    // schema. A check that can only fire on a file jsonschema already rejected
+    // is a check that will never fire.
   }
 
   // ── 3. Value discipline (CLAUDE.md rule 8) ───────────────────────────
-  // Money is the thing this repository has been burned by most. The artefact
-  // declares `value_kinds_present` so the browser knows whether a total is even
-  // expressible; if that declaration disagrees with the entries, a summary can
-  // sum a per-sale figure with a one-off one, which is the "₪106,164 per sale"
-  // headline rule 8 exists to prevent.
+  // `value_kinds_present` is what the browser trusts when deciding whether a
+  // total may be shown at all; if it disagrees with the entries, a summary can
+  // sum a per-sale figure with a one-off one — the "₪106,164 per sale" headline
+  // rule 8 exists to prevent.
+  //
+  // Only the agreement is checked. The schema pins which kinds are legal and
+  // requires `value.amount` to be a number (JSON cannot express NaN), so those
+  // need no check here. What the schema CANNOT express is that this array is
+  // derived from those entries — publish.py computes it mechanically, and a
+  // mechanical derivation is exactly the kind of thing that breaks quietly.
+  // WARN, not ERROR: a disagreement is a signal that something drifted, not
+  // evidence that the owner's data is corrupt.
   {
     const valued = entries.filter((e) => e.value)
     const observed = new Set(valued.map((e) => e.value?.kind).filter(Boolean))
@@ -168,33 +168,14 @@ export function runChecks(artefact) {
     const undeclared = [...observed].filter((kind) => !declared.has(kind))
     const unbacked = [...declared].filter((kind) => !observed.has(kind))
 
-    if (undeclared.length) {
+    if (undeclared.length || unbacked.length) {
       report(
-        ERROR,
+        WARN,
         'value-discipline',
-        `entries carry value kinds the artefact does not declare: ${undeclared.join(', ')}`,
-        'value_kinds_present is what the browser trusts when deciding whether a total may be shown (rule 8).',
+        `value_kinds_present disagrees with the entries${undeclared.length ? `; carried but not declared: ${undeclared.join(', ')}` : ''}${unbacked.length ? `; declared but carried by nothing: ${unbacked.join(', ')}` : ''}`,
+        'The browser reads this array to decide whether a total may be shown (rule 8). publish.py derives it from the entries, so a gap means the derivation drifted.',
       )
-    }
-    if (unbacked.length) {
-      report(
-        ERROR,
-        'value-discipline',
-        `artefact declares value kinds no entry carries: ${unbacked.join(', ')}`,
-        'A declared kind invites a total that nothing backs.',
-      )
-    }
-
-    const malformed = valued.filter((e) => n(e.value?.amount) === null)
-    if (malformed.length) {
-      report(
-        ERROR,
-        'value-discipline',
-        `${count(malformed.length)} of ${count(valued.length)} valued entries carry an amount that is not a finite number`,
-        'When a figure cannot be stated honestly the entry must carry no value at all, never zero or null (rule 8, F7-S1).',
-      )
-    }
-    if (!undeclared.length && !unbacked.length && !malformed.length) {
+    } else {
       report(
         NOTE,
         'value-discipline',
@@ -317,19 +298,38 @@ export function runChecks(artefact) {
 
   // ── 7. Run health (CLAUDE.md rule 10) ────────────────────────────────
   // An empty export is a failure, not a result — and so is a partial one that
-  // reports success. A step that failed while the run still published means the
+  // reports success. A step that ERRORED while the run still published means the
   // owner is reading a surface with a silent hole in it.
+  //
+  // Only `error` counts. The schema's step enum is ok | error | skipped |
+  // degraded, and the other two are designed outcomes, not faults: ADR-017 makes
+  // a sales import that contributed no rows `degraded` precisely because "it is
+  // not an error and is not ok either", and a late-report day is the normal case
+  // for it. Treating everything that is not `ok` as a failure would exit 1 on a
+  // healthy `--skip-market` run — the same "check fires on something it should
+  // not" mistake as the old clamped negative-stock check, in the other
+  // direction.
   {
     const steps = artefact.run?.steps ?? []
-    const failed = steps.filter((step) => step.status && step.status !== 'ok')
-    if (failed.length) {
+    const errored = steps.filter((step) => step.status === 'error')
+    const expected = steps.filter((step) => step.status === 'skipped' || step.status === 'degraded')
+
+    if (errored.length) {
       report(
         ERROR,
         'run-health',
-        `${count(failed.length)} of ${count(steps.length)} run steps did not succeed, yet the artefact was published: ${failed.map((s) => `${s.step} (${s.status})`).join(', ')}`,
+        `${count(errored.length)} of ${count(steps.length)} run steps errored, yet the artefact was published: ${errored.map((s) => `${s.step} (${s.error ?? 'no reason recorded'})`).join(', ')}`,
         'Rule 10: an incomplete export is a failure, not a result. The owner cannot see which half is missing.',
       )
-    } else if (steps.length) {
+    }
+    if (expected.length) {
+      report(
+        NOTE,
+        'run-health',
+        `${count(expected.length)} of ${count(steps.length)} run steps were skipped or degraded, which ADR-017 treats as a run continuing on older evidence: ${expected.map((s) => `${s.step} (${s.status})`).join(', ')}`,
+      )
+    }
+    if (steps.length && !errored.length && !expected.length) {
       report(NOTE, 'run-health', `all ${count(steps.length)} run steps succeeded`)
     }
   }
