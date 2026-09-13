@@ -7,7 +7,7 @@ Version: 1.0 (2026-09-12)
 Parent: [Implementation Plan](plan.md)
 Related Specs: F6-S1, F7-S1
 Inputs: [docs/architecture/system-design.md §20.1, §20.2, §22, docs/reviews/checkpoint-3-reproduction.md]
-Updated: 2026-09-12
+Updated: 2026-09-13
 ---
 
 # Phase 4 — Removal
@@ -95,6 +95,47 @@ LLM layer (`src/lib/ai/*`, `src/api/llm_proxy.py`), telemetry, the MCP server, a
 >
 > `.mcp.json` and `src/mcp_server/` stay pending **P4-OQ-2** — `.mcp.json` launches the
 > local price server, so removing it is a developer-workflow change.
+
+> **Step 1 run 2, 2026-09-13, at `aa1d9f7`.** Re-run because run 1 predates the cut-over
+> deploying and the nightly changes of 09-13, and because "verify rather than assume" is
+> this phase's own instruction. Method: for every REMOVE token, `git grep` for lines that
+> are actual `import` / `from … import` / `require(` statements in files **outside** the
+> removal set — a mention in a comment, a config or `.gitignore` is not a reader.
+>
+> **11 files outside the set import into it.** Five are tests of their own subject, which
+> Step 4 already handles by deleting each with the code it covers:
+> `pages.component.test.jsx`, `shelfPlanning.integration.test.jsx`,
+> `velocityClaimContract.test.js` (→ `mockAI`), `loadMarketContext.test.js`
+> (→ `reorderEngine`), `tests/test_llm_cache_key.py` (→ `llm_proxy`).
+>
+> **Six are scripts, and three of those are a problem the REMOVE list does not name:**
+>
+> | Script | Imports from | Status |
+> |---|---|---|
+> | `scripts/check_signals_live.mjs` | demo spine, `reorderEngine` | **live twice over** — `npm run check:signals` *and* `collect-daily.yml:192`, where it is a nightly gate |
+> | `scripts/doctor.mjs` | demo spine, `src/lib/planogram/` | **live** — `npm run doctor` |
+> | `scripts/build-rag-corpus.mjs` | demo spine, `loadDemoStoreData` | not npm-scripted, but not on the REMOVE list either |
+> | `scripts/run_mcp_price_lookup.py` | `mcp_price_adapter` | not on the list; its import target is. Goes with the MCP group or blocks it |
+> | `scripts/compare_explanations.mjs` | demo spine, `reorderEngine`, `src/lib/ai/` | already on the list (LLM row) — no action |
+> | `scripts/report_reorder_explanations.mjs` | demo spine, `reorderEngine` | already on the list (LLM row) — no action |
+>
+> So **Task 4.1 cannot delete the demo spine while `check:signals` and `doctor` exist as
+> written.** That is this phase's rule 2 exactly: a file with one reader is a task nobody
+> finished. It is also F-3 from the 09-13 incident record, which asked the softer question
+> — the probe guards a path the owner no longer sees — and this is the hard one: it blocks
+> the phase.
+>
+> **A path in §20.1 is wrong.** The V2/V4 row lists `explainReorder.js` among
+> `src/lib/analytics/*`. It is at `src/lib/i18n/explainReorder.js`; there is no
+> `src/lib/analytics/explainReorder.js`. Deleting by the listed path would silently remove
+> nothing. **smartshelf-architect.**
+>
+> **Task 4.2 is partly done already, by the 09-13 incident fix (`ebbe58f`, `25a3b84`):**
+> the `refresh_pipeline.py` step is out of `collect-daily.yml`, and
+> `public/data/sources.json` is deleted along with its three writers. What remains of 4.2
+> is deleting `refresh_pipeline.py`, `export_dashboard_data.py`,
+> `loadOperationalData.js` and `public/data/operational.json` — and the last of those is
+> still needed by ADR-009's one-shot outcome-id translation until Phase 4 ends.
 
 **Not started, and deliberately.** The deletions are proven safe but the phase's own
 precondition is not met: the cut-over has not been deployed, so the old spine is still the
