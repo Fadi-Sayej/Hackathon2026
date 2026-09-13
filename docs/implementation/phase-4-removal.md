@@ -130,6 +130,13 @@ LLM layer (`src/lib/ai/*`, `src/api/llm_proxy.py`), telemetry, the MCP server, a
 > `src/lib/analytics/explainReorder.js`. Deleting by the listed path would silently remove
 > nothing. **smartshelf-architect.**
 >
+> **Fixed 2026-09-13.** §20.1's row now names `src/lib/i18n/explainReorder.js` directly.
+> The same pass also added `scripts/build-rag-corpus.mjs` and
+> `scripts/run_mcp_price_lookup.py` to their rows — both were readers of REMOVE-listed
+> code (the demo spine and `mcp_price_adapter` respectively) that Step 1 run 2 found above
+> but that were not themselves on the list, so a Task 4.1 deletion would have hit the same
+> "one reader left" trap the demo-spine group already hit.
+>
 > **Task 4.2 is partly done already, by the 09-13 incident fix (`ebbe58f`, `25a3b84`):**
 > the `refresh_pipeline.py` step is out of `collect-daily.yml`, and
 > `public/data/sources.json` is deleted along with its three writers. What remains of 4.2
