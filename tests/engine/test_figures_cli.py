@@ -30,6 +30,45 @@ pytestmark = pytest.mark.skipif(
 )
 
 
+def test_figures_reproduces_the_population_that_was_published():
+    """The reproduction command must reproduce what was published, not a variant.
+
+    `--population` defaulted to "living" while ADR-020 made the published population a
+    policy setting — currently `whole`, because D-14 forbids showing the owner a figure
+    that depends on automatic withdrawal while GAP-009 is open. run_engine() honours the
+    policy; figures.py passed an explicit value, so the policy never applied.
+
+    Measured on a fresh clone of 462d604 against the nightly's committed artefact: the
+    default run produced 22 of 46 figures that disagreed, several by roughly 2x
+    (price_consistency.population 2,466 against 5,986; identical 1,504 against 4,671).
+    Adding `--population whole` made 45 of 46 match exactly, the 46th being a timestamp.
+    It exits 0 either way, so nothing tells a reader which set they are holding.
+
+    Synthetic, because the rule is under test rather than the data. Asserted against the
+    policy rather than the literal "whole" so that closing GAP-009 does not silently make
+    this pass for the wrong reason.
+    """
+    import argparse
+
+    from src.engine.policy import load_policy
+
+    # The parser must not decide the population. Rebuilt here rather than imported because
+    # figures.main() runs the whole engine; what is under test is the default it passes.
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--population", choices=("living", "whole"), default=None)
+    assert parser.parse_args([]).population is None, (
+        "figures.py must pass population=None when the flag is absent, so run_engine "
+        "falls back to policy.published_population"
+    )
+    assert parser.parse_args(["--population", "living"]).population == "living"
+
+    src = (ROOT / "scripts" / "figures.py").read_text(encoding="utf-8")
+    assert 'default="living"' not in src, (
+        'figures.py still hard-defaults --population to "living"; the published population '
+        f"is {load_policy().published_population!r} and comes from policy (ADR-020)"
+    )
+
+
 @pytest.fixture(scope="module")
 def cli_json():
     """One subprocess run: the CLI contract and the figures it prints, together."""
@@ -52,7 +91,13 @@ def test_it_prints_the_engines_figures_and_recomputes_nothing(cli_json):
     disagreed with the engine on F1's ceiling — 18% against 26% — until ADR-015. One number,
     one implementation."""
     payload = json.loads(cli_json.stdout)
-    assert payload["population"] == "living"
+    # Was `== "living"`, which encoded the old CLI default as correct and so locked in the
+    # defect it should have caught: the engine published `whole` (ADR-020 made the
+    # population a policy setting) while this command reproduced `living`, and 22 of 46
+    # figures disagreed with the committed artefact. Asserted against policy now, so the
+    # test follows the decision instead of a literal.
+    from src.engine.policy import load_policy
+    assert payload["population"] == load_policy().published_population
     assert payload["figures"], "no figures printed"
     # every figure is a published one, carrying the provenance the engine attached
     for name, figure in payload["figures"].items():

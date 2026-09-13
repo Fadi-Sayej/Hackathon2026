@@ -8,9 +8,15 @@ It replaces `scripts/print_figures.py`, which computed all 46 figures a SECOND t
 second implementation disagreed with the engine on F1's ceiling until ADR-015 — 18% against
 26% — and nothing would have said which was right. One number, one implementation.
 
-`--population whole` suppresses the catalogue hand-off so every figure counts over the
-entire catalogue. D-14 forbids putting a figure that depends on automatic withdrawal in
-front of the owner until GAP-009 closes, and this is where those figures come from.
+The population counted over comes from policy (`published_population`, ADR-020), so this
+command reproduces what was actually published. It defaulted to `living` while the engine
+published `whole`, which made 22 of 46 figures disagree with the committed artefact —
+several by roughly 2x — while still exiting 0. Measured on a fresh clone; see
+docs/reviews/checkpoint-3-reproduction.md.
+
+`--population` still overrides, either way, for comparing the two. D-14 forbids putting a
+figure that depends on automatic withdrawal in front of the owner until GAP-009 closes,
+which is why the policy currently says `whole`.
 """
 from __future__ import annotations
 
@@ -37,8 +43,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--json", action="store_true", help="machine-readable output")
     parser.add_argument("--skip-market", action="store_true")
-    parser.add_argument("--population", choices=("living", "whole"), default="living",
-                        help="'whole' counts over the entire catalogue (D-14)")
+    parser.add_argument("--population", choices=("living", "whole"), default=None,
+                        help="override the published population; default is policy's "
+                             "published_population, so figures reproduce what shipped")
     args = parser.parse_args()
 
     result = run_engine(mode="print", skip_market=args.skip_market,
@@ -70,7 +77,10 @@ def main() -> int:
         (gated if reason in _CREDENTIAL_GATED else blocked).append(f"{cap_id}: {reason}")
 
     payload = {
-        "population": args.population,
+        # What the run USED, not what was asked for. With no --population the CLI passes
+        # None and run_engine resolves it from policy, so reporting args.population here
+        # printed "None" for the one field a reader needs to compare artefacts by.
+        "population": artefact.get("population"),
         "generated_at": artefact.get("generated_at"),
         # Checkpoint 3 / AC-127: "reproduced" means the same inputs produced the same
         # output, not that the numbers look similar. Without this the comparison is by eye.
