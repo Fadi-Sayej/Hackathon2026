@@ -72,7 +72,7 @@ using for these rows everywhere except `_resolve_identity`.
 
 ## Why the owner is better served, not just the id
 
-Two rows named «כריך אבוקدو» with different departments and different stock are not two
+Two rows named «כריך אבוקדו» with different departments and different stock are not two
 findings. They are one question: *is this the same product listed twice?* Before, he saw
 several separate "no identifier" and "negative stock" findings that shared an id, and
 settling one settled the rest. Now he sees one record that names the disagreement. That is
