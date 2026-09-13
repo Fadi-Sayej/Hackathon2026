@@ -313,18 +313,75 @@ def test_89_a_barcoded_duplicate_disagreeing_only_on_stock_is_reported(tmp_path)
     assert sorted(inputs.conflicting[0]["fields"]["recorded_stock"]) == [-5.0, 10.0]
 
 
-def test_89_each_barcode_less_row_keeps_its_own_stock(tmp_path):
+def test_89_barcode_less_rows_sharing_a_name_and_disagreeing_are_a_conflict(tmp_path):
     """The pilot's 'בייגל סלמון נורוויגי': two barcode-less rows, stock -400 and -7. Both
-    were published as -7 and the -400 disappeared from the artefact. ADR-019 keeps a
-    barcode-less row as itself, so after the fix each carries its own number."""
+    were published as -7 and the -400 disappeared.
+
+    ADR-022. A barcode-less row used to be "kept as itself", which made both rows publish
+    findings under ONE entry id — so the owner resolving one resolved the other. Grouped by
+    name like a barcode is, they disagree, so neither is a product the system can state and
+    both numbers survive in the conflict record instead of being erased."""
     from src.engine.inputs import _shape_products
     a = {"barcode": None, "product_name": "בייגל סלמון", "category": "barista",
          "selling_price": 34.9, "wolt_price": 0.0, "cost_price": 0.0}
     b = dict(a)
     inv = [{"barcode": None, "product_name": "בייגל סלמון", "current_stock": -400.0},
            {"barcode": None, "product_name": "בייגל סלמון", "current_stock": -7.0}]
-    products, _conflicting = _shape_products([a, b], inv, OwnerState.unavailable("x"))
-    assert sorted(p["recorded_stock"] for p in products) == [-400.0, -7.0]
+    products, conflicting = _shape_products([a, b], inv, OwnerState.unavailable("x"))
+    assert products == []
+    assert len(conflicting) == 1
+    assert conflicting[0]["barcode"] is None and conflicting[0]["product_name"] == "בייגל סלמון"
+    assert sorted(conflicting[0]["fields"]["recorded_stock"]) == [-400.0, -7.0]
+
+
+def test_89_barcode_less_rows_identical_in_every_field_collapse():
+    """The one pilot name listed twice with nothing different. Same row twice, nothing to
+    tell the owner — exactly ADR-019's rule for a barcode, now applied to a name."""
+    from src.engine.inputs import _shape_products
+    row = {"barcode": None, "product_name": "קפה", "category": "barista",
+           "selling_price": 9.0, "wolt_price": 0.0, "cost_price": 0.0}
+    inv = [{"barcode": None, "product_name": "קפה", "current_stock": 3.0}] * 2
+    products, conflicting = _shape_products([row, dict(row)], inv, OwnerState.unavailable("x"))
+    assert [p["product_name"] for p in products] == ["קפה"]
+    assert conflicting == []
+
+
+def test_89_a_barcode_less_row_with_a_unique_name_is_untouched():
+    from src.engine.inputs import _shape_products
+    row = {"barcode": None, "product_name": "אייס", "category": "c",
+           "selling_price": 1.0, "wolt_price": 0.0, "cost_price": 0.0}
+    products, conflicting = _shape_products([row], [{"barcode": None, "product_name": "אייס",
+                                                     "current_stock": -2.0}], OwnerState.unavailable("x"))
+    assert len(products) == 1 and products[0]["recorded_stock"] == -2.0 and conflicting == []
+
+
+def test_89_no_two_hygiene_entries_share_an_id(tmp_path):
+    """#89's acceptance criterion, end to end through the capability: ownerState.js keys the
+    owner's outcomes by entry id, so two entries sharing one means one decision silently
+    settles both. Covers the trap in grouping barcode-less rows: a conflict record built from
+    `entry_id(family, None)` would give EVERY barcode-less conflict the same id."""
+    from collections import Counter
+    from src.engine import reconciliation
+    rows = [
+        # two barcode-less names, each listed twice and disagreeing
+        {"barcode": None, "product_name": "כריך טונה", "category": "drive",   "current_stock": 0.0},
+        {"barcode": None, "product_name": "כריך טונה", "category": "barista", "current_stock": -96.0},
+        {"barcode": None, "product_name": "כריך אבוקדו", "category": "barista", "current_stock": -185.0},
+        {"barcode": None, "product_name": "כריך אבוקדו", "category": "barista", "current_stock": -1.0},
+        # a barcode-less singleton with negative stock and no identifier
+        {"barcode": None, "product_name": "בייגל", "category": "barista", "current_stock": -3.0},
+        # a barcoded duplicate that disagrees
+        {"barcode": "7290000000024", "product_name": "במבה", "category": "c", "current_stock": -5.0},
+        {"barcode": "7290000000024", "product_name": "במבה", "category": "c", "current_stock": 10.0},
+    ]
+    for r in rows:
+        r.setdefault("selling_price", 5.0); r.setdefault("wolt_price", 0.0); r.setdefault("cost_price", 1.0)
+    inputs = _load(_rows_silver(tmp_path, rows), tmp_path)
+    ids = Counter(e.id for e in reconciliation._hygiene_entries(inputs))
+    assert [i for i, n in ids.items() if n > 1] == [], "an id shared by two entries settles both"
+    conflicts = [e for e in reconciliation._hygiene_entries(inputs)
+                 if e.signal_family == "hygiene.conflicting_duplicate"]
+    assert len(conflicts) == 3, "tuna, avocado and bamba each conflict once"
 
 
 def test_89_a_misaligned_inventory_is_refused_not_silently_joined():

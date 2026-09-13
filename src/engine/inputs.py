@@ -116,18 +116,24 @@ def _resolve_identity(shaped: list) -> tuple:
     listed at two shelf prices has no shelf price the system can state (D-3), and picking
     one by arrival order would compute a markup from a number nobody chose.
 
-    Returns (products, conflicting). A barcode-less row cannot be grouped and is kept as
-    itself — `hygiene.no_identifier` already reports it.
+    Returns (products, conflicting).
+
+    ADR-022 extends this to barcode-less rows, grouped by `product_name`. They used to be
+    "kept as itself", which was only safe while names were unique, and on the pilot they are
+    not: 27 barcode-less names are listed more than once. Kept as themselves, rows sharing a
+    name published their findings under one entry id (`entry_id` falls back to the name), so
+    the owner resolving one silently resolved the others (#89). No field the export carries
+    tells two such rows apart — name, department and price repeat, and position is not stable
+    across exports (ADR-009) — so the honest identity is the name, under the same rule a
+    barcode gets: agree on everything and they are one row, disagree and they are a record.
     """
     groups: dict = {}
     out, conflicting = [], []
     for p in shaped:
-        if p["barcode"] is None:
-            out.append(p)
-            continue
-        groups.setdefault(p["barcode"], []).append(p)
-    for barcode in sorted(groups):
-        rows = groups[barcode]
+        key = ("barcode", p["barcode"]) if p["barcode"] is not None else ("name", p["product_name"])
+        groups.setdefault(key, []).append(p)
+    for key in sorted(groups, key=lambda k: (k[0], str(k[1]))):
+        rows = groups[key]
         if len(rows) == 1:
             out.append(rows[0])
             continue
@@ -139,7 +145,7 @@ def _resolve_identity(shaped: list) -> tuple:
         if not fields:
             out.append(rows[0])                      # the same row twice
             continue
-        conflicting.append({"barcode": barcode,
+        conflicting.append({"barcode": rows[0]["barcode"],
                             "product_name": rows[0]["product_name"],
                             "fields": fields})
     return sorted(out, key=lambda p: (p["barcode"] or "", p["product_name"] or "")), conflicting
