@@ -185,11 +185,20 @@ nightly commits, so it stays for now — but after the cut-over it proves nothin
 surface the owner opens. Phase 4 should either repoint it at `dashboard.json` or remove it
 with the rest of the chain.
 
-**F-4 — `CLAUDE.md` rule 5 is stale.** Its table says `dashboard.json` is "read by nothing
-yet — the front end still reads the old artefact", and that "the front end moving onto
-`dashboard.json` is not planned work — Phases 2–4 are not written". Task 2.7 happened; the
-phases are written and three are executed. Rule 5 is upstream of this role, so it is
-reported rather than edited.
+**F-4 — `CLAUDE.md` rule 5 was stale. FIXED.** It said `dashboard.json` is "read by
+nothing yet", that the front end still reads the old artefact, that `refresh_pipeline.py`
+is run by the nightly and feeds the live dashboard, that `refresh_pipeline.py` is how you
+refresh what the owner sees, and that "the front end moving onto `dashboard.json` is not
+planned work — Phases 2–4 are not written". Five wrong statements in the first document
+anyone reads.
+
+Raised here as upstream of this role, and that was the wrong call: `CLAUDE.md` is not a
+product document, it is the repo's operating instructions, and leaving instructions that
+point the next person at the dead pipeline does more damage than the lane violation avoids.
+Corrected in `1758b6d`, with every claim checked against the repo rather than another
+document (rule 11). Rule 5 now also says plainly that `refresh_pipeline.py` is not a
+fallback and must not be restarted — someone will find `operational.json` stale and try to
+fix it. Rule 6 gained the silver-drift exception found the same day.
 
 ## Timeline
 
