@@ -274,3 +274,78 @@ def test_identical_rows_from_different_export_days_are_the_same_input(tmp_path):
     pq_.write_table(pa_.Table.from_pylist([{**row, "_source_file": "inv.csv", "_as_of": "2026-09-01"}]),
                     b / "yomyom_products.parquet")
     assert _load(a, tmp_path).inputs_digest == _load(b, tmp_path).inputs_digest
+
+
+# ── #89: the stock join overwrote rows that share a key ──────────────────────────────
+#
+# _shape_products joined inventory through a dict keyed on (barcode, product_name). That key
+# is not unique — the pilot has 30 keys carrying more than one row with differing stock — so
+# the last row's stock was written onto every earlier one. 35 rows published another row's
+# stock and 25 real negative stock values vanished.
+#
+# Every ADR-019 test above passed throughout, because _dup_silver gives every duplicate row
+# current_stock=1.0: no test ever let two rows disagree on stock, so none crossed the point
+# where the disagreement was being erased. These do.
+
+def _rows_silver(tmp_path, rows):
+    """Like _dup_silver, but each row carries its OWN stock, in export order."""
+    silver = tmp_path / "silver"; silver.mkdir(parents=True, exist_ok=True)
+    base = {"_source_file": "inv.csv", "_as_of": "2026-08-02"}
+    prod = [{**base, **{k: v for k, v in r.items() if k != "current_stock"}} for r in rows]
+    inv = [{"barcode": r.get("barcode"), "product_name": r.get("product_name"),
+            "current_stock": r["current_stock"], **base} for r in rows]
+    pq.write_table(pa.Table.from_pylist(prod), silver / "yomyom_products.parquet")
+    pq.write_table(pa.Table.from_pylist(inv), silver / "yomyom_inventory.parquet")
+    pq.write_table(pa.Table.from_pylist(prod), silver / "yomyom_margins.parquet")
+    return silver
+
+
+def test_89_a_barcoded_duplicate_disagreeing_only_on_stock_is_reported(tmp_path):
+    """The join handed both rows the same stock, so ADR-019 saw them agree and collapsed
+    them — publishing one stock and silently losing the other. A disagreement that the join
+    erases is a disagreement ADR-019 can never see."""
+    a = {"barcode": "7290000000017", "product_name": "במבה", "category": "c",
+         "selling_price": 5.0, "wolt_price": 6.0, "cost_price": 3.0, "current_stock": -5.0}
+    b = {**a, "current_stock": 10.0}
+    inputs = _load(_rows_silver(tmp_path, [a, b]), tmp_path)
+    assert inputs.products == [], "a product listed with two stocks has no stock the system can state"
+    assert len(inputs.conflicting) == 1
+    assert sorted(inputs.conflicting[0]["fields"]["recorded_stock"]) == [-5.0, 10.0]
+
+
+def test_89_each_barcode_less_row_keeps_its_own_stock(tmp_path):
+    """The pilot's 'בייגל סלמון נורוויגי': two barcode-less rows, stock -400 and -7. Both
+    were published as -7 and the -400 disappeared from the artefact. ADR-019 keeps a
+    barcode-less row as itself, so after the fix each carries its own number."""
+    from src.engine.inputs import _shape_products
+    a = {"barcode": None, "product_name": "בייגל סלמון", "category": "barista",
+         "selling_price": 34.9, "wolt_price": 0.0, "cost_price": 0.0}
+    b = dict(a)
+    inv = [{"barcode": None, "product_name": "בייגל סלמון", "current_stock": -400.0},
+           {"barcode": None, "product_name": "בייגל סלמון", "current_stock": -7.0}]
+    products, _conflicting = _shape_products([a, b], inv, OwnerState.unavailable("x"))
+    assert sorted(p["recorded_stock"] for p in products) == [-400.0, -7.0]
+
+
+def test_89_a_misaligned_inventory_is_refused_not_silently_joined():
+    """The fix joins inventory to products by position, which is correct only because the two
+    tables are the same export in the same order (7,674 of 7,674 aligned on the pilot). If a
+    future export breaks that, attaching stock by position would publish one product's stock
+    on another — the same defect, quieter. So misalignment is an error, not a guess."""
+    import pytest
+    from src.engine.inputs import _shape_products, MisalignedInventoryError
+    prod = [{"barcode": "1", "product_name": "a"}, {"barcode": "2", "product_name": "b"}]
+    inv = [{"barcode": "2", "product_name": "b", "current_stock": 1.0},
+           {"barcode": "1", "product_name": "a", "current_stock": 2.0}]
+    with pytest.raises(MisalignedInventoryError):
+        _shape_products(prod, inv, OwnerState.unavailable("x"))
+    with pytest.raises(MisalignedInventoryError):
+        _shape_products(prod, inv[:1], OwnerState.unavailable("x"))
+
+
+def test_89_a_missing_inventory_still_reads_as_none_not_zero():
+    """A withheld stock table is `None` for every row (ARCH-DRIVER-002). The positional join
+    must not turn "no table" into an alignment error or into zero."""
+    from src.engine.inputs import _shape_products
+    products, _ = _shape_products([{"barcode": "1", "product_name": "a"}], None, OwnerState.unavailable("x"))
+    assert products[0]["recorded_stock"] is None

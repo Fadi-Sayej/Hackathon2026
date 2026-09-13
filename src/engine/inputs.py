@@ -51,12 +51,46 @@ def _num(v) -> Optional[float]:
     return float(v) if isinstance(v, (int, float)) and not isinstance(v, bool) else None
 
 
+class MisalignedInventoryError(ValueError):
+    """The inventory table is not row-for-row the products table, so a row's stock cannot
+    be attached to it by position. Refused rather than guessed (#89)."""
+
+
+def _stock_by_row(products, inventory) -> list:
+    """One stock value per product row, taken from the SAME row of the export.
+
+    #89. This used to be a dict keyed on (barcode, product_name), and that key is not
+    unique: the pilot carries 30 keys with more than one row and differing stock, so the
+    last row's stock was written onto every earlier one. 35 rows published another row's
+    stock, 25 real negative stocks vanished, and ADR-019 was blinded as a side effect —
+    rows that disagreed only on stock reached `_resolve_identity` already agreeing, and
+    collapsed as "the same row twice".
+
+    Position is the identity that works, because the two tables are the same export: the
+    importer projects every silver table from one `normalized_rows` list in one loop
+    (`pos_importer.import_pos_file`). It is checked rather than assumed, because the day a
+    table is regenerated on its own, attaching stock by position would publish one
+    product's stock on another — this same defect, quieter.
+    """
+    if not inventory:
+        return [None] * len(products)          # a missing stock table is None, never 0
+    if len(inventory) != len(products):
+        raise MisalignedInventoryError(
+            f"inventory has {len(inventory)} rows and products has {len(products)}; "
+            "they must be the same export, row for row")
+    for i, (p, r) in enumerate(zip(products, inventory)):
+        if (norm_barcode(p.get("barcode")) != norm_barcode(r.get("barcode"))
+                or p.get("product_name") != r.get("product_name")):
+            raise MisalignedInventoryError(
+                f"row {i}: products has {p.get('barcode')!r} {p.get('product_name')!r}, "
+                f"inventory has {r.get('barcode')!r} {r.get('product_name')!r}")
+    return [_num(r.get("current_stock")) for r in inventory]
+
+
 def _shape_products(products, inventory, owner: OwnerState) -> list:
-    stock = {}
-    for r in inventory or []:
-        stock[(norm_barcode(r.get("barcode")), r.get("product_name"))] = _num(r.get("current_stock"))
+    stock = _stock_by_row(products, inventory)
     out = []
-    for r in products:
+    for i, r in enumerate(products):
         barcode = norm_barcode(r.get("barcode"))
         owner_cost = answered_cost(owner, barcode) if barcode else None
         pos_cost = _pos(r.get("cost_price"))
@@ -66,7 +100,7 @@ def _shape_products(products, inventory, owner: OwnerState) -> list:
             "shelf_price": _pos(r.get("selling_price")), "delivery_price": _pos(r.get("wolt_price")),
             "cost_price": owner_cost if owner_cost is not None else pos_cost,
             "cost_source": "owner" if owner_cost is not None else ("pos" if pos_cost is not None else None),
-            "recorded_stock": stock.get((barcode, r.get("product_name"))),
+            "recorded_stock": stock[i],
         })
     return _resolve_identity(sorted(out, key=lambda p: (p["barcode"] or "", p["product_name"] or "")))
 
