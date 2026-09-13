@@ -639,22 +639,14 @@ def build_competitor_product_signals(
     qr = build_quality_report(signals, run_at, out_path)
     qr_path = _write_quality_report(qr, ts_str)
 
-    # ── 5b. Source status contract ────────────────────────────────────────────
-    try:
-        from src.common.source_status import update_source
-
-        update_source(
-            "wolt_delivery",
-            status="complete" if not wolt_df.is_empty() else "not_started",
-            row_count=len(wolt_signals),
-        )
-        update_source(
-            "alonit_prices",
-            status="complete" if not alonit_df.is_empty() else "not_started",
-            row_count=len(alonit_signals),
-        )
-    except Exception:  # status tracking must never break the build
-        pass
+    # ── 5b. Source status contract — RETIRED (ADR-005) ────────────────────────
+    # This wrote public/data/sources.json, which ADR-005 retires at the browser
+    # cut-over and design §20.2 says stops *immediately*. The cut-over happened on
+    # 2026-09-12 and this kept writing, which is how the file ended up with two
+    # writers disagreeing 30x about what `row_count` meant: here it was
+    # len(alonit_signals) = 560,596 after dedup, in export_dashboard_data.py it was
+    # raw parquet rows across 33 snapshot days = 17,165,316. Both were true; the
+    # field never had a definition. dashboard.json's `vintages` is the provenance now.
 
     logger.info(
         "=== Done: {} signals  "

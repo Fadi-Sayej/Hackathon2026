@@ -296,16 +296,8 @@ def build_expiry_report(
     json_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     md_path.write_text(_build_markdown_report(report, alerts), encoding="utf-8")
 
-    try:
-        from src.common.source_status import update_source
-
-        update_source(
-            "expiry_scans",
-            status="complete" if scans else "not_started",
-            row_count=len(scans),
-        )
-    except Exception:  # status tracking must never break the report
-        pass
+    # The update_source("expiry_scans", …) call that used to sit here wrote
+    # public/data/sources.json, retired by ADR-005 at the browser cut-over.
 
     return report
 

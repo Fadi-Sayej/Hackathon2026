@@ -7,7 +7,6 @@ from typing import Any
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from src.common.source_status import update_source
 from src.internal_pos.pos_normalizer import inspect_pos_file, load_schema_config, load_raw_rows, normalize_rows
 from src.internal_pos.pos_quality import build_quality_report, classify_source_file, write_quality_report
 
@@ -120,10 +119,8 @@ def import_pos_file(
     )
     quality_path = write_quality_report(report, QUALITY_REPORT_DIR)
 
-    try:
-        update_source("yomyom_pos", status="complete", row_count=len(normalized_rows))
-    except Exception:  # status tracking must never break the import
-        pass
+    # public/data/sources.json is retired (ADR-005, design §20.2 "stops immediately").
+    # The update_source("yomyom_pos", …) call that used to sit here is gone with it.
 
     try:
         from src.snapshots.pos_snapshots import archive_current_silver
