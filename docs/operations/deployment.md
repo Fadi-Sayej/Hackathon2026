@@ -23,32 +23,33 @@ HTTPS, deployment URLs, and rollbacks.
 
 ## Pilot prerequisites — verified status
 
-Task 0.13's checkpoint, run 2026-09-12. Three of five pass; the two that do not are
-console actions, not code, and both take the pilot down rather than degrading it quietly.
+Task 0.13's checkpoint. First run 2026-09-12 had three of five; re-verified **2026-09-13**,
+now **five of five**. The two that were outstanding were console actions, not code, and
+both have since been done.
 
 | # | Prerequisite | Verified | Evidence |
 |---|---|---|---|
 | 1 | Six `VITE_FIREBASE_*` values present; `VITE_STORE_ID` matches `firestore.rules` | **pass** | `npm run check:firebase` exits 0, store id `yomyom-kafr-qasim` |
 | 2 | Anonymous sign-in enabled; rules allow a write and read-back | **pass** | `npm run check:firebase-live` — sign-in ✅, write+read ✅, probe cleaned up |
 | 3 | The engine pulls owner state with the service account | **pass** | `_pull_owner_state()` → `available`, `data/owner/owner_state.json` written |
-| 4 | `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD` set in Vercel for Production **and** Preview | **NOT VERIFIED** | `npx vercel env ls` → *"The specified token is not valid"*. Needs `vercel login` on the deployment machine |
-| 5 | GitHub secret `FIREBASE_SERVICE_ACCOUNT_JSON` for a read-only service account | **NOT SET** | `gh api repos/Fadi-Sayej/Hackathon2026/actions/secrets` → `total_count: 0`, with admin permission — so this is an absence, not a permissions failure |
+| 4 | `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD` set in Vercel for Production **and** Preview | **pass** (2026-09-13) | `npx vercel env ls` lists both, both environments, created 35d ago. Confirmed live, not just present: `curl https://hackathon2026-fadi19.vercel.app` → **401**, which is the gate working. A 503 would mean a variable was missing |
+| 5 | GitHub secret `FIREBASE_SERVICE_ACCOUNT_JSON` for a read-only service account | **pass** (2026-09-13) | `gh api repos/Fadi-Sayej/Hackathon2026/actions/secrets` → `total_count: 1`, `FIREBASE_SERVICE_ACCOUNT_JSON` |
 
-### What each unmet item costs
+### What items 4 and 5 cost while they were unmet
+
+Kept here because both failure modes are silent and will look the same if either is ever
+unset again.
 
 **4 — Basic Auth.** `middleware.ts` fails closed: with either variable unset every request
 returns HTTP 503 (design §11.7). The failure is safe but **total**, and invisible until
 someone opens the URL. An unset pair takes the pilot app down on the day it is shown.
+`curl` the URL and read the status code — 401 is healthy, 503 is a missing variable.
 
 **5 — the CI secret.** Without it the nightly workflow cannot pull owner state, so every
 CI-produced artefact carries `owner_state: unavailable` and `owner_questions` publishes
 `unavailable: answer_storage_unavailable`. The engine is honest about it — it does not
 invent an empty answer set — but the owner is never asked a cost question by anything CI
-builds. Locally, with `FIREBASE_SERVICE_ACCOUNT_PATH` exported, the same run publishes
-`owner_questions: available` with 12 candidates against a limit of 3.
-
-**Neither is code.** Both are a console action by someone with access to the Vercel project
-and the GitHub repository, and both must be done before the pilot URL is shown to anyone.
+builds.
 
 ### Running the engine with credentials
 
@@ -86,7 +87,9 @@ service-account files, or `.vercel/`.
 The committed bundle already contains the real YomYom product catalog in `src/data/demoProducts.js`.
 That is enough for the deployed app to show real product names, categories, prices, and inventory.
 
-The daily operational export lives at `public/data/operational.json`.
+**Since the Task 2.7 cut-over, the artefact the owner reads is
+`public/data/dashboard.json`,** not `operational.json`. `loadDashboard.js` is the only
+adapter a V1 page uses; nothing reachable from the nav imports `loadOperationalData`.
 
 **Decision: option 1 — the generated `public/data/*.json` files are committed.** Option 2 is not
 available: Vercel's build image has no Python, no pyarrow, and no `data/**` parquet (all gitignored),
@@ -94,19 +97,40 @@ so it cannot regenerate the JSON. Option 3 waits on B-2/B-6. Committing the arti
 clean Vercel build produce a working site, and `nagham.md` B-1 is explicit that the pilot cannot
 depend on someone's laptop.
 
-The committed export is real, regenerated from the committed `yomyom-inventory.csv`: **2,183
-recommendations** — 1,147 `CHECK_WOLT_PRICE_GAP`, 625 `CHECK_NEGATIVE_STOCK`, 307
-`VERIFY_UNKNOWN_BARCODE`, 104 `CHECK_MARGIN` — across 7,674 POS products.
+Read from `public/data/dashboard.json` on 2026-09-13 (schema 2, generated
+2026-09-12T13:21:36Z) — **3,533 entries** across seven capabilities:
 
-To refresh it for a release:
+| Capability | Status | Entries |
+|---|---|---|
+| `catalogue_lifecycle` | available | 1,632 |
+| `hygiene` | available | 1,187 |
+| `reconciliation` | available | 439 |
+| `price_consistency` | available | 199 |
+| `margin_below_cost` | available | 71 |
+| `competitor_position` | available | 5 |
+| `owner_questions` | available | 0 |
+
+**Refreshing is automatic.** `collect-daily.yml` runs the engine nightly and commits
+`public/data/dashboard.json` and `market-context.json`; the push makes Vercel redeploy.
+That commit step was added 2026-09-13 — before it, the nightly published the artefact into
+the runner's workspace and threw it away, so the owner's screen only ever changed when a
+human committed one by hand.
+
+To refresh by hand for a release:
 
 ```bash
 python3 scripts/import_yomyom_pos.py --input yomyom-inventory.csv   # POS CSV → silver parquet
-npm run data:dashboard                                              # → public/data/*.json
-git add public/data/operational.json public/data/sources.json
-git commit -m "data: refresh operational export"
+npm run data:refresh                                                # → public/data/dashboard.json
+git add public/data/dashboard.json public/data/market-context.json
+git commit -m "data: refresh the engine artefact"
 git push                                                            # Vercel redeploys
 ```
+
+`public/data/operational.json` and `sources.json` are **frozen** and no longer refreshed.
+`refresh_pipeline.py` stopped running on 2026-09-13: its `product_recommendations` step
+required `silver_pos/yomyom_sales.parquet`, which Task 0.6 deleted on purpose because its
+`units_sold_30d` was synthesised from a monthly mean (rule 13). Frozen is the correct state
+for a rollback target — see §20.2. Phase 4 deletes the chain.
 
 `vercel.json` serves `/data/*` with `Cache-Control: no-store`, so a redeploy is picked up
 immediately rather than serving a manager yesterday's actions.
