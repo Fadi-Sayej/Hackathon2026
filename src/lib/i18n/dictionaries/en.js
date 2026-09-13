@@ -888,6 +888,9 @@ export const en = {
   // ── V1 navigation (cut-over) ────────────────────────────────────────
   'page.daily.name': "Today",
   'page.daily.hint': "What needs you right now",
+  'page.daily.title': "Today’s work",
+  'page.daily.description':
+    "What needs your decision today. Record what you did and it will not come back.",
   'page.questions.name': "Cost questions",
   'page.questions.hint': "One answer improves the recommendations",
   'page.price_consistency.name': "Delivery price",
