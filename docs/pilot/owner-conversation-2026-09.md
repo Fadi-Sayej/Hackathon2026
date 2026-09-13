@@ -101,7 +101,13 @@ when they differ.
 ## 3. A figure we have committed to saying, and cannot yet
 
 `intent.md` §9.4 commits to telling him that **1,628** items in his catalogue are services
-and internal codes that nobody else sells. **Our own rule finds 782** — less than half.
+and internal codes that nobody else sells. **Our own rule finds 722** — well under half.
+
+> **Updated 2026-09-13, from 782.** The figure moved when ADR-022 stopped counting
+> barcode-less products that share a name as separate products: 60 such rows now appear as
+> 26 conflict records instead, and all 60 were structurally uncomparable, so the count fell
+> by exactly 60 and the comparable population did not move (7,523 − 722 = 6,801). The gap
+> to 1,628 got wider, not narrower — which makes this question more pressing, not less.
 
 Either the barcode-digit test under-counts services that carry a plausible code, or the
 1,628 was looser than the sentence implies. **Do not say either number until this is

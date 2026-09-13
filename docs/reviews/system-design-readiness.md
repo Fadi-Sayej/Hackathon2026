@@ -1190,6 +1190,15 @@ team has committed to saying out loud on 12/9**, and rule 11 says it is quoted f
 artefact that produced it. Recorded for `smartshelf-pm`; belongs with the owner
 conversation, not with this gate.
 
+> **Addendum, 2026-09-13 — the figures above are superseded by ADR-022, not corrected.**
+> Run 3's numbers were read from the artefact as it stood and were true when read, so they
+> stay as written. ADR-022 (#89) then stopped counting barcode-less products that share a
+> name as separate products, which moves this finding's evidence to `catalogue: 7523`,
+> `structurally_uncomparable: 722`, `comparable_population: 6801` (7,523 − 722 = 6,801 —
+> all 60 rows that left were uncomparable). **The finding stays closed:** the predicate and
+> its declared threshold are unchanged, only the population it runs over. The divergence
+> from the intent's 1,628 widens from 782 to 722.
+
 #### ARCH-GATE-003 — still open, and the ground moved under it
 
 Run 2 recorded it as "the design removes the surface and builds nothing in its place". As
