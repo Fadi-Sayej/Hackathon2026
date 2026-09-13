@@ -425,11 +425,17 @@ English follows it.
 - Modify: `package.json` — `"check:surface": "vitest run src/surface/__tests__/checkpoint2.test.jsx"`
 - Modify: `.github/workflows/ci.yml`
 
-> **Not Playwright, for now.** Task 2.7's cut-over is deferred (D-14 / GAP-009), so the
-> spine is not the app's default and there is no URL to drive. The check runs the same
+> **Not Playwright, for now.** Written before Task 2.7's cut-over, when the spine was not
+> yet the app's default and there was no URL to drive it against. The check runs the same
 > crossing — `loadDashboard → compose → DailyPage → ownerState` — in jsdom against
 > `public/data/dashboard.json`, the file the engine actually produced, and runs in CI.
-> When the cut-over happens it becomes `e2e/daily-surface.spec.js` unchanged in substance.
+>
+> **The cut-over happened 2026-09-12** (Task 2.7), so there is now a real URL to drive —
+> but `e2e/daily-surface.spec.js` was never written; `check:surface` in jsdom is still the
+> only thing exercising this crossing. `e2e/daily-work.spec.js` (the pre-cut-over spec) is
+> `test.skip`'d rather than replaced, and stays that way until Phase 4 Task 4.1 deletes it
+> with the page it drove. Writing the Playwright version is unclaimed work, not a blocker —
+> `check:surface` already covers AC-100, AC-101, AC-103, AC-107, AC-109 for real.
 
 **Why e2e and not unit.** Every test above hands its unit a fixture. None of them crosses
 `loadDashboard` → `compose` → `DailyPage` → `ownerState` with a real artefact, and that is
