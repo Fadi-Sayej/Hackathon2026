@@ -1,7 +1,7 @@
 ---
 ID: ADR-020
 Title: The published population is a policy setting, not a constant
-Status: Draft
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-09-12
 Parent: [System Design](../system-design.md) §19
@@ -12,7 +12,7 @@ Updated: 2026-09-12
 
 # ADR-020 — The published population is a policy setting, not a constant
 
-**Status:** Draft · **Recorded in:** [System Design](../system-design.md) §19
+**Status:** Accepted (2026-09-13) · **Recorded in:** [System Design](../system-design.md) §19
 
 ## Context
 
@@ -100,6 +100,25 @@ conversation. GAP-009 stays open and still matters — it just no longer holds t
 **We will know it was wrong if:** the owner, shown the whole-catalogue figures, spends his
 ten minutes on products he does not stock. That is an argument for closing GAP-009, not for
 reversing this.
+
+## Confirmation owed before the population changes
+
+Accepted with one condition, and it is the condition this ADR was written around.
+`published_population: whole` is correct **because GAP-009 is open** — withdrawal rests on
+"absent from the monthly reports" meaning "sold nothing", true of 3,932 of 3,932
+withdrawable products, of which exactly one appears in the reports with an observed zero.
+Until the owner confirms that reading, D-14 forbids showing him any figure that depends on
+it, and the whole catalogue is the only honest population.
+
+So this acceptance is **not** an acceptance of `whole` as the permanent answer. It accepts
+that the population is a declared policy line with its reason attached, and that `whole` is
+the right value while the question is open. When
+[GAP-009](../../features/gaps-and-open-questions.md) closes, the value changes to `living`
+— and nothing else, which is the point.
+
+The cost of being wrong is stated above and has not changed: the owner sees 68 confirmed
+losses rather than 53, some over products he may no longer stock. That errs toward showing
+him too much, which is the direction D-14 chose deliberately.
 
 ## Binds
 

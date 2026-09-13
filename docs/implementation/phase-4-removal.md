@@ -97,6 +97,23 @@ LLM layer (`src/lib/ai/*`, `src/api/llm_proxy.py`), telemetry, the MCP server, a
 > `.mcp.json` and `src/mcp_server/` stay pending **P4-OQ-2** — `.mcp.json` launches the
 > local price server, so removing it is a developer-workflow change.
 
+> **P4-OQ-2 answered 2026-09-13: the MCP group is deleted with the rest.**
+>
+> The whole of it is a closed set that nothing else reaches — `.mcp.json`,
+> `src/mcp_server/`, `src/external/mcp_price_adapter.py` and
+> `scripts/run_mcp_price_lookup.py` import each other and nothing in the product imports
+> any of them. The engine drives its own market chain (`market_context`,
+> `competitor_signals`, `product_matching`) and has never used this path.
+>
+> The developer-workflow objection is real but small, and it cuts the other way once
+> stated plainly: a tool that no test, workflow or product path exercises is a tool nobody
+> notices has broken. This repository has been bitten by precisely that four times — rule
+> 12 exists because of it — and an ad-hoc price lookup that silently stops working is the
+> same failure in a smaller costume. The price data it queries is in the committed
+> snapshots either way, so the capability is not lost, only the convenience wrapper.
+>
+> It stays reachable at `v1-attic` if the convenience turns out to be missed.
+
 > **Step 1 run 2, 2026-09-13, at `aa1d9f7`.** Re-run because run 1 predates the cut-over
 > deploying and the nightly changes of 09-13, and because "verify rather than assume" is
 > this phase's own instruction. Method: for every REMOVE token, `git grep` for lines that
@@ -296,6 +313,6 @@ a quarter has passed".
 
 | id | Question | Owner | Blocks |
 |---|---|---|---|
-| P4-OQ-1 | Task 4.3 needs to know every pilot device has opened the app since the cut-over. Nothing measures that today — the outcome store is per-device and the engine only sees what Firestore holds. Is "ask the owner" the answer, or does the artefact need a device count? | smartshelf-pm | Task 4.3 |
-| P4-OQ-2 | §20.1 lists `src/mcp_server/` and `.mcp.json` as REMOVE, but `.mcp.json` is what launches the price server for local development. Removing it is a developer-workflow change, not just a deletion | smartshelf-architect | Task 4.1 |
-| P4-OQ-3 | §20.1 marks `src/telemetry/` dead, but `deployment.md` documents it as the live internal pilot dashboard and PRD §8's 30-day go/no-go depends on measuring what it measures. ARCH-GATE-003 named this and nothing replaced it. Delete it and the pilot loses its own instrument; keep it and §20.1 is wrong | smartshelf-pm, then architect | Task 4.1, and the 12/9 meeting |
+| ~~P4-OQ-1~~ | **Answered 2026-09-13 — the artefact publishes a device count.** Not "ask the owner": what Task 4.3 deletes is irreversible, and a recollection is unverifiable afterwards. Specified in [ADR-021](../architecture/decisions/ADR-021-the-artefact-states-how-many-devices-wrote-owner-state.md), which is `Ready for review` — Task 4.3 waits on its acceptance **and** its implementation. Note the ADR's own limit: the count gives a floor and a date, not proof of completeness, so the owner still confirms "that is all of them" — now against a number rather than from memory | smartshelf-architect | Task 4.3 |
+| ~~P4-OQ-2~~ | **Answered 2026-09-13 — it goes with the group.** See below. | smartshelf-architect | — |
+| ~~P4-OQ-3~~ | **Answered 2026-09-13 — telemetry stays and is rebuilt against `dashboard.json`; it comes off §20.1's REMOVE list.** The question's premise did not survive checking: the page has measured nothing since the cut-over (frozen source, incompatible id namespace, pre-V1 decision store — see `deployment.md` §Internal telemetry page). So deleting it would not have cost the pilot its instrument, because it had already lost one. Rebuilding it is **F13 in substance**, and SPEC-000 §4's reason for never specifying F13 — *"already measured by an existing surface"* — is now known to be false. **smartshelf-pm owes F13 a spec**, and its three numbers are owner decisions (F13 intent §Solution) | smartshelf-pm, then architect | no longer blocks Task 4.1c |
