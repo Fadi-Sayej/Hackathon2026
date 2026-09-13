@@ -92,7 +92,7 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 | [Intent → Spec conformance](reviews/intent-spec-conformance.md) | CONDITIONAL PASS (run 2) |
 | [System Design → Implementation readiness](reviews/system-design-readiness.md) | CONDITIONAL PASS (run 2) — 0 blockers, 3 MAJOR open |
 | [Documentation structure migration](reviews/documentation-structure-migration.md) | see report |
-| [Nightly incident 2026-09-13](reviews/nightly-2026-09-13-incident.md) | FIXED — the nightly published the owner's artefact and never committed it; 4 findings open |
+| [Nightly incident 2026-09-13](reviews/nightly-2026-09-13-incident.md) | FIXED — the nightly published the owner's artefact and never committed it; 2 of 5 findings open |
 
 ## Implementation
 

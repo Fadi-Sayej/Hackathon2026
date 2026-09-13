@@ -103,15 +103,53 @@ failing on it.
 Verified on the runner by `workflow_dispatch`
 [34753047653](https://github.com/Fadi-Sayej/Hackathon2026/actions/runs/34753047653).
 
-## 4. Findings not fixed here
+## 4. Findings
 
-**F-1 — `sources.json` has two writers that disagree about what a row is.** The legacy
-exporter recorded 17,165,316 `alonit_prices` rows and 161,270 `wolt_delivery_catalog` rows;
-the engine's own `competitor_product_signals` step records 560,596 and 7,414 for the same
-33 committed snapshot days, after dedup. A factor of 30 and 22. Whichever number the owner
-is shown, nobody can currently source it (rule 11), so the file is deliberately **not** added
-to the nightly commit and stays frozen. *Someone must decide which figure is the honest one
-before this file is published again.*
+**F-1 — `sources.json` had two writers that disagreed about what a row is. RESOLVED —
+and the finding should not have been raised as a question.** The legacy exporter recorded
+17,165,316 `alonit_prices` rows and 161,270 `wolt_delivery` rows; the engine's
+`competitor_product_signals` step recorded 560,596 and 7,414 for the same 33 committed
+snapshot days, after dedup. Both were correct. `row_count` never had a definition, so
+whichever writer ran last won and neither could be published (rule 11).
+
+This was written up as needing a human decision. It was not open. **ADR-005 (`Accepted`)
+already retires `sources.json` at the browser cut-over, and design §20.2 says it "stops
+immediately", End of Phase 2.** The cut-over shipped 2026-09-12 and three code paths kept
+writing it. The real failure is that an Accepted decision silently did not execute — and
+that this review re-litigated it instead of enforcing it, which is handover rule 8: read
+the artefact chain before reporting a problem.
+
+Retired in `25a3b84` — three live writers removed, file deleted. `dashboard.json`'s
+`vintages` / `inputs_digest` / `run` is the provenance now.
+
+**The durable part is `tests/test_retired_artefacts.py`.** An Accepted ADR that no test
+enforces is a comment, which is exactly how this survived the cut-over. `RETIRED` maps a
+path to the decision that retired it, and one of its two tests drives the real POS importer
+*without* patching a sources path, so a writer coming back fails rather than being silently
+redirected. Add a line when an artefact is retired.
+
+**F-1b — the same defect was live in the artefact the owner reads. FIXED.** Chasing the
+class rather than the instance: `vintages.competitor.sources` was
+`sorted({o["store_id"] …})`, so the published provenance listed 164 "sources" named "401",
+"402", "403" and seven Wolt ObjectIds like `631480ca6741954d25cf2611`. A field named
+`sources` holding store identifiers — the same undefined-field defect as `row_count`, one
+layer closer to the owner. The schema catches neither: it requires an array of strings and
+constrains nothing about which. Fixed in `783eec4` to `sources: ["delivery", "price_file"]`
+with `store_count: 164`. `DataPage` renders only `snapshot_date`, so this was a wrong value
+*available*, not a wrong value on screen.
+
+**Audit of the other §20.2 commitments**, prompted by the worry that one unenforced line
+implies more. It does not — the miss was isolated:
+
+| Commitment | Due | State |
+|---|---|---|
+| Browser reads only `dashboard.json` | End Phase 2 | done |
+| `sources.json` stops immediately | End Phase 2 | **missed — now done** |
+| `operational.json` one more release | End Phase 2 | done, now stopped |
+| ADR-009 outcome-id translation needs the last `operational.json` fetchable | End Phase 4 | intact — still committed at 2.8 MB, which is why it was frozen rather than deleted |
+| Owner-state key migration into `ownerState.v2` | End Phase 4 | present |
+| `check:signals` runs old probes until reorder leaves | Phase 4 | correct for this phase |
+| Firestore off → on | Phase 0 | done, CI secret set |
 
 **F-2 — `data/owner/owner_state.json` is tracked and drifts.** It is the engine's mirror of
 the Firestore owner state, rewritten on every run that pulls with a credential, and it is
