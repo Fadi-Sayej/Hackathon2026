@@ -117,6 +117,29 @@ def _window_from_summary(monthly, policy: Policy) -> Optional[EvidenceWindow]:
     return evidence_window(months, policy.full_annual_cycle_months) if months else None
 
 
+def _competitor_vintage(observations: Optional[list]) -> dict:
+    """Where the competitor half of a run came from, in terms a reader can check.
+
+    `sources` used to be `sorted({o["store_id"] …})`, so the published provenance listed
+    164 "sources" named "401", "402", "403" and a handful of Wolt ObjectIds. Those are
+    store identifiers, not sources, and the schema could not catch it — it requires an
+    array of strings and says nothing about which strings. The DataPage fixture has
+    always expected a feed name (`sources: ['wolt']`).
+
+    So `sources` now names the feeds actually observed — `delivery` (the Wolt catalogue)
+    and `price_file` (the Alonit files) — and the store count keeps its information under
+    a name that describes it. Neither value is inferred; both are read straight off the
+    observations. Mapping a feed kind to a brand would be an assumption, so it is not made
+    here.
+    """
+    obs = observations or []
+    return {
+        "snapshot_date": (max((o["observed_at"] or "")[:10] for o in obs) or None) if obs else None,
+        "sources": sorted({o["source_type"] for o in obs if o.get("source_type")}),
+        "store_count": len({o["store_id"] for o in obs if o.get("store_id")}),
+    }
+
+
 def _shape_observations(signals, stores: StoreTypeConfig) -> Optional[list]:
     if signals is None:
         return None
@@ -157,13 +180,10 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
     if matches:
         for m in matches:
             m["internal_barcode"] = norm_barcode(m.get("internal_barcode"))
-    snapshot_date = None
-    if observations:
-        snapshot_date = max((o["observed_at"] or "")[:10] for o in observations) or None
     vintages = {
         "pos": read_pos_vintage(silver_dir) or {"file": None, "as_of": None},
         "sales": (window.to_dict() if window else {"months": [], "first": None, "last": None, "full_annual_cycle": False}),
-        "competitor": {"snapshot_date": snapshot_date, "sources": sorted({o["store_id"] for o in observations or []})},
+        "competitor": _competitor_vintage(observations),
         "owner_state": {"pulled_at": owner.pulled_at, "status": owner.status},
     }
     vintages["sales"] = {k: vintages["sales"][k] for k in ("months", "first", "last", "full_annual_cycle")}

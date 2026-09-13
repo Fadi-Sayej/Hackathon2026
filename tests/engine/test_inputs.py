@@ -59,6 +59,37 @@ def test_products_are_shaped_and_owner_cost_wins(tmp_path):
     assert inputs.vintages["owner_state"]["status"] == "available"
 
 
+def test_competitor_vintage_names_its_sources_and_counts_its_stores():
+    """`vintages.competitor.sources` has to hold sources.
+
+    It held `store_id`. On the live artefact that meant the owner's provenance block
+    listed 164 "sources" reading "401", "402", "403" and seven Wolt ObjectIds like
+    "631480ca6741954d25cf2611". The DataPage fixture has always expected a feed name
+    (`sources: ['wolt']`), so this is a drift between name and content, not a
+    preference — and the schema cannot catch it: it requires an array of strings and
+    says nothing about which strings.
+
+    Same defect family as the `row_count` that retired sources.json: a field written
+    without a definition. The store count is kept, under a name that says what it is.
+    """
+    from src.engine.inputs import _competitor_vintage
+
+    observations = [
+        {"store_id": "401", "source_type": "price_file", "observed_at": "2026-09-13T02:00:00Z"},
+        {"store_id": "402", "source_type": "price_file", "observed_at": "2026-09-13T02:00:00Z"},
+        {"store_id": "631480ca6741954d25cf2611", "source_type": "delivery",
+         "observed_at": "2026-09-12T02:00:00Z"},
+    ]
+    v = _competitor_vintage(observations)
+    assert v["sources"] == ["delivery", "price_file"]   # what the data came from
+    assert v["store_count"] == 3                        # not thrown away, just named
+    assert v["snapshot_date"] == "2026-09-13"           # newest observation wins
+    assert "401" not in v["sources"]
+
+    empty = _competitor_vintage(None)
+    assert empty == {"snapshot_date": None, "sources": [], "store_count": 0}
+
+
 def test_missing_silver_yields_none_products(tmp_path):
     inputs = load_inputs(policy=load_policy(), owner=OwnerState.unavailable("x"),
                          run_at=datetime(2026, 9, 8, tzinfo=timezone.utc), silver_dir=tmp_path / "none",
