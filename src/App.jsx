@@ -3,7 +3,6 @@ import './App.css'
 
 import { AppShell } from './components/layout/AppShell.jsx'
 import { ReceivingPage } from './pages/ReceivingPage.jsx'
-import { SmoothScrollProvider } from './lib/motion/SmoothScrollProvider.jsx'
 import { loadDashboard } from './lib/dataAdapters/loadDashboard.js'
 import { loadOwnerState, recordAnswer, recordOutcome } from './owner/ownerState.js'
 import { CapabilityPage } from './pages/CapabilityPage.jsx'
@@ -102,16 +101,14 @@ export default function App() {
   }
 
   return (
-    <SmoothScrollProvider>
-      <AppShell
-        activePage={activePage}
-        dataProvenance={provenance}
-        hasDemoState={false}
-        onResetDemoState={null}
-        onNavigate={setActivePage}
-      >
-        {body()}
-      </AppShell>
-    </SmoothScrollProvider>
+    <AppShell
+      activePage={activePage}
+      dataProvenance={provenance}
+      hasDemoState={false}
+      onResetDemoState={null}
+      onNavigate={setActivePage}
+    >
+      {body()}
+    </AppShell>
   )
 }
