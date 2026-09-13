@@ -61,10 +61,17 @@ def _stock_by_row(products, inventory) -> list:
 
     #89. This used to be a dict keyed on (barcode, product_name), and that key is not
     unique: the pilot carries 30 keys with more than one row and differing stock, so the
-    last row's stock was written onto every earlier one. 35 rows published another row's
-    stock, 25 real negative stocks vanished, and ADR-019 was blinded as a side effect —
-    rows that disagreed only on stock reached `_resolve_identity` already agreeing, and
-    collapsed as "the same row twice".
+    last row's stock was written onto every earlier one. Counted per raw row, before any
+    grouping: 35 rows published another row's stock — 13 real negatives shown as a
+    different negative, 12 real negatives hidden as zero or positive, and 9 rows at zero
+    or above shown as negative. Those raw counts include barcoded rows that leave the
+    population as conflicts either way, so they do not sum to the change in the published
+    negative-stock count.
+
+    It also blinds ADR-019 by construction: rows that disagree on stock reach
+    `_resolve_identity` already agreeing. On the pilot none disagreed on stock alone, so no
+    conflict was hidden outright — but 9 conflict records omitted stock from the fields
+    they said were in dispute.
 
     Position is the identity that works, because the two tables are the same export: the
     importer projects every silver table from one `normalized_rows` list in one loop

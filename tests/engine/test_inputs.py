@@ -280,8 +280,9 @@ def test_identical_rows_from_different_export_days_are_the_same_input(tmp_path):
 #
 # _shape_products joined inventory through a dict keyed on (barcode, product_name). That key
 # is not unique — the pilot has 30 keys carrying more than one row with differing stock — so
-# the last row's stock was written onto every earlier one. 35 rows published another row's
-# stock and 25 real negative stock values vanished.
+# the last row's stock was written onto every earlier one. 35 raw rows published another
+# row's stock: 13 real negatives shown as a different negative, 12 hidden as zero or
+# positive, and 9 rows at zero or above shown as negative.
 #
 # Every ADR-019 test above passed throughout, because _dup_silver gives every duplicate row
 # current_stock=1.0: no test ever let two rows disagree on stock, so none crossed the point
