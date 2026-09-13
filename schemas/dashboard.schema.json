@@ -105,6 +105,19 @@
                 "string",
                 "null"
               ]
+            },
+            "as_of_source": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "declared",
+                "git_commit",
+                "file_mtime",
+                null
+              ],
+              "description": "How as_of was arrived at: 'declared' (a human passed --as-of, the only certain one), 'git_commit' (the file's last change in git — machine-independent), 'file_mtime' (last resort; on a CI runner this is checkout time, not an export date). null for tables written before this existed."
             }
           }
         },

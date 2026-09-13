@@ -55,8 +55,18 @@ export function DataPage({ artefact }) {
       ) : null}
 
       <dl className="data__vintages">
+        {/* The date alone is not provenance. `file_mtime` on a CI runner is the checkout
+            time, not the day the export was taken, so a bare date there reads as "this
+            morning" when the stock counts can be months old. Only `declared` is certainly
+            the export date; the other two say what they actually are. */}
         <Field id="pos" label={t('data.pos')} empty={none}>
-          {vintages.pos?.as_of}
+          {vintages.pos?.as_of
+            ? [vintages.pos.as_of,
+               vintages.pos.as_of_source && vintages.pos.as_of_source !== 'declared'
+                 ? t(`data.pos.${vintages.pos.as_of_source}`)
+                 : null,
+              ].filter(Boolean).join(' · ')
+            : null}
         </Field>
         <Field id="sales_window" label={t('data.salesWindow')} empty={none}>
           {sales.first && sales.last ? `${sales.first} … ${sales.last}` : null}
