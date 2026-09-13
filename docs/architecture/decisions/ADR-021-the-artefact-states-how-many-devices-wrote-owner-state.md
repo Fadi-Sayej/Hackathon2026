@@ -1,7 +1,7 @@
 ---
 ID: ADR-021
 Title: The artefact states how many devices have written owner state, and when
-Status: Ready for review
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-09-13
 Parent: [System Design](../system-design.md) §19
@@ -12,7 +12,7 @@ Updated: 2026-09-13
 
 # ADR-021 — The artefact states how many devices have written owner state, and when
 
-**Status:** Ready for review · **Recorded in:** [System Design](../system-design.md) §19
+**Status:** Accepted (2026-09-13, after review) · **Recorded in:** [System Design](../system-design.md) §19
 
 ## Context
 
@@ -46,30 +46,55 @@ Browser, on every owner-state write (ADR-003 keeps the browser the sole writer):
 Engine, at run start, with the rest of the owner-state pull:
 
 ```json
-"owner_state": {
-  "status": "available",
-  "devices": {
-    "count": 3,
-    "seen": [
-      { "id": "d3f1…", "first_seen_at": "2026-09-12T09:14:02Z", "last_seen_at": "2026-09-13T07:41:55Z" }
-    ]
+"vintages": {
+  "owner_state": {
+    "pulled_at": "…",
+    "status": "available",
+    "reason": null,
+    "devices": { "count": 3, "last_seen_at": ["2026-08-30T11:02:00Z", "2026-09-12T09:14:02Z", "2026-09-13T07:41:55Z"] }
   }
 }
 ```
 
-Sorted by `id`, so the artefact stays deterministic. It is an input like every other part of
-owner state, so no capability reads a clock.
+Three things about that shape, each of which the first draft of this ADR got wrong and a
+review caught:
+
+- **It goes under `vintages.owner_state`, which already exists** — `inputs.py` publishes
+  `{pulled_at, status, reason}` there, and owner-state provenance is exactly what that block
+  is for. The first draft invented a second, top-level `owner_state` and would have left the
+  artefact describing the same subject in two places.
+- **The `device_id` is never published.** It exists so the engine can count distinct writers;
+  once counted it has done its work. The published figure is a count and a sorted list of
+  dates, which is what answers "how many wrote since the cut-over" without putting
+  per-device identifiers into a committed file.
+- **Device timestamps are NOT fed to `inputs_digest`.** `_digest()` deliberately excludes
+  `pulled_at` and says why: *"the owner's ANSWERS are an input; the moment we fetched them is
+  not, and hashing it made two runs over identical data disagree — which is precisely the
+  failure this digest exists to detect."* `last_seen_at` moves every time anyone opens the
+  app, so hashing it would re-introduce that exact defect at a higher frequency. It is
+  provenance, not content.
+
+Sorted ascending, so the artefact stays deterministic. It is an input like every other part
+of owner state, so no capability reads a clock.
 
 ## What this does and does not prove
 
-**It gives a floor and a date.** "Three devices have written since the cut-over, the most
-recent this morning" is checkable, and it is in the artefact rather than in someone's
-memory.
+**It counts browser profiles that have written, which is not the same as devices.** Clearing
+site data mints a new `device_id`, and two browsers on one phone count twice — so the number
+can exceed the physical fleet. It is neither a floor nor a ceiling on devices, and the first
+draft of this ADR claimed "a floor", which a review found to be wrong. What it is, exactly:
+*the number of distinct browser profiles that have written owner state, and when each last
+did.*
 
-**It cannot prove completeness.** A device that never opens the app again is
-indistinguishable from a device that does not exist. So the owner still confirms *"that is
-all of them"* — the difference is that he now confirms it **against a number and a set of
-dates**, instead of being asked to recall a fleet.
+That is still the useful quantity, because the thing Task 4.3 risks is **unmigrated legacy
+keys sitting in a profile that has not opened the app since the cut-over** — and the
+migration runs on open. A profile that cleared its storage cleared the legacy keys with it
+and has nothing to migrate, so counting it twice is harmless for this purpose.
+
+**It cannot prove completeness.** A profile that never opens the app again is
+indistinguishable from one that does not exist. So the owner still confirms *"that is all of
+them"* — the difference is that he now confirms it **against a number and a set of dates**,
+instead of being asked to recall a fleet.
 
 That limit is the honest reading and is stated here so no one later mistakes the count for
 a guarantee. It is the same distinction rule 13 draws between "not measurable" and
@@ -104,6 +129,35 @@ question will be asked again at every future migration.
 
 **We will know it was wrong if:** the count is right and nobody looks at it, which would
 mean "ask the owner" was the proportionate answer after all.
+
+## Review, 2026-09-13
+
+Reviewed against the code rather than against the draft's own reasoning, on the instruction
+of the repository owner, who took the decision below. Recorded because handover rule 2
+exists to stop an author approving their own work unexamined, and the honest way to satisfy
+it here was to make the review adversarial and publish what it found.
+
+**It found four defects, all in the draft, all fixed above.**
+
+| # | Finding | Why it mattered |
+|---|---|---|
+| 1 | Invented a **top-level `owner_state`** block | `vintages.owner_state` already exists in `inputs.py` and is the established home for owner-state provenance. Two blocks describing one subject is the drift this repository keeps paying for |
+| 2 | Published the **`device_id`** | The count and the dates answer the question. The id is working state for the engine, not a figure for a reader, and committing per-device identifiers buys nothing the purpose needs |
+| 3 | Silent on **`inputs_digest`** | `_digest()` deliberately excludes `pulled_at`, with a comment saying hashing it "made two runs over identical data disagree — precisely the failure this digest exists to detect". `last_seen_at` moves far more often. An implementer following the draft could have re-introduced a bug this repository had already found and fixed |
+| 4 | Claimed the count is **"a floor"** | It is not. Clearing site data mints a new id and two browsers on one phone count twice, so it can exceed the physical fleet. Under rule 13's own distinction, stating the wrong bound is worse than stating no bound |
+
+Finding 3 is the one that would have cost real time: it is invisible until reproduction
+starts failing intermittently, and the cause would have looked like the engine rather than
+the ADR.
+
+### Considered and not adopted
+
+Having the browser report **whether it actually performed a legacy migration** would say
+something stronger than "this profile has written" — it would say "this profile carried
+legacy data, and it has now been moved". It is a better signal and it is cheap. It is left
+out because it still cannot see a profile that never opens, so it does not remove the
+owner's confirmation, and Task 4.3 does not need it to proceed. Worth revisiting if a second
+migration is ever required.
 
 ## Binds
 
