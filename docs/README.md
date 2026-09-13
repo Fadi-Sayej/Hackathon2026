@@ -57,7 +57,7 @@ globally unique across the specification layer and were **not** renumbered by th
 | F10 — Expiry-Bounded Ordering | [intent](features/F10-expiry-bounded-ordering/intent.md) | *not specified* | V2 |
 | F11 — Supplier Lead Times | [intent](features/F11-supplier-lead-times/intent.md) | *not specified* | V3 |
 | F12 — Planogram | [intent](features/F12-planogram/intent.md) | *not specified* | V4 |
-| F13 — Pilot Measurement | [intent](features/F13-pilot-measurement/intent.md) | *not specified* | V1 |
+| F13 — Pilot Measurement | [intent](features/F13-pilot-measurement/intent.md) | [F13-S1](features/F13-pilot-measurement/specs/F13-S1-pilot-measurement.md) — **`Blocked`** | V1 |
 
 Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](features/gaps-and-open-questions.md)
 — `GAP-…`, `OQ-…`, `ASM-…`.
