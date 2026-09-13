@@ -255,6 +255,36 @@ reachable afterwards.
 > `Ready for review`. It is not approved, and Checkpoint 4's wording is not settled until a
 > human accepts it (handover rule 2).
 
+> **Correction, later on 2026-09-13 — the owner's entry is 369 KB, not 496 KB, and the
+> "4 KB of headroom" argument above is wrong.** Mine to correct: I measured 496 KB, wrote
+> it into the table above as a standing fact, and then argued from it. #88 moved the motion
+> layer off the critical path between that measurement and the argument, and I did not
+> re-measure before reasoning.
+>
+> Measured at `0659474`:
+>
+> | Entry | Size | Headroom against 500 KB |
+> |---|---|---|
+> | `index.html` — the owner's app | **369 KB** (`format` 187 + `main` 182) | **131 KB** |
+> | `telemetry.html` — the team only | 619 KB (`telemetry` 432 + `format` 187) | over; no browser loads both |
+> | lazy, off every critical path | 128 KB (`gsap` 68, `ScrollTrigger` 42, `lenis` 18) | — |
+>
+> `main` fell 309 → 182 KB because those three are now loaded on demand.
+>
+> **What it changes.** The paragraph above asks the team to choose between "the target is
+> real and the owner's entry needs weight taken off it" and "500 KB was chosen when the
+> number meant something else". With 131 KB of headroom that choice is not pressing and
+> should not be presented as though it were: the next component added does not plausibly
+> fail CI. Everything else in that answer stands — the target governs `index.html`, the
+> ratchet governs the total, and the target is now enforced rather than printed.
+>
+> **What it does not change.** Task 4.1 is still repo hygiene rather than a bundle fix, and
+> the case for it is now weaker still, not stronger.
+>
+> The lesson is the one this repository keeps relearning, and I was the one quoting it:
+> a measured figure has a timestamp. Re-measure before arguing from it, especially in a
+> tree where another session is landing work.
+
 ---
 
 ### Task 4.2: Stop writing `operational.json`
