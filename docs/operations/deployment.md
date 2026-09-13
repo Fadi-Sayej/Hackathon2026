@@ -174,6 +174,25 @@ rewrite), so no `vercel.json` rewrite change is needed. It is the internal read-
 dashboard (alerts shown vs acted-on, acceptance by type, ₪ impact). It reads decisions from
 Firestore when `VITE_FIREBASE_*` is set, otherwise from that device's localStorage.
 
+> **It has measured nothing since the cut-over (verified 2026-09-13).** Three independent
+> breaks, each of which alone is enough:
+>
+> 1. `TelemetryDashboard.jsx` reads `public/data/operational.json`, **frozen** at `f5406a0`
+>    on 2026-09-12 and never rebuilt again by design (CLAUDE.md rule 5 — it is the §20.2
+>    rollback target). `dashboard.json` moved on and moves nightly.
+> 2. `telemetryModel.js` joins shown-to-decided by `id`, and the two sets no longer share an
+>    id namespace: the frozen set holds 4,495 rows keyed the pre-ADR-009 way
+>    (`CHECK_WOLT_PRICE_GAP`, `WATCH_PRODUCT`, …), while the owner is shown 3,534 entries
+>    keyed `sha256(signal_family ‖ barcode ‖ variant)` (`price.inverted`,
+>    `recon.impossible_opening`, …).
+> 3. It reads decisions through `src/lib/persistence/persistence.js` — the pre-V1 store.
+>    The V1 app writes one key, `smartshelf.ownerState.v2`.
+>
+> So whatever `/telemetry.html` displays is a still photograph of the pre-cut-over pilot,
+> and **PRD §8's 30-day go/no-go has had no working instrument since 2026-09-12.** The
+> decision taken on 09-13 is to rebuild it against the artefact rather than delete it; until
+> that lands, do not read numbers off this page.
+
 ## Custom Domain
 
 Use the default Vercel deployment URL until the DNS owner confirms a custom subdomain. Do not point
