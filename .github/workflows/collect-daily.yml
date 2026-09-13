@@ -184,6 +184,34 @@ jobs:
       - name: Do detection and hygiene still fail independently?
         run: python3 scripts/check_independence.py
 
+      - name: Are the deployed Firestore rules the ones in this repository?
+        # The pilot's data isolation rests on two lines of firestore.rules: one store is
+        # allowed, everything else denied. Vercel Preview and Production carry the same
+        # VITE_FIREBASE_* values, so that deny branch is the only thing stopping a preview
+        # of any branch from writing the owner's state — Preview's VITE_STORE_ID was set to
+        # `preview-sandbox` on 2026-09-13 precisely so the catch-all refuses it.
+        #
+        # Nothing deploys those rules. `firebase deploy --only firestore:rules` is run by
+        # hand, so the committed file and the live ruleset can drift silently, and a console
+        # edit loosening the catch-all would make the isolation decorative with nothing to
+        # say so. This reads the deployed ruleset text and diffs it.
+        #
+        # Read-only: no document is touched and no anonymous user is created. Exit 2 means
+        # the credential or the API refused, which is a different sentence from drift, so it
+        # is reported and does not fail the night.
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set +e
+          python3 scripts/check_firestore_rules.py
+          code=$?
+          set -e
+          if [ "$code" = "2" ]; then
+            echo "::warning::Could not read the deployed Firestore rules; drift is unverified tonight."
+            exit 0
+          fi
+          exit $code
+
       - name: Is every signal still reaching an output?
         # A run can succeed while a signal quietly stops applying — that has happened
         # four times in this project, each time with unit tests green. Reads

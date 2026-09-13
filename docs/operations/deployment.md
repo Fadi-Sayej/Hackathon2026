@@ -102,12 +102,42 @@ VITE_STORE_ID   Config   Preview      preview-sandbox     ← changed
 VITE_STORE_ID   Secret   Production   (unchanged, 35d)
 ```
 
-Two things this does **not** prove, and both belong to whoever signs #96:
+**The rules that are actually in force were the load-bearing unknown, and they are now
+checked — nightly.** The isolation is only as good as the deployed ruleset, and nothing
+deployed or verified it: `firebase deploy --only firestore:rules` is run by hand.
 
-1. **That the deployed rules match this file.** The isolation rests on it. `firestore.rules`
-   is deployed with `firebase deploy --only firestore:rules`, and nothing in CI checks that
-   the live rules and the committed file agree.
-2. **That Preview and Production point at the same Firebase project.** Likely — the repo
+Settled 2026-09-13 by reading the deployed ruleset rather than inferring it:
+
+```
+project:  hackathon26-a6ebd
+release:  cloud.firestore -> 7447070e-16cd-473a-863b-fa5c7f75bd48
+deployed: 2026-08-09T11:50:54Z
+OK    the deployed ruleset is byte-identical to firestore.rules
+```
+
+So the deny branch really is in force, and `preview-sandbox` really is refused. The
+isolation above is not decorative.
+
+`npm run check:rules` (`scripts/check_firestore_rules.py`) does this, and
+`collect-daily.yml` runs it every night. It is **read-only** — it reads the released
+ruleset from `firebaserules.googleapis.com` and diffs the text. No document is touched and
+no anonymous user is created, which is why it was preferred to a client `getDoc` probe
+against `stores/preview-sandbox/…`: that settles the same question but connects to the
+production project as a new anonymous user.
+
+Exit codes are three sentences, not two: `0` identical, `1` drifted with the diff printed,
+`2` the credential or API refused — reported as a warning, because *"we could not look"* and
+*"a rule changed"* must never look alike. Verified in all three directions, including by
+loosening the local catch-all to `if true` and confirming the diff names that line.
+
+**`npm run check:firebase-live` does not settle this**, and should not be read as though it
+does. It writes, reads and deletes a probe document against the **pilot** store, so it
+exercises the *allow* branch for `yomyom-kafr-qasim` and says nothing about whether any
+other store is denied. The isolation rests on the *deny* branch.
+
+One thing this still does **not** prove, and it belongs to whoever signs #96:
+
+1. **That Preview and Production point at the same Firebase project.** Likely — the repo
    names only `hackathon26-a6ebd` — but unproven, and **not checkable from the CLI**: these
    are Secret-type, and `vercel env pull` returns one identical 11-character placeholder for
    every Secret value. Comparing those placeholders reports a match for any two secrets, and

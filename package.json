@@ -48,6 +48,7 @@
     "check:signals:legacy": "node scripts/check_signals_live.mjs",
     "check:signals:v1": "python3 scripts/check_v1_signals.py",
     "check:independence": "python3 scripts/check_independence.py",
+    "check:rules": "python3 scripts/check_firestore_rules.py",
     "check:surface": "vitest run src/surface/__tests__/checkpoint2.test.jsx",
     "figures": "python3 scripts/figures.py",
     "figures:whole": "python3 scripts/figures.py --population whole"
