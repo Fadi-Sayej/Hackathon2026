@@ -19,7 +19,7 @@ PRD                     what the product is, for whom, and what is out of scope
 2. [**Feature Intents**](features/) — `features/F#-*/intent.md`
 3. [**Approved Feature Specs**](features/) — `features/F#-*/specs/F#-S#-*.md`
 4. [**System Design**](architecture/system-design.md) — the single authoritative architecture
-5. [**ADRs**](architecture/decisions/) — ADR-001 … ADR-014
+5. [**ADRs**](architecture/decisions/) — ADR-001 … ADR-020
 6. [**Implementation Plan**](implementation/plan.md)
 7. **Code** — evidence of what exists, never product authority
 
@@ -66,7 +66,7 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 
 - [**System Design**](architecture/system-design.md) — one document, system-level, answering
   all seven approved specs as one coherent system. Not owned by any feature.
-- [**ADRs**](architecture/decisions/) — ADR-001 … ADR-014, one file each.
+- [**ADRs**](architecture/decisions/) — ADR-001 … ADR-020, one file each.
 
 | ADR | Decision |
 |---|---|
@@ -84,6 +84,17 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 | [ADR-012](architecture/decisions/ADR-012-money-is-a-typed-value-with-a-declared-policy.md) | Money is a typed value with a declared per-capability policy |
 | [ADR-013](architecture/decisions/ADR-013-tests-run-before-merge.md) | Tests run before merge |
 | [ADR-014](architecture/decisions/ADR-014-a-capability-is-the-smallest-independently-unavailable-unit.md) | A capability is the smallest independently-unavailable unit; hygiene is one |
+| [ADR-015](architecture/decisions/ADR-015-ceiling-is-the-densest-qualifying-collapse.md) | The markup ceiling is the densest qualifying collapse, not the last |
+| [ADR-016](architecture/decisions/ADR-016-outcome-snapshot-carries-the-signal-family.md) | The owner-outcome snapshot carries the signal family |
+| [ADR-017](architecture/decisions/ADR-017-a-run-states-whether-its-sales-evidence-arrived.md) | A run states whether its sales evidence arrived |
+| [ADR-018](architecture/decisions/ADR-018-the-browser-does-not-ship-a-schema-validator.md) | The browser does not ship a schema validator |
+| [ADR-019](architecture/decisions/ADR-019-a-conflicting-duplicate-barcode-is-a-hygiene-record.md) | A conflicting duplicate barcode is a hygiene record, never a silent pick |
+| [ADR-020](architecture/decisions/ADR-020-the-published-population-is-a-policy-not-a-constant.md) | The published population is a policy setting, not a constant — **`Draft`**, and the cut-over shipped on it |
+
+ADR-001 … ADR-019 are `Accepted`. **ADR-020 is still `Draft`**, which under the status
+vocabulary means no downstream role may start on it — yet Task 2.7's cut-over shipped on
+it on 2026-09-12 and the pilot has been running on it since. Accepting or rejecting it is
+a human act and is outstanding.
 
 ## Quality gates
 
