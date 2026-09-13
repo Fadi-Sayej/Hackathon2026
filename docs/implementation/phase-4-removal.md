@@ -313,6 +313,6 @@ a quarter has passed".
 
 | id | Question | Owner | Blocks |
 |---|---|---|---|
-| P4-OQ-1 | Task 4.3 needs to know every pilot device has opened the app since the cut-over. Nothing measures that today — the outcome store is per-device and the engine only sees what Firestore holds. Is "ask the owner" the answer, or does the artefact need a device count? | smartshelf-pm | Task 4.3 |
+| ~~P4-OQ-1~~ | **Answered 2026-09-13 — the artefact publishes a device count.** Not "ask the owner": what Task 4.3 deletes is irreversible, and a recollection is unverifiable afterwards. Specified in [ADR-021](../architecture/decisions/ADR-021-the-artefact-states-how-many-devices-wrote-owner-state.md), which is `Ready for review` — Task 4.3 waits on its acceptance **and** its implementation. Note the ADR's own limit: the count gives a floor and a date, not proof of completeness, so the owner still confirms "that is all of them" — now against a number rather than from memory | smartshelf-architect | Task 4.3 |
 | ~~P4-OQ-2~~ | **Answered 2026-09-13 — it goes with the group.** See below. | smartshelf-architect | — |
 | P4-OQ-3 | §20.1 marks `src/telemetry/` dead, but `deployment.md` documents it as the live internal pilot dashboard and PRD §8's 30-day go/no-go depends on measuring what it measures. ARCH-GATE-003 named this and nothing replaced it. Delete it and the pilot loses its own instrument; keep it and §20.1 is wrong | smartshelf-pm, then architect | Task 4.1, and the 12/9 meeting |

@@ -19,7 +19,7 @@ PRD                     what the product is, for whom, and what is out of scope
 2. [**Feature Intents**](features/) — `features/F#-*/intent.md`
 3. [**Approved Feature Specs**](features/) — `features/F#-*/specs/F#-S#-*.md`
 4. [**System Design**](architecture/system-design.md) — the single authoritative architecture
-5. [**ADRs**](architecture/decisions/) — ADR-001 … ADR-020
+5. [**ADRs**](architecture/decisions/) — ADR-001 … ADR-021
 6. [**Implementation Plan**](implementation/plan.md)
 7. **Code** — evidence of what exists, never product authority
 
@@ -66,7 +66,7 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 
 - [**System Design**](architecture/system-design.md) — one document, system-level, answering
   all seven approved specs as one coherent system. Not owned by any feature.
-- [**ADRs**](architecture/decisions/) — ADR-001 … ADR-020, one file each.
+- [**ADRs**](architecture/decisions/) — ADR-001 … ADR-021, one file each.
 
 | ADR | Decision |
 |---|---|
@@ -90,8 +90,9 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 | [ADR-018](architecture/decisions/ADR-018-the-browser-does-not-ship-a-schema-validator.md) | The browser does not ship a schema validator |
 | [ADR-019](architecture/decisions/ADR-019-a-conflicting-duplicate-barcode-is-a-hygiene-record.md) | A conflicting duplicate barcode is a hygiene record, never a silent pick |
 | [ADR-020](architecture/decisions/ADR-020-the-published-population-is-a-policy-not-a-constant.md) | The published population is a policy setting, not a constant |
+| [ADR-021](architecture/decisions/ADR-021-the-artefact-states-how-many-devices-wrote-owner-state.md) | The artefact states how many devices have written owner state, and when — **`Ready for review`** |
 
-All twenty are `Accepted`. ADR-020 was accepted on 2026-09-13 **conditional on GAP-009**:
+ADR-001 … ADR-020 are `Accepted`; ADR-021 is `Ready for review`. ADR-020 was accepted on 2026-09-13 **conditional on GAP-009**:
 `published_population: whole` is the right value while that question is open, and becomes
 `living` when it closes.
 
