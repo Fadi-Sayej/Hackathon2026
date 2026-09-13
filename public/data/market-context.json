@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-12T13:58:44.734054+00:00",
-  "date": "2026-09-12",
+  "generatedAt": "2026-09-13T11:04:34.742215+00:00",
+  "date": "2026-09-13",
   "status": "ok",
   "sources": {
     "weather": "open-meteo",
@@ -9,22 +9,22 @@
     "islamic": "computed_hijri"
   },
   "weather": {
-    "temperatureC": 29.6,
+    "temperatureC": 32.9,
     "precipitation": 0.0,
-    "windSpeed": 15.9,
-    "weatherCode": 2,
-    "label": "warm",
-    "observedAt": "2026-09-12T16:45",
+    "windSpeed": 16.7,
+    "weatherCode": 1,
+    "label": "hot",
+    "observedAt": "2026-09-13T14:00",
     "lat": 32.114,
     "lon": 34.976,
     "source": "open-meteo"
   },
   "hebrew": {
-    "date": "2026-09-12",
+    "date": "2026-09-13",
     "holidays": [
       {
-        "title": "Rosh Hashana 5787",
-        "hebrew": "ראש השנה 5787",
+        "title": "Rosh Hashana II",
+        "hebrew": "ראש השנה ב׳",
         "category": "holiday"
       }
     ],
@@ -41,11 +41,11 @@
     "source": "hebcal"
   },
   "islamic": {
-    "date": "2026-09-12",
+    "date": "2026-09-13",
     "hijri": {
       "year": 1448,
       "month": 3,
-      "day": 29
+      "day": 30
     },
     "isRamadan": false,
     "ramadanDay": null,
@@ -53,8 +53,8 @@
     "isEidAlFitr": false,
     "isEidAlAdha": false,
     "ramadanStart": "2027-02-08",
-    "daysToRamadan": 149,
-    "daysToEidAlFitr": 179,
+    "daysToRamadan": 148,
+    "daysToEidAlFitr": 178,
     "phase": null,
     "windows": {
       "ramadan_build_up_days": 21,
@@ -64,9 +64,29 @@
     },
     "source": "computed_hijri"
   },
-  "demandSignals": {},
-  "demandBasis": {},
-  "activeReasons": [],
+  "demandSignals": {
+    "משקאות": 1.2,
+    "מחלקת -barista": 1.2,
+    "גלידות": 1.15,
+    "קפואים מצוננים": 1.15
+  },
+  "demandBasis": {
+    "משקאות": [
+      "hot_weather"
+    ],
+    "מחלקת -barista": [
+      "hot_weather"
+    ],
+    "גלידות": [
+      "hot_weather"
+    ],
+    "קפואים מצוננים": [
+      "hot_weather"
+    ]
+  },
+  "activeReasons": [
+    "hot_weather"
+  ],
   "shelfLife": {
     "categories": {
       "מחלקת -barista": 2,
@@ -626,6 +646,7 @@
       "7290001045633",
       "7290001045657",
       "7290001045688",
+      "7290001121146",
       "7290001216040",
       "7290001247068",
       "7290001247099",
@@ -1599,6 +1620,7 @@
       "7290110557379",
       "7290110557386",
       "7290110557423",
+      "7290110557874",
       "7290110558314",
       "7290110558420",
       "7290110558437",
@@ -1799,6 +1821,7 @@
       "7290114310406",
       "7290114310536",
       "7290114310550",
+      "7290114310895",
       "7290114311038",
       "7290114311069",
       "7290114311328",
@@ -2388,6 +2411,7 @@
       "91400000028",
       "91400000226",
       "91400001230",
+      "91400001292",
       "91400032210",
       "91400032739",
       "9310072028743",
@@ -2396,7 +2420,7 @@
       "9780201321029",
       "9800800056"
     ],
-    "days": 33,
+    "days": 34,
     "status": "ok",
     "lift": 1.15
   }
