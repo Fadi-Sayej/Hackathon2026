@@ -156,12 +156,37 @@ other store is denied. The isolation rests on the *deny* branch.
 
 One thing this still does **not** prove, and it belongs to whoever signs #96:
 
-1. **That Preview and Production point at the same Firebase project.** Likely — the repo
-   names only `hackathon26-a6ebd` — but unproven, and **not checkable from the CLI**: these
-   are Secret-type, and `vercel env pull` returns one identical 11-character placeholder for
+1. **That the deployed browser bundle targets `hackathon26-a6ebd` at all.** Likely — the repo
+   names no other project — but unproven, and **not checkable from the CLI**: these are
+   Secret-type, and `vercel env pull` returns one identical 11-character placeholder for
    every Secret value. Comparing those placeholders reports a match for any two secrets, and
-   comparing a placeholder against a real name reports a spurious mismatch. Read the real
-   values in the Vercel or Firebase console, never from `env pull`.
+   comparing a placeholder against a real name reports a spurious mismatch. Never settle this
+   from `env pull`. The Vercel dashboard may not settle it either — Secret values are often
+   non-readable after creation.
+
+   **There is a route, and it takes half a minute in a browser.** Vite bakes the config into
+   the built JavaScript, so the deployed bundle carries the project id *in plain text*. It is
+   not a secret: it is already in `.firebaserc` and `collect-daily.yml`. Confirmed against a
+   local build — `hackathon26-a6ebd` appears three times in the telemetry chunk:
+
+   | Entry | `projectId` | `initializeApp` |
+   |---|---|---|
+   | `index.html` — the owner's app | 0 | 0 | 
+   | `telemetry.html` | **present** | 2 |
+
+   `index.html` carries no Firebase at all, which is #94 restated from the other end, and it
+   stays that way until #95 lands. So today the check must use `/telemetry.html`:
+
+   > Open the pilot URL, sign in, go to **`/telemetry.html`**. DevTools → **Sources** →
+   > search all files for `hackathon26`. Whatever project id appears there is the one the
+   > browser writes to. If it is not `hackathon26-a6ebd`, the engine and the browser are
+   > looking at different databases and **#94's write-through would fail in a third way** —
+   > everything green, nothing arriving, for a reason no probe here would catch.
+
+   Neither session can run it: `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD` are not in `.env`,
+   so the protected site is unreachable from a terminal here. It needs whoever has the
+   sign-in. After #95 merges, #96 step 2 settles the same question more directly, by a real
+   answer appearing under `stores/yomyom-kafr-qasim/ownerState/answers`.
 
 The middleware fails closed: if either Basic Auth variable is absent, every request returns HTTP 503
 instead of serving store data publicly.
