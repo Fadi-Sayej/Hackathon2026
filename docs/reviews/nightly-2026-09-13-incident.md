@@ -151,11 +151,32 @@ implies more. It does not — the miss was isolated:
 | `check:signals` runs old probes until reorder leaves | Phase 4 | correct for this phase |
 | Firestore off → on | Phase 0 | done, CI secret set |
 
-**F-2 — `data/owner/owner_state.json` is tracked and drifts.** It is the engine's mirror of
-the Firestore owner state, rewritten on every run that pulls with a credential, and it is
-tracked despite the `data/**` ignore. Nothing commits it, so it only produces a dirty
-working tree after `npm run test:py`. Decide whether the mirror belongs in the repository at
-all.
+**F-2 — `data/owner/owner_state.json` is tracked and drifts. RESOLVED, but not the way this
+finding assumed.** It is the engine's mirror of the Firestore owner state, rewritten on
+every run that pulls with a credential, and tracked despite the `data/**` ignore. This
+asked whether the mirror belongs in the repository at all.
+
+It does. `_pull_owner_state()` reads it when there is no credential, which is what lets a
+stranger reproduce the figures on a laptop — Checkpoint 3's whole claim. Removing it would
+have broken reproduction to tidy a dirty working tree.
+
+The real defect was next to it, and Checkpoint 3 run 2 exposed it: with no service account
+and every `FIREBASE_*` variable stripped, the clone still published
+`owner_state: {status: "available"}` under a `pulled_at` from another machine 22 hours
+earlier. The fallback was flagged twice in code — `read_mirror()` sets
+`reason='from_mirror'`, the caller would set `'no_credentials'` — and the vintage published
+only `pulled_at` and `status`, dropping both. Rule 12 again: a flag set carefully and
+carried nowhere.
+
+Fixed in `859e053`. `reason` now travels into `vintages.owner_state`, is documented in the
+artefact schema, and `DataPage` shows it in all three languages. That screen is where it
+bites: if `FIREBASE_SERVICE_ACCOUNT_JSON` were ever unset in CI — one of the two silent
+failure modes the deployment runbook names — the nightly would fall back to the committed
+mirror and the owner would read "available" beside a stale timestamp with nothing to warn
+him. Design §13 asks for unavailable *honestly*, never silently local.
+
+The dirty working tree after `npm run test:py` remains, and is now understood as cosmetic:
+the mirror is a cache that declares itself, and nothing commits it.
 
 **F-3 — `check_signals_live.mjs` guards a path the owner no longer sees.** It reads
 `public/data/market-context.json` and exercises the legacy JS ranking
