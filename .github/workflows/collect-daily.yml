@@ -102,43 +102,51 @@ jobs:
       # EmptyExportError BEFORE writing, so a failed rebuild leaves the last good
       # dashboard on disk instead of replacing it with an empty one.
       - name: Rebuild silver POS from the committed exports
-        # data/internal/ is gitignored, so a runner starts with no POS tables at
-        # all. Both source files ARE committed; these two importers turn them into
-        # the silver parquet the recommender reads. Skipping the sales import
-        # would cost velocity for 1,565 products and the stock-discrepancy signal.
-        run: |
-          python3 scripts/import_yomyom_pos.py --input yomyom-inventory.csv
-          python3 scripts/import_yomyom_sales.py
+        # data/internal/ is gitignored, so a runner starts with no POS tables at all.
+        # Both source files ARE committed; this importer turns yomyom-inventory.csv into
+        # the products/inventory/margins parquet the engine's capabilities read.
+        #
+        # import_yomyom_sales.py is NOT called here any more: run_engine()'s own
+        # sales_import step writes sales_monthly.parquet and sales_summary.parquet from
+        # the same seven CSVs, which ARE committed under data/internal/raw_pos/yomyom/sales/
+        # despite the data/** ignore. Calling it first was simply the same import twice.
+        run: python3 scripts/import_yomyom_pos.py --input yomyom-inventory.csv
 
-      - name: Refresh the dashboard
-        id: refresh
-        # `npm run data:refresh` is a thin alias for this script; calling Python
-        # directly avoids installing Node for every nightly run.
-        # --json-out, not stdout: the pipeline's libraries log to stdout, so the
-        # printed JSON arrives interleaved with log lines and cannot be parsed.
-        run: python3 scripts/refresh_pipeline.py --json-out /tmp/refresh.json
-
-      - name: Fail on a degraded refresh
-        # The pipeline reports `partial` when a step raised and `degraded` when a
-        # step returned successfully having done nothing (readiness_only). Both
-        # mean the dashboard we are about to commit is worse than the one already
-        # there, so neither may pass quietly.
-        run: |
-          STATUS=$(python3 -c "import json;print(json.load(open('/tmp/refresh.json'))['status'])")
-          echo "refresh status: $STATUS"
-          if [ "$STATUS" != "ok" ]; then
-            echo "::error::Dashboard refresh came back '$STATUS', not 'ok'."
-            echo "::error::Refusing to publish a degraded dashboard. See the step log above."
-            python3 -c "import json;d=json.load(open('/tmp/refresh.json'));[print('::error::step',s['step'],s['status'],s.get('error','')) for s in d['steps'] if s['status']!='ok']"
-            exit 1
-          fi
-
+      # ── Why refresh_pipeline.py is no longer run here (2026-09-13) ──────────
+      #
+      # It cannot be repaired honestly. Its product_recommendations step required
+      # silver_pos/yomyom_sales.parquet, and Task 0.6 deleted that table on purpose:
+      # its units_sold_30d was synthesised from a monthly mean, which is exactly what
+      # rule 13 forbids — the seven reports are MONTHLY and cover 24.3% of the
+      # catalogue. Its companion column demand_per_day_corrected came from
+      # build_velocity_from_snapshots.py, which this workflow has never run, so
+      # corrected_monthly_demand() has always returned None on a runner.
+      #
+      # That leaves no honest repair. Rebuilding the table re-introduces the
+      # synthesised figure Phase 0 removed; passing --allow-no-competitor to get a
+      # green export is rule 10. So the legacy chain stops running instead of being
+      # propped up.
+      #
+      # public/data/operational.json therefore freezes at its last good value, which is
+      # the correct state for a rollback target (§20.2): after the cut-over no V1 page
+      # imports loadOperationalData — only src/telemetry/ does — so nothing the owner
+      # opens reads it. Phase 4 deletes the chain.
+      #
+      # sources.json is left frozen too, deliberately, and NOT added to the commit below
+      # even though competitor_product_signals.py still rewrites it on every engine run.
+      # Its two writers disagree about what a row is: the legacy exporter recorded
+      # 17,165,316 alonit rows where the engine's own chain records 560,596 after dedup,
+      # and 161,270 wolt rows against 7,414. Until someone decides which of those the
+      # owner is being shown, committing either nightly would bake in a number nobody
+      # can source (rule 11).
       - name: Run the engine and publish the artefact
         id: engine
-        # The V1 engine, alongside refresh_pipeline.py rather than instead of it.
-        # operational.json keeps being written for one release so a rolled-back
-        # browser still works (§20.2), and the owner's screen still reads it —
-        # Task 2.7's cut-over waits on D-14 / GAP-009.
+        # The V1 engine, and now the only pipeline here. run_engine() drives its own
+        # market chain (market_context, rehydrate_silver, competitor_signals,
+        # product_matching) and its own sales import, and read nothing the refresh
+        # pipeline produced. On 2026-09-13 the legacy recommender went readiness_only
+        # and the gate that followed exited 1, so this step never ran and the owner's
+        # artefact was never rebuilt — for a failure in a chain it does not use.
         env:
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
           FIREBASE_PROJECT_ID: hackathon26-a6ebd
@@ -160,46 +168,46 @@ jobs:
                   print(f"::warning::step {s['step']} {s['status']} {s.get('error') or ''}")
           PY
 
-      - name: Is every signal still reaching an output?
-        # The refresh can succeed while a signal quietly stops applying — that has
-        # happened four times in this project, each time with unit tests green.
-        # Runs against the dashboard we are about to commit, so an inert signal
-        # blocks the commit instead of shipping.
-        run: node scripts/check_signals_live.mjs
-
       - name: Does each capability depend on what it declares?
         # The V1 equivalent, over the engine's artefact (Task 3.3). Withholds each
         # input at source and reads the published statuses, so a capability that
         # reads something it did not declare is caught. Five engine runs; nightly is
         # where it belongs, not on push.
         #
-        # continue-on-error, deliberately. These two guard dashboard.json, which
-        # nothing reads yet — the browser cut-over has not happened. The step below
-        # commits operational.json, which the OWNER reads. Letting a probe over an
-        # unread artefact block the commit of the one he depends on would take his
-        # screen stale to protect something nobody is looking at.
-        #
-        # They become blocking at the cut-over, when dashboard.json is what he reads.
-        continue-on-error: true
+        # Blocking since the cut-over (Task 2.7), exactly as the earlier note here said
+        # it would become. dashboard.json is now what the owner opens, so a probe
+        # failure means the artefact is wrong — and committing a wrong artefact to his
+        # live surface is worse than leaving him yesterday's. Both run in mode="print"
+        # against tempdir copies, so neither can touch the file about to be committed.
         run: python3 scripts/check_v1_signals.py
 
       - name: Do detection and hygiene still fail independently?
-        continue-on-error: true
         run: python3 scripts/check_independence.py
 
-      - name: Commit the rebuilt dashboard
-        # Only public/data — every intermediate parquet stays gitignored and is
-        # rebuilt from the snapshots on the next run.
+      - name: Is every signal still reaching an output?
+        # A run can succeed while a signal quietly stops applying — that has happened
+        # four times in this project, each time with unit tests green. Reads
+        # public/data/market-context.json, which run_engine() writes through its own
+        # market_context step, so this still guards a file we are about to commit.
+        run: node scripts/check_signals_live.mjs
+
+      - name: Commit the owner's artefact
+        # The step this workflow was missing. The engine published dashboard.json into
+        # the runner's workspace every night and the job then threw it away: nothing here
+        # ever added it to a commit. Before the cut-over that was invisible, because the
+        # browser read operational.json. After it, the owner's screen could only ever show
+        # whatever artefact a human last committed by hand — a nightly run that moves
+        # nothing (rule 12).
         run: |
           git config user.name  "smartshelf-collector"
           git config user.email "collector@users.noreply.github.com"
-          git add public/data/operational.json public/data/market-context.json public/data/sources.json
+          git add public/data/dashboard.json public/data/market-context.json
           if git diff --cached --quiet; then
-            echo "Dashboard unchanged."
+            echo "Artefact unchanged."
             exit 0
           fi
           DAY=$(date -u +%Y-%m-%d)
-          git commit -q -m "refresh: dashboard for ${DAY}"
+          git commit -q -m "engine: artefact for ${DAY}"
           git pull --rebase --autostash origin main || true
           git push origin HEAD:main
 
