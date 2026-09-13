@@ -193,6 +193,41 @@ Firestore when `VITE_FIREBASE_*` is set, otherwise from that device's localStora
 > decision taken on 09-13 is to rebuild it against the artefact rather than delete it; until
 > that lands, do not read numbers off this page.
 
+> **And the instrument is the smaller half. The input has never flowed at all** — found
+> 2026-09-13, filed as **#94 (P0)**.
+>
+> The owner's answers and outcomes have never left his phone. Verified four ways rather
+> than inferred:
+>
+> | Checked | Result |
+> |---|---|
+> | `src/owner/ownerState.js` | `localStorage` only — no Firestore call, no `fetch` |
+> | the V1 spine (`main`, `App`, `surface/*`, `pages/*`) | imports nothing from `firebase` |
+> | the owner's shipped bundle (`main-*.js`, `format-*.js`) | **zero** references to `firestore` / `initializeApp` |
+> | `src/owner_state/pull.py` | reads `stores/{store}/ownerState`, which nothing in `src/` writes |
+>
+> The app cannot write to Firestore: Firebase is not in the bundle he downloads.
+>
+> **It does not look broken.** `recordOutcome` is `async`, validates `signal_family`
+> (ADR-016), checks both enums, and builds a snapshot carrying certainty and
+> characterisation — then writes `localStorage` and returns, never awaiting a network call.
+> He taps done, the card leaves his list, the record dies in his browser.
+>
+> Two consequences worth stating plainly:
+>
+> 1. **Zero outcomes is structural, not disengagement.** With perfect engagement for thirty
+>    days the count would still be zero, so PRD §8's number was never going to compute.
+> 2. **`vintages.owner_state.reason: null` currently reads as healthy and is not.** That
+>    field (859e053) distinguishes a replayed mirror from a live pull; it does not
+>    distinguish a live pull that finds something from one that finds an empty collection.
+>    Until #94 lands it is the most misleading field in the artefact.
+>
+> Design §3 — the verified current-state trace — had this right all along at line 229:
+> outcomes and answers *"never leave the device"*. The write-through in §9.3, §9.4, §11.5
+> and §20 is **target**, not built. Phase 2 Task 2.1 was meant to deliver it and did not;
+> its Step 3 said to reuse `src/lib/persistence/*` unchanged, and that layer syncs
+> different collections with different shapes, so it could never have satisfied §11.5.
+
 ## Prerequisite verification, 2026-09-13
 
 Task 0.13's four non-code prerequisites, all re-checked against the live systems rather
