@@ -166,6 +166,27 @@ they are repointed or removed.
 the bundle (§20.1, S26). Checkpoint 4's 500 KB is unreachable until it goes and trivially
 reachable afterwards.
 
+> **No longer true, measured 2026-09-13 at `0f3a86f`.** The cut-over already achieved it.
+> Nothing reachable imports the demo spine or the planogram, so Vite tree-shakes both out —
+> `grep` across `dist/assets` for `demoProducts`, `loadDemoStoreData`, `packageGeometry`,
+> `FIXTURE_PRESETS` and `allocationEngine` returns **zero hits in every chunk**.
+>
+> What a browser actually downloads:
+>
+> | Entry | Size | Against the 500 KB target |
+> |---|---|---|
+> | `index.html` — the owner's app | **496 KB** (`main` 309 + `format` 187) | **under** |
+> | `telemetry.html` — the team only | 619 KB (`telemetry` 432 + `format` 187) | over, and nobody but us opens it |
+>
+> `check_bundle_size.mjs` had been summing both entries and comparing 928 KB to the 500 KB
+> target, which is not a number anyone downloads. It now resolves each HTML entry to the
+> chunks that entry references and reports per entry; the ratchet still gates on the total.
+>
+> **So Task 4.1 is repo hygiene, not a bundle fix.** That is a materially weaker reason to
+> hurry it, and it removes the argument for deleting anything before Checkpoint 3 is green.
+> Whether Checkpoint 4's "bundle < 500 KB" means the owner's entry or the whole build output
+> is a wording question the guard now surfaces but does not answer. **smartshelf-architect.**
+
 ---
 
 ### Task 4.2: Stop writing `operational.json`
