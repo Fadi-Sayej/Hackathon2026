@@ -51,12 +51,53 @@ def _num(v) -> Optional[float]:
     return float(v) if isinstance(v, (int, float)) and not isinstance(v, bool) else None
 
 
+class MisalignedInventoryError(ValueError):
+    """The inventory table is not row-for-row the products table, so a row's stock cannot
+    be attached to it by position. Refused rather than guessed (#89)."""
+
+
+def _stock_by_row(products, inventory) -> list:
+    """One stock value per product row, taken from the SAME row of the export.
+
+    #89. This used to be a dict keyed on (barcode, product_name), and that key is not
+    unique: the pilot carries 30 keys with more than one row and differing stock, so the
+    last row's stock was written onto every earlier one. Counted per raw row, before any
+    grouping: 35 rows published another row's stock — 13 real negatives shown as a
+    different negative, 12 real negatives hidden as zero or positive, and 9 rows at zero
+    or above shown as negative. Those raw counts include barcoded rows that leave the
+    population as conflicts either way, so they do not sum to the change in the published
+    negative-stock count.
+
+    It also blinds ADR-019 by construction: rows that disagree on stock reach
+    `_resolve_identity` already agreeing. On the pilot none disagreed on stock alone, so no
+    conflict was hidden outright — but 9 conflict records omitted stock from the fields
+    they said were in dispute.
+
+    Position is the identity that works, because the two tables are the same export: the
+    importer projects every silver table from one `normalized_rows` list in one loop
+    (`pos_importer.import_pos_file`). It is checked rather than assumed, because the day a
+    table is regenerated on its own, attaching stock by position would publish one
+    product's stock on another — this same defect, quieter.
+    """
+    if not inventory:
+        return [None] * len(products)          # a missing stock table is None, never 0
+    if len(inventory) != len(products):
+        raise MisalignedInventoryError(
+            f"inventory has {len(inventory)} rows and products has {len(products)}; "
+            "they must be the same export, row for row")
+    for i, (p, r) in enumerate(zip(products, inventory)):
+        if (norm_barcode(p.get("barcode")) != norm_barcode(r.get("barcode"))
+                or p.get("product_name") != r.get("product_name")):
+            raise MisalignedInventoryError(
+                f"row {i}: products has {p.get('barcode')!r} {p.get('product_name')!r}, "
+                f"inventory has {r.get('barcode')!r} {r.get('product_name')!r}")
+    return [_num(r.get("current_stock")) for r in inventory]
+
+
 def _shape_products(products, inventory, owner: OwnerState) -> list:
-    stock = {}
-    for r in inventory or []:
-        stock[(norm_barcode(r.get("barcode")), r.get("product_name"))] = _num(r.get("current_stock"))
+    stock = _stock_by_row(products, inventory)
     out = []
-    for r in products:
+    for i, r in enumerate(products):
         barcode = norm_barcode(r.get("barcode"))
         owner_cost = answered_cost(owner, barcode) if barcode else None
         pos_cost = _pos(r.get("cost_price"))
@@ -66,7 +107,7 @@ def _shape_products(products, inventory, owner: OwnerState) -> list:
             "shelf_price": _pos(r.get("selling_price")), "delivery_price": _pos(r.get("wolt_price")),
             "cost_price": owner_cost if owner_cost is not None else pos_cost,
             "cost_source": "owner" if owner_cost is not None else ("pos" if pos_cost is not None else None),
-            "recorded_stock": stock.get((barcode, r.get("product_name"))),
+            "recorded_stock": stock[i],
         })
     return _resolve_identity(sorted(out, key=lambda p: (p["barcode"] or "", p["product_name"] or "")))
 
@@ -82,18 +123,24 @@ def _resolve_identity(shaped: list) -> tuple:
     listed at two shelf prices has no shelf price the system can state (D-3), and picking
     one by arrival order would compute a markup from a number nobody chose.
 
-    Returns (products, conflicting). A barcode-less row cannot be grouped and is kept as
-    itself — `hygiene.no_identifier` already reports it.
+    Returns (products, conflicting).
+
+    ADR-022 extends this to barcode-less rows, grouped by `product_name`. They used to be
+    "kept as itself", which was only safe while names were unique, and on the pilot they are
+    not: 27 barcode-less names are listed more than once. Kept as themselves, rows sharing a
+    name published their findings under one entry id (`entry_id` falls back to the name), so
+    the owner resolving one silently resolved the others (#89). No field the export carries
+    tells two such rows apart — name, department and price repeat, and position is not stable
+    across exports (ADR-009) — so the honest identity is the name, under the same rule a
+    barcode gets: agree on everything and they are one row, disagree and they are a record.
     """
     groups: dict = {}
     out, conflicting = [], []
     for p in shaped:
-        if p["barcode"] is None:
-            out.append(p)
-            continue
-        groups.setdefault(p["barcode"], []).append(p)
-    for barcode in sorted(groups):
-        rows = groups[barcode]
+        key = ("barcode", p["barcode"]) if p["barcode"] is not None else ("name", p["product_name"])
+        groups.setdefault(key, []).append(p)
+    for key in sorted(groups, key=lambda k: (k[0], str(k[1]))):
+        rows = groups[key]
         if len(rows) == 1:
             out.append(rows[0])
             continue
@@ -105,7 +152,7 @@ def _resolve_identity(shaped: list) -> tuple:
         if not fields:
             out.append(rows[0])                      # the same row twice
             continue
-        conflicting.append({"barcode": barcode,
+        conflicting.append({"barcode": rows[0]["barcode"],
                             "product_name": rows[0]["product_name"],
                             "fields": fields})
     return sorted(out, key=lambda p: (p["barcode"] or "", p["product_name"] or "")), conflicting

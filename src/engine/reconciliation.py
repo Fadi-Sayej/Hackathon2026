@@ -53,12 +53,17 @@ def _hygiene_entries(inputs: EngineInputs) -> list:
 def _conflicting_entries(inputs: EngineInputs) -> list:
     """ADR-019. A barcode whose rows disagree never reaches inputs.products, so it cannot be
     found by walking them — it arrives on its own field. The record carries the disagreeing
-    fields and both values and no money: the prices are precisely what is in doubt (D-1)."""
+    fields and both values and no money: the prices are precisely what is in doubt (D-1).
+
+    ADR-022: a conflict can now be a barcode-less name. Its id falls back to the name the
+    same way `_hygiene_entries` does — `entry_id(family, None)` would give every
+    barcode-less conflict one shared id, which is #89 again, in the one record that exists
+    to report it."""
     family = "hygiene.conflicting_duplicate"
     out = []
     for c in inputs.conflicting or []:
         out.append(Entry(
-            id=entry_id(family, c["barcode"]), signal_family=family,
+            id=entry_id(family, c["barcode"] or c.get("product_name")), signal_family=family,
             capability=HYGIENE, barcode=c["barcode"], product_name=c.get("product_name"),
             department=None, action="fix_record", characterisation="hygiene",
             evidence={"reason": "conflicting_duplicate", "fields": c["fields"]},
