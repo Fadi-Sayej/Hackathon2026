@@ -762,6 +762,7 @@ export const he = {
   'questions.why': "נוגע ל-{money} ₪ במהלך {window}",
   'questions.failed': "לא הצלחנו לשמור — לא נרשם.",
   'unavailable.answer_storage_unavailable': "לא ניתן להגיע למקום שבו נשמרות התשובות.",
+  'unavailable.unknown_stock_date': "איננו יודעים באיזה יום נספר המלאי, ולכן לא ניתן לבדוק זאת.",
   'data.title': "מאיפה הגיעו המספרים",
   'data.none': "אין",
   'data.unknown': "לא ידוע",

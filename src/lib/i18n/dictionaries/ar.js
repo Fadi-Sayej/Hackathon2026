@@ -767,6 +767,7 @@ export const ar = {
   'questions.why': "يخص {money} ₪ خلال {window}",
   'questions.failed': "لم نستطع حفظ الإجابة — لم تُسجَّل.",
   'unavailable.answer_storage_unavailable': "لا نستطيع الوصول إلى مكان حفظ إجاباتك.",
+  'unavailable.unknown_stock_date': "لا نعرف يوم جرد المخزون، فلا يمكن فحص هذا.",
   'data.title': "من أين جاءت الأرقام",
   'data.none': "لا يوجد",
   'data.unknown': "غير معروف",
