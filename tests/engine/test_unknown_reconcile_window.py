@@ -144,6 +144,26 @@ def test_reconciliation_is_unavailable_when_the_stock_date_is_unknown():
     assert out.entries == []
 
 
+def test_an_empty_stock_date_is_as_unknown_as_a_missing_one():
+    """`""` is not a date, and the guard must not treat it as one.
+
+    Found by mutation: changing `if not as_of` to `if as_of is None` left every
+    other test green. An empty string would then pass the guard and reach
+    `date.fromisoformat(as_of[:10])` in _sales_import, which raises ValueError —
+    a capability_error, which is a worse answer than an honest refusal. Anything
+    falsy is "we do not know".
+    """
+    for empty in ("", "   ", None):
+        inputs = make_inputs(products=[product("2", stock=-716.0)],
+                             sales_summary=[summary("2", units=663, receipts=62)], window=W)
+        inputs.vintages.setdefault("pos", {})["as_of"] = empty
+
+        out = run(inputs)
+
+        assert out.status == "unavailable", f"{empty!r} must read as no date"
+        assert out.unavailable_reason == "unknown_stock_date"
+
+
 def test_a_stale_summary_with_no_nulls_is_still_refused():
     """The hole in inferring the date from NULLs in the summary.
 
@@ -182,6 +202,26 @@ def test_a_known_date_that_precedes_every_report_is_refused_too():
 
     assert out.status == "unavailable"
     assert out.unavailable_reason == "no_sales_evidence"
+
+
+def test_a_first_run_with_no_silver_reports_no_pos_data_not_an_unknown_date(tmp_path):
+    """The clean-clone case, across the whole engine rather than at the function.
+
+    A fresh checkout has no silver layer at all (`data/internal/silver_pos/` is
+    gitignored). The new guards must not intercept that: `derive_status` already
+    answers it, and answering it twice with a different reason would tell an
+    operator to look for a stock-count date when what is missing is every table.
+    """
+    import src.engine.run as run_mod
+
+    result = run_mod.run_engine(mode="print", skip_market=True, silver_dir=tmp_path,
+                                sales_dir=tmp_path / "no-reports")
+    recon = result["artefact"]["capabilities"]["reconciliation"]
+
+    assert recon["status"] == "unavailable"
+    assert recon["unavailable_reason"] == "no_pos_data", \
+        "the requires list answers a first run; the stock-date guards must not preempt it"
+    assert result["status"] == "degraded"
 
 
 def test_reconciliation_still_runs_when_the_window_is_known():

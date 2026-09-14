@@ -127,8 +127,12 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
     # full-history sums intact and no NULL to find. Reproduced: 439 findings
     # published `available`, over a window nobody chose. The stock date is a fact the
     # engine already holds, so the guard reads the fact.
+    # `.strip()` is not decoration: a whitespace-only value is truthy, so `if not
+    # as_of` alone let "   " through to date.fromisoformat() in _sales_import, which
+    # raises — a capability_error, which is a worse answer than an honest refusal.
+    # Found by mutation, then by the test written against it.
     as_of = ((inputs.vintages or {}).get("pos") or {}).get("as_of")
-    if not as_of:
+    if not str(as_of or "").strip():
         return CapabilityOutput.unavailable(RECON, SPEC, "unknown_stock_date")
 
     # The second: the date is known, but it precedes every month we have, so no
