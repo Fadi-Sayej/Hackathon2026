@@ -1,3 +1,4 @@
+import { unavailableReason } from '../lib/i18n/unavailableReason.js'
 import { useI18n } from '../lib/i18n/index.js'
 import { dirProps } from '../lib/utils/rtl.js'
 
@@ -36,7 +37,7 @@ export function CapabilityPage({ artefact, capabilityId }) {
       {status === 'unavailable' ? (
         // AC-107. No counts are rendered at all: a zero here would be read as a finding,
         // and the capability did not run.
-        <p className="capability__unavailable">{t(`unavailable.${reason}`)}</p>
+        <p className="capability__unavailable">{unavailableReason(t, reason)}</p>
       ) : (
         <>
           <dl className="capability__counts">

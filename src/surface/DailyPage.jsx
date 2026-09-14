@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
+import { unavailableReason } from '../lib/i18n/unavailableReason.js'
 import { useI18n } from '../lib/i18n/index.js'
 import { formatCurrency } from '../components/shared/formatters.js'
 import { compose } from './compose.js'
@@ -51,7 +52,7 @@ export function DailyPage({ artefact, ownerState, onOutcome, now }) {
         <ul className="daily__unavailable" aria-label={t('daily.unavailable')}>
           {unavailable.map(({ id, reason }) => (
             <li key={id} data-capability={id}>
-              {t(`capability.${id}`)} — {t(`unavailable.${reason}`)}
+              {t(`capability.${id}`)} — {unavailableReason(t, reason)}
             </li>
           ))}
         </ul>

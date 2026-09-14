@@ -1,3 +1,4 @@
+import { unavailableReason } from '../lib/i18n/unavailableReason.js'
 import { useI18n } from '../lib/i18n/index.js'
 import { dirProps } from '../lib/utils/rtl.js'
 
@@ -99,7 +100,7 @@ export function DataPage({ artefact }) {
         {Object.entries(capabilities).map(([id, capability]) => (
           <li key={id} data-capability-status={id}>
             {t(`capability.${id}`)} — {capability.status === 'unavailable'
-              ? t(`unavailable.${capability.unavailable_reason}`)
+              ? unavailableReason(t, capability.unavailable_reason)
               : t('data.available')}
           </li>
         ))}
