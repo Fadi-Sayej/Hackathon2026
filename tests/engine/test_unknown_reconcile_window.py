@@ -40,6 +40,13 @@ from src.internal_pos.sales_importer import import_sales
 W = window_of(["2026-01", "2026-02", "2026-03"])
 
 
+def _vintaged(inputs, as_of="2026-08-12"):
+    """make_inputs() builds no vintages, and run() now reads the stock date from
+    there rather than inferring it from NULLs in the summary."""
+    inputs.vintages.setdefault("pos", {})["as_of"] = as_of
+    return inputs
+
+
 def _unwindowed(barcode, *, units, receipts):
     """A summary row built without a stock-count date.
 
@@ -52,7 +59,7 @@ def _unwindowed(barcode, *, units, receipts):
     row["reconcile_months"] = None
     return row
 
-REPORT = "﻿tתאור פריט,ברקוד/קוד,מכר,מחיר קניה,מחיר מכירה,עלות המכר (חנות),כניסות מלאי,מחיר קניה נטו,הנחה,קוד מחלקה,\n"
+REPORT = "﻿תאור פריט,ברקוד/קוד,מכר,מחיר קניה,מחיר מכירה,עלות המכר (חנות),כניסות מלאי,מחיר קניה נטו,הנחה,קוד מחלקה,\n"
 
 
 def _report(directory: Path, hebrew_month: str, *, units: int, receipts: int) -> None:
@@ -120,16 +127,15 @@ def test_a_known_as_of_is_unchanged(tmp_path):
 
 # ── The consumer must refuse to compute, not compute a zero ──────────────────
 
-def test_reconciliation_is_unavailable_when_the_window_is_unknown():
+def test_reconciliation_is_unavailable_when_the_stock_date_is_unknown():
     """Not `available` with zero findings.
 
     An empty detection list under a green status is indistinguishable from
     "reconciled, nothing missing" — the same silent conversion in a new costume.
     """
-    inputs = make_inputs(
-        products=[product("2", stock=-716.0)],
-        sales_summary=[_unwindowed("2", units=663, receipts=62)],
-        window=W)
+    inputs = make_inputs(products=[product("2", stock=-716.0)],
+                         sales_summary=[_unwindowed("2", units=663, receipts=62)], window=W)
+    inputs.vintages.setdefault("pos", {})["as_of"] = None
 
     out = run(inputs)
 
@@ -138,12 +144,50 @@ def test_reconciliation_is_unavailable_when_the_window_is_unknown():
     assert out.entries == []
 
 
+def test_a_stale_summary_with_no_nulls_is_still_refused():
+    """The hole in inferring the date from NULLs in the summary.
+
+    When no monthly report parses, `import_sales` returns early and does NOT
+    rewrite sales_summary.parquet — a summary from an older run survives with its
+    full-history sums and no NULL to find. Reproduced against the real data: 439
+    findings published `available`, over a window nobody chose. So the guard asks
+    the vintage, which is the fact, rather than the summary, which is a proxy.
+    """
+    inputs = make_inputs(products=[product("2", stock=-716.0)],
+                         sales_summary=[summary("2", units=663, receipts=62)],  # NOT null
+                         window=W)
+    inputs.vintages.setdefault("pos", {})["as_of"] = None
+
+    out = run(inputs)
+
+    assert out.status == "unavailable", "a stale non-null summary must not slip past"
+    assert out.unavailable_reason == "unknown_stock_date"
+
+
+def test_a_known_date_that_precedes_every_report_is_refused_too():
+    """The date is known; the window is still empty.
+
+    A count dated before the first monthly report leaves every row with
+    reconcile_receipts 0.0 — no NULL anywhere — and the `receipts <= 0` skip would
+    swallow all of them, publishing `available` with zero findings. Measured: a
+    2025-12-31 count against Jan–Jul reports zeroes all 1,778 rows.
+    """
+    inputs = _vintaged(make_inputs(
+        products=[product("2", stock=-716.0)],
+        sales_summary=[summary("2", units=0, receipts=0, months=0,
+                               reconcile_units=0.0, reconcile_receipts=0.0, reconcile_months=0)],
+        window=W))
+
+    out = run(inputs)
+
+    assert out.status == "unavailable"
+    assert out.unavailable_reason == "no_sales_evidence"
+
+
 def test_reconciliation_still_runs_when_the_window_is_known():
     """The guard must not fire on a healthy run."""
-    inputs = make_inputs(
-        products=[product("2", stock=-716.0)],
-        sales_summary=[summary("2", units=663, receipts=62)],
-        window=W)
+    inputs = _vintaged(make_inputs(products=[product("2", stock=-716.0)],
+                                   sales_summary=[summary("2", units=663, receipts=62)], window=W))
 
     out = run(inputs)
 
@@ -153,15 +197,29 @@ def test_reconciliation_still_runs_when_the_window_is_known():
 
 def test_one_product_missing_its_window_does_not_silence_the_whole_capability():
     """A row without reconciliation figures is skipped; rows that have them are
-    still reconciled. The capability goes unavailable only when it has nothing
-    windowed to work from."""
-    inputs = make_inputs(
+    still reconciled."""
+    inputs = _vintaged(make_inputs(
         products=[product("1", stock=-716.0), product("2", stock=-716.0)],
         sales_summary=[summary("1", units=663, receipts=62),
                        _unwindowed("2", units=663, receipts=62)],
-        window=W)
+        window=W))
 
     out = run(inputs)
 
     assert out.status == "available"
     assert [e.barcode for e in out.entries] == ["1"]
+
+
+def test_a_row_missing_only_its_unit_count_does_not_crash_the_capability():
+    """float()/int() below would raise on any of the three, and a TypeError here
+    becomes `capability_error` — a worse answer than an honest skip."""
+    row = summary("2", units=663, receipts=62)
+    row["reconcile_units"] = None
+    inputs = _vintaged(make_inputs(products=[product("2", stock=-716.0)],
+                                   sales_summary=[summary("1", units=663, receipts=62), row],
+                                   window=W))
+
+    out = run(inputs)
+
+    assert out.status == "available"
+    assert [e.barcode for e in out.entries] == []
