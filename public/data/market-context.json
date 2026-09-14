@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-13T11:04:34.742215+00:00",
-  "date": "2026-09-13",
+  "generatedAt": "2026-09-14T02:59:03.694421+00:00",
+  "date": "2026-09-14",
   "status": "ok",
   "sources": {
     "weather": "open-meteo",
@@ -9,27 +9,27 @@
     "islamic": "computed_hijri"
   },
   "weather": {
-    "temperatureC": 32.9,
+    "temperatureC": 20.6,
     "precipitation": 0.0,
-    "windSpeed": 16.7,
+    "windSpeed": 7.1,
     "weatherCode": 1,
-    "label": "hot",
-    "observedAt": "2026-09-13T14:00",
+    "label": "warm",
+    "observedAt": "2026-09-14T05:45",
     "lat": 32.114,
     "lon": 34.976,
     "source": "open-meteo"
   },
   "hebrew": {
-    "date": "2026-09-13",
+    "date": "2026-09-14",
     "holidays": [
       {
-        "title": "Rosh Hashana II",
-        "hebrew": "ראש השנה ב׳",
+        "title": "Tzom Gedaliah",
+        "hebrew": "צום גדליה",
         "category": "holiday"
       }
     ],
     "isErevChag": false,
-    "isFastDay": false,
+    "isFastDay": true,
     "isShabbatEve": false,
     "chametz": null,
     "pesachStart": "2027-04-22",
@@ -41,11 +41,11 @@
     "source": "hebcal"
   },
   "islamic": {
-    "date": "2026-09-13",
+    "date": "2026-09-14",
     "hijri": {
       "year": 1448,
-      "month": 3,
-      "day": 30
+      "month": 4,
+      "day": 1
     },
     "isRamadan": false,
     "ramadanDay": null,
@@ -53,8 +53,8 @@
     "isEidAlFitr": false,
     "isEidAlAdha": false,
     "ramadanStart": "2027-02-08",
-    "daysToRamadan": 148,
-    "daysToEidAlFitr": 178,
+    "daysToRamadan": 147,
+    "daysToEidAlFitr": 177,
     "phase": null,
     "windows": {
       "ramadan_build_up_days": 21,
@@ -64,29 +64,9 @@
     },
     "source": "computed_hijri"
   },
-  "demandSignals": {
-    "משקאות": 1.2,
-    "מחלקת -barista": 1.2,
-    "גלידות": 1.15,
-    "קפואים מצוננים": 1.15
-  },
-  "demandBasis": {
-    "משקאות": [
-      "hot_weather"
-    ],
-    "מחלקת -barista": [
-      "hot_weather"
-    ],
-    "גלידות": [
-      "hot_weather"
-    ],
-    "קפואים מצוננים": [
-      "hot_weather"
-    ]
-  },
-  "activeReasons": [
-    "hot_weather"
-  ],
+  "demandSignals": {},
+  "demandBasis": {},
+  "activeReasons": [],
   "shelfLife": {
     "categories": {
       "מחלקת -barista": 2,
@@ -647,6 +627,7 @@
       "7290001045657",
       "7290001045688",
       "7290001121146",
+      "7290001121849",
       "7290001216040",
       "7290001247068",
       "7290001247099",
@@ -933,6 +914,7 @@
       "7290008909884",
       "7290008975780",
       "7290010002078",
+      "7290010002108",
       "7290010117864",
       "7290010117970",
       "7290010119950",
@@ -2053,6 +2035,7 @@
       "7290119777198",
       "7290119778041",
       "7290120663046",
+      "7290120664289",
       "7290121290005",
       "7290121290036",
       "7290121290067",
@@ -2068,6 +2051,8 @@
       "7290121290548",
       "7290121290630",
       "7290121290661",
+      "7290121807081",
+      "7290121807135",
       "7290122780079",
       "7290122780291",
       "7290122780352",
@@ -2420,7 +2405,7 @@
       "9780201321029",
       "9800800056"
     ],
-    "days": 34,
+    "days": 35,
     "status": "ok",
     "lift": 1.15
   }
