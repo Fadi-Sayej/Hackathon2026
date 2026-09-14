@@ -17,6 +17,7 @@ from __future__ import annotations
 from src.engine.inputs import EngineInputs
 from src.engine.model import CapabilityOutput, Entry, Figure, entry_id
 from src.engine.registry import derive_status
+from src.engine.stock_date import usable_stock_date
 
 SPEC = "SPEC-002"
 RECON, HYGIENE = "reconciliation", "hygiene"
@@ -131,8 +132,11 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
     # as_of` alone let "   " through to date.fromisoformat() in _sales_import, which
     # raises — a capability_error, which is a worse answer than an honest refusal.
     # Found by mutation, then by the test written against it.
-    as_of = ((inputs.vintages or {}).get("pos") or {}).get("as_of")
-    if not str(as_of or "").strip():
+    # usable_stock_date is the single definition both halves ask, so the summary
+    # cannot be windowed on a date the capability would have refused, or refused on
+    # one the summary used. It rejects a blank, an unparseable string and a future
+    # date alike — all three are "we do not know when the stock was counted".
+    if usable_stock_date(((inputs.vintages or {}).get("pos") or {}).get("as_of")) is None:
         return CapabilityOutput.unavailable(RECON, SPEC, "unknown_stock_date")
 
     # The second: the date is known, but it precedes every month we have, so no

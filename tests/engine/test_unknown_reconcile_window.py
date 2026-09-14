@@ -263,3 +263,46 @@ def test_a_row_missing_only_its_unit_count_does_not_crash_the_capability():
 
     assert out.status == "available"
     assert [e.barcode for e in out.entries] == []
+
+
+# ── A date that is not a date, and a date that has not happened ──────────────
+# Found by an adversarial review of this branch. `resolve_as_of` validates nothing,
+# so `--as-of` is taken verbatim and the schema types the field as a bare string.
+# Measured against the real data, each of these published 439 findings `available`:
+# date.fromisoformat raised inside _sales_import, _step recorded a step error,
+# import_sales never ran, and the PREVIOUS summary survived with its non-NULL
+# reconcile columns — so the presence-only guard had nothing to catch.
+
+def test_a_string_that_is_not_a_date_is_not_a_date():
+    from src.engine.stock_date import usable_stock_date
+
+    for junk in ("None", "2026-13-45", "unknown", "DROP TABLE", "   ", "", None):
+        assert usable_stock_date(junk) is None, f"{junk!r} must not be usable"
+
+
+def test_a_stock_count_cannot_have_happened_tomorrow():
+    """An mtime on a freshly fetched export is always today or later, and every
+    historical report precedes it — which is "use the entire history" reached
+    through a date that is present and well-formed."""
+    from datetime import date, timedelta
+    from src.engine.stock_date import usable_stock_date
+
+    today = date(2026, 9, 14)
+    assert usable_stock_date("2099-12-31", today=today) is None
+    assert usable_stock_date((today + timedelta(days=1)).isoformat(), today=today) is None
+    assert usable_stock_date(today.isoformat(), today=today) == today, "today itself is fine"
+    assert usable_stock_date("2026-06-06", today=today) == date(2026, 6, 6)
+
+
+def test_the_capability_refuses_a_date_it_cannot_parse():
+    """Both halves ask usable_stock_date, so the summary cannot be windowed on a
+    date the capability would have refused."""
+    for junk in ("None", "2026-13-45", "2099-12-31"):
+        inputs = make_inputs(products=[product("2", stock=-716.0)],
+                             sales_summary=[summary("2", units=663, receipts=62)], window=W)
+        inputs.vintages.setdefault("pos", {})["as_of"] = junk
+
+        out = run(inputs)
+
+        assert out.status == "unavailable", f"{junk!r} must not reconcile"
+        assert out.unavailable_reason == "unknown_stock_date"
