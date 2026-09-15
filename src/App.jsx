@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import './App.css'
+// The daily surface's own rules. Task 2.7 shipped its class names and no stylesheet.
+import './surface/surface.css'
+// …and the other nine V1 pages, which had the same omission.
+import './surface/pages.css'
 
 import { AppShell } from './components/layout/AppShell.jsx'
 import { ReceivingPage } from './pages/ReceivingPage.jsx'
@@ -56,10 +60,22 @@ export default function App() {
     refreshOwnerState()
   }, [refreshOwnerState])
 
+  // `catalog` and `competitor` are the keys AppShell reads, and they are the whole reason
+  // this object exists in the shape it does. Until #111 this returned only generatedAt /
+  // population / run, so `dataProvenance?.catalog === 'real'` was `undefined === 'real'`,
+  // and the owner's real figures were captioned "Demo data" from the cut-over onwards.
+  //
+  // They are derived from the artefact's own vintages rather than hard-coded true: V1 has
+  // no demo path — loadDashboard reads the engine artefact and nothing else — but saying
+  // "real" should still rest on the artefact saying where the data came from, not on the
+  // assumption that it must have.
   const provenance = useMemo(() => {
     const artefact = load.artefact
     if (!artefact) return null
+    const vintages = artefact.vintages || {}
     return {
+      catalog: vintages.pos?.file ? 'real' : null,
+      competitor: vintages.competitor?.snapshot_date ? 'real' : null,
       generatedAt: artefact.generated_at,
       population: artefact.population,
       run: artefact.run?.status,

@@ -33,10 +33,10 @@ EN_DICT = ROOT / "src" / "lib" / "i18n" / "dictionaries" / "en.js"
 # alternative is an enum in the artefact schema, which is an architecture change
 # (#103). Until then these two tests are what keep them equal.
 #
-# `unknown_stock_date` is deliberately absent: it arrives with #102, which is a
-# separate branch. When that lands, this test is what will demand the one-line
-# addition here and in the JS list — which is the guard doing its job, not a
-# conflict to pre-empt.
+# `unknown_stock_date` arrived with #102 and is here now. It was left out on this
+# branch deliberately, and the merge went exactly as that note predicted: the two
+# dictionary edits conflicted, and this test failed on the resolution until the
+# reason was added here too. The guard doing its job.
 KNOWN = {
     "no_pos_data",
     "no_inventory_data",
@@ -47,6 +47,7 @@ KNOWN = {
     "no_comparable_source",
     "answer_storage_unavailable",
     "capability_error",
+    "unknown_stock_date",
 }
 
 

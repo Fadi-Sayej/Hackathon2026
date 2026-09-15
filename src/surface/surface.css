@@ -1,0 +1,231 @@
+/*
+ * surface.css — the V1 daily surface.
+ *
+ * WHY THIS FILE APPEARED LATE
+ *   Task 2.7 cut the browser over to the engine's artefact and shipped `DailyPage` and
+ *   `EntryCard` with a full set of class names — `daily`, `entry-card`,
+ *   `entry-card__value` and the rest — and no rules for any of them. `App.css` styles the
+ *   pre-cut-over class names (`app-shell`, `sidebar`, `topbar`), which is why the chrome
+ *   looked finished while the page inside it rendered as browser defaults: the evidence
+ *   `<dl>` stacked every label above its value, `<ol>` printed its markers, the two spans
+ *   of the money line ran together as "₪16.00per sale", and the three decision buttons
+ *   were unstyled.
+ *
+ *   Reported by the owner from the live site on 2026-09-16.
+ *
+ * WHAT IT IS TRYING TO DO
+ *   One card is one decision. The name and what is wrong come first, the money second and
+ *   large enough to act on, the evidence after that as a quiet table he can check, and the
+ *   three buttons last. Nothing here invents colour or spacing: every value is a token
+ *   from index.css, so the surface matches the chrome around it.
+ *
+ *   Bilingual by construction. Product names are Hebrew, labels may be English, Hebrew or
+ *   Arabic, and EntryCard sets `dir` per card. Everything below is logical — inline-start,
+ *   inline-end, padding-inline — so a card reads correctly in either direction without a
+ *   second set of rules.
+ */
+
+.daily {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* The markers were the "1." and "2." floating in the margin of the live page. The order
+   is meaningful — FR-106 ranks these — but it is carried by position, not by a glyph. */
+.daily__entries {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.daily__empty,
+.daily__error,
+.daily__unavailable {
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius-lg);
+  background: var(--paper-200);
+  color: var(--ink-600);
+}
+
+.daily__unavailable {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.daily__error {
+  border-color: var(--danger);
+  background: var(--danger-wash);
+  color: var(--danger);
+}
+
+/* ── one card, one decision ──────────────────────────────────────────────── */
+
+.entry-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 20px;
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius-xl);
+  background: var(--paper-100);
+  box-shadow: var(--shadow-sm);
+}
+
+.entry-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+
+.entry-card__name {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink-900);
+}
+
+.entry-card__dept {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--ink-400);
+}
+
+.entry-card__what {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--ink-600);
+}
+
+/* The money line. Two spans that ran together without this — the live page read
+   "₪16.00per sale" — so the gap is the fix, not decoration. */
+.entry-card__value {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+}
+
+.entry-card__amount {
+  font-family: var(--font-mono);
+  font-size: 1.375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--danger);
+}
+
+.entry-card__kind,
+.entry-card__estimated {
+  font-size: 0.8125rem;
+  color: var(--ink-600);
+}
+
+/* D-2: a per-sale figure and a one-off figure are different quantities and must not read
+   as the same number. The kind is always beside the amount; this makes it legible rather
+   than merely present. */
+.entry-card__estimated {
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--warn-wash);
+  color: var(--warn);
+}
+
+/* ── the evidence table ──────────────────────────────────────────────────── */
+
+.entry-card__evidence {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px 20px;
+  margin: 0;
+  padding-block: 12px 0;
+  border-top: 1px solid var(--ink-line);
+}
+
+.entry-card__evidence > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.entry-card__evidence dt {
+  font-size: 0.75rem;
+  color: var(--ink-400);
+}
+
+.entry-card__evidence dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--ink-900);
+  overflow-wrap: anywhere;
+}
+
+/* ── the three answers ───────────────────────────────────────────────────── */
+
+.entry-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-block-start: 4px;
+}
+
+.entry-card__actions button {
+  padding: 8px 16px;
+  border: 1px solid var(--ink-line-strong);
+  border-radius: var(--radius-pill);
+  background: var(--paper-100);
+  font: inherit;
+  font-size: 0.875rem;
+  color: var(--ink-900);
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.entry-card__actions button:hover {
+  background: var(--paper-300);
+  border-color: var(--ink-900);
+}
+
+.entry-card__actions button:focus-visible {
+  outline: 2px solid var(--info);
+  outline-offset: 2px;
+}
+
+/* "Done" is the one he reaches for most, so it is the one that looks reachable. */
+.entry-card__actions button[data-outcome='acted'] {
+  border-color: var(--ok);
+  background: var(--ok-wash);
+  color: var(--ok);
+  font-weight: 600;
+}
+
+.entry-card__actions button[data-outcome='acted']:hover {
+  background: var(--ok);
+  color: var(--paper-100);
+}
+
+@media (max-width: 640px) {
+  .entry-card {
+    padding: 16px;
+  }
+
+  .entry-card__evidence {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+
+  .entry-card__actions button {
+    flex: 1 1 auto;
+  }
+}

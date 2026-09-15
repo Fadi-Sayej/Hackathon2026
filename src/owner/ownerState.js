@@ -7,7 +7,14 @@
  *
  * The cache is written first and the caller commits only after that write succeeds (§9.3).
  * An outcome the owner believes is recorded, which is not, is worse than an error.
+ *
+ * Then the record is written through to Firestore (remoteOwnerState.js). Until #94 it was not:
+ * this module wrote localStorage and returned, and the engine — which reads owner state only
+ * from Firestore — never saw a single answer or outcome. The write-through is fired, never
+ * awaited here, so a slow or failed send cannot undo a decision already made.
  */
+
+import { pushAll, writeThrough } from './remoteOwnerState.js'
 
 export const STORAGE_KEY = 'smartshelf.ownerState.v2'
 
@@ -111,11 +118,11 @@ function migrate() {
 export function loadOwnerState() {
   if (cache) return cache
   const existing = readKey(STORAGE_KEY)
-  if (existing) {
-    cache = { ...empty(), ...existing }
-    return cache
-  }
-  return migrate()
+  const state = existing ? (cache = { ...empty(), ...existing }) : migrate()
+  // Once per session: send what this device holds. It recovers everything recorded before
+  // write-through existed, and retries anything a failed send left behind (#94).
+  void pushAll(state)
+  return state
 }
 
 export async function recordOutcome(entry, { status, reason = null, deferredUntil = null } = {}) {
@@ -162,6 +169,7 @@ export async function recordOutcome(entry, { status, reason = null, deferredUnti
     meta: { ...state.meta, updated_at: Date.now() },
   }
   writeState(next)
+  void writeThrough('outcomes', entry.id, next.outcomes[entry.id])
 }
 
 export async function recordAnswer(barcode, { value, status = ANSWER_STATUS.ANSWERED } = {}) {
@@ -173,9 +181,11 @@ export async function recordAnswer(barcode, { value, status = ANSWER_STATUS.ANSW
     throw new Error(`recordAnswer: value ${String(value)} is not a usable cost`)
   }
   const state = loadOwnerState()
+  const record = { cost_price: { value: num, at: Date.now(), status } }
   writeState({
     ...state,
-    answers: { ...state.answers, [barcode]: { cost_price: { value: num, at: Date.now(), status } } },
+    answers: { ...state.answers, [barcode]: record },
     meta: { ...state.meta, updated_at: Date.now() },
   })
+  void writeThrough('answers', barcode, record)
 }

@@ -17,8 +17,7 @@
 # The Wolt URLs use the petah-tikva geographic slug because Wolt routes
 # the Kafr Qasim / Rosh Ha'ayin sector through that city slug.
 #
-# Loaded by: scripts/run_delivery_venue_connector.py (the daily collector) and
-# scripts/run_delivery_to_firestore.py.
+# Loaded by: scripts/run_delivery_venue_connector.py (the daily collector).
 
 targets:
 

@@ -197,7 +197,7 @@ terminology.
 
 ### 6a. Matching Against YomYom POS Products
 
-The `src/external/mcp_price_adapter.py` adapter joins observations to YomYom
+~~The `src/external/mcp_price_adapter.py` adapter~~ (**removed 2026-09-16**, Phase 4 Task 4.1c — the engine's own market chain does this now) joined observations to YomYom
 POS products by:
 
 1. Exact barcode match (GTIN → GTIN)

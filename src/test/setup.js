@@ -13,9 +13,20 @@
  *    "found multiple elements".
  */
 import { afterEach, beforeEach } from 'vitest'
+import { resetPushForTests, setRemoteLoaderForTests } from '../owner/remoteOwnerState.js'
+
+/*
+ * 3. Owner state now writes through to Firestore (#94). No test may load the Firebase SDK
+ *    or reach a network by accident, so every test starts "unconfigured" — the same state a
+ *    build without VITE_FIREBASE_* is in — and a test that exercises the write-through
+ *    installs its own fake with setRemoteLoaderForTests().
+ */
+const UNCONFIGURED = async () => ({ isConfigured: () => false })
 
 beforeEach(() => {
   globalThis.localStorage?.clear?.()
+  setRemoteLoaderForTests(UNCONFIGURED)
+  resetPushForTests()
 })
 
 afterEach(async () => {

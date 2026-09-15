@@ -43,8 +43,7 @@ const ENGINE_REASONS = [
   'no_delivery_prices',
   'no_comparable_source',
   'answer_storage_unavailable',
-  // `unknown_stock_date` arrives with #102, on its own branch; the Python
-  // counterpart will demand it here when that lands.
+  'unknown_stock_date',
   // run-level
   'capability_error',
 ]

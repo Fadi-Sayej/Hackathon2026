@@ -42,9 +42,13 @@ export function DailyPage({ artefact, ownerState, onOutcome, now }) {
     }
   }, [onOutcome, t])
 
+  // No heading inside this section. AppShell's topbar already renders
+  // `page.daily.title`, and `daily.title` is the same string — the live page showed
+  // "Today's work" twice, once in the chrome and once at the top of the list. The
+  // section is labelled instead, so the landmark keeps its name for a screen reader
+  // without printing a second copy for everyone else.
   return (
-    <section className="daily">
-      <h2>{t('daily.title')}</h2>
+    <section className="daily" aria-label={t('daily.title')}>
 
       {error ? <p role="alert" className="daily__error">{t('outcome.failed')}</p> : null}
 

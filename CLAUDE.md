@@ -191,19 +191,20 @@ particular: no role quotes a figure it has not read from the artifact that produ
 - `src/` (Python) — `internal_pos/` POS import · `signals/` competitor signals ·
   `matching/` product matching · `recommendations/` both recommendation families ·
   `external/` connectors · `common/` paths and status · `expiry/`, `internal/`
-  receiving · `mcp_server/` price server (launched by `.mcp.json`).
+  receiving.
 - `src/` (JS) — `pages/` one file per screen · `lib/analytics/` ranking and money
   rules · `lib/dataAdapters/` reads `public/data/*.json` · `lib/i18n/` he/en · `data/`
   generated, committed.
-- `scripts/` — 57 entry points. Only the handful in the System Design §7 are the product.
+- `scripts/` — 67 entry points (52 `.py`, 12 `.mjs`, 3 `.sh`, counted with `ls`). Only the
+  handful in the System Design §7 are the product.
 
 ## Commands
 
 ```bash
 npm run dev            # Vite dev server
 npm run data:refresh   # rebuild every dashboard input (see rule 5)
-npm run test           # 596 JS tests
-npm run test:py        # 478 Python tests
+npm run test           # 645 JS tests
+npm run test:py        # 501 Python tests
 npm run lint
 python3 scripts/analyse_sales_movement.py   # T8: measured calendar weights
 git mine               # log without the daily snapshot commits
@@ -309,7 +310,7 @@ is `Approved`.
 | `Superseded` | Replaced. Carries `Superseded-by:`. | No — follow the pointer |
 
 **`Accepted` and `Approved` are the same gate.** If you treat an ADR's `Accepted` as
-"not approved" you will block the whole chain on all fourteen ADRs.
+"not approved" you will block the whole chain on all twenty-two of them.
 
 ### The handover rules
 

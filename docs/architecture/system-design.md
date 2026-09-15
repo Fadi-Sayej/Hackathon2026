@@ -1245,7 +1245,7 @@ elsewhere in this document resolves to the file below.
 | `src/lib/i18n/*`, `I18nProvider`, `rtl.js`, `format.js` | VERIFIED_WORKING | same | **REUSE** |
 | `src/components/layout/AppShell.jsx`, shared components | VERIFIED_WORKING | same, nav reduced to 10 items: daily · five capability pages (price, reconciliation, hygiene, competitor, catalogue) · margin browse · questions · receiving · data | **REUSE** |
 | `src/App.jsx` | two spines | one spine: artefact + owner state | **REPLACE** |
-| `src/data/*.js`, `scripts/normalize-datasets.mjs`, `loadDemoStoreData`, `posConnectors/*`, `scripts/build-rag-corpus.mjs` | obsolete under target | — | **REMOVE** |
+| `src/data/*.js`, `scripts/normalize-datasets.mjs`, `loadDemoStoreData`, `posConnectors/*`, `scripts/build-rag-corpus.mjs`, `scripts/audit-store-format.mjs` | obsolete under target | — | **REMOVE** |
 | `src/lib/analytics/{reorderEngine,inventoryEngine,demandEngine,competitorEngine,storeFormat,reorderFacts,affinityEngine,planogramEngine,complianceEngine,mockAI,velocityConfidence}.js`, `src/lib/i18n/explainReorder.js`, pages `Recommendations/ApprovedOrders/Dashboard/Report/PriceGap/Products/AssortmentGap` | V2/V4/demo | — (tag `v1-attic`) | **REMOVE** |
 | `src/lib/planogram/*`, `StoreLayoutPage`, `ShelfPlanPage`, `PlanogramPage`, `components/planogram/*`, `e2e/shelf-planning.spec.js` | V4 | — (tag `v1-attic`) | **REMOVE** |
 | `src/lib/ai/*`, `src/api/llm_proxy.py`, `tests/test_llm_*.py`, `compare_explanations.mjs`, `report_reorder_explanations.mjs`, Gemini env keys | unspecified, wired shut | — | **REMOVE** |

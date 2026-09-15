@@ -776,6 +776,7 @@ export const ar = {
   'unavailable.ceiling_degenerate': "هوامشك لا تستقرّ على سقف نستطيع تحديده.",
   'unavailable.capability_error': "حدث خلل عندنا أثناء الحساب. المشكلة منّا لا من بياناتك.",
   'unavailable.unknown': "لم نتمكّن من استخراج هذا اليوم.",
+  'unavailable.unknown_stock_date': "لا نعرف يوم جرد المخزون، فلا يمكن فحص هذا.",
   'data.title': "من أين جاءت الأرقام",
   'data.none': "لا يوجد",
   'data.unknown': "غير معروف",
@@ -787,6 +788,8 @@ export const ar = {
   'data.ownerState.available': "متاحة",
   'data.ownerState.unavailable': "غير متاحة",
   'data.ownerState.fromMirror': "من النسخة المحفوظة، لم تُجلب الآن",
+  'data.devices': "المتصفحات التي حفظت إجاباتك",
+  'data.devices.counted': "{n}، آخر حفظ {last}",
   'data.pos.git_commit': "بحسب آخر تغيير في الملف",
   'data.pos.file_mtime': "التاريخ غير مؤكّد — من ختم الملف",
   'data.available': "تعمل",
@@ -910,20 +913,47 @@ export const ar = {
     "ما يحتاج قرارك اليوم. سجِّل ما فعلته ولن يعود.",
   'page.questions.name': "أسئلة التكلفة",
   'page.questions.hint': "جواب واحد يحسّن التوصيات",
+  'page.questions.title': "أسئلة التكلفة",
+  'page.questions.description':
+    "بدون سعر التكلفة لا يمكن معرفة قيمة التوصية. جواب واحد يغلق السؤال نهائياً.",
   'page.price_consistency.name': "سعر التوصيل",
   'page.price_consistency.hint': "رفّك مقابل Wolt",
+  'page.price_consistency.title': "سعر التوصيل",
+  'page.price_consistency.description':
+    "أين يختلف سعرك على Wolt عن سعر الرف.",
   'page.competitor_position.name': "موقعك من السوق",
   'page.competitor_position.hint': "أسعارك مقابل جيرانك",
+  'page.competitor_position.title': "موقعك من السوق",
+  'page.competitor_position.description':
+    "أسعارك مقابل المتاجر القريبة التي تصحّ مقارنتك بها.",
   'page.reconciliation.name': "مخزون لا يتطابق",
   'page.reconciliation.hint': "استلمت وبعت ولا يتوازن",
+  'page.reconciliation.title': "مخزون لا يتطابق",
+  'page.reconciliation.description':
+    "ما استُلم وما بيع لا يتوازنان مع ما على الرف.",
   'page.hygiene.name': "سجلات تحتاج تصحيحاً",
   'page.hygiene.hint': "بلا باركود، بلا سعر، مخزون سالب",
+  'page.hygiene.title': "سجلات تحتاج تصحيحاً",
+  'page.hygiene.description':
+    "صفوف بلا باركود، أو بلا سعر، أو بمخزون تحت الصفر.",
   'page.catalogue_lifecycle.name': "حياة الكتالوج",
   'page.catalogue_lifecycle.hint': "حيّ، راكد، أو انتهى",
+  'page.catalogue_lifecycle.title': "حياة الكتالوج",
+  'page.catalogue_lifecycle.description':
+    "أي المنتجات ما زالت تتحرك، وأيها سكن، وأيها انتهى.",
   'page.margin_below_cost.name': "تحت التكلفة",
   'page.margin_below_cost.hint': "للاطّلاع فقط",
+  'page.margin_below_cost.title': "تحت التكلفة",
+  'page.margin_below_cost.description':
+    "منتجات سعرها أقل من كلفتها. للاطّلاع فقط — لا قرار مطلوب هنا.",
   'page.data.name': "من أين جاءت الأرقام",
   'page.data.hint': "تواريخ البيانات وحالة التشغيل",
+  'page.data.title': "من أين جاءت الأرقام",
+  'page.data.description':
+    "كم عمر كل مصدر بيانات، وهل اكتمل تشغيل الليلة الماضية.",
   'page.receiving.name': "تسجيل الاستلام",
   'page.receiving.hint': "ما وصل اليوم وتاريخ صلاحيته",
+  'page.receiving.title': "تسجيل الاستلام",
+  'page.receiving.description':
+    "سجِّل ما وصل اليوم وتاريخ انتهاء صلاحيته.",
 }

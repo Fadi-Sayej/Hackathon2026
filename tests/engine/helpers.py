@@ -8,7 +8,7 @@ from src.common.store_types import load_store_types
 from src.engine.inputs import EngineInputs
 from src.engine.model import EvidenceWindow
 from src.engine.policy import load_policy
-from src.owner_state.model import OwnerState
+from src.owner_state.model import OwnerState, device_register
 
 RUN_AT = datetime(2026, 9, 8, 6, 0, tzinfo=timezone.utc)
 
@@ -58,5 +58,6 @@ def make_inputs(**kw):
         vintages={"pos": {"file": "f", "as_of": "2026-08-02"},
                   "sales": {"months": [], "first": None, "last": None, "full_annual_cycle": False},
                   "competitor": {"snapshot_date": "2026-09-08", "sources": []},
-                  "owner_state": {"pulled_at": owner.pulled_at, "status": owner.status}},
+                  "owner_state": {"pulled_at": owner.pulled_at, "status": owner.status,
+                                  "devices": device_register(owner)}},
         owner=owner, policy=kw.get("policy") or load_policy(), run_at=kw.get("run_at") or RUN_AT)

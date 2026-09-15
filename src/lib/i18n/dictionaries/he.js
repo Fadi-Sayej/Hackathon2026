@@ -771,6 +771,7 @@ export const he = {
   'unavailable.ceiling_degenerate': "המרווחים שלך אינם מתכנסים לתקרה שניתן לנקוב בה.",
   'unavailable.capability_error': "משהו השתבש אצלנו בחישוב. זו אשמתנו, לא הנתונים שלך.",
   'unavailable.unknown': "לא הצלחנו להפיק את זה היום.",
+  'unavailable.unknown_stock_date': "איננו יודעים באיזה יום נספר המלאי, ולכן לא ניתן לבדוק זאת.",
   'data.title': "מאיפה הגיעו המספרים",
   'data.none': "אין",
   'data.unknown': "לא ידוע",
@@ -782,6 +783,8 @@ export const he = {
   'data.ownerState.available': "זמינות",
   'data.ownerState.unavailable': "לא זמינות",
   'data.ownerState.fromMirror': "מהעותק השמור, לא נטען עכשיו",
+  'data.devices': "דפדפנים ששמרו את התשובות שלך",
+  'data.devices.counted': "{n}, נשמר לאחרונה {last}",
   'data.pos.git_commit': "לפי השינוי האחרון בקובץ",
   'data.pos.file_mtime': "התאריך לא אומת — לפי חותמת הקובץ",
   'data.available': "פעיל",
@@ -905,20 +908,47 @@ export const he = {
     "מה שדורש את ההחלטה שלך היום. רשום מה עשית והוא לא יחזור.",
   'page.questions.name': "שאלות עלות",
   'page.questions.hint': "תשובה אחת משפרת את ההמלצות",
+  'page.questions.title': "שאלות עלות",
+  'page.questions.description':
+    "בלי מחיר העלות שלך אי אפשר לומר כמה שווה המלצה. תשובה אחת סוגרת את השאלה לתמיד.",
   'page.price_consistency.name': "מחיר משלוח",
   'page.price_consistency.hint': "המדף מול Wolt",
+  'page.price_consistency.title': "מחיר משלוח",
+  'page.price_consistency.description':
+    "היכן שמחיר ה-Wolt שלך ומחיר המדף לא מסתדרים זה עם זה.",
   'page.competitor_position.name': "המיקום שלך בשוק",
   'page.competitor_position.hint': "המחירים שלך מול השכנים",
+  'page.competitor_position.title': "המיקום שלך בשוק",
+  'page.competitor_position.description':
+    "המחירים שלך מול החנויות הסמוכות שאפשר להשוות אליהן בכנות.",
   'page.reconciliation.name': "מלאי שלא מסתדר",
   'page.reconciliation.hint': "קיבלת ומכרת ולא מסתדר",
+  'page.reconciliation.title': "מלאי שלא מסתדר",
+  'page.reconciliation.description':
+    "מה שהתקבל ומה שנמכר לא מסתדרים מול מה שיש על המדף.",
   'page.hygiene.name': "רשומות לתיקון",
   'page.hygiene.hint': "ללא ברקוד, ללא מחיר, מלאי שלילי",
+  'page.hygiene.title': "רשומות לתיקון",
+  'page.hygiene.description':
+    "שורות ללא ברקוד, ללא מחיר, או עם מלאי מתחת לאפס.",
   'page.catalogue_lifecycle.name': "מחזור חיי הקטלוג",
   'page.catalogue_lifecycle.hint': "חי, תקוע או נגמר",
+  'page.catalogue_lifecycle.title': "מחזור חיי הקטלוג",
+  'page.catalogue_lifecycle.description':
+    "אילו מוצרים עדיין זזים, אילו נדמו, ואילו נגמרו.",
   'page.margin_below_cost.name': "מתחת לעלות",
   'page.margin_below_cost.hint': "לעיון בלבד",
+  'page.margin_below_cost.title': "מתחת לעלות",
+  'page.margin_below_cost.description':
+    "מוצרים שמחירם נמוך מהעלות שלהם. לעיון בלבד — אין כאן החלטה לקבל.",
   'page.data.name': "מאיפה המספרים",
   'page.data.hint': "תאריכי הנתונים ומצב ההרצה",
+  'page.data.title': "מאיפה המספרים",
+  'page.data.description':
+    "בן כמה כל מקור נתונים, והאם ההרצה של אתמול בלילה הסתיימה.",
   'page.receiving.name': "רישום קבלה",
   'page.receiving.hint': "מה הגיע היום ותאריך התפוגה",
+  'page.receiving.title': "רישום קבלה",
+  'page.receiving.description':
+    "רשום מה הגיע היום ומה תאריך התפוגה שלו.",
 }

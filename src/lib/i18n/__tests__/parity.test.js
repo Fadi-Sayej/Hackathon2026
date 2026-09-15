@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { ar } from '../dictionaries/ar.js'
 import { en } from '../dictionaries/en.js'
 import { he } from '../dictionaries/he.js'
+import { NAV_PAGE_IDS } from '../../../components/layout/navGroups.js'
 
 /**
  * AC-112 — the surface renders in all three languages with no untranslated key.
@@ -47,5 +48,36 @@ describe('AC-112 — key parity across the three dictionaries', () => {
       .filter((k) => k in en && k in he)
       .filter((k) => new Set([placeholders(ar[k]), placeholders(he[k]), placeholders(en[k])]).size > 1)
     expect(mismatched).toEqual([])
+  })
+})
+
+/**
+ * #90 — nine of the ten V1 pages rendered `page.<id>.title` as their heading, live, for
+ * days. The parity test above could not see it: parity compares the dictionaries against
+ * EACH OTHER, and these keys were missing from all three, so the three agreed perfectly.
+ *
+ * So this one compares them against the thing that consumes them. AppShell renders
+ * `page.<id>.name`, `.hint`, `.title` and `.description` for every id in the nav; a page
+ * added to the nav without its four strings is the defect, and it is invisible to every
+ * test that starts from the dictionaries.
+ *
+ * e2e/v1-navigation.spec.js is the other half — it proves the rendered heading is not a raw
+ * key — but it can only catch a key missing from Arabic, because the translator falls back
+ * to Arabic before it falls back to the key. A Hebrew or English gap shows Arabic on screen
+ * and passes there. It fails here instead.
+ */
+describe('every page in the nav has its four strings, in all three dictionaries', () => {
+  it.each(['ar', 'he', 'en'])('%s', (name) => {
+    const dict = DICTS[name]
+    const missing = NAV_PAGE_IDS.flatMap((id) =>
+      ['name', 'hint', 'title', 'description']
+        .map((part) => `page.${id}.${part}`)
+        .filter((key) => !(key in dict)),
+    )
+    expect(missing).toEqual([])
+  })
+
+  it('the nav is not empty, so the check above is not vacuous', () => {
+    expect(NAV_PAGE_IDS.length).toBeGreaterThan(0)
   })
 })

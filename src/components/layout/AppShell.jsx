@@ -1,5 +1,6 @@
 import { Button } from '../shared/Button.jsx'
 import { navIcons } from './navIcons.jsx'
+import { navGroups } from './navGroups.js'
 import { ErrorBoundary } from '../shared/ErrorBoundary.jsx'
 import { LANGUAGES, useI18n } from '../../lib/i18n/index.js'
 
@@ -16,44 +17,6 @@ import { LANGUAGES, useI18n } from '../../lib/i18n/index.js'
  * real data it put all 7,451 products on the bottom shelf with 2 facings each.
  * `store-layout` and `shelf-plan` replace it.
  */
-/**
- * The ten V1 pages (design §20.1: "nav reduced to 10 items"), grouped as the owner would
- * group them rather than as the codebase does.
- *
- * The V2/V4 entries — reorder, approved orders, assortment gaps, store layout, shelf plan,
- * dashboard, report — are gone from here at the cut-over. Their code stays until Phase 4 so
- * a rollback still has somewhere to land; it is simply no longer reachable.
- */
-const navGroups = [
-  {
-    id: 'group.daily',
-    items: [
-      { id: 'daily' },
-      { id: 'questions' },
-    ],
-  },
-  {
-    id: 'group.market',
-    items: [
-      { id: 'price_consistency' },
-      { id: 'competitor_position' },
-    ],
-  },
-  {
-    id: 'group.inventory',
-    items: [
-      { id: 'reconciliation' },
-      { id: 'hygiene' },
-      { id: 'catalogue_lifecycle' },
-      { id: 'margin_below_cost' },
-      { id: 'receiving' },
-    ],
-  },
-  {
-    id: 'group.system',
-    items: [{ id: 'data' }],
-  },
-]
 
 /**
  * The icon for a nav id, or nothing.
@@ -102,6 +65,11 @@ export function AppShell({
                     type="button"
                     aria-current={isActive ? 'page' : undefined}
                     className={`nav-item ${isActive ? 'nav-item-active' : ''}`}
+                    /* The page id, in the DOM, because the label is translated and the
+                       order is a layout choice — neither is a stable handle. Same role as
+                       `data-field` on the data page. e2e/v1-navigation.spec.js reads the
+                       nav from here rather than from a list it keeps in step by hand. */
+                    data-nav={item.id}
                     onClick={() => onNavigate(item.id)}
                   >
                     <span className="nav-icon">{renderNavIcon(item.id)}</span>

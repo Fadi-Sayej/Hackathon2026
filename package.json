@@ -30,7 +30,6 @@
     "test:py:fast": "python3 -m pytest tests -q -m \"not slow\"",
     "data:store-types": "python3 scripts/export_store_types.py",
     "classify:store-types": "python3 scripts/classify_store_types.py",
-    "audit:store-format": "node scripts/audit-store-format.mjs",
     "data:refresh": "python3 scripts/run_engine.py",
     "engine:print": "python3 scripts/run_engine.py --print",
     "data:snapshots": "python3 scripts/compare_pos_snapshots.py",

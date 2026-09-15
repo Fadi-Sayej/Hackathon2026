@@ -14,7 +14,7 @@ from src.owner_state.model import SCHEMA, OwnerState
 
 ROOT = Path(__file__).resolve().parents[2]
 MIRROR_PATH = ROOT / "data" / "owner" / "owner_state.json"
-DOCS = ("answers", "outcomes", "revivals", "meta")
+DOCS = ("answers", "outcomes", "revivals", "devices", "meta")
 
 
 def _admin_client(project_id: str, credentials_json: Optional[str], credentials_path: Optional[str]):
@@ -47,6 +47,9 @@ def pull(*, project_id: str, store_id: str, credentials_json: Optional[str],
         "schema": SCHEMA, "status": "available", "pulled_at": pulled_at,
         "answers": docs.get("answers") or {}, "outcomes": docs.get("outcomes") or {},
         "revivals": docs.get("revivals") or {},
+        # ADR-021. One more document in the same collection, so this needs no new step and
+        # no second credential — which is why the ADR put it here.
+        "devices": docs.get("devices") or {},
     })
 
 

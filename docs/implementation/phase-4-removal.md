@@ -52,13 +52,30 @@ Strictly sequential. Each task's verification is the next task's precondition.
 
 **Files:** none — a git tag.
 
-- [ ] `git tag -a v1-attic -m "Everything V1 removed in Phase 4, reachable here"` at the
-      commit **before** the first deletion
-- [ ] push the tag
-- [ ] record the tag's sha in this file
+- [x] `git tag -a v1-attic` at the commit **before** the first deletion
+- [x] push the tag
+- [x] record the tag's sha in this file
 
 Nothing else in this phase may start until the tag exists on the remote. A tag that lives
 only on one machine is not a rollback.
+
+> **Done. Verified 2026-09-15.**
+>
+> | | |
+> |---|---|
+> | tag object | `80fd2574f4400698387e85741558ed7e231174d2` |
+> | tagged commit | `bf1d47a640c029382493cc496e174adc7512c7f4` (2026-09-12) |
+> | on the remote | yes — `git ls-remote --tags origin v1-attic` returns the same object |
+>
+> **The tag was cut on 09-12, three days before Checkpoint 3 closed, so it does not sit at
+> the commit immediately before the first deletion.** That is harmless here, and it was
+> checked rather than assumed: `git diff v1-attic..main` over every §20.1 REMOVE path — the
+> demo spine, the V2/V4 analytics, the planogram, the LLM layer, telemetry, the MCP server,
+> the scripts and `operational.json` — returns **nothing**. The tag preserves the same bytes
+> Phase 4 deletes.
+>
+> If any REMOVE path is modified before Task 4.1 starts, that stops being true, and the tag
+> should be re-cut rather than trusted. Re-run that diff before the first deletion.
 
 ---
 
@@ -148,6 +165,162 @@ LLM layer (`src/lib/ai/*`, `src/api/llm_proxy.py`), telemetry, the MCP server, a
 > `src/lib/analytics/explainReorder.js`. Deleting by the listed path would silently remove
 > nothing. **smartshelf-architect.**
 >
+> **A fourth reader, and the grep could not have found it (2026-09-15, #91).**
+> `scripts/audit-store-format.mjs` reads the demo spine through a **dynamic** `import()` built
+> from a joined path, inside a function:
+>
+> ```js
+> const demo = await import(path.join(rootDir, 'src/data/demoProducts.js'))
+> ```
+>
+> Every sweep this phase used — `git grep "^import"`, grepping the module name — returns
+> nothing for it, because the three readers it did find all use top-level static imports. The
+> script was npm-scripted (`audit:store-format`) and passing. **So Step 1's instruction to
+> "re-run the grep rather than trust the list" does not go far enough: the grep is the weak
+> part, not the list's age.** Before Task 4.1 deletes anything, sweep for dynamic `import(`
+> and for `readFileSync` over a source path as well.
+>
+> **Resolved by deleting it, not repointing it**, and the reasoning matters because it is the
+> opposite of the answer `doctor.mjs` got in #68. The doctor checks the real catalogue and had
+> a V1 home to move to. This script runs the **V2 reorder engine** over the **demo spine** —
+> both deleted here — to guard one rule: no finding may rest on a store format we are not
+> comparable to (ADR-008).
+>
+> That rule is emphatically still live. The engine enforces it (`o["affinity"] >= floor`) and
+> publishes `comparability_floor`, and it is load-bearing to a degree worth stating: in the
+> 2026-09-15 artefact **161 of 164 observed stores sit below the 0.3 floor**. But **no Python
+> test named it**, so deleting the script would have dropped the only artefact guarding it.
+> Two tests in `test_competitor_position.py` now do, and they were proven to guard rather than
+> to pass: with `min_affinity` set to `0.0` in `configs/store_types.yaml`, exactly one fails.
+
+> **MCP group deleted 2026-09-16 (Task 4.1c, first group).** `src/mcp_server/`,
+> `src/external/mcp_price_adapter.py`, `scripts/run_mcp_price_lookup.py` and `.mcp.json`,
+> which held only that one server entry.
+>
+> Swept the way #91 says to, not the way that missed it: every reference to `mcp_server`,
+> `mcp_price_adapter`, `run_mcp_price_lookup` or `price_server` anywhere in the tree. All
+> that remained were **documentation** mentions — no code, no workflow, no npm script, no
+> test. The group imports only itself, and the engine's own market chain
+> (`market_context` → `competitor_signals` → `product_matching`) never used it.
+>
+> **The bundle does not move, and that is correct here.** Rule 3 — "a group that does not
+> move the bundle deleted nothing that shipped" — is about browser code. This group is
+> Python and one JSON config; none of it was ever in a chunk. `CEILING_KB` stays where it is.
+
+> **The scripts row audited 2026-09-16 (Task 4.1c, second group). Four files deleted, eleven
+> held.** §20.1's dead row names eighteen paths and then "17 unreferenced scripts". Four of
+> the named ones — the MCP group — went in the first group. This pass swept the remaining
+> fourteen the way #91 says to: every mention anywhere in the tree, then each mention read to
+> see whether it is an import, an invocation, or prose. **Eleven of the fourteen are not dead**,
+> and three of those are live in a way the row's "no execution path from `package.json`,
+> `.github/`, `collect_daily.sh`, or any live module" claim contradicts directly.
+>
+> **Deleted — the closed subsets, where every reference outside the file is prose or is
+> itself being removed:**
+>
+> | Path | Its only readers |
+> |---|---|
+> | `src/external/firestore_writer.py` | `run_delivery_to_firestore.py`, deleted with it |
+> | `scripts/run_delivery_to_firestore.py` | one comment line in `configs/delivery_targets.yaml`, corrected in this commit |
+> | `scripts/export_market_params.py` | one `Regenerate:` comment in the file it generates |
+> | `src/data/marketParams.js` | **nothing** — zero importers in the tree |
+>
+> `firestore_writer.py` is S27's "second Firestore schema", and the sweep confirms the
+> phrase: it writes top-level `stores`, `products` and `price_snapshots` documents, while V1
+> reads only `stores/yomyom-kafr-qasim/ownerState` (`src/owner_state/pull.py`). Nothing reads
+> what it wrote. The nightly's delivery step is `run_delivery_venue_connector.py`
+> (`collect_daily.sh:112`) — a different script that never touches it. The three
+> `FIREBASE_SERVICE_ACCOUNT_*` variables stay live for `src/engine/run.py`,
+> `src/owner_state/pull.py` and `check_firestore_rules.py`, so nothing in `.env.example` or
+> the deployment doc is orphaned by this.
+>
+> `marketParams.js` is listed in the S26 demo-spine row rather than here, and is taken with
+> its generator anyway because it has no importers at all: it is not part of what blocks that
+> group, and a generated file whose generator is gone is the stale state this phase keeps
+> creating. 1,083 lines, tree-shaken out of the bundle already, so the bundle does not move —
+> rule 3 is about browser code, and the same reasoning as the MCP group applies. `CEILING_KB`
+> stays.
+>
+> **Held, and why. The row is wrong about three of these.**
+>
+> | Path | Held on |
+> |---|---|
+> | `src/external/tenbis_connector.py` | **live in the nightly.** `src/external/delivery_venue_connector.py:41` imports `TenBisCollectionResult` and `collect_tenbis_venue` at module top level, and `collect_daily.sh:112` runs it every night. S27 calls this an "unreachable branch" — the *branch* at line 543 may be, but the *import* is not, so deleting the module breaks the collector on import, before any branch is evaluated |
+> | `scripts/run_alonit_signal_pipeline.py`, `src/external/alonit_signal_pipeline.py` | **live npm script** — `collect:alonit-signals` (`package.json:17`). Not in CI; the script is the whole execution path |
+> | `scripts/export_store_types.py` | **live npm script** — `data:store-types` (`package.json:31`) |
+> | `scripts/export_competitor_market_data.py` | imported by `tests/test_store_types.py:196` (`CHAIN_META`, `OUR_STORE`) — a test of the **store-types config**, not of this script, so Step 4's "delete the test with its subject" does not apply. Also `pilot_daily.sh:98` |
+> | `scripts/join_yomyom_kaggle.py` | `pilot_daily.sh:97`, which `npm run pilot:daily` runs |
+> | `src/external/kaggle_supermarket_importer.py`, `scripts/import_kaggle_supermarkets.py` | the only producers of `data/external/silver/products/kaggle_*`, which `join_yomyom_kaggle.py:44` reads. Deleting them while that script lives would not break it — it globs, finds nothing, and writes a delivery-only `barcode_matches.parquet`. A smaller number, no error. That is rule 12 in the data direction, so the Kaggle chain is held with its consumer |
+> | `scripts/build_assortment_gap.py`, `export_assortment_gap.py`, `measure_gap_ranking.py` | their only reader outside themselves is `src/pages/AssortmentGapPage.jsx` (via `public/data/assortment_gap.json` and the `gap.emptyDetail` string, which names both scripts in all three dictionaries). The page is in the V2/V4 row; `src/lib/i18n/*` is **REUSE**, so deleting the scripts first leaves a shipped dictionary telling the owner to run something that does not exist. Held for the page's commit |
+>
+> So `pilot_daily.sh` — not named anywhere in §20.1 — is what pins four of the eleven. It is the
+> legacy pipeline that ends in `public/data/operational.json`, which is Task 4.2's subject and
+> is deliberately frozen until Phase 4 ends (ADR-009's one-shot id translation still needs
+> it). **Those four cannot go before Task 4.2, and Task 4.2 cannot start yet.**
+>
+> **And "17 unreferenced scripts" cannot be executed as written.** It names no paths, so
+> there is nothing to grep, nothing to verify and nothing to delete by path — and this sweep
+> shows the row's own named entries are wrong about three files, which is the strongest
+> argument against trusting an unnamed remainder. `scripts/` holds **67** files after this
+> commit — 52 `.py`, 12 `.mjs`, 3 `.sh`, counted with `ls`, not read off another document —
+> and the System Design §7 names the handful that are the product; the difference is not 17.
+> **smartshelf-architect: the row needs the paths enumerated, `tenbis_connector.py`,
+> `run_alonit_signal_pipeline.py` and `export_store_types.py` moved off "dead", and
+> `pilot_daily.sh` named as the blocker it is.**
+
+> **The LLM group swept 2026-09-16 (Task 4.1c, third group). Nothing deleted — it has a
+> second blocker, and the grep that missed `audit-store-format.mjs` would have missed this
+> one too.**
+>
+> Step 1 run 1 concluded: *"The LLM layer's only importer outside itself is `ReportPage`, so
+> it goes with that group."* That is wrong. **`scripts/check_signals_live.mjs:154` imports
+> `src/lib/ai/factsGuard.js`**, and `collect-daily.yml:192` runs that script every night, in
+> the step immediately before the artefact is committed. The import is dynamic and sits
+> inside a function:
+>
+> ```js
+> const { validateExplanationResult } = await import('../src/lib/ai/factsGuard.js')
+> ```
+>
+> This is the third time the same shape has hidden a reader — #91 found it for
+> `audit-store-format.mjs` and told this phase to sweep for dynamic `import(` and for
+> `readFileSync` over a source path. That instruction had not been carried out; this is it,
+> run over the whole tree rather than one group, so no later group has to repeat it:
+>
+> | Site | Target | Consequence |
+> |---|---|---|
+> | `scripts/check_signals_live.mjs:154` | `src/lib/ai/factsGuard.js` | **the finding above** |
+> | `src/pages/__tests__/RecommendationsPage.cap.test.js:11` | `readFileSync('src/pages/RecommendationsPage.jsx')` | the page is in the V2/V4 row; this test reads it as **text**, so a grep for an import of it finds nothing. Must be deleted in the same commit as the page (Step 4) |
+> | `src/pages/__tests__/RecommendationsPage.cap.test.js:34` | `../../lib/i18n/dictionaries/${lang}.js` | template-literal path; the dictionaries are **REUSE**, so no action — recorded because no fixed-string grep can see it |
+> | `src/lib/analytics/__tests__/reorderEngine.test.js:293` | `../actionPriority.js` | `reorderEngine` is REMOVE, `actionPriority.js` is **live** (`OperationalPage.jsx`, `src/telemetry/telemetryModel.js`). Deleting the test is safe; deleting its target is not |
+> | `src/test/setup.js:25` | `@testing-library/react` | a package, not a source path |
+>
+> **How close the `factsGuard` one is to biting.** `checkLlmSignal()` returns early when
+> neither `VITE_LLM_PROXY_URL` nor `LLM_PROXY_URL` is set, so the import does not execute
+> today: neither variable appears in `collect-daily.yml`, `vercel.json` or `vite.config.js` —
+> only in `.env.example`, blank. So deleting `factsGuard.js` would not break tonight's
+> nightly. It would leave the gate **one environment variable away** from throwing, in the
+> step that decides whether `dashboard.json` is committed, and the throw would look like a
+> data failure rather than a missing file. That is not a risk worth taking to delete a file
+> that has to wait for `ReportPage` anyway.
+>
+> **So the LLM group is held on two things, and both are named.** `ReportPage` (#74), and
+> `check_signals_live.mjs`, which §20.2 retires in **Task 4.2** together with the reorder
+> engine it exercises. Task 4.2 is itself blocked. The group moves when whichever of those
+> lands last lands.
+>
+> **The Python half was considered separately and held.** `src/api/llm_proxy.py`,
+> `src/api/__init__.py`, `tests/test_llm_proxy.py` and `tests/test_llm_cache_key.py` are a
+> closed set — nothing outside their own tests imports them, and §3 records that nothing
+> launches the server. It could go alone. It should not: the browser client
+> (`src/lib/ai/llmExplanationProvider.js`, reading `VITE_LLM_PROXY_URL`) stays until
+> `ReportPage` goes, and deleting the server while its client ships is the exact inverse of
+> the MCP group, which was defensible **because** it took client and server together. One
+> commit, when the group unblocks.
+>
+> **smartshelf-architect:** §20.1's LLM row and S23 both describe this layer as reaching
+> nothing but `ReportPage`. The nightly gate belongs in that row as a second reader.
+
 > **Fixed 2026-09-13.** §20.1's row now names `src/lib/i18n/explainReorder.js` directly.
 > The same pass also added `scripts/build-rag-corpus.mjs` and
 > `scripts/run_mcp_price_lookup.py` to their rows — both were readers of REMOVE-listed
@@ -318,6 +491,36 @@ nightly by Task 3.4. Until both are true this task does not start.
 so `smartshelf.ownerState.v2` exists everywhere. **This is not knowable from here.** The
 pilot is one store and a handful of devices; the answer is "ask, then delete", not "assume
 a quarter has passed".
+
+> **It is knowable from here now — ADR-021 is implemented (#84, 2026-09-16).** The artefact
+> carries the register at **`vintages.owner_state.devices`**, as
+> `{status, reason, count, last_seen_at}`, and Step 1 below is no longer a question asked
+> from memory.
+>
+> **What it reads today, from the artefact rather than from this file:** running
+> `python3 scripts/run_engine.py` on this branch publishes
+>
+> ```json
+> "devices": { "status": "unavailable", "reason": "not_registered", "count": null, "last_seen_at": [] }
+> ```
+>
+> — and that is correct, not a fault. Nothing has registered because the browser half ships
+> with **#95, which is held**. The first nightly after #95 deploys is the first that can
+> report a number, and until then the honest reading of this precondition is unchanged.
+> `count` is `null` rather than `0` deliberately: nobody having opened the app and nobody
+> having registered are different facts, and only one of them is known here
+> (ARCH-DRIVER-002, rule 8).
+>
+> **Step 1 becomes:** read `count` and `last_seen_at` off `public/data/dashboard.json`, show
+> the owner that list of dates, and ask him to confirm it covers every device he uses. The
+> confirmation is still his — what changed is that he confirms against evidence.
+>
+> **Correction to P4-OQ-1's row below.** It says the count "gives a floor and a date". It
+> does not, and ADR-021's own review recorded that as finding 4: clearing site data mints a
+> new id and two browsers on one phone count twice, so the number can **exceed** the physical
+> fleet. It is neither a floor nor a ceiling — it is the number of distinct browser profiles
+> that have written. Stating the wrong bound is worse than stating none (rule 13's own
+> distinction), and the row still states it. **smartshelf-architect.**
 
 - [ ] **Step 1:** confirm with the owner that every device has been used since the cut-over
 - [ ] **Step 2:** remove the migration and its tests; keep the three legacy keys **unread

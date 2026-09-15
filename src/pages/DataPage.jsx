@@ -2,6 +2,9 @@ import { unavailableReason } from '../lib/i18n/unavailableReason.js'
 import { useI18n } from '../lib/i18n/index.js'
 import { dirProps } from '../lib/utils/rtl.js'
 
+/** Vintage sources a human wrote down, as opposed to the two the importer infers. */
+const DECLARED_VINTAGE = new Set(['declared', 'declared_sidecar'])
+
 /**
  * The page an operator opens when a number looks wrong.
  *
@@ -63,9 +66,15 @@ export function DataPage({ artefact }) {
         <Field id="pos" label={t('data.pos')} empty={none}>
           {vintages.pos?.as_of
             ? [vintages.pos.as_of,
-               vintages.pos.as_of_source && vintages.pos.as_of_source !== 'declared'
-                 ? t(`data.pos.${vintages.pos.as_of_source}`)
-                 : null,
+               // Both declared forms are a date a person wrote down, so neither needs a
+               // caveat. The other two are proxies that have each been wrong in
+               // production — mtime is reset by `git clone`, and `git log` answers with
+               // the checkout commit in a shallow one — so they say what they are.
+               DECLARED_VINTAGE.has(vintages.pos.as_of_source)
+                 ? null
+                 : vintages.pos.as_of_source
+                   ? t(`data.pos.${vintages.pos.as_of_source}`)
+                   : null,
               ].filter(Boolean).join(' · ')
             : null}
         </Field>
@@ -92,6 +101,18 @@ export function DataPage({ artefact }) {
               ]
                 .filter(Boolean)
                 .join(' · ')
+            : null}
+        </Field>
+        {/* ADR-021. It exists so Task 4.3's precondition can be checked instead of guessed,
+            and the wording is part of the decision: these are browsers that HAVE saved, not
+            the devices that exist. Absent reads as empty, never as zero — nobody having
+            saved and nobody having registered are different facts. */}
+        <Field id="owner_devices" label={t('data.devices')} empty={none}>
+          {vintages.owner_state?.devices?.status === 'available'
+            ? t('data.devices.counted', {
+              n: vintages.owner_state.devices.count,
+              last: vintages.owner_state.devices.last_seen_at.at(-1) ?? '—',
+            })
             : null}
         </Field>
       </dl>
