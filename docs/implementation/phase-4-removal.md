@@ -268,6 +268,59 @@ LLM layer (`src/lib/ai/*`, `src/api/llm_proxy.py`), telemetry, the MCP server, a
 > `run_alonit_signal_pipeline.py` and `export_store_types.py` moved off "dead", and
 > `pilot_daily.sh` named as the blocker it is.**
 
+> **The LLM group swept 2026-09-16 (Task 4.1c, third group). Nothing deleted — it has a
+> second blocker, and the grep that missed `audit-store-format.mjs` would have missed this
+> one too.**
+>
+> Step 1 run 1 concluded: *"The LLM layer's only importer outside itself is `ReportPage`, so
+> it goes with that group."* That is wrong. **`scripts/check_signals_live.mjs:154` imports
+> `src/lib/ai/factsGuard.js`**, and `collect-daily.yml:192` runs that script every night, in
+> the step immediately before the artefact is committed. The import is dynamic and sits
+> inside a function:
+>
+> ```js
+> const { validateExplanationResult } = await import('../src/lib/ai/factsGuard.js')
+> ```
+>
+> This is the third time the same shape has hidden a reader — #91 found it for
+> `audit-store-format.mjs` and told this phase to sweep for dynamic `import(` and for
+> `readFileSync` over a source path. That instruction had not been carried out; this is it,
+> run over the whole tree rather than one group, so no later group has to repeat it:
+>
+> | Site | Target | Consequence |
+> |---|---|---|
+> | `scripts/check_signals_live.mjs:154` | `src/lib/ai/factsGuard.js` | **the finding above** |
+> | `src/pages/__tests__/RecommendationsPage.cap.test.js:11` | `readFileSync('src/pages/RecommendationsPage.jsx')` | the page is in the V2/V4 row; this test reads it as **text**, so a grep for an import of it finds nothing. Must be deleted in the same commit as the page (Step 4) |
+> | `src/pages/__tests__/RecommendationsPage.cap.test.js:34` | `../../lib/i18n/dictionaries/${lang}.js` | template-literal path; the dictionaries are **REUSE**, so no action — recorded because no fixed-string grep can see it |
+> | `src/lib/analytics/__tests__/reorderEngine.test.js:293` | `../actionPriority.js` | `reorderEngine` is REMOVE, `actionPriority.js` is **live** (`OperationalPage.jsx`, `src/telemetry/telemetryModel.js`). Deleting the test is safe; deleting its target is not |
+> | `src/test/setup.js:25` | `@testing-library/react` | a package, not a source path |
+>
+> **How close the `factsGuard` one is to biting.** `checkLlmSignal()` returns early when
+> neither `VITE_LLM_PROXY_URL` nor `LLM_PROXY_URL` is set, so the import does not execute
+> today: neither variable appears in `collect-daily.yml`, `vercel.json` or `vite.config.js` —
+> only in `.env.example`, blank. So deleting `factsGuard.js` would not break tonight's
+> nightly. It would leave the gate **one environment variable away** from throwing, in the
+> step that decides whether `dashboard.json` is committed, and the throw would look like a
+> data failure rather than a missing file. That is not a risk worth taking to delete a file
+> that has to wait for `ReportPage` anyway.
+>
+> **So the LLM group is held on two things, and both are named.** `ReportPage` (#74), and
+> `check_signals_live.mjs`, which §20.2 retires in **Task 4.2** together with the reorder
+> engine it exercises. Task 4.2 is itself blocked. The group moves when whichever of those
+> lands last lands.
+>
+> **The Python half was considered separately and held.** `src/api/llm_proxy.py`,
+> `src/api/__init__.py`, `tests/test_llm_proxy.py` and `tests/test_llm_cache_key.py` are a
+> closed set — nothing outside their own tests imports them, and §3 records that nothing
+> launches the server. It could go alone. It should not: the browser client
+> (`src/lib/ai/llmExplanationProvider.js`, reading `VITE_LLM_PROXY_URL`) stays until
+> `ReportPage` goes, and deleting the server while its client ships is the exact inverse of
+> the MCP group, which was defensible **because** it took client and server together. One
+> commit, when the group unblocks.
+>
+> **smartshelf-architect:** §20.1's LLM row and S23 both describe this layer as reaching
+> nothing but `ReportPage`. The nightly gate belongs in that row as a second reader.
+
 > **Fixed 2026-09-13.** §20.1's row now names `src/lib/i18n/explainReorder.js` directly.
 > The same pass also added `scripts/build-rag-corpus.mjs` and
 > `scripts/run_mcp_price_lookup.py` to their rows — both were readers of REMOVE-listed
