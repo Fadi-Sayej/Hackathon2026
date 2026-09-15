@@ -2,6 +2,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { resetPushForTests, setRemoteLoaderForTests } from '../remoteOwnerState'
 import { ANSWER_STATUS, OUTCOME_STATUS, recordAnswer, recordOutcome, resetCacheForTests } from '../ownerState'
+import { DEVICE_KEY } from '../deviceRegister'
 import { createFakeFirestore } from './fakeFirestore'
 
 /**
@@ -23,6 +24,9 @@ import { createFakeFirestore } from './fakeFirestore'
 const FIXTURE = new URL('../../../tests/fixtures/owner_state_firestore_contract.json', import.meta.url)
 const FIXED = Date.UTC(2026, 8, 13, 9, 0, 0)          // 2026-09-13T09:00:00Z
 const DAY = 24 * 60 * 60 * 1000
+// A fixed device id, seeded rather than minted: the real one is random by design (ADR-021),
+// and a fixture that changes every run proves nothing about the seam it exists to pin.
+const DEVICE = { id: '0c4b8f1e-6c1d-4f0a-9b77-3a5e2d8c14ab', first_seen_at: FIXED - 14 * DAY }
 const settle = () => new Promise((r) => setTimeout(r, 0))
 
 function createStorage() {
@@ -42,6 +46,7 @@ afterEach(() => { vi.useRealTimers() })
 async function produceDocuments() {
   const fake = createFakeFirestore()
   setRemoteLoaderForTests(fake.loader)
+  globalThis.localStorage.setItem(DEVICE_KEY, JSON.stringify(DEVICE))
 
   // a valued confirmed loss the owner acted on
   await recordOutcome({ id: 'a1b2c3d4e5f60718', signal_family: 'price.inverted', capability: 'price_consistency',
@@ -72,9 +77,19 @@ describe('owner state crosses the browser → Firestore → engine seam intact',
     expect(docs).toEqual(JSON.parse(readFileSync(FIXTURE, 'utf8')))
   })
 
-  it('writes the four documents pull.py streams, and meta.schema is the one it accepts', async () => {
+  it('writes the documents pull.py streams, and meta.schema is the one it accepts', async () => {
     const docs = await produceDocuments()
-    expect(Object.keys(docs).sort()).toEqual(['answers', 'meta', 'outcomes'])   // revivals: nothing recorded
+    expect(Object.keys(docs).sort()).toEqual(['answers', 'devices', 'meta', 'outcomes'])   // revivals: nothing recorded
     expect(docs.meta.schema).toBe(1)
+  })
+})
+
+describe('the device register crosses the same seam (ADR-021)', () => {
+  it('sends one field per profile, keyed by the id, and keeps the first_seen_at it minted', async () => {
+    const docs = await produceDocuments()
+    expect(Object.keys(docs.devices)).toEqual([DEVICE.id])
+    expect(docs.devices[DEVICE.id]).toEqual({
+      device_id: DEVICE.id, first_seen_at: DEVICE.first_seen_at, last_seen_at: FIXED,
+    })
   })
 })

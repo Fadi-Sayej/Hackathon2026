@@ -13,7 +13,9 @@ VINTAGES = {"pos": {"file": "x.csv", "as_of": "2026-08-02"},
             "sales": {"months": ["2026-01"], "first": "2026-01", "last": "2026-01",
                       "full_annual_cycle": False, "imported_this_run": True},
             "competitor": {"snapshot_date": None, "sources": []},
-            "owner_state": {"pulled_at": None, "status": "unavailable"}}
+            "owner_state": {"pulled_at": None, "status": "unavailable",
+                            "devices": {"status": "unavailable", "reason": "owner_state_unavailable",
+                                        "count": None, "last_seen_at": []}}}
 RUN = {"status": "ok", "steps": []}
 
 

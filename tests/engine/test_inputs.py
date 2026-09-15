@@ -235,6 +235,48 @@ def test_the_digest_ignores_when_the_owner_state_was_fetched(tmp_path):
     assert load_inputs(owner=early, **common).inputs_digest == load_inputs(owner=later, **common).inputs_digest
 
 
+def test_every_artefact_this_engine_builds_carries_the_register(tmp_path):
+    """ADR-005 says the publisher refuses an artefact that breaches the schema, but `devices`
+    cannot be a required property there: the artefact the owner is reading right now was
+    published before the register existed, and CI validates that committed file on every run.
+    So the guarantee lives here instead — the schema says what a VALID artefact may look like,
+    and this says what THIS engine must always emit."""
+    row = {"barcode": "0012", "product_name": "מים", "category": "c", "selling_price": 4.0,
+           "wolt_price": 5.0, "cost_price": 1.0}
+    silver = _dup_silver(tmp_path, [row])
+    common = dict(run_at=datetime(2026, 9, 8, tzinfo=timezone.utc), silver_dir=silver,
+                  signals_dir=tmp_path / "n", matches_path=tmp_path / "n.parquet",
+                  policy=load_policy())
+    for owner in (OwnerState.unavailable("pull_failed: RuntimeError"),
+                  OwnerState.from_dict({"status": "available", "pulled_at": "t"}),
+                  OwnerState.from_dict({"status": "available", "pulled_at": "t",
+                                        "devices": {"aaa": {"last_seen_at": 1789290000000}}})):
+        devices = load_inputs(owner=owner, **common).vintages["owner_state"]["devices"]
+        assert set(devices) == {"status", "reason", "count", "last_seen_at"}
+        assert devices["count"] != 0
+
+
+def test_the_digest_ignores_the_device_register(tmp_path):
+    """ADR-021 review finding 3, and the one that would have cost real time. `last_seen_at`
+    moves every time anyone opens the app — far more often than `pulled_at`, which is already
+    excluded for exactly this reason. Hashing it would make two runs over identical data
+    disagree, and the cause would have looked like the engine rather than the ADR."""
+    row = {"barcode": "0012", "product_name": "מים", "category": "c", "selling_price": 4.0,
+           "wolt_price": 5.0, "cost_price": 1.0}
+    silver = _dup_silver(tmp_path, [row])
+    answers = {"0012": {"cost_price": {"value": 2.5, "at": 1, "status": "answered"}}}
+    common = dict(run_at=datetime(2026, 9, 8, tzinfo=timezone.utc), silver_dir=silver,
+                  signals_dir=tmp_path / "n", matches_path=tmp_path / "n.parquet",
+                  policy=load_policy())
+    base = {"status": "available", "pulled_at": "t", "answers": answers}
+    quiet = OwnerState.from_dict({**base, "devices": {"aaa": {"first_seen_at": 1, "last_seen_at": 1}}})
+    busy = OwnerState.from_dict({**base, "devices": {"aaa": {"first_seen_at": 1, "last_seen_at": 1789290000000},
+                                                     "bbb": {"first_seen_at": 2, "last_seen_at": 1789290000001}}})
+    assert load_inputs(owner=quiet, **common).inputs_digest == load_inputs(owner=busy, **common).inputs_digest
+    # …and it is published, so excluding it from the digest is not the same as dropping it.
+    assert load_inputs(owner=busy, **common).vintages["owner_state"]["devices"]["count"] == 2
+
+
 def test_a_changed_owner_answer_does_change_the_digest(tmp_path):
     row = {"barcode": "0012", "product_name": "מים", "category": "c", "selling_price": 4.0,
            "wolt_price": 5.0, "cost_price": 1.0}

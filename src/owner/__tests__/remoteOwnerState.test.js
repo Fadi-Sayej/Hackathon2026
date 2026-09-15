@@ -163,3 +163,73 @@ describe('pushAll — decisions recorded before write-through existed', () => {
     expect(fake.calls.length).toBe(after)
   })
 })
+
+describe('the device register rides this path (ADR-021)', () => {
+  it('registers a profile that opened the app and recorded nothing', async () => {
+    // The case Task 4.3's precondition is actually about. Stamping outcomes with a device
+    // was the rejected alternative precisely because a profile that opened the app and did
+    // nothing produces no outcome to stamp — so the register must not wait for one.
+    const fake = createFakeFirestore()
+    setRemoteLoaderForTests(fake.loader)
+    loadOwnerState()
+    await settle()
+    const devices = fake.doc('devices')
+    expect(Object.keys(devices)).toHaveLength(1)
+    expect(fake.doc('outcomes')).toBeUndefined()
+  })
+
+  it('writes device_id, first_seen_at and last_seen_at, and nothing else', async () => {
+    const fake = createFakeFirestore()
+    setRemoteLoaderForTests(fake.loader)
+    loadOwnerState()
+    await settle()
+    const record = Object.values(fake.doc('devices'))[0]
+    expect(Object.keys(record).sort()).toEqual(['device_id', 'first_seen_at', 'last_seen_at'])
+    expect(Object.keys(fake.doc('devices'))[0]).toBe(record.device_id)
+  })
+
+  it('stays one profile across a session, and moves last_seen_at forward', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(Date.UTC(2026, 8, 13, 9, 0, 0))
+    const fake = createFakeFirestore()
+    setRemoteLoaderForTests(fake.loader)
+    loadOwnerState()
+    await settle()
+    const first = Object.values(fake.doc('devices'))[0]
+
+    vi.setSystemTime(Date.UTC(2026, 8, 13, 17, 30, 0))
+    await recordOutcome(entry(), { status: OUTCOME_STATUS.ACTED })
+    await settle()
+    const after = fake.doc('devices')
+    expect(Object.keys(after)).toHaveLength(1)
+    expect(Object.values(after)[0].first_seen_at).toBe(first.first_seen_at)
+    expect(Object.values(after)[0].last_seen_at).toBe(Date.UTC(2026, 8, 13, 17, 30, 0))
+  })
+
+  it('a second profile is a second field, not a replacement', async () => {
+    // mergeFields names one device id, so two browsers writing the same document must both
+    // survive. A deep merge or a whole-document set would leave a count of one for ever.
+    const fake = createFakeFirestore()
+    setRemoteLoaderForTests(fake.loader)
+    loadOwnerState()
+    await settle()
+    globalThis.localStorage = createStorage()   // a second browser profile, same store
+    resetCacheForTests()
+    resetPushForTests()
+    loadOwnerState()
+    await settle()
+    expect(Object.keys(fake.doc('devices'))).toHaveLength(2)
+  })
+
+  it('a profile that cannot keep an id is not registered, and the rest still writes', async () => {
+    const readonly = createStorage()
+    const backing = { ...readonly, setItem: (k, v) => { if (k === 'smartshelf.device.v1') throw new Error('nope'); readonly.setItem(k, v) } }
+    globalThis.localStorage = backing
+    const fake = createFakeFirestore()
+    setRemoteLoaderForTests(fake.loader)
+    await recordAnswer('7290000041445', { value: 7.5, status: ANSWER_STATUS.ANSWERED })
+    await settle()
+    expect(fake.doc('devices')).toBeUndefined()
+    expect(fake.doc('answers')['7290000041445'].cost_price.value).toBe(7.5)
+  })
+})

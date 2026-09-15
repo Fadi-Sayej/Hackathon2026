@@ -102,6 +102,18 @@ export function DataPage({ artefact }) {
                 .join(' · ')
             : null}
         </Field>
+        {/* ADR-021. It exists so Task 4.3's precondition can be checked instead of guessed,
+            and the wording is part of the decision: these are browsers that HAVE saved, not
+            the devices that exist. Absent reads as empty, never as zero — nobody having
+            saved and nobody having registered are different facts. */}
+        <Field id="owner_devices" label={t('data.devices')} empty={none}>
+          {vintages.owner_state?.devices?.status === 'available'
+            ? t('data.devices.counted', {
+              n: vintages.owner_state.devices.count,
+              last: vintages.owner_state.devices.last_seen_at.at(-1) ?? '—',
+            })
+            : null}
+        </Field>
       </dl>
 
       <ul className="data__capabilities">
