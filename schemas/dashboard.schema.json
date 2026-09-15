@@ -187,8 +187,7 @@
           "type": "object",
           "required": [
             "pulled_at",
-            "status",
-            "devices"
+            "status"
           ],
           "properties": {
             "pulled_at": {
@@ -212,7 +211,7 @@
             },
             "devices": {
               "type": "object",
-              "description": "ADR-021. How many distinct browser profiles have written owner state, and when each last did. Never the device_id: it exists so the engine can count distinct writers and is not published. It counts profiles, not devices \u2014 clearing site data mints a new id and two browsers on one phone count twice \u2014 so it is neither a floor nor a ceiling on the physical fleet.",
+              "description": "ADR-021. How many distinct browser profiles have written owner state, and when each last did. NOT required, for the same reason as vintages.pos.as_of_source: an artefact published before the register existed does not carry it, and the committed artefact is validated by CI. Every artefact this engine builds does carry it \u2014 tests/engine/test_inputs.py holds that, where the schema cannot. Never the device_id: it exists so the engine can count distinct writers and is not published. It counts profiles, not devices \u2014 clearing site data mints a new id and two browsers on one phone count twice \u2014 so it is neither a floor nor a ceiling on the physical fleet.",
               "required": [
                 "status",
                 "count",
