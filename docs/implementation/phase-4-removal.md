@@ -52,13 +52,30 @@ Strictly sequential. Each task's verification is the next task's precondition.
 
 **Files:** none — a git tag.
 
-- [ ] `git tag -a v1-attic -m "Everything V1 removed in Phase 4, reachable here"` at the
-      commit **before** the first deletion
-- [ ] push the tag
-- [ ] record the tag's sha in this file
+- [x] `git tag -a v1-attic` at the commit **before** the first deletion
+- [x] push the tag
+- [x] record the tag's sha in this file
 
 Nothing else in this phase may start until the tag exists on the remote. A tag that lives
 only on one machine is not a rollback.
+
+> **Done. Verified 2026-09-15.**
+>
+> | | |
+> |---|---|
+> | tag object | `80fd2574f4400698387e85741558ed7e231174d2` |
+> | tagged commit | `bf1d47a640c029382493cc496e174adc7512c7f4` (2026-09-12) |
+> | on the remote | yes — `git ls-remote --tags origin v1-attic` returns the same object |
+>
+> **The tag was cut on 09-12, three days before Checkpoint 3 closed, so it does not sit at
+> the commit immediately before the first deletion.** That is harmless here, and it was
+> checked rather than assumed: `git diff v1-attic..main` over every §20.1 REMOVE path — the
+> demo spine, the V2/V4 analytics, the planogram, the LLM layer, telemetry, the MCP server,
+> the scripts and `operational.json` — returns **nothing**. The tag preserves the same bytes
+> Phase 4 deletes.
+>
+> If any REMOVE path is modified before Task 4.1 starts, that stops being true, and the tag
+> should be re-cut rather than trusted. Re-run that diff before the first deletion.
 
 ---
 
