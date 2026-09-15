@@ -79,9 +79,22 @@ Copied verbatim from `docs/architecture/system-design.md`; every task's requirem
 
 1. Firebase: six `VITE_FIREBASE_*` values in `.env` and in Vercel; Anonymous sign-in enabled; `firestore.rules` deployed; `npm run check:firebase-live` exits 0.
 2. GitHub secret `FIREBASE_SERVICE_ACCOUNT_JSON` for a **read-only** service account (`roles/datastore.viewer`).
-3. ~~Vercel: the PR preview check currently fails with "Deployment was blocked" on account
-   `fadi19`.~~ **Resolved — verified 2026-09-13.** `Vercel` and `Vercel Preview Comments`
-   both report SUCCESS on PRs #61, #81 and #85.
+3. **Vercel: the PR preview check fails with "Deployment was blocked" for PRs opened by
+   collaborators.** Still open — a console setting on the project, not anything in this
+   repository.
+
+   > **Re-opened 2026-09-15. It was marked resolved on 09-13 and the evidence was bad.**
+   > That claim cited SUCCESS on PRs #61, #81 and #85 — all three authored by the repo
+   > owner, whose previews were never the problem. Measured across authors on 09-15:
+   >
+   > | PR | Author | Vercel |
+   > |---|---|---|
+   > | #100, #102, #104 | `anasakkari3` | **failure — Deployment was blocked** |
+   > | #95, #106 | `Fadi-Sayej` | success — Deployment has completed |
+   >
+   > The prerequisite was always about a contributor's PR, and the sample that "resolved"
+   > it excluded exactly that case. What it costs: the collaborator doing the frontend work
+   > has **no preview URL**, so no page of it can be opened in a browser before it merges.
 4. Basic Auth: `BASIC_AUTH_USER` and `BASIC_AUTH_PASSWORD` set in Vercel for every environment. `middleware.ts` fails closed with 503 when they are unset (design §11.7), so an unset pair takes the pilot app down rather than exposing it — ARCH-GATE-011, readiness gate §18 action 10.
 
 ## Release conditions (outside implementation; see design.md §22)

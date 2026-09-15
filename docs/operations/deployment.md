@@ -349,8 +349,14 @@ than against this file's previous record of them.
 |---|---|---|---|
 | 1 | Firebase config, anonymous sign-in, rules deployed | **met** | verified live 2026-09-12 (P2-OQ-2); the nightly's `owner_state_pull` step is `ok` |
 | 2 | `FIREBASE_SERVICE_ACCOUNT_JSON` repo secret, read-only role | **met** | present since `2026-09-12T15:09:22Z`. The 09-13 nightly published `vintages.owner_state = {status: "available", pulled_at: …}` with **no `reason`** — a live pull, not the committed replica |
-| 3 | Vercel PR previews build | **met** | `Vercel` and `Vercel Preview Comments` both SUCCESS on PRs #61, #81, #85 |
+| 3 | Vercel PR previews build | **NOT met — for collaborators** | Re-checked 2026-09-15 across authors: `Deployment was blocked` on #100, #102, #104 (`anasakkari3`); `Deployment has completed` on #95, #106 (`Fadi-Sayej`). The 09-13 "met" cited only owner-authored PRs |
 | 4 | Basic Auth set in Vercel | **met, production** | `GET /` returns `401` with `www-authenticate: Basic realm="SmartShelf pilot"`. Also `401` on `/telemetry.html` and `/data/dashboard.json` |
+
+> **On row 3, and how it was got wrong.** Three PRs were checked on 09-13 and all three
+> passed, so the prerequisite was recorded as met. All three were opened by the repo owner.
+> The prerequisite exists because a *collaborator's* PR was blocked, and that case was not in
+> the sample — a filtered sample read as the whole. The same shape as the `vercel env ls
+> production` reading recorded above: the filter, mistaken for the answer.
 
 **Why the 401 is the proof and not merely a good sign.** `middleware.ts` fails **closed with
 503** when `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD` are unset (design §11.7) — an unset pair
