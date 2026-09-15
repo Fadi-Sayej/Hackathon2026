@@ -45,13 +45,14 @@ export function EntryCard({ entry, onOutcome, formatMoney }) {
       </dl>
 
       <footer className="entry-card__actions">
-        <button type="button" onClick={() => onOutcome(entry, { status: 'acted' })}>
+        <button type="button" data-outcome="acted" onClick={() => onOutcome(entry, { status: 'acted' })}>
           {t('outcome.acted')}
         </button>
-        <button type="button" onClick={() => onOutcome(entry, { status: 'declined', reason: 'not_worth_it' })}>
+        <button type="button" data-outcome="declined"
+                onClick={() => onOutcome(entry, { status: 'declined', reason: 'not_worth_it' })}>
           {t('outcome.declined')}
         </button>
-        <button type="button" onClick={() => onOutcome(entry, { status: 'deferred' })}>
+        <button type="button" data-outcome="deferred" onClick={() => onOutcome(entry, { status: 'deferred' })}>
           {t('outcome.deferred')}
         </button>
       </footer>
