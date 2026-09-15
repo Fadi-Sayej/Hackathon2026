@@ -40,6 +40,84 @@ def test_missing_silver_has_no_vintage(tmp_path):
     assert imp.read_pos_vintage(tmp_path) is None
 
 
+def _inventory_lacking(silver: Path, *columns: str) -> None:
+    """A silver table written before `columns` existed.
+
+    The column set mirrors configs/pos_schema_mapping.yaml's inventory table, so this
+    is a real older table rather than a three-column stand-in. `data/internal/silver_pos/`
+    is gitignored, so whatever silver a developer has is whatever they last generated,
+    and a parquet older than the commit that added a vintage column is the ordinary
+    case on a real clone.
+    """
+    import pyarrow as pa
+
+    present = {
+        "barcode": ["0012"],
+        "product_name": ["מים"],
+        "category": ["משקאות"],
+        "current_stock": [-5],
+        "last_purchase_date": [None],
+        "_imported_at": ["2026-08-02T00:00:00Z"],
+        "_source_file": ["yomyom-inventory.csv"],
+        "_source_kind": ["inventory"],
+        "_as_of": ["2026-08-02"],
+        "_as_of_source": ["declared"],
+    }
+    for column in columns:
+        present.pop(column, None)
+    silver.mkdir(parents=True, exist_ok=True)
+    pq.write_table(pa.table(present), silver / "yomyom_inventory.parquet")
+
+
+def test_a_parquet_written_before_as_of_still_loads(tmp_path):
+    """read_pos_vintage selects the columns present rather than demanding them.
+
+    Demanding them raises ArrowInvalid, and pyarrow does not degrade. The first caller
+    to hit it is _sales_import (run.py), which runs before load_inputs; the exception
+    is caught by _step, inputs becomes None, and run_engine's `if inputs is not None:`
+    then skips the capability loop. validate_artefact refuses the result — nothing is
+    written, the previous artefact survives — but the run is `partial` and the owner's
+    file stops being rebuilt. The caller's contract is `read_pos_vintage(...) or {...}`:
+    return, do not raise.
+    """
+    silver = tmp_path / "silver"
+    _inventory_lacking(silver, "_as_of", "_as_of_source")
+    assert imp.read_pos_vintage(silver) == {
+        "file": "yomyom-inventory.csv", "as_of": None, "as_of_source": None}
+
+
+def test_a_parquet_written_before_as_of_source_keeps_the_vintage(tmp_path):
+    """The newer column is the one most likely to be missing, and it must not cost
+    the date beside it."""
+    silver = tmp_path / "silver"
+    _inventory_lacking(silver, "_as_of_source")
+    assert imp.read_pos_vintage(silver) == {
+        "file": "yomyom-inventory.csv", "as_of": "2026-08-02", "as_of_source": None}
+
+
+def test_a_parquet_with_no_vintage_columns_at_all_does_not_raise(tmp_path):
+    silver = tmp_path / "silver"
+    _inventory_lacking(silver, "_source_file", "_as_of", "_as_of_source")
+    assert imp.read_pos_vintage(silver) == {
+        "file": None, "as_of": None, "as_of_source": None}
+
+
+def test_the_shape_a_zero_row_import_actually_writes(tmp_path):
+    """_records_to_table writes a lone `_empty` column when there are no records
+    (pos_importer.py), so this — not a zero-row table carrying the vintage columns —
+    is what an empty import leaves on disk. Reading it must not raise and must not
+    invent a date."""
+    import pyarrow as pa
+
+    silver = tmp_path / "silver"
+    silver.mkdir(parents=True)
+    pq.write_table(
+        pa.table({"_empty": pa.array([], type=pa.bool_())}),
+        silver / "yomyom_inventory.parquet",
+    )
+    assert imp.read_pos_vintage(silver).get("as_of") is None
+
+
 # ── The POS vintage must be the day the export was taken ──────────────────────
 # SPEC-007 FR-120, and the comment in import_pos_file has always said so. The
 # default did not honour it: `date.fromtimestamp(path.stat().st_mtime)`.
