@@ -1,0 +1,337 @@
+/*
+ * pages.css — the nine V1 pages that are not the daily surface.
+ *
+ * Companion to surface.css, and the same omission. The Task 2.7 cut-over shipped every V1
+ * page with class names and no rules; surface.css covered `daily` and `entry-card`, which
+ * fixed the first screen and left the other nine rendering as browser defaults. Reported
+ * from the live site on 2026-09-16, once for the first page and again for the rest.
+ *
+ * WHAT IS IN SCOPE
+ *   An audit of every className in src/**\/*.jsx against every rule in src/**\/*.css found
+ *   67 unstyled classes across 15 files. Most are in V2/V4 code that no longer appears in
+ *   the nav and that Phase 4 deletes — RecommendationsPage, AssortmentGapPage,
+ *   OperationalPage, the planogram panels, TelemetryDashboard. Styling those would be
+ *   dressing code on its way out.
+ *
+ *   These are the ones the owner can actually reach:
+ *
+ *     capability__*   CapabilityPage — SIX of the ten nav pages (price_consistency,
+ *                     reconciliation, hygiene, competitor_position, catalogue_lifecycle,
+ *                     margin_below_cost)
+ *     questions__*    the cost questions page
+ *     data__*         the provenance page an operator opens when a number looks wrong
+ *     spine__*        the loading and unreadable states, which every page passes through
+ *     pill-success    the "REAL POS DATA" badges in the header
+ *
+ * Tokens from index.css throughout, and logical properties throughout, for the reasons
+ * given at the top of surface.css: product names are Hebrew, labels may be English, Hebrew
+ * or Arabic, and each section sets its own dir.
+ */
+
+/* ── shared shape: every page is a column of blocks ──────────────────────── */
+
+.capability,
+.questions,
+.data {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.capability > h2,
+.questions > h2,
+.data > h2 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--ink-900);
+}
+
+/* A capability that could not run says so in place of its findings. It is information,
+   not an error — the engine declining to guess is the product working. */
+.capability__unavailable,
+.questions__unavailable,
+.capability__missing p,
+.questions__none {
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius-lg);
+  background: var(--paper-200);
+  color: var(--ink-600);
+}
+
+.questions__error {
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-lg);
+  background: var(--danger-wash);
+  color: var(--danger);
+}
+
+/* ── counts and thresholds ───────────────────────────────────────────────── */
+
+.capability__counts,
+.capability__thresholds,
+.data__vintages {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px 20px;
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius-lg);
+  background: var(--paper-100);
+}
+
+.capability__thresholds {
+  background: var(--paper-200);
+}
+
+.capability__counts > div,
+.capability__thresholds > div,
+.data__vintages > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.capability__counts dt,
+.capability__thresholds dt,
+.data__vintages dt {
+  font-size: 0.75rem;
+  color: var(--ink-400);
+}
+
+.capability__counts dd,
+.capability__thresholds dd,
+.data__vintages dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+  color: var(--ink-900);
+  overflow-wrap: anywhere;
+}
+
+.capability__counts dd {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+/* ── the findings list ───────────────────────────────────────────────────── */
+
+/* Markers off for the same reason as daily__entries: the order is meaningful and carried
+   by position, not by a printed number in the margin. */
+.capability__entries {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius-lg);
+  background: var(--ink-line);
+  overflow: hidden;
+}
+
+.capability__entries li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+  padding: 12px 16px;
+  background: var(--paper-100);
+}
+
+.capability__product {
+  font-weight: 600;
+  color: var(--ink-900);
+}
+
+.capability__what {
+  font-size: 0.875rem;
+  color: var(--ink-600);
+}
+
+/* ── cost questions ──────────────────────────────────────────────────────── */
+
+.questions__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.question {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px;
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius-xl);
+  background: var(--paper-100);
+  box-shadow: var(--shadow-sm);
+}
+
+.question label {
+  font-weight: 600;
+  color: var(--ink-900);
+}
+
+/* One answer, one field, one button, on a line. A cost is a short number; a full-width
+   input invites a paragraph. */
+.question input {
+  inline-size: 100%;
+  max-inline-size: 220px;
+  padding: 8px 12px;
+  border: 1px solid var(--ink-line-strong);
+  border-radius: var(--radius-md);
+  background: var(--paper-100);
+  font: inherit;
+  font-family: var(--font-mono);
+  color: var(--ink-900);
+}
+
+.question input:focus-visible {
+  outline: 2px solid var(--info);
+  outline-offset: 1px;
+}
+
+.question button {
+  align-self: flex-start;
+  padding: 8px 18px;
+  border: 1px solid var(--ok);
+  border-radius: var(--radius-pill);
+  background: var(--ok-wash);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ok);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.question button:hover {
+  background: var(--ok);
+  color: var(--paper-100);
+}
+
+.question button:focus-visible {
+  outline: 2px solid var(--info);
+  outline-offset: 2px;
+}
+
+/* Why the system is asking. Quiet, because it is context for a decision rather than the
+   decision — but present, because an unexplained question is one nobody answers. */
+.question__why {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--ink-400);
+}
+
+/* ── the data page ───────────────────────────────────────────────────────── */
+
+.data__run {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  border: 1px solid var(--ink-line);
+  background: var(--paper-200);
+  color: var(--ink-900);
+}
+
+.data__run[data-run-status='ok'] {
+  border-color: var(--ok);
+  background: var(--ok-wash);
+  color: var(--ok);
+}
+
+.data__run[data-run-status='degraded'] {
+  border-color: var(--warn);
+  background: var(--warn-wash);
+  color: var(--warn);
+}
+
+.data__run[data-run-status='partial'] {
+  border-color: var(--danger);
+  background: var(--danger-wash);
+  color: var(--danger);
+}
+
+.data__cause {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--ink-600);
+  overflow-wrap: anywhere;
+}
+
+.data__capabilities {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius-lg);
+  background: var(--ink-line);
+  overflow: hidden;
+}
+
+.data__capabilities li {
+  padding: 10px 16px;
+  background: var(--paper-100);
+  font-size: 0.875rem;
+  color: var(--ink-600);
+}
+
+/* ── the states every page passes through ────────────────────────────────── */
+
+.spine__loading,
+.spine__unreadable {
+  margin: 0;
+  padding: 20px;
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius-lg);
+  background: var(--paper-200);
+  color: var(--ink-600);
+}
+
+/* An artefact the browser cannot read is not a blank screen. ADR-018 refuses a schema
+   validator in the browser, so this is the only place a malformed artefact surfaces. */
+.spine__unreadable {
+  border-color: var(--danger);
+  background: var(--danger-wash);
+  color: var(--danger);
+}
+
+/* ── the header badges ───────────────────────────────────────────────────── */
+
+/* `.pill` is styled in App.css; only the success variant was missing, so the "REAL POS
+   DATA" and "REAL COMPETITOR PRICES" badges read the same as the neutral one beside them. */
+.pill-success {
+  border-color: var(--ok);
+  background: var(--ok-wash);
+  color: var(--ok);
+}
+
+@media (max-width: 640px) {
+  .capability__counts,
+  .capability__thresholds,
+  .data__vintages {
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    padding: 14px;
+  }
+
+  .question input {
+    max-inline-size: none;
+  }
+}

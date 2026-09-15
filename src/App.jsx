@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import './App.css'
 // The daily surface's own rules. Task 2.7 shipped its class names and no stylesheet.
 import './surface/surface.css'
+// …and the other nine V1 pages, which had the same omission.
+import './surface/pages.css'
 
 import { AppShell } from './components/layout/AppShell.jsx'
 import { ReceivingPage } from './pages/ReceivingPage.jsx'
