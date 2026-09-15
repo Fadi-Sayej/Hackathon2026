@@ -207,6 +207,67 @@ LLM layer (`src/lib/ai/*`, `src/api/llm_proxy.py`), telemetry, the MCP server, a
 > move the bundle deleted nothing that shipped" — is about browser code. This group is
 > Python and one JSON config; none of it was ever in a chunk. `CEILING_KB` stays where it is.
 
+> **The scripts row audited 2026-09-16 (Task 4.1c, second group). Four files deleted, eleven
+> held.** §20.1's dead row names eighteen paths and then "17 unreferenced scripts". Four of
+> the named ones — the MCP group — went in the first group. This pass swept the remaining
+> fourteen the way #91 says to: every mention anywhere in the tree, then each mention read to
+> see whether it is an import, an invocation, or prose. **Eleven of the fourteen are not dead**,
+> and three of those are live in a way the row's "no execution path from `package.json`,
+> `.github/`, `collect_daily.sh`, or any live module" claim contradicts directly.
+>
+> **Deleted — the closed subsets, where every reference outside the file is prose or is
+> itself being removed:**
+>
+> | Path | Its only readers |
+> |---|---|
+> | `src/external/firestore_writer.py` | `run_delivery_to_firestore.py`, deleted with it |
+> | `scripts/run_delivery_to_firestore.py` | one comment line in `configs/delivery_targets.yaml`, corrected in this commit |
+> | `scripts/export_market_params.py` | one `Regenerate:` comment in the file it generates |
+> | `src/data/marketParams.js` | **nothing** — zero importers in the tree |
+>
+> `firestore_writer.py` is S27's "second Firestore schema", and the sweep confirms the
+> phrase: it writes top-level `stores`, `products` and `price_snapshots` documents, while V1
+> reads only `stores/yomyom-kafr-qasim/ownerState` (`src/owner_state/pull.py`). Nothing reads
+> what it wrote. The nightly's delivery step is `run_delivery_venue_connector.py`
+> (`collect_daily.sh:112`) — a different script that never touches it. The three
+> `FIREBASE_SERVICE_ACCOUNT_*` variables stay live for `src/engine/run.py`,
+> `src/owner_state/pull.py` and `check_firestore_rules.py`, so nothing in `.env.example` or
+> the deployment doc is orphaned by this.
+>
+> `marketParams.js` is listed in the S26 demo-spine row rather than here, and is taken with
+> its generator anyway because it has no importers at all: it is not part of what blocks that
+> group, and a generated file whose generator is gone is the stale state this phase keeps
+> creating. 1,083 lines, tree-shaken out of the bundle already, so the bundle does not move —
+> rule 3 is about browser code, and the same reasoning as the MCP group applies. `CEILING_KB`
+> stays.
+>
+> **Held, and why. The row is wrong about three of these.**
+>
+> | Path | Held on |
+> |---|---|
+> | `src/external/tenbis_connector.py` | **live in the nightly.** `src/external/delivery_venue_connector.py:41` imports `TenBisCollectionResult` and `collect_tenbis_venue` at module top level, and `collect_daily.sh:112` runs it every night. S27 calls this an "unreachable branch" — the *branch* at line 543 may be, but the *import* is not, so deleting the module breaks the collector on import, before any branch is evaluated |
+> | `scripts/run_alonit_signal_pipeline.py`, `src/external/alonit_signal_pipeline.py` | **live npm script** — `collect:alonit-signals` (`package.json:17`). Not in CI; the script is the whole execution path |
+> | `scripts/export_store_types.py` | **live npm script** — `data:store-types` (`package.json:31`) |
+> | `scripts/export_competitor_market_data.py` | imported by `tests/test_store_types.py:196` (`CHAIN_META`, `OUR_STORE`) — a test of the **store-types config**, not of this script, so Step 4's "delete the test with its subject" does not apply. Also `pilot_daily.sh:98` |
+> | `scripts/join_yomyom_kaggle.py` | `pilot_daily.sh:97`, which `npm run pilot:daily` runs |
+> | `src/external/kaggle_supermarket_importer.py`, `scripts/import_kaggle_supermarkets.py` | the only producers of `data/external/silver/products/kaggle_*`, which `join_yomyom_kaggle.py:44` reads. Deleting them while that script lives would not break it — it globs, finds nothing, and writes a delivery-only `barcode_matches.parquet`. A smaller number, no error. That is rule 12 in the data direction, so the Kaggle chain is held with its consumer |
+> | `scripts/build_assortment_gap.py`, `export_assortment_gap.py`, `measure_gap_ranking.py` | their only reader outside themselves is `src/pages/AssortmentGapPage.jsx` (via `public/data/assortment_gap.json` and the `gap.emptyDetail` string, which names both scripts in all three dictionaries). The page is in the V2/V4 row; `src/lib/i18n/*` is **REUSE**, so deleting the scripts first leaves a shipped dictionary telling the owner to run something that does not exist. Held for the page's commit |
+>
+> So `pilot_daily.sh` — not named anywhere in §20.1 — is what pins four of the eleven. It is the
+> legacy pipeline that ends in `public/data/operational.json`, which is Task 4.2's subject and
+> is deliberately frozen until Phase 4 ends (ADR-009's one-shot id translation still needs
+> it). **Those four cannot go before Task 4.2, and Task 4.2 cannot start yet.**
+>
+> **And "17 unreferenced scripts" cannot be executed as written.** It names no paths, so
+> there is nothing to grep, nothing to verify and nothing to delete by path — and this sweep
+> shows the row's own named entries are wrong about three files, which is the strongest
+> argument against trusting an unnamed remainder. `scripts/` holds **67** files after this
+> commit — 52 `.py`, 12 `.mjs`, 3 `.sh`, counted with `ls`, not read off another document —
+> and the System Design §7 names the handful that are the product; the difference is not 17.
+> **smartshelf-architect: the row needs the paths enumerated, `tenbis_connector.py`,
+> `run_alonit_signal_pipeline.py` and `export_store_types.py` moved off "dead", and
+> `pilot_daily.sh` named as the blocker it is.**
+
 > **Fixed 2026-09-13.** §20.1's row now names `src/lib/i18n/explainReorder.js` directly.
 > The same pass also added `scripts/build-rag-corpus.mjs` and
 > `scripts/run_mcp_price_lookup.py` to their rows — both were readers of REMOVE-listed
