@@ -113,11 +113,12 @@
               ],
               "enum": [
                 "declared",
+                "declared_sidecar",
                 "git_commit",
                 "file_mtime",
                 null
               ],
-              "description": "How as_of was arrived at: 'declared' (a human passed --as-of, the only certain one), 'git_commit' (the file's last change in git — machine-independent), 'file_mtime' (last resort; on a CI runner this is checkout time, not an export date). null for tables written before this existed."
+              "description": "How as_of was arrived at. 'declared' (--as-of) and 'declared_sidecar' (<export>.vintage.json) are written down by a human and are the only ones certainly the export date. 'git_commit' is the file's last change in git, available only in a repository deep enough to answer — a shallow checkout returns the checkout commit's date, so it is refused there. 'file_mtime' is a filesystem timestamp and is reset by git clone. null for tables written before this existed."
             }
           }
         },

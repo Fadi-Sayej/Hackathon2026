@@ -3,6 +3,8 @@ from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
+import json
+
 import pyarrow.parquet as pq
 
 import src.common.source_status as source_status
@@ -100,3 +102,68 @@ def test_the_vintage_source_reaches_the_reader(tmp_path, monkeypatch):
     vintage = imp.read_pos_vintage(silver)
     assert vintage["as_of"] == "2026-06-06"
     assert vintage["as_of_source"] == "git_commit"
+
+
+# ── A shallow clone cannot answer "when did this file last change" ────────────
+# Shipped 2026-09-13 and wrong by 2026-09-15. `actions/checkout@v4` defaults to
+# fetch-depth 1, so the runner holds ONE commit and `git log -1 -- <file>` has
+# nothing to diff against — it attributes the file to the checkout commit and
+# returns that commit's date.
+#
+#   09-14 nightly  checked out 7d8f65a (dated 09-14)  published as_of 2026-09-14
+#   09-15 nightly  checked out 4645cd5 (dated 09-14)  published as_of 2026-09-14
+#
+# The CSV has not changed since 2026-06-06. So the git route reproduced exactly
+# the defect it replaced — a date that tracks the checkout, not the data — and
+# labelled it `git_commit`, which reads as verified. That is worse than the mtime
+# version, because mtime at least announced itself as a filesystem timestamp.
+#
+# Two changes. A declared sidecar beside the export is consulted first, because a
+# date someone wrote down is the only kind that is actually the export date. And
+# the git route refuses to answer in a shallow repository rather than guessing.
+
+def test_a_shallow_repository_cannot_supply_a_vintage(tmp_path, monkeypatch):
+    monkeypatch.setattr(imp, "_is_shallow", lambda p: True)
+    monkeypatch.setattr(imp, "_git_log_date", lambda p: "2026-09-14")  # what a runner returns
+    csv = tmp_path / "inv.csv"
+    csv.write_text("x", encoding="utf-8")
+
+    assert imp._git_committed_date(csv) is None, (
+        "in a one-commit clone git log reports the checkout, not the file's history"
+    )
+    when, source = imp.resolve_as_of(csv)
+    assert source == "file_mtime", "with git unusable it must fall back and say so"
+    assert when != "2026-09-14"
+
+
+def test_a_declared_sidecar_beats_git(tmp_path, monkeypatch):
+    """The only source that is actually the export date is one a human wrote down.
+
+    It also survives a shallow clone, a fresh checkout and a customer's zip, none of
+    which carry our git history.
+    """
+    monkeypatch.setattr(imp, "_git_committed_date", lambda p: "2026-09-14")
+    csv = tmp_path / "yomyom-inventory.csv"
+    csv.write_text("x", encoding="utf-8")
+    (tmp_path / "yomyom-inventory.vintage.json").write_text(
+        json.dumps({"as_of": "2026-06-06", "note": "export taken by the owner"}), encoding="utf-8")
+
+    assert imp.resolve_as_of(csv) == ("2026-06-06", "declared_sidecar")
+
+
+def test_an_explicit_as_of_still_beats_the_sidecar(tmp_path, monkeypatch):
+    csv = tmp_path / "inv.csv"
+    csv.write_text("x", encoding="utf-8")
+    (tmp_path / "inv.vintage.json").write_text(json.dumps({"as_of": "2026-06-06"}), encoding="utf-8")
+    assert imp.resolve_as_of(csv, declared="2026-01-01") == ("2026-01-01", "declared")
+
+
+def test_a_malformed_sidecar_is_ignored_not_fatal(tmp_path, monkeypatch):
+    """A broken sidecar must not take the import down; it must decline to answer."""
+    monkeypatch.setattr(imp, "_git_committed_date", lambda p: None)
+    csv = tmp_path / "inv.csv"
+    csv.write_text("x", encoding="utf-8")
+    (tmp_path / "inv.vintage.json").write_text("{not json", encoding="utf-8")
+    when, source = imp.resolve_as_of(csv)
+    assert source == "file_mtime"
+    assert when

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 import subprocess
 from datetime import date, datetime, timezone
@@ -57,20 +58,71 @@ def _build_table_rows(
 _ISO_DAY = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
-def _git_committed_date(path: Path) -> str | None:
-    """The day this file last changed in git, or None if that cannot be known.
-
-    Machine-independent, unlike an mtime, and it is a real fact about the data rather
-    than about the checkout that produced it.
-    """
+def _git(args: list[str], cwd: Path) -> str | None:
     try:
-        out = subprocess.run(
-            ["git", "log", "-1", "--format=%ad", "--date=short", "--", path.name],
-            cwd=path.parent, capture_output=True, text=True, timeout=10, check=False)
+        out = subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True,
+                             timeout=10, check=False)
     except (OSError, subprocess.SubprocessError):
         return None
-    day = out.stdout.strip()
-    return day if out.returncode == 0 and _ISO_DAY.match(day) else None
+    return out.stdout.strip() if out.returncode == 0 else None
+
+
+def _is_shallow(path: Path) -> bool:
+    """True when this checkout does not hold enough history to answer a `git log`.
+
+    `actions/checkout@v4` defaults to `fetch-depth: 1`. A repository with one commit
+    cannot say when a file last changed — there is no parent to diff against — so
+    `git log -1 -- <file>` attributes it to the checkout commit and returns THAT date.
+    Unknown, not false: a shallow repository must decline rather than answer.
+    """
+    return _git(["rev-parse", "--is-shallow-repository"], path.parent) == "true"
+
+
+def _git_log_date(path: Path) -> str | None:
+    day = _git(["log", "-1", "--format=%ad", "--date=short", "--", path.name], path.parent)
+    return day if day and _ISO_DAY.match(day) else None
+
+
+def _git_committed_date(path: Path) -> str | None:
+    """The day this file last changed in git, or None when git cannot know.
+
+    Machine-independent, unlike an mtime — but only in a repository deep enough to
+    answer. Shipped 2026-09-13 without the shallow check and was wrong within a day:
+
+        09-14 nightly  checked out 7d8f65a (dated 09-14)  published as_of 2026-09-14
+        09-15 nightly  checked out 4645cd5 (dated 09-14)  published as_of 2026-09-14
+
+    while `yomyom-inventory.csv` had not changed since 2026-06-06. That is the same
+    defect the git route replaced — a date tracking the checkout rather than the data —
+    wearing a `git_commit` label that reads as verified. Worse than the mtime it
+    replaced, because mtime at least announced itself as a filesystem timestamp.
+    """
+    if _is_shallow(path):
+        return None
+    return _git_log_date(path)
+
+
+def _declared_sidecar(path: Path) -> str | None:
+    """`<export>.vintage.json` beside the export: `{"as_of": "YYYY-MM-DD"}`.
+
+    The only source that is actually the export date is one a human wrote down, and
+    unlike git it survives a shallow clone, a fresh checkout and a customer emailing a
+    zip — none of which carry our history. Whoever replaces the export knows when it was
+    taken; this is where that goes.
+
+    A malformed or dateless sidecar declines rather than raises. A broken note about the
+    data must not stop the data being imported.
+    """
+    sidecar = path.with_suffix(path.suffix + ".vintage.json")
+    if not sidecar.exists():
+        sidecar = path.with_suffix(".vintage.json")
+    if not sidecar.exists():
+        return None
+    try:
+        day = (json.loads(sidecar.read_text(encoding="utf-8")) or {}).get("as_of")
+    except (OSError, ValueError):
+        return None
+    return day if isinstance(day, str) and _ISO_DAY.match(day) else None
 
 
 def resolve_as_of(input_path: Path, declared: str | None = None) -> tuple[str, str]:
@@ -89,14 +141,24 @@ def resolve_as_of(input_path: Path, declared: str | None = None) -> tuple[str, s
     description, type, stock, prices and department. So there is nothing to read out of
     the data, and the answer has to be sourced honestly instead of guessed:
 
-      declared    a human passed --as-of. Always wins; this is the only one that is
-                  certainly the export date.
-      git_commit  the file's last change in git. True and identical on every machine.
-      file_mtime  last resort — a customer's export will not be in our history. Still
-                  published, but labelled, so nobody reads a checkout time as a vintage.
+      declared         a human passed --as-of. Always wins.
+      declared_sidecar `<export>.vintage.json` beside the file. Also written down by a
+                       human, and it survives a shallow clone and a customer's zip.
+      git_commit       the file's last change in git — only in a repository deep enough
+                       to answer. See _git_committed_date for what a shallow one does.
+      file_mtime       last resort. Still published, but labelled, so nobody reads a
+                       checkout timestamp as a vintage.
+
+    The first two are the only ones that are certainly the export date. The other two are
+    proxies, and both have now been wrong in production for the same underlying reason —
+    they measure the checkout rather than the data — which is why the ladder starts with
+    something a person wrote down.
     """
     if declared:
         return declared, "declared"
+    sidecar = _declared_sidecar(input_path)
+    if sidecar:
+        return sidecar, "declared_sidecar"
     committed = _git_committed_date(input_path)
     if committed:
         return committed, "git_commit"

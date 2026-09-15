@@ -1,6 +1,9 @@
 import { useI18n } from '../lib/i18n/index.js'
 import { dirProps } from '../lib/utils/rtl.js'
 
+/** Vintage sources a human wrote down, as opposed to the two the importer infers. */
+const DECLARED_VINTAGE = new Set(['declared', 'declared_sidecar'])
+
 /**
  * The page an operator opens when a number looks wrong.
  *
@@ -62,9 +65,15 @@ export function DataPage({ artefact }) {
         <Field id="pos" label={t('data.pos')} empty={none}>
           {vintages.pos?.as_of
             ? [vintages.pos.as_of,
-               vintages.pos.as_of_source && vintages.pos.as_of_source !== 'declared'
-                 ? t(`data.pos.${vintages.pos.as_of_source}`)
-                 : null,
+               // Both declared forms are a date a person wrote down, so neither needs a
+               // caveat. The other two are proxies that have each been wrong in
+               // production — mtime is reset by `git clone`, and `git log` answers with
+               // the checkout commit in a shallow one — so they say what they are.
+               DECLARED_VINTAGE.has(vintages.pos.as_of_source)
+                 ? null
+                 : vintages.pos.as_of_source
+                   ? t(`data.pos.${vintages.pos.as_of_source}`)
+                   : null,
               ].filter(Boolean).join(' · ')
             : null}
         </Field>
