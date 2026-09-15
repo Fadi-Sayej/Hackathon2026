@@ -1,0 +1,61 @@
+{
+  "answers": {
+    "7290000041445": {
+      "cost_price": {
+        "value": 9.9,
+        "at": 1789290000000,
+        "status": "answered"
+      }
+    },
+    "00729012345": {
+      "cost_price": {
+        "value": 4.5,
+        "at": 1789290000000,
+        "status": "answered"
+      }
+    }
+  },
+  "outcomes": {
+    "a1b2c3d4e5f60718": {
+      "status": "acted",
+      "reason": null,
+      "at": 1789290000000,
+      "snapshot": {
+        "signal_family": "price.inverted",
+        "capability": "price_consistency",
+        "barcode": "7290000041445",
+        "characterisation": "confirmed_loss",
+        "value": 16,
+        "kind": "per_sale",
+        "certainty": "confirmed"
+      }
+    },
+    "0f1e2d3c4b5a6978": {
+      "status": "declined",
+      "reason": "not_worth_it",
+      "at": 1789290000000,
+      "snapshot": {
+        "signal_family": "hygiene.negative_stock",
+        "capability": "hygiene",
+        "barcode": "7290019153696",
+        "characterisation": "hygiene"
+      }
+    },
+    "8f6ebc2c4a19e4f4": {
+      "status": "deferred",
+      "reason": null,
+      "at": 1789290000000,
+      "deferred_until": 1789894800000,
+      "snapshot": {
+        "signal_family": "competitor.policy_breach",
+        "capability": "competitor_position",
+        "barcode": "7290017888729",
+        "characterisation": "policy_breach_review"
+      }
+    }
+  },
+  "meta": {
+    "schema": 1,
+    "updated_at": 1789290000000
+  }
+}
