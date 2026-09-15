@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-14T02:59:03.694421+00:00",
-  "date": "2026-09-14",
+  "generatedAt": "2026-09-15T03:02:37.922105+00:00",
+  "date": "2026-09-15",
   "status": "ok",
   "sources": {
     "weather": "open-meteo",
@@ -9,27 +9,21 @@
     "islamic": "computed_hijri"
   },
   "weather": {
-    "temperatureC": 20.6,
+    "temperatureC": 19.8,
     "precipitation": 0.0,
-    "windSpeed": 7.1,
-    "weatherCode": 1,
-    "label": "warm",
-    "observedAt": "2026-09-14T05:45",
+    "windSpeed": 7.6,
+    "weatherCode": 0,
+    "label": "mild",
+    "observedAt": "2026-09-15T06:00",
     "lat": 32.114,
     "lon": 34.976,
     "source": "open-meteo"
   },
   "hebrew": {
-    "date": "2026-09-14",
-    "holidays": [
-      {
-        "title": "Tzom Gedaliah",
-        "hebrew": "צום גדליה",
-        "category": "holiday"
-      }
-    ],
+    "date": "2026-09-15",
+    "holidays": [],
     "isErevChag": false,
-    "isFastDay": true,
+    "isFastDay": false,
     "isShabbatEve": false,
     "chametz": null,
     "pesachStart": "2027-04-22",
@@ -41,11 +35,11 @@
     "source": "hebcal"
   },
   "islamic": {
-    "date": "2026-09-14",
+    "date": "2026-09-15",
     "hijri": {
       "year": 1448,
       "month": 4,
-      "day": 1
+      "day": 2
     },
     "isRamadan": false,
     "ramadanDay": null,
@@ -53,8 +47,8 @@
     "isEidAlFitr": false,
     "isEidAlAdha": false,
     "ramadanStart": "2027-02-08",
-    "daysToRamadan": 147,
-    "daysToEidAlFitr": 177,
+    "daysToRamadan": 146,
+    "daysToEidAlFitr": 176,
     "phase": null,
     "windows": {
       "ramadan_build_up_days": 21,
@@ -913,6 +907,7 @@
       "7290008909853",
       "7290008909884",
       "7290008975780",
+      "7290009957792",
       "7290010002078",
       "7290010002108",
       "7290010117864",
@@ -1138,6 +1133,7 @@
       "7290018296127",
       "7290018296608",
       "7290018296615",
+      "7290018296653",
       "7290018296868",
       "7290018359495",
       "7290018441275",
@@ -2216,6 +2212,7 @@
       "8001620011935",
       "8001620019177",
       "8004030026018",
+      "8004030845046",
       "8004030860001",
       "80050025",
       "80050278",
@@ -2299,6 +2296,7 @@
       "8606018615827",
       "8606018615841",
       "8606018615865",
+      "8690637007705",
       "8690777203012",
       "8690777206051",
       "8690777221405",
@@ -2405,7 +2403,7 @@
       "9780201321029",
       "9800800056"
     ],
-    "days": 35,
+    "days": 36,
     "status": "ok",
     "lift": 1.15
   }
