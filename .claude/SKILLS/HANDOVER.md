@@ -92,7 +92,7 @@ is `Approved`.
 | `Superseded` | Replaced. Carries `Superseded-by:`. | No — follow the pointer |
 
 **`Accepted` and `Approved` are the same gate.** If you treat an ADR's `Accepted` as
-"not approved" you will block the whole chain on all fourteen ADRs.
+"not approved" you will block the whole chain on all twenty-two of them.
 
 ### The handover rules
 
