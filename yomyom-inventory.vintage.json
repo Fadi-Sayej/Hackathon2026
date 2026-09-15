@@ -1,0 +1,6 @@
+{
+  "as_of": "2026-06-06",
+  "file": "yomyom-inventory.csv",
+  "note": "The day this POS export was taken, declared rather than inferred. SPEC-007 FR-120 asks for the export date, and nothing inside the CSV carries one: its columns are item code, barcode, description, type, stock, prices and department. Both proxies the importer can compute have now been wrong in production for the same reason — they measure the checkout, not the data. File mtime is reset by git clone. git log is reset by a shallow clone, which is what actions/checkout uses by default: the 09-14 and 09-15 nightlies both published 2026-09-14 because that was the date of the commit they checked out. 2026-06-06 is when this file last actually changed, read from the full history at 9eb71d6.",
+  "when_you_replace_the_export": "Change this date in the same commit. It is the one thing about the export that the export cannot tell us."
+}
