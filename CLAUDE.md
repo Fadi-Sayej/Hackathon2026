@@ -191,7 +191,7 @@ particular: no role quotes a figure it has not read from the artifact that produ
 - `src/` (Python) — `internal_pos/` POS import · `signals/` competitor signals ·
   `matching/` product matching · `recommendations/` both recommendation families ·
   `external/` connectors · `common/` paths and status · `expiry/`, `internal/`
-  receiving · `mcp_server/` price server (launched by `.mcp.json`).
+  receiving.
 - `src/` (JS) — `pages/` one file per screen · `lib/analytics/` ranking and money
   rules · `lib/dataAdapters/` reads `public/data/*.json` · `lib/i18n/` he/en · `data/`
   generated, committed.

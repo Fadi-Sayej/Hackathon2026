@@ -193,6 +193,20 @@ LLM layer (`src/lib/ai/*`, `src/api/llm_proxy.py`), telemetry, the MCP server, a
 > Two tests in `test_competitor_position.py` now do, and they were proven to guard rather than
 > to pass: with `min_affinity` set to `0.0` in `configs/store_types.yaml`, exactly one fails.
 
+> **MCP group deleted 2026-09-16 (Task 4.1c, first group).** `src/mcp_server/`,
+> `src/external/mcp_price_adapter.py`, `scripts/run_mcp_price_lookup.py` and `.mcp.json`,
+> which held only that one server entry.
+>
+> Swept the way #91 says to, not the way that missed it: every reference to `mcp_server`,
+> `mcp_price_adapter`, `run_mcp_price_lookup` or `price_server` anywhere in the tree. All
+> that remained were **documentation** mentions — no code, no workflow, no npm script, no
+> test. The group imports only itself, and the engine's own market chain
+> (`market_context` → `competitor_signals` → `product_matching`) never used it.
+>
+> **The bundle does not move, and that is correct here.** Rule 3 — "a group that does not
+> move the bundle deleted nothing that shipped" — is about browser code. This group is
+> Python and one JSON config; none of it was ever in a chunk. `CEILING_KB` stays where it is.
+
 > **Fixed 2026-09-13.** §20.1's row now names `src/lib/i18n/explainReorder.js` directly.
 > The same pass also added `scripts/build-rag-corpus.mjs` and
 > `scripts/run_mcp_price_lookup.py` to their rows — both were readers of REMOVE-listed
