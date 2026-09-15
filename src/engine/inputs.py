@@ -14,7 +14,7 @@ from src.common.store_types import StoreTypeConfig, load_store_types
 from src.engine.model import EvidenceWindow, norm_barcode
 from src.engine.policy import Policy
 from src.internal_pos.pos_importer import read_pos_vintage
-from src.owner_state.model import OwnerState, answered_cost
+from src.owner_state.model import OwnerState, answered_cost, device_register
 
 OUR_FORMAT = "gas_convenience"
 
@@ -242,8 +242,12 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
         # dropped every flag: the Checkpoint 3 clone, with no credential at all, still
         # said `status: available` under a pulled_at from another machine. Design §13
         # requires that the system be unavailable honestly rather than silently local.
+        # `devices` is ADR-021: how many browser profiles have written, and when each last
+        # did. It sits here rather than in a block of its own because this is where
+        # owner-state provenance lives, and it is provenance — see _digest() on why its
+        # timestamps are not hashed.
         "owner_state": {"pulled_at": owner.pulled_at, "status": owner.status,
-                        "reason": owner.reason},
+                        "reason": owner.reason, "devices": device_register(owner)},
     }
     vintages["sales"] = {k: vintages["sales"][k] for k in ("months", "first", "last", "full_annual_cycle")}
     digest = _digest(products, summary_rows, monthly, observations, matches, policy, owner)
@@ -303,9 +307,11 @@ def _digest(products, summary_rows, monthly, observations, matches, policy, owne
     feed("observations", observations)
     feed("matches", matches)
     feed("policy", policy.as_dict())
-    # NOT pulled_at. The owner's ANSWERS are an input; the moment we fetched them is not,
-    # and hashing it made two runs over identical data disagree — which is precisely the
-    # failure this digest exists to detect, so it would have detected nothing.
+    # NOT pulled_at, and NOT the device register (ADR-021). The owner's ANSWERS are an
+    # input; the moment we fetched them is not, and hashing it made two runs over identical
+    # data disagree — which is precisely the failure this digest exists to detect, so it
+    # would have detected nothing. `last_seen_at` moves every time anyone opens the app, so
+    # hashing it would re-introduce that defect at a higher frequency.
     feed("owner", {"status": owner.status,
                    "answers": _json.dumps(owner.answers, sort_keys=True, default=str)})
     return h.hexdigest()

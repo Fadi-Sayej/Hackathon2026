@@ -54,6 +54,13 @@
       }
     }
   },
+  "devices": {
+    "0c4b8f1e-6c1d-4f0a-9b77-3a5e2d8c14ab": {
+      "device_id": "0c4b8f1e-6c1d-4f0a-9b77-3a5e2d8c14ab",
+      "first_seen_at": 1788080400000,
+      "last_seen_at": 1789290000000
+    }
+  },
   "meta": {
     "schema": 1,
     "updated_at": 1789290000000

@@ -778,6 +778,8 @@ export const ar = {
   'data.ownerState.available': "متاحة",
   'data.ownerState.unavailable': "غير متاحة",
   'data.ownerState.fromMirror': "من النسخة المحفوظة، لم تُجلب الآن",
+  'data.devices': "المتصفحات التي حفظت إجاباتك",
+  'data.devices.counted': "{n}، آخر حفظ {last}",
   'data.pos.git_commit': "بحسب آخر تغيير في الملف",
   'data.pos.file_mtime': "التاريخ غير مؤكّد — من ختم الملف",
   'data.available': "تعمل",

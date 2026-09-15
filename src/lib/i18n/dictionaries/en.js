@@ -772,6 +772,10 @@ export const en = {
   'data.ownerState.available': "available",
   'data.ownerState.unavailable': "unavailable",
   'data.ownerState.fromMirror': "from the saved copy, not fetched now",
+  // ADR-021: "browsers", never "devices" — clearing site data mints a new one and two
+  // browsers on one phone count twice, so this is not a count of the phones in the shop.
+  'data.devices': "Browsers that saved your answers",
+  'data.devices.counted': "{n}, last saved {last}",
   'data.pos.git_commit': "dated from when the file last changed",
   'data.pos.file_mtime': "date not confirmed — taken from the file's timestamp",
   'data.available': "working",

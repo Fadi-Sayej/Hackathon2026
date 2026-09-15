@@ -24,17 +24,26 @@
  *   copies would disagree with no error. `mergeFields` replaces exactly the named record and
  *   leaves every sibling alone — the same thing the local write does.
  *
+ * WHAT ELSE RIDES ON THIS PATH
+ *   ADR-021's device register. Every write below also stamps this browser profile into the
+ *   `devices` document, and `pushAll` — which runs on every load, not only when the owner
+ *   acts — is the one that matters: the case Task 4.3 risks is a profile that OPENED the app
+ *   and recorded nothing, which no outcome could ever stamp.
+ *
  * WHAT THIS DOES NOT DO (yet)
  *   It writes; it does not read the remote state back into this device. A second device
  *   therefore still shows what it has itself recorded, not what the first did. That is the
  *   browser-reader half of §11.5, and it is separate work.
  */
 
+import { deviceField } from './deviceRegister.js'
+
 /** design §10.3 `meta: { schema: 1, updated_at }`. MUST equal `SCHEMA` in
  *  src/owner_state/model.py, which rejects anything else as `owner_state_schema`. */
 export const FIRESTORE_SCHEMA = 1
 
 const RECORD_DOCS = ['answers', 'outcomes', 'revivals']
+const DEVICES_DOC = 'devices'
 
 async function defaultLoader() {
   // One lazy module that imports the SDK by name — see firestoreOwnerStateWriter.js for why
@@ -67,6 +76,18 @@ async function connect() {
 
 const ref = (r, db, name) => r.doc(db, 'stores', r.storeId, 'ownerState', name)
 
+/**
+ * ADR-021. One field per browser profile, replaced whole — `mergeFields` for the same reason
+ * the records use it, and `first_seen_at` is carried from localStorage so replacing it whole
+ * cannot lose it. Returns nothing to push when the profile cannot keep an id.
+ */
+function stampDevice(r, db, now) {
+  const field = deviceField({ now })
+  if (!field) return null
+  return r.setDoc(ref(r, db, DEVICES_DOC), { [field.key]: field.record },
+    { mergeFields: [new r.FieldPath(field.key)] })
+}
+
 function stampMeta(r, db, now) {
   return r.setDoc(ref(r, db, 'meta'), { schema: FIRESTORE_SCHEMA, updated_at: now() }, { merge: true })
 }
@@ -82,7 +103,8 @@ export async function writeThrough(docName, key, record, { now = Date.now } = {}
     await Promise.all([
       r.setDoc(ref(r, db, docName), { [key]: record }, { mergeFields: [new r.FieldPath(key)] }),
       stampMeta(r, db, now),
-    ])
+      stampDevice(r, db, now),
+    ].filter(Boolean))
     return { written: true }
   } catch (error) {
     report(error)
@@ -110,6 +132,11 @@ export async function pushAll(state, { now = Date.now } = {}) {
       writes.push(r.setDoc(ref(r, db, name), map, { mergeFields: keys.map((k) => new r.FieldPath(k)) }))
     }
     writes.push(stampMeta(r, db, now))
+    // Unconditional — the loop above skips a document with no records, but the register
+    // must not skip a profile with none. A profile that opened the app and recorded nothing
+    // is precisely what Task 4.3's precondition asks about.
+    const device = stampDevice(r, db, now)
+    if (device) writes.push(device)
     await Promise.all(writes)
     return { written: true }
   } catch (error) {

@@ -492,6 +492,36 @@ so `smartshelf.ownerState.v2` exists everywhere. **This is not knowable from her
 pilot is one store and a handful of devices; the answer is "ask, then delete", not "assume
 a quarter has passed".
 
+> **It is knowable from here now — ADR-021 is implemented (#84, 2026-09-16).** The artefact
+> carries the register at **`vintages.owner_state.devices`**, as
+> `{status, reason, count, last_seen_at}`, and Step 1 below is no longer a question asked
+> from memory.
+>
+> **What it reads today, from the artefact rather than from this file:** running
+> `python3 scripts/run_engine.py` on this branch publishes
+>
+> ```json
+> "devices": { "status": "unavailable", "reason": "not_registered", "count": null, "last_seen_at": [] }
+> ```
+>
+> — and that is correct, not a fault. Nothing has registered because the browser half ships
+> with **#95, which is held**. The first nightly after #95 deploys is the first that can
+> report a number, and until then the honest reading of this precondition is unchanged.
+> `count` is `null` rather than `0` deliberately: nobody having opened the app and nobody
+> having registered are different facts, and only one of them is known here
+> (ARCH-DRIVER-002, rule 8).
+>
+> **Step 1 becomes:** read `count` and `last_seen_at` off `public/data/dashboard.json`, show
+> the owner that list of dates, and ask him to confirm it covers every device he uses. The
+> confirmation is still his — what changed is that he confirms against evidence.
+>
+> **Correction to P4-OQ-1's row below.** It says the count "gives a floor and a date". It
+> does not, and ADR-021's own review recorded that as finding 4: clearing site data mints a
+> new id and two browsers on one phone count twice, so the number can **exceed** the physical
+> fleet. It is neither a floor nor a ceiling — it is the number of distinct browser profiles
+> that have written. Stating the wrong bound is worse than stating none (rule 13's own
+> distinction), and the row still states it. **smartshelf-architect.**
+
 - [ ] **Step 1:** confirm with the owner that every device has been used since the cut-over
 - [ ] **Step 2:** remove the migration and its tests; keep the three legacy keys **unread
       but not deleted** — removing the migration is reversible, deleting a user's data is not

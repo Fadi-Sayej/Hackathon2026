@@ -16,7 +16,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from src.owner_state.model import SCHEMA, answered_cost, standing_outcome
+from src.owner_state.model import SCHEMA, answered_cost, device_register, standing_outcome
 from src.owner_state.pull import pull
 
 FIXTURE = ROOT / "tests" / "fixtures" / "owner_state_firestore_contract.json"
@@ -85,3 +85,22 @@ def test_the_snapshot_carries_the_signal_family_to_the_engine():
     """ADR-016: the family is the only durable grouping key INT-MEAS has."""
     state = _pulled()
     assert state.outcomes["a1b2c3d4e5f60718"]["snapshot"]["signal_family"] == "price.inverted"
+
+
+def test_the_register_the_browser_wrote_is_the_one_the_engine_counts():
+    """ADR-021 crosses the same seam #94 was lost at, so it is pinned by the same fixture.
+    The browser writes epoch milliseconds — what it uses everywhere — and the engine
+    publishes ISO-8601, and nothing else converts between them."""
+    register = device_register(_pulled())
+    assert register["status"] == "available"
+    assert register["count"] == 1
+    assert register["last_seen_at"] == ["2026-09-13T09:00:00Z"]
+
+
+def test_the_engine_never_publishes_the_device_id():
+    """ADR-021 review finding 2, asserted against the real id the browser sent rather than
+    against a shape written by hand here."""
+    docs = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    device_id = next(iter(docs["devices"]))
+    assert device_id in json.dumps(docs)          # the browser did write it
+    assert device_id not in json.dumps(device_register(_pulled()))

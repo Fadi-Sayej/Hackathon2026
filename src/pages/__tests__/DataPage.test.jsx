@@ -97,3 +97,49 @@ describe('capability statuses', () => {
       .toMatch(/answers|إجابات|תשובות/i)
   })
 })
+
+describe('ADR-021 — the device register on the data page', () => {
+  const withDevices = (devices) => {
+    const a = artefact()
+    a.vintages.owner_state.devices = devices
+    return a
+  }
+
+  it('shows the count and the most recent save', () => {
+    renderWithI18n(<DataPage artefact={withDevices({
+      status: 'available', reason: null, count: 3,
+      last_seen_at: ['2026-08-30T11:02:00Z', '2026-09-12T09:14:02Z', '2026-09-13T07:41:55Z'],
+    })} />)
+    const el = document.querySelector('[data-field="owner_devices"]')
+    expect(el.textContent).toContain('3')
+    expect(el.textContent).toContain('2026-09-13T07:41:55Z')   // the latest, not the first
+  })
+
+  it('shows nothing rather than zero when nobody has registered', () => {
+    // ARCH-DRIVER-002 and rule 8. "0 browsers" is a claim about the pilot; the absence of a
+    // register is a fact about the artefact, and only one of them is true here.
+    renderWithI18n(<DataPage artefact={withDevices({
+      status: 'unavailable', reason: 'not_registered', count: null, last_seen_at: [],
+    })} />)
+    const el = document.querySelector('[data-field="owner_devices"]')
+    expect(el.textContent).not.toMatch(/\b0\b/)
+    expect(el.textContent).toMatch(/none|لا يوجد|אין/i)
+  })
+
+  it('shows nothing on an artefact published before the register existed', () => {
+    renderWithI18n(<DataPage artefact={artefact()} />)
+    expect(document.querySelector('[data-field="owner_devices"]').textContent).not.toMatch(/\b0\b/)
+  })
+
+  it('never calls them devices, in any of the three dictionaries', async () => {
+    // ADR-021: clearing site data mints a new id and two browsers on one phone count twice,
+    // so a label saying "devices" states a bound the number does not have.
+    for (const lang of ['he', 'en', 'ar']) {
+      const dict = Object.values(await import(`../../lib/i18n/dictionaries/${lang}.js`))[0]
+      expect(dict['data.devices']).toBeTruthy()
+      expect(dict['data.devices.counted']).toContain('{n}')
+    }
+    const en = Object.values(await import('../../lib/i18n/dictionaries/en.js'))[0]
+    expect(en['data.devices']).not.toMatch(/device|phone/i)
+  })
+})

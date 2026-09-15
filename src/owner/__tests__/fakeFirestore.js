@@ -60,9 +60,9 @@ export function createFakeFirestore({ storeId = 'yomyom-kafr-qasim', configured 
     calls,
     loader: async () => api,
     doc: (name) => docs.get(`stores/${storeId}/ownerState/${name}`),
-    /** The four documents exactly as `src/owner_state/pull.py` would stream them. */
+    /** Every document exactly as `src/owner_state/pull.py` would stream them. */
     ownerStateDocs: () => Object.fromEntries(
-      ['answers', 'outcomes', 'revivals', 'meta']
+      ['answers', 'outcomes', 'revivals', 'devices', 'meta']
         .map((n) => [n, docs.get(`stores/${storeId}/ownerState/${n}`)])
         .filter(([, v]) => v !== undefined),
     ),
