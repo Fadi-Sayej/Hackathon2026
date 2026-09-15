@@ -5,7 +5,7 @@ Status: Ready for review
 Owner: smartshelf-engineer
 Parent: [Phase 3](../implementation/phase-3-reproduction.md)
 Inputs: [scripts/figures.py, public/data/dashboard.json, a fresh git clone of main @ 462d604, GitHub Actions run 34753047653]
-Updated: 2026-09-13
+Updated: 2026-09-15
 ---
 
 # Checkpoint 3 — can a stranger reproduce the figures?
@@ -194,7 +194,26 @@ comparison. **smartshelf-architect.**
 
 ## What still blocks a green Checkpoint 3
 
-**One condition, and it is a calendar.** Two consecutive green nightlies. The 2026-09-13
+> ## ✅ Nothing. Met 2026-09-15.
+>
+> The calendar condition came in. Two consecutive **scheduled** runs, both green, both
+> committing the owner's artefact:
+>
+> | Run | Started | Result | Artefact |
+> |---|---|---|---|
+> | [34799925663](https://github.com/Fadi-Sayej/Hackathon2026/actions/runs/34799925663) | 2026-09-14T02:39Z | success | `4645cd5 engine: artefact for 2026-09-14` |
+> | [34922204888](https://github.com/Fadi-Sayej/Hackathon2026/actions/runs/34922204888) | 2026-09-15T02:42Z | success | `7361454 engine: artefact for 2026-09-15` |
+>
+> Every step passed on both nights, including the three blocking probes — `check_v1_signals`,
+> `check_independence` and `check_signals_live` — and `check:rules`, which ran for the first
+> time on 09-14 and found no drift either night.
+>
+> The 09-13 re-run is deliberately **not** counted: the condition is two consecutive
+> *scheduled* runs, because what it proves is that the nightly works unattended.
+>
+> **Phase 4 is unblocked.** It was the only thing holding it.
+
+**The condition as it stood (2026-09-13).** Two consecutive green nightlies. The 2026-09-13
 scheduled run failed (see [the incident record](nightly-2026-09-13-incident.md)); the
 dispatched re-run after the fix was green. The next scheduled run is 2026-09-14 at 00:00
 UTC, and a second on 2026-09-15.
