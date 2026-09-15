@@ -26,6 +26,8 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
+import pyarrow.parquet as pq
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
@@ -95,6 +97,41 @@ def main() -> int:
                         f"without it — an undeclared dependency")
 
             print(f"withholding {input_name:14} → {', '.join(dependants)} unavailable, others unaffected")
+
+        # The stock-count date is not a declared input, so the loop above cannot reach
+        # it: it is a rule-level unavailability, derived from vintages.pos.as_of rather
+        # than from a file landing. It still needs a probe, and for the reason rule 12
+        # exists — the real silver layer always carries `_as_of`, so the guard that
+        # refuses to reconcile without it would never fire in CI, and nothing would
+        # notice if it stopped working. Withheld at source like everything else here.
+        undated_dir = Path(tmp) / "without_as_of"
+        shutil.copytree(source, undated_dir)
+        inventory = undated_dir / "yomyom_inventory.parquet"
+        table = pq.read_table(inventory)
+        dated = [c for c in table.schema.names if c in ("_as_of", "_as_of_source")]
+        if not dated:
+            failures.append("yomyom_inventory.parquet carries no _as_of, so this probe "
+                            "proves nothing — re-import the POS export")
+        else:
+            pq.write_table(table.select([c for c in table.schema.names if c not in dated]),
+                           inventory, compression="snappy")
+            undated = _run(undated_dir)
+            recon = undated["reconciliation"]
+            if whole["reconciliation"]["status"] == "available":
+                if recon["status"] != "unavailable" or recon["unavailable_reason"] != "unknown_stock_date":
+                    failures.append(
+                        f"reconciliation published {recon['status']} "
+                        f"({recon['unavailable_reason']}) with no stock-count date — it must "
+                        f"refuse rather than reconcile against every month (rule 12)")
+            for cid in sorted(CAPABILITIES):
+                if cid == "reconciliation" or whole[cid]["status"] != "available":
+                    continue
+                if undated[cid]["status"] != "available":
+                    failures.append(
+                        f"{cid} went {undated[cid]['status']} "
+                        f"({undated[cid]['unavailable_reason']}) without the stock-count date, "
+                        f"which it does not use")
+            print("withholding _as_of         → reconciliation unavailable, others unaffected")
 
     for line in failures:
         print(f"FAIL  {line}", file=sys.stderr)

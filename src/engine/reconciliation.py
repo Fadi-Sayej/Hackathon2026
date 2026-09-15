@@ -17,6 +17,7 @@ from __future__ import annotations
 from src.engine.inputs import EngineInputs
 from src.engine.model import CapabilityOutput, Entry, Figure, entry_id
 from src.engine.registry import derive_status
+from src.engine.stock_date import usable_stock_date
 
 SPEC = "SPEC-002"
 RECON, HYGIENE = "reconciliation", "hygiene"
@@ -80,6 +81,17 @@ def _detection_entries(inputs: EngineInputs) -> list:
         if not b or b in withdrawn or p["recorded_stock"] is None:
             continue
         s = inputs.sales_summary.get(b)
+        # A row whose windowed figures are absent was summarised without a usable
+        # window. Skipping it and defaulting it to 0.0 produce the same output — the
+        # row is not flagged either way — so this is defence, not the thing keeping
+        # the capability honest. What does that is the pair of guards in run(): the
+        # whole capability goes unavailable rather than publishing a thinner list.
+        # All three columns are checked, not just receipts: `float()` and `int()`
+        # below would raise on any one of them, and a TypeError here becomes
+        # `capability_error`, which is a worse answer than an honest skip.
+        if s is not None and any(s.get(k) is None for k in
+                                 ("reconcile_receipts", "reconcile_units", "reconcile_months")):
+            continue
         receipts = float(s["reconcile_receipts"]) if s else 0.0
         if receipts <= 0:
             continue                                     # FR-021: nothing to close without receipts
@@ -104,6 +116,40 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
     status, reason = derive_status(RECON, inputs)
     if status == "unavailable":
         return CapabilityOutput.unavailable(RECON, SPEC, reason)
+
+    # Two rule-level unavailabilities, neither expressible by a `requires` list.
+    # derive_status's contract allows a capability to make itself MORE unavailable,
+    # never more available.
+    #
+    # The first asks the vintage directly rather than inferring it from NULLs in the
+    # summary. Inferring was the first version of this guard and it had a hole: when
+    # no monthly report parses, import_sales returns early and does NOT rewrite
+    # sales_summary.parquet, so a summary written by an older run survives with its
+    # full-history sums intact and no NULL to find. Reproduced: 439 findings
+    # published `available`, over a window nobody chose. The stock date is a fact the
+    # engine already holds, so the guard reads the fact.
+    # `.strip()` is not decoration: a whitespace-only value is truthy, so `if not
+    # as_of` alone let "   " through to date.fromisoformat() in _sales_import, which
+    # raises — a capability_error, which is a worse answer than an honest refusal.
+    # Found by mutation, then by the test written against it.
+    # usable_stock_date is the single definition both halves ask, so the summary
+    # cannot be windowed on a date the capability would have refused, or refused on
+    # one the summary used. It rejects a blank, an unparseable string and a future
+    # date alike — all three are "we do not know when the stock was counted".
+    if usable_stock_date(((inputs.vintages or {}).get("pos") or {}).get("as_of")) is None:
+        return CapabilityOutput.unavailable(RECON, SPEC, "unknown_stock_date")
+
+    # The second: the date is known, but it precedes every month we have, so no
+    # month is inside the reconciliation window. Every row then carries
+    # reconcile_receipts 0.0, the `receipts <= 0` skip below swallows all of them,
+    # and the capability would publish `available` with zero findings — "reconciled,
+    # nothing missing" when nothing was reconciled at all. Measured: a 2025-12-31
+    # count against Jan–Jul reports zeroes all 1,778 rows. `no_sales_evidence` is
+    # literally what this is — there is none before the count.
+    if inputs.sales_summary and not any(
+            (row.get("reconcile_months") or 0) > 0 for row in inputs.sales_summary.values()):
+        return CapabilityOutput.unavailable(RECON, SPEC, "no_sales_evidence")
+
     flagged = _detection_entries(inputs)
     return CapabilityOutput(
         id=RECON, spec=SPEC, status="available", window=inputs.window,

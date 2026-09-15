@@ -761,6 +761,7 @@ export const en = {
   'questions.why': "Affects ₪{money} across {window}",
   'questions.failed': "We could not save the answer — it was not recorded.",
   'unavailable.answer_storage_unavailable': "We cannot reach where your answers are stored.",
+  'unavailable.unknown_stock_date': "We do not know the day the stock was counted, so this cannot be checked.",
   'data.title': "Where the numbers came from",
   'data.none': "none",
   'data.unknown': "unknown",

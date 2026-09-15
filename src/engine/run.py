@@ -61,9 +61,10 @@ def _sales_import(sales_dir: Optional[Path] = None, silver_dir: Optional[Path] =
     silver_dir = silver_dir or SILVER_DIR
     from datetime import date
     from src.internal_pos.pos_importer import read_pos_vintage
+    from src.engine.stock_date import usable_stock_date
     from src.internal_pos.sales_importer import import_sales
     vintage = read_pos_vintage(silver_dir)
-    as_of = date.fromisoformat(vintage["as_of"][:10]) if vintage and vintage.get("as_of") else None
+    as_of = usable_stock_date(vintage.get("as_of") if vintage else None)
     return import_sales(sales_dir, inventory_as_of=as_of, silver_dir=silver_dir)
 
 
