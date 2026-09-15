@@ -899,20 +899,47 @@ export const en = {
     "What needs your decision today. Record what you did and it will not come back.",
   'page.questions.name': "Cost questions",
   'page.questions.hint': "One answer improves the recommendations",
+  'page.questions.title': "Cost questions",
+  'page.questions.description':
+    "Without your cost price the engine cannot say what a recommendation is worth. One answer closes the question for good.",
   'page.price_consistency.name': "Delivery price",
   'page.price_consistency.hint': "Your shelf against Wolt",
+  'page.price_consistency.title': "Delivery price",
+  'page.price_consistency.description':
+    "Where your Wolt price and your shelf price disagree.",
   'page.competitor_position.name': "Your position",
   'page.competitor_position.hint': "Your prices against your neighbours",
+  'page.competitor_position.title': "Your position",
+  'page.competitor_position.description':
+    "Your prices against the nearby stores we can honestly compare you to.",
   'page.reconciliation.name': "Stock that does not add up",
   'page.reconciliation.hint': "Received and sold do not balance",
+  'page.reconciliation.title': "Stock that does not add up",
+  'page.reconciliation.description':
+    "What was received and what was sold do not balance against what is on the shelf.",
   'page.hygiene.name': "Records to fix",
   'page.hygiene.hint': "No barcode, no price, negative stock",
+  'page.hygiene.title': "Records to fix",
+  'page.hygiene.description':
+    "Rows with no barcode, with no price, or with a stock count below zero.",
   'page.catalogue_lifecycle.name': "Catalogue",
   'page.catalogue_lifecycle.hint': "Living, idle or finished",
+  'page.catalogue_lifecycle.title': "Catalogue",
+  'page.catalogue_lifecycle.description':
+    "Which products are still moving, which have gone quiet, and which are finished.",
   'page.margin_below_cost.name': "Below cost",
   'page.margin_below_cost.hint': "Browse only",
+  'page.margin_below_cost.title': "Below cost",
+  'page.margin_below_cost.description':
+    "Products priced under what they cost you. Browse only — nothing here asks for a decision.",
   'page.data.name': "Where the numbers came from",
   'page.data.hint': "Data dates and run status",
+  'page.data.title': "Where the numbers came from",
+  'page.data.description':
+    "How old each input is, and whether last night’s run finished.",
   'page.receiving.name': "Receiving",
   'page.receiving.hint': "What arrived today, and its date",
+  'page.receiving.title': "Receiving",
+  'page.receiving.description':
+    "Record what arrived today and the date it expires.",
 }
