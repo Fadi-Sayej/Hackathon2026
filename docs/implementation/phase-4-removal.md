@@ -165,6 +165,34 @@ LLM layer (`src/lib/ai/*`, `src/api/llm_proxy.py`), telemetry, the MCP server, a
 > `src/lib/analytics/explainReorder.js`. Deleting by the listed path would silently remove
 > nothing. **smartshelf-architect.**
 >
+> **A fourth reader, and the grep could not have found it (2026-09-15, #91).**
+> `scripts/audit-store-format.mjs` reads the demo spine through a **dynamic** `import()` built
+> from a joined path, inside a function:
+>
+> ```js
+> const demo = await import(path.join(rootDir, 'src/data/demoProducts.js'))
+> ```
+>
+> Every sweep this phase used — `git grep "^import"`, grepping the module name — returns
+> nothing for it, because the three readers it did find all use top-level static imports. The
+> script was npm-scripted (`audit:store-format`) and passing. **So Step 1's instruction to
+> "re-run the grep rather than trust the list" does not go far enough: the grep is the weak
+> part, not the list's age.** Before Task 4.1 deletes anything, sweep for dynamic `import(`
+> and for `readFileSync` over a source path as well.
+>
+> **Resolved by deleting it, not repointing it**, and the reasoning matters because it is the
+> opposite of the answer `doctor.mjs` got in #68. The doctor checks the real catalogue and had
+> a V1 home to move to. This script runs the **V2 reorder engine** over the **demo spine** —
+> both deleted here — to guard one rule: no finding may rest on a store format we are not
+> comparable to (ADR-008).
+>
+> That rule is emphatically still live. The engine enforces it (`o["affinity"] >= floor`) and
+> publishes `comparability_floor`, and it is load-bearing to a degree worth stating: in the
+> 2026-09-15 artefact **161 of 164 observed stores sit below the 0.3 floor**. But **no Python
+> test named it**, so deleting the script would have dropped the only artefact guarding it.
+> Two tests in `test_competitor_position.py` now do, and they were proven to guard rather than
+> to pass: with `min_affinity` set to `0.0` in `configs/store_types.yaml`, exactly one fails.
+
 > **Fixed 2026-09-13.** §20.1's row now names `src/lib/i18n/explainReorder.js` directly.
 > The same pass also added `scripts/build-rag-corpus.mjs` and
 > `scripts/run_mcp_price_lookup.py` to their rows — both were readers of REMOVE-listed

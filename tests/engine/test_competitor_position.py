@@ -127,3 +127,42 @@ def test_ac_046_position_is_reportable_including_when_cheaper():
 def test_no_observations_at_all_is_unavailable():
     out = run(_inputs([product("product_a", shelf=10.0, cost=5.0)], None, None))
     assert out.status == "unavailable" and out.unavailable_reason == "no_competitor_data"
+
+
+# ── ADR-008's floor, which nothing in Python named until #91 ────────────────────────────
+#
+# `scripts/audit-store-format.mjs` was the only artefact guarding "no finding rests on a
+# store format we are not comparable to". It ran the V2 reorder engine over the demo spine,
+# both of which Phase 4 deletes, and it read the spine through a dynamic import() that the
+# REMOVE-list grep could not see (#91).
+#
+# The rule itself is not going anywhere — the engine enforces it (`o["affinity"] >= floor`)
+# and publishes `comparability_floor`. It is load-bearing to a degree worth stating: in the
+# 2026-09-15 artefact, 161 of 164 observed stores sit BELOW the 0.3 floor. These two tests
+# are what the script's guarantee becomes, so deleting it drops no invariant.
+
+BELOW_FLOOR = dict(store_format="supermarket", affinity=0.1)   # 0.1 < min_affinity 0.3
+
+
+def test_a_store_below_the_affinity_floor_cannot_drive_a_finding():
+    """The one thing that must never happen (ADR-008, F3). A price from a format we are not
+    comparable to may inform context; it may not produce a judgement about the owner."""
+    prods = [product("bisli_001", shelf=13.90, cost=4.00)]
+    obs = [observation("bisli_001", 6.50, "rami-levy-pt-01", **BELOW_FLOOR, observed_at=FRESH)]
+    out = run(_inputs(prods, obs, [match("bisli_001", "bisli_001", "rami-levy-pt-01")]))
+
+    assert out.entries == [], "a below-floor store produced a finding"
+    assert out.counts["breaches"] == 0 and out.counts["evaluated"] == 0
+    # it is still reported, as context — excluded is not the same as unseen
+    roles = {p["store_id"]: p.get("role") for p in out.extras["position"]}
+    assert roles.get("rami-levy-pt-01") != "comparable"
+
+
+def test_the_same_price_from_a_comparable_store_does_produce_one():
+    """Guards the test above against passing vacuously: identical numbers, affinity 1.0."""
+    prods = [product("bisli_001", shelf=13.90, cost=4.00)]
+    obs = [observation("bisli_001", 6.50, "dor-alon-kq-01", **FORECOURT, observed_at=FRESH)]
+    out = run(_inputs(prods, obs, [match("bisli_001", "bisli_001", "dor-alon-kq-01")]))
+
+    assert out.counts["evaluated"] == 1
+    assert [e.characterisation for e in out.entries] == ["policy_breach_attention"]
