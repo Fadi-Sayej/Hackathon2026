@@ -244,8 +244,28 @@ required `silver_pos/yomyom_sales.parquet`, which Task 0.6 deleted on purpose be
 `units_sold_30d` was synthesised from a monthly mean (rule 13). Frozen is the correct state
 for a rollback target — see §20.2. Phase 4 deletes the chain.
 
-`vercel.json` serves `/data/*` with `Cache-Control: no-store`, so a redeploy is picked up
-immediately rather than serving a manager yesterday's actions.
+`vercel.json` serves `/data/*` with **`Cache-Control: no-cache`**, so a redeploy is picked
+up immediately rather than serving a manager yesterday's actions.
+
+> **Changed from `no-store` on 2026-09-16.** The requirement above is right and is
+> unchanged; `no-store` was simply a stricter header than it needs. The two differ in one
+> way only: `no-store` forbids the browser from keeping a copy, so **every page load is a
+> full download**; `no-cache` lets it keep one but forbids using it without asking the
+> origin first. Both guarantee the owner never sees an artefact older than the last deploy.
+>
+> What it costs, measured on the committed artefacts at `8317d5e`: the V1 spine fetches
+> `dashboard.json` through `loadDashboard.js`, which is **4.34 MB raw / 245 KB gzipped**,
+> and under `no-store` he pays it in full every time he opens the app. The artefact changes
+> **once a day**, when the nightly commits it. Under `no-cache` the second and later opens
+> of the same day are a conditional request answered `304 Not Modified` — a few hundred
+> bytes instead of 245 KB, with identical freshness.
+>
+> **The change is safe in the degenerate case.** If Vercel serves these files without a
+> validator (`ETag` / `Last-Modified`), the browser cannot make the conditional request and
+> re-downloads — exactly today's behaviour. So this either helps or does nothing; it cannot
+> serve anything stale. **Worth confirming once on the deployed site:** a second load of the
+> pilot URL should show `304` against `/data/dashboard.json` in the network panel. If it
+> shows `200` every time, Vercel is not sending a validator and this is a no-op to revert.
 
 Do not implement the runtime-fetch split from Issue #24 as part of B-1.
 
