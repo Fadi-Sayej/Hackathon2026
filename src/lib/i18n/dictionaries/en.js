@@ -205,6 +205,7 @@ export const en = {
   'op.updated': 'Updated {date}',
   'op.staticExport': 'Static export',
   'op.posFooter': '{n} products from the POS export. Stock counts are known to be unreliable, so nothing here predicts running out.',
+  'op.posFooterUnknown': "The product count is not available in today's run. Stock counts are known to be unreliable, so nothing here predicts running out.",
 
   // ── Reorder, products, approved orders ─────────────────────────────
   'rec.approved': 'Approved',

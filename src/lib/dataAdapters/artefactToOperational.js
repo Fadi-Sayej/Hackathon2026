@@ -116,14 +116,27 @@ function posHealthFrom(artefact) {
   const figure = (name) => num(figures[name]?.value)
   const entryCount = (id) => (artefact?.capabilities?.[id]?.entries || []).length
 
+  // `?? 0` on any of these would render "we could not look" as "there is nothing to see".
+  // It is the same seam that let `daysUntilStockout: null` reach the owner as "No sales":
+  // a capability the engine correctly marked unavailable, flattened into a fact one layer
+  // downstream. AC-107 is explicit that an unavailable capability must never read as zero
+  // findings, and a count is the easiest place to break it.
+  //
+  // `competitor_position.catalogue` is the catalogue size and is correct — but its figure
+  // declares `inputs: ['pos', 'competitor']`, so a failed scrape takes it away entirely.
+  // Defaulted to 0 the footer read "0 products from the POS export" for a 7,523-product
+  // catalogue that was never in doubt. Null instead, and the footer says it has no count.
+  const hygieneAvailable = artefact?.capabilities?.hygiene?.status === 'available'
+  const hygieneCount = (name) => (hygieneAvailable ? counts[name] ?? null : null)
+
   return {
-    totalProducts: figure('competitor_position.catalogue') ?? 0,
-    missingBarcode: counts.no_identifier ?? 0,
-    zeroPrice: counts.absent_price ?? 0,
+    totalProducts: figure('competitor_position.catalogue'),
+    missingBarcode: hygieneCount('no_identifier'),
+    zeroPrice: hygieneCount('absent_price'),
     // The engine asks the owner for a cost rather than counting absences, so there is no
     // equivalent. Reported as the open question count, which is the honest nearest thing.
     zeroCost: entryCount('owner_questions'),
-    negativeStock: counts.negative_stock ?? 0,
+    negativeStock: hygieneCount('negative_stock'),
     woltPriceGaps: entryCount('price_consistency'),
     marginRisks: entryCount('margin_below_cost'),
     sourceFile: artefact?.vintages?.pos?.file ?? null,

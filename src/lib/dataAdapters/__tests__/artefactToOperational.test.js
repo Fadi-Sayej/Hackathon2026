@@ -107,3 +107,55 @@ describe('artefactToOperational', () => {
     expect(artefactToOperational(null)).toBeNull()
   })
 })
+
+/**
+ * The degraded run, which the committed artefact cannot demonstrate because everything in it
+ * is available today.
+ *
+ * This is the seam that produced two defects already: a guard placed correctly upstream and
+ * flattened one layer down. `inventoryEngine` emitted `daysUntilStockout: null` and the
+ * formatter printed "No sales"; `run.py` isolated the catalogue step and the workflow's
+ * `git add` undid it. Here the engine marks a capability `unavailable` and a `?? 0` turned
+ * that into a count of zero — which AC-107 exists to forbid, because zero findings and
+ * "could not look" are indistinguishable once the number is written.
+ */
+describe('artefactToOperational when capabilities did not run', () => {
+  const degraded = {
+    generated_at: '2026-09-16T02:00:00Z',
+    run: { status: 'partial' },
+    population: 'living',
+    // competitor_position absent entirely, so its figures are gone with it.
+    figures: {},
+    vintages: { pos: { file: 'yomyom-inventory.csv', as_of: '2026-06-06' } },
+    capabilities: {
+      hygiene: { status: 'unavailable', unavailable_reason: 'pos input missing', entries: [] },
+    },
+  }
+  const out = artefactToOperational(degraded)
+
+  it('states no product count rather than zero products', () => {
+    // "0 products from the POS export" for a 7,523-product catalogue, because the figure
+    // that carries the count declares inputs ['pos', 'competitor'] and the scrape failed.
+    expect(out.posHealth.totalProducts).toBeNull()
+    expect(out.posHealth.totalProducts).not.toBe(0)
+  })
+
+  it('states no hygiene counts rather than a clean bill of health', () => {
+    // 0 negative-stock and 0 missing-barcode reads as a tidy catalogue. It means the check
+    // never ran.
+    expect(out.posHealth.negativeStock).toBeNull()
+    expect(out.posHealth.missingBarcode).toBeNull()
+    expect(out.posHealth.zeroPrice).toBeNull()
+  })
+
+  it('still names which capability could not run, with its reason', () => {
+    expect(out.meta.unavailable).toEqual([{ id: 'hygiene', reason: 'pos input missing' }])
+  })
+
+  it('keeps real counts real when the capability did run', () => {
+    // The guard must not swing the other way and null out healthy figures.
+    const healthy = artefactToOperational(artefact)
+    expect(healthy.posHealth.negativeStock).toBe(artefact.capabilities.hygiene.counts.negative_stock)
+    expect(typeof healthy.posHealth.totalProducts).toBe('number')
+  })
+})
