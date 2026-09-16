@@ -98,10 +98,16 @@ particular: no role quotes a figure it has not read from the artifact that produ
    0.6 deleted deliberately: its `units_sold_30d` was synthesised from a monthly mean,
    which rule 13 forbids. Rebuilding that table re-introduces the invented figure;
    `--allow-no-competitor` to get a green export is rule 10. `operational.json` is frozen
-   at its last good value as the rollback target (design §20.2), which is also what
-   ADR-009's one-shot outcome-id translation needs. Phase 4 deletes the chain. The whole
-   story is in
+   at its last good value. Phase 4 deletes the chain. The whole story is in
    [`docs/reviews/nightly-2026-09-13-incident.md`](docs/reviews/nightly-2026-09-13-incident.md).
+
+   **This rule used to say `operational.json` survives because "ADR-009's one-shot
+   outcome-id translation needs" it. That translation does not exist in code**
+   (verified 2026-09-16 — `migrate()` in `src/owner/ownerState.js` is synchronous,
+   copies legacy ids verbatim, and nothing under `src/owner/` mentions
+   `operational.json`). So that is not a reason to keep the file. What is: the last
+   reader is `src/telemetry/TelemetryDashboard.jsx`, which F13 replaces. Do not plan
+   Phase 4 Task 4.2 around a translation that was never built.
 
 6. **`data/**` is gitignored; `public/data/*.json` is committed.** A fresh clone has the
    artefacts and nothing to rebuild them from, so regenerating needs the POS import
