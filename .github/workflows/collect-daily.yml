@@ -201,10 +201,22 @@ jobs:
         run: |
           git config user.name  "smartshelf-collector"
           git config user.email "collector@users.noreply.github.com"
+          # The artefact's add is UNCONDITIONAL and comes first. `git add` with a missing
+          # pathspec exits 128 and stages NOTHING — not even the paths that did exist — and
+          # this step runs under `bash -e`, so one absent file would abort before the commit
+          # and the nightly would publish an artefact it then threw away. That is rule 12 at
+          # the top of the pipeline, and it is exactly the case run.py's isolation exists to
+          # survive: the catalogue step failing while the artefact is fine.
+          git add public/data/dashboard.json public/data/market-context.json
           # catalogue.json is published by the same run (ADR-024) and committed with the
           # artefact deliberately: it carries that run's `inputs_digest` so a reader can
           # prove the two came from one run, and committing them apart is how they drift.
-          git add public/data/dashboard.json public/data/market-context.json public/data/catalogue.json
+          # Guarded with `if` rather than `[ -f … ] && …`: the latter is safe only while it
+          # is not the last line of the script, and nobody reordering this block should have
+          # to know that.
+          if [ -f public/data/catalogue.json ]; then
+            git add public/data/catalogue.json
+          fi
           if git diff --cached --quiet; then
             echo "Artefact unchanged."
             exit 0
