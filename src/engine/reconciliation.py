@@ -136,7 +136,12 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
     # cannot be windowed on a date the capability would have refused, or refused on
     # one the summary used. It rejects a blank, an unparseable string and a future
     # date alike — all three are "we do not know when the stock was counted".
-    if usable_stock_date(((inputs.vintages or {}).get("pos") or {}).get("as_of")) is None:
+    # `as_of_source` travels with `as_of` for the reason inputs.py already gives: a date is
+    # not provenance until you know how it was arrived at. A `file_mtime` date is the
+    # checkout time, not a stock count — see stock_date.UNUSABLE_SOURCES.
+    pos_vintage = ((inputs.vintages or {}).get("pos") or {})
+    if usable_stock_date(pos_vintage.get("as_of"),
+                         source=pos_vintage.get("as_of_source")) is None:
         return CapabilityOutput.unavailable(RECON, SPEC, "unknown_stock_date")
 
     # The second: the date is known, but it precedes every month we have, so no
