@@ -74,6 +74,17 @@ describe('artefactToOperational', () => {
     expect(out.posHealth.sourceFile).toBe(artefact.vintages.pos.file)
   })
 
+  it('counts open owner questions from counts, not from the empty entries list', () => {
+    // owner_questions is the ONE capability that does not use `entries`. Its payload is in
+    // `items`, a sibling of `counts`, and `entries: []` sits beside it — so `entries.length`
+    // returns 0 while questions are open, in the shape every other capability uses.
+    const oq = artefact.capabilities.owner_questions
+    expect(oq.entries.length).toBe(0)
+    expect(oq.items.length).toBeGreaterThan(0)
+    expect(out.posHealth.zeroCost).toBe(oq.counts.open)
+    expect(out.posHealth.zeroCost).toBe(oq.items.length)
+  })
+
   it('carries unavailability, which the old shape had no way to express', () => {
     expect(Array.isArray(out.meta.unavailable)).toBe(true)
     // Every capability the engine could not run is named, with its reason.

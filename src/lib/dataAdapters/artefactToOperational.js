@@ -115,6 +115,12 @@ function posHealthFrom(artefact) {
   const figures = artefact?.figures || {}
   const figure = (name) => num(figures[name]?.value)
   const entryCount = (id) => (artefact?.capabilities?.[id]?.entries || []).length
+  // Null when the capability did not run, rather than zero — see the AC-107 note below.
+  const capabilityCount = (id, name) => {
+    const capability = artefact?.capabilities?.[id]
+    if (!capability || capability.status !== 'available') return null
+    return capability.counts?.[name] ?? null
+  }
 
   // `?? 0` on any of these would render "we could not look" as "there is nothing to see".
   // It is the same seam that let `daysUntilStockout: null` reach the owner as "No sales":
@@ -135,7 +141,12 @@ function posHealthFrom(artefact) {
     zeroPrice: hygieneCount('absent_price'),
     // The engine asks the owner for a cost rather than counting absences, so there is no
     // equivalent. Reported as the open question count, which is the honest nearest thing.
-    zeroCost: entryCount('owner_questions'),
+    //
+    // Read from `counts.open`, NOT from `entries`. `owner_questions` is the one capability
+    // that does not use `entries` — its payload sits in `items`, a sibling of `counts`, with
+    // `entries: []` beside it. So `entries.length` returns 0 while 11 questions are open,
+    // and returns it confidently, in the shape every other capability uses.
+    zeroCost: capabilityCount('owner_questions', 'open'),
     negativeStock: hygieneCount('negative_stock'),
     woltPriceGaps: entryCount('price_consistency'),
     marginRisks: entryCount('margin_below_cost'),
