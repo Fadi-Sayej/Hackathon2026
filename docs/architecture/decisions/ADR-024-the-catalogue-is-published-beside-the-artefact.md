@@ -98,6 +98,14 @@ page and the finding pages cannot disagree about what exists.
   no shelf price, and `0` reads as free.
 - `recorded_stock` is published raw, negatives included — F2's whole subject — and carries
   **no money figure**. **D-1**, and CLAUDE.md rule 8.
+- **Both prices are the store's own.** `shelf_price` is its shelf; `delivery_price` is its
+  own Wolt listing (`wolt_price` from the POS export). F1 exists *because* those two
+  disagree. There is **no competitor price in this file** — F3 compares against rivals and
+  is computed from scraped `observations`, which never reach it. The schema says so on the
+  field itself, because the mistake is cheap to make and expensive to see: mapping
+  `delivery_price` onto a competitor field lights a price-comparison page instantly and
+  tells the owner a rival is undercutting him with his own price. Caught in review of the
+  first adapter written against this schema, before it shipped.
 - `products: null` when the engine could not load the population, never `[]`. An empty list
   is a claim about the shop; `null` is what happened. `count` is absent with it.
 - An empty list **is** allowed when the engine loaded the population and it was empty —

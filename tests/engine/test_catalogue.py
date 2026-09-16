@@ -211,3 +211,25 @@ def test_a_failing_catalogue_does_not_unpublish_the_artefact(tmp_path, monkeypat
     assert result["published"] is True and target.exists()
     step = next(s for s in result["steps"] if s["step"] == "catalogue")
     assert step["status"] == "error" and "disk full" in step["error"]
+
+
+def test_the_catalogue_carries_no_competitor_price():
+    """Both prices in this file are the STORE'S OWN: `shelf_price` is its shelf,
+    `delivery_price` is its own Wolt listing (`wolt_price` from its POS export). F1 exists
+    because those two disagree; F3 compares against rivals and is computed from scraped
+    `observations`, which never reach this file.
+
+    Asserted at the contract rather than left to each reader, because the mistake is cheap
+    to make and expensive to see: mapping `delivery_price` onto a competitor field lights a
+    price-comparison page instantly and tells the owner a rival is undercutting him with his
+    own price. Caught in review of the first adapter written against this schema.
+    """
+    p = built([row("1", "a", delivery_price=7.5)])["products"][0]
+    assert p["delivery_price"] == 7.5
+    banned = {"competitor", "competitor_price", "cheapestCompetitorPrice",
+              "cheapest_competitor_price", "rival_price", "market_price"}
+    assert not (set(p) & banned)
+    # and the schema says so where an adapter author will read it
+    schema = json.loads(Path("schemas/catalogue.schema.json").read_text(encoding="utf-8"))
+    described = schema["properties"]["products"]["items"]["properties"]["delivery_price"]["description"]
+    assert "STORE'S OWN" in described and "competitor_position" in described

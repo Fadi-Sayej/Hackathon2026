@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "SmartShelf product catalogue",
-  "description": "public/data/catalogue.json — the resolved product population the artefact's capabilities were computed over. Published beside dashboard.json by the same run, never inside it: it carries no computed figure, and the daily surface needs none of it. ADR-024.",
+  "description": "public/data/catalogue.json — the resolved product population the artefact's capabilities were computed over. Published beside dashboard.json by the same run, never inside it: it carries no computed figure, and the daily surface needs none of it. ADR-024. Every price here is THE STORE'S OWN; this file contains no competitor price and no figure derived from one.",
   "type": "object",
   "required": [
     "schema_version",
@@ -75,13 +75,14 @@
               "number",
               "null"
             ],
-            "description": "Null where the export carries none. D-3: a product with no shelf price has no shelf price, and 0 would read as free."
+            "description": "THE STORE'S OWN price on the shelf. Null where the export carries none. D-3: a product with no shelf price has no shelf price, and 0 would read as free."
           },
           "delivery_price": {
             "type": [
               "number",
               "null"
-            ]
+            ],
+            "description": "THE STORE'S OWN price on Wolt — `wolt_price` from its POS export, not a rival's. Both prices in this file belong to YomYom, and F1 exists because the two disagree. Mapping this to a competitor field would tell the owner a rival is undercutting him with his own price: a two-character change that lights a page instantly and lies. Competitor prices are not in this file at all — they reach the surface through the `competitor_position` capability, computed from scraped observations, a different input entirely."
           },
           "cost_price": {
             "type": [
