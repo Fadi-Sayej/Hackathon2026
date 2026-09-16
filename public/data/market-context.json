@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-15T03:02:37.922105+00:00",
-  "date": "2026-09-15",
+  "generatedAt": "2026-09-16T02:57:03.128319+00:00",
+  "date": "2026-09-16",
   "status": "ok",
   "sources": {
     "weather": "open-meteo",
@@ -9,18 +9,18 @@
     "islamic": "computed_hijri"
   },
   "weather": {
-    "temperatureC": 19.8,
+    "temperatureC": 20.5,
     "precipitation": 0.0,
-    "windSpeed": 7.6,
-    "weatherCode": 0,
-    "label": "mild",
-    "observedAt": "2026-09-15T06:00",
+    "windSpeed": 7.4,
+    "weatherCode": 1,
+    "label": "warm",
+    "observedAt": "2026-09-16T05:45",
     "lat": 32.114,
     "lon": 34.976,
     "source": "open-meteo"
   },
   "hebrew": {
-    "date": "2026-09-15",
+    "date": "2026-09-16",
     "holidays": [],
     "isErevChag": false,
     "isFastDay": false,
@@ -35,11 +35,11 @@
     "source": "hebcal"
   },
   "islamic": {
-    "date": "2026-09-15",
+    "date": "2026-09-16",
     "hijri": {
       "year": 1448,
       "month": 4,
-      "day": 2
+      "day": 3
     },
     "isRamadan": false,
     "ramadanDay": null,
@@ -47,8 +47,8 @@
     "isEidAlFitr": false,
     "isEidAlAdha": false,
     "ramadanStart": "2027-02-08",
-    "daysToRamadan": 146,
-    "daysToEidAlFitr": 176,
+    "daysToRamadan": 145,
+    "daysToEidAlFitr": 175,
     "phase": null,
     "windows": {
       "ramadan_build_up_days": 21,
@@ -227,6 +227,7 @@
       "5000159561976",
       "5000396020687",
       "5000396021202",
+      "5010123703585",
       "5010182997253",
       "5010182997680",
       "5010182997918",
@@ -883,6 +884,7 @@
       "7290008175814",
       "7290008343466",
       "7290008367875",
+      "7290008415576",
       "7290008464505",
       "7290008464611",
       "7290008464628",
@@ -2089,6 +2091,7 @@
       "7613035758834",
       "7613035809857",
       "7613036105606",
+      "7613036520492",
       "7613036576734",
       "7613036984379",
       "7613036984478",
@@ -2403,7 +2406,7 @@
       "9780201321029",
       "9800800056"
     ],
-    "days": 36,
+    "days": 37,
     "status": "ok",
     "lift": 1.15
   }
