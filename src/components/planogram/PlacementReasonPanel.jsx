@@ -1,3 +1,4 @@
+import { useT } from '../../lib/i18n/index.js'
 import { formatCurrency, formatDays } from '../shared/formatters.js'
 import { getCategoryColor } from './categoryColors.js'
 import { compareHebrew, dirProps } from '../../lib/utils/rtl.js'
@@ -8,6 +9,7 @@ export function PlacementReasonPanel({
   planogramItems = [],
   planogramSummary,
 }) {
+  const t = useT()
   const product = selectedItem
     ? analyzedProducts.find((entry) => entry.id === selectedItem.productId)
     : null
@@ -34,7 +36,7 @@ export function PlacementReasonPanel({
             </div>
             <div>
               <dt>Stockout risk</dt>
-              <dd className="numeric-cell">{formatDays(product.analytics.daysUntilStockout)}</dd>
+              <dd className="numeric-cell">{formatDays(product.analytics.daysUntilStockout, t)}</dd>
             </div>
             <div>
               <dt>Expiry risk</dt>

@@ -118,7 +118,7 @@ export function RecommendationsPage({
                 <div className="recommendation-stats ltr-data">
                   <span>Stock: {recommendation.metrics?.currentStock ?? '—'}</span>
                   <span>Daily sales: {recommendation.metrics?.weightedAvgDailySales ?? '—'}</span>
-                  <span>Stockout: {formatDays(recommendation.metrics?.daysUntilStockout)}</span>
+                  <span>Stockout: {formatDays(recommendation.metrics?.daysUntilStockout, t)}</span>
                   <span>Confidence: {percent(recommendation.confidence)}</span>
                 </div>
 
