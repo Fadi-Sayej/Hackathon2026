@@ -255,8 +255,13 @@ LLM layer (`src/lib/ai/*`, `src/api/llm_proxy.py`), telemetry, the MCP server, a
 >
 > So `pilot_daily.sh` — not named anywhere in §20.1 — is what pins four of the eleven. It is the
 > legacy pipeline that ends in `public/data/operational.json`, which is Task 4.2's subject and
-> is deliberately frozen until Phase 4 ends (ADR-009's one-shot id translation still needs
-> it). **Those four cannot go before Task 4.2, and Task 4.2 cannot start yet.**
+> is deliberately frozen until Phase 4 ends. **Those four cannot go before Task 4.2, and
+> Task 4.2 cannot start yet.**
+>
+> *(Corrected 2026-09-16: this said the freeze is because "ADR-009's one-shot id translation
+> still needs it". It does not — that translation was never built. See the Task 4.2 note
+> below. The four are still pinned, by `pilot_daily.sh`; only the stated reason for the
+> freeze was wrong.)*
 >
 > **And "17 unreferenced scripts" cannot be executed as written.** It names no paths, so
 > there is nothing to grep, nothing to verify and nothing to delete by path — and this sweep
@@ -334,6 +339,58 @@ LLM layer (`src/lib/ai/*`, `src/api/llm_proxy.py`), telemetry, the MCP server, a
 > is deleting `refresh_pipeline.py`, `export_dashboard_data.py`,
 > `loadOperationalData.js` and `public/data/operational.json` — and the last of those is
 > still needed by ADR-009's one-shot outcome-id translation until Phase 4 ends.
+
+> **ADR-009's one-shot id translation does not exist in code. Verified 2026-09-16.**
+>
+> Task 4.2's remaining work has been described as blocked on `public/data/operational.json`,
+> which §20.2's "Outcome ids" row keeps alive until the end of Phase 4 because *"one-shot
+> legacy id translation in `ownerState.js` (ADR-009), needs the last `operational.json` to be
+> fetchable"*. CLAUDE.md rule 5 repeated it. **Neither was true.**
+>
+> ADR-009 describes the mechanism precisely:
+>
+> > On first load after cut-over, `ownerState.js` maps legacy ids by `(legacy type →
+> > capability, barcode)` from the last `operational.json` it can still fetch and rewrites
+> > them; the mapping runs once and is then deleted (no permanent adapter).
+>
+> What `migrate()` does instead: reads the three legacy localStorage keys and copies each
+> outcome under **its legacy id, verbatim** — `state.outcomes[id] = outcome`. It is
+> synchronous, so it structurally cannot fetch anything, and `git grep operational` across
+> `src/owner/` returns no reference at all. There is no mapping and nothing to delete.
+>
+> **The two id spaces do not meet.** Measured on the committed artefacts at `a559357`:
+>
+> | | ids |
+> |---|---|
+> | `dashboard.json`, union of `capabilities[*].entries[*].id` | **3,464** |
+> | `operational.json` | **4,359** |
+> | intersection | **0** |
+>
+> So a legacy outcome carried over by `migrate()` matches no V1 entry, suppresses nothing,
+> and the owner is shown a recommendation he already actioned. Rule 12's shape exactly:
+> specified, documented as live in two authoritative places, and it changes nothing.
+>
+> **What it costs today, and what changed.** The committed owner-state mirror holds
+> `answers: {}` and `outcomes: {}`, so there is nothing to translate and nothing is lost yet.
+> That was a safe accident while the browser wrote only to localStorage. **#95 merged on
+> 09-15 and the write-through now deploys**, so from the next legacy-carrying device that
+> opens the app, orphan ids reach Firestore. ADR-016's snapshot records them with
+> `signal_family: null` — deliberately, for legacy records — so F13 can still tell them
+> apart, which is the one part of this that was built as designed.
+>
+> **Consequences for this phase.**
+>
+> - `operational.json` is **not** held by ADR-009. Its last reader is
+>   `src/telemetry/TelemetryDashboard.jsx` (plus `EMPTY_OPERATIONAL_DATA` in a page test),
+>   which F13 (#83) replaces. That, and nothing else, is what Task 4.2 waits on.
+> - Whether the translation should be **built or withdrawn** is ADR-009's author's call, not
+>   this file's. Both are defensible: with zero recorded outcomes there is nothing to
+>   translate, so withdrawing costs nothing today — but the restore of the pre-V1 nav
+>   (in flight on `restore/old-ui`) may make legacy-shaped ids a live source again rather
+>   than a historical one, and that decides it. **smartshelf-architect.**
+> - Until then, do not delete `operational.json` and do not cite ADR-009 as the reason it
+>   stays. CLAUDE.md rule 5 has been corrected; §20.2's row and ADR-009 itself have not been
+>   touched, because they are not this role's to edit.
 
 **Not started, and deliberately.** Deleting the fallback before the replacement has run for
 a day is the risk this phase's three rules exist to prevent, and `vercel rollback` restores

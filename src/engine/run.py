@@ -64,7 +64,10 @@ def _sales_import(sales_dir: Optional[Path] = None, silver_dir: Optional[Path] =
     from src.engine.stock_date import usable_stock_date
     from src.internal_pos.sales_importer import import_sales
     vintage = read_pos_vintage(silver_dir)
-    as_of = usable_stock_date(vintage.get("as_of") if vintage else None)
+    # Same question, same answer, or the summary carries figures the capability would have
+    # refused — which is the failure stock_date.py exists to close.
+    as_of = usable_stock_date(vintage.get("as_of") if vintage else None,
+                              source=vintage.get("as_of_source") if vintage else None)
     return import_sales(sales_dir, inventory_as_of=as_of, silver_dir=silver_dir)
 
 
