@@ -31,6 +31,19 @@ import { dirProps } from '../lib/utils/rtl.js'
  *                is engineering, not missing data.
  *   `expiry`     shelf-life dates. The engine publishes no expiry capability; capture began
  *                on 2026-09-12 and `expiry_scans.csv` holds one row.
+ *   `decision`   nothing is missing. The RULE is missing, and deliberately so: F9 is
+ *                `Registered — not specified`, which the handover protocol defines as "writing
+ *                a spec is deliberately forbidden until a named decision is taken". GAP-009 is
+ *                the blocker. Publishing a catalogue would make this page render, and that is
+ *                precisely why it must not — a screen that looks finished on an undecided rule
+ *                is rule 8 one level up: a plausible answer where there is no honest one.
+ *   `withdrawn`  removed on purpose, not pending. Design §20.1 marks the LLM layer REMOVE;
+ *                D-12 forbids a runtime server for one store, and no document ever stated what
+ *                the generated report should claim or how it would be checked.
+ *
+ * `decision` and `withdrawn` were split out of `catalogue` on 2026-09-16, after review pointed
+ * out that grouping them there said "waiting for the product list" about two screens that are
+ * not waiting for data at all. Both would have lit up the moment the catalogue shipped.
  */
 export function PageAwaitingData({ pageId, needs }) {
   const { t } = useI18n()

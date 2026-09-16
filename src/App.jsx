@@ -28,10 +28,20 @@ const AWAITING = {
   'store-layout': 'demand',
   'shelf-plan': 'demand',
   prices: 'catalogue',
-  assortment: 'catalogue',
   products: 'catalogue',
   dashboard: 'catalogue',
-  report: 'catalogue',
+  // Not 'catalogue'. A catalogue would let these two RENDER, and that is the trap: both
+  // would then look finished while resting on nothing anyone decided.
+  //   assortment  F9 is `Registered — not specified`, and the protocol forbids writing the
+  //               spec until a named decision is taken. GAP-009 is the blocker, and it is
+  //               measured: the gap rule would key on absence from the sales reports, which
+  //               covers 5,848 of 7,463 products because the reports reach 24.3% of the
+  //               catalogue (rule 13). Lighting it would answer a question nobody settled.
+  //   report      the LLM layer is REMOVE in design §20.1 — no document says what the report
+  //               should claim or how it would be checked, and D-12 forbids a runtime server
+  //               for one store. It is withdrawn, not postponed, and says so.
+  assortment: 'decision',
+  report: 'withdrawn',
   expiry: 'expiry',
 }
 
