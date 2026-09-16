@@ -6,15 +6,34 @@ import './surface/surface.css'
 import './surface/pages.css'
 
 import { AppShell } from './components/layout/AppShell.jsx'
-import { ReceivingPage } from './pages/ReceivingPage.jsx'
 import { loadDashboard } from './lib/dataAdapters/loadDashboard.js'
-import { loadOwnerState, recordAnswer, recordOutcome } from './owner/ownerState.js'
-import { CapabilityPage } from './pages/CapabilityPage.jsx'
+import { artefactToOperational } from './lib/dataAdapters/artefactToOperational.js'
+import { loadOwnerState, recordOutcome } from './owner/ownerState.js'
+import { OperationalPage } from './pages/OperationalPage.jsx'
 import { DataPage } from './pages/DataPage.jsx'
-import { QuestionPanel } from './questions/QuestionPanel.jsx'
-import { DailyPage } from './surface/DailyPage.jsx'
-import { CAPABILITY_PAGES } from './surface/pages.js'
+import { PageAwaitingData } from './pages/PageAwaitingData.jsx'
 import { useI18n } from './lib/i18n/index.js'
+
+/**
+ * What each restored page is waiting for, when the artefact cannot feed it.
+ *
+ * Reorder, Approved orders, Store layout and Shelf plan rank by how fast a product sells.
+ * That number does not exist outside `src/data/demoProducts.js` — no silver POS table
+ * carries a sales or velocity column — so they come back present and empty rather than
+ * confident on demo data. See PageAwaitingData for the full reasoning.
+ */
+const AWAITING = {
+  recommendations: 'demand',
+  orders: 'demand',
+  'store-layout': 'demand',
+  'shelf-plan': 'demand',
+  prices: 'catalogue',
+  assortment: 'catalogue',
+  products: 'catalogue',
+  dashboard: 'catalogue',
+  report: 'catalogue',
+  expiry: 'expiry',
+}
 
 /**
  * One spine: the engine's artefact, plus the owner's state. Nothing else.
@@ -31,14 +50,9 @@ import { useI18n } from './lib/i18n/index.js'
  */
 export default function App() {
   const { t } = useI18n()
-  const [activePage, setActivePage] = useState('daily')
+  const [activePage, setActivePage] = useState('operational')
   const [load, setLoad] = useState({ status: 'loading', artefact: null, reason: null })
   const [ownerState, setOwnerState] = useState(() => loadOwnerState())
-
-  // The clock is read once, here, and passed down. A component that reads it renders
-  // differently on two identical inputs, and a deferral must lapse because time passed in
-  // the app's state rather than because something re-rendered.
-  const [now] = useState(() => Date.now())
 
   useEffect(() => {
     let live = true
@@ -48,17 +62,49 @@ export default function App() {
 
   const refreshOwnerState = useCallback(() => setOwnerState({ ...loadOwnerState() }), [])
 
-  const onOutcome = useCallback(async (entry, outcome) => {
-    // Throws on a failed cache write, by design: the entry leaves the surface only after
-    // the write succeeds (§9.3).
-    await recordOutcome(entry, outcome)
-    refreshOwnerState()
-  }, [refreshOwnerState])
+  // `onOutcome` and `onAnswer` went with DailyPage and QuestionPanel, which the restored
+  // nav does not route. `recordOutcome` is still the write path — it is reached through
+  // `onDecide` below, so the engine still reads what the owner decides.
 
-  const onAnswer = useCallback(async (barcode, answer) => {
-    await recordAnswer(barcode, answer)
+  // Every artefact entry by its id, so a decision made on a restored page can be recorded
+  // with the `signal_family` ADR-016 requires — `entry_id` is a hash with no inverse, so an
+  // outcome written without it loses the only durable grouping key F13 will have.
+  const entriesById = useMemo(() => {
+    const index = new Map()
+    for (const cap of Object.values(load.artefact?.capabilities || {})) {
+      for (const entry of cap.entries || []) index.set(entry.id, entry)
+    }
+    return index
+  }, [load.artefact])
+
+  /**
+   * A decision taken on a restored page, written where the engine will actually read it.
+   *
+   * `OperationalPage` keeps its own cache in `smartshelf.operationalActions.v1` and tells us
+   * afterwards. That cache is now a UI convenience, not the record: this writes through to
+   * `smartshelf.ownerState.v2`, which is what `compose.js` suppresses on, what #95 pushes to
+   * Firestore, and what the engine's owner-state pull reads.
+   *
+   * The two stores do not diverge, because the ids are the same one. The old UI used to key
+   * on `recommendation_id` and the new UI on ADR-009's `entry_id`, two spaces with an
+   * intersection of exactly zero — but `artefactToOperational` carries `entry.id` straight
+   * through, so a restored page decides against the engine's own id. Without that, an outcome
+   * recorded here would reach Firestore under an id no capability entry has, never suppress
+   * anything, and still be counted by whatever F13 measures.
+   */
+  const onDecide = useCallback(async (decision) => {
+    const entry = entriesById.get(decision?.id)
+    if (!entry) return            // not ours to record; the page keeps its local cache
+    const status = decision.status === 'DONE' ? 'acted'
+      : decision.status === 'SNOOZED' ? 'deferred'
+        : 'declined'
+    await recordOutcome(entry, {
+      status,
+      reason: status === 'declined' ? (decision.reason ?? 'not_worth_it') : null,
+      deferredUntil: status === 'deferred' ? (decision.snoozeUntil ?? null) : null,
+    })
     refreshOwnerState()
-  }, [refreshOwnerState])
+  }, [entriesById, refreshOwnerState])
 
   // `catalog` and `competitor` are the keys AppShell reads, and they are the whole reason
   // this object exists in the shape it does. Until #111 this returned only generatedAt /
@@ -96,22 +142,25 @@ export default function App() {
     }
 
     const artefact = load.artefact
-    if (activePage === 'daily') {
+
+    // The old Today page, fed by the live engine rather than the frozen operational.json.
+    // The adapter also enforces D-1 on the way through: `CHECK_STOCK_DISCREPANCY` arrives
+    // with no cost, so the old ranker states no figure rather than the ₪103,828.75 it would
+    // otherwise compute from stock counts the manager says are unreliable.
+    if (activePage === 'operational') {
       return (
-        <DailyPage artefact={artefact} ownerState={ownerState} onOutcome={onOutcome} now={now} />
+        <OperationalPage
+          operationalData={artefactToOperational(artefact)}
+          actions={ownerState.outcomes || {}}
+          onDecide={onDecide}
+        />
       )
     }
-    if (activePage === 'questions') {
-      return <QuestionPanel artefact={artefact} onAnswer={onAnswer} />
-    }
-    if (activePage === 'data') {
+    if (activePage === 'data-source') {
       return <DataPage artefact={artefact} />
     }
-    if (activePage === 'receiving') {
-      return <ReceivingPage />
-    }
-    if (CAPABILITY_PAGES.has(activePage)) {
-      return <CapabilityPage artefact={artefact} capabilityId={activePage} />
+    if (AWAITING[activePage]) {
+      return <PageAwaitingData pageId={activePage} needs={AWAITING[activePage]} />
     }
     return null
   }

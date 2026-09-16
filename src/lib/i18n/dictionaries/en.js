@@ -5,6 +5,18 @@
  */
 export const en = {
   // ── Shell ──────────────────────────────────────────────────────────
+  'awaiting.demand.title': "Waiting for real sales movement",
+  'awaiting.demand.what': "This screen ranks products by how fast they sell. We do not have that number yet.",
+  'awaiting.demand.why': "The seven sales reports are monthly and cover 24.3% of the catalogue. Turning a monthly total into a daily rate would be a guess, and this screen would rank your shelves on it.",
+  'awaiting.demand.when': "It arrives with V2, when real movement per product is measured. Until then the screen stays empty rather than confident.",
+  'awaiting.catalogue.title': "Waiting for the product list",
+  'awaiting.catalogue.what': "This screen needs every product, not only the ones with a finding against them.",
+  'awaiting.catalogue.why': "The nightly publishes what it found — prices out of line, stock that does not add up — not the full catalogue. Your 7,674 products are in the POS import; they are simply not in the file the browser reads.",
+  'awaiting.catalogue.when': "This one is work, not missing data. The engine can publish the catalogue.",
+  'awaiting.expiry.title': "Waiting for expiry dates",
+  'awaiting.expiry.what': "This screen shows what is nearing its date. Nothing has been recorded yet.",
+  'awaiting.expiry.why': "Expiry capture started on 12/9 and holds one scan so far. A screen of zeros would read as nothing expiring, which is not something we know.",
+  'awaiting.expiry.when': "It fills as the receiving screen is used.",
   'app.name': 'SmartShelf AI',
   'app.tagline': 'Shelf and inventory operations',
   'app.language': 'Language',

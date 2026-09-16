@@ -12,7 +12,17 @@ import { expect, test } from '@playwright/test'
  * disappearing ahead of the code it covered.
  */
 test.describe.configure({ mode: 'serial' })
-test.skip(true, 'pages removed from the nav at the cut-over; deleted with them in Phase 4')
+// Un-skipped 2026-09-16. It was switched off at the cut-over because its twelve pages left
+// the nav; they are back, on the repository owner's decision, and its PAGES list already
+// matches the restored nav exactly and in order.
+//
+// This is the net that #90 slipped through — nine of the ten V1 pages shipped rendering a
+// raw i18n key as their heading during the months it was off. It asserts a non-empty
+// heading, no `page.<id>.title` left in the body, no console errors, six nav groups and a
+// nav item per page, in all three languages. Everything the restored pages need to be
+// caught by, including the ones that render PageAwaitingData: an awaiting page still has a
+// heading and a sentence, so "empty because it is waiting" and "empty because it broke"
+// stay distinguishable.
 
 
 /**

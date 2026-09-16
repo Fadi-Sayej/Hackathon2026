@@ -28,13 +28,24 @@ import { expect, test } from '@playwright/test'
  *   content is the load-bearing assertion here, not a nicety.
  */
 
-/** design §20.1, "nav reduced to 10 items". Asserted as a set, not a count, because a
- *  swap keeps the count. */
+/**
+ * The twelve pages, restored 2026-09-16 on the repository owner's decision.
+ *
+ * This list read as design §20.1's ten V1 ids until that date. It changed because the nav
+ * changed, deliberately: the ten-page surface had dropped Reorder and the two planogram
+ * screens, and those are the features the business is being built around. Editing this
+ * array is the intended way to record such a decision — the test exists so that a nav
+ * change is a deliberate edit here rather than something nobody notices.
+ *
+ * Asserted as a set, not a count, because a swap keeps the count.
+ */
 const V1_PAGES = [
-  'daily', 'questions',
-  'price_consistency', 'competitor_position',
-  'reconciliation', 'hygiene', 'catalogue_lifecycle', 'margin_below_cost', 'receiving',
-  'data',
+  'operational', 'recommendations', 'orders',
+  'prices', 'assortment',
+  'store-layout', 'shelf-plan',
+  'products', 'expiry',
+  'dashboard', 'report',
+  'data-source',
 ]
 
 const LANGUAGES = ['he', 'en', 'ar']
@@ -66,7 +77,7 @@ async function setLanguage(page, code) {
 }
 
 test.describe('the V1 nav', () => {
-  test('carries exactly the ten pages the design says it does', async ({ page }) => {
+  test('carries exactly the twelve pages the nav says it does', async ({ page }) => {
     await open(page)
     const ids = await page.locator('.nav-item').evaluateAll(
       (nodes) => nodes.map((n) => n.dataset.nav),
