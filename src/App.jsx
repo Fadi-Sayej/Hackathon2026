@@ -17,10 +17,15 @@ import { useI18n } from './lib/i18n/index.js'
 /**
  * What each restored page is waiting for, when the artefact cannot feed it.
  *
- * Reorder, Approved orders, Store layout and Shelf plan rank by how fast a product sells.
- * That number does not exist outside `src/data/demoProducts.js` — no silver POS table
- * carries a sales or velocity column — so they come back present and empty rather than
- * confident on demo data. See PageAwaitingData for the full reasoning.
+ * Reorder, Approved orders, Store layout and Shelf plan rank by how fast a product sells
+ * per day, and that is not a column anyone forgot to add. `sales_monthly.parquet` carries
+ * units, receipts and revenue — but one row per product per MONTH, with no date column in
+ * any of the seven reports, so a daily rate is not measurable (rule 13).
+ *
+ * This repository has already built the table that would light these pages:
+ * `silver_pos/yomyom_sales.parquet`, whose `units_sold_30d` Task 0.6 deleted for being
+ * synthesised from a monthly mean (rule 5). Rebuilding it to fill these screens would put
+ * that invented figure back. So they come back present and empty rather than confident.
  */
 const AWAITING = {
   recommendations: 'demand',

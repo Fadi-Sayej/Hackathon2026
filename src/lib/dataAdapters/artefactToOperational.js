@@ -18,9 +18,12 @@
  *
  *     expiry            the engine publishes no expiry capability. `ExpiryPage` gets the
  *                       empty shape and says so, rather than a confident set of zero alerts.
- *     salesLast7Days    no silver POS table carries any sales or velocity column. This is
- *     salesLast30Days   what Reorder and the planogram screens need, and why they come back
- *                       empty. See navGroups.js.
+ *     salesLast7Days    the sales tables are MONTHLY — `sales_monthly.parquet` has units
+ *     salesLast30Days   and revenue but one row per product per month, and no date column
+ *                       anywhere in the seven reports, so a daily rate is not measurable
+ *                       (rule 13). The 30-day table that would supply it was built and then
+ *                       deleted for being synthesised from a monthly mean (rule 5). This is
+ *                       what Reorder and the planogram screens need, and why they are empty.
  *     supplier          in yomyom_products.parquet, not in the artefact. `ApprovedOrdersPage`
  *                       groups by it, so it groups under one heading until the engine
  *                       publishes a catalogue.
