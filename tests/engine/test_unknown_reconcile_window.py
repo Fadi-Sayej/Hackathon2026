@@ -306,3 +306,57 @@ def test_the_capability_refuses_a_date_it_cannot_parse():
 
         assert out.status == "unavailable", f"{junk!r} must not reconcile"
         assert out.unavailable_reason == "unknown_stock_date"
+
+
+# ── The third door: a date that parses, is in the past, and still is not one ──
+#
+# #102 closed "the date is absent". #109 closed "the date is wrong because git was
+# asked on a shallow clone". Both leave `file_mtime` — the ladder's last rung, which
+# `git clone` sets to the checkout time. On a runner that is always today: it parses,
+# it is not in the future, and it widens the window to every month. The production
+# instance came in through the other door and cost 355 → 439 findings; this one is the
+# same arithmetic reached by the ladder's own fallback.
+
+def test_a_filesystem_timestamp_is_not_a_stock_count_date():
+    from src.engine.stock_date import usable_stock_date
+
+    assert usable_stock_date("2026-06-06", source="file_mtime") is None
+    # The other three rungs are statements about the data, not about the disk.
+    for source in ("declared", "declared_sidecar", "git_commit"):
+        assert usable_stock_date("2026-06-06", source=source) == date(2026, 6, 6), source
+
+
+def test_an_absent_source_is_not_a_reason_to_refuse():
+    """ADR-017: unknown is not false. Tables written before `_as_of_source` existed carry
+    no source, and refusing those would take a working capability off the owner's screen
+    for a column's age rather than for a defect."""
+    from src.engine.stock_date import usable_stock_date
+
+    assert usable_stock_date("2026-06-06") == date(2026, 6, 6)
+    assert usable_stock_date("2026-06-06", source=None) == date(2026, 6, 6)
+
+
+def test_reconciliation_refuses_a_date_that_came_from_the_filesystem():
+    """The whole point: the date is valid by every other test in this file — it parses,
+    it is in the past — and the capability must still refuse, because what it measures is
+    when the file was written, not when the shelf was counted."""
+    inputs = make_inputs(products=[product("2", stock=-716.0)],
+                         sales_summary=[_unwindowed("2", units=663, receipts=62)], window=W)
+    inputs.vintages.setdefault("pos", {}).update(
+        {"as_of": "2026-06-06", "as_of_source": "file_mtime"})
+
+    out = run(inputs)
+
+    assert out.status == "unavailable"
+    assert out.unavailable_reason == "unknown_stock_date"
+    assert out.entries == []
+
+
+def test_the_same_date_from_git_is_accepted():
+    """The guard must key on the SOURCE, not on the date. Same value, different rung."""
+    inputs = make_inputs(products=[product("2", stock=-716.0)],
+                         sales_summary=[summary("2", units=663, receipts=62, months=3)], window=W)
+    inputs.vintages.setdefault("pos", {}).update(
+        {"as_of": "2026-06-06", "as_of_source": "git_commit"})
+
+    assert run(inputs).status == "available"
