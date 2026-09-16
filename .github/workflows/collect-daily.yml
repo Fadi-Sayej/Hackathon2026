@@ -201,7 +201,10 @@ jobs:
         run: |
           git config user.name  "smartshelf-collector"
           git config user.email "collector@users.noreply.github.com"
-          git add public/data/dashboard.json public/data/market-context.json
+          # catalogue.json is published by the same run (ADR-024) and committed with the
+          # artefact deliberately: it carries that run's `inputs_digest` so a reader can
+          # prove the two came from one run, and committing them apart is how they drift.
+          git add public/data/dashboard.json public/data/market-context.json public/data/catalogue.json
           if git diff --cached --quiet; then
             echo "Artefact unchanged."
             exit 0

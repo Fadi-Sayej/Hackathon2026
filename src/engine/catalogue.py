@@ -50,10 +50,37 @@ import os
 from pathlib import Path
 from typing import Any
 
+import jsonschema
+
+from src.engine.publish import PublishRefused
+
 ROOT = Path(__file__).resolve().parents[2]
 CATALOGUE_PATH = ROOT / "public" / "data" / "catalogue.json"
+SCHEMA_PATH = ROOT / "schemas" / "catalogue.schema.json"
 
 SCHEMA_VERSION = 1
+
+
+def _schema() -> dict:
+    return json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
+
+
+def validate_catalogue(catalogue: dict) -> None:
+    """Refuse BEFORE any write, the way publish.validate_artefact does (ADR-005).
+
+    Reuses `PublishRefused` rather than inventing a sibling: the caller's handling is
+    identical — record the step as an error, leave the previous file alone — and a second
+    exception type would only invite one of the two to be caught and the other not.
+    """
+    try:
+        jsonschema.validate(catalogue, _schema())
+    except jsonschema.ValidationError as err:
+        raise PublishRefused(
+            f"catalogue violates schema: {err.message} at {list(err.absolute_path)}") from err
+    if (catalogue.get("products") is None) != (catalogue.get("count") is None):
+        raise PublishRefused(
+            "catalogue count and products must be absent together: a count beside a null "
+            "list, or a list beside a null count, states something the engine does not know")
 
 
 def build_catalogue(products: list[dict[str, Any]] | None, *, generated_at: str,
@@ -90,7 +117,12 @@ def write_catalogue(catalogue: dict, path: Path = CATALOGUE_PATH) -> Path:
 
     Written compactly rather than indented — this is 1.73 MB of data nobody reads by eye,
     and indentation costs the owner about 400 KB of download for nothing.
+
+    Validated first. A catalogue that breaches its schema must not replace a good one:
+    the three pages that read it would rather show yesterday's list than a broken one,
+    and `inputs_digest` is what tells them which they are looking at.
     """
+    validate_catalogue(catalogue)
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
     tmp.write_text(json.dumps(catalogue, ensure_ascii=False, separators=(",", ":")),
