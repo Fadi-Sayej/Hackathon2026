@@ -93,9 +93,9 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 | [ADR-021](architecture/decisions/ADR-021-the-artefact-states-how-many-devices-wrote-owner-state.md) | The artefact states how many devices have written owner state, and when |
 | [ADR-022](architecture/decisions/ADR-022-a-barcode-less-row-is-identified-by-its-name.md) | A barcode-less row is identified by its name, under ADR-019's rule; amends one sentence of ADR-019 |
 | [ADR-023](architecture/decisions/ADR-023-the-engine-publishes-the-pilot-measurement.md) | The engine publishes the pilot measurement; the browser renders it — **`Ready for review`** |
-| [ADR-024](architecture/decisions/ADR-024-the-catalogue-is-published-beside-the-artefact.md) | The product catalogue is published beside the artefact, not inside it — **`Ready for review`** |
+| [ADR-024](architecture/decisions/ADR-024-the-catalogue-is-published-beside-the-artefact.md) | The product catalogue is published beside the artefact, not inside it — accepted 2026-09-17 |
 
-ADR-001 … ADR-022 are `Accepted`. ADR-023 and ADR-024 are `Ready for review`. ADR-022 amends a sentence of ADR-019 and was accepted on 2026-09-13, after the defect it fixes was verified end to end: `entry_id` falls back to `product_name`, and `compose.js` skips any entry whose id carries a settled outcome, so two barcode-less rows sharing a name settled together on the owner's screen. ADR-020 was accepted on 2026-09-13 **conditional on GAP-009**:
+ADR-001 … ADR-022 and ADR-024 are `Accepted`. ADR-023 is `Ready for review`. ADR-022 amends a sentence of ADR-019 and was accepted on 2026-09-13, after the defect it fixes was verified end to end: `entry_id` falls back to `product_name`, and `compose.js` skips any entry whose id carries a settled outcome, so two barcode-less rows sharing a name settled together on the owner's screen. ADR-020 was accepted on 2026-09-13 **conditional on GAP-009**:
 `published_population: whole` is the right value while that question is open, and becomes
 `living` when it closes.
 

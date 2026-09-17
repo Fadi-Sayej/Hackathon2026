@@ -1,18 +1,20 @@
 ---
 ID: ADR-024
 Title: The product catalogue is published beside the artefact, not inside it
-Status: Ready for review
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-09-16
 Parent: [System Design](../system-design.md) §7.3, §20.2
 Related Specs: F1-S1, F3-S1, F4-S1
 Inputs: [ADR-001, ADR-005, ADR-019, ADR-020, ADR-022, docs/architecture/system-design.md §7.3, CLAUDE.md rules 5, 8, 13]
-Updated: 2026-09-16
+Updated: 2026-09-17
 ---
 
 # ADR-024 — The product catalogue is published beside the artefact, not inside it
 
-**Status:** Ready for review · a role may not approve its own output (HANDOVER rule 2)
+**Status:** Accepted (2026-09-17, by the repository owner) · proposed by `smartshelf-engineer`
+and held at `Ready for review` until he decided it, because a role may not approve its own
+output (HANDOVER rule 2). Asked and answered directly rather than relayed.
 
 ## Context
 
