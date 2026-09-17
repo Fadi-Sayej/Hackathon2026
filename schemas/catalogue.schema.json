@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SmartShelf product catalogue",
+  "description": "public/data/catalogue.json — the resolved product population the artefact's capabilities were computed over. Published beside dashboard.json by the same run, never inside it: it carries no computed figure, and the daily surface needs none of it. ADR-024. Every price here is THE STORE'S OWN; this file contains no competitor price and no figure derived from one.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "generated_at",
+    "inputs_digest",
+    "population",
+    "count",
+    "products"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "generated_at": {
+      "type": "string",
+      "description": "The run that produced this file. Must equal dashboard.json's for the same run."
+    },
+    "inputs_digest": {
+      "type": "string",
+      "description": "The artefact's own inputs_digest, carried so a reader can PROVE the two files came from one run rather than assume it. The pages fetch them separately and a failed catalogue write leaves a stale file beside a fresh artefact; comparing the digests is how that is detected rather than believed."
+    },
+    "population": {
+      "type": "string",
+      "description": "ADR-020. Which catalogue the run counted over, identical to the artefact's."
+    },
+    "pos": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "vintages.pos as the artefact publishes it — file, as_of and as_of_source. A product list with no export date behind it is not evidence of anything."
+    },
+    "count": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Null when products is null. 0 is a legitimate count here, unlike elsewhere: an empty LIST is a claim the engine only makes when it loaded the products and there were none. Not knowing is expressed by null on both fields together."
+    },
+    "products": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "description": "Null when the engine could not load the population — never [] for that case, which would read as 'the store has no products'. Sorted by barcode then product_name so the bytes repeat night to night and git stores the file once.",
+      "items": {
+        "type": "object",
+        "required": [
+          "product_name"
+        ],
+        "properties": {
+          "barcode": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Null for a barcode-less row, which ADR-022 identifies by name instead."
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "department": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "shelf_price": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "THE STORE'S OWN price on the shelf. Null where the export carries none. D-3: a product with no shelf price has no shelf price, and 0 would read as free."
+          },
+          "delivery_price": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "THE STORE'S OWN price on Wolt — `wolt_price` from its POS export, not a rival's. Both prices in this file belong to YomYom, and F1 exists because the two disagree. Mapping this to a competitor field would tell the owner a rival is undercutting him with his own price: a two-character change that lights a page instantly and lies. Competitor prices are not in this file at all — they reach the surface through the `competitor_position` capability, computed from scraped observations, a different input entirely."
+          },
+          "cost_price": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "cost_source": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "How the cost was arrived at, so a reader can tell a declared cost from a derived one."
+          },
+          "recorded_stock": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Raw, negative values included — F2's whole subject. Carries no money: D-1 forbids a shekel figure on a stock quantity."
+          },
+          "has_identifier": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

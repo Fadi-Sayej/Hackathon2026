@@ -13,6 +13,7 @@ from src.common.paths import SILVER_POS_ROOT
 from src.engine.inputs import load_inputs
 from src.engine.model import CapabilityOutput
 from src.engine.policy import load_policy
+from src.engine.catalogue import build_catalogue, write_catalogue
 from src.engine.publish import ARTEFACT_PATH, PublishRefused, build_artefact, validate_artefact, write_atomic
 from src.engine.registry import CAPABILITIES
 from src.owner_state.model import OwnerState
@@ -126,7 +127,8 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
                artefact_path: Path = ARTEFACT_PATH, capability_runners: Optional[dict] = None,
                now: Optional[datetime] = None, silver_dir: Optional[Path] = None,
                sales_dir: Optional[Path] = None, population: Optional[str] = None,
-               signals_dir: Optional[Path] = None, matches_path: Optional[Path] = None) -> dict:
+               signals_dir: Optional[Path] = None, matches_path: Optional[Path] = None,
+               catalogue_path: Optional[Path] = None) -> dict:
     # Resolved here, not in the signature: a default bound at import time cannot be
     # redirected by a caller that patches the module global, which is how Task 1.9
     # runs the engine over a copy of the data with an input withheld.
@@ -218,6 +220,26 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
         except PublishRefused as exc:
             steps.append({"step": "publish", "status": "error", "ms": 0, "error": str(exc)})
             status = "partial"
+        # ADR-024, and deliberately AFTER the artefact is out. The catalogue serves three
+        # secondary pages; the artefact is the owner's daily screen. If publishing the
+        # catalogue can fail, it must fail without taking the artefact with it — so it is
+        # its own step, recorded, and it does not raise.
+        #
+        # A failure leaves the PREVIOUS catalogue.json in place beside a fresh
+        # dashboard.json, which is why build_catalogue carries `inputs_digest`: the two
+        # files disagreeing is detectable by a reader rather than invisible.
+        if published:
+            # Derived from artefact_path rather than defaulted to the real location, so a
+            # test that redirects the artefact redirects this too and cannot write into
+            # public/data/ by omission. The two files are published side by side, and
+            # that is now true of every caller rather than of the production one only.
+            _step(steps, "catalogue", lambda: write_catalogue(build_catalogue(
+                inputs.products if inputs else None,
+                generated_at=artefact["generated_at"],
+                inputs_digest=artefact["inputs_digest"],
+                vintages=artefact["vintages"],
+                population=population,
+            ), path=catalogue_path or (Path(artefact_path).parent / "catalogue.json")))
     else:
         validate_artefact(artefact, require_complete_registry=complete)
     artefact["run"]["status"] = status
