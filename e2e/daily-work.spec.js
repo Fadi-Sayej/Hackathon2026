@@ -62,9 +62,17 @@ test('searching the action list filters it', async ({ page }) => {
 })
 
 // Prices and Products are on their `catalogue` awaiting state: `dashboard.json` publishes
-// findings, not a product list, and catalogue.json is not published until ADR-024 is accepted
-// and the nightly writes one (PR #129). Skipped on the real blocker rather than on the
-// cut-over reason that was true on 2026-09-12 and stopped being true on 2026-09-16.
+// findings, not a product list.
+//
+// ADR-024 was accepted and #129 merged on 2026-09-17, so the nightly (cron `0 0 * * *`)
+// writes the first `public/data/catalogue.json` on 2026-09-18. These return when the pages
+// are routed at it.
+//
+// Phrased as a DATE, not as a condition — and that is not pedantry, it is this file's own
+// argument applied to itself. The first version of this comment said "until ADR-024 is
+// accepted and the nightly writes one", and ADR-024 was accepted within a day of it being
+// written. A reason that names an open condition sends the next reader looking for something
+// that already happened, which is precisely how the cut-over skip this replaced went stale.
 test.skip('prices, gaps and products all render their tables', async ({ page }) => {
   for (const [name, marker] of [
     ['Prices', 'Price comparison'],
