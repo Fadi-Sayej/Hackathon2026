@@ -34,7 +34,31 @@ def main() -> int:
     if args.json_out:
         Path(args.json_out).write_text(payload, encoding="utf-8")
     print(payload)
-    return 0 if result["status"] == "ok" else 1
+    # The exit code answers ONE question: did this run produce what it was asked for?
+    # In publish mode that is "is there a fresh artefact?" — not "was the day perfect?".
+    #
+    # `degraded` and `partial` are honest states of a PUBLISHED artefact: owner state
+    # unavailable, sales continued on evidence already on disk (ADR-017), a capability that
+    # raised. Every one is already reported four ways — printed above, written to
+    # --json-out, warned about by collect-daily.yml's next step, and carried in the
+    # artefact's own run.status where the data page renders it.
+    #
+    # Exiting 1 for them cost the thing the nightly exists to do. That step has no
+    # continue-on-error, so a degraded run aborted the job BEFORE "Commit the owner's
+    # artefact": the artefact was written into the runner's workspace and thrown away.
+    # Rule 12 at the top of the pipeline, and the same shape as the 2026-09-13 incident
+    # that the engine step's own comment describes — "the gate that followed exited 1, so
+    # this step never ran and the owner's artefact was never rebuilt".
+    #
+    # It also made the NEXT step's promise unreachable on precisely the runs it was written
+    # for: "ADR-017: a run that continued on older sales evidence is never 'ok'. This does
+    # NOT fail the build." It did, one step earlier.
+    #
+    # Print mode publishes nothing by design, so it keeps the old meaning: there is no
+    # artefact to ask about, and a reproduction that degrades should still say so.
+    if args.print_mode:
+        return 0 if result["status"] == "ok" else 1
+    return 0 if result["published"] else 1
 
 
 if __name__ == "__main__":
