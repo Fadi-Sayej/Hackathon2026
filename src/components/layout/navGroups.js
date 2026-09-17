@@ -26,8 +26,11 @@
  *   Reorder and the planogram screens come back PRESENT AND EMPTY, each saying what it is
  *   waiting for. They read `product.salesLast7Days` / `salesLast30Days`, and those fields
  *   exist in exactly three places — `src/data/demoProducts.js`, the generator that writes
- *   it, and the engines that consume it. No silver POS table carries any sales or velocity
- *   column. Both features only ever ran on demo data, which is why the old score-ranked
+ *   it, and the engines that consume it. Not for want of a sales COLUMN: sales_monthly.parquet
+ *   carries units, receipts and revenue. For want of a DATE — the seven reports are monthly,
+ *   one row per product per month, so a daily rate is not measurable (rule 13), and the
+ *   30-day table that would supply one was deleted for being synthesised from a monthly mean
+ *   (rule 5). Both features only ever ran on demo data, which is why the old score-ranked
  *   planogram put all 7,451 products on the bottom shelf with two facings each the moment
  *   it met the real catalogue.
  *
@@ -38,6 +41,10 @@ export const navGroups = [
   {
     id: 'group.daily',
     items: [
+      // Kept from the cut-over surface rather than restored from the attic. The twelve pages
+      // are the owner's request; this one is the pilot's acceptance criteria, and dropping it
+      // was a side effect of the restore that nobody decided. Both now exist.
+      { id: 'daily' },
       { id: 'operational' },
       { id: 'recommendations' },
       { id: 'orders' },

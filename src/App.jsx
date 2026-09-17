@@ -9,6 +9,7 @@ import { AppShell } from './components/layout/AppShell.jsx'
 import { loadDashboard } from './lib/dataAdapters/loadDashboard.js'
 import { artefactToOperational } from './lib/dataAdapters/artefactToOperational.js'
 import { loadOwnerState, recordOutcome } from './owner/ownerState.js'
+import { DailyPage } from './surface/DailyPage.jsx'
 import { OperationalPage } from './pages/OperationalPage.jsx'
 import { DataPage } from './pages/DataPage.jsx'
 import { PageAwaitingData } from './pages/PageAwaitingData.jsx'
@@ -65,7 +66,13 @@ const AWAITING = {
  */
 export default function App() {
   const { t } = useI18n()
-  const [activePage, setActivePage] = useState('operational')
+  // The daily surface stays the landing page. Restoring the twelve pages took it off the
+  // nav entirely, and with it AC-100 (ten places, all filled), AC-103 (per-sale and one-off
+  // money never interleaved), AC-105 (an outcome survives a reload), AC-107 (unavailable
+  // never reads as zero), AC-109 (no product twice) and AC-112 (three languages on a phone).
+  // Twelve e2e tests caught that; the owner never asked for it and was never offered it.
+  const [activePage, setActivePage] = useState('daily')
+  const [now] = useState(() => Date.now())
   const [load, setLoad] = useState({ status: 'loading', artefact: null, reason: null })
   const [ownerState, setOwnerState] = useState(() => loadOwnerState())
 
@@ -77,9 +84,14 @@ export default function App() {
 
   const refreshOwnerState = useCallback(() => setOwnerState({ ...loadOwnerState() }), [])
 
-  // `onOutcome` and `onAnswer` went with DailyPage and QuestionPanel, which the restored
-  // nav does not route. `recordOutcome` is still the write path — it is reached through
-  // `onDecide` below, so the engine still reads what the owner decides.
+  // Throws on a failed cache write, by design: the entry leaves the surface only after the
+  // write succeeds (§9.3). `onDecide` below is the same write path reached from a restored
+  // page, which keys on the same ADR-009 entry id, so the two surfaces cannot disagree about
+  // what the owner has already dealt with.
+  const onOutcome = useCallback(async (entry, outcome) => {
+    await recordOutcome(entry, outcome)
+    refreshOwnerState()
+  }, [refreshOwnerState])
 
   // Every artefact entry by its id, so a decision made on a restored page can be recorded
   // with the `signal_family` ADR-016 requires — `entry_id` is a hash with no inverse, so an
@@ -157,6 +169,15 @@ export default function App() {
     }
 
     const artefact = load.artefact
+
+    // The V1 daily surface — the owner's first screen, and the one the pilot's acceptance
+    // criteria are written against. It is kept alongside the restored pages rather than
+    // replaced by them: removing it was a consequence of the restore, not a request.
+    if (activePage === 'daily') {
+      return (
+        <DailyPage artefact={artefact} ownerState={ownerState} onOutcome={onOutcome} now={now} />
+      )
+    }
 
     // The old Today page, fed by the live engine rather than the frozen operational.json.
     // The adapter also enforces D-1 on the way through: `CHECK_STOCK_DISCREPANCY` arrives

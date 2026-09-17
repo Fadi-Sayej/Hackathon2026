@@ -34,6 +34,7 @@ test.describe.configure({ mode: 'serial' })
  */
 
 const PAGES = [
+  'daily',
   'operational',
   'recommendations',
   'orders',

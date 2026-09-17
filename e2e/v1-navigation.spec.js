@@ -40,6 +40,9 @@ import { expect, test } from '@playwright/test'
  * Asserted as a set, not a count, because a swap keeps the count.
  */
 const V1_PAGES = [
+  // The daily surface is the landing page and the pilot's acceptance criteria are written
+  // against it (AC-100/103/105/107/109/112). The twelve restored pages sit behind it.
+  'daily',
   'operational', 'recommendations', 'orders',
   'prices', 'assortment',
   'store-layout', 'shelf-plan',
