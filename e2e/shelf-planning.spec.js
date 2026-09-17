@@ -12,7 +12,6 @@ import { expect, test } from '@playwright/test'
  * disappearing ahead of the code it covered.
  */
 test.describe.configure({ mode: 'serial' })
-test.skip(true, 'pages removed from the nav at the cut-over; deleted with them in Phase 4')
 
 
 /**
@@ -20,6 +19,13 @@ test.skip(true, 'pages removed from the nav at the cut-over; deleted with them i
  * draw the store, pick a fixture, read what goes on it, approve, take the
  * build sheet to the aisle.
  */
+
+// Store layout and Shelf plan are on their `demand` awaiting state and render no `.pg-canvas`.
+// The blocker is not the cut-over — the pages are back in the nav — it is that every fixture
+// here ranks by units sold per day. That is not measurable from seven monthly reports
+// (rule 13), and the 30-day table that would supply it was deleted for being synthesised
+// from a monthly mean (rule 5). These return with real demand in V2, not with a nav change.
+test.skip(true, 'Store layout awaits per-product demand; see rule 13 and PageAwaitingData')
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/')
