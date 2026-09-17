@@ -10,41 +10,77 @@
  */
 
 /**
- * The ten V1 pages (design §20.1: "nav reduced to 10 items"), grouped as the owner would
- * group them rather than as the codebase does.
+ * The twelve pages, restored 2026-09-16 on the repository owner's decision.
  *
- * The V2/V4 entries — reorder, approved orders, assortment gaps, store layout, shelf plan,
- * dashboard, report — are gone from here at the cut-over. Their code stays until Phase 4 so
- * a rollback still has somewhere to land; it is simply no longer reachable.
+ * The Task 2.7 cut-over reduced this to ten V1 ids (design §20.1) and in doing so dropped
+ * REORDER and the two PLANOGRAM screens. Those are the two features the business is being
+ * built around, so a nav that omits them is the wrong shape however well the ten work.
+ * That is a product judgement and it is his to make; this file follows it.
+ *
+ * Nothing was recovered from the attic to do this. All twelve page components are still on
+ * `main`, byte-identical to the tag `v1-attic`, and all 52 `page.<id>.*` strings and all
+ * twelve nav icons were still in place — the cut-over stopped rendering them, it never
+ * removed them.
+ *
+ * WHAT THE OWNER SEES ON THE TWO FEATURES HE CARES MOST ABOUT
+ *   Reorder and the planogram screens come back PRESENT AND EMPTY, each saying what it is
+ *   waiting for. They read `product.salesLast7Days` / `salesLast30Days`, and those fields
+ *   exist in exactly three places — `src/data/demoProducts.js`, the generator that writes
+ *   it, and the engines that consume it. Not for want of a sales COLUMN: sales_monthly.parquet
+ *   carries units, receipts and revenue. For want of a DATE — the seven reports are monthly,
+ *   one row per product per month, so a daily rate is not measurable (rule 13), and the
+ *   30-day table that would supply one was deleted for being synthesised from a monthly mean
+ *   (rule 5). Both features only ever ran on demo data, which is why the old score-ranked
+ *   planogram put all 7,451 products on the bottom shelf with two facings each the moment
+ *   it met the real catalogue.
+ *
+ *   Restoring them on demo data was offered and declined. Real demand arrives with V2.
+ *   Until then an empty screen that says why is worth more than a full one that is wrong.
  */
 export const navGroups = [
   {
     id: 'group.daily',
     items: [
+      // Kept from the cut-over surface rather than restored from the attic. The twelve pages
+      // are the owner's request; this one is the pilot's acceptance criteria, and dropping it
+      // was a side effect of the restore that nobody decided. Both now exist.
       { id: 'daily' },
-      { id: 'questions' },
+      { id: 'operational' },
+      { id: 'recommendations' },
+      { id: 'orders' },
     ],
   },
   {
     id: 'group.market',
     items: [
-      { id: 'price_consistency' },
-      { id: 'competitor_position' },
+      { id: 'prices' },
+      { id: 'assortment' },
+    ],
+  },
+  {
+    id: 'group.shelves',
+    items: [
+      { id: 'store-layout' },
+      { id: 'shelf-plan' },
     ],
   },
   {
     id: 'group.inventory',
     items: [
-      { id: 'reconciliation' },
-      { id: 'hygiene' },
-      { id: 'catalogue_lifecycle' },
-      { id: 'margin_below_cost' },
-      { id: 'receiving' },
+      { id: 'products' },
+      { id: 'expiry' },
+    ],
+  },
+  {
+    id: 'group.reports',
+    items: [
+      { id: 'dashboard' },
+      { id: 'report' },
     ],
   },
   {
     id: 'group.system',
-    items: [{ id: 'data' }],
+    items: [{ id: 'data-source' }],
   },
 ]
 

@@ -3,7 +3,7 @@ import { useT } from '../lib/i18n/index.js'
 import { CompetitorBadge } from '../components/shared/CompetitorBadge.jsx'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
 import { StatusBadge } from '../components/shared/StatusBadge.jsx'
-import { formatCurrency, formatDays, statusTone } from '../components/shared/formatters.js'
+import { formatCurrency, formatDays, formatStatus, statusTone } from '../components/shared/formatters.js'
 import { compareHebrew, dirProps } from '../lib/utils/rtl.js'
 
 export function ProductsPage({ analyzedProducts }) {
@@ -106,10 +106,10 @@ export function ProductsPage({ analyzedProducts }) {
                     <span className="price-value">{formatCurrency(product.price)}</span>
                     <CompetitorBadge competitor={product.competitor} />
                   </td>
-                  <td className="cell-numeric">{formatDays(product.analytics.daysUntilStockout)}</td>
+                  <td className="cell-numeric">{formatDays(product.analytics.daysUntilStockout, t)}</td>
                   <td>
                     <StatusBadge tone={statusTone(product.analytics.primaryStatus)}>
-                      {product.analytics.primaryStatus}
+                      {formatStatus(product.analytics.primaryStatus, t)}
                     </StatusBadge>
                   </td>
                 </tr>

@@ -385,7 +385,9 @@ export function OperationalPage({
           ))}
         </div>
         <p className="page-description op-pos-footer">
-          {t('op.posFooter', { n: posHealth.totalProducts })}
+          {posHealth.totalProducts === null || posHealth.totalProducts === undefined
+            ? t('op.posFooterUnknown')
+            : t('op.posFooter', { n: posHealth.totalProducts })}
         </p>
       </section>
     </>

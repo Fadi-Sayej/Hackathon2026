@@ -6,7 +6,7 @@ import { useT } from '../lib/i18n/index.js'
 import { StatusBadge } from '../components/shared/StatusBadge.jsx'
 import { EmptyState } from '../components/shared/EmptyState.jsx'
 import { DataProvenanceBanner } from '../components/shared/DataProvenanceBanner.jsx'
-import { formatCurrency, formatDays, percent, statusTone } from '../components/shared/formatters.js'
+import { formatCurrency, formatDays, formatStatus, percent, statusTone } from '../components/shared/formatters.js'
 import { compareHebrew, dirProps } from '../lib/utils/rtl.js'
 
 export function DashboardPage({
@@ -123,9 +123,9 @@ export function DashboardPage({
                     </div>
                     <div className="compact-row-end">
                       <StatusBadge tone={statusTone(product.analytics.primaryStatus)}>
-                        {product.analytics.primaryStatus}
+                        {formatStatus(product.analytics.primaryStatus, t)}
                       </StatusBadge>
-                      <small>{formatDays(product.analytics.daysUntilStockout)}</small>
+                      <small>{formatDays(product.analytics.daysUntilStockout, t)}</small>
                     </div>
                   </div>
                 ))}
