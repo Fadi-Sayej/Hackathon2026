@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-17T02:59:59.238795+00:00",
-  "date": "2026-09-17",
+  "generatedAt": "2026-09-18T02:48:44.228046+00:00",
+  "date": "2026-09-18",
   "status": "ok",
   "sources": {
     "weather": "open-meteo",
@@ -9,22 +9,22 @@
     "islamic": "computed_hijri"
   },
   "weather": {
-    "temperatureC": 21.4,
+    "temperatureC": 24.6,
     "precipitation": 0.0,
-    "windSpeed": 7.4,
-    "weatherCode": 1,
+    "windSpeed": 6.2,
+    "weatherCode": 2,
     "label": "warm",
-    "observedAt": "2026-09-17T05:45",
+    "observedAt": "2026-09-18T05:45",
     "lat": 32.114,
     "lon": 34.976,
     "source": "open-meteo"
   },
   "hebrew": {
-    "date": "2026-09-17",
+    "date": "2026-09-18",
     "holidays": [],
     "isErevChag": false,
     "isFastDay": false,
-    "isShabbatEve": false,
+    "isShabbatEve": true,
     "chametz": null,
     "pesachStart": "2027-04-22",
     "windows": {
@@ -35,11 +35,11 @@
     "source": "hebcal"
   },
   "islamic": {
-    "date": "2026-09-17",
+    "date": "2026-09-18",
     "hijri": {
       "year": 1448,
       "month": 4,
-      "day": 4
+      "day": 5
     },
     "isRamadan": false,
     "ramadanDay": null,
@@ -47,8 +47,8 @@
     "isEidAlFitr": false,
     "isEidAlAdha": false,
     "ramadanStart": "2027-02-08",
-    "daysToRamadan": 144,
-    "daysToEidAlFitr": 174,
+    "daysToRamadan": 143,
+    "daysToEidAlFitr": 173,
     "phase": null,
     "windows": {
       "ramadan_build_up_days": 21,
@@ -58,9 +58,21 @@
     },
     "source": "computed_hijri"
   },
-  "demandSignals": {},
-  "demandBasis": {},
-  "activeReasons": [],
+  "demandSignals": {
+    "מוצרי מכולת": 1.1,
+    "מוצרי מקרר": 1.1
+  },
+  "demandBasis": {
+    "מוצרי מכולת": [
+      "shabbat_eve"
+    ],
+    "מוצרי מקרר": [
+      "shabbat_eve"
+    ]
+  },
+  "activeReasons": [
+    "shabbat_eve"
+  ],
   "shelfLife": {
     "categories": {
       "מחלקת -barista": 2,
@@ -455,6 +467,7 @@
       "7290000078762",
       "7290000081663",
       "7290000085180",
+      "7290000094199",
       "7290000097282",
       "7290000099545",
       "7290000101941",
@@ -606,6 +619,9 @@
       "7290000536743",
       "7290000537566",
       "7290000554686",
+      "7290000554754",
+      "7290000554969",
+      "7290000554976",
       "7290000560533",
       "7290000560540",
       "7290000572208",
@@ -685,6 +701,7 @@
       "7290002327028",
       "7290002327042",
       "7290002331018",
+      "7290002331094",
       "7290002331124",
       "7290002331155",
       "7290002331360",
@@ -1006,7 +1023,9 @@
       "7290013310576",
       "7290013472199",
       "7290013520067",
+      "7290013520111",
       "7290013520463",
+      "7290013520500",
       "7290013531759",
       "7290013585233",
       "7290013585257",
@@ -1137,6 +1156,7 @@
       "7290018296608",
       "7290018296615",
       "7290018296653",
+      "7290018296813",
       "7290018296868",
       "7290018359495",
       "7290018441275",
@@ -2408,7 +2428,7 @@
       "9780201321029",
       "9800800056"
     ],
-    "days": 38,
+    "days": 39,
     "status": "ok",
     "lift": 1.15
   }

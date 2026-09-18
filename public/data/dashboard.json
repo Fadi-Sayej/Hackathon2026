@@ -1,70 +1,70 @@
 {
  "schema_version": 2,
- "inputs_digest": "2de122b18f820d57719b79ba810c7b6f1cba47b9d315247ede700ea577e29a8b",
+ "inputs_digest": "0d026cd92c7ba6079f1aa2b37897f3a1f3d8e82be33f30bc9648e96bf2a35418",
  "population": "whole",
- "generated_at": "2026-09-17T02:59:56.667752+00:00",
- "run_id": "4067b6d7a1a1",
+ "generated_at": "2026-09-18T02:48:41.914228+00:00",
+ "run_id": "1e01f77847c1",
  "run": {
   "status": "ok",
   "steps": [
    {
     "step": "owner_state_pull",
     "status": "ok",
-    "ms": 831,
+    "ms": 707,
     "error": null
    },
    {
     "step": "sales_import",
     "status": "ok",
-    "ms": 306,
+    "ms": 239,
     "error": null
    },
    {
     "step": "market_context",
     "status": "ok",
-    "ms": 68288,
+    "ms": 67908,
     "error": null
    },
    {
     "step": "rehydrate_silver",
     "status": "ok",
-    "ms": 303,
+    "ms": 395,
     "error": null
    },
    {
     "step": "competitor_signals",
     "status": "ok",
-    "ms": 29338,
+    "ms": 23867,
     "error": null
    },
    {
     "step": "product_matching",
     "status": "ok",
-    "ms": 29474,
+    "ms": 26663,
     "error": null
    },
    {
     "step": "load_inputs",
     "status": "ok",
-    "ms": 19104,
+    "ms": 17394,
     "error": null
    },
    {
     "step": "capability:catalogue_lifecycle",
     "status": "ok",
-    "ms": 16,
+    "ms": 15,
     "error": null
    },
    {
     "step": "capability:price_consistency",
     "status": "ok",
-    "ms": 11,
+    "ms": 10,
     "error": null
    },
    {
     "step": "capability:reconciliation",
     "status": "ok",
-    "ms": 4,
+    "ms": 3,
     "error": null
    },
    {
@@ -76,7 +76,7 @@
    {
     "step": "capability:competitor_position",
     "status": "ok",
-    "ms": 1187,
+    "ms": 1049,
     "error": null
    },
    {
@@ -115,7 +115,7 @@
    "imported_this_run": true
   },
   "competitor": {
-   "snapshot_date": "2026-09-17",
+   "snapshot_date": "2026-09-18",
    "sources": [
     "delivery",
     "price_file"
@@ -123,17 +123,43 @@
    "store_count": 164
   },
   "owner_state": {
-   "pulled_at": "2026-09-17T02:59:57.517432+00:00",
+   "pulled_at": "2026-09-18T02:48:42.635019+00:00",
    "status": "available",
    "reason": null,
    "devices": {
     "status": "available",
     "reason": null,
-    "count": 3,
+    "count": 29,
     "last_seen_at": [
-     "2026-09-16T10:49:58.101000Z",
-     "2026-09-16T11:04:43.758000Z",
-     "2026-09-16T11:05:30.158000Z"
+     "2026-09-16T11:05:30.158000Z",
+     "2026-09-17T09:52:20.419000Z",
+     "2026-09-17T09:57:57.248000Z",
+     "2026-09-17T10:03:17.897000Z",
+     "2026-09-17T14:58:16.879000Z",
+     "2026-09-17T14:58:18.415000Z",
+     "2026-09-17T14:58:18.555000Z",
+     "2026-09-17T14:58:18.576000Z",
+     "2026-09-17T14:58:21.483000Z",
+     "2026-09-17T14:58:24.210000Z",
+     "2026-09-17T14:58:30.195000Z",
+     "2026-09-17T14:58:37.207000Z",
+     "2026-09-17T14:58:43.757000Z",
+     "2026-09-17T14:58:49.789000Z",
+     "2026-09-17T14:58:56.940000Z",
+     "2026-09-17T14:59:03.787000Z",
+     "2026-09-17T15:00:55.717000Z",
+     "2026-09-17T15:00:56.100000Z",
+     "2026-09-17T15:01:03.297000Z",
+     "2026-09-17T15:01:32.192000Z",
+     "2026-09-17T15:01:38.244000Z",
+     "2026-09-17T15:03:16.358000Z",
+     "2026-09-17T15:03:23.581000Z",
+     "2026-09-17T15:03:43.473000Z",
+     "2026-09-17T15:03:44.381000Z",
+     "2026-09-17T15:03:50.736000Z",
+     "2026-09-17T15:04:09.107000Z",
+     "2026-09-17T15:04:30.102000Z",
+     "2026-09-17T15:04:37.869000Z"
     ]
    }
   }
@@ -122768,7 +122794,7 @@
     "attention_pct": 100.0,
     "cost_floor_pct": 10.0,
     "format_allowance_pct": 7.5123,
-    "format_allowance_basis_count": 428,
+    "format_allowance_basis_count": 436,
     "freshness_days": 14,
     "comparability_floor": 0.3
    },
@@ -122777,14 +122803,14 @@
     "comparable_population": 6801,
     "matched": 2621,
     "structurally_uncomparable": 722,
-    "no_comparison": 5898,
-    "evaluated": 863,
+    "no_comparison": 5896,
+    "evaluated": 865,
     "breaches": 2,
     "attention": 0,
     "review": 2,
     "purchase_cost_findings": 4,
     "no_cost_skipped": 40,
-    "stale_skipped": 967
+    "stale_skipped": 978
    },
    "entries": [
     {
@@ -122816,7 +122842,7 @@
         "store_name": "AM-PMדרך השלום",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -122824,7 +122850,7 @@
         "store_name": "AM-PMקרית ביאליק",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -122832,7 +122858,7 @@
         "store_name": "AM-PM המושבה הגרמנית",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -122840,7 +122866,7 @@
         "store_name": "AM-PMאח\"י אילת חיפה",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -122856,7 +122882,7 @@
         "store_name": "Am-pm בן יהודה 30",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -122864,7 +122890,7 @@
         "store_name": "Am-pm ארלוזרוב",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -122872,7 +122898,7 @@
         "store_name": "Am-pm נורדאו",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -122880,7 +122906,7 @@
         "store_name": "Am-pmאלנבי",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -122888,7 +122914,7 @@
         "store_name": "Am-pm קינג גורג",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -122896,7 +122922,7 @@
         "store_name": "Am-pm 24 שנקין",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -122904,7 +122930,7 @@
         "store_name": "Am-pm  אבן גבירול",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -122912,7 +122938,7 @@
         "store_name": "Am-pm זמנהוף",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -122920,7 +122946,7 @@
         "store_name": "Am-pm לינקולן",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -122928,7 +122954,7 @@
         "store_name": "Am-pm  הרצל",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -122936,7 +122962,7 @@
         "store_name": "Am-pm  כל-בו שלום",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -122944,7 +122970,7 @@
         "store_name": "Am-pm פרנקל",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -122952,7 +122978,7 @@
         "store_name": "Am-pm גורדון",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -122960,7 +122986,7 @@
         "store_name": "Am-pm זבוטינסקי ר\"ג",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -122968,7 +122994,7 @@
         "store_name": "Am-pm זבוטינסקי ת\"א",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -122976,7 +123002,7 @@
         "store_name": "Am-pm נחלת יצחק",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -122984,7 +123010,7 @@
         "store_name": "Am-pm בן יהודה 61",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -122992,7 +123018,7 @@
         "store_name": "Am-pm בן גוריון",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123000,7 +123026,7 @@
         "store_name": "Am-pmכצנלסון גבעתיים",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123008,7 +123034,7 @@
         "store_name": "Am-pm י.ל פרץ",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123016,7 +123042,7 @@
         "store_name": "Am-pm בוגרשוב",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123024,7 +123050,7 @@
         "store_name": "Am-pm שנקין59",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123032,7 +123058,7 @@
         "store_name": "Am-pmזבוטינסקי 44",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123040,7 +123066,7 @@
         "store_name": "Am-pm סוקולוב הרצליה",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123048,7 +123074,7 @@
         "store_name": "Am-pm טברסקי",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123056,7 +123082,7 @@
         "store_name": "Am-pm שד יהודית",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123064,7 +123090,7 @@
         "store_name": "Am-pm ברודצקי",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123072,7 +123098,7 @@
         "store_name": "Am-pm הנשיא הרצליה",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123080,7 +123106,7 @@
         "store_name": "Am-pm נווה מונסון",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123088,7 +123114,7 @@
         "store_name": "Am-pm הוד השרון",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123096,7 +123122,7 @@
         "store_name": "Am-pm הדר נס ציונה",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123104,7 +123130,7 @@
         "store_name": "Am-pm ווינשל",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123112,7 +123138,7 @@
         "store_name": "Am- pm עליית הנוער",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123120,7 +123146,7 @@
         "store_name": "Am-pm המלכות",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123128,7 +123154,7 @@
         "store_name": "AMPMיהודה הלוי",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123136,7 +123162,7 @@
         "store_name": "Am-pm החשמונאים",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123144,7 +123170,7 @@
         "store_name": "Am-pm אבא הלל",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-16T02:38:34+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123152,7 +123178,7 @@
         "store_name": "Am-pm קהילת סלוניקי",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123160,7 +123186,7 @@
         "store_name": "Am-pmאלנבי 69",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123168,7 +123194,7 @@
         "store_name": "AMPMהרצל 61",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123176,7 +123202,7 @@
         "store_name": "Am-pmבן גוריון בת ים",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123184,7 +123210,7 @@
         "store_name": "AMPM ארלוזורוב 52",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123192,7 +123218,7 @@
         "store_name": "AMPM אלנבי 56",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123200,7 +123226,7 @@
         "store_name": "AMPM הקסטל",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123208,7 +123234,7 @@
         "store_name": "AM-PM הקוממיות 16",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123216,7 +123242,7 @@
         "store_name": "Am-pm-העצמאות",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123224,7 +123250,7 @@
         "store_name": "טשרניחובסקי כ\"ס",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123232,7 +123258,7 @@
         "store_name": "AM-PM קריית אונו",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123240,7 +123266,7 @@
         "store_name": "מוריה חיפה AM-PM",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123248,7 +123274,7 @@
         "store_name": "AMPM חדרה",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123256,7 +123282,7 @@
         "store_name": "AM-PMזבוטינסקי בת ים",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123264,7 +123290,7 @@
         "store_name": "AM-PM אילנות חיפה",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123272,7 +123298,7 @@
         "store_name": "AM-PM נרקיסים",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123280,7 +123306,7 @@
         "store_name": "AM-PM טירת הכרמל",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123296,7 +123322,7 @@
         "store_name": "בית קשת",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123304,7 +123330,7 @@
         "store_name": "להבות חביבה",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123312,7 +123338,7 @@
         "store_name": "בית השיטה מיני סופר",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123320,7 +123346,7 @@
         "store_name": "כפר-עזה",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123328,7 +123354,7 @@
         "store_name": "להב",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123336,7 +123362,7 @@
         "store_name": "משמר השרון",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123344,7 +123370,7 @@
         "store_name": "עין שמר",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123352,7 +123378,7 @@
         "store_name": "עינת",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123360,7 +123386,7 @@
         "store_name": "צומת הגומא",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123368,7 +123394,7 @@
         "store_name": "Victory | Rosh Ha'ayin Park Afek",
         "format": "supermarket",
         "price": 5.2,
-        "observed_at": "2026-09-16T02:52:29.580489Z",
+        "observed_at": "2026-09-18T02:44:17.917392Z",
         "role": "context"
        },
        {
@@ -123376,7 +123402,7 @@
         "store_name": "גבעת עוז",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123384,7 +123410,7 @@
         "store_name": "עין שמר משלוחים",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123392,7 +123418,7 @@
         "store_name": "נווה ירק  מושב",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123400,7 +123426,7 @@
         "store_name": "מכמורת",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123412,11 +123438,19 @@
         "role": "context"
        },
        {
+        "store_id": "727",
+        "store_name": "גבע כרמל",
+        "format": "unknown",
+        "price": 4.9,
+        "observed_at": "2026-09-18T02:29:57+00:00",
+        "role": "context"
+       },
+       {
         "store_id": "730",
         "store_name": "מגדים",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123424,7 +123458,7 @@
         "store_name": "דוכן גן שמואל",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123432,7 +123466,7 @@
         "store_name": "דוכן גן שמואל משלוחי",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123440,7 +123474,7 @@
         "store_name": "האון -תפעול",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123448,7 +123482,7 @@
         "store_name": "מצפה רמון",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123456,7 +123490,7 @@
         "store_name": "ד\"ש פ\"ת",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123464,7 +123498,7 @@
         "store_name": "צוקים",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123472,7 +123506,7 @@
         "store_name": "עוקף קריות",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123480,7 +123514,7 @@
         "store_name": "דוכן צמח",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123488,7 +123522,7 @@
         "store_name": "ציפורית",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123496,7 +123530,7 @@
         "store_name": "עמיעד",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123504,7 +123538,7 @@
         "store_name": "אביב דרך נמיר",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123512,7 +123546,7 @@
         "store_name": "חריש",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123520,7 +123554,7 @@
         "store_name": "נהורה",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123528,7 +123562,7 @@
         "store_name": "יקנעם",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123536,7 +123570,7 @@
         "store_name": "רמת רחל",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123544,7 +123578,7 @@
         "store_name": "מחסייה",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-16T02:38:34+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123552,7 +123586,7 @@
         "store_name": "יד נתן",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123560,7 +123594,7 @@
         "store_name": "גן יבנה",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123568,7 +123602,7 @@
         "store_name": "משען",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123576,7 +123610,7 @@
         "store_name": "גבים",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123584,7 +123618,7 @@
         "store_name": "נתב\"ג",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123592,7 +123626,7 @@
         "store_name": "נס ציונה",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123600,7 +123634,7 @@
         "store_name": "עין איילה צ.עופר",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123608,7 +123642,7 @@
         "store_name": "עין כרמל",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123616,7 +123650,7 @@
         "store_name": "גן הצפון",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123624,7 +123658,7 @@
         "store_name": "בית דגן",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123632,7 +123666,7 @@
         "store_name": "הזורע",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123640,7 +123674,7 @@
         "store_name": "דבירה",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123648,7 +123682,7 @@
         "store_name": "גאליה",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123656,7 +123690,7 @@
         "store_name": "תדהר",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123664,7 +123698,7 @@
         "store_name": "לטרון",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123672,7 +123706,7 @@
         "store_name": "נען מזרח",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123680,7 +123714,7 @@
         "store_name": "נען מערב",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123688,7 +123722,7 @@
         "store_name": "פתחיה",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123696,7 +123730,7 @@
         "store_name": "מגל מזרח",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123712,7 +123746,7 @@
         "store_name": "כפר טרומן",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123720,7 +123754,7 @@
         "store_name": "יקום",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123728,7 +123762,7 @@
         "store_name": "כפר סבא",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123736,7 +123770,7 @@
         "store_name": "טל שחר",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123744,7 +123778,7 @@
         "store_name": "אילות",
         "format": "unknown",
         "price": 6.7,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123752,7 +123786,7 @@
         "store_name": "נוה ירק",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        }
       ],
@@ -123796,7 +123830,7 @@
         "store_name": "טשרניחובסקי כ\"ס",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123812,7 +123846,7 @@
         "store_name": "משמר השרון",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123820,7 +123854,7 @@
         "store_name": "עין שמר",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123828,7 +123862,7 @@
         "store_name": "עינת",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123844,7 +123878,7 @@
         "store_name": "נווה ירק  מושב",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123852,7 +123886,7 @@
         "store_name": "מכמורת",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123860,7 +123894,7 @@
         "store_name": "גבע כרמל",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123868,7 +123902,7 @@
         "store_name": "דוכן גן שמואל",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123876,7 +123910,7 @@
         "store_name": "דוכן גן שמואל משלוחי",
         "format": "unknown",
         "price": 4.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        }
       ],
@@ -123920,7 +123954,7 @@
         "store_name": "AM-PM המושבה הגרמנית",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123936,7 +123970,7 @@
         "store_name": "Am-pm בן יהודה 30",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123944,7 +123978,7 @@
         "store_name": "Am-pm נורדאו",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123952,7 +123986,7 @@
         "store_name": "Am-pm 24 שנקין",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123960,7 +123994,7 @@
         "store_name": "Am-pm לינקולן",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123968,7 +124002,7 @@
         "store_name": "Am-pm  כל-בו שלום",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123984,7 +124018,7 @@
         "store_name": "Am-pm זבוטינסקי ר\"ג",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -123992,7 +124026,7 @@
         "store_name": "Am-pm זבוטינסקי ת\"א",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124000,7 +124034,7 @@
         "store_name": "Am-pm בן יהודה 61",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124008,7 +124042,7 @@
         "store_name": "Am-pm בן גוריון",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124016,7 +124050,7 @@
         "store_name": "Am-pmכצנלסון גבעתיים",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124024,7 +124058,7 @@
         "store_name": "Am-pm י.ל פרץ",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124032,7 +124066,7 @@
         "store_name": "Am-pm בוגרשוב",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124040,7 +124074,7 @@
         "store_name": "Am-pm שנקין59",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124048,7 +124082,7 @@
         "store_name": "Am-pm סוקולוב הרצליה",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124056,7 +124090,7 @@
         "store_name": "Am-pm טברסקי",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124064,7 +124098,7 @@
         "store_name": "Am-pm שד יהודית",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124072,7 +124106,7 @@
         "store_name": "Am-pm ברודצקי",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124080,7 +124114,7 @@
         "store_name": "Am-pm הנשיא הרצליה",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124088,7 +124122,7 @@
         "store_name": "Am-pm נווה מונסון",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124096,7 +124130,7 @@
         "store_name": "Am-pm הוד השרון",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124112,7 +124146,7 @@
         "store_name": "Am- pm עליית הנוער",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124120,7 +124154,7 @@
         "store_name": "Am-pm המלכות",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124128,7 +124162,7 @@
         "store_name": "AMPMיהודה הלוי",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124136,7 +124170,7 @@
         "store_name": "Am-pm החשמונאים",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124144,7 +124178,7 @@
         "store_name": "Am-pm אבא הלל",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-16T02:38:34+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124152,7 +124186,7 @@
         "store_name": "Am-pm קהילת סלוניקי",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124160,7 +124194,7 @@
         "store_name": "Am-pmאלנבי 69",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124168,7 +124202,7 @@
         "store_name": "AMPMהרצל 61",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124176,7 +124210,7 @@
         "store_name": "Am-pmבן גוריון בת ים",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124184,7 +124218,7 @@
         "store_name": "AMPM ארלוזורוב 52",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124192,7 +124226,7 @@
         "store_name": "Am-pm-העצמאות",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124200,7 +124234,7 @@
         "store_name": "טשרניחובסקי כ\"ס",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124208,7 +124242,7 @@
         "store_name": "מוריה חיפה AM-PM",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124216,7 +124250,7 @@
         "store_name": "AMPM חדרה",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124224,7 +124258,7 @@
         "store_name": "AM-PMזבוטינסקי בת ים",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124232,7 +124266,7 @@
         "store_name": "AM-PM אילנות חיפה",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124240,7 +124274,7 @@
         "store_name": "AM-PM נרקיסים",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124248,7 +124282,7 @@
         "store_name": "AM-PM טירת הכרמל",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124256,7 +124290,7 @@
         "store_name": "עין שמר",
         "format": "unknown",
         "price": 19.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124264,7 +124298,7 @@
         "store_name": "עינת",
         "format": "unknown",
         "price": 19.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124272,7 +124306,7 @@
         "store_name": "King Store | Rosh Haayin",
         "format": "supermarket",
         "price": 21.9,
-        "observed_at": "2026-09-17T02:58:07.160344Z",
+        "observed_at": "2026-09-18T02:46:14.461687Z",
         "role": "context"
        },
        {
@@ -124280,7 +124314,7 @@
         "store_name": "Wolt Market | Lev Haaretz",
         "format": "urban_minimarket",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:57:14.871421Z",
+        "observed_at": "2026-09-18T02:45:05.277402Z",
         "role": "comparable"
        },
        {
@@ -124296,7 +124330,7 @@
         "store_name": "העוגן",
         "format": "unknown",
         "price": 19.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124304,7 +124338,7 @@
         "store_name": "אחיטוב",
         "format": "unknown",
         "price": 19.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124312,7 +124346,7 @@
         "store_name": "גונן",
         "format": "unknown",
         "price": 19.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124320,7 +124354,7 @@
         "store_name": "נורדיה",
         "format": "unknown",
         "price": 19.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124328,7 +124362,7 @@
         "store_name": "גבע כרמל",
         "format": "unknown",
         "price": 19.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124336,7 +124370,7 @@
         "store_name": "דוכן גן שמואל",
         "format": "unknown",
         "price": 19.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124344,7 +124378,7 @@
         "store_name": "דוכן גן שמואל משלוחי",
         "format": "unknown",
         "price": 19.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124352,7 +124386,7 @@
         "store_name": "דוכן צמח",
         "format": "unknown",
         "price": 19.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124360,7 +124394,7 @@
         "store_name": "צפת",
         "format": "unknown",
         "price": 24.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        }
       ],
@@ -124404,7 +124438,7 @@
         "store_name": "AM-PMדרך השלום",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124412,7 +124446,7 @@
         "store_name": "AM-PMקרית ביאליק",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124420,7 +124454,7 @@
         "store_name": "AM-PM המושבה הגרמנית",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124428,7 +124462,7 @@
         "store_name": "AM-PMאח\"י אילת חיפה",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124444,7 +124478,7 @@
         "store_name": "Am-pm בן יהודה 30",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124452,7 +124486,7 @@
         "store_name": "Am-pm ארלוזרוב",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124460,7 +124494,7 @@
         "store_name": "Am-pm נורדאו",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124468,7 +124502,7 @@
         "store_name": "Am-pmאלנבי",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124476,7 +124510,7 @@
         "store_name": "Am-pm קינג גורג",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124484,7 +124518,7 @@
         "store_name": "Am-pm 24 שנקין",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124492,7 +124526,7 @@
         "store_name": "Am-pm  אבן גבירול",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124500,7 +124534,7 @@
         "store_name": "Am-pm זמנהוף",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124508,7 +124542,7 @@
         "store_name": "Am-pm לינקולן",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124516,7 +124550,7 @@
         "store_name": "Am-pm  הרצל",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124524,7 +124558,7 @@
         "store_name": "Am-pm  כל-בו שלום",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124532,7 +124566,7 @@
         "store_name": "Am-pm פרנקל",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124540,7 +124574,7 @@
         "store_name": "Am-pm גורדון",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124548,7 +124582,7 @@
         "store_name": "Am-pm זבוטינסקי ר\"ג",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124556,7 +124590,7 @@
         "store_name": "Am-pm זבוטינסקי ת\"א",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124564,7 +124598,7 @@
         "store_name": "Am-pm נחלת יצחק",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124572,7 +124606,7 @@
         "store_name": "Am-pm בן יהודה 61",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124580,7 +124614,7 @@
         "store_name": "Am-pm בן גוריון",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124588,7 +124622,7 @@
         "store_name": "Am-pmכצנלסון גבעתיים",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124596,7 +124630,7 @@
         "store_name": "Am-pm י.ל פרץ",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124604,7 +124638,7 @@
         "store_name": "Am-pm בוגרשוב",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124612,7 +124646,7 @@
         "store_name": "Am-pm שנקין59",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124620,7 +124654,7 @@
         "store_name": "Am-pmזבוטינסקי 44",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124628,7 +124662,7 @@
         "store_name": "Am-pm סוקולוב הרצליה",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124636,7 +124670,7 @@
         "store_name": "Am-pm טברסקי",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124644,7 +124678,7 @@
         "store_name": "Am-pm שד יהודית",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124652,7 +124686,7 @@
         "store_name": "Am-pm ברודצקי",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124660,7 +124694,7 @@
         "store_name": "Am-pm הנשיא הרצליה",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124668,7 +124702,7 @@
         "store_name": "Am-pm נווה מונסון",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124676,7 +124710,7 @@
         "store_name": "Am-pm הוד השרון",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124684,7 +124718,7 @@
         "store_name": "Am-pm הדר נס ציונה",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124692,7 +124726,7 @@
         "store_name": "Am-pm ווינשל",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124700,7 +124734,7 @@
         "store_name": "Am- pm עליית הנוער",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124708,7 +124742,7 @@
         "store_name": "Am-pm המלכות",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124716,7 +124750,7 @@
         "store_name": "AMPMיהודה הלוי",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124724,7 +124758,7 @@
         "store_name": "Am-pm החשמונאים",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124732,7 +124766,7 @@
         "store_name": "Am-pm אבא הלל",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-16T02:38:34+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124740,7 +124774,7 @@
         "store_name": "Am-pm קהילת סלוניקי",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124748,7 +124782,7 @@
         "store_name": "Am-pmאלנבי 69",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124756,7 +124790,7 @@
         "store_name": "AMPMהרצל 61",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124764,7 +124798,7 @@
         "store_name": "Am-pmבן גוריון בת ים",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124772,7 +124806,7 @@
         "store_name": "AMPM ארלוזורוב 52",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124780,7 +124814,7 @@
         "store_name": "AMPM אלנבי 56",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124788,7 +124822,7 @@
         "store_name": "AMPM הקסטל",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124796,7 +124830,7 @@
         "store_name": "AM-PM הקוממיות 16",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124804,7 +124838,7 @@
         "store_name": "AM-PM דניה",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124812,7 +124846,7 @@
         "store_name": "Am-pm-העצמאות",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124820,7 +124854,7 @@
         "store_name": "טשרניחובסקי כ\"ס",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124828,7 +124862,7 @@
         "store_name": "AM-PM קריית אונו",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124836,7 +124870,7 @@
         "store_name": "מוריה חיפה AM-PM",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124844,7 +124878,7 @@
         "store_name": "AMPM חדרה",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124852,7 +124886,7 @@
         "store_name": "AM-PMזבוטינסקי בת ים",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124860,7 +124894,7 @@
         "store_name": "AM-PM אילנות חיפה",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124868,7 +124902,7 @@
         "store_name": "AM-PM נרקיסים",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124876,7 +124910,7 @@
         "store_name": "AM-PM טירת הכרמל",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124884,7 +124918,7 @@
         "store_name": "Rami Levy In The Neighborhood | Rosh Haayin",
         "format": "urban_minimarket",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:58:29.111272Z",
+        "observed_at": "2026-09-18T02:46:45.378444Z",
         "role": "comparable"
        },
        {
@@ -124892,7 +124926,7 @@
         "store_name": "יסעור",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124900,7 +124934,7 @@
         "store_name": "בית קשת",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124908,7 +124942,7 @@
         "store_name": "להבות חביבה",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124916,7 +124950,7 @@
         "store_name": "Shufersal | Rosh Ha’ayin",
         "format": "supermarket",
         "price": 39.9,
-        "observed_at": "2026-09-17T02:59:21.388069Z",
+        "observed_at": "2026-09-18T02:47:56.116333Z",
         "role": "context"
        },
        {
@@ -124924,7 +124958,7 @@
         "store_name": "גשר הזיו",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124932,7 +124966,7 @@
         "store_name": "עינת -ב מרכולית",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124940,7 +124974,7 @@
         "store_name": "אלומות",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124948,7 +124982,7 @@
         "store_name": "אורים",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124956,7 +124990,7 @@
         "store_name": "בית השיטה מיני סופר",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124964,7 +124998,7 @@
         "store_name": "כפר-עזה",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124972,7 +125006,7 @@
         "store_name": "להב",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124980,7 +125014,7 @@
         "store_name": "משמר השרון",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124988,7 +125022,7 @@
         "store_name": "עין שמר",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -124996,7 +125030,7 @@
         "store_name": "עינת",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125004,7 +125038,7 @@
         "store_name": "King Store | Rosh Haayin",
         "format": "supermarket",
         "price": 35.9,
-        "observed_at": "2026-09-17T02:58:07.160344Z",
+        "observed_at": "2026-09-18T02:46:14.461687Z",
         "role": "context"
        },
        {
@@ -125012,7 +125046,7 @@
         "store_name": "צומת הגומא",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125020,7 +125054,7 @@
         "store_name": "גבעת עוז",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125028,7 +125062,7 @@
         "store_name": "עינת מ.ס",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125036,7 +125070,7 @@
         "store_name": "עין שמר משלוחים",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125044,7 +125078,7 @@
         "store_name": "כפר הנשיא",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125052,7 +125086,7 @@
         "store_name": "בית יהושוע",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125060,7 +125094,7 @@
         "store_name": "דגניה א",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125068,7 +125102,7 @@
         "store_name": "נווה ירק  מושב",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125076,7 +125110,7 @@
         "store_name": "העוגן",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125084,7 +125118,7 @@
         "store_name": "מעוז חיים",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125092,7 +125126,7 @@
         "store_name": "שדי חמד-מושב",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125100,7 +125134,7 @@
         "store_name": "לכיש",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125108,7 +125142,7 @@
         "store_name": "אחיטוב",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125116,7 +125150,7 @@
         "store_name": "מכמורת",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125124,7 +125158,7 @@
         "store_name": "ישרש",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125132,7 +125166,7 @@
         "store_name": "ברור חיל",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125140,7 +125174,7 @@
         "store_name": "נהלל",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125148,7 +125182,7 @@
         "store_name": "גונן",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125156,7 +125190,7 @@
         "store_name": "נורדיה",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125164,7 +125198,7 @@
         "store_name": "גבע כרמל",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125172,7 +125206,7 @@
         "store_name": "מגדים",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125180,7 +125214,7 @@
         "store_name": "דוכן גן שמואל",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125188,7 +125222,7 @@
         "store_name": "דוכן גן שמואל משלוחי",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125196,7 +125230,7 @@
         "store_name": "הרכבים ירושלים",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125204,7 +125238,7 @@
         "store_name": "האון -תפעול",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125212,7 +125246,7 @@
         "store_name": "עיר ימים נתניה",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125220,7 +125254,7 @@
         "store_name": "מצפה רמון",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125228,7 +125262,7 @@
         "store_name": "ד\"ש פ\"ת",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125236,7 +125270,7 @@
         "store_name": "צוקים",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125244,7 +125278,7 @@
         "store_name": "עוקף קריות",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125252,7 +125286,7 @@
         "store_name": "שערי הצפון",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125260,7 +125294,7 @@
         "store_name": "דוכן צמח",
         "format": "unknown",
         "price": 40.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125268,7 +125302,7 @@
         "store_name": "ציפורית",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125276,7 +125310,7 @@
         "store_name": "בנימינה מערב",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125284,7 +125318,7 @@
         "store_name": "ניר בנים",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125292,7 +125326,7 @@
         "store_name": "עמיעד",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125300,7 +125334,7 @@
         "store_name": "יזרעאל",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125308,7 +125342,7 @@
         "store_name": "חריש",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125316,7 +125350,7 @@
         "store_name": "מזרע",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125324,7 +125358,7 @@
         "store_name": "נהורה",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125332,7 +125366,7 @@
         "store_name": "יקנעם",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125340,7 +125374,7 @@
         "store_name": "רמת רחל",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125348,7 +125382,7 @@
         "store_name": "יד נתן",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125356,7 +125390,7 @@
         "store_name": "נגבה",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125364,7 +125398,7 @@
         "store_name": "גן יבנה",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125372,7 +125406,7 @@
         "store_name": "משען",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125380,7 +125414,7 @@
         "store_name": "גבים",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125388,7 +125422,7 @@
         "store_name": "נתב\"ג",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125396,7 +125430,7 @@
         "store_name": "נס ציונה",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125404,7 +125438,7 @@
         "store_name": "עין איילה צ.עופר",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125412,7 +125446,7 @@
         "store_name": "עין כרמל",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125420,7 +125454,7 @@
         "store_name": "גן הצפון",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125428,7 +125462,7 @@
         "store_name": "צפת",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125436,7 +125470,7 @@
         "store_name": "חוקוק",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125444,7 +125478,7 @@
         "store_name": "בית דגן",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125452,7 +125486,7 @@
         "store_name": "הזורע",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125460,7 +125494,7 @@
         "store_name": "מענית",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125468,7 +125502,7 @@
         "store_name": "תל יצחק",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125476,7 +125510,7 @@
         "store_name": "דבירה",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125484,7 +125518,7 @@
         "store_name": "גאליה",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125492,7 +125526,7 @@
         "store_name": "תדהר",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125500,7 +125534,7 @@
         "store_name": "גני חוגה",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125508,7 +125542,7 @@
         "store_name": "לטרון",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125516,7 +125550,7 @@
         "store_name": "נען מזרח",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125524,7 +125558,7 @@
         "store_name": "נען מערב",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125532,7 +125566,7 @@
         "store_name": "פתחיה",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125540,7 +125574,7 @@
         "store_name": "מגל מערב",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125548,7 +125582,7 @@
         "store_name": "מגל מזרח",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125556,7 +125590,7 @@
         "store_name": "ערד",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125564,7 +125598,7 @@
         "store_name": "מתנ\"ח יבנה",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125572,7 +125606,7 @@
         "store_name": "כפר טרומן",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125580,7 +125614,7 @@
         "store_name": "יקום",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125588,7 +125622,7 @@
         "store_name": "כפר סבא",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125596,7 +125630,7 @@
         "store_name": "עכו",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125604,7 +125638,7 @@
         "store_name": "טל שחר",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125612,7 +125646,7 @@
         "store_name": "חדרה מזרח",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125620,7 +125654,7 @@
         "store_name": "אילות",
         "format": "unknown",
         "price": 38.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125628,7 +125662,7 @@
         "store_name": "אלון הרכבת ב\"ש",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125636,7 +125670,7 @@
         "store_name": "נוה ירק",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125644,7 +125678,7 @@
         "store_name": "תל מונד",
         "format": "unknown",
         "price": 45.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        }
       ],
@@ -125688,7 +125722,7 @@
         "store_name": "AM-PMדרך השלום",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125696,7 +125730,7 @@
         "store_name": "AM-PMקרית ביאליק",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125704,7 +125738,7 @@
         "store_name": "AM-PM המושבה הגרמנית",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125712,7 +125746,7 @@
         "store_name": "AM-PMאח\"י אילת חיפה",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125728,7 +125762,7 @@
         "store_name": "Am-pm בן יהודה 30",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125736,7 +125770,7 @@
         "store_name": "Am-pm ארלוזרוב",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125744,7 +125778,7 @@
         "store_name": "Am-pm נורדאו",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125752,7 +125786,7 @@
         "store_name": "Am-pmאלנבי",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125760,7 +125794,7 @@
         "store_name": "Am-pm קינג גורג",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125768,7 +125802,7 @@
         "store_name": "Am-pm 24 שנקין",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125776,7 +125810,7 @@
         "store_name": "Am-pm  אבן גבירול",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125784,7 +125818,7 @@
         "store_name": "Am-pm זמנהוף",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125792,7 +125826,7 @@
         "store_name": "Am-pm לינקולן",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125800,7 +125834,7 @@
         "store_name": "Am-pm  הרצל",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125808,7 +125842,7 @@
         "store_name": "Am-pm  כל-בו שלום",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125816,7 +125850,7 @@
         "store_name": "Am-pm פרנקל",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125824,7 +125858,7 @@
         "store_name": "Am-pm גורדון",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125832,7 +125866,7 @@
         "store_name": "Am-pm זבוטינסקי ר\"ג",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125840,7 +125874,7 @@
         "store_name": "Am-pm זבוטינסקי ת\"א",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125848,7 +125882,7 @@
         "store_name": "Am-pm נחלת יצחק",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125856,7 +125890,7 @@
         "store_name": "Am-pm בן יהודה 61",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125864,7 +125898,7 @@
         "store_name": "Am-pm בן גוריון",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125872,7 +125906,7 @@
         "store_name": "Am-pmכצנלסון גבעתיים",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125880,7 +125914,7 @@
         "store_name": "Am-pm י.ל פרץ",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125888,7 +125922,7 @@
         "store_name": "Am-pm בוגרשוב",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125896,7 +125930,7 @@
         "store_name": "Am-pm שנקין59",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125904,7 +125938,7 @@
         "store_name": "Am-pmזבוטינסקי 44",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125912,7 +125946,7 @@
         "store_name": "Am-pm סוקולוב הרצליה",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125920,7 +125954,7 @@
         "store_name": "Am-pm טברסקי",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125928,7 +125962,7 @@
         "store_name": "Am-pm שד יהודית",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125936,7 +125970,7 @@
         "store_name": "Am-pm ברודצקי",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125944,7 +125978,7 @@
         "store_name": "Am-pm הנשיא הרצליה",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125952,7 +125986,7 @@
         "store_name": "Am-pm נווה מונסון",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125960,7 +125994,7 @@
         "store_name": "Am-pm הוד השרון",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125968,7 +126002,7 @@
         "store_name": "Am-pm הדר נס ציונה",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125976,7 +126010,7 @@
         "store_name": "Am-pm ווינשל",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125984,7 +126018,7 @@
         "store_name": "Am- pm עליית הנוער",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -125992,7 +126026,7 @@
         "store_name": "Am-pm המלכות",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126000,7 +126034,7 @@
         "store_name": "AMPMיהודה הלוי",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126008,7 +126042,7 @@
         "store_name": "Am-pm החשמונאים",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126016,7 +126050,7 @@
         "store_name": "Am-pm אבא הלל",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-16T02:38:34+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126024,7 +126058,7 @@
         "store_name": "Am-pm קהילת סלוניקי",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126032,7 +126066,7 @@
         "store_name": "Am-pmבן גוריון בת ים",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126040,7 +126074,7 @@
         "store_name": "AMPM ארלוזורוב 52",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126048,7 +126082,7 @@
         "store_name": "AMPM אלנבי 56",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126056,7 +126090,7 @@
         "store_name": "AMPM הקסטל",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126064,7 +126098,7 @@
         "store_name": "AM-PM הקוממיות 16",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126072,7 +126106,7 @@
         "store_name": "Am-pm-העצמאות",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126080,7 +126114,7 @@
         "store_name": "טשרניחובסקי כ\"ס",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126088,7 +126122,7 @@
         "store_name": "AM-PM קריית אונו",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126096,7 +126130,7 @@
         "store_name": "מוריה חיפה AM-PM",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126104,7 +126138,7 @@
         "store_name": "AMPM חדרה",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126112,7 +126146,7 @@
         "store_name": "AM-PMזבוטינסקי בת ים",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126120,7 +126154,7 @@
         "store_name": "AM-PM אילנות חיפה",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126128,7 +126162,7 @@
         "store_name": "AM-PM נרקיסים",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126136,7 +126170,7 @@
         "store_name": "AM-PM טירת הכרמל",
         "format": "unknown",
         "price": 9.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126144,7 +126178,7 @@
         "store_name": "Rami Levy In The Neighborhood | Rosh Haayin",
         "format": "urban_minimarket",
         "price": 8.9,
-        "observed_at": "2026-09-17T02:58:29.111272Z",
+        "observed_at": "2026-09-18T02:46:45.378444Z",
         "role": "comparable"
        },
        {
@@ -126152,7 +126186,7 @@
         "store_name": "יסעור",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126160,7 +126194,7 @@
         "store_name": "להבות חביבה",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126168,7 +126202,7 @@
         "store_name": "גשר הזיו",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126176,7 +126210,7 @@
         "store_name": "עינת -ב מרכולית",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126184,7 +126218,7 @@
         "store_name": "אלומות",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126192,7 +126226,7 @@
         "store_name": "אורים",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126200,7 +126234,7 @@
         "store_name": "בית השיטה מיני סופר",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126208,7 +126242,7 @@
         "store_name": "כפר-עזה",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126216,7 +126250,7 @@
         "store_name": "להב",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126224,7 +126258,7 @@
         "store_name": "משמר השרון",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126232,7 +126266,7 @@
         "store_name": "עין שמר",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126240,7 +126274,7 @@
         "store_name": "עינת",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126248,7 +126282,7 @@
         "store_name": "King Store | Rosh Haayin",
         "format": "supermarket",
         "price": 7.5,
-        "observed_at": "2026-09-17T02:58:07.160344Z",
+        "observed_at": "2026-09-18T02:46:14.461687Z",
         "role": "context"
        },
        {
@@ -126256,7 +126290,7 @@
         "store_name": "צומת הגומא",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126264,7 +126298,7 @@
         "store_name": "גבעת עוז",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126272,7 +126306,7 @@
         "store_name": "עינת מ.ס",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126280,7 +126314,7 @@
         "store_name": "עין שמר משלוחים",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126288,7 +126322,7 @@
         "store_name": "כפר הנשיא",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126296,7 +126330,7 @@
         "store_name": "בית יהושוע",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126304,7 +126338,7 @@
         "store_name": "דגניה א",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126312,7 +126346,7 @@
         "store_name": "נווה ירק  מושב",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126320,7 +126354,7 @@
         "store_name": "העוגן",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126328,7 +126362,7 @@
         "store_name": "מעוז חיים",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126336,7 +126370,7 @@
         "store_name": "שדי חמד-מושב",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126344,7 +126378,7 @@
         "store_name": "לכיש",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126352,7 +126386,7 @@
         "store_name": "אחיטוב",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126360,7 +126394,7 @@
         "store_name": "מכמורת",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126368,7 +126402,7 @@
         "store_name": "ישרש",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126376,7 +126410,7 @@
         "store_name": "נהלל",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126384,7 +126418,7 @@
         "store_name": "גונן",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126392,7 +126426,7 @@
         "store_name": "נורדיה",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126400,7 +126434,7 @@
         "store_name": "גבע כרמל",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126408,7 +126442,7 @@
         "store_name": "מגדים",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126416,7 +126450,7 @@
         "store_name": "דוכן גן שמואל",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126424,7 +126458,7 @@
         "store_name": "דוכן גן שמואל משלוחי",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126432,7 +126466,7 @@
         "store_name": "האון -תפעול",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126440,7 +126474,7 @@
         "store_name": "עיר ימים נתניה",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126448,7 +126482,7 @@
         "store_name": "בני דרור",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126456,7 +126490,7 @@
         "store_name": "מצפה רמון",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126464,7 +126498,7 @@
         "store_name": "ד\"ש פ\"ת",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126472,7 +126506,7 @@
         "store_name": "עוקף קריות",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126480,7 +126514,7 @@
         "store_name": "דוכן צמח",
         "format": "unknown",
         "price": 7.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126488,7 +126522,7 @@
         "store_name": "ציפורית",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126496,7 +126530,7 @@
         "store_name": "ניר בנים",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126504,7 +126538,7 @@
         "store_name": "עמיעד",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126512,7 +126546,7 @@
         "store_name": "אביב דרך נמיר",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126520,7 +126554,7 @@
         "store_name": "יזרעאל",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126528,7 +126562,7 @@
         "store_name": "חריש",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126536,7 +126570,7 @@
         "store_name": "מזרע",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126544,7 +126578,7 @@
         "store_name": "נהורה",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126552,7 +126586,7 @@
         "store_name": "יקנעם",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126560,7 +126594,7 @@
         "store_name": "רמת רחל",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126568,7 +126602,7 @@
         "store_name": "מחסייה",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-16T02:38:34+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126576,7 +126610,7 @@
         "store_name": "יד נתן",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126584,7 +126618,7 @@
         "store_name": "גן יבנה",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126592,7 +126626,7 @@
         "store_name": "משען",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126600,7 +126634,7 @@
         "store_name": "גבים",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126608,7 +126642,7 @@
         "store_name": "נתב\"ג",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126616,7 +126650,7 @@
         "store_name": "עין כרמל",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126624,7 +126658,7 @@
         "store_name": "גן הצפון",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126632,7 +126666,7 @@
         "store_name": "צפת",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126640,7 +126674,7 @@
         "store_name": "חוקוק",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126648,7 +126682,7 @@
         "store_name": "בית דגן",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126656,7 +126690,7 @@
         "store_name": "הזורע",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126664,7 +126698,7 @@
         "store_name": "מענית",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126672,7 +126706,7 @@
         "store_name": "תל יצחק",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126680,7 +126714,7 @@
         "store_name": "דבירה",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126688,7 +126722,7 @@
         "store_name": "תדהר",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126696,7 +126730,7 @@
         "store_name": "גני חוגה",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126704,7 +126738,7 @@
         "store_name": "לטרון",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126712,7 +126746,7 @@
         "store_name": "נען מזרח",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126720,7 +126754,7 @@
         "store_name": "נען מערב",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126728,7 +126762,7 @@
         "store_name": "פתחיה",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126736,7 +126770,7 @@
         "store_name": "מגל מערב",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126744,7 +126778,7 @@
         "store_name": "מגל מזרח",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126752,7 +126786,7 @@
         "store_name": "ערד",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126760,7 +126794,7 @@
         "store_name": "מתנ\"ח יבנה",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126768,7 +126802,7 @@
         "store_name": "כפר טרומן",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126776,7 +126810,7 @@
         "store_name": "יקום",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126784,7 +126818,7 @@
         "store_name": "כפר סבא",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126792,7 +126826,7 @@
         "store_name": "עכו",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126800,7 +126834,7 @@
         "store_name": "חדרה מזרח",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126808,7 +126842,7 @@
         "store_name": "אילות",
         "format": "unknown",
         "price": 10.0,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126816,7 +126850,15 @@
         "store_name": "אלון הרכבת ב\"ש",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
+        "role": "context"
+       },
+       {
+        "store_id": "978",
+        "store_name": "נוה ירק",
+        "format": "unknown",
+        "price": 11.9,
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126824,7 +126866,7 @@
         "store_name": "תל מונד",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126832,7 +126874,7 @@
         "store_name": "עוקף חדרה",
         "format": "unknown",
         "price": 11.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        }
       ],
@@ -126876,7 +126918,7 @@
         "store_name": "AM-PMדרך השלום",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126884,7 +126926,7 @@
         "store_name": "AM-PMקרית ביאליק",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126892,7 +126934,7 @@
         "store_name": "AM-PM המושבה הגרמנית",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126900,7 +126942,7 @@
         "store_name": "AM-PMאח\"י אילת חיפה",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126916,7 +126958,7 @@
         "store_name": "Am-pm ארלוזרוב",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126924,7 +126966,7 @@
         "store_name": "Am-pm נורדאו",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126932,7 +126974,7 @@
         "store_name": "Am-pmאלנבי",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126940,7 +126982,7 @@
         "store_name": "Am-pm קינג גורג",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126948,7 +126990,7 @@
         "store_name": "Am-pm 24 שנקין",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126956,7 +126998,7 @@
         "store_name": "Am-pm זמנהוף",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126964,7 +127006,7 @@
         "store_name": "Am-pm לינקולן",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126972,7 +127014,7 @@
         "store_name": "Am-pm  הרצל",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126980,7 +127022,7 @@
         "store_name": "Am-pm  כל-בו שלום",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126988,7 +127030,7 @@
         "store_name": "Am-pm פרנקל",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -126996,7 +127038,7 @@
         "store_name": "Am-pm גורדון",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127004,7 +127046,7 @@
         "store_name": "Am-pm זבוטינסקי ת\"א",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127012,7 +127054,7 @@
         "store_name": "Am-pm נחלת יצחק",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127020,7 +127062,7 @@
         "store_name": "Am-pm בן גוריון",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127028,7 +127070,7 @@
         "store_name": "Am-pmכצנלסון גבעתיים",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127036,7 +127078,7 @@
         "store_name": "Am-pm שנקין59",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127044,7 +127086,7 @@
         "store_name": "Am-pmזבוטינסקי 44",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127052,7 +127094,7 @@
         "store_name": "Am-pm סוקולוב הרצליה",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127060,7 +127102,7 @@
         "store_name": "Am-pm ברודצקי",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127068,7 +127110,7 @@
         "store_name": "Am-pm הנשיא הרצליה",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127076,7 +127118,7 @@
         "store_name": "Am-pm נווה מונסון",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127084,7 +127126,7 @@
         "store_name": "Am-pm הוד השרון",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127092,7 +127134,7 @@
         "store_name": "Am-pm ווינשל",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127100,7 +127142,7 @@
         "store_name": "Am- pm עליית הנוער",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127108,7 +127150,7 @@
         "store_name": "Am-pm המלכות",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127116,7 +127158,7 @@
         "store_name": "AMPMיהודה הלוי",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127124,7 +127166,7 @@
         "store_name": "Am-pm החשמונאים",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127132,7 +127174,7 @@
         "store_name": "Am-pm אבא הלל",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-16T02:38:34+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127140,7 +127182,7 @@
         "store_name": "Am-pm קהילת סלוניקי",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127148,7 +127190,7 @@
         "store_name": "Am-pmאלנבי 69",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127156,7 +127198,7 @@
         "store_name": "Am-pmבן גוריון בת ים",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127164,7 +127206,7 @@
         "store_name": "AMPM ארלוזורוב 52",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127172,7 +127214,7 @@
         "store_name": "AMPM אלנבי 56",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127180,7 +127222,7 @@
         "store_name": "AMPM הקסטל",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127188,7 +127230,7 @@
         "store_name": "AM-PM הקוממיות 16",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127196,7 +127238,7 @@
         "store_name": "AM-PM דניה",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127204,7 +127246,7 @@
         "store_name": "Am-pm-העצמאות",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127212,7 +127254,7 @@
         "store_name": "טשרניחובסקי כ\"ס",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127220,7 +127262,7 @@
         "store_name": "AM-PM קריית אונו",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127228,7 +127270,7 @@
         "store_name": "מוריה חיפה AM-PM",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127236,7 +127278,7 @@
         "store_name": "AM-PMזבוטינסקי בת ים",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127244,7 +127286,7 @@
         "store_name": "AM-PM אילנות חיפה",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127252,7 +127294,7 @@
         "store_name": "AM-PM נרקיסים",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127260,7 +127302,7 @@
         "store_name": "AM-PM טירת הכרמל",
         "format": "unknown",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127268,7 +127310,7 @@
         "store_name": "להבות חביבה",
         "format": "unknown",
         "price": 34.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127276,7 +127318,7 @@
         "store_name": "Shufersal | Rosh Ha’ayin",
         "format": "supermarket",
         "price": 36.9,
-        "observed_at": "2026-09-17T02:59:21.388069Z",
+        "observed_at": "2026-09-18T02:47:56.116333Z",
         "role": "context"
        },
        {
@@ -127284,7 +127326,7 @@
         "store_name": "גשר הזיו",
         "format": "unknown",
         "price": 34.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127292,7 +127334,7 @@
         "store_name": "משמר השרון",
         "format": "unknown",
         "price": 29.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127300,7 +127342,7 @@
         "store_name": "עין שמר",
         "format": "unknown",
         "price": 29.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127308,7 +127350,7 @@
         "store_name": "King Store | Rosh Haayin",
         "format": "supermarket",
         "price": 27.9,
-        "observed_at": "2026-09-16T02:54:33.866932Z",
+        "observed_at": "2026-09-18T02:46:14.461687Z",
         "role": "context"
        },
        {
@@ -127316,7 +127358,7 @@
         "store_name": "עין שמר משלוחים",
         "format": "unknown",
         "price": 29.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127324,7 +127366,7 @@
         "store_name": "כפר הנשיא",
         "format": "unknown",
         "price": 29.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127332,7 +127374,7 @@
         "store_name": "נווה ירק  מושב",
         "format": "unknown",
         "price": 29.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127340,7 +127382,7 @@
         "store_name": "לכיש",
         "format": "unknown",
         "price": 29.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127348,7 +127390,7 @@
         "store_name": "ישרש",
         "format": "unknown",
         "price": 29.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127356,7 +127398,7 @@
         "store_name": "ברור חיל",
         "format": "unknown",
         "price": 29.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127364,7 +127406,7 @@
         "store_name": "נהלל",
         "format": "unknown",
         "price": 29.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127372,7 +127414,7 @@
         "store_name": "נורדיה",
         "format": "unknown",
         "price": 29.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127380,7 +127422,7 @@
         "store_name": "גבע כרמל",
         "format": "unknown",
         "price": 29.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127388,7 +127430,7 @@
         "store_name": "מגדים",
         "format": "unknown",
         "price": 29.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127396,7 +127438,7 @@
         "store_name": "דוכן גן שמואל",
         "format": "unknown",
         "price": 29.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127404,7 +127446,7 @@
         "store_name": "דוכן גן שמואל משלוחי",
         "format": "unknown",
         "price": 29.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127412,7 +127454,7 @@
         "store_name": "ד\"ש פ\"ת",
         "format": "unknown",
         "price": 34.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127420,7 +127462,7 @@
         "store_name": "דוכן צמח",
         "format": "unknown",
         "price": 29.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127428,7 +127470,7 @@
         "store_name": "נתב\"ג",
         "format": "unknown",
         "price": 34.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127436,7 +127478,7 @@
         "store_name": "גן הצפון",
         "format": "unknown",
         "price": 34.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127444,7 +127486,7 @@
         "store_name": "לטרון",
         "format": "unknown",
         "price": 34.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127452,7 +127494,7 @@
         "store_name": "מגל מערב",
         "format": "unknown",
         "price": 34.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        },
        {
@@ -127460,7 +127502,7 @@
         "store_name": "מגל מזרח",
         "format": "unknown",
         "price": 34.9,
-        "observed_at": "2026-09-17T02:42:51+00:00",
+        "observed_at": "2026-09-18T02:29:57+00:00",
         "role": "context"
        }
       ],
@@ -127494,28 +127536,28 @@
      "format": "urban_minimarket",
      "affinity": 0.7,
      "matched": 239,
-     "cheaper_here": 72,
-     "dearer_here": 135,
-     "median_diff_pct": 6.02
+     "cheaper_here": 73,
+     "dearer_here": 132,
+     "median_diff_pct": 5.43
     },
     {
      "store_id": "65daeb8779ca7f0a9bf964f3",
      "store_name": "Wolt Market | Lev Haaretz",
      "format": "urban_minimarket",
      "affinity": 0.7,
-     "matched": 223,
-     "cheaper_here": 137,
+     "matched": 222,
+     "cheaper_here": 136,
      "dearer_here": 60,
-     "median_diff_pct": -5.88
+     "median_diff_pct": -5.84
     },
     {
      "store_id": "401",
      "store_name": "AM-PMדרך השלום",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1528,
+     "matched": 1525,
      "cheaper_here": 925,
-     "dearer_here": 377,
+     "dearer_here": 375,
      "median_diff_pct": -7.72
     },
     {
@@ -127523,8 +127565,8 @@
      "store_name": "AM-PMקרית ביאליק",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1416,
-     "cheaper_here": 790,
+     "matched": 1413,
+     "cheaper_here": 789,
      "dearer_here": 404,
      "median_diff_pct": -5.59
     },
@@ -127533,10 +127575,10 @@
      "store_name": "AM-PM המושבה הגרמנית",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1355,
-     "cheaper_here": 762,
-     "dearer_here": 383,
-     "median_diff_pct": -5.95
+     "matched": 1352,
+     "cheaper_here": 761,
+     "dearer_here": 382,
+     "median_diff_pct": -5.98
     },
     {
      "store_id": "404",
@@ -127563,18 +127605,18 @@
      "store_name": "Am-pm בן יהודה 30",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1262,
-     "cheaper_here": 722,
+     "matched": 1266,
+     "cheaper_here": 726,
      "dearer_here": 349,
-     "median_diff_pct": -6.3
+     "median_diff_pct": -6.43
     },
     {
      "store_id": "503",
      "store_name": "Am-pm ארלוזרוב",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1293,
-     "cheaper_here": 729,
+     "matched": 1294,
+     "cheaper_here": 730,
      "dearer_here": 366,
      "median_diff_pct": -6.29
     },
@@ -127583,8 +127625,8 @@
      "store_name": "Am-pm נורדאו",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1390,
-     "cheaper_here": 769,
+     "matched": 1388,
+     "cheaper_here": 768,
      "dearer_here": 404,
      "median_diff_pct": -5.29
     },
@@ -127593,9 +127635,9 @@
      "store_name": "Am-pmאלנבי",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1418,
-     "cheaper_here": 791,
-     "dearer_here": 407,
+     "matched": 1414,
+     "cheaper_here": 788,
+     "dearer_here": 406,
      "median_diff_pct": -5.29
     },
     {
@@ -127603,10 +127645,10 @@
      "store_name": "Am-pm קינג גורג",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1362,
-     "cheaper_here": 759,
+     "matched": 1364,
+     "cheaper_here": 761,
      "dearer_here": 390,
-     "median_diff_pct": -5.29
+     "median_diff_pct": -5.44
     },
     {
      "store_id": "507",
@@ -127614,7 +127656,7 @@
      "format": "unknown",
      "affinity": 0.2,
      "matched": 1336,
-     "cheaper_here": 734,
+     "cheaper_here": 735,
      "dearer_here": 385,
      "median_diff_pct": -5.26
     },
@@ -127623,9 +127665,9 @@
      "store_name": "Am-pm  אבן גבירול",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1200,
-     "cheaper_here": 692,
-     "dearer_here": 330,
+     "matched": 1197,
+     "cheaper_here": 691,
+     "dearer_here": 328,
      "median_diff_pct": -6.47
     },
     {
@@ -127633,28 +127675,28 @@
      "store_name": "Am-pm זמנהוף",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1249,
+     "matched": 1247,
      "cheaper_here": 706,
      "dearer_here": 356,
-     "median_diff_pct": -5.79
+     "median_diff_pct": -5.92
     },
     {
      "store_id": "510",
      "store_name": "Am-pm לינקולן",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1344,
-     "cheaper_here": 761,
+     "matched": 1345,
+     "cheaper_here": 762,
      "dearer_here": 378,
-     "median_diff_pct": -5.98
+     "median_diff_pct": -6.01
     },
     {
      "store_id": "511",
      "store_name": "Am-pm  הרצל",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1246,
-     "cheaper_here": 691,
+     "matched": 1245,
+     "cheaper_here": 690,
      "dearer_here": 359,
      "median_diff_pct": -5.59
     },
@@ -127663,20 +127705,20 @@
      "store_name": "Am-pm  כל-בו שלום",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1447,
+     "matched": 1446,
      "cheaper_here": 804,
-     "dearer_here": 415,
-     "median_diff_pct": -5.29
+     "dearer_here": 414,
+     "median_diff_pct": -5.44
     },
     {
      "store_id": "513",
      "store_name": "Am-pm פרנקל",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1309,
-     "cheaper_here": 732,
-     "dearer_here": 370,
-     "median_diff_pct": -5.59
+     "matched": 1311,
+     "cheaper_here": 736,
+     "dearer_here": 368,
+     "median_diff_pct": -5.79
     },
     {
      "store_id": "514",
@@ -127693,8 +127735,8 @@
      "store_name": "Am-pm זבוטינסקי ר\"ג",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1332,
-     "cheaper_here": 743,
+     "matched": 1330,
+     "cheaper_here": 741,
      "dearer_here": 384,
      "median_diff_pct": -5.79
     },
@@ -127704,7 +127746,7 @@
      "format": "unknown",
      "affinity": 0.2,
      "matched": 1336,
-     "cheaper_here": 752,
+     "cheaper_here": 753,
      "dearer_here": 380,
      "median_diff_pct": -5.92
     },
@@ -127723,8 +127765,8 @@
      "store_name": "Am-pm בן יהודה 61",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1249,
-     "cheaper_here": 701,
+     "matched": 1246,
+     "cheaper_here": 699,
      "dearer_here": 356,
      "median_diff_pct": -5.59
     },
@@ -127733,9 +127775,9 @@
      "store_name": "Am-pm בן גוריון",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1196,
-     "cheaper_here": 668,
-     "dearer_here": 348,
+     "matched": 1195,
+     "cheaper_here": 667,
+     "dearer_here": 347,
      "median_diff_pct": -5.59
     },
     {
@@ -127743,19 +127785,19 @@
      "store_name": "Am-pmכצנלסון גבעתיים",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1353,
-     "cheaper_here": 757,
+     "matched": 1351,
+     "cheaper_here": 754,
      "dearer_here": 394,
-     "median_diff_pct": -5.92
+     "median_diff_pct": -5.79
     },
     {
      "store_id": "533",
      "store_name": "Am-pm י.ל פרץ",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1134,
-     "cheaper_here": 630,
-     "dearer_here": 328,
+     "matched": 1132,
+     "cheaper_here": 629,
+     "dearer_here": 326,
      "median_diff_pct": -5.92
     },
     {
@@ -127766,17 +127808,17 @@
      "matched": 1259,
      "cheaper_here": 705,
      "dearer_here": 354,
-     "median_diff_pct": -5.66
+     "median_diff_pct": -5.59
     },
     {
      "store_id": "535",
      "store_name": "Am-pm שנקין59",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1295,
+     "matched": 1294,
      "cheaper_here": 733,
      "dearer_here": 364,
-     "median_diff_pct": -6.04
+     "median_diff_pct": -6.29
     },
     {
      "store_id": "536",
@@ -127793,10 +127835,10 @@
      "store_name": "Am-pm סוקולוב הרצליה",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1333,
-     "cheaper_here": 750,
+     "matched": 1329,
+     "cheaper_here": 746,
      "dearer_here": 376,
-     "median_diff_pct": -5.98
+     "median_diff_pct": -5.92
     },
     {
      "store_id": "540",
@@ -127806,16 +127848,16 @@
      "matched": 1283,
      "cheaper_here": 714,
      "dearer_here": 372,
-     "median_diff_pct": -5.59
+     "median_diff_pct": -5.29
     },
     {
      "store_id": "542",
      "store_name": "Am-pm שד יהודית",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1339,
-     "cheaper_here": 753,
-     "dearer_here": 379,
+     "matched": 1341,
+     "cheaper_here": 755,
+     "dearer_here": 380,
      "median_diff_pct": -5.66
     },
     {
@@ -127824,16 +127866,16 @@
      "format": "unknown",
      "affinity": 0.2,
      "matched": 1334,
-     "cheaper_here": 747,
-     "dearer_here": 381,
-     "median_diff_pct": -5.92
+     "cheaper_here": 746,
+     "dearer_here": 382,
+     "median_diff_pct": -5.66
     },
     {
      "store_id": "545",
      "store_name": "Am-pm הנשיא הרצליה",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1405,
+     "matched": 1404,
      "cheaper_here": 786,
      "dearer_here": 400,
      "median_diff_pct": -5.59
@@ -127843,8 +127885,8 @@
      "store_name": "Am-pm נווה מונסון",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1337,
-     "cheaper_here": 743,
+     "matched": 1338,
+     "cheaper_here": 744,
      "dearer_here": 399,
      "median_diff_pct": -5.29
     },
@@ -127854,7 +127896,7 @@
      "format": "unknown",
      "affinity": 0.2,
      "matched": 1356,
-     "cheaper_here": 758,
+     "cheaper_here": 757,
      "dearer_here": 397,
      "median_diff_pct": -5.66
     },
@@ -127863,9 +127905,9 @@
      "store_name": "Am-pm הדר נס ציונה",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1270,
-     "cheaper_here": 696,
-     "dearer_here": 384,
+     "matched": 1275,
+     "cheaper_here": 698,
+     "dearer_here": 386,
      "median_diff_pct": -5.29
     },
     {
@@ -127873,8 +127915,8 @@
      "store_name": "Am-pm ווינשל",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1350,
-     "cheaper_here": 755,
+     "matched": 1351,
+     "cheaper_here": 756,
      "dearer_here": 390,
      "median_diff_pct": -5.59
     },
@@ -127883,9 +127925,9 @@
      "store_name": "Am- pm עליית הנוער",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1373,
+     "matched": 1371,
      "cheaper_here": 758,
-     "dearer_here": 403,
+     "dearer_here": 401,
      "median_diff_pct": -5.29
     },
     {
@@ -127903,9 +127945,9 @@
      "store_name": "AMPMיהודה הלוי",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1305,
-     "cheaper_here": 732,
-     "dearer_here": 362,
+     "matched": 1306,
+     "cheaper_here": 731,
+     "dearer_here": 363,
      "median_diff_pct": -5.92
     },
     {
@@ -127914,7 +127956,7 @@
      "format": "unknown",
      "affinity": 0.2,
      "matched": 1394,
-     "cheaper_here": 780,
+     "cheaper_here": 782,
      "dearer_here": 396,
      "median_diff_pct": -5.59
     },
@@ -127923,8 +127965,8 @@
      "store_name": "Am-pm אבא הלל",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1410,
-     "cheaper_here": 788,
+     "matched": 1409,
+     "cheaper_here": 787,
      "dearer_here": 406,
      "median_diff_pct": -5.59
     },
@@ -127934,18 +127976,18 @@
      "format": "unknown",
      "affinity": 0.2,
      "matched": 1382,
-     "cheaper_here": 778,
+     "cheaper_here": 777,
      "dearer_here": 394,
-     "median_diff_pct": -5.79
+     "median_diff_pct": -5.66
     },
     {
      "store_id": "568",
      "store_name": "Am-pmאלנבי 69",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1250,
-     "cheaper_here": 701,
-     "dearer_here": 361,
+     "matched": 1249,
+     "cheaper_here": 698,
+     "dearer_here": 362,
      "median_diff_pct": -6.29
     },
     {
@@ -127953,7 +127995,7 @@
      "store_name": "AMPMהרצל 61",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1081,
+     "matched": 1082,
      "cheaper_here": 625,
      "dearer_here": 292,
      "median_diff_pct": -6.71
@@ -127963,8 +128005,8 @@
      "store_name": "Am-pmבן גוריון בת ים",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1269,
-     "cheaper_here": 714,
+     "matched": 1268,
+     "cheaper_here": 713,
      "dearer_here": 369,
      "median_diff_pct": -5.59
     },
@@ -127993,9 +128035,9 @@
      "store_name": "AMPM הקסטל",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1270,
-     "cheaper_here": 707,
-     "dearer_here": 368,
+     "matched": 1267,
+     "cheaper_here": 706,
+     "dearer_here": 367,
      "median_diff_pct": -5.29
     },
     {
@@ -128003,7 +128045,7 @@
      "store_name": "AM-PM הקוממיות 16",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1331,
+     "matched": 1330,
      "cheaper_here": 749,
      "dearer_here": 379,
      "median_diff_pct": -6.29
@@ -128013,19 +128055,19 @@
      "store_name": "AM-PM דניה",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1170,
-     "cheaper_here": 657,
-     "dearer_here": 339,
-     "median_diff_pct": -5.79
+     "matched": 1165,
+     "cheaper_here": 654,
+     "dearer_here": 336,
+     "median_diff_pct": -5.66
     },
     {
      "store_id": "581",
      "store_name": "Am-pm-העצמאות",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1289,
-     "cheaper_here": 718,
-     "dearer_here": 370,
+     "matched": 1287,
+     "cheaper_here": 717,
+     "dearer_here": 369,
      "median_diff_pct": -5.66
     },
     {
@@ -128033,9 +128075,9 @@
      "store_name": "טשרניחובסקי כ\"ס",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1351,
-     "cheaper_here": 743,
-     "dearer_here": 388,
+     "matched": 1347,
+     "cheaper_here": 742,
+     "dearer_here": 387,
      "median_diff_pct": -5.26
     },
     {
@@ -128043,20 +128085,20 @@
      "store_name": "AM-PM קריית אונו",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1284,
-     "cheaper_here": 724,
+     "matched": 1283,
+     "cheaper_here": 722,
      "dearer_here": 364,
-     "median_diff_pct": -5.92
+     "median_diff_pct": -5.66
     },
     {
      "store_id": "591",
      "store_name": "מוריה חיפה AM-PM",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1305,
-     "cheaper_here": 729,
-     "dearer_here": 377,
-     "median_diff_pct": -5.92
+     "matched": 1299,
+     "cheaper_here": 724,
+     "dearer_here": 376,
+     "median_diff_pct": -5.62
     },
     {
      "store_id": "594",
@@ -128064,27 +128106,27 @@
      "format": "unknown",
      "affinity": 0.2,
      "matched": 1347,
-     "cheaper_here": 755,
-     "dearer_here": 381,
-     "median_diff_pct": -5.66
+     "cheaper_here": 754,
+     "dearer_here": 382,
+     "median_diff_pct": -5.59
     },
     {
      "store_id": "595",
      "store_name": "AM-PMזבוטינסקי בת ים",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1369,
-     "cheaper_here": 762,
+     "matched": 1368,
+     "cheaper_here": 760,
      "dearer_here": 392,
-     "median_diff_pct": -5.29
+     "median_diff_pct": -5.26
     },
     {
      "store_id": "596",
      "store_name": "AM-PM אילנות חיפה",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1343,
-     "cheaper_here": 741,
+     "matched": 1344,
+     "cheaper_here": 743,
      "dearer_here": 394,
      "median_diff_pct": -5.29
     },
@@ -128093,8 +128135,8 @@
      "store_name": "AM-PM נרקיסים",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1354,
-     "cheaper_here": 694,
+     "matched": 1356,
+     "cheaper_here": 695,
      "dearer_here": 448,
      "median_diff_pct": -3.34
     },
@@ -128103,9 +128145,9 @@
      "store_name": "AM-PM טירת הכרמל",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1347,
+     "matched": 1345,
      "cheaper_here": 753,
-     "dearer_here": 386,
+     "dearer_here": 384,
      "median_diff_pct": -5.29
     },
     {
@@ -128113,9 +128155,9 @@
      "store_name": "יסעור",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1143,
-     "cheaper_here": 844,
-     "dearer_here": 176,
+     "matched": 1144,
+     "cheaper_here": 846,
+     "dearer_here": 175,
      "median_diff_pct": -14.35
     },
     {
@@ -128123,8 +128165,8 @@
      "store_name": "בית קשת",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 631,
-     "cheaper_here": 516,
+     "matched": 632,
+     "cheaper_here": 517,
      "dearer_here": 55,
      "median_diff_pct": -18.35
     },
@@ -128133,9 +128175,9 @@
      "store_name": "להבות חביבה",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1197,
+     "matched": 1196,
      "cheaper_here": 895,
-     "dearer_here": 186,
+     "dearer_here": 185,
      "median_diff_pct": -14.35
     },
     {
@@ -128143,19 +128185,19 @@
      "store_name": "גשר הזיו",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1202,
-     "cheaper_here": 869,
+     "matched": 1203,
+     "cheaper_here": 870,
      "dearer_here": 199,
-     "median_diff_pct": -12.86
+     "median_diff_pct": -12.75
     },
     {
      "store_id": "649",
      "store_name": "עינת -ב מרכולית",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 666,
+     "matched": 669,
      "cheaper_here": 158,
-     "dearer_here": 392,
+     "dearer_here": 393,
      "median_diff_pct": 6.71
     },
     {
@@ -128173,8 +128215,8 @@
      "store_name": "אורים",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 863,
-     "cheaper_here": 690,
+     "matched": 864,
+     "cheaper_here": 691,
      "dearer_here": 91,
      "median_diff_pct": -16.95
     },
@@ -128183,8 +128225,8 @@
      "store_name": "בית השיטה מיני סופר",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1202,
-     "cheaper_here": 902,
+     "matched": 1200,
+     "cheaper_here": 900,
      "dearer_here": 172,
      "median_diff_pct": -14.35
     },
@@ -128193,8 +128235,8 @@
      "store_name": "כפר-עזה",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 856,
-     "cheaper_here": 684,
+     "matched": 858,
+     "cheaper_here": 686,
      "dearer_here": 90,
      "median_diff_pct": -17.72
     },
@@ -128203,8 +128245,8 @@
      "store_name": "להב",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 774,
-     "cheaper_here": 632,
+     "matched": 775,
+     "cheaper_here": 633,
      "dearer_here": 71,
      "median_diff_pct": -17.75
     },
@@ -128213,9 +128255,9 @@
      "store_name": "משמר השרון",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1706,
+     "matched": 1704,
      "cheaper_here": 431,
-     "dearer_here": 1009,
+     "dearer_here": 1007,
      "median_diff_pct": 6.71
     },
     {
@@ -128223,9 +128265,9 @@
      "store_name": "עין שמר",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1753,
-     "cheaper_here": 440,
-     "dearer_here": 1034,
+     "matched": 1749,
+     "cheaper_here": 439,
+     "dearer_here": 1032,
      "median_diff_pct": 7.19
     },
     {
@@ -128233,28 +128275,28 @@
      "store_name": "עינת",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1584,
-     "cheaper_here": 404,
-     "dearer_here": 936,
-     "median_diff_pct": 7.15
+     "matched": 1578,
+     "cheaper_here": 405,
+     "dearer_here": 929,
+     "median_diff_pct": 6.71
     },
     {
      "store_id": "658",
      "store_name": "צומת הגומא",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 837,
+     "matched": 836,
      "cheaper_here": 662,
      "dearer_here": 89,
-     "median_diff_pct": -17.16
+     "median_diff_pct": -17.41
     },
     {
      "store_id": "661",
      "store_name": "גבעת עוז",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 791,
-     "cheaper_here": 650,
+     "matched": 792,
+     "cheaper_here": 651,
      "dearer_here": 65,
      "median_diff_pct": -17.75
     },
@@ -128263,9 +128305,9 @@
      "store_name": "עינת מ.ס",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 792,
-     "cheaper_here": 647,
-     "dearer_here": 70,
+     "matched": 786,
+     "cheaper_here": 643,
+     "dearer_here": 69,
      "median_diff_pct": -17.72
     },
     {
@@ -128273,9 +128315,9 @@
      "store_name": "עין שמר משלוחים",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1368,
-     "cheaper_here": 335,
-     "dearer_here": 833,
+     "matched": 1375,
+     "cheaper_here": 336,
+     "dearer_here": 837,
      "median_diff_pct": 7.75
     },
     {
@@ -128283,9 +128325,9 @@
      "store_name": "כפר הנשיא",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1121,
+     "matched": 1123,
      "cheaper_here": 274,
-     "dearer_here": 660,
+     "dearer_here": 662,
      "median_diff_pct": 6.71
     },
     {
@@ -128293,8 +128335,8 @@
      "store_name": "בית יהושוע",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 895,
-     "cheaper_here": 235,
+     "matched": 896,
+     "cheaper_here": 236,
      "dearer_here": 530,
      "median_diff_pct": 7.27
     },
@@ -128303,10 +128345,10 @@
      "store_name": "דגניה א",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 947,
-     "cheaper_here": 225,
+     "matched": 948,
+     "cheaper_here": 226,
      "dearer_here": 569,
-     "median_diff_pct": 7.72
+     "median_diff_pct": 7.67
     },
     {
      "store_id": "709",
@@ -128333,9 +128375,9 @@
      "store_name": "מעוז חיים",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 959,
-     "cheaper_here": 221,
-     "dearer_here": 579,
+     "matched": 955,
+     "cheaper_here": 220,
+     "dearer_here": 577,
      "median_diff_pct": 7.72
     },
     {
@@ -128343,19 +128385,19 @@
      "store_name": "שדי חמד-מושב",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1109,
-     "cheaper_here": 283,
-     "dearer_here": 668,
-     "median_diff_pct": 7.61
+     "matched": 1110,
+     "cheaper_here": 285,
+     "dearer_here": 667,
+     "median_diff_pct": 7.6
     },
     {
      "store_id": "717",
      "store_name": "לכיש",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1080,
-     "cheaper_here": 264,
-     "dearer_here": 651,
+     "matched": 1088,
+     "cheaper_here": 267,
+     "dearer_here": 655,
      "median_diff_pct": 7.19
     },
     {
@@ -128363,9 +128405,9 @@
      "store_name": "אחיטוב",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1217,
-     "cheaper_here": 304,
-     "dearer_here": 727,
+     "matched": 1219,
+     "cheaper_here": 305,
+     "dearer_here": 728,
      "median_diff_pct": 6.71
     },
     {
@@ -128373,19 +128415,19 @@
      "store_name": "מכמורת",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1171,
-     "cheaper_here": 299,
-     "dearer_here": 696,
-     "median_diff_pct": 6.93
+     "matched": 1175,
+     "cheaper_here": 300,
+     "dearer_here": 699,
+     "median_diff_pct": 7.15
     },
     {
      "store_id": "722",
      "store_name": "ישרש",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1168,
+     "matched": 1170,
      "cheaper_here": 286,
-     "dearer_here": 698,
+     "dearer_here": 700,
      "median_diff_pct": 6.71
     },
     {
@@ -128403,9 +128445,9 @@
      "store_name": "נהלל",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1238,
-     "cheaper_here": 323,
-     "dearer_here": 722,
+     "matched": 1241,
+     "cheaper_here": 325,
+     "dearer_here": 723,
      "median_diff_pct": 6.71
     },
     {
@@ -128423,8 +128465,8 @@
      "store_name": "נורדיה",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1214,
-     "cheaper_here": 308,
+     "matched": 1216,
+     "cheaper_here": 310,
      "dearer_here": 725,
      "median_diff_pct": 6.71
     },
@@ -128433,9 +128475,9 @@
      "store_name": "גבע כרמל",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1088,
-     "cheaper_here": 294,
-     "dearer_here": 644,
+     "matched": 1092,
+     "cheaper_here": 295,
+     "dearer_here": 646,
      "median_diff_pct": 6.71
     },
     {
@@ -128453,9 +128495,9 @@
      "store_name": "דוכן גן שמואל",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1666,
+     "matched": 1664,
      "cheaper_here": 407,
-     "dearer_here": 1009,
+     "dearer_here": 1008,
      "median_diff_pct": 7.75
     },
     {
@@ -128463,18 +128505,18 @@
      "store_name": "דוכן גן שמואל משלוחי",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1215,
-     "cheaper_here": 289,
-     "dearer_here": 759,
-     "median_diff_pct": 8.11
+     "matched": 1216,
+     "cheaper_here": 287,
+     "dearer_here": 761,
+     "median_diff_pct": 8.13
     },
     {
      "store_id": "801",
      "store_name": "הרכבים ירושלים",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 557,
-     "cheaper_here": 453,
+     "matched": 560,
+     "cheaper_here": 455,
      "dearer_here": 45,
      "median_diff_pct": -17.75
     },
@@ -128483,7 +128525,7 @@
      "store_name": "האון -תפעול",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 972,
+     "matched": 971,
      "cheaper_here": 757,
      "dearer_here": 113,
      "median_diff_pct": -16.81
@@ -128503,8 +128545,8 @@
      "store_name": "בני דרור",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 549,
-     "cheaper_here": 442,
+     "matched": 550,
+     "cheaper_here": 443,
      "dearer_here": 55,
      "median_diff_pct": -17.75
     },
@@ -128513,9 +128555,9 @@
      "store_name": "מצפה רמון",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 763,
-     "cheaper_here": 619,
-     "dearer_here": 72,
+     "matched": 759,
+     "cheaper_here": 616,
+     "dearer_here": 71,
      "median_diff_pct": -17.75
     },
     {
@@ -128523,9 +128565,9 @@
      "store_name": "ד\"ש פ\"ת",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 995,
+     "matched": 994,
      "cheaper_here": 783,
-     "dearer_here": 108,
+     "dearer_here": 107,
      "median_diff_pct": -16.81
     },
     {
@@ -128533,8 +128575,8 @@
      "store_name": "צוקים",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 735,
-     "cheaper_here": 603,
+     "matched": 737,
+     "cheaper_here": 605,
      "dearer_here": 56,
      "median_diff_pct": -17.75
     },
@@ -128543,8 +128585,8 @@
      "store_name": "עוקף קריות",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 865,
-     "cheaper_here": 703,
+     "matched": 866,
+     "cheaper_here": 704,
      "dearer_here": 73,
      "median_diff_pct": -17.72
     },
@@ -128553,8 +128595,8 @@
      "store_name": "שערי הצפון",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 647,
-     "cheaper_here": 527,
+     "matched": 648,
+     "cheaper_here": 528,
      "dearer_here": 55,
      "median_diff_pct": -17.75
     },
@@ -128563,9 +128605,9 @@
      "store_name": "דוכן צמח",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1504,
-     "cheaper_here": 376,
-     "dearer_here": 891,
+     "matched": 1502,
+     "cheaper_here": 375,
+     "dearer_here": 890,
      "median_diff_pct": 7.14
     },
     {
@@ -128574,7 +128616,7 @@
      "format": "unknown",
      "affinity": 0.2,
      "matched": 699,
-     "cheaper_here": 573,
+     "cheaper_here": 574,
      "dearer_here": 56,
      "median_diff_pct": -17.75
     },
@@ -128584,7 +128626,7 @@
      "format": "unknown",
      "affinity": 0.2,
      "matched": 721,
-     "cheaper_here": 572,
+     "cheaper_here": 573,
      "dearer_here": 75,
      "median_diff_pct": -17.75
     },
@@ -128603,7 +128645,7 @@
      "store_name": "עמיעד",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 943,
+     "matched": 944,
      "cheaper_here": 762,
      "dearer_here": 87,
      "median_diff_pct": -17.72
@@ -128613,18 +128655,18 @@
      "store_name": "אביב דרך נמיר",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 829,
-     "cheaper_here": 667,
+     "matched": 830,
+     "cheaper_here": 668,
      "dearer_here": 81,
-     "median_diff_pct": -17.16
+     "median_diff_pct": -17.26
     },
     {
      "store_id": "852",
      "store_name": "יזרעאל",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 841,
-     "cheaper_here": 677,
+     "matched": 839,
+     "cheaper_here": 675,
      "dearer_here": 78,
      "median_diff_pct": -17.72
     },
@@ -128633,7 +128675,7 @@
      "store_name": "חריש",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 906,
+     "matched": 905,
      "cheaper_here": 727,
      "dearer_here": 90,
      "median_diff_pct": -16.81
@@ -128663,10 +128705,10 @@
      "store_name": "יקנעם",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 809,
-     "cheaper_here": 673,
+     "matched": 812,
+     "cheaper_here": 676,
      "dearer_here": 61,
-     "median_diff_pct": -18.33
+     "median_diff_pct": -18.31
     },
     {
      "store_id": "871",
@@ -128683,10 +128725,10 @@
      "store_name": "מחסייה",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 309,
-     "cheaper_here": 274,
-     "dearer_here": 15,
-     "median_diff_pct": -20.13
+     "matched": 331,
+     "cheaper_here": 290,
+     "dearer_here": 18,
+     "median_diff_pct": -19.77
     },
     {
      "store_id": "901",
@@ -128703,8 +128745,8 @@
      "store_name": "נגבה",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 676,
-     "cheaper_here": 563,
+     "matched": 677,
+     "cheaper_here": 564,
      "dearer_here": 54,
      "median_diff_pct": -18.35
     },
@@ -128713,8 +128755,8 @@
      "store_name": "גן יבנה",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 806,
-     "cheaper_here": 635,
+     "matched": 804,
+     "cheaper_here": 633,
      "dearer_here": 84,
      "median_diff_pct": -16.95
     },
@@ -128733,9 +128775,9 @@
      "store_name": "גבים",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 739,
+     "matched": 738,
      "cheaper_here": 604,
-     "dearer_here": 59,
+     "dearer_here": 58,
      "median_diff_pct": -17.75
     },
     {
@@ -128743,9 +128785,9 @@
      "store_name": "נתב\"ג",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 999,
-     "cheaper_here": 799,
-     "dearer_here": 103,
+     "matched": 1002,
+     "cheaper_here": 801,
+     "dearer_here": 104,
      "median_diff_pct": -16.81
     },
     {
@@ -128753,8 +128795,8 @@
      "store_name": "נס ציונה",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 535,
-     "cheaper_here": 439,
+     "matched": 536,
+     "cheaper_here": 440,
      "dearer_here": 47,
      "median_diff_pct": -18.35
     },
@@ -128763,9 +128805,9 @@
      "store_name": "עין איילה צ.עופר",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 896,
+     "matched": 895,
      "cheaper_here": 702,
-     "dearer_here": 95,
+     "dearer_here": 94,
      "median_diff_pct": -16.95
     },
     {
@@ -128773,7 +128815,7 @@
      "store_name": "עין כרמל",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 947,
+     "matched": 948,
      "cheaper_here": 742,
      "dearer_here": 103,
      "median_diff_pct": -16.81
@@ -128793,9 +128835,9 @@
      "store_name": "צפת",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 713,
+     "matched": 712,
      "cheaper_here": 568,
-     "dearer_here": 64,
+     "dearer_here": 63,
      "median_diff_pct": -17.72
     },
     {
@@ -128803,8 +128845,8 @@
      "store_name": "חוקוק",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 856,
-     "cheaper_here": 686,
+     "matched": 857,
+     "cheaper_here": 687,
      "dearer_here": 82,
      "median_diff_pct": -16.95
     },
@@ -128813,18 +128855,18 @@
      "store_name": "בית דגן",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 875,
-     "cheaper_here": 690,
+     "matched": 872,
+     "cheaper_here": 687,
      "dearer_here": 95,
-     "median_diff_pct": -16.95
+     "median_diff_pct": -17.16
     },
     {
      "store_id": "921",
      "store_name": "הזורע",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 855,
-     "cheaper_here": 681,
+     "matched": 854,
+     "cheaper_here": 680,
      "dearer_here": 88,
      "median_diff_pct": -17.72
     },
@@ -128833,8 +128875,8 @@
      "store_name": "מענית",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 804,
-     "cheaper_here": 656,
+     "matched": 805,
+     "cheaper_here": 657,
      "dearer_here": 67,
      "median_diff_pct": -17.75
     },
@@ -128873,10 +128915,10 @@
      "store_name": "תדהר",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 892,
+     "matched": 891,
      "cheaper_here": 712,
-     "dearer_here": 86,
-     "median_diff_pct": -16.95
+     "dearer_here": 85,
+     "median_diff_pct": -17.05
     },
     {
      "store_id": "933",
@@ -128893,8 +128935,8 @@
      "store_name": "לטרון",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 945,
-     "cheaper_here": 761,
+     "matched": 948,
+     "cheaper_here": 763,
      "dearer_here": 87,
      "median_diff_pct": -16.95
     },
@@ -128913,8 +128955,8 @@
      "store_name": "נען מערב",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 912,
-     "cheaper_here": 727,
+     "matched": 913,
+     "cheaper_here": 728,
      "dearer_here": 88,
      "median_diff_pct": -16.95
     },
@@ -128924,7 +128966,7 @@
      "format": "unknown",
      "affinity": 0.2,
      "matched": 900,
-     "cheaper_here": 708,
+     "cheaper_here": 707,
      "dearer_here": 95,
      "median_diff_pct": -16.81
     },
@@ -128933,9 +128975,9 @@
      "store_name": "מגל מערב",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 923,
+     "matched": 924,
      "cheaper_here": 742,
-     "dearer_here": 82,
+     "dearer_here": 83,
      "median_diff_pct": -16.95
     },
     {
@@ -128943,9 +128985,9 @@
      "store_name": "מגל מזרח",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1030,
+     "matched": 1031,
      "cheaper_here": 827,
-     "dearer_here": 102,
+     "dearer_here": 103,
      "median_diff_pct": -16.81
     },
     {
@@ -128953,9 +128995,9 @@
      "store_name": "ערד",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 844,
-     "cheaper_here": 684,
-     "dearer_here": 78,
+     "matched": 841,
+     "cheaper_here": 683,
+     "dearer_here": 76,
      "median_diff_pct": -17.75
     },
     {
@@ -128963,8 +129005,8 @@
      "store_name": "מתנ\"ח יבנה",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1141,
-     "cheaper_here": 843,
+     "matched": 1139,
+     "cheaper_here": 841,
      "dearer_here": 179,
      "median_diff_pct": -14.35
     },
@@ -128973,8 +129015,8 @@
      "store_name": "כפר טרומן",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 813,
-     "cheaper_here": 664,
+     "matched": 811,
+     "cheaper_here": 662,
      "dearer_here": 69,
      "median_diff_pct": -17.75
     },
@@ -128983,8 +129025,8 @@
      "store_name": "יקום",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 1020,
-     "cheaper_here": 808,
+     "matched": 1019,
+     "cheaper_here": 807,
      "dearer_here": 101,
      "median_diff_pct": -16.81
     },
@@ -128993,8 +129035,8 @@
      "store_name": "כפר סבא",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 708,
-     "cheaper_here": 572,
+     "matched": 706,
+     "cheaper_here": 571,
      "dearer_here": 65,
      "median_diff_pct": -17.72
     },
@@ -129003,9 +129045,9 @@
      "store_name": "עכו",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 835,
-     "cheaper_here": 675,
-     "dearer_here": 75,
+     "matched": 836,
+     "cheaper_here": 676,
+     "dearer_here": 76,
      "median_diff_pct": -17.72
     },
     {
@@ -129013,19 +129055,19 @@
      "store_name": "טל שחר",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 943,
-     "cheaper_here": 747,
+     "matched": 942,
+     "cheaper_here": 746,
      "dearer_here": 94,
-     "median_diff_pct": -17.47
+     "median_diff_pct": -17.59
     },
     {
      "store_id": "968",
      "store_name": "חדרה מזרח",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 686,
-     "cheaper_here": 558,
-     "dearer_here": 61,
+     "matched": 689,
+     "cheaper_here": 560,
+     "dearer_here": 62,
      "median_diff_pct": -17.75
     },
     {
@@ -129033,9 +129075,9 @@
      "store_name": "אילות",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 865,
-     "cheaper_here": 512,
-     "dearer_here": 329,
+     "matched": 863,
+     "cheaper_here": 511,
+     "dearer_here": 328,
      "median_diff_pct": -3.26
     },
     {
@@ -129053,8 +129095,8 @@
      "store_name": "נוה ירק",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 808,
-     "cheaper_here": 653,
+     "matched": 811,
+     "cheaper_here": 656,
      "dearer_here": 77,
      "median_diff_pct": -17.75
     },
@@ -129063,9 +129105,9 @@
      "store_name": "תל מונד",
      "format": "unknown",
      "affinity": 0.2,
-     "matched": 811,
+     "matched": 812,
      "cheaper_here": 632,
-     "dearer_here": 86,
+     "dearer_here": 87,
      "median_diff_pct": -16.95
     },
     {
@@ -129083,9 +129125,9 @@
      "store_name": "Victory | Rosh Ha'ayin Shabazi",
      "format": "supermarket",
      "affinity": 0.1,
-     "matched": 242,
-     "cheaper_here": 96,
-     "dearer_here": 104,
+     "matched": 249,
+     "cheaper_here": 97,
+     "dearer_here": 108,
      "median_diff_pct": 0.0
     },
     {
@@ -129093,10 +129135,10 @@
      "store_name": "Shufersal | Rosh Ha’ayin",
      "format": "supermarket",
      "affinity": 0.1,
-     "matched": 276,
-     "cheaper_here": 164,
-     "dearer_here": 76,
-     "median_diff_pct": -8.6
+     "matched": 283,
+     "cheaper_here": 169,
+     "dearer_here": 77,
+     "median_diff_pct": -8.86
     },
     {
      "store_id": "6576d161608e6c09be0c0e54",
@@ -129104,7 +129146,7 @@
      "format": "supermarket",
      "affinity": 0.1,
      "matched": 351,
-     "cheaper_here": 57,
+     "cheaper_here": 58,
      "dearer_here": 265,
      "median_diff_pct": 15.83
     },
@@ -129113,7 +129155,7 @@
      "store_name": "Victory | Rosh Ha'ayin Park Afek",
      "format": "supermarket",
      "affinity": 0.1,
-     "matched": 236,
+     "matched": 235,
      "cheaper_here": 90,
      "dearer_here": 110,
      "median_diff_pct": 0.0
@@ -131406,7 +131448,7 @@
     "attention_pct": 100.0,
     "cost_floor_pct": 10.0,
     "format_allowance_pct": 7.5123,
-    "format_allowance_basis_count": 428,
+    "format_allowance_basis_count": 436,
     "freshness_days": 14,
     "comparability_floor": 0.3
    }
@@ -131423,7 +131465,7 @@
     "attention_pct": 100.0,
     "cost_floor_pct": 10.0,
     "format_allowance_pct": 7.5123,
-    "format_allowance_basis_count": 428,
+    "format_allowance_basis_count": 436,
     "freshness_days": 14,
     "comparability_floor": 0.3
    }
@@ -131440,7 +131482,7 @@
     "attention_pct": 100.0,
     "cost_floor_pct": 10.0,
     "format_allowance_pct": 7.5123,
-    "format_allowance_basis_count": 428,
+    "format_allowance_basis_count": 436,
     "freshness_days": 14,
     "comparability_floor": 0.3
    }
@@ -131457,13 +131499,13 @@
     "attention_pct": 100.0,
     "cost_floor_pct": 10.0,
     "format_allowance_pct": 7.5123,
-    "format_allowance_basis_count": 428,
+    "format_allowance_basis_count": 436,
     "freshness_days": 14,
     "comparability_floor": 0.3
    }
   },
   "competitor_position.no_comparison": {
-   "value": 5898,
+   "value": 5896,
    "unit": "products",
    "inputs": [
     "pos",
@@ -131474,13 +131516,13 @@
     "attention_pct": 100.0,
     "cost_floor_pct": 10.0,
     "format_allowance_pct": 7.5123,
-    "format_allowance_basis_count": 428,
+    "format_allowance_basis_count": 436,
     "freshness_days": 14,
     "comparability_floor": 0.3
    }
   },
   "competitor_position.evaluated": {
-   "value": 863,
+   "value": 865,
    "unit": "products",
    "inputs": [
     "pos",
@@ -131491,7 +131533,7 @@
     "attention_pct": 100.0,
     "cost_floor_pct": 10.0,
     "format_allowance_pct": 7.5123,
-    "format_allowance_basis_count": 428,
+    "format_allowance_basis_count": 436,
     "freshness_days": 14,
     "comparability_floor": 0.3
    }
@@ -131508,7 +131550,7 @@
     "attention_pct": 100.0,
     "cost_floor_pct": 10.0,
     "format_allowance_pct": 7.5123,
-    "format_allowance_basis_count": 428,
+    "format_allowance_basis_count": 436,
     "freshness_days": 14,
     "comparability_floor": 0.3
    }
@@ -131525,7 +131567,7 @@
     "attention_pct": 100.0,
     "cost_floor_pct": 10.0,
     "format_allowance_pct": 7.5123,
-    "format_allowance_basis_count": 428,
+    "format_allowance_basis_count": 436,
     "freshness_days": 14,
     "comparability_floor": 0.3
    }
@@ -131542,7 +131584,7 @@
     "attention_pct": 100.0,
     "cost_floor_pct": 10.0,
     "format_allowance_pct": 7.5123,
-    "format_allowance_basis_count": 428,
+    "format_allowance_basis_count": 436,
     "freshness_days": 14,
     "comparability_floor": 0.3
    }
@@ -131559,7 +131601,7 @@
     "attention_pct": 100.0,
     "cost_floor_pct": 10.0,
     "format_allowance_pct": 7.5123,
-    "format_allowance_basis_count": 428,
+    "format_allowance_basis_count": 436,
     "freshness_days": 14,
     "comparability_floor": 0.3
    }
@@ -131576,13 +131618,13 @@
     "attention_pct": 100.0,
     "cost_floor_pct": 10.0,
     "format_allowance_pct": 7.5123,
-    "format_allowance_basis_count": 428,
+    "format_allowance_basis_count": 436,
     "freshness_days": 14,
     "comparability_floor": 0.3
    }
   },
   "competitor_position.stale_skipped": {
-   "value": 967,
+   "value": 978,
    "unit": "products",
    "inputs": [
     "pos",
@@ -131593,7 +131635,7 @@
     "attention_pct": 100.0,
     "cost_floor_pct": 10.0,
     "format_allowance_pct": 7.5123,
-    "format_allowance_basis_count": 428,
+    "format_allowance_basis_count": 436,
     "freshness_days": 14,
     "comparability_floor": 0.3
    }
@@ -131605,7 +131647,7 @@
     "competitor"
    ],
    "thresholds": {
-    "basis_count": 428
+    "basis_count": 436
    }
   },
   "margin_below_cost.below_cost": {
@@ -131711,7 +131753,7 @@
     "competitor"
    ],
    "thresholds": {
-    "snapshot_date": "2026-09-17"
+    "snapshot_date": "2026-09-18"
    }
   },
   "provenance.owner_state_available": {
@@ -131721,7 +131763,7 @@
     "owner_state"
    ],
    "thresholds": {
-    "pulled_at": "2026-09-17T02:59:57.517432+00:00"
+    "pulled_at": "2026-09-18T02:48:42.635019+00:00"
    }
   }
  }
