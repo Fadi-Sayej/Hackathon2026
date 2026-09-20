@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-19T02:48:23.006534+00:00",
-  "date": "2026-09-19",
+  "generatedAt": "2026-09-20T02:53:08.146970+00:00",
+  "date": "2026-09-20",
   "status": "ok",
   "sources": {
     "weather": "open-meteo",
@@ -9,21 +9,27 @@
     "islamic": "computed_hijri"
   },
   "weather": {
-    "temperatureC": 20.9,
+    "temperatureC": 19.8,
     "precipitation": 0.0,
-    "windSpeed": 5.2,
-    "weatherCode": 2,
-    "label": "warm",
-    "observedAt": "2026-09-19T05:45",
+    "windSpeed": 7.8,
+    "weatherCode": 1,
+    "label": "mild",
+    "observedAt": "2026-09-20T05:45",
     "lat": 32.114,
     "lon": 34.976,
     "source": "open-meteo"
   },
   "hebrew": {
-    "date": "2026-09-19",
-    "holidays": [],
-    "isErevChag": false,
-    "isFastDay": false,
+    "date": "2026-09-20",
+    "holidays": [
+      {
+        "title": "Erev Yom Kippur",
+        "hebrew": "ערב יום כיפור",
+        "category": "holiday"
+      }
+    ],
+    "isErevChag": true,
+    "isFastDay": true,
     "isShabbatEve": false,
     "chametz": null,
     "pesachStart": "2027-04-22",
@@ -35,11 +41,11 @@
     "source": "hebcal"
   },
   "islamic": {
-    "date": "2026-09-19",
+    "date": "2026-09-20",
     "hijri": {
       "year": 1448,
       "month": 4,
-      "day": 6
+      "day": 7
     },
     "isRamadan": false,
     "ramadanDay": null,
@@ -47,8 +53,8 @@
     "isEidAlFitr": false,
     "isEidAlAdha": false,
     "ramadanStart": "2027-02-08",
-    "daysToRamadan": 142,
-    "daysToEidAlFitr": 172,
+    "daysToRamadan": 141,
+    "daysToEidAlFitr": 171,
     "phase": null,
     "windows": {
       "ramadan_build_up_days": 21,
@@ -110,6 +116,7 @@
       "18000701223",
       "18000703494",
       "18000766413",
+      "25675120037",
       "25675120068",
       "27000001127",
       "27000867044",
@@ -2417,7 +2424,7 @@
       "9780201321029",
       "9800800056"
     ],
-    "days": 40,
+    "days": 41,
     "status": "ok",
     "lift": 1.15
   }
