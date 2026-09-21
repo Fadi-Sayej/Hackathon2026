@@ -39,7 +39,13 @@ export default defineConfig({
    * source if you are iterating locally — preview serves dist/, not src/.
    */
   webServer: {
-    command: 'npm run build && npx vite preview --port 5173 --strictPort',
+    // `--mode e2e` loads .env.e2e, which blanks the three keys isFirebaseConfigured()
+    // gates on and points VITE_STORE_ID at a sandbox. Without it, Vite loads the repo
+    // root's .env — the documented developer setup — and every test context mints an
+    // ADR-021 device id and writes it to the PILOT'S live Firestore, while AC-105 records
+    // a real `acted` outcome against a real entry id. Measured 2026-09-21: 29 registered
+    // devices, 25 of them inside six minutes of one suite run.
+    command: 'npx vite build --mode e2e && npx vite preview --port 5173 --strictPort',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
