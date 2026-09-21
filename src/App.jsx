@@ -248,7 +248,14 @@ export default function App() {
       return (
         <OperationalPage
           operationalData={artefactToOperational(artefact)}
-          actions={ownerState.outcomes || {}}
+          // `decisions`, not `actions`. OperationalPage destructures `decisions = {}` and has
+          // no `actions` prop, so this arrived as nothing and `mergeDecisions` seeded from an
+          // empty object every time. An entry the owner settled on the daily surface still
+          // showed as open here — which is precisely what commit 2d1f63a claimed could not
+          // happen: "the two surfaces write through the same path, so they cannot disagree
+          // about what the owner has already dealt with". True of the writes. The reads were
+          // never wired, and no test caught it because both sides are exercised separately.
+          decisions={ownerState.outcomes || {}}
           onDecide={onDecide}
         />
       )
