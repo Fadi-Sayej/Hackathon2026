@@ -12,7 +12,7 @@ import { loadCatalogue } from './lib/dataAdapters/loadCatalogue.js'
 import { catalogueToProducts } from './lib/dataAdapters/catalogueToProducts.js'
 import { analyzeProducts } from './lib/analytics/inventoryEngine.js'
 import { ProductsPage } from './pages/ProductsPage.jsx'
-import { loadOwnerState, recordOutcome } from './owner/ownerState.js'
+import { clearOutcome, loadOwnerState, recordOutcome } from './owner/ownerState.js'
 import { DailyPage } from './surface/DailyPage.jsx'
 import { OperationalPage } from './pages/OperationalPage.jsx'
 import { DataPage } from './pages/DataPage.jsx'
@@ -154,6 +154,14 @@ export default function App() {
     refreshOwnerState()
   }, [refreshOwnerState])
 
+  // Taking an outcome back. Needed because "Later" sends no date and an outcome with no
+  // `deferred_until` is deferred forever, so the gentlest-sounding button on the surface
+  // was the destructive one (OQ-604, #139).
+  const onUndoOutcome = useCallback(async (entryId) => {
+    await clearOutcome(entryId)
+    refreshOwnerState()
+  }, [refreshOwnerState])
+
   // Every artefact entry by its id, so a decision made on a restored page can be recorded
   // with the `signal_family` ADR-016 requires — `entry_id` is a hash with no inverse, so an
   // outcome written without it loses the only durable grouping key F13 will have.
@@ -236,7 +244,8 @@ export default function App() {
     // replaced by them: removing it was a consequence of the restore, not a request.
     if (activePage === 'daily') {
       return (
-        <DailyPage artefact={artefact} ownerState={ownerState} onOutcome={onOutcome} now={now} />
+        <DailyPage artefact={artefact} ownerState={ownerState} onOutcome={onOutcome}
+          onUndoOutcome={onUndoOutcome} now={now} />
       )
     }
 
