@@ -42,6 +42,15 @@ import { dirProps } from '../lib/utils/rtl.js'
  *                the blocker. Publishing a catalogue would make this page render, and that is
  *                precisely why it must not — a screen that looks finished on an undecided rule
  *                is rule 8 one level up: a plausible answer where there is no honest one.
+ *   `competitor` the comparison is COMPUTED and then not published. The 2026-09-21 run
+ *                matched 2,618 products against 164 shops and published 6 of them as
+ *                entries; `counts.matched` says so in the artefact. PriceGapPage needs a
+ *                price per product and the artefact carries findings, so the page has
+ *                nothing to read. Distinct from `catalogue` on purpose: the catalogue now
+ *                EXISTS, and leaving Prices on it would have been the stale-reason failure
+ *                this file exists to avoid. Worth knowing what the old page did with that
+ *                gap — it imported `src/data/marketData.js`, 553 KB frozen on 2026-08-09,
+ *                and showed "2,767 prices, median age 124 days" as though it were today's.
  *   `withdrawn`  removed on purpose, not pending. Design §20.1 marks the LLM layer REMOVE;
  *                D-12 forbids a runtime server for one store, and no document ever stated what
  *                the generated report should claim or how it would be checked.
