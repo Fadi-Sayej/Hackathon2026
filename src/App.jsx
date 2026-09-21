@@ -40,7 +40,13 @@ const AWAITING = {
   orders: 'demand',
   'store-layout': 'demand',
   'shelf-plan': 'demand',
-  prices: 'catalogue',
+  // NOT 'catalogue' — the catalogue is published and this page still cannot render, which
+  // is exactly the stale-reason failure this codebase keeps hitting. PriceGapPage reads
+  // `competitor.cheapestCompetitorPrice` per product. Last night's run matched 2,618
+  // products against 164 shops and published 6 of them as entries: the comparisons are
+  // COMPUTED and then not published. The blocker is an engine publishing decision, not a
+  // missing input and not the catalogue.
+  prices: 'competitor',
   products: 'catalogue',
   dashboard: 'catalogue',
   // Not 'catalogue'. A catalogue would let these two RENDER, and that is the trap: both
