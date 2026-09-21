@@ -27,7 +27,7 @@ export const en = {
   'awaiting.withdrawn.when': "It is not scheduled. Everything it used to summarise is on the daily screen, where each finding names its own evidence.",
   'awaiting.competitor.title': "Waiting for competitor prices to be published",
   'awaiting.competitor.what': "This screen compares your shelf price against what nearby shops charge for the same product.",
-  'awaiting.competitor.why': "The comparison already exists. Last night's run matched 2,618 of your products to prices from 164 shops — but only the 6 that broke a pricing rule reach your browser. The other comparisons are computed and then not published, so this page has nothing to read. The previous version filled that gap from a file frozen on 9 August and showed “2,767 prices, median age 124 days” as though it were today's.",
+  'awaiting.competitor.why': "The comparison partly exists. Last night's run matched 2,618 of your products to prices from 164 shops, but only 860 could actually be compared — the rest had no cost price, or the competitor's price was too old to trust. Of those 860, the 6 that broke a pricing rule reach your browser and the other 854 do not: the file publishes findings, not comparisons. The previous version of this screen filled the gap from a file frozen on 9 August and showed “2,767 prices, median age 124 days” as though it were today's.",
   'awaiting.competitor.when': "It opens when the nightly publishes the matched prices beside the findings. That is work on the engine, not missing data.",
   'days.unknown': "No sales data",
   'days.lessThanOne': "<1 day",
