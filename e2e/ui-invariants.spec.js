@@ -12,7 +12,6 @@ import { expect, test } from '@playwright/test'
  * disappearing ahead of the code it covered.
  */
 test.describe.configure({ mode: 'serial' })
-test.skip(true, 'pages removed from the nav at the cut-over; deleted with them in Phase 4')
 
 
 /**

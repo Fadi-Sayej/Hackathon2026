@@ -14,7 +14,6 @@ import { expect, test } from '@playwright/test'
  *
  * Deleted with the old page in Phase 4 Task 4.1.
  */
-test.skip(true, 'drives the pre-cut-over surface; replaced by npm run check:surface')
 
 
 /**
@@ -26,7 +25,14 @@ test.beforeEach(async ({ page }) => {
   await page.selectOption('.lang-switch-select', 'en')
 })
 
-test('Today is the landing screen and explains itself', async ({ page }) => {
+test('the old Today page explains itself', async ({ page }) => {
+  // No longer the LANDING screen: the V1 daily surface is, and the pilot's acceptance
+  // criteria are written against it. This page is the first of the twelve restored behind
+  // it. Selected by `data-nav` rather than by name because `page.daily.name` and
+  // `page.operational.name` are both the literal string 'Today' in English with the same
+  // hint — two nav items a reader cannot tell apart, which is a live question for the owner
+  // and not something a test should paper over by guessing at an index.
+  await page.locator('[data-nav="operational"]').click()
   await expect(page.locator('.topbar h1')).toHaveText("Today's tasks")
   await expect(page.locator('.topbar .page-description')).toContainText('money at stake')
 })
@@ -55,7 +61,19 @@ test('searching the action list filters it', async ({ page }) => {
   await expect(page.getByText('Nothing matches that search')).toBeVisible()
 })
 
-test('prices, gaps and products all render their tables', async ({ page }) => {
+// Prices and Products are on their `catalogue` awaiting state: `dashboard.json` publishes
+// findings, not a product list.
+//
+// ADR-024 was accepted and #129 merged on 2026-09-17, so the nightly (cron `0 0 * * *`)
+// writes the first `public/data/catalogue.json` on 2026-09-18. These return when the pages
+// are routed at it.
+//
+// Phrased as a DATE, not as a condition — and that is not pedantry, it is this file's own
+// argument applied to itself. The first version of this comment said "until ADR-024 is
+// accepted and the nightly writes one", and ADR-024 was accepted within a day of it being
+// written. A reason that names an open condition sends the next reader looking for something
+// that already happened, which is precisely how the cut-over skip this replaced went stale.
+test.skip('prices, gaps and products all render their tables', async ({ page }) => {
   for (const [name, marker] of [
     ['Prices', 'Price comparison'],
     ['Products', 'Inventory table'],
@@ -66,7 +84,9 @@ test('prices, gaps and products all render their tables', async ({ page }) => {
   }
 })
 
-test('product names stay in Hebrew whatever the interface language', async ({ page }) => {
+// Same blocker: the Products table has no rows to put a Hebrew name in until the catalogue
+// is published. The invariant itself is untouched and this returns with it.
+test.skip('product names stay in Hebrew whatever the interface language', async ({ page }) => {
   await page.locator('.nav-item', { hasText: 'Products' }).click()
   const table = page.locator('table').first()
   await expect(table).toBeVisible()
