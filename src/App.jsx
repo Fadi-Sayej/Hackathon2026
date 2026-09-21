@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 // The daily surface's own rules. Task 2.7 shipped its class names and no stylesheet.
 import './surface/surface.css'
@@ -8,6 +8,10 @@ import './surface/pages.css'
 import { AppShell } from './components/layout/AppShell.jsx'
 import { loadDashboard } from './lib/dataAdapters/loadDashboard.js'
 import { artefactToOperational } from './lib/dataAdapters/artefactToOperational.js'
+import { loadCatalogue } from './lib/dataAdapters/loadCatalogue.js'
+import { catalogueToProducts } from './lib/dataAdapters/catalogueToProducts.js'
+import { analyzeProducts } from './lib/analytics/inventoryEngine.js'
+import { ProductsPage } from './pages/ProductsPage.jsx'
 import { loadOwnerState, recordOutcome } from './owner/ownerState.js'
 import { DailyPage } from './surface/DailyPage.jsx'
 import { OperationalPage } from './pages/OperationalPage.jsx'
@@ -28,6 +32,9 @@ import { useI18n } from './lib/i18n/index.js'
  * synthesised from a monthly mean (rule 5). Rebuilding it to fill these screens would put
  * that invented figure back. So they come back present and empty rather than confident.
  */
+/** Pages that fetch `catalogue.json`. Everything else never pays for it. */
+const NEEDS_CATALOGUE = new Set(['products'])
+
 const AWAITING = {
   recommendations: 'demand',
   orders: 'demand',
@@ -81,6 +88,46 @@ export default function App() {
     loadDashboard().then((next) => { if (live) setLoad(next) })
     return () => { live = false }
   }, [])
+
+  /**
+   * The catalogue, fetched only by the pages that need it and only once.
+   *
+   * 7,523 products is 1.73 MB raw. The daily surface — the screen the owner opens every
+   * morning — needs none of it, and `vercel.json` used to serve `/data/*` with `no-store`,
+   * which would have made that a fresh download on every page view. So this is deliberately
+   * NOT fetched beside the artefact: `status: 'idle'` until someone opens a page that lists
+   * products (ADR-024).
+   */
+  const [catalogue, setCatalogue] = useState({ status: 'idle', catalogue: null, reason: null })
+  // A ref, not the status, because the status is what the effect SETS. Guarding on
+  // `catalogue.status !== 'idle'` with it in the dependency list made the effect re-run the
+  // instant it set 'loading', and the first run's cleanup then discarded the fetch that was
+  // already in flight — the page sat on "Reading today's numbers…" forever. The ref is not
+  // state the render reads, so setting it starts nothing.
+  const catalogueRequested = useRef(false)
+
+  useEffect(() => {
+    if (!NEEDS_CATALOGUE.has(activePage) || catalogueRequested.current) return
+    catalogueRequested.current = true
+    setCatalogue({ status: 'loading', catalogue: null, reason: null })
+    // Deliberately not cancelled on cleanup. App is the root and never unmounts, so the only
+    // thing a cancel could do here is drop a result we asked for and never ask again.
+    loadCatalogue().then(setCatalogue)
+  }, [activePage])
+
+  /**
+   * Catalogue rows through the real analytics engine, memoised because it is 7,523 of them.
+   *
+   * `analyzeProducts` gates every velocity-derived verdict behind `hasVelocity`, and the
+   * catalogue carries no sales fields at all, so each product reports `daysUntilStockout:
+   * null` and a `noVelocityData` status rather than a confident "Healthy". What it DOES
+   * compute is margin, which needs no velocity and has both prices — so the page is useful
+   * and honest at the same time, which was the open question before it was measured.
+   */
+  const analyzedProducts = useMemo(() => {
+    const rows = catalogueToProducts(catalogue.catalogue)
+    return rows ? analyzeProducts(rows, {}) : null
+  }, [catalogue.catalogue])
 
   const refreshOwnerState = useCallback(() => setOwnerState({ ...loadOwnerState() }), [])
 
@@ -194,6 +241,17 @@ export default function App() {
     }
     if (activePage === 'data-source') {
       return <DataPage artefact={artefact} />
+    }
+
+    // Products, now that the catalogue exists. Falls back to the awaiting state rather than
+    // to an empty table whenever the file is not readable — an empty product list is a claim
+    // that the shop has no products, and `loadCatalogue` keeps that apart from a failed load.
+    if (activePage === 'products') {
+      if (analyzedProducts) return <ProductsPage analyzedProducts={analyzedProducts} />
+      if (catalogue.status === 'loading' || catalogue.status === 'idle') {
+        return <p className="spine__loading">{t('spine.loading')}</p>
+      }
+      return <PageAwaitingData pageId={activePage} needs="catalogue" />
     }
     if (AWAITING[activePage]) {
       return <PageAwaitingData pageId={activePage} needs={AWAITING[activePage]} />

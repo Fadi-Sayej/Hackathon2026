@@ -234,6 +234,7 @@ export const en = {
   'prod.emptyTitle': 'No matching products',
   'prod.emptyDesc': 'No products match the current search and category filter. Clear the search or choose another category.',
   'prod.status': 'Status',
+  'prod.showingCapped': "Showing the first {shown} of {total}. Search, or pick a department, to narrow it.",
   'ord.preferredSupplier': 'Preferred supplier',
   'ord.csv.supplier': 'Supplier',
   'ord.csv.product': 'Product',
