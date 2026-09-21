@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-20T02:53:08.146970+00:00",
-  "date": "2026-09-20",
+  "generatedAt": "2026-09-21T02:53:31.241211+00:00",
+  "date": "2026-09-21",
   "status": "ok",
   "sources": {
     "weather": "open-meteo",
@@ -9,26 +9,26 @@
     "islamic": "computed_hijri"
   },
   "weather": {
-    "temperatureC": 19.8,
+    "temperatureC": 19.4,
     "precipitation": 0.0,
-    "windSpeed": 7.8,
-    "weatherCode": 1,
+    "windSpeed": 7.9,
+    "weatherCode": 2,
     "label": "mild",
-    "observedAt": "2026-09-20T05:45",
+    "observedAt": "2026-09-21T05:45",
     "lat": 32.114,
     "lon": 34.976,
     "source": "open-meteo"
   },
   "hebrew": {
-    "date": "2026-09-20",
+    "date": "2026-09-21",
     "holidays": [
       {
-        "title": "Erev Yom Kippur",
-        "hebrew": "ערב יום כיפור",
+        "title": "Yom Kippur",
+        "hebrew": "יום כיפור",
         "category": "holiday"
       }
     ],
-    "isErevChag": true,
+    "isErevChag": false,
     "isFastDay": true,
     "isShabbatEve": false,
     "chametz": null,
@@ -41,11 +41,11 @@
     "source": "hebcal"
   },
   "islamic": {
-    "date": "2026-09-20",
+    "date": "2026-09-21",
     "hijri": {
       "year": 1448,
       "month": 4,
-      "day": 7
+      "day": 8
     },
     "isRamadan": false,
     "ramadanDay": null,
@@ -53,8 +53,8 @@
     "isEidAlFitr": false,
     "isEidAlAdha": false,
     "ramadanStart": "2027-02-08",
-    "daysToRamadan": 141,
-    "daysToEidAlFitr": 171,
+    "daysToRamadan": 140,
+    "daysToEidAlFitr": 170,
     "phase": null,
     "windows": {
       "ramadan_build_up_days": 21,
@@ -1552,6 +1552,7 @@
       "7290110117795",
       "7290110117801",
       "7290110117818",
+      "7290110117832",
       "7290110117849",
       "7290110117856",
       "7290110117863",
@@ -1959,6 +1960,7 @@
       "7290117860045",
       "7290117860090",
       "7290117860144",
+      "7290117860946",
       "7290117907597",
       "7290117907658",
       "7290117907665",
@@ -2424,7 +2426,7 @@
       "9780201321029",
       "9800800056"
     ],
-    "days": 41,
+    "days": 42,
     "status": "ok",
     "lift": 1.15
   }
