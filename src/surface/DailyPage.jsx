@@ -22,9 +22,17 @@ import { EntryCard } from './EntryCard.jsx'
  * why compose takes it as a parameter — a deferral that lapses must do so because time
  * passed in the app's state, not because a component happened to re-render.
  */
-export function DailyPage({ artefact, ownerState, onOutcome, now }) {
+export function DailyPage({ artefact, ownerState, onOutcome, onUndoOutcome, now }) {
   const { t } = useI18n()
   const [error, setError] = useState(null)
+  // The last entry settled on this screen, so it can be taken back.
+  //
+  // "Later" is the reason this exists. It sends no date, and an outcome with no
+  // `deferred_until` is deferred forever (compose.js:26) — so a mistaken tap on the button
+  // that reads "Later" removed the entry permanently. OQ-604 predicted exactly that and is
+  // still open; how long "later" lasts is the PM's call. This decides nothing and stops the
+  // loss in the meantime. It covers Done and Dismiss too, at no extra cost.
+  const [lastSettled, setLastSettled] = useState(null)
 
   const { entries, unavailable, nothingToDo } = useMemo(
     () => compose(artefact, ownerState, { now }),
@@ -36,11 +44,24 @@ export function DailyPage({ artefact, ownerState, onOutcome, now }) {
       // §9.3: the entry leaves the surface only after the write succeeds. An outcome the
       // owner believes is recorded, which is not, is worse than an error.
       await onOutcome(entry, outcome)
+      setLastSettled({ id: entry.id, name: entry.product_name || entry.barcode || entry.id,
+        status: outcome?.status ?? null })
       setError(null)
     } catch (cause) {
       setError(cause?.message || t('outcome.failed'))
     }
   }, [onOutcome, t])
+
+  const handleUndo = useCallback(async () => {
+    if (!lastSettled || !onUndoOutcome) return
+    try {
+      await onUndoOutcome(lastSettled.id)
+      setLastSettled(null)
+      setError(null)
+    } catch (cause) {
+      setError(cause?.message || t('outcome.failed'))
+    }
+  }, [lastSettled, onUndoOutcome, t])
 
   // No heading inside this section. AppShell's topbar already renders
   // `page.daily.title`, and `daily.title` is the same string — the live page showed
@@ -51,6 +72,19 @@ export function DailyPage({ artefact, ownerState, onOutcome, now }) {
     <section className="daily" aria-label={t('daily.title')}>
 
       {error ? <p role="alert" className="daily__error">{t('outcome.failed')}</p> : null}
+
+      {lastSettled && onUndoOutcome ? (
+        /* `role="status"`, not `alert`: this is a confirmation with a way back, not a
+           problem. It names the product, because "Undo" alone is useless once the card it
+           referred to has gone from the list. */
+        <p className="daily__undo" role="status">
+          {t(`outcome.settled.${lastSettled.status || 'acted'}`, { name: lastSettled.name })}{' '}
+          <button type="button" className="daily__undo-button" data-undo={lastSettled.id}
+            onClick={handleUndo}>
+            {t('outcome.undo')}
+          </button>
+        </p>
+      ) : null}
 
       {unavailable.length > 0 ? (
         <ul className="daily__unavailable" aria-label={t('daily.unavailable')}>

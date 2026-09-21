@@ -172,6 +172,35 @@ export async function recordOutcome(entry, { status, reason = null, deferredUnti
   void writeThrough('outcomes', entry.id, next.outcomes[entry.id])
 }
 
+/**
+ * Take an outcome back. Returns false when there was nothing to take back.
+ *
+ * WHY THIS HAS TO EXIST
+ *   `EntryCard`'s "Later" sends `{ status: 'deferred' }` with no date, `recordOutcome`
+ *   writes `deferred_until` only when it is non-null, and `compose` reads a missing
+ *   `deferred_until` as deferred indefinitely. So the button labelled "Later" hid the entry
+ *   for good. F6-S1 saw it coming — OQ-604, verbatim: "nothing defines its duration. Without
+ *   it, deferral is indistinguishable from permanent dismissal."
+ *
+ *   How long "later" means is a product decision (OQ-604) and is not taken here. Making the
+ *   press recoverable takes no decision at all, and it is the difference between a mistake
+ *   that costs a tap and one that costs the entry.
+ *
+ * The remote write is a `null` tombstone rather than a field delete: `writeThrough` merges a
+ * single field, and nothing reads outcomes back from Firestore today (see #134), so a null
+ * is both the cheapest correct thing and honest about what happened.
+ */
+export async function clearOutcome(entryId) {
+  if (!entryId) throw new Error('clearOutcome: entryId is required')
+  const state = loadOwnerState()
+  if (!state.outcomes?.[entryId]) return false
+  const outcomes = { ...state.outcomes }
+  delete outcomes[entryId]
+  writeState({ ...state, outcomes, meta: { ...state.meta, updated_at: Date.now() } })
+  void writeThrough('outcomes', entryId, null)
+  return true
+}
+
 export async function recordAnswer(barcode, { value, status = ANSWER_STATUS.ANSWERED } = {}) {
   if (!barcode) throw new Error('recordAnswer: barcode is required')
   const num = Number(value)

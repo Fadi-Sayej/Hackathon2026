@@ -222,6 +222,45 @@ test.describe('recording an outcome', () => {
     expect(outcome.snapshot.signal_family).toBeTruthy()
   })
 
+  test('a mistaken Later can be taken back, and the entry returns', async ({ page }) => {
+    // "Later" sends no date. `recordOutcome` writes `deferred_until` only when it is
+    // non-null and `compose` treats a missing one as deferred indefinitely, so the gentlest
+    // button on the surface is the destructive one. How long "later" should last is OQ-604
+    // and still open; this proves the press is recoverable in the meantime.
+    await openDailySurface(page)
+
+    const first = page.locator('.entry-card').first()
+    const id = await first.getAttribute('data-entry-id')
+    expect(id).toBeTruthy()
+
+    await first.getByRole('button', { name: 'Later' }).click()
+    await expect(page.locator(`[data-entry-id="${id}"]`)).toHaveCount(0)
+
+    // The deferral really was written, and really was dateless — this is the defect, not a
+    // rendering quirk, and asserting it here keeps the reason for the Undo visible.
+    const deferred = await page.evaluate(
+      (entryId) => JSON.parse(localStorage.getItem('smartshelf.ownerState.v2')).outcomes[entryId],
+      id,
+    )
+    expect(deferred).toMatchObject({ status: 'deferred' })
+    expect(deferred.deferred_until).toBeUndefined()
+
+    await page.locator(`[data-undo="${id}"]`).click()
+    await expect(page.locator(`[data-entry-id="${id}"]`)).toBeVisible()
+
+    // And it is gone from the store, not merely re-rendered — otherwise the next reload
+    // would hide it again.
+    const cleared = await page.evaluate(
+      (entryId) => JSON.parse(localStorage.getItem('smartshelf.ownerState.v2')).outcomes[entryId],
+      id,
+    )
+    expect(cleared).toBeUndefined()
+
+    await page.reload()
+    await expect(page.locator('.spine__loading')).toHaveCount(0, { timeout: 30_000 })
+    await expect(page.locator(`[data-entry-id="${id}"]`)).toBeVisible()
+  })
+
   test('deferring an entry replaces it rather than leaving a gap', async ({ page }) => {
     const { bound, candidates } = await openDailySurface(page)
     test.skip(candidates <= bound, 'no spare candidate to refill the vacated place')
