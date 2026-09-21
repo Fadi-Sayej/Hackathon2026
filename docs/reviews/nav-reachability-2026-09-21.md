@@ -77,6 +77,24 @@ unrouted. Its 71 entries — 34 below cost, 37 thin margin — leave the product
 page is removed as things stand. This is the strongest single argument against the narrow fix
 the question proposed.
 
+## Corroborated independently by F2's validation
+
+[F2-validation](F2-validation.md) (`Updated: 2026-09-16`, merged 2026-09-21) ran
+`compose(artefact, {outcomes:{}, answers:{}})` over the committed artefact for its usefulness
+pass and got **`{price_consistency: 7, reconciliation: 3}`** — the same ten places this review
+simulated, from a different author asking a different question.
+
+Two things follow from reading them together:
+
+- Its own §"usefulness" records reconciliation contributing **3 of 10 places** while hygiene
+  emits **1,117 records** and contributes none. That is this review's reachability problem
+  stated as a usefulness finding: the capability is not weak, it has nowhere to put its output.
+- Its line 110 — *"The artefact says **439**. The honest count is **355**"* — has since landed.
+  The 2026-09-21 artefact publishes **355**, so that prediction is now history rather than a
+  pending correction. Its AC-020/021/022 rows still cite 439 and are correct **for the artefact
+  they were written against**; a reader comparing them to today's file should not treat the
+  difference as drift.
+
 ## What the question asked, and why it is premature
 
 The two nav items collide **in English only**:
