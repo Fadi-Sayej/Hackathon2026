@@ -235,6 +235,7 @@ export const he = {
   'prod.emptyTitle': 'אין מוצרים תואמים',
   'prod.emptyDesc': 'אין מוצר שתואם את החיפוש והקטגוריה. נקה את החיפוש או בחר קטגוריה אחרת.',
   'prod.status': 'סטטוס',
+  'prod.showingCapped': "מוצגים {shown} הראשונים מתוך {total}. חפשו, או בחרו מחלקה, כדי לצמצם.",
   'ord.preferredSupplier': 'ספק מועדף',
   'ord.csv.supplier': 'ספק',
   'ord.csv.product': 'מוצר',

@@ -240,6 +240,7 @@ export const ar = {
   'prod.emptyTitle': 'لا منتجات مطابقة',
   'prod.emptyDesc': 'لا يوجد منتج يطابق البحث والفئة المختارة. امسح البحث أو اختر فئة أخرى.',
   'prod.status': 'الحالة',
+  'prod.showingCapped': "تظهر أول {shown} من {total}. ابحث، أو اختر قسماً، لتضييق القائمة.",
   'ord.preferredSupplier': 'المورّد المعتمد',
   'ord.csv.supplier': 'المورّد',
   'ord.csv.product': 'المنتج',
