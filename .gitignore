@@ -80,6 +80,9 @@ data/matching/
 data/recommendations/
 reports/
 .env*
+# …except the e2e mode file, which holds no secret and must travel with the repo:
+# without it every developer's e2e run writes to the pilot's live Firestore.
+!.env.e2e
 
 # ── B-6: POS snapshot durability (nagham.md B-6) ─────────────────────────────
 # Snapshots — data/internal/snapshots/<ts>/{products,inventory}.parquet + meta.json
