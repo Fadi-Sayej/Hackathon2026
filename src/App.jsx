@@ -42,10 +42,18 @@ const AWAITING = {
   'shelf-plan': 'demand',
   // NOT 'catalogue' — the catalogue is published and this page still cannot render, which
   // is exactly the stale-reason failure this codebase keeps hitting. PriceGapPage reads
-  // `competitor.cheapestCompetitorPrice` per product. Last night's run matched 2,618
-  // products against 164 shops and published 6 of them as entries: the comparisons are
-  // COMPUTED and then not published. The blocker is an engine publishing decision, not a
-  // missing input and not the catalogue.
+  // `competitor.cheapestCompetitorPrice` per product; the artefact publishes findings.
+  //
+  // The gap is 854, not 2,612, and the difference matters. Of 2,618 matched products only
+  // 860 were EVALUATED — competitor_position drops the rest before comparison for no cost
+  // price (40) or a stale competitor price (1,036), which is the engine correctly declining
+  // to compare rather than discarding work. Of those 860, six became entries. So 854
+  // comparisons exist and are not published, because there was no finding to hang them on.
+  //
+  // Store-level output already ships: `capabilities.competitor_position.position` is 164
+  // rows with matched / cheaper_here / dearer_here / median_diff_pct, in today's artefact.
+  //
+  // A publishing decision on the engine side, not a missing input and not the catalogue.
   prices: 'competitor',
   products: 'catalogue',
   dashboard: 'catalogue',
