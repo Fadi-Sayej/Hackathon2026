@@ -84,9 +84,11 @@ test.skip('prices, gaps and products all render their tables', async ({ page }) 
   }
 })
 
-// Same blocker: the Products table has no rows to put a Hebrew name in until the catalogue
-// is published. The invariant itself is untouched and this returns with it.
-test.skip('product names stay in Hebrew whatever the interface language', async ({ page }) => {
+// Returned 2026-09-21, when the nightly published the first catalogue.json and Products was
+// routed at it. This is the invariant it was skipped to protect: the manager searches the
+// shelf and the invoice in Hebrew, so a translated product name breaks the only link to the
+// physical item. It now runs against 7,523 real rows.
+test('product names stay in Hebrew whatever the interface language', async ({ page }) => {
   await page.locator('.nav-item', { hasText: 'Products' }).click()
   const table = page.locator('table').first()
   await expect(table).toBeVisible()

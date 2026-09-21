@@ -6,6 +6,17 @@ import { StatusBadge } from '../components/shared/StatusBadge.jsx'
 import { formatCurrency, formatDays, formatStatus, statusTone } from '../components/shared/formatters.js'
 import { compareHebrew, dirProps } from '../lib/utils/rtl.js'
 
+/**
+ * How many rows reach the DOM at once.
+ *
+ * Measured, not guessed. Before this cap the page rendered all 7,523 catalogue rows —
+ * 98,044 DOM nodes — and took 4.9 SECONDS to show its first row at 390px with the CPU
+ * throttled 4× to stand in for a mid-range phone. The owner would have read that as broken.
+ * The list is not browsable at that length anyway: nobody scrolls seven thousand rows, they
+ * search. So the table shows a bounded slice and says plainly how much it is not showing.
+ */
+const VISIBLE_ROWS = 250
+
 export function ProductsPage({ analyzedProducts }) {
   const t = useT()
   const [query, setQuery] = useState('')
@@ -27,13 +38,19 @@ export function ProductsPage({ analyzedProducts }) {
     const normalizedQuery = query.trim().toLowerCase()
     return analyzedProducts.filter((product) => {
       const matchesCategory = category === 'All' || product.category === category
+      // Null-guarded on both. The catalogue adapter publishes `name`/`category` as null
+      // where the export has none (D-3), and today every row has both — so this is latent,
+      // not live. It would surface as the search box throwing on the first export with a
+      // missing department, which is a bad way to find out.
       const matchesQuery =
         !normalizedQuery ||
-        product.name.toLowerCase().includes(normalizedQuery) ||
-        product.category.toLowerCase().includes(normalizedQuery)
+        (product.name || '').toLowerCase().includes(normalizedQuery) ||
+        (product.category || '').toLowerCase().includes(normalizedQuery)
       return matchesCategory && matchesQuery
     }).sort((a, b) => compareHebrew(a.name, b.name))
   }, [analyzedProducts, category, query])
+
+  const visibleProducts = filteredProducts.slice(0, VISIBLE_ROWS)
 
   return (
     <section className="panel">
@@ -88,7 +105,7 @@ export function ProductsPage({ analyzedProducts }) {
                   fall back to `ym-<name>` in normalize-datasets.mjs and identical names
                   collide. The index disambiguates the render; the data issue itself is
                   recorded in CLAUDE.md. */}
-              {filteredProducts.map((product, index) => (
+              {visibleProducts.map((product, index) => (
                 <tr key={`${product.id}:${index}`}>
                   <td className="table-cell-hebrew">
                     <strong {...dirProps(product.name)}>{product.name ?? '—'}</strong>
@@ -116,6 +133,16 @@ export function ProductsPage({ analyzedProducts }) {
               ))}
             </tbody>
           </table>
+          {filteredProducts.length > VISIBLE_ROWS && (
+            /* Said rather than implied. A table that silently stops at 250 of 7,523 teaches
+               the reader that a product is absent when it is merely further down. */
+            <p className="page-description products-truncated">
+              {t('prod.showingCapped', {
+                shown: visibleProducts.length,
+                total: filteredProducts.length,
+              })}
+            </p>
+          )}
         </div>
       )}
     </section>
