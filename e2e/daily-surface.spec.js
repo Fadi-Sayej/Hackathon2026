@@ -223,10 +223,12 @@ test.describe('recording an outcome', () => {
   })
 
   test('a mistaken Later can be taken back, and the entry returns', async ({ page }) => {
-    // "Later" sends no date. `recordOutcome` writes `deferred_until` only when it is
-    // non-null and `compose` treats a missing one as deferred indefinitely, so the gentlest
-    // button on the surface is the destructive one. How long "later" should last is OQ-604
-    // and still open; this proves the press is recoverable in the meantime.
+    // Undo exists because "Later" used to send no date: `recordOutcome` writes
+    // `deferred_until` only when it is non-null and `compose` treats a missing one as
+    // deferred indefinitely, so the gentlest button on the surface was the destructive one.
+    // #139 fixed that — the surface now supplies the next local day boundary — and Undo is
+    // still worth having for a mistaken press. How long "later" should last beyond the day
+    // remains OQ-604.
     await openDailySurface(page)
 
     const first = page.locator('.entry-card').first()
@@ -236,14 +238,17 @@ test.describe('recording an outcome', () => {
     await first.getByRole('button', { name: 'Later' }).click()
     await expect(page.locator(`[data-entry-id="${id}"]`)).toHaveCount(0)
 
-    // The deferral really was written, and really was dateless — this is the defect, not a
-    // rendering quirk, and asserting it here keeps the reason for the Undo visible.
+    // The deferral really was written, and really does carry a date (#139). This assertion
+    // read `toBeUndefined()` until that landed: the test's subject is Undo, and it had
+    // incidentally pinned the defect as expected behaviour — which is why the fix showed up
+    // here as a failure rather than in a test about deferral.
     const deferred = await page.evaluate(
       (entryId) => JSON.parse(localStorage.getItem('smartshelf.ownerState.v2')).outcomes[entryId],
       id,
     )
     expect(deferred).toMatchObject({ status: 'deferred' })
-    expect(deferred.deferred_until).toBeUndefined()
+    expect(Number.isFinite(deferred.deferred_until)).toBe(true)
+    expect(deferred.deferred_until).toBeGreaterThan(Date.now())
 
     await page.locator(`[data-undo="${id}"]`).click()
     await expect(page.locator(`[data-entry-id="${id}"]`)).toBeVisible()
