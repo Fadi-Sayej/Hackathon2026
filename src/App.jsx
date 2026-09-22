@@ -270,7 +270,9 @@ export default function App() {
       )
     }
     if (activePage === 'data-source') {
-      return <DataPage artefact={artefact} />
+      return (
+        <DataPage artefact={artefact} ownerState={ownerState} onRestore={onUndoOutcome} now={now} />
+      )
     }
 
     // Products, now that the catalogue exists. Falls back to the awaiting state rather than
