@@ -107,6 +107,7 @@ ADR-001 … ADR-022 and ADR-024 are `Accepted`. ADR-023 is `Ready for review`. A
 | [System Design → Implementation readiness](reviews/system-design-readiness.md) | CONDITIONAL PASS (run 3, 2026-09-13) — 0 blockers, **1 MAJOR open** (ARCH-GATE-003). GATE-002 and GATE-004 closed against the built artefact |
 | [Documentation structure migration](reviews/documentation-structure-migration.md) | see report |
 | [F2 — stock reconciliation and hygiene](reviews/F2-validation.md) | conformance PASS (10/10) · fidelity PASS · usefulness 3 of 10 daily places; 2 findings |
+| [Nav reachability 2026-09-21](reviews/nav-reachability-2026-09-21.md) | **OPEN** — `CapabilityPage` is unrouted, so FR-102/C-51/AC-110 are discharged by nothing and **1,638 of 3,380 published findings are reachable from no screen**. Wants an ADR on §20.1 versus the restore |
 | [Nightly incident 2026-09-13](reviews/nightly-2026-09-13-incident.md) | FIXED — the nightly published the owner's artefact and never committed it; all 6 findings closed |
 
 ## Implementation
