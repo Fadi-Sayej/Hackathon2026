@@ -103,3 +103,51 @@ export function compose(artefact, ownerState, { now } = {}) {
 function amount(entry) {
   return entry?.value && Number.isFinite(entry.value.amount) ? entry.value.amount : -Infinity
 }
+
+/**
+ * Entries the owner deferred that are still hidden, oldest first.
+ *
+ * SEPARATE FROM `compose` ON PURPOSE
+ *   AC-101 locks `compose`'s return to exactly `entries`, `unavailable` and `nothingToDo`,
+ *   and FR-101 is the reason: "the bound exists to make the day's work finishable;
+ *   displaying the remainder restores the firehose the bound removes." Adding a hidden-count
+ *   to that object is the shape that rule forbids, and a test asserts the key set to stop it.
+ *
+ *   FR-102 says where this belongs instead: "The owner MUST be able to reach the full set of
+ *   entries for a capability deliberately, ON A SURFACE OTHER THAN THIS ONE." So this is a
+ *   function the data page calls, not a field the daily surface renders.
+ *
+ * WHY IT IS NEEDED AT ALL
+ *   Before #142 "Later" sent no date, and `isSettled` reads a missing `deferred_until` as
+ *   deferred indefinitely — one tap hid an entry for good. #142 added an Undo for the tap
+ *   that just happened; it does nothing for records already written.
+ *
+ *   And the repair cannot be done server-side: `loadOwnerState` reads localStorage,
+ *   `remoteOwnerState` exports only `writeThrough` and `pushAll` and never reads back, and
+ *   `pushAll` merges this device's copy UP on the next session — so a `deferred_until`
+ *   written straight to Firestore is both invisible here and overwritten on the next visit.
+ *   The way back has to run in the browser.
+ *
+ * Only deferrals. `acted` and `declined` are decisions about the thing itself; a deferral is
+ * a decision about WHEN, and these have no when.
+ */
+export function deferredEntries(artefact, ownerState, { now } = {}) {
+  const outcomes = ownerState?.outcomes || {}
+  const out = []
+  for (const [id, capability] of Object.entries(artefact?.capabilities || {})) {
+    if (capability?.status === 'unavailable' || NOT_ENTRIES.has(id)) continue
+    for (const entry of capability?.entries || []) {
+      const outcome = outcomes[entry.id]
+      if (outcome?.status !== 'deferred' || !isSettled(outcome, now)) continue
+      out.push({
+        entry,
+        capability: id,
+        at: Number.isFinite(outcome.at) ? outcome.at : null,
+        until: Number.isFinite(outcome.deferred_until) ? outcome.deferred_until : null,
+      })
+    }
+  }
+  // Oldest first: the one hidden longest is the likeliest mistake, and — for anything
+  // deferred before #142 — the one that has been invisible the longest.
+  return out.sort((a, b) => (a.at ?? 0) - (b.at ?? 0))
+}

@@ -1,6 +1,7 @@
 import { unavailableReason } from '../lib/i18n/unavailableReason.js'
 import { useI18n } from '../lib/i18n/index.js'
 import { dirProps } from '../lib/utils/rtl.js'
+import { deferredEntries } from '../surface/compose.js'
 
 /** Vintage sources a human wrote down, as opposed to the two the importer infers. */
 const DECLARED_VINTAGE = new Set(['declared', 'declared_sidecar'])
@@ -23,9 +24,27 @@ function Field({ id, label, children, empty }) {
   )
 }
 
-export function DataPage({ artefact }) {
+export function DataPage({ artefact, ownerState, onRestore, now }) {
   const { t } = useI18n()
   if (!artefact) return null
+
+  /**
+   * Entries the owner hid with "Later" and has not got back.
+   *
+   * It lives here rather than on the daily surface because FR-102 says so: "The owner MUST
+   * be able to reach the full set of entries for a capability deliberately, on a surface
+   * other than this one." Putting it on the daily surface would also collide with AC-101,
+   * which forbids a count of unshown entries there — FR-101's reason being that the ten-item
+   * bound exists to make the day finishable, and showing the remainder undoes it.
+   *
+   * Before #142 "Later" carried no date and `compose` reads a dateless deferral as
+   * indefinite, so one tap hid an entry permanently. #142 gave the surface an Undo for the
+   * tap just made; this is the way back for everything already hidden.
+   */
+  // `now` comes from App, which fixes it once per session. Reading the clock here would be
+  // an impure render — and would also mean a deferral could lapse mid-render, so the list
+  // shortened itself while the owner was looking at it.
+  const hidden = deferredEntries(artefact, ownerState, { now })
 
   const { vintages = {}, run = {}, capabilities = {} } = artefact
   const sales = vintages.sales || {}
@@ -116,6 +135,31 @@ export function DataPage({ artefact }) {
             : null}
         </Field>
       </dl>
+
+      {hidden.length > 0 && onRestore ? (
+        <section className="data__hidden" aria-label={t('data.hidden.title')}>
+          <h3>{t('data.hidden.title')}</h3>
+          <p className="data__hidden-why">{t('data.hidden.why')}</p>
+          <ul className="data__hidden-list">
+            {hidden.map(({ entry, at }) => (
+              <li key={entry.id} data-hidden-entry={entry.id}>
+                <span className="data__hidden-name" {...dirProps(entry.product_name)}>
+                  {entry.product_name || entry.barcode || entry.id}
+                </span>
+                {/* The date it was hidden, because "Restore" with no context asks the owner
+                    to remember a tap he may have made a fortnight ago. */}
+                <span className="data__hidden-when">
+                  {at ? new Date(at).toLocaleDateString() : t('data.none')}
+                </span>
+                <button type="button" className="data__hidden-restore"
+                  data-restore={entry.id} onClick={() => onRestore(entry.id)}>
+                  {t('data.hidden.restore')}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <ul className="data__capabilities">
         {Object.entries(capabilities).map(([id, capability]) => (
