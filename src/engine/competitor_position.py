@@ -104,6 +104,17 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
               "stale_skipped": len(stale_only)}
     entries: list[Entry] = []
     position: dict = {}
+    # FR-102's problem in this capability's own terms (#137). Six findings reach the owner
+    # from 860 evaluated products; the other 854 were compared against a live reference and
+    # found acceptably priced, and that comparison was computed and dropped. A page that
+    # answers "what is this product's position" needs the comparison, not the finding.
+    #
+    # Every MATCHED product gets a row, and a row carries either the comparison or the
+    # reason there is none. Publishing only the evaluated ones would make the page say
+    # nothing for a product skipped as stale — indistinguishable, to the owner, from "no
+    # competitor sells this". That is rule 8 and D-3: when a number cannot be stated, say so,
+    # do not fall silent. Measured, the two options differ by 1 KB gzipped.
+    comparison: list = []
 
     for p in inputs.products:
         b = p["barcode"]
@@ -136,15 +147,36 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
         sup = [o for o in obs if o["store_format"] in SUPERMARKET_FORMATS]
         reference = balanced_reference(min((o["price"] for o in same), default=None),
                                        min((o["price"] for o in sup), default=None), allowance_pct)
+        seen_at = max((o.get("observed_at") or "") for o in obs)[:10] or None
+        # Barcode and figures only. `product_name` and `department` are in catalogue.json
+        # (ADR-024) against the same barcode, and a page showing this needs that file
+        # anyway — carrying them here too costs 41 KB gzipped for a second copy of the
+        # truth, which is what §20.1 deleted src/data/*.js for. Measured both ways.
+        row = {"barcode": b, "shelf_price": p["shelf_price"], "stores": len(obs),
+               "observed_at": seen_at, "reference": None, "premium_pct": None,
+               "uncompared_reason": None}
         if reference is None or not p["shelf_price"]:
             counts["no_comparison"] += 1
+            # Which of the two it was, because they are different facts to a reader: no
+            # comparable price at all, versus a product of ours with no shelf price to compare.
+            row["uncompared_reason"] = "no_shelf_price" if not p["shelf_price"] else "no_reference"
+            comparison.append(row)
             continue
         if p["cost_price"] is None:
             counts["no_cost_skipped"] += 1                          # FR-043d: no judgement without a cost
+            # The reference IS known here; only the judgement is withheld. Publishing it
+            # lets the page show his position without claiming the policy verdict.
+            row["reference"] = reference
+            row["premium_pct"] = round((p["shelf_price"] / reference["value"] - 1.0) * 100.0, 2)
+            row["uncompared_reason"] = "no_cost"
+            comparison.append(row)
             continue
         counts["evaluated"] += 1
 
         premium_pct = (p["shelf_price"] / reference["value"] - 1.0) * 100.0
+        row["reference"] = reference
+        row["premium_pct"] = round(premium_pct, 2)
+        comparison.append(row)
         sources = [{"store_id": o["store_id"], "store_name": o["store_name"], "format": o["store_format"],
                     "price": o["price"], "observed_at": o["observed_at"],
                     "role": "comparable" if o["affinity"] >= floor else "context"} for o in obs]
@@ -189,5 +221,8 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
                           {"basis_count": allowance_n}))
     out = CapabilityOutput(id=CAP, spec=SPEC, status="available", thresholds=thresholds, counts=counts,
                            entries=entries, figures=figures, notes=notes)
-    out.extras = {"position": sorted(position.values(), key=lambda r: (-r["affinity"], r["store_id"]))}
+    out.extras = {"position": sorted(position.values(), key=lambda r: (-r["affinity"], r["store_id"])),
+                  # Sorted by barcode for the reason ADR-024 sorts the catalogue: the nightly
+                  # commits this file, so the bytes must repeat when the data does.
+                  "comparison": sorted(comparison, key=lambda r: str(r["barcode"] or ""))}
     return out

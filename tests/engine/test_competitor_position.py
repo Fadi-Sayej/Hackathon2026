@@ -166,3 +166,94 @@ def test_the_same_price_from_a_comparable_store_does_produce_one():
 
     assert out.counts["evaluated"] == 1
     assert [e.characterisation for e in out.entries] == ["policy_breach_attention"]
+
+
+# ── The comparison behind the findings (#137) ────────────────────────────────
+#
+# Six findings reach the owner from 860 evaluated products. The other 854 were compared
+# against a live reference and found acceptably priced, and that comparison was computed and
+# dropped at the publish boundary. A page answering "what is this product's position" needs
+# the comparison, not the finding — which is why PriceGapPage sat on an awaiting state.
+#
+# Every MATCHED product gets a row. A row carries either the comparison or the reason there
+# is none; never silence. Publishing only the evaluated ones would make the page say nothing
+# for a product skipped as stale, which the owner reads as "no competitor sells this" —
+# rule 8 and D-3, one layer out.
+
+def test_every_matched_product_gets_a_row():
+    prods = [product("prod_0001", shelf=10.0, cost=4.0), product("prod_0002", shelf=12.0, cost=5.0)]
+    obs = [observation("prod_0001", 9.0, "dor-alon-kq-01", **FORECOURT, observed_at=FRESH),
+           observation("prod_0002", 11.0, "dor-alon-kq-01", **FORECOURT, observed_at=FRESH)]
+    out = run(_inputs(prods, obs, [match(b, b, "dor-alon-kq-01") for b in ("prod_0001", "prod_0002")]))
+    assert len(out.extras["comparison"]) == out.counts["matched"] == 2
+
+
+def test_a_row_carries_either_a_comparison_or_a_reason_never_neither():
+    """The invariant the page depends on. A row with no premium and no reason is the silence
+    this exists to remove: the owner cannot tell 'priced fine' from 'we could not check'."""
+    codes = ("priced_01", "nocost_01", "noshelf_01")
+    prods = [product("priced_01", shelf=10.0, cost=4.0),
+             product("nocost_01", shelf=10.0, cost=None),
+             product("noshelf_01", shelf=None, cost=4.0)]
+    obs = [observation(b, 9.0, "dor-alon-kq-01", **FORECOURT, observed_at=FRESH) for b in codes]
+    out = run(_inputs(prods, obs, [match(b, b, "dor-alon-kq-01") for b in codes]))
+    assert len(out.extras["comparison"]) == 3
+    for row in out.extras["comparison"]:
+        assert (row["premium_pct"] is not None) or (row["uncompared_reason"] is not None), row
+
+
+def test_no_cost_still_publishes_the_position():
+    """FR-043d withholds the JUDGEMENT without a cost, not the comparison. The reference is
+    known; only the policy verdict is unsafe. Publishing it lets the page show where he
+    stands without claiming he is in breach."""
+    prods = [product("nocost_01", shelf=10.0, cost=None)]
+    obs = [observation("nocost_01", 8.0, "dor-alon-kq-01", **FORECOURT, observed_at=FRESH)]
+    out = run(_inputs(prods, obs, [match("nocost_01", "nocost_01", "dor-alon-kq-01")]))
+    row = out.extras["comparison"][0]
+    assert row["uncompared_reason"] == "no_cost"
+    assert row["reference"] is not None and row["premium_pct"] is not None
+    assert out.entries == []                       # and still no finding, which AC-051 requires
+
+
+def test_no_shelf_price_and_no_reference_are_different_facts():
+    """Both leave the product uncompared and they are not the same thing to a reader: one is
+    a gap in our own data, the other is that nobody comparable sells it."""
+    prods = [product("noshelf_01", shelf=None, cost=4.0)]
+    obs = [observation("noshelf_01", 9.0, "dor-alon-kq-01", **FORECOURT, observed_at=FRESH)]
+    out = run(_inputs(prods, obs, [match("noshelf_01", "noshelf_01", "dor-alon-kq-01")]))
+    assert out.extras["comparison"][0]["uncompared_reason"] == "no_shelf_price"
+
+
+def test_the_row_carries_no_product_name_or_department():
+    """catalogue.json (ADR-024) holds those against the same barcode, and a page rendering
+    this needs that file anyway. Measured: carrying them here too costs 39 KB gzipped for a
+    second copy of the truth — what §20.1 deleted src/data/*.js for."""
+    prods = [product("prod_0001", shelf=10.0, cost=4.0)]
+    obs = [observation("prod_0001", 9.0, "dor-alon-kq-01", **FORECOURT, observed_at=FRESH)]
+    out = run(_inputs(prods, obs, [match("prod_0001", "prod_0001", "dor-alon-kq-01")]))
+    assert set(out.extras["comparison"][0]) == {
+        "barcode", "shelf_price", "stores", "observed_at", "reference", "premium_pct",
+        "uncompared_reason"}
+
+
+def test_the_comparison_is_sorted_by_barcode():
+    """The nightly commits this file, so the bytes must repeat when the data does — ADR-024's
+    reasoning, and ADR-021's before it."""
+    codes = ("prod_0003", "prod_0001", "prod_0002")
+    prods = [product(b, shelf=10.0, cost=4.0) for b in codes]
+    obs = [observation(b, 9.0, "dor-alon-kq-01", **FORECOURT, observed_at=FRESH) for b in codes]
+    out = run(_inputs(prods, obs, [match(b, b, "dor-alon-kq-01") for b in codes]))
+    published = [r["barcode"] for r in out.extras["comparison"]]
+    assert published == sorted(published) == ["prod_0001", "prod_0002", "prod_0003"]
+
+
+def test_the_published_premium_matches_the_entry_it_produced():
+    """One number, one place. If the row and the finding could disagree, the page and the
+    daily surface would disagree about the same product — the failure credibility.js's own
+    header warns about."""
+    prods = [product("dearone1", shelf=100.0, cost=10.0)]
+    obs = [observation("dearone1", 50.0, "dor-alon-kq-01", **FORECOURT, observed_at=FRESH)]
+    out = run(_inputs(prods, obs, [match("dearone1", "dearone1", "dor-alon-kq-01")]))
+    entry = next(e for e in out.entries if e.barcode == "dearone1")
+    row = next(r for r in out.extras["comparison"] if r["barcode"] == "dearone1")
+    assert row["premium_pct"] == entry.evidence["premium_pct"]
