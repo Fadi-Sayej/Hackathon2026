@@ -46,6 +46,8 @@ const PAGES = [
   'expiry',
   'dashboard',
   'report',
+  'catalogue_lifecycle',
+  'competitor_position',
   'data-source',
 ]
 

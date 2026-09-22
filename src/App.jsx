@@ -16,6 +16,7 @@ import { clearOutcome, loadOwnerState, recordOutcome } from './owner/ownerState.
 import { DailyPage } from './surface/DailyPage.jsx'
 import { OperationalPage } from './pages/OperationalPage.jsx'
 import { DataPage } from './pages/DataPage.jsx'
+import { CapabilityPage } from './pages/CapabilityPage.jsx'
 import { PageAwaitingData } from './pages/PageAwaitingData.jsx'
 import { useI18n } from './lib/i18n/index.js'
 
@@ -268,6 +269,9 @@ export default function App() {
           onDecide={onDecide}
         />
       )
+    }
+    if (activePage === 'catalogue_lifecycle' || activePage === 'competitor_position') {
+      return <CapabilityPage artefact={artefact} capabilityId={activePage} />
     }
     if (activePage === 'data-source') {
       return (
