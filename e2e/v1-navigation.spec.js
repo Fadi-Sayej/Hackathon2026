@@ -48,6 +48,9 @@ const V1_PAGES = [
   'store-layout', 'shelf-plan',
   'products', 'expiry',
   'dashboard', 'report',
+  // The two capabilities whose entries were reachable from no screen at all until the
+  // CapabilityPage was routed: 1,632 catalogue_lifecycle and 6 competitor_position.
+  'catalogue_lifecycle', 'competitor_position',
   'data-source',
 ]
 

@@ -80,7 +80,7 @@ export const navGroups = [
   },
   {
     id: 'group.system',
-    items: [{ id: 'data-source' }],
+    items: [{ id: 'catalogue_lifecycle' }, { id: 'competitor_position' }, { id: 'data-source' }],
   },
 ]
 
