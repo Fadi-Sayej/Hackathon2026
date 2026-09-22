@@ -108,3 +108,28 @@ describe('AC-105 — recording an outcome', () => {
     expect(document.querySelectorAll('.entry-card')).toHaveLength(0)
   })
 })
+
+describe('#139 — pressing Later hands the store a date, not a permanent dismissal', () => {
+  it('the surface fills the boundary in, because the card decides nothing', async () => {
+    const onOutcome = render({ price_consistency: cap([entry()]) })
+    await userEvent.click(document.querySelector('[data-outcome="deferred"]'))
+
+    expect(onOutcome).toHaveBeenCalledTimes(1)
+    const [, outcome] = onOutcome.mock.calls[0]
+    expect(outcome.status).toBe('deferred')
+    // The regression: this was `undefined`, and compose reads that as deferred for ever.
+    expect(Number.isFinite(outcome.deferredUntil)).toBe(true)
+    expect(outcome.deferredUntil).toBeGreaterThan(NOW)
+  })
+
+  it('acted and declined are passed through untouched', async () => {
+    for (const which of ['acted', 'declined']) {
+      const onOutcome = render({ price_consistency: cap([entry()]) })
+      await userEvent.click(document.querySelector(`[data-outcome="${which}"]`))
+      const [, outcome] = onOutcome.mock.calls[0]
+      expect(outcome.status).toBe(which)
+      expect(outcome.deferredUntil).toBeUndefined()
+      cleanup()
+    }
+  })
+})

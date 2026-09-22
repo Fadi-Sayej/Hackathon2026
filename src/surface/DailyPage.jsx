@@ -3,6 +3,7 @@ import { unavailableReason } from '../lib/i18n/unavailableReason.js'
 import { useI18n } from '../lib/i18n/index.js'
 import { formatCurrency } from '../components/shared/formatters.js'
 import { compose } from './compose.js'
+import { settleOutcome } from './deferral.js'
 import { EntryCard } from './EntryCard.jsx'
 
 /**
@@ -43,14 +44,17 @@ export function DailyPage({ artefact, ownerState, onOutcome, onUndoOutcome, now 
     try {
       // §9.3: the entry leaves the surface only after the write succeeds. An outcome the
       // owner believes is recorded, which is not, is worse than an error.
-      await onOutcome(entry, outcome)
+      // "Later" arrives from the card without a date — the card reports which button was
+      // pressed and decides nothing. A dateless deferral is a permanent delete (#139), so
+      // the surface, which is the thing that has `now`, says how long it lasts.
+      await onOutcome(entry, settleOutcome(outcome, { now }))
       setLastSettled({ id: entry.id, name: entry.product_name || entry.barcode || entry.id,
         status: outcome?.status ?? null })
       setError(null)
     } catch (cause) {
       setError(cause?.message || t('outcome.failed'))
     }
-  }, [onOutcome, t])
+  }, [onOutcome, t, now])
 
   const handleUndo = useCallback(async () => {
     if (!lastSettled || !onUndoOutcome) return
