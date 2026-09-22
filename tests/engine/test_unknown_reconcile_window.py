@@ -360,3 +360,68 @@ def test_the_same_date_from_git_is_accepted():
         {"as_of": "2026-06-06", "as_of_source": "git_commit"})
 
     assert run(inputs).status == "available"
+
+
+def _load_with(tmp_path, as_of, as_of_source):
+    """Silver carrying a chosen vintage, loaded. test_inputs.py's `_dup_silver` hard-codes
+    `_as_of` and writes no `_as_of_source`, and the source is the axis these tests vary, so
+    this builds its own rather than widening a helper another file owns."""
+    from datetime import datetime, timezone
+    from src.engine.inputs import load_inputs
+    from src.engine.policy import load_policy
+    from src.owner_state.model import OwnerState
+
+    silver = tmp_path / "silver"
+    silver.mkdir(parents=True, exist_ok=True)
+    base = {"_source_file": "inv.csv", "_as_of": as_of, "_as_of_source": as_of_source}
+    row = {"barcode": "0012", "product_name": "מים", "category": "c",
+           "selling_price": 4.0, "wolt_price": 5.0, "cost_price": 1.0}
+    prod = [{**base, **row}]
+    inv = [{"barcode": row["barcode"], "product_name": row["product_name"],
+            "current_stock": 1.0, **base}]
+    pq.write_table(pa.Table.from_pylist(prod), silver / "yomyom_products.parquet")
+    pq.write_table(pa.Table.from_pylist(inv), silver / "yomyom_inventory.parquet")
+    pq.write_table(pa.Table.from_pylist(prod), silver / "yomyom_margins.parquet")
+    return load_inputs(policy=load_policy(), owner=OwnerState.unavailable("no_credentials"),
+                       run_at=datetime(2026, 9, 8, tzinfo=timezone.utc), silver_dir=silver,
+                       signals_dir=tmp_path / "n", matches_path=tmp_path / "n.parquet")
+
+# ── The boundary is published, not merely obeyed (#105) ──────────────────────
+#
+# OQ-201 asked whether stock, receipts and sales cover the same period, and the answer
+# recorded at system-design §21 is "window vintages published so misalignment is visible".
+# Reconciliation's own window was the one that was not: `vintages.sales` spans every monthly
+# row, while the capability counts only months BEFORE the stock count. Measured on the
+# 2026-09-21 artefact, the published span said seven months and no entry used more than five.
+
+def test_the_reconciliation_boundary_is_published(tmp_path):
+    """Visible, not inferable. `evidence.reconcile_months` is a count, not a boundary — two
+    products with different histories can share a count and not a window."""
+    inputs = _load_with(tmp_path, "2026-06-06", "declared_sidecar")
+    assert inputs.vintages["sales"]["reconcile_before"] == "2026-06"
+
+
+def test_the_boundary_comes_from_the_same_definition_the_capability_refuses_on():
+    """One definition, asked twice. If `usable_stock_date` rejects the date the capability
+    goes `unknown_stock_date`, and a published month beside a refusing capability would say
+    the window was known when it was not."""
+    from src.engine.stock_date import usable_stock_date
+
+    assert usable_stock_date("2026-06-06", source="declared_sidecar").strftime("%Y-%m") == "2026-06"
+    for unusable in (None, "", "   ", "not-a-date"):
+        assert usable_stock_date(unusable) is None
+    assert usable_stock_date("2026-06-06", source="file_mtime") is None
+
+
+def test_a_refused_date_publishes_no_boundary(tmp_path):
+    """Null, never the full span. The defect this guards is a window that overstates what
+    was reconciled; defaulting to everything would BE that defect."""
+    inputs = _load_with(tmp_path, "2026-06-06", "file_mtime")
+    assert inputs.vintages["sales"]["reconcile_before"] is None
+    # Unavailable, and the specific reason is whichever gate fires first — this fixture has
+    # no sales summary, so `derive_status` returns `no_sales_evidence` before the capability
+    # reaches its own `unknown_stock_date` refusal. Both are honest; the tests above pin the
+    # stock-date one directly. What matters here is that no findings are published over a
+    # boundary the engine does not have.
+    out = run(inputs)
+    assert out.status == "unavailable" and out.entries == []
