@@ -98,6 +98,46 @@ known; only the policy verdict would be unsafe. So the row carries `reference` a
 `premium_pct` with `uncompared_reason: "no_cost"` — the owner sees where he stands, and the
 system does not claim he is in breach.
 
+### `reference` is not the cheapest competitor price, and must never be mapped as one
+
+The row's `reference` is the **balanced policy reference** — `balanced_reference()` over the
+same-format minimum and the supermarket minimum plus the measured format allowance. It is the
+figure the breach judgement is made against, and the allowance is a real fact about what kind
+of shop this is.
+
+It is **not** the lowest price anyone charges. Measured on entry `8f6ebc2c4a19e4f4` in the
+2026-09-22 artefact: shelf **9.90**, reference **5.6031**, cheapest observed **4.90** across
+71 of 121 observations — the reference sits **14.35 % above** the cheapest price actually
+seen.
+
+So a consumer mapping `reference` into a field called `cheapestCompetitorPrice` — which
+`PriceGapPage` has — would tell the owner a rival charges ₪5.60 when one charges ₪4.90:
+**overstating the rival and understating his gap, in the direction that flatters him.** Same
+shape as the `delivery_price` trap ADR-024 documents, and subtler, because here both numbers
+are real and both are genuinely about competitors.
+
+**No cheapest-observed field is published, deliberately.** "Cheapest competitor" is pre-cut-over
+framing that arrived with `src/data/marketData.js`; the considered figure is the reference, and
+the page should stop speaking the old way rather than the engine start. Raised by
+@hackathon26-20 while reviewing the first consumer of this block, and agreed.
+
+## These counts move every night
+
+`matched`, `evaluated` and `stale_skipped` are **time-relative**: freshness is measured against
+the run clock, so observations age out of `evaluated` and into `stale_skipped` while nothing
+about the data or the code changes. Between 2026-09-21 and 2026-09-22, with no scrape in
+between and no code change — verified by running `origin/main`'s capability over identical
+inputs and getting identical counts — they moved:
+
+```
+matched        2618 → 2619
+evaluated       860 → 856
+stale_skipped  1036 → 1054
+```
+
+**Any prose that quotes them is wrong within a day.** A surface that needs to say how many were
+compared must read it from the artefact it is rendering, never from a string.
+
 ## What this does not do
 
 **It does not change any finding.** `entries`, `counts` and `position` are untouched, and a
