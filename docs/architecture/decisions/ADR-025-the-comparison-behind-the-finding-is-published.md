@@ -1,7 +1,7 @@
 ---
 ID: ADR-025
 Title: The comparison behind a competitor finding is published, not only the finding
-Status: Ready for review
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-09-22
 Parent: [System Design](../system-design.md) §7.3
@@ -12,7 +12,9 @@ Updated: 2026-09-22
 
 # ADR-025 — The comparison behind a competitor finding is published
 
-**Status:** Ready for review · a role may not approve its own output (HANDOVER rule 2)
+**Status:** Accepted (2026-09-22, by the repository owner) · proposed by `smartshelf-engineer`
+and held at `Ready for review` until he decided it, because a role may not approve its own
+output (HANDOVER rule 2). Asked and answered directly.
 
 ## Context
 
