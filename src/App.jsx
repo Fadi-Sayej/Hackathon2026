@@ -56,8 +56,14 @@ const AWAITING = {
   //
   // A publishing decision on the engine side, not a missing input and not the catalogue.
   prices: 'competitor',
+  // Reached only when `catalogue.json` cannot be read — the products branch below returns
+  // before this map is consulted. So this is the failed-load state, not a "not published yet".
   products: 'catalogue',
-  dashboard: 'catalogue',
+  // NOT 'catalogue' either, and for the same reason as prices: the catalogue is published and
+  // Overview still cannot render. It takes nine props, and `stockoutOpportunities`,
+  // `priceLeaderProducts` and the HIGH-urgency `recommendations` it filters are all
+  // velocity-derived. Demand is the honest blocker and it is the one that does not arrive.
+  dashboard: 'demand',
   // Not 'catalogue'. A catalogue would let these two RENDER, and that is the trap: both
   // would then look finished while resting on nothing anyone decided.
   //   assortment  F9 is `Registered — not specified`, and the protocol forbids writing the

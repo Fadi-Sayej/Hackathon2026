@@ -11,7 +11,7 @@ export const en = {
   'awaiting.demand.when': "It arrives with V2, when real movement per product is measured. Until then the screen stays empty rather than confident.",
   'awaiting.catalogue.title': "Waiting for the product list",
   'awaiting.catalogue.what': "This screen needs every product, not only the ones with a finding against them.",
-  'awaiting.catalogue.why': "The nightly publishes what it found — prices out of line, stock that does not add up — not the full catalogue. Your 7,674 products are in the POS import; they are simply not in the file the browser reads.",
+  'awaiting.catalogue.why': "The product list could not be read. Your products are in the POS import and the nightly publishes them, so this is a fault rather than missing data — the file did not arrive, or arrived in a shape this screen does not know.",
   'awaiting.catalogue.when': "This one is work, not missing data. The engine can publish the catalogue.",
   'awaiting.expiry.title': "Waiting for expiry dates",
   'awaiting.expiry.what': "This screen shows what is nearing its date. Nothing has been recorded yet.",
@@ -27,7 +27,13 @@ export const en = {
   'awaiting.withdrawn.when': "It is not scheduled. Everything it used to summarise is on the daily screen, where each finding names its own evidence.",
   'awaiting.competitor.title': "Waiting for competitor prices to be published",
   'awaiting.competitor.what': "This screen compares your shelf price against what nearby shops charge for the same product.",
-  'awaiting.competitor.why': "The comparison partly exists. Last night's run matched 2,618 of your products to prices from 164 shops, but only 860 could actually be compared — the rest had no cost price, or the competitor's price was too old to trust. Of those 860, the 6 that broke a pricing rule reach your browser and the other 854 do not: the file publishes findings, not comparisons. The previous version of this screen filled the gap from a file frozen on 9 August and showed “2,767 prices, median age 124 days” as though it were today's.",
+  // No figures in this string, deliberately. It shipped on 2026-09-21 saying "2,618 …
+  // 860 … 854" and every one of those was wrong the next morning: competitor freshness is
+  // measured against RUN TIME, so products age out of `evaluated` into `stale_skipped` with
+  // no scrape and no code change. A count belongs in the artefact the page is rendering,
+  // never in a translated string — and an awaiting state explains why a screen is empty,
+  // which needs no census.
+  'awaiting.competitor.why': "The comparison partly exists. Last night's run matched most of your products against prices from nearby shops, but only some of them could actually be compared — the rest had no cost price, or the competitor's price was too old to trust. Of the ones it could compare, only those that broke a pricing rule reach your browser: the file publishes findings, not comparisons. The previous version of this screen filled the gap from a file frozen in August and showed its prices as though they were today's.",
   'awaiting.competitor.when': "It opens when the nightly publishes the matched prices beside the findings. That is work on the engine, not missing data.",
   'days.unknown': "No sales data",
   'days.lessThanOne': "<1 day",

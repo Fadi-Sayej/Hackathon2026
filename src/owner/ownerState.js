@@ -138,6 +138,15 @@ export async function recordOutcome(entry, { status, reason = null, deferredUnti
   if (reason !== null && !Object.values(OUTCOME_REASONS).includes(reason)) {
     throw new Error(`recordOutcome: reason ${String(reason)} is outside the enum`)
   }
+  // #139. A deferral with no date is written without `deferred_until`, and compose reads
+  // that absence as deferred indefinitely — so the button labelled "Later" removed the
+  // entry for good. The store refuses it here rather than recording it, for the same reason
+  // it refuses an unknown status: a silently-accepted wrong value became an artefact-level
+  // fact nobody saw for four days. OQ-604 may lengthen the duration; it may not restore
+  // "forever".
+  if (status === OUTCOME_STATUS.DEFERRED && !Number.isFinite(deferredUntil)) {
+    throw new Error('recordOutcome: a deferral needs deferredUntil; without one it is a permanent dismissal (#139)')
+  }
 
   const state = loadOwnerState()
   const next = {

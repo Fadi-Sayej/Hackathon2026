@@ -14,6 +14,7 @@ from src.common.store_types import StoreTypeConfig, load_store_types
 from src.engine.model import EvidenceWindow, norm_barcode
 from src.engine.policy import Policy
 from src.internal_pos.pos_importer import read_pos_vintage
+from src.engine.stock_date import usable_stock_date
 from src.owner_state.model import OwnerState, answered_cost, device_register
 
 OUR_FORMAT = "gas_convenience"
@@ -249,7 +250,24 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
         "owner_state": {"pulled_at": owner.pulled_at, "status": owner.status,
                         "reason": owner.reason, "devices": device_register(owner)},
     }
-    vintages["sales"] = {k: vintages["sales"][k] for k in ("months", "first", "last", "full_annual_cycle")}
+    # The boundary reconciliation actually used, published because OQ-201 was closed on the
+    # words "window vintages published so misalignment is visible" (§21) — and this is the
+    # one window that was not. `vintages.sales` spans every monthly row; reconciliation
+    # counts only the months BEFORE the stock count, so the two differ whenever the count
+    # predates the last report. Measured on the 2026-09-21 artefact: the published window
+    # said seven months while no entry used more than five.
+    #
+    # `usable_stock_date` rather than a second derivation, so this and the capability's own
+    # refusal (reconciliation.run) cannot disagree about what the date is — the single
+    # definition that module exists to be.
+    #
+    # Null means the same thing it means there: we do not know when the stock was counted,
+    # so there is no boundary. It is never the full span by default.
+    _as_of = usable_stock_date((vintages["pos"] or {}).get("as_of"),
+                               source=(vintages["pos"] or {}).get("as_of_source"))
+    vintages["sales"]["reconcile_before"] = _as_of.strftime("%Y-%m") if _as_of else None
+    vintages["sales"] = {k: vintages["sales"][k]
+                         for k in ("months", "first", "last", "full_annual_cycle", "reconcile_before")}
     digest = _digest(products, summary_rows, monthly, observations, matches, policy, owner)
     return EngineInputs(products=products, inventory=inventory or None,
                         sales_monthly=monthly, sales_summary=summary, window=window,

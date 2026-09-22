@@ -144,3 +144,23 @@ describe('recordAnswer', () => {
       .rejects.toThrow(/value/)
   })
 })
+
+describe('#139 — the store refuses a deferral with no date', () => {
+  const entry = { id: 'e1', signal_family: 'price.inverted', capability: 'price_consistency',
+    barcode: 'b1', characterisation: 'confirmed_loss' }
+
+  it('throws rather than recording a permanent dismissal', async () => {
+    await expect(recordOutcome(entry, { status: OUTCOME_STATUS.DEFERRED }))
+      .rejects.toThrow(/deferral needs deferredUntil/)
+  })
+
+  it('accepts one that carries a date', async () => {
+    await recordOutcome(entry, { status: OUTCOME_STATUS.DEFERRED, deferredUntil: 1_800_000_000_000 })
+    expect(loadOwnerState().outcomes.e1.deferred_until).toBe(1_800_000_000_000)
+  })
+
+  it('still accepts acted and declined, which carry no date', async () => {
+    await recordOutcome({ ...entry, id: 'e2' }, { status: OUTCOME_STATUS.ACTED })
+    expect(loadOwnerState().outcomes.e2.status).toBe('acted')
+  })
+})
