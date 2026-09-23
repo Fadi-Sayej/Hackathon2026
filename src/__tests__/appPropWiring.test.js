@@ -71,6 +71,7 @@ const PAGES = [
   ['DataPage', 'src/pages/DataPage.jsx'],
   ['PageAwaitingData', 'src/pages/PageAwaitingData.jsx'],
   ['DailyPage', 'src/surface/DailyPage.jsx'],
+  ['QuestionPanel', 'src/questions/QuestionPanel.jsx'],
 ]
 
 describe('every prop App passes is one the page accepts', () => {

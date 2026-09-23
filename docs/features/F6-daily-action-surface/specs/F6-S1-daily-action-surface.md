@@ -313,7 +313,7 @@ Outcomes persist independently of entry production (FR-115).
 | An unvalued hygiene entry outranks nothing because it has no value | The reason FR-106 and OQ-602 exist; hygiene work would otherwise never surface |
 | A very large standing value dominates every recurring value permanently | The reason FR-105 and OQ-601 exist |
 | The owner declines an entry that reappears with a changed value | Whether a changed value reopens a declined entry is part of **OQ-605** |
-| Questions (SPEC-005) and actions compete for the same attention | **OQ-503**, shared with SPEC-005 |
+| Questions (SPEC-005) and actions compete for the same attention | The questions sit in their own panel above the action list and take none of its ten places — **OQ-503**, resolved 2026-09-23 (SPEC-005 §17) |
 | The owner acts in his own system without recording an outcome here | The entry persists until the underlying data changes; not an error |
 
 ---

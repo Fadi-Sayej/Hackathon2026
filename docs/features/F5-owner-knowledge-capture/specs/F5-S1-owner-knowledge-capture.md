@@ -265,7 +265,7 @@ product's catalogue state (SCN-088).
 | The owner does not know the answer | Distinct from deferral — **OQ-501** |
 | An answered fact later changes in reality | FR-089 permits re-asking only on demonstrable change; how change is demonstrated is **OQ-502** |
 | Questions from several capabilities compete for the same limit | The limit is global, not per capability (INV-040). Cross-capability ordering follows FR-085 |
-| Question surfaces compete with the 10-action surface for attention | Relationship undefined — **OQ-503** |
+| Question surfaces compete with the 10-action surface for attention | A panel of their own above the action list, taking none of its ten places — **OQ-503**, resolved 2026-09-23 |
 | Answering makes a product newly eligible for a money-bearing signal | Correct and expected; the signal appears at the next production |
 
 ---
@@ -360,10 +360,13 @@ state model.
 FR-089 allows re-asking on change but does not define it. Without a definition, either
 answers ossify or the owner is re-interrogated. Affects FR-089.
 
-**OQ-503 (P1) — Do questions occupy slots on the ten-action surface, or a separate
-place?**
-Both compete for the same limited attention, and both are bounded. If they share the
-surface, the effective action budget is smaller than ten. Affects SPEC-006 and FR-084.
+**OQ-503 — RESOLVED (2026-09-23, by the repository owner).** The question asked whether
+questions occupy slots on the ten-action surface or a separate place. **A separate panel,
+at the top of the daily page, above the action list.** It takes none of the ten places, so
+the action budget stays ten, and FR-084's limit of three governs the panel on its own. The
+owner chose it over a page of its own when the questions were found to have had no screen
+at all since 2026-09-16: the twelve-page restore had removed them from the app with the
+daily surface, and only the daily surface came back.
 
 **OQ-504 (P2) — Does an answer expire?**
 A cost price answered once may drift. Affects FR-089 and whether answers carry a
