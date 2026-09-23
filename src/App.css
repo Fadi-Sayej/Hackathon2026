@@ -3955,3 +3955,47 @@ input[type='radio'] {
 .metric-card-neutral {
   color: var(--ink-600);
 }
+
+/* The collapsible nav group heading.
+   Styled as the label it replaces rather than as a button, because it IS the heading —
+   the affordance is the caret, not a border. Full-width target so the whole row is
+   tappable on a phone, which is where a drawer is hardest to hit. */
+.nav-group-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  text-align: inherit;
+  /* Matches the phone target the nav items are held to elsewhere. */
+  min-height: 2.25rem;
+}
+
+.nav-group-caret {
+  font-weight: 700;
+  opacity: 0.55;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A collapsed nav group hides its items on the sidebar only.
+   Never on a phone: there the nav is one scrolling bar, `.nav-group` is `display: contents`
+   and every group label is hidden, so a collapsed group would be shut with no way to open
+   it — and its six capability pages would be unreachable on the device the owner uses. The
+   bar already scrolls horizontally, so the length costs him nothing there. */
+@media (min-width: 901px) {
+  .nav-group[data-collapsed='true'] .nav-item { display: none; }
+}
+
+/* ...and the toggle is hidden on a phone like every other group label.
+   It needs saying again here because `.nav-group-toggle { display: flex }` above sits later
+   in the file than the `max-width: 900px` block that hides `.nav-group-label`, so it won the
+   cascade and put a 23px heading into a bottom bar that reserves a fixed height for itself.
+   Caught by "the phone nav stays a single row", which measured the bar at 95px against 72px
+   reserved. */
+@media (max-width: 900px) {
+  .nav-group-toggle { display: none; }
+}

@@ -59,6 +59,7 @@ export const ar = {
   'group.shelves': 'الرفوف',
   'group.inventory': 'المخزون',
   'group.reports': 'التقارير',
+  'group.findings': "كل الملاحظات كاملة",
   'group.system': 'النظام',
 
   // ── Pages: name + one-line purpose ─────────────────────────────────

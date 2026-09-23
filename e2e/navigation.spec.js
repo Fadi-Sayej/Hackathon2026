@@ -1,6 +1,24 @@
 import { expect, test } from '@playwright/test'
 
 /**
+ * Open every collapsible nav group.
+ *
+ * The six capability pages sit behind one heading, closed by default — the owner asked for a
+ * shorter nav and dropping a route to get there would have cost him 1,671 findings. They are
+ * one tap away, so a test that walks "every page" has to take the tap rather than conclude
+ * the pages are gone.
+ */
+async function expandNav(page) {
+  // Visible ones only. On a phone the nav is a bottom bar, the toggle is hidden and the
+  // group is never collapsed — the items are always in the DOM and CSS hides them only
+  // above 900px. Clicking a `display: none` heading there just times out.
+  const shut = page.locator('.nav-group-toggle[aria-expanded="false"]')
+  for (const toggle of await shut.all()) {
+    if (await toggle.isVisible()) await toggle.click()
+  }
+}
+
+/**
  * SKIPPED AT THE CUT-OVER (2026-09-12).
  *
  * The browser now reads the engine's artefact and the nav carries the ten V1 pages
@@ -69,6 +87,7 @@ for (const language of LANGUAGES) {
   test.describe(`language: ${language.code}`, () => {
     test(`sets the document direction to ${language.dir}`, async ({ page }) => {
       await page.goto('/')
+  await expandNav(page)
       await setLanguage(page, language.code)
       await expect(page.locator('html')).toHaveAttribute('dir', language.dir)
     })
@@ -98,6 +117,7 @@ for (const language of LANGUAGES) {
       })
 
       await page.goto('/')
+  await expandNav(page)
       await setLanguage(page, language.code)
 
       for (const id of PAGES) {
@@ -119,6 +139,7 @@ for (const language of LANGUAGES) {
 
 test('the language choice survives a reload', async ({ page }) => {
   await page.goto('/')
+  await expandNav(page)
   await setLanguage(page, 'en')
   await page.reload()
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
@@ -126,10 +147,13 @@ test('the language choice survives a reload', async ({ page }) => {
 
 test('navigation is grouped and every item explains itself', async ({ page }) => {
   await page.goto('/')
+  await expandNav(page)
 
-  // Six groups, and a hint under every entry — the fix for "I do not understand
-  // what each page is".
-  await expect(page.locator('.nav-group')).toHaveCount(6)
+  // Seven groups since 2026-09-23 — the six capability pages were split out of System into
+  // their own collapsible heading, so one Today could be had without dropping a route.
+  // And a hint under every entry, which is the fix for "I do not understand what each page
+  // is" and applies to the collapsed ones too: they are one tap away, not gone.
+  await expect(page.locator('.nav-group')).toHaveCount(7)
   const items = page.locator('.nav-item')
   await expect(items).toHaveCount(PAGES.length)
   for (let index = 0; index < PAGES.length; index += 1) {

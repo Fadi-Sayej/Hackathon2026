@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Button } from '../shared/Button.jsx'
 import { navIcons } from './navIcons.jsx'
 import { navGroups } from './navGroups.js'
@@ -38,6 +39,9 @@ export function AppShell({
   onNavigate,
   onResetDemoState,
 }) {
+  // Which collapsible nav groups the owner has opened. Closed is the default: the findings
+  // group is six capability pages he reaches deliberately, not daily work.
+  const [openGroups, setOpenGroups] = useState(() => new Set())
   const { t, language, setLanguage } = useI18n()
   const catalogIsReal = dataProvenance?.catalog === 'real'
   const competitorIsReal = dataProvenance?.competitor === 'real'
@@ -54,9 +58,43 @@ export function AppShell({
         </div>
 
         <nav className="sidebar-nav" aria-label={t('app.nav')}>
-          {navGroups.map((group) => (
-            <div className="nav-group" key={group.id}>
-              <p className="nav-group-label">{t(group.id)}</p>
+          {navGroups.map((group) => {
+            // A collapsible group opens itself when the active page is inside it, so landing
+            // on one of its pages never shows a closed drawer with no explanation — and the
+            // owner's own toggle wins for every other group state.
+            const holdsActive = group.items.some((item) => item.id === activePage)
+            const isOpen = !group.collapsible || holdsActive || openGroups.has(group.id)
+            return (
+            /* `data-collapsed` rather than not rendering: on a phone the nav is a single
+               scrolling bar with `.nav-group { display: contents }` and every group label
+               hidden, so a JS-collapsed group would be shut with no way to open it and its
+               six pages would be unreachable on the device the owner actually uses. The
+               items are always in the DOM; CSS hides them, and only above 900px. */
+            <div
+              className="nav-group"
+              key={group.id}
+              data-collapsible={group.collapsible || undefined}
+              data-collapsed={group.collapsible && !isOpen ? 'true' : undefined}
+            >
+              {group.collapsible ? (
+                <button
+                  type="button"
+                  className="nav-group-label nav-group-toggle"
+                  aria-expanded={isOpen}
+                  data-nav-group={group.id}
+                  onClick={() => setOpenGroups((open) => {
+                    const next = new Set(open)
+                    if (next.has(group.id)) next.delete(group.id)
+                    else next.add(group.id)
+                    return next
+                  })}
+                >
+                  {t(group.id)}
+                  <span className="nav-group-caret" aria-hidden="true">{isOpen ? '\u2212' : '+'}</span>
+                </button>
+              ) : (
+                <p className="nav-group-label">{t(group.id)}</p>
+              )}
               {group.items.map((item) => {
                 const isActive = activePage === item.id
                 return (
@@ -83,7 +121,8 @@ export function AppShell({
                 )
               })}
             </div>
-          ))}
+            )
+          })}
         </nav>
 
         <div className="sidebar-foot">

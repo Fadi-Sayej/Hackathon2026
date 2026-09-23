@@ -54,6 +54,7 @@ export const he = {
   'group.shelves': 'מדפים',
   'group.inventory': 'מלאי',
   'group.reports': 'דוחות',
+  'group.findings': "כל הממצאים, במלואם",
   'group.system': 'מערכת',
 
   // ── Pages ──────────────────────────────────────────────────────────

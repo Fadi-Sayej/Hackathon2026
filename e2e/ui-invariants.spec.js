@@ -1,6 +1,24 @@
 import { expect, test } from '@playwright/test'
 
 /**
+ * Open every collapsible nav group.
+ *
+ * The six capability pages sit behind one heading, closed by default — the owner asked for a
+ * shorter nav and dropping a route to get there would have cost him 1,671 findings. They are
+ * one tap away, so a test that walks "every page" has to take the tap rather than conclude
+ * the pages are gone.
+ */
+async function expandNav(page) {
+  // Visible ones only. On a phone the nav is a bottom bar, the toggle is hidden and the
+  // group is never collapsed — the items are always in the DOM and CSS hides them only
+  // above 900px. Clicking a `display: none` heading there just times out.
+  const shut = page.locator('.nav-group-toggle[aria-expanded="false"]')
+  for (const toggle of await shut.all()) {
+    if (await toggle.isVisible()) await toggle.click()
+  }
+}
+
+/**
  * SKIPPED AT THE CUT-OVER (2026-09-12).
  *
  * The browser now reads the engine's artefact and the nav carries the ten V1 pages
@@ -56,6 +74,7 @@ async function wrappedNumbers(page) {
 for (const language of ['ar', 'he', 'en']) {
   test(`no number is split across lines in ${language}`, async ({ page }) => {
     await page.goto('/')
+  await expandNav(page)
     await page.selectOption('.lang-switch-select', language)
     await page.waitForTimeout(300)
 
@@ -72,6 +91,7 @@ for (const language of ['ar', 'he', 'en']) {
 test('no page scrolls horizontally on a phone', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/')
+  await expandNav(page)
 
   for (const [index, id] of PAGES.entries()) {
     const nav = page.locator('.nav-item').nth(index)
@@ -174,6 +194,7 @@ async function untranslatedControls(page, allowed) {
 for (const language of ['ar', 'he']) {
   test(`no control is left in English in ${language}`, async ({ page }) => {
     await page.goto('/')
+  await expandNav(page)
     await page.selectOption('.lang-switch-select', language)
     await page.waitForTimeout(300)
 
@@ -189,6 +210,7 @@ for (const language of ['ar', 'he']) {
 
 test('no text is cut off by a clipping ancestor', async ({ page }) => {
   await page.goto('/')
+  await expandNav(page)
 
   for (const [index, id] of PAGES.entries()) {
     const nav = page.locator('.nav-item').nth(index)
@@ -212,6 +234,7 @@ test('no text is cut off by a clipping ancestor', async ({ page }) => {
 test('the phone nav stays a single row', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/')
+  await expandNav(page)
   await page.waitForTimeout(400)
 
   const rows = await page.evaluate(
