@@ -7,7 +7,7 @@ Date: 2026-09-23
 Parent: [System Design](../system-design.md) §19
 Related Specs: F2-S1, F6-S1, F7-S1
 Inputs: [F2-S1 §5, §11, FR-027, NFR-010, ASM-011, OQ-201; ADR-005, ADR-009, ADR-011, ADR-016, ADR-017, ADR-021; docs/architecture/system-design.md §7.1, §11.1, §11.2, §21; public/data/dashboard.json (2026-09-23); src/engine/inputs.py; src/engine/reconciliation.py; src/engine/run.py; src/internal_pos/sales_importer.py; scripts/import_yomyom_sales.py; src/surface/compose.js; tests/engine/test_unavailable_reasons.py; issue #150; issue #105; PR #144]
-Updated: 2026-09-23
+Updated: 2026-09-24
 ---
 
 # ADR-026 — The reconcile window is cut once per run, at the run's own stock date, and reconciliation publishes that cut
@@ -273,6 +273,12 @@ keys on the window's value, so nothing needs migrating in either direction, and 
 change reverts with the code.
 
 ## Implementation — for `smartshelf-engineer`, once accepted
+
+> **This file list changed after acceptance.** Commit `630667c` (PR #160) added
+> `tests/internal_pos/test_sales_importer.py` and `src/engine/stock_date.py`'s docstring, and
+> dropped the fixture, which needed no change. The engineer role made that edit to an accepted
+> ADR, where its rules say to ask the architect. The repository owner ratified it on
+> 2026-09-24, asked directly and answered directly. The decision above did not change.
 
 **Files:**
 - Modify:
