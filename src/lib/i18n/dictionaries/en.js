@@ -63,7 +63,7 @@ export const en = {
 
   // ── Pages ──────────────────────────────────────────────────────────
   'page.operational.name': 'Today',
-  'page.operational.hint': 'What needs you right now',
+  'page.operational.hint': "What needs handling right now",
   'page.operational.title': "Today's tasks",
   'page.operational.description':
     'Everything that needs a decision today, ranked by the money at stake. Start here.',
@@ -952,8 +952,8 @@ export const en = {
   'op.showRest': "Show the rest",
 
   // ── V1 navigation (cut-over) ────────────────────────────────────────
-  'page.daily.name': "Today",
-  'page.daily.hint': "What needs you right now",
+  'page.daily.name': "Today’s work",
+  'page.daily.hint': "What needs your decision right now",
   'page.daily.title': "Today’s work",
   'page.daily.description':
     "What needs your decision today. Record what you did and it will not come back.",

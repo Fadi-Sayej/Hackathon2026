@@ -74,7 +74,12 @@ test.describe('the owner opens the app', () => {
     // page is a .nav-item click. If that ever stops being true the owner's first
     // screen has changed, which is a product decision, not a refactor.
     await openDailySurface(page)
-    await expect(page.locator('.nav-item[aria-current="page"] .nav-item-name')).toHaveText('Today')
+    // "Today’s work", not "Today": both nav entries read "Today" in English until 2026-09-23,
+    // with the same hint, while he and ar had always distinguished them. English now makes
+    // the same distinction — the daily surface asks for a decision, the restored Today page
+    // asks for attention — and `operational` keeps the bare name it held first.
+    await expect(page.locator('.nav-item[aria-current="page"] .nav-item-name'))
+      .toHaveText('Today’s work')
   })
 
   test('AC-100 — fills all ten places, and never more', async ({ page }) => {
