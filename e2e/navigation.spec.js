@@ -35,7 +35,6 @@ test.describe.configure({ mode: 'serial' })
 
 const PAGES = [
   'daily',
-  'operational',
   'recommendations',
   'orders',
   'prices',
@@ -46,6 +45,7 @@ const PAGES = [
   'expiry',
   'dashboard',
   'report',
+  'margin_below_cost',
   'catalogue_lifecycle',
   'competitor_position',
   'data-source',

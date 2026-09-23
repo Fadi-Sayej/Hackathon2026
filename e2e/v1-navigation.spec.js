@@ -43,14 +43,14 @@ const V1_PAGES = [
   // The daily surface is the landing page and the pilot's acceptance criteria are written
   // against it (AC-100/103/105/107/109/112). The twelve restored pages sit behind it.
   'daily',
-  'operational', 'recommendations', 'orders',
+  'recommendations', 'orders',
   'prices', 'assortment',
   'store-layout', 'shelf-plan',
   'products', 'expiry',
   'dashboard', 'report',
   // The two capabilities whose entries were reachable from no screen at all until the
   // CapabilityPage was routed: 1,632 catalogue_lifecycle and 6 competitor_position.
-  'catalogue_lifecycle', 'competitor_position',
+  'margin_below_cost', 'catalogue_lifecycle', 'competitor_position',
   'data-source',
 ]
 

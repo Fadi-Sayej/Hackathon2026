@@ -61,9 +61,12 @@ function propsAcceptedBy(source, name) {
 
 const app = read('src/App.jsx')
 
+// OperationalPage left this list on 2026-09-23 with the old Today page. It is no longer
+// rendered by App, so there are no props to check — and asserting on a component App does
+// not mount would pass forever without meaning anything.
 const PAGES = [
-  ['OperationalPage', 'src/pages/OperationalPage.jsx'],
   ['ProductsPage', 'src/pages/ProductsPage.jsx'],
+  ['CapabilityPage', 'src/pages/CapabilityPage.jsx'],
   ['DataPage', 'src/pages/DataPage.jsx'],
   ['PageAwaitingData', 'src/pages/PageAwaitingData.jsx'],
   ['DailyPage', 'src/surface/DailyPage.jsx'],
@@ -82,12 +85,20 @@ describe('every prop App passes is one the page accepts', () => {
   }
 
   it('catches the exact regression it was written for', () => {
-    // A guard that cannot fail is not a guard. This proves the mechanism by running it over
-    // the broken source rather than trusting that it would have caught it.
-    const broken = app.replace('decisions={ownerState.outcomes', 'actions={ownerState.outcomes')
-    expect(broken).not.toBe(app)
-    const accepted = propsAcceptedBy(read('src/pages/OperationalPage.jsx'), 'OperationalPage')
-    const passed = propsPassedTo(broken, 'OperationalPage')
-    expect([...passed].filter((p) => !accepted.has(p))).toEqual(['actions'])
+    // A guard that cannot fail is not a guard. The original case re-broke the live App.jsx;
+    // the page it broke is gone, so the mechanism is proved against a fixture carrying the
+    // exact shape that shipped — `actions=` passed to a component destructuring `decisions`.
+    const brokenApp = '<OperationalPage operationalData={x} actions={y} onDecide={z} />'
+    const component = 'export function OperationalPage({ operationalData, decisions = {}, onDecide }) {'
+    const accepted = propsAcceptedBy(component, 'OperationalPage')
+    const passed = propsPassedTo(brokenApp, 'OperationalPage')
+    expect([...passed].filter((prop) => !accepted.has(prop))).toEqual(['actions'])
+  })
+
+  it('still finds props on the pages App does render', () => {
+    // Guards the guard: if the JSX regex stopped matching, every page would report zero
+    // unknown props and the suite would go green on a check that had stopped running.
+    expect(propsPassedTo(app, 'DailyPage').size).toBeGreaterThan(0)
+    expect(propsPassedTo(app, 'DataPage').size).toBeGreaterThan(0)
   })
 })
