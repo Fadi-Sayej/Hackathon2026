@@ -149,9 +149,11 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
 
     # ADR-026: the window is carved from the one boundary load_inputs cut the figures at,
     # so the period published beside the arithmetic is the period of the arithmetic. That
-    # boundary is null exactly when the stock date is unusable, so a null here beside a
-    # usable date cannot come out of load_inputs; if it ever arrives, the answer is the
-    # same honest refusal, never a window carved from nothing.
+    # boundary is null exactly when load_inputs found the stock date unusable. The check
+    # above can still pass beside it: usable_stock_date reads the wall clock, so a count
+    # dated tomorrow at load is dated today here if the run crosses UTC midnight. That is
+    # the same unknown, and it gets the same honest refusal, never a window carved from
+    # nothing and never a crash.
     reconcile_before = ((inputs.vintages or {}).get("sales") or {}).get("reconcile_before")
     if reconcile_before is None:
         return CapabilityOutput.unavailable(RECON, SPEC, "unknown_stock_date")
@@ -168,9 +170,13 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
         return CapabilityOutput.unavailable(RECON, SPEC, "no_sales_evidence")
 
     # The same strict `<` the cut applies, over the same monthly rows, so the window is the
-    # months the figures were summed over. The guard above guarantees at least one.
+    # months the figures were summed over. Through load_inputs the guard above leaves at
+    # least one; handed inputs that leave none, a window of no months is refused rather than
+    # published as "None..None" beside findings.
     window = evidence_window([m for m in inputs.window.months if m < reconcile_before],
                              inputs.policy.full_annual_cycle_months)
+    if not window.months:
+        return CapabilityOutput.unavailable(RECON, SPEC, "no_sales_evidence")
     flagged = _detection_entries(inputs, window)
     return CapabilityOutput(
         id=RECON, spec=SPEC, status="available", window=window,

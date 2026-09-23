@@ -188,20 +188,31 @@ def _cut_reconcile_window(summary_rows: list, monthly: Optional[list],
 
     Rows are summed in (barcode, month) order, the order the importer summed them in, so a
     normal night publishes the same figures it did when the importer made the cut.
+
+    Absent is not empty: with no monthly table there is nothing to cut, so the figures are
+    None, not 0. And a product whose flows are not numbers gets None rather than a
+    TypeError: these sums used to run inside the isolated import step, and here a raise would
+    cost every capability its artefact, which SPEC-002 §11 forbids. Detection already skips a
+    row whose figures are None.
     """
-    known = reconcile_before is not None
+    known = reconcile_before is not None and monthly is not None
     before = defaultdict(list)
     if known:
-        for r in sorted(monthly or [], key=lambda r: (r["barcode"], r["month"])):
+        for r in sorted(monthly, key=lambda r: (r["barcode"], r["month"])):
             if r["month"] < reconcile_before:
                 before[r["barcode"]].append(r)
+
+    def number(v) -> bool:
+        return isinstance(v, (int, float)) and not isinstance(v, bool)
+
     out = []
     for row in summary_rows:
         rows = before.get(row["barcode"], [])
+        ok = known and all(number(r["units"]) and number(r["receipts"]) for r in rows)
         out.append({**row,
-                    "reconcile_units": sum(r["units"] for r in rows) if known else None,
-                    "reconcile_receipts": sum(r["receipts"] for r in rows) if known else None,
-                    "reconcile_months": len({r["month"] for r in rows}) if known else None})
+                    "reconcile_units": sum((r["units"] for r in rows), 0.0) if ok else None,
+                    "reconcile_receipts": sum((r["receipts"] for r in rows), 0.0) if ok else None,
+                    "reconcile_months": len({r["month"] for r in rows}) if ok else None})
     return out
 
 
@@ -324,8 +335,9 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
 #
 # Note that products reach this function already shaped, so their provenance columns are
 # gone before the exclusion list is consulted: two exports carrying identical rows are the
-# same input whichever day they were taken. The export day is not lost, it is published in
-# vintages.pos.as_of.
+# same input whichever day of a month they were taken. Across months they are not, because
+# ADR-026 cuts the reconcile figures at the count's month and _digest hashes that month.
+# The export day is not lost, it is published in vintages.pos.as_of.
 _NOT_CONTENT = frozenset({"_imported_at", "_source_kind", "created_at"})
 
 
