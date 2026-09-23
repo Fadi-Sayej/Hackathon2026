@@ -12,8 +12,9 @@ import { catalogueToProducts } from './lib/dataAdapters/catalogueToProducts.js'
 import { analyzeProducts } from './lib/analytics/inventoryEngine.js'
 import { ProductsPage } from './pages/ProductsPage.jsx'
 import { PriceGapPage } from './pages/PriceGapPage.jsx'
-import { clearOutcome, loadOwnerState, recordOutcome } from './owner/ownerState.js'
+import { clearOutcome, loadOwnerState, recordAnswer, recordOutcome } from './owner/ownerState.js'
 import { DailyPage } from './surface/DailyPage.jsx'
+import { QuestionPanel } from './questions/QuestionPanel.jsx'
 import { DataPage } from './pages/DataPage.jsx'
 import { CapabilityPage } from './pages/CapabilityPage.jsx'
 import { PageAwaitingData } from './pages/PageAwaitingData.jsx'
@@ -159,6 +160,13 @@ export default function App() {
     refreshOwnerState()
   }, [refreshOwnerState])
 
+  // The owner's answer to a cost question. It throws on an unusable value or a failed cache
+  // write, and QuestionPanel keeps what he typed when it does (§9.3).
+  const onAnswer = useCallback(async (barcode, answer) => {
+    await recordAnswer(barcode, answer)
+    refreshOwnerState()
+  }, [refreshOwnerState])
+
   // `entriesById` and `onDecide` went with the old Today page on 2026-09-23. They existed to
   // let a restored page record against the engine's own ADR-009 entry id; the daily surface
   // reaches `recordOutcome` through `onOutcome` directly and never needed the index.
@@ -204,9 +212,16 @@ export default function App() {
     // criteria are written against. It is kept alongside the restored pages rather than
     // replaced by them: removing it was a consequence of the restore, not a request.
     if (activePage === 'daily') {
+      // The cost questions sit at the top of Today, above the action list: the repository
+      // owner's decision on 2026-09-23, which settles OQ-503. They had no screen at all from
+      // 2026-09-16, when the twelve-page restore took them out of App with the daily surface
+      // and only the daily surface came back.
       return (
-        <DailyPage artefact={artefact} ownerState={ownerState} onOutcome={onOutcome}
-          onUndoOutcome={onUndoOutcome} now={now} />
+        <>
+          <QuestionPanel artefact={artefact} onAnswer={onAnswer} />
+          <DailyPage artefact={artefact} ownerState={ownerState} onOutcome={onOutcome}
+            onUndoOutcome={onUndoOutcome} now={now} />
+        </>
       )
     }
 
