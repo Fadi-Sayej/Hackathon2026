@@ -1,6 +1,24 @@
 import { expect, test } from '@playwright/test'
 
 /**
+ * Open every collapsible nav group.
+ *
+ * The six capability pages sit behind one heading, closed by default — the owner asked for a
+ * shorter nav and dropping a route to get there would have cost him 1,671 findings. They are
+ * one tap away, so a test that walks "every page" has to take the tap rather than conclude
+ * the pages are gone.
+ */
+async function expandNav(page) {
+  // Visible ones only. On a phone the nav is a bottom bar, the toggle is hidden and the
+  // group is never collapsed — the items are always in the DOM and CSS hides them only
+  // above 900px. Clicking a `display: none` heading there just times out.
+  const shut = page.locator('.nav-group-toggle[aria-expanded="false"]')
+  for (const toggle of await shut.all()) {
+    if (await toggle.isVisible()) await toggle.click()
+  }
+}
+
+/**
  * Every V1 page opens, in every language, with a real heading and a body.
  *
  * WHY THIS EXISTS
@@ -50,7 +68,8 @@ const V1_PAGES = [
   'dashboard', 'report',
   // The two capabilities whose entries were reachable from no screen at all until the
   // CapabilityPage was routed: 1,632 catalogue_lifecycle and 6 competitor_position.
-  'margin_below_cost', 'catalogue_lifecycle', 'competitor_position',
+  'price_consistency', 'margin_below_cost', 'reconciliation',
+  'hygiene', 'catalogue_lifecycle', 'competitor_position',
   'data-source',
 ]
 
@@ -71,6 +90,7 @@ function watchForErrors(page) {
 async function open(page) {
   const errors = watchForErrors(page)
   await page.goto('/')
+  await expandNav(page)
   // Refuse to proceed until the shell is really up. A spec that navigates a page which
   // never rendered asserts nothing, which is the trap daily-surface.spec.js records.
   await expect(page.locator('.nav-item').first()).toBeVisible()

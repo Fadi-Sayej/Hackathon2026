@@ -59,6 +59,7 @@ export const en = {
   'group.shelves': 'Shelves',
   'group.inventory': 'Inventory',
   'group.reports': 'Reports',
+  'group.findings': "Every finding, in full",
   'group.system': 'System',
 
   // ── Pages ──────────────────────────────────────────────────────────

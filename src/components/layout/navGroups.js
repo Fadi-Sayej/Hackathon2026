@@ -86,17 +86,30 @@ export const navGroups = [
     ],
   },
   {
-    id: 'group.system',
+    // The six capabilities, whole, behind one heading — closed until asked for.
+    //
+    // FR-102 needs every capability reachable on a surface other than the daily one, and
+    // there are six of them. Listed flat that is eighteen nav entries against the fifteen
+    // the owner asked for, and his objection was to the LENGTH rather than to the routes:
+    // "15 but combine the first 2, i don't need 2 today work".
+    //
+    // Collapsed, the nav reads as twelve entries and one heading, and nothing is dropped to
+    // get there. Opening it is one tap, and it opens itself when the active page is inside,
+    // so arriving at one of these pages never shows a closed drawer with no explanation.
+    id: 'group.findings',
+    collapsible: true,
     items: [
-      // `margin_below_cost` has no other door. compose excludes it (SPEC-GAP-A: no
-      // specification produces it, so it is browse-only until SPEC-008), and it was
-      // reachable only through the old Today page — 71 entries, 34 of them products sold
-      // below what they cost. Routing it here is what makes removing that page safe.
+      { id: 'price_consistency' },
       { id: 'margin_below_cost' },
+      { id: 'reconciliation' },
+      { id: 'hygiene' },
       { id: 'catalogue_lifecycle' },
       { id: 'competitor_position' },
-      { id: 'data-source' },
     ],
+  },
+  {
+    id: 'group.system',
+    items: [{ id: 'data-source' }],
   },
 ]
 
@@ -105,5 +118,8 @@ export const navGroups = [
  * rather than keep a second list in step by hand. AppShell renders `page.<id>.name`,
  * `.hint`, `.title` and `.description` for each of these, and a page added here with no
  * strings renders `page.<id>.title` as its heading (#90).
+ *
+ * A collapsed group's items are still in here, and should be: they are rendered the moment
+ * it is opened, so a missing string is a defect whether or not the drawer starts shut.
  */
 export const NAV_PAGE_IDS = navGroups.flatMap((group) => group.items.map((item) => item.id))
