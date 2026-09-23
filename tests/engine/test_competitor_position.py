@@ -3,7 +3,9 @@ from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from helpers import make_inputs, match, observation, product
+import pytest
+
+from helpers import RUN_AT, make_inputs, match, observation, product
 from src.engine.competitor_position import balanced_reference, measure_format_allowance, run
 
 # NOTE: identifiers are >= policy.uncomparable_min_barcode_digits (8) characters.
@@ -257,3 +259,102 @@ def test_the_published_premium_matches_the_entry_it_produced():
     entry = next(e for e in out.entries if e.barcode == "dearone1")
     row = next(r for r in out.extras["comparison"] if r["barcode"] == "dearone1")
     assert row["premium_pct"] == entry.evidence["premium_pct"]
+
+
+# ── A product seen only in stale observations (SCN-047) ─────────────────────
+#
+# F3-S1 SCN-047: GIVEN the newest observation for a product is older than the freshness
+# bound, THEN it is not surfaced as a recommendation, AND any display marks the
+# observation's age. Such a product used to get no comparison row, so no display could mark
+# anything, and the page would have read it as "no competitor sells this". The count beside
+# it was wrong in the other direction: `stale_skipped` counted every stale barcode in the
+# competitor feed. On 2026-09-23 it read 1,085 where it now reads 53 — 1,028 of them were
+# barcodes the store does not sell.
+
+OLD = "2026-08-01T00:00:00Z"               # 38 days before RUN_AT; freshness_days is 14
+
+
+def test_scn_047_a_product_seen_only_in_stale_observations_gets_a_row_saying_so():
+    prods = [product("product_p", shelf=17.0, cost=5.0)]
+    obs = [observation("product_p", 10.0, "rami-levy-pt-01", **SUPER, observed_at=OLD),
+           observation("product_p", 11.0, "dor-alon-kq-01", **FORECOURT, observed_at="2026-08-20T09:30:00Z")]
+    out = run(_inputs(prods, obs, [match("product_p", "product_p", s) for s in ("rami-levy-pt-01", "dor-alon-kq-01")]))
+    assert out.entries == []
+    # Dated by the NEWEST of the stale prices: the age a display marks is how recent the
+    # best evidence is, not how old the worst of it is.
+    assert out.extras["comparison"] == [{
+        "barcode": "product_p", "shelf_price": 17.0, "stores": 2, "observed_at": "2026-08-20",
+        "reference": None, "premium_pct": None, "uncompared_reason": "stale"}]
+    assert out.counts["stale_skipped"] == 1 and out.counts["matched"] == 0
+
+
+@pytest.mark.parametrize("barcode, extra, withdrawn", [
+    ("notours_1", [], None),                                                        # the store does not sell it
+    ("svc", [product("svc", shelf=30.0, cost=None, name="שטיפת רכב")], None),       # structurally uncomparable, FR-052
+    ("gone_0001", [product("gone_0001", shelf=9.0, cost=3.0)], {"gone_0001"}),      # withdrawn, FR-074
+], ids=["not-in-catalogue", "structurally-uncomparable", "withdrawn"])
+def test_stale_skipped_counts_only_the_stores_comparable_products(barcode, extra, withdrawn):
+    """Published with unit 'products', beside the catalogue it is a share of."""
+    obs = [observation("product_p", 10.0, "dor-alon-kq-01", **FORECOURT, observed_at=OLD),
+           observation(barcode, 10.0, "dor-alon-kq-01", **FORECOURT, observed_at=OLD)]
+    out = run(_inputs([product("product_p", shelf=17.0, cost=5.0)] + extra, obs, [], withdrawn=withdrawn))
+    assert out.counts["stale_skipped"] == 1
+    assert [r["barcode"] for r in out.extras["comparison"]] == ["product_p"]
+
+
+def test_a_stale_product_with_no_shelf_price_names_our_own_gap_and_keeps_its_date():
+    """Both are true and a row carries one reason. Ours comes first, as it does for a matched
+    product (no_shelf_price before no_reference), because it is the one the owner can fix.
+    The date stays on the row either way: SCN-047 asks any display to mark the age."""
+    prods = [product("noshelf_01", shelf=None, cost=4.0)]
+    obs = [observation("noshelf_01", 9.0, "dor-alon-kq-01", **FORECOURT, observed_at=OLD)]
+    out = run(_inputs(prods, obs, []))
+    row = out.extras["comparison"][0]
+    assert (row["uncompared_reason"], row["observed_at"], row["stores"]) == ("no_shelf_price", "2026-08-01", 1)
+    assert out.counts["stale_skipped"] == 0 and out.counts["no_comparison"] == 1
+
+
+def test_one_fresh_price_is_a_comparison_made_on_the_fresh_price_alone():
+    """Only a product whose EVERY observation is stale is marked stale. With one fresh price
+    it is matched, and a stale price beside it must not reach the reference, the shop count or
+    the date. 10.00 against the fresh 9.00 is +11.11%; the stale 1.00 would move all three."""
+    prods = [product("product_p", shelf=10.0, cost=4.0)]
+    obs = [observation("product_p", 9.0, "dor-alon-kq-01", **FORECOURT, observed_at=FRESH),
+           observation("product_p", 1.0, "rami-levy-pt-01", **SUPER, observed_at=OLD)]
+    out = run(_inputs(prods, obs, [match("product_p", "product_p", s) for s in ("dor-alon-kq-01", "rami-levy-pt-01")]))
+    row = out.extras["comparison"][0]
+    assert (row["uncompared_reason"], row["premium_pct"], row["stores"], row["observed_at"]) == (None, 11.11, 1, "2026-09-08")
+    assert out.counts["matched"] == 1 and out.counts["stale_skipped"] == 0
+
+
+def test_an_undated_observation_is_never_called_stale():
+    """`_fresh` refuses an observation with no date, and it should: it cannot drive a finding.
+    But "too old" is a claim about its age, and its age is unknown. None of the 526,437
+    observations in the 2026-09-23 feed is undated; this is here so the first one is not
+    published as a fact about an age nobody measured."""
+    prods = [product("product_p", shelf=17.0, cost=5.0)]
+    obs = [observation("product_p", 10.0, "dor-alon-kq-01", **FORECOURT, observed_at=None)]
+    out = run(_inputs(prods, obs, []))
+    assert out.extras["comparison"] == [] and out.counts["stale_skipped"] == 0
+
+
+def test_scn_047_the_stale_row_and_its_count_reach_the_published_artefact(tmp_path, monkeypatch):
+    """Rule 12. Every test above hands `run` its input; this one runs the engine and the
+    publisher and reads what the owner's browser reads: the row, the count, and the figure
+    of the same name that the Data page renders."""
+    import src.engine.run as run_mod
+    inputs = make_inputs(products=[product("product_p", shelf=17.0, cost=5.0)],
+                         observations=[observation("product_p", 10.0, "dor-alon-kq-01", **FORECOURT, observed_at=OLD),
+                                       observation("notours_1", 10.0, "dor-alon-kq-01", **FORECOURT, observed_at=OLD)],
+                         matches=[])
+    monkeypatch.setattr(run_mod, "_pull_owner_state", lambda: inputs.owner)
+    monkeypatch.setattr(run_mod, "_sales_import", lambda *a, **k: None)
+    monkeypatch.setattr(run_mod, "_market_chain", lambda skip: [])
+    monkeypatch.setattr(run_mod, "load_inputs", lambda **kw: inputs)
+    art = run_mod.run_engine(mode="publish", artefact_path=tmp_path / "d.json", now=RUN_AT)["artefact"]
+    cp = art["capabilities"]["competitor_position"]
+    assert cp["status"] == "available"
+    assert [(r["barcode"], r["uncompared_reason"], r["observed_at"]) for r in cp["comparison"]] == [
+        ("product_p", "stale", "2026-08-01")]
+    assert cp["counts"]["stale_skipped"] == 1
+    assert art["figures"]["competitor_position.stale_skipped"]["value"] == 1
