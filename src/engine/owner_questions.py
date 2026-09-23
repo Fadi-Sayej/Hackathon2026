@@ -68,14 +68,24 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
             suppressed["no_effect"] += 1; continue     # not living: answering changes nothing today
         # ARCH-GATE-002: the basis is declared in policy.yaml and published with the figure,
         # because FR-085 orders by money and never says which money.
-        money = units * (p["shelf_price"] or 0.0)
+        #
+        # ADR-027: with no shelf price there is no figure. Reading it as 0.0 published "₪0 at
+        # stake" for a stake that is unknown, and sorted the question last for it. The basis
+        # is still published, because it says which figure is missing and why.
+        money = units * p["shelf_price"] if p["shelf_price"] else None
         items.append({"question_id": _question_id(b), "barcode": b, "product_name": p["product_name"],
                       "department": p["department"], "fact": FACT,
-                      "why": {"products_affected": 1, "money_at_stake": round(money, 2),
+                      "why": {"products_affected": 1,
+                              "money_at_stake": round(money, 2) if money is not None else None,
+                              "money_missing": None if money is not None else "shelf_price",
                               "money_basis": inputs.policy.question_money_basis,
                               "units_sold": units, "window_id": inputs.window.window_id if inputs.window else None},
-                      "expected_value": round(money * inputs.policy.question_yield_factor, 2)})
-    items.sort(key=lambda i: (-i["expected_value"], i["barcode"]))
+                      "expected_value": (round(money * inputs.policy.question_yield_factor, 2)
+                                         if money is not None else None)})
+    # FR-085 over exactly the questions it can be computed for, then the rest by units sold,
+    # the only weight a question without a figure has. It orders them; it is never money.
+    items.sort(key=lambda i: (0, -i["expected_value"], i["barcode"]) if i["expected_value"] is not None
+               else (1, -i["why"]["units_sold"], i["barcode"]))
     counts = {"open": len(items), "suppressed_withdrawn": suppressed["withdrawn"], "suppressed_idle": suppressed["idle"],
               "suppressed_answered": suppressed["answered"], "suppressed_no_effect": suppressed["no_effect"]}
     out = CapabilityOutput(id=CAP, spec=SPEC, status="available",

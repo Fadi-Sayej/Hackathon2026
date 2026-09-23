@@ -787,6 +787,7 @@ export const ar = {
   'questions.costOf': "كم تشتري {product}؟",
   'questions.save': "حفظ",
   'questions.why': "يخص {money} ₪ خلال {window}",
+  'questions.whyNoPrice': "لا يوجد سعر رف، فلا مبلغ — بيع منه {units} خلال {window}",
   'questions.failed': "لم نستطع حفظ الإجابة — لم تُسجَّل.",
   'unavailable.answer_storage_unavailable': "لا نستطيع الوصول إلى مكان حفظ إجاباتك.",
   'unavailable.no_pos_data': "لا يوجد ملف مخزون من الصندوق، فلا يمكن استخراج شيء هنا.",

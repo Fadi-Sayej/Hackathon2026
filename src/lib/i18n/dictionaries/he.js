@@ -782,6 +782,7 @@ export const he = {
   'questions.costOf': "בכמה אתה קונה {product}?",
   'questions.save': "שמור",
   'questions.why': "נוגע ל-{money} ₪ במהלך {window}",
+  'questions.whyNoPrice': "אין מחיר מדף, ולכן אין סכום — נמכרו {units} במהלך {window}",
   'questions.failed': "לא הצלחנו לשמור — לא נרשם.",
   'unavailable.answer_storage_unavailable': "לא ניתן להגיע למקום שבו נשמרות התשובות.",
   'unavailable.no_pos_data': "אין קובץ מלאי מהקופה, ולכן לא ניתן להפיק כאן דבר.",

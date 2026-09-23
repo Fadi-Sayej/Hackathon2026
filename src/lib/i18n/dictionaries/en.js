@@ -781,6 +781,7 @@ export const en = {
   'questions.costOf': "What do you pay for {product}?",
   'questions.save': "Save",
   'questions.why': "Affects ₪{money} across {window}",
+  'questions.whyNoPrice': "No shelf price, so no amount — {units} sold across {window}",
   'questions.failed': "We could not save the answer — it was not recorded.",
   'unavailable.answer_storage_unavailable': "We cannot reach where your answers are stored.",
   'unavailable.no_pos_data': "We have no stock file from the till, so nothing here can be worked out.",

@@ -6,6 +6,9 @@ import userEvent from '@testing-library/user-event'
 
 import { renderWithI18n } from '../../test/renderWithI18n.jsx'
 import { QuestionPanel } from '../QuestionPanel.jsx'
+import { ar } from '../../lib/i18n/dictionaries/ar.js'
+import { he } from '../../lib/i18n/dictionaries/he.js'
+import { en } from '../../lib/i18n/dictionaries/en.js'
 
 afterEach(cleanup)
 
@@ -86,5 +89,29 @@ describe('why the question is being asked', () => {
     render({ items: [item(2)] })
     const why = document.querySelector('.question__why')
     expect(why.textContent).toMatch(/2026-01\.\.2026-07/)
+  })
+})
+
+describe('ADR-027 — a question with no shelf price shows no figure', () => {
+  // `money_at_stake: null` used to reach this panel as 0 and print "Affects ₪0": nothing at
+  // stake, for a stake nobody knows. The line names the missing price instead, and shows the
+  // only weight the question has: what sold, over which window.
+  const unpriced = {
+    ...item(9),
+    why: { products_affected: 1, money_at_stake: null, money_missing: 'shelf_price',
+      money_basis: 'window_revenue_at_shelf_price', units_sold: 80, window_id: '2026-01..2026-07' },
+    expected_value: null,
+  }
+
+  it.each([['ar', ar], ['he', he], ['en', en]])('in %s it names the missing price, never ₪', (language, dict) => {
+    renderWithI18n(
+      <QuestionPanel artefact={{ schema_version: 2, capabilities: { owner_questions: cap({ items: [unpriced, item(2)] }) } }}
+        onAnswer={vi.fn()} />,
+      { language },
+    )
+    const [first, second] = document.querySelectorAll('.question__why')
+    expect(first.textContent).toBe(dict['questions.whyNoPrice'].replace('{units}', '80').replace('{window}', '2026-01..2026-07'))
+    expect(first.textContent).not.toContain('₪')
+    expect(second.textContent).toContain('₪')                     // a priced question keeps its figure
   })
 })

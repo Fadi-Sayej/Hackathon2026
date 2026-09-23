@@ -76,3 +76,55 @@ def test_storage_unavailable_means_no_questions_are_presented():
     out = run(_inputs(owner=OwnerState.unavailable("pull_failed")))
     assert out.status == "unavailable" and out.unavailable_reason == "answer_storage_unavailable"
     assert out.extras["items"] == []
+
+
+# ── ADR-027: a question whose money is unknown carries no figure ───────────────────────
+#
+# #130. A missing shelf price was read as 0.0: the question published "₪0 at stake" for a
+# stake that is unknown, and sorted last, which under D-8's cap of three means unseen.
+
+def _priced_and_unpriced():
+    return make_inputs(
+        products=[product("cheap_one", shelf=10.0, cost=None, stock=5.0),     # 1 unit    -> ₪10
+                  product("noprice_50", shelf=None, cost=None, stock=5.0),    # 50 units, no price
+                  product("dear_one", shelf=2.0, cost=None, stock=5.0),       # 100 units -> ₪200
+                  product("noprice_80", shelf=None, cost=None, stock=5.0)],   # 80 units, no price
+        sales_summary=[summary("cheap_one", units=1), summary("noprice_50", units=50),
+                       summary("dear_one", units=100), summary("noprice_80", units=80)],
+        window=W)
+
+
+def test_adr_027_an_unknown_shelf_price_publishes_no_figure_and_names_what_is_missing():
+    q = {i["barcode"]: i for i in run(_priced_and_unpriced()).extras["items"]}["noprice_50"]
+    assert q["why"]["money_at_stake"] is None and q["expected_value"] is None
+    assert q["why"]["money_missing"] == "shelf_price"
+    assert q["why"]["units_sold"] == 50.0
+
+
+def test_adr_027_a_known_price_keeps_its_figure_and_says_nothing_is_missing():
+    q = {i["barcode"]: i for i in run(_priced_and_unpriced()).extras["items"]}["dear_one"]
+    assert (q["why"]["money_at_stake"], q["expected_value"], q["why"]["money_missing"]) == (200.0, 200.0, None)
+
+
+def test_adr_027_questions_with_a_figure_come_first_then_the_rest_by_units_sold():
+    order = [i["barcode"] for i in run(_priced_and_unpriced()).extras["items"]]
+    assert order == ["dear_one", "cheap_one", "noprice_80", "noprice_50"]
+
+
+def test_adr_027_the_missing_figure_reaches_the_published_file_as_null(tmp_path, monkeypatch):
+    """Rule 12: the tests above read `run`'s return value. This one runs the engine and the
+    publisher and reads the file the browser fetches, where a None could still have become
+    a 0 or dropped out."""
+    import json
+    import src.engine.run as run_mod
+    from helpers import RUN_AT
+    inputs = _priced_and_unpriced()
+    monkeypatch.setattr(run_mod, "_pull_owner_state", lambda: inputs.owner)
+    monkeypatch.setattr(run_mod, "_sales_import", lambda *a, **k: None)
+    monkeypatch.setattr(run_mod, "_market_chain", lambda skip: [])
+    monkeypatch.setattr(run_mod, "load_inputs", lambda **kw: inputs)
+    run_mod.run_engine(mode="publish", artefact_path=tmp_path / "d.json", now=RUN_AT)
+    items = json.loads((tmp_path / "d.json").read_text())["capabilities"]["owner_questions"]["items"]
+    q = {i["barcode"]: i for i in items}["noprice_80"]
+    assert (q["why"]["money_at_stake"], q["expected_value"], q["why"]["money_missing"]) == (None, None, "shelf_price")
+    assert [i["barcode"] for i in items] == ["dear_one", "cheap_one", "noprice_80", "noprice_50"]
