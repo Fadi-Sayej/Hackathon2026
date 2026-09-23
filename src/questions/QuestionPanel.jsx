@@ -75,10 +75,17 @@ export function QuestionPanel({ artefact, onAnswer }) {
                   (ARCH-DRIVER-007): an answer worth asking for over seven months is not
                   worth the same over one. */}
               <p className="question__why">
-                {t('questions.why', {
-                  money: item.why?.money_at_stake ?? '',
-                  window: item.why?.window_id ?? '',
-                })}
+                {/* ADR-027: no shelf price is no figure. `?? ''` used to print "Affects ₪0",
+                    nothing at stake, for a stake nobody knows. */}
+                {item.why?.money_at_stake === null || item.why?.money_at_stake === undefined
+                  ? t('questions.whyNoPrice', {
+                    units: item.why?.units_sold ?? '',
+                    window: item.why?.window_id ?? '',
+                  })
+                  : t('questions.why', {
+                    money: item.why.money_at_stake,
+                    window: item.why?.window_id ?? '',
+                  })}
               </p>
             </li>
           ))}
