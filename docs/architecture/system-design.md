@@ -1212,6 +1212,7 @@ own, so their rows say so rather than grade it after the fact.
 | [ADR-023](decisions/ADR-023-the-engine-publishes-the-pilot-measurement.md) | The engine publishes the pilot measurement; the browser renders it — **`Ready for review`** | Not stated |
 | [ADR-024](decisions/ADR-024-the-catalogue-is-published-beside-the-artefact.md) | The product catalogue is published beside the artefact, not inside it | Not stated |
 | [ADR-025](decisions/ADR-025-the-comparison-behind-the-finding-is-published.md) | The comparison behind a competitor finding is published, not only the finding | Not stated |
+| [ADR-026](decisions/ADR-026-reconciliation-publishes-the-span-it-reconciled.md) | The reconcile window is cut once per run, at the run's own stock date, and reconciliation publishes that cut — **`Ready for review`** | Easy |
 
 ---
 
@@ -1310,10 +1311,10 @@ Design elements: **E** engine module · **P** publisher/artefact · **C** `compo
 
 | Requirement | Design element | Flow / contract | Verification |
 |---|---|---|---|
-| FR-020, FR-021, FR-022 | E `reconciliation`: implied opening < 0 with receipts > 0 in the reconcile window | 11.1 `sales_summary` | AC-020 |
+| FR-020, FR-021, FR-022 | E `reconciliation`: implied opening < 0 with receipts > 0 in the reconcile window — where that window is cut: [ADR-026](decisions/ADR-026-reconciliation-publishes-the-span-it-reconciled.md), `Ready for review`, not yet accepted | 11.1 `sales_summary` | AC-020 |
 | FR-023, FR-025, FR-026, INV-010, INV-011 | `value_policy: none`; publisher assertion; no cost on the row; i18n copy for "not determinable before a count" | ADR-012 | AC-021, AC-022, AC-023 |
 | FR-024 | `ordering_key: gap_ratio` | 11.3 | AC-020 |
-| FR-027, NFR-010 | `evidence: {recorded_stock, receipts, units_sold, unaccounted, window}` | 11.3 | AC-024 |
+| FR-027, NFR-010 | `evidence: {recorded_stock, receipts, units_sold, unaccounted, window}` — which window: [ADR-026](decisions/ADR-026-reconciliation-publishes-the-span-it-reconciled.md), `Ready for review`, not yet accepted | 11.3 | AC-024 |
 | FR-028, FR-029, FR-030, INV-013, C-12 | E `hygiene` — a capability of its own (ADR-014), `value_policy: none`, one `variant` per reason (negative_stock, no_identifier, absent_price), own badge and own page | 11.2, 11.4 | AC-025 |
 | FR-031, FR-032, INV-014 | no standing kind exists in V1; `value_kinds_present` | ADR-012 | AC-026 |
 | FR-033, INV-015 | `action: count_product`; no cause strings | §14 | AC-027 |
@@ -1321,7 +1322,7 @@ Design elements: **E** engine module · **P** publisher/artefact · **C** `compo
 | NFR-011, AC-028 | determinism; `figures` | R | AC-028 |
 | C-13, SCN-028 | outcomes persist independent of flag | O | AC-029 |
 | §11 unavailable rows | `reconciliation.requires` names `sales_summary`, `hygiene.requires` does not; `status` is computed from `requires`, so receipts absent → `reconciliation: unavailable` while `hygiene` stays available | 11.2, ADR-014 | AC-107 + the rule-12 independence probe (§14) |
-| OQ-201/202 | no floor applied (FR-103(4)); window vintages published so misalignment is visible | 11.4 | — |
+| OQ-201/202 | no floor applied (FR-103(4)); window vintages published so misalignment is visible; the capability's own window: [ADR-026](decisions/ADR-026-reconciliation-publishes-the-span-it-reconciled.md), `Ready for review`, not yet accepted | 11.4 | — |
 
 ### SPEC-003 — Competitor price position
 
