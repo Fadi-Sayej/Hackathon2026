@@ -50,7 +50,8 @@ const V1_PAGES = [
   'dashboard', 'report',
   // The two capabilities whose entries were reachable from no screen at all until the
   // CapabilityPage was routed: 1,632 catalogue_lifecycle and 6 competitor_position.
-  'margin_below_cost', 'catalogue_lifecycle', 'competitor_position',
+  'price_consistency', 'margin_below_cost', 'reconciliation',
+  'hygiene', 'catalogue_lifecycle', 'competitor_position',
   'data-source',
 ]
 

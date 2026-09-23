@@ -32,7 +32,10 @@ import { useI18n } from './lib/i18n/index.js'
  * that invented figure back. So they come back present and empty rather than confident.
  */
 /** Nav ids that are a capability rendered whole by CapabilityPage (FR-102, AC-110). */
-const CAPABILITY_PAGES = new Set(['margin_below_cost', 'catalogue_lifecycle', 'competitor_position'])
+const CAPABILITY_PAGES = new Set([
+  'price_consistency', 'margin_below_cost', 'reconciliation',
+  'hygiene', 'catalogue_lifecycle', 'competitor_position',
+])
 
 /** Pages that fetch `catalogue.json`. Everything else never pays for it. */
 const NEEDS_CATALOGUE = new Set(['products'])

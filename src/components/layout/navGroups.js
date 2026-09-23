@@ -92,7 +92,20 @@ export const navGroups = [
       // specification produces it, so it is browse-only until SPEC-008), and it was
       // reachable only through the old Today page — 71 entries, 34 of them products sold
       // below what they cost. Routing it here is what makes removing that page safe.
+      // All six capabilities, not the three that happened to have no other door.
+      //
+      // #152 removed the old Today page and routed `margin_below_cost` with it, because that
+      // capability was excluded from the daily surface outright and so had literally zero
+      // screens. The other three were filed as "partially reachable" because they DO appear
+      // on the daily surface — and that was the wrong predicate. Ten places out of 1,671 is
+      // not a route to the full set, and FR-102 asks for the full set on a surface other
+      // than the daily one. Measured after #152: 1,117 hygiene, 355 reconciliation and 199
+      // price_consistency entries had no way to be seen whole, of which exactly 10 were on
+      // the daily surface on the day it was measured.
+      { id: 'price_consistency' },
       { id: 'margin_below_cost' },
+      { id: 'reconciliation' },
+      { id: 'hygiene' },
       { id: 'catalogue_lifecycle' },
       { id: 'competitor_position' },
       { id: 'data-source' },
