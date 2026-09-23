@@ -25,16 +25,6 @@ export const en = {
   'awaiting.withdrawn.what': "The written report was produced by a language model. That layer was removed from the pilot.",
   'awaiting.withdrawn.why': "No document ever said what the report should claim or how anyone would check it, and D-12 rules out running a server for one store. A paragraph that reads well and cannot be verified is worse than no paragraph.",
   'awaiting.withdrawn.when': "It is not scheduled. Everything it used to summarise is on the daily screen, where each finding names its own evidence.",
-  'awaiting.competitor.title': "Waiting for competitor prices to be published",
-  'awaiting.competitor.what': "This screen compares your shelf price against what nearby shops charge for the same product.",
-  // No figures in this string, deliberately. It shipped on 2026-09-21 saying "2,618 …
-  // 860 … 854" and every one of those was wrong the next morning: competitor freshness is
-  // measured against RUN TIME, so products age out of `evaluated` into `stale_skipped` with
-  // no scrape and no code change. A count belongs in the artefact the page is rendering,
-  // never in a translated string — and an awaiting state explains why a screen is empty,
-  // which needs no census.
-  'awaiting.competitor.why': "The comparison partly exists. Last night's run matched most of your products against prices from nearby shops, but only some of them could actually be compared — the rest had no cost price, or the competitor's price was too old to trust. Of the ones it could compare, only those that broke a pricing rule reach your browser: the file publishes findings, not comparisons. The previous version of this screen filled the gap from a file frozen in August and showed its prices as though they were today's.",
-  'awaiting.competitor.when': "It opens when the nightly publishes the matched prices beside the findings. That is work on the engine, not missing data.",
   'days.unknown': "No sales data",
   'days.lessThanOne': "<1 day",
   'days.count': "{days} days",
@@ -84,7 +74,7 @@ export const en = {
   'page.prices.hint': 'Your prices against competitors',
   'page.prices.title': 'Price comparison',
   'page.prices.description':
-    'Your prices against Dor Alon, Rami Levy and Shufersal, matched by barcode. Every price shows when it was last seen.',
+    "Your shelf price against the reference nearby shops set — the price the pricing rule judges against, not the cheapest price anyone charges.",
 
   'page.assortment.name': 'Assortment gaps',
   'page.assortment.hint': "What rivals sell and you don't",
@@ -260,19 +250,8 @@ export const en = {
   'ord.estTotal': 'Estimated total',
 
   // ── Prices, gaps, expiry, dashboard, report, data source ──────────
-  'pg.noData': 'No product data',
-  'pg.noDataDesc': 'Load a POS export to compare prices.',
-  'pg.belowCost': 'Selling below cost',
-  'pg.belowCostDetail': 'Losing money on every sale',
-  'pg.dearer': 'Dearer than nearby',
-  'pg.dearerDetail': 'Customers may notice',
-  'pg.cheaper': 'Cheaper than nearby',
-  'pg.cheaperDetail': 'Your advantage',
-  'pg.compared': 'Prices compared',
-  'pg.title': 'Price comparison',
   'pg.nothingHere': 'Nothing here',
   'pg.nothingHereDesc': 'No products fall into this group.',
-  'pg.priceSeen': 'Price seen',
   'gap.under15': 'Under ₪15',
   'gap.over100': 'Over ₪100',
   'gap.loading': 'Loading',
@@ -537,7 +516,6 @@ export const en = {
   'mc.aiContext': 'Market context',
   'mc.staticNote': 'Static context for reliable local demo.',
   'dash.highPriorityItems': '{n} high priority items',
-  'pg.medianAge': 'Median price age {n} days',
   'gap.comparedBranches': 'Compared against {n} branches of the same store format.',
   'gap.acrossBranches': 'Across {n} comparable branches',
 
@@ -574,9 +552,6 @@ export const en = {
   'mi.belowCheapestBy': 'We are {amount} below the cheapest of {n} nearby stores',
   'mi.cheaperBy': 'A competitor is {amount} cheaper — consider matching or repositioning',
 
-  'pg.matchedNote': 'Matched by barcode against Dor Alon, Rami Levy and Shufersal. These are',
-  'pg.referenceNote': ' reference observations, not live prices',
-  'pg.everyRowShows': '— every row shows when the price was last seen. Check before acting on a price that is months old.',
   'gap.comparedIntro': 'Compared against {n} branches of the same store format. These are products',
   'gap.footnote': 'No sales rate is shown for any row, and none can be: this shop has never sold these products. Prices are what comparable branches charged when last collected.',
   'ds.demoDesc': 'The real YomYom POS catalog exported to the app (falls back to a small demo sample if the export is absent). Always available, no upload required.',
@@ -644,7 +619,6 @@ export const en = {
   'eb.categoryMovement': 'Category movement',
   'eb.stockRisk': 'Stock risk',
   'eb.managerAttention': 'Manager attention',
-  'eb.competitorPrices': 'Competitor prices',
   'eb.assortment': 'Assortment',
   'eb.expiryAlerts': 'Expiry alerts',
   'eb.productHealth': 'Product health',
@@ -1003,4 +977,32 @@ export const en = {
   'page.receiving.title': "Receiving",
   'page.receiving.description':
     "Record what arrived today and the date it expires.",
+
+  // The Prices page, on the published comparison (ADR-025).
+  'prices.seen': "Prices seen {when} · {n} nearby shops",
+  'prices.seenNoShops': "Prices seen {when}",
+  'prices.when.today': "today",
+  'prices.when.yesterday': "yesterday",
+  'prices.tab.dearer': "Dearer {n}",
+  'prices.tab.cheaper': "Same or cheaper {n}",
+  'prices.tab.none': "No comparison {n}",
+  'prices.search': "Find a product or barcode…",
+  'prices.searchLabel': "Find a product",
+  'prices.col.gap': "Gap",
+  'prices.col.yours': "Yours",
+  'prices.col.reference': "Reference",
+  'prices.col.shops': "Shops",
+  'prices.col.seen': "Seen",
+  'prices.col.why': "Why",
+  'prices.finding': "Open the finding",
+  'prices.notJudged': "not judged",
+  'prices.legend.finding': "⚑ a finding — opens it under “Every finding, in full”",
+  'prices.legend.notJudged': "“Not judged”: there is no cost price, so the position is shown without a verdict.",
+  'prices.packWarning': "A very large gap usually means those shops sell a different pack under the same barcode. Check the pack before raising a price.",
+  'prices.why.no_reference': "sold nearby, but in no shop like yours",
+  'prices.why.no_shelf_price': "you have no shelf price for it",
+  'prices.why.stale': "price too old to use",
+  'prices.why.unknown': "not compared",
+  'prices.more': "Show {n} more",
+  'prices.notPublished': "This run did not publish the comparison, so there is nothing to show yet.",
 }

@@ -11,6 +11,7 @@ import { loadCatalogue } from './lib/dataAdapters/loadCatalogue.js'
 import { catalogueToProducts } from './lib/dataAdapters/catalogueToProducts.js'
 import { analyzeProducts } from './lib/analytics/inventoryEngine.js'
 import { ProductsPage } from './pages/ProductsPage.jsx'
+import { PriceGapPage } from './pages/PriceGapPage.jsx'
 import { clearOutcome, loadOwnerState, recordOutcome } from './owner/ownerState.js'
 import { DailyPage } from './surface/DailyPage.jsx'
 import { DataPage } from './pages/DataPage.jsx'
@@ -38,28 +39,13 @@ const CAPABILITY_PAGES = new Set([
 ])
 
 /** Pages that fetch `catalogue.json`. Everything else never pays for it. */
-const NEEDS_CATALOGUE = new Set(['products'])
+const NEEDS_CATALOGUE = new Set(['products', 'prices'])
 
 const AWAITING = {
   recommendations: 'demand',
   orders: 'demand',
   'store-layout': 'demand',
   'shelf-plan': 'demand',
-  // NOT 'catalogue' — the catalogue is published and this page still cannot render, which
-  // is exactly the stale-reason failure this codebase keeps hitting. PriceGapPage reads
-  // `competitor.cheapestCompetitorPrice` per product; the artefact publishes findings.
-  //
-  // The gap is 854, not 2,612, and the difference matters. Of 2,618 matched products only
-  // 860 were EVALUATED — competitor_position drops the rest before comparison for no cost
-  // price (40) or a stale competitor price (1,036), which is the engine correctly declining
-  // to compare rather than discarding work. Of those 860, six became entries. So 854
-  // comparisons exist and are not published, because there was no finding to hang them on.
-  //
-  // Store-level output already ships: `capabilities.competitor_position.position` is 164
-  // rows with matched / cheaper_here / dearer_here / median_diff_pct, in today's artefact.
-  //
-  // A publishing decision on the engine side, not a missing input and not the catalogue.
-  prices: 'competitor',
   // Reached only when `catalogue.json` cannot be read — the products branch below returns
   // before this map is consulted. So this is the failed-load state, not a "not published yet".
   products: 'catalogue',
@@ -238,6 +224,21 @@ export default function App() {
     // that the shop has no products, and `loadCatalogue` keeps that apart from a failed load.
     if (activePage === 'products') {
       if (analyzedProducts) return <ProductsPage analyzedProducts={analyzedProducts} />
+      if (catalogue.status === 'loading' || catalogue.status === 'idle') {
+        return <p className="spine__loading">{t('spine.loading')}</p>
+      }
+      return <PageAwaitingData pageId={activePage} needs="catalogue" />
+    }
+    // Prices, on the comparison the nightly publishes since 2026-09-23 (ADR-025) and the
+    // catalogue for its names. Until then it sat on an awaiting state that said the file
+    // "publishes findings, not comparisons" — true when written, false the morning after.
+    if (activePage === 'prices') {
+      if (catalogue.catalogue) {
+        return (
+          <PriceGapPage artefact={artefact} catalogue={catalogue.catalogue} now={now}
+            onOpenFinding={() => setActivePage('competitor_position')} />
+        )
+      }
       if (catalogue.status === 'loading' || catalogue.status === 'idle') {
         return <p className="spine__loading">{t('spine.loading')}</p>
       }

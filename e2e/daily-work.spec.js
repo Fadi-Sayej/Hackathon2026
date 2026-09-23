@@ -33,28 +33,20 @@ test('the data provenance strip never claims more than it has', async ({ page })
 })
 
 
-// Products renders since 2026-09-21. PRICES does not: it awaits the per-product
-// competitor comparison (#137/#148), not the catalogue: `dashboard.json` publishes
-// findings, not a product list.
+// Returned 2026-09-23, when Prices was routed at the per-product comparison the nightly
+// publishes (ADR-025, #148). It was skipped because PRICES awaited exactly that, and the
+// skip's reason named a date rather than a condition so that nobody would go looking for a
+// condition that had already been met. Products has its own test below.
 //
-// ADR-024 was accepted and #129 merged on 2026-09-17, so the nightly (cron `0 0 * * *`)
-// writes the first `public/data/catalogue.json` on 2026-09-18. These return when the pages
-// are routed at it.
-//
-// Phrased as a DATE, not as a condition — and that is not pedantry, it is this file's own
-// argument applied to itself. The first version of this comment said "until ADR-024 is
-// accepted and the nightly writes one", and ADR-024 was accepted within a day of it being
-// written. A reason that names an open condition sends the next reader looking for something
-// that already happened, which is precisely how the cut-over skip this replaced went stale.
-test.skip('prices, gaps and products all render their tables', async ({ page }) => {
-  for (const [name, marker] of [
-    ['Prices', 'Price comparison'],
-    ['Products', 'Inventory table'],
-  ]) {
-    await page.locator('.nav-item', { hasText: name }).click()
-    // `.first()` because the page title and a panel heading share the wording.
-    await expect(page.getByText(marker).first()).toBeVisible()
-  }
+// The header is asserted by name because it is the claim that matters: the column is the
+// policy REFERENCE, which is not the cheapest price anyone charges, and the page this
+// replaced called it "Cheapest nearby".
+test('prices renders the comparison, named in Hebrew, against the reference', async ({ page }) => {
+  await page.locator('.nav-item[data-nav="prices"]').click()
+  const table = page.locator('.page-body table').first()
+  await expect(table).toBeVisible()
+  await expect(table.locator('th', { hasText: 'Reference' })).toHaveCount(1)
+  await expect(table).toContainText(/[\u0590-\u05FF]/)
 })
 
 // Returned 2026-09-21, when the nightly published the first catalogue.json and Products was
