@@ -1179,10 +1179,11 @@ No tracing, no external metrics: a two-person team reads a JSON block and a red 
 ---
 ## 19. Architecture Decisions
 
-The fourteen architecture decision records live one per file under
-[`decisions/`](decisions/). They were extracted from this section by the 2026-09-08
-documentation migration; their content is unchanged, and every `ADR-0NN` reference
-elsewhere in this document resolves to the file below.
+The architecture decision records live one per file under [`decisions/`](decisions/).
+The first fourteen were extracted from this section by the 2026-09-08 documentation
+migration; their content is unchanged, and every `ADR-0NN` reference elsewhere in this
+document resolves to the file below. ADR-021 … ADR-025 state no reversibility of their
+own, so their rows say so rather than grade it after the fact.
 
 | ADR | Decision | Reversibility |
 |---|---|---|
@@ -1206,6 +1207,11 @@ elsewhere in this document resolves to the file below.
 | [ADR-019](decisions/ADR-019-a-conflicting-duplicate-barcode-is-a-hygiene-record.md) | A duplicate barcode whose rows disagree is excluded and reported as hygiene; no field is picked | Easy |
 | [ADR-020](decisions/ADR-020-the-published-population-is-a-policy-not-a-constant.md) | The published population is a policy setting; the artefact states it, so D-14 no longer blocks the cut-over | Easy |
 | [ADR-013](decisions/ADR-013-tests-run-before-merge.md) | Tests run before merge | Easy |
+| [ADR-021](decisions/ADR-021-the-artefact-states-how-many-devices-wrote-owner-state.md) | The artefact states how many devices have written owner state, and when | Not stated |
+| [ADR-022](decisions/ADR-022-a-barcode-less-row-is-identified-by-its-name.md) | A barcode-less row is identified by its name, under ADR-019's rule | Not stated |
+| [ADR-023](decisions/ADR-023-the-engine-publishes-the-pilot-measurement.md) | The engine publishes the pilot measurement; the browser renders it — **`Ready for review`** | Not stated |
+| [ADR-024](decisions/ADR-024-the-catalogue-is-published-beside-the-artefact.md) | The product catalogue is published beside the artefact, not inside it | Not stated |
+| [ADR-025](decisions/ADR-025-the-comparison-behind-the-finding-is-published.md) | The comparison behind a competitor finding is published, not only the finding | Not stated |
 
 ---
 
