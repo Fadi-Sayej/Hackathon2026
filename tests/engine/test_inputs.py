@@ -306,15 +306,22 @@ def test_reimporting_the_same_data_does_not_change_the_digest(tmp_path):
 
 def test_identical_rows_from_different_export_days_are_the_same_input(tmp_path):
     """Deliberate. The digest is over CONTENT: if two POS exports carry identical rows they
-    are the same input, whichever day they were taken. The export day is not lost — it is
-    published in vintages.pos.as_of, where a reader can see it."""
+    are the same input, whichever day of a month they were taken. The export day is not
+    lost — it is published in vintages.pos.as_of, where a reader can see it.
+
+    The day is varied where the engine reads it, the inventory table. This test used to vary
+    the products table, which read_pos_vintage never consults, so it pinned nothing. Across
+    months the digest does change (ADR-026 hashes the month the reconcile figures are cut
+    at); test_unknown_reconcile_window.py pins that."""
     row = {"barcode": "0012", "product_name": "מים", "category": "c", "selling_price": 4.0,
            "wolt_price": 5.0, "cost_price": 1.0}
     import pyarrow as pa_, pyarrow.parquet as pq_
-    a = _dup_silver(tmp_path / "a", [row])
+    a = _dup_silver(tmp_path / "a", [row])                 # counted 2026-08-02
     b = _dup_silver(tmp_path / "b", [row])
-    pq_.write_table(pa_.Table.from_pylist([{**row, "_source_file": "inv.csv", "_as_of": "2026-09-01"}]),
-                    b / "yomyom_products.parquet")
+    inv = pq_.read_table(b / "yomyom_inventory.parquet").to_pylist()
+    pq_.write_table(pa_.Table.from_pylist([{**r, "_as_of": "2026-08-20"} for r in inv]),
+                    b / "yomyom_inventory.parquet")
+    assert _load(b, tmp_path).vintages["pos"]["as_of"] == "2026-08-20", "the day must really differ"
     assert _load(a, tmp_path).inputs_digest == _load(b, tmp_path).inputs_digest
 
 

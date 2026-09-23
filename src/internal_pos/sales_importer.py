@@ -9,7 +9,7 @@ from __future__ import annotations
 import csv
 import re
 from collections import defaultdict
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -89,12 +89,15 @@ MONTHLY_SCHEMA = pa.schema([("barcode", pa.string()), ("month", pa.string()), ("
 SUMMARY_SCHEMA = pa.schema([("barcode", pa.string()), ("product_name", pa.string()), ("months_present", pa.int64()),
                             ("units_total", pa.float64()), ("receipts_total", pa.float64()),
                             ("last_month_with_units", pa.string()), ("observed_zero", pa.bool_()),
-                            ("reconcile_units", pa.float64()), ("reconcile_receipts", pa.float64()),
-                            ("reconcile_months", pa.int64()), ("_imported_at", pa.string())])
+                            ("_imported_at", pa.string())])
 
 
-def import_sales(directory: Path, *, inventory_as_of: Optional[date], full_cycle_months: int = 12,
+def import_sales(directory: Path, *, full_cycle_months: int = 12,
                  silver_dir: Path = SILVER_POS_ROOT, imported_at: Optional[str] = None) -> dict:
+    """The reports, as they are. No stock date is asked for and no reconcile window is cut:
+    ADR-026 makes that cut once per run, in load_inputs, where the stock date and these
+    tables meet. Cutting here as well was a second derivation of one boundary, and the two
+    disagreed on the day no report parsed after a new stock count."""
     imported_at = imported_at or datetime.now(timezone.utc).isoformat()
     monthly: list[dict] = []
     months: list[str] = []
@@ -105,11 +108,9 @@ def import_sales(directory: Path, *, inventory_as_of: Optional[date], full_cycle
         months.append(month)
         monthly.extend(rows)
     if not months:
-        return {"window": None, "monthly_rows": 0, "products": 0, "reconcile_before": None}
+        return {"window": None, "monthly_rows": 0, "products": 0}
 
     window = evidence_window(months, full_cycle_months)
-    reconcile_before = f"{inventory_as_of.year}-{inventory_as_of.month:02d}" if inventory_as_of else None
-    windowed = reconcile_before is not None
 
     by_barcode: dict[str, list[dict]] = defaultdict(list)
     for row in monthly:
@@ -118,24 +119,11 @@ def import_sales(directory: Path, *, inventory_as_of: Optional[date], full_cycle
     for barcode in sorted(by_barcode):
         rows = sorted(by_barcode[barcode], key=lambda r: r["month"])
         with_units = [r["month"] for r in rows if r["units"] > 0]
-        in_window = [r for r in rows if reconcile_before is None or r["month"] < reconcile_before]
         summary.append({
             "barcode": barcode, "product_name": rows[-1]["product_name"], "months_present": len(rows),
             "units_total": sum(r["units"] for r in rows), "receipts_total": sum(r["receipts"] for r in rows),
             "last_month_with_units": max(with_units) if with_units else None,
             "observed_zero": any(r["units"] == 0 for r in rows),
-            # None, not a full-history sum. `reconcile_before is None` means the stock
-            # count's date is unknown, and a window nobody chose is not a window: sales
-            # after the count cannot explain a shortfall observed at the count, so
-            # including them answers a different question than the one reconciliation
-            # asks. Measured against the real seven reports, treating unknown as "every
-            # month" flagged 443 products where the true vintage flags 360 — 117
-            # invented, 34 genuine ones lost, 100 more carrying a different figure.
-            # Rule 8, in the engine: a number that cannot be stated honestly is not
-            # stated. The fields are nullable in SUMMARY_SCHEMA already.
-            "reconcile_units": sum(r["units"] for r in in_window) if windowed else None,
-            "reconcile_receipts": sum(r["receipts"] for r in in_window) if windowed else None,
-            "reconcile_months": len(in_window) if windowed else None,
             "_imported_at": imported_at,
         })
 
@@ -146,5 +134,4 @@ def import_sales(directory: Path, *, inventory_as_of: Optional[date], full_cycle
                    silver_dir / "sales_monthly.parquet", compression="snappy")
     pq.write_table(pa.Table.from_pylist(summary, schema=SUMMARY_SCHEMA),
                    silver_dir / "sales_summary.parquet", compression="snappy")
-    return {"window": window.to_dict(), "monthly_rows": len(monthly), "products": len(summary),
-            "reconcile_before": reconcile_before}
+    return {"window": window.to_dict(), "monthly_rows": len(monthly), "products": len(summary)}

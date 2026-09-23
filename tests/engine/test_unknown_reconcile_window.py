@@ -71,36 +71,36 @@ def _report(directory: Path, hebrew_month: str, *, units: int, receipts: int) ->
     )
 
 
-# ── The importer must not invent a window ────────────────────────────────────
+# ── The cut must not invent a window ─────────────────────────────────────────
+#
+# ADR-026 moved the cut from the importer to load_inputs, so these ask load_inputs. The
+# importer no longer takes a stock date at all; what it still owes is everything that
+# does not need one.
 
-def test_an_unknown_as_of_writes_no_reconciliation_figures(tmp_path):
-    """The regression. `None` meant "every month"; it must mean "unknown"."""
-    sales = tmp_path / "sales"
-    _report(sales, "ינואר", units=10, receipts=100)
-    _report(sales, "יולי", units=900, receipts=5)      # after any plausible count
+def _load_after_import(tmp_path, sales, as_of, *, source="declared_sidecar", stock=50.0):
+    """The importer, then load_inputs, over silver carrying a chosen stock count — the
+    boundary ADR-026 moved the cut across."""
+    from datetime import datetime, timezone
+    import src.engine.run as run_mod
+    from src.engine.inputs import load_inputs
+    from src.engine.policy import load_policy
+    from src.owner_state.model import OwnerState
 
-    result = import_sales(sales, inventory_as_of=None, silver_dir=tmp_path / "silver")
-
-    row = pq.read_table(tmp_path / "silver" / "sales_summary.parquet").to_pylist()[0]
-    assert row["reconcile_units"] is None, "a window nobody chose must not be summed"
-    assert row["reconcile_receipts"] is None
-    assert row["reconcile_months"] is None
-    assert result["reconcile_before"] is None
+    silver = _pos_silver(tmp_path / "silver", as_of, stock=stock, source=source)
+    run_mod._sales_import(sales, silver)
+    return load_inputs(policy=load_policy(), owner=OwnerState.unavailable("no_credentials"),
+                       run_at=datetime(2026, 9, 23, tzinfo=timezone.utc), silver_dir=silver,
+                       signals_dir=tmp_path / "n", matches_path=tmp_path / "n.parquet")
 
 
-def test_an_unknown_as_of_still_writes_everything_that_does_not_need_a_window(tmp_path):
-    """Only the three windowed figures are withheld.
-
-    `catalogue_lifecycle` reads the same table and asks nothing about the stock
-    date — 1,632 entries today. Withholding the whole table to protect three
-    columns would take it down with them, which is why this is not
-    `sales_summary = None`.
-    """
+def test_the_importer_writes_everything_lifecycle_reads_without_a_stock_date(tmp_path):
+    """`catalogue_lifecycle` reads the same table and asks nothing about the stock date —
+    1,632 entries on 2026-09-16. The importer needs no date to write what it reads."""
     sales = tmp_path / "sales"
     _report(sales, "ינואר", units=10, receipts=100)
     _report(sales, "יולי", units=900, receipts=5)
 
-    import_sales(sales, inventory_as_of=None, silver_dir=tmp_path / "silver")
+    import_sales(sales, silver_dir=tmp_path / "silver")
 
     row = pq.read_table(tmp_path / "silver" / "sales_summary.parquet").to_pylist()[0]
     assert row["units_total"] == 910
@@ -110,16 +110,17 @@ def test_an_unknown_as_of_still_writes_everything_that_does_not_need_a_window(tm
     assert (tmp_path / "silver" / "sales_monthly.parquet").exists()
 
 
-def test_a_known_as_of_is_unchanged(tmp_path):
-    """The nightly's behaviour is pinned. Only months before the count count."""
+def test_a_known_stock_date_cuts_before_its_month(tmp_path):
+    """The nightly's behaviour is pinned, at the place the cut now happens. Counted on
+    2026-06-06: January counts, July (after the count) does not."""
     sales = tmp_path / "sales"
     _report(sales, "ינואר", units=10, receipts=100)
     _report(sales, "יולי", units=900, receipts=5)
 
-    result = import_sales(sales, inventory_as_of=date(2026, 6, 6), silver_dir=tmp_path / "silver")
+    inputs = _load_after_import(tmp_path, sales, "2026-06-06")
 
-    row = pq.read_table(tmp_path / "silver" / "sales_summary.parquet").to_pylist()[0]
-    assert result["reconcile_before"] == "2026-06"
+    row = inputs.sales_summary["12"]
+    assert inputs.vintages["sales"]["reconcile_before"] == "2026-06"
     assert row["reconcile_units"] == 10, "July is after the count and must be excluded"
     assert row["reconcile_receipts"] == 100
     assert row["reconcile_months"] == 1
@@ -425,3 +426,255 @@ def test_a_refused_date_publishes_no_boundary(tmp_path):
     # boundary the engine does not have.
     out = run(inputs)
     assert out.status == "unavailable" and out.entries == []
+
+
+# ── ADR-026: the reconcile window is cut once per run, at load ───────────────
+#
+# The boundary used to be decided twice: by the importer when it wrote the summary, and
+# again by load_inputs when #144 published it. The two agree every normal night and
+# disagree on the day no report parses after a new stock count, because the summary cut
+# for the old count survives beside the new one. ADR-026 makes the cut once, in
+# load_inputs, so the figures, the published boundary and the capability's window are one
+# fact. Most of these drive the whole engine, because the loss happened between modules.
+#
+# One product, 0012, sells in January (10 units, 100 received) and July (5, 900).
+
+def _pos_silver(silver, as_of, *, stock, source="declared_sidecar"):
+    """POS tables for 0012 carrying a chosen stock count. Rewrites only the POS tables, so
+    calling it on an existing silver keeps whatever sales tables an earlier run left."""
+    silver.mkdir(parents=True, exist_ok=True)
+    base = {"_source_file": "inv.csv", "_as_of": as_of, "_as_of_source": source}
+    row = {"barcode": "0012", "product_name": "מים", "category": "c",
+           "selling_price": 4.0, "wolt_price": 5.0, "cost_price": 1.0}
+    pq.write_table(pa.Table.from_pylist([{**base, **row}]), silver / "yomyom_products.parquet")
+    pq.write_table(pa.Table.from_pylist([{**base, **row}]), silver / "yomyom_margins.parquet")
+    pq.write_table(pa.Table.from_pylist([{"barcode": "0012", "product_name": "מים",
+                                          "current_stock": stock, **base}]),
+                   silver / "yomyom_inventory.parquet")
+    return silver
+
+
+def _two_reports(tmp_path):
+    sales = tmp_path / "sales"
+    _report(sales, "ינואר", units=10, receipts=100)
+    _report(sales, "יולי", units=5, receipts=900)
+    return sales
+
+
+def _engine(silver, sales_dir):
+    """The whole path (importer, load_inputs, capability, publisher) in print mode."""
+    from datetime import datetime, timezone
+    import src.engine.run as run_mod
+
+    return run_mod.run_engine(mode="print", skip_market=True, silver_dir=silver,
+                              sales_dir=sales_dir, signals_dir=silver.parent / "no-signals",
+                              matches_path=silver.parent / "no-matches.parquet",
+                              now=datetime(2026, 9, 23, tzinfo=timezone.utc))["artefact"]
+
+
+def test_adr_026_the_window_published_is_the_span_reconciled(tmp_path):
+    """AC-024, NFR-010: the period beside the arithmetic is the period of the arithmetic.
+
+    Counted on 2026-06-06, so only January is summed: 50 − 100 + 10 = −40, flagged. The
+    window used to say 2026-01..2026-07 beside January's figures."""
+    silver = _pos_silver(tmp_path / "silver", "2026-06-06", stock=50.0)
+
+    artefact = _engine(silver, _two_reports(tmp_path))
+    recon = artefact["capabilities"]["reconciliation"]
+
+    assert recon["status"] == "available"
+    assert recon["window"]["window_id"] == "2026-01..2026-01"
+    assert [e["evidence"]["window_id"] for e in recon["entries"]] == ["2026-01..2026-01"]
+    assert artefact["figures"]["reconciliation.flagged"]["thresholds"]["window"] == "2026-01..2026-01"
+    assert artefact["vintages"]["sales"]["reconcile_before"] == "2026-06"
+
+
+def test_adr_026_lifecycle_keeps_the_span_of_the_sales_data(tmp_path):
+    """What must not move. Catalogue lifecycle reasons over every month (ADR-011), so its
+    window stays the sales span however the reconcile window is cut."""
+    silver = _pos_silver(tmp_path / "silver", "2026-06-06", stock=50.0)
+
+    artefact = _engine(silver, _two_reports(tmp_path))
+
+    assert artefact["capabilities"]["catalogue_lifecycle"]["window"]["window_id"] == "2026-01..2026-07"
+    assert artefact["vintages"]["sales"]["months"] == ["2026-01", "2026-07"]
+
+
+def test_adr_026_a_new_count_is_reconciled_against_the_reports_on_disk(tmp_path):
+    """#105 finding 2, made impossible rather than refused.
+
+    A summary cut at a February count survives a night when no report parses, and an August
+    export lands. At February 0012 is not short (500 − 100 + 10 = 410). Counted in August
+    against both months, it is (500 − 1000 + 15 = −485). The engine used to publish the
+    February cut beside the August stock. It must publish what a clean import on the August
+    date publishes."""
+    sales = _two_reports(tmp_path)
+    silver = _pos_silver(tmp_path / "silver", "2026-02-15", stock=500.0)
+    _engine(silver, sales)                                     # the February night
+    _pos_silver(silver, "2026-08-12", stock=500.0)             # an August export lands…
+    bad_day = _engine(silver, tmp_path / "no-reports")         # …and no report parses
+    control = _engine(_pos_silver(tmp_path / "control", "2026-08-12", stock=500.0), sales)
+
+    want = control["capabilities"]["reconciliation"]
+    got = bad_day["capabilities"]["reconciliation"]
+    assert [(e["barcode"], e["evidence"]["unaccounted"]) for e in want["entries"]] == [("12", 485.0)]
+    assert [(e["barcode"], e["evidence"]["unaccounted"]) for e in got["entries"]] == [("12", 485.0)]
+    assert got["window"]["window_id"] == "2026-01..2026-07"
+    assert bad_day["vintages"]["sales"]["reconcile_before"] == "2026-08"
+
+
+def test_adr_026_an_unusable_stock_date_cuts_nothing(tmp_path):
+    """#102, kept where the cut now lives. A filesystem timestamp is not a stock count, so
+    there is no boundary: the figures stay unknown, never the whole history."""
+    inputs = _load_after_import(tmp_path, _two_reports(tmp_path), "2026-06-06", source="file_mtime")
+
+    row = inputs.sales_summary["12"]
+    assert (row["reconcile_units"], row["reconcile_receipts"], row["reconcile_months"]) == (None, None, None)
+    assert inputs.vintages["sales"]["reconcile_before"] is None
+    assert run(inputs).unavailable_reason == "unknown_stock_date"
+
+
+def test_adr_026_reconcile_months_counts_months_not_rows(tmp_path):
+    """#156 part 1. A report can print one barcode's line twice, and the month it covers is
+    still one month. (Whether the two lines are one sale is #156 part 2, not asserted here.)"""
+    sales = tmp_path / "sales"
+    sales.mkdir(parents=True)
+    line = "מים,0012,10,2.00,4.00,20.00,100,2.00,0.00,22,\n"
+    (sales / "דוח מכירות חודש ינואר 2026.csv").write_text(REPORT + line + line, encoding="utf-8")
+
+    inputs = _load_after_import(tmp_path, sales, "2026-06-06")
+
+    assert inputs.sales_summary["12"]["reconcile_months"] == 1
+
+
+def test_adr_026_the_boundary_is_part_of_the_digest(tmp_path):
+    """ADR-026 part 5. Identical files with counts in different months cut different
+    figures, so the digest must differ. Two counts within one month cut identically, so it
+    must not."""
+    sales = _two_reports(tmp_path)
+
+    def digest(as_of):
+        return _engine(_pos_silver(tmp_path / as_of, as_of, stock=50.0), sales)["inputs_digest"]
+
+    june = digest("2026-06-06")
+    assert june != digest("2026-08-12")
+    assert june == digest("2026-06-20")
+
+
+def test_adr_026_no_published_boundary_means_nothing_is_carved():
+    """The window is carved from vintages.sales.reconcile_before, which is null exactly when
+    load_inputs found the stock date unusable. The capability's own check can still pass
+    beside it, because usable_stock_date reads the wall clock and a run can cross UTC
+    midnight between the two. The answer is the honest refusal, not a window carved from
+    nothing and not a crash."""
+    inputs = _vintaged(make_inputs(products=[product("2", stock=-716.0)],
+                                   sales_summary=[summary("2", units=663, receipts=62)], window=W))
+    inputs.vintages["sales"]["reconcile_before"] = None
+
+    out = run(inputs)
+
+    assert out.status == "unavailable"
+    assert out.unavailable_reason == "unknown_stock_date"
+    assert out.entries == []
+
+
+# ── ADR-026, pinned where it can fail (from the PR #160 review) ──────────────
+
+def test_adr_026_the_count_s_own_month_is_outside_the_cut_and_the_window(tmp_path):
+    """The strict `<`, pinned where it can fail: a report IN the count's month.
+
+    Counted on 2026-06-06 with June's report on disk. June's flows straddle the count, so the
+    figures and the window both stop before June. `<=` in the cut would sum June as well
+    (170 received, 17 sold); `<=` in the carve would print 2026-01..2026-06 beside January's
+    figures, which is #150's defect back from one character."""
+    sales = tmp_path / "sales"
+    _report(sales, "ינואר", units=10, receipts=100)
+    _report(sales, "יוני", units=7, receipts=70)
+    _report(sales, "יולי", units=5, receipts=900)
+
+    recon = _engine(_pos_silver(tmp_path / "silver", "2026-06-06", stock=50.0),
+                    sales)["capabilities"]["reconciliation"]
+
+    assert recon["window"]["window_id"] == "2026-01..2026-01"
+    assert [(e["evidence"]["receipts"], e["evidence"]["units_sold"], e["evidence"]["window_id"])
+            for e in recon["entries"]] == [(100.0, 10.0, "2026-01..2026-01")]
+
+
+def test_adr_026_an_old_summary_s_baked_cut_is_ignored(tmp_path):
+    """The summary every existing checkout still holds: written before ADR-026, carrying the
+    three figures the importer used to bake. Cut at a February count (500 − 100 + 10 = 410,
+    not short), it survives a night when no report parses beside an August export. The
+    figures must be cut again at load from the monthly rows (500 − 1000 + 15 = −485).
+    Preferring the baked ones would bring #105 back."""
+    import src.engine.run as run_mod
+
+    sales = _two_reports(tmp_path)
+    silver = _pos_silver(tmp_path / "silver", "2026-02-15", stock=500.0)
+    run_mod._sales_import(sales, silver)
+    path = silver / "sales_summary.parquet"
+    baked = [{**row, "reconcile_units": 10.0, "reconcile_receipts": 100.0, "reconcile_months": 1}
+             for row in pq.read_table(path).to_pylist()]            # the February cut, old format
+    pq.write_table(pa.Table.from_pylist(baked), path)
+    _pos_silver(silver, "2026-08-12", stock=500.0)
+
+    got = _engine(silver, tmp_path / "no-reports")["capabilities"]["reconciliation"]
+
+    assert [(e["barcode"], e["evidence"]["unaccounted"]) for e in got["entries"]] == [("12", 485.0)]
+
+
+def test_adr_026_a_malformed_monthly_row_costs_its_product_not_the_run(tmp_path):
+    """SPEC-002 §11 independence, at the place the sums moved to. The importer always writes
+    numbers, but the sums now run inside load_inputs instead of inside the isolated import
+    step, so a NULL in sales_monthly must cost that product its figures, not every capability
+    its artefact."""
+    import src.engine.run as run_mod
+
+    silver = _pos_silver(tmp_path / "silver", "2026-06-06", stock=50.0)
+    run_mod._sales_import(_two_reports(tmp_path), silver)
+    path = silver / "sales_monthly.parquet"
+    rows = pq.read_table(path).to_pylist()
+    rows[0]["units"] = None                                           # one line, malformed
+    pq.write_table(pa.Table.from_pylist(rows, schema=pq.read_schema(path)), path)
+
+    artefact = _engine(silver, tmp_path / "no-reports")
+
+    assert artefact["capabilities"]["hygiene"]["status"] == "available"
+    recon = artefact["capabilities"]["reconciliation"]
+    assert recon["unavailable_reason"] != "capability_error"
+    assert recon["entries"] == [], "0012's figures are unknown, so it is not reconciled"
+
+
+def test_adr_026_absent_monthly_rows_are_unknown_not_zero(tmp_path):
+    """Absent is not empty. With the summary on disk and the monthly table gone, a known
+    boundary has nothing to cut, so the figures are None, not 0."""
+    from datetime import datetime, timezone
+    import src.engine.run as run_mod
+    from src.engine.inputs import load_inputs
+    from src.engine.policy import load_policy
+    from src.owner_state.model import OwnerState
+
+    silver = _pos_silver(tmp_path / "silver", "2026-06-06", stock=50.0)
+    run_mod._sales_import(_two_reports(tmp_path), silver)
+    (silver / "sales_monthly.parquet").unlink()
+    inputs = load_inputs(policy=load_policy(), owner=OwnerState.unavailable("no_credentials"),
+                         run_at=datetime(2026, 9, 23, tzinfo=timezone.utc), silver_dir=silver,
+                         signals_dir=tmp_path / "n", matches_path=tmp_path / "n.parquet")
+
+    row = inputs.sales_summary["12"]
+    assert (row["reconcile_units"], row["reconcile_receipts"], row["reconcile_months"]) == (None, None, None)
+
+
+def test_adr_026_a_window_of_no_months_is_never_published():
+    """Defence the capability owes on its own. load_inputs cuts the figures and the window
+    from the same rows, so a boundary before every month leaves no reconciled month and
+    no_sales_evidence refuses first. Handed a reconciled month anyway, the capability must
+    still refuse rather than publish `None..None` beside findings."""
+    inputs = _vintaged(make_inputs(products=[product("2", stock=-716.0)],
+                                   sales_summary=[summary("2", units=663, receipts=62)], window=W))
+    inputs.vintages["sales"]["reconcile_before"] = "2026-01"          # before every month of W
+
+    out = run(inputs)
+
+    assert out.status == "unavailable"
+    assert out.unavailable_reason == "no_sales_evidence"
+    assert out.entries == []

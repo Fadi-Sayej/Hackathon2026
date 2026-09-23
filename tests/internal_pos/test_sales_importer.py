@@ -1,5 +1,4 @@
 # tests/internal_pos/test_sales_importer.py
-from datetime import date
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
@@ -20,7 +19,7 @@ def test_writes_one_row_per_barcode_per_month_and_a_summary(tmp_path):
     _write(reports, "דוח מכירות חודש ינואר 2026.csv", ["מים,00123,10,2,4,20,12,2,0,1,", "קפה,555,0,1,3,0,0,1,0,1,"])
     _write(reports, "דוח מכירות חודש פברואר 2026.csv", ["מים,123,5,2,4,10,0,2,0,1,"])
     silver = tmp_path / "silver"
-    result = import_sales(reports, inventory_as_of=date(2026, 3, 1), silver_dir=silver, imported_at="t")
+    result = import_sales(reports, silver_dir=silver, imported_at="t")
 
     monthly = pq.read_table(silver / "sales_monthly.parquet").to_pylist()
     assert sorted((r["barcode"], r["month"]) for r in monthly) == [("123", "2026-01"), ("123", "2026-02"), ("555", "2026-01")]
@@ -32,16 +31,6 @@ def test_writes_one_row_per_barcode_per_month_and_a_summary(tmp_path):
     assert result["window"]["full_annual_cycle"] is False
 
 
-def test_reconcile_window_stops_before_the_inventory_month(tmp_path):
-    reports = tmp_path / "sales"; reports.mkdir()
-    _write(reports, "דוח מכירות חודש ינואר 2026.csv", ["a,1,10,1,1,0,7,1,0,1,"])
-    _write(reports, "דוח מכירות חודש פברואר 2026.csv", ["a,1,20,1,1,0,9,1,0,1,"])
-    silver = tmp_path / "silver"
-    import_sales(reports, inventory_as_of=date(2026, 2, 15), silver_dir=silver, imported_at="t")
-    row = pq.read_table(silver / "sales_summary.parquet").to_pylist()[0]
-    assert row["reconcile_units"] == 10 and row["reconcile_receipts"] == 7 and row["reconcile_months"] == 1
-
-
 def test_evidence_window_requires_consecutive_months():
     w = evidence_window([f"2025-{m:02d}" for m in range(1, 13)], 12)
     assert w.full_annual_cycle is True
@@ -51,5 +40,5 @@ def test_evidence_window_requires_consecutive_months():
 
 def test_no_reports_means_no_window(tmp_path):
     reports = tmp_path / "sales"; reports.mkdir()
-    result = import_sales(reports, inventory_as_of=None, silver_dir=tmp_path / "silver", imported_at="t")
+    result = import_sales(reports, silver_dir=tmp_path / "silver", imported_at="t")
     assert result["window"] is None and result["monthly_rows"] == 0

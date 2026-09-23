@@ -56,7 +56,10 @@ def make_inputs(**kw):
         window=kw.get("window"), observations=kw.get("observations"), matches=kw.get("matches"),
         stores=load_store_types(), withdrawn=kw.get("withdrawn"), conflicting=kw.get("conflicting", []), inputs_digest=kw.get("inputs_digest", "0" * 64), idle=kw.get("idle"),
         vintages={"pos": {"file": "f", "as_of": "2026-08-02"},
-                  "sales": {"months": [], "first": None, "last": None, "full_annual_cycle": False},
+                  # ADR-026: reconciliation carves its window from this boundary, and load_inputs
+                  # derives it from the POS date above, so it follows that date: 2026-08.
+                  "sales": {"months": [], "first": None, "last": None, "full_annual_cycle": False,
+                            "reconcile_before": "2026-08"},
                   "competitor": {"snapshot_date": "2026-09-08", "sources": []},
                   "owner_state": {"pulled_at": owner.pulled_at, "status": owner.status,
                                   "devices": device_register(owner)}},

@@ -18,6 +18,7 @@ from src.engine.inputs import EngineInputs
 from src.engine.model import CapabilityOutput, Entry, Figure, entry_id
 from src.engine.registry import derive_status
 from src.engine.stock_date import usable_stock_date
+from src.internal_pos.sales_importer import evidence_window
 
 SPEC = "SPEC-002"
 RECON, HYGIENE = "reconciliation", "hygiene"
@@ -73,7 +74,7 @@ def _conflicting_entries(inputs: EngineInputs) -> list:
     return out
 
 
-def _detection_entries(inputs: EngineInputs) -> list:
+def _detection_entries(inputs: EngineInputs, window) -> list:
     withdrawn = inputs.withdrawn or set()
     out = []
     for p in inputs.products:
@@ -105,7 +106,7 @@ def _detection_entries(inputs: EngineInputs) -> list:
             capability=RECON, barcode=b, product_name=p["product_name"],
             department=p["department"], action="count_product", characterisation="inconsistent",
             evidence={"recorded_stock": p["recorded_stock"], "receipts": receipts, "units_sold": units,
-                      "unaccounted": round(missing, 2), "window_id": inputs.window.window_id,
+                      "unaccounted": round(missing, 2), "window_id": window.window_id,
                       "reconcile_months": int(s["reconcile_months"])},
             value=None, ordering_key={"name": "gap_ratio", "value": round(missing / receipts, 4)}))
     return sorted(out, key=lambda e: (-e.ordering_key["value"], e.barcode))
@@ -124,10 +125,12 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
     # The first asks the vintage directly rather than inferring it from NULLs in the
     # summary. Inferring was the first version of this guard and it had a hole: when
     # no monthly report parses, import_sales returns early and does NOT rewrite
-    # sales_summary.parquet, so a summary written by an older run survives with its
-    # full-history sums intact and no NULL to find. Reproduced: 439 findings
-    # published `available`, over a window nobody chose. The stock date is a fact the
-    # engine already holds, so the guard reads the fact.
+    # sales_summary.parquet, so a summary written by an older run survived with its
+    # sums intact and no NULL to find. Reproduced: 439 findings published `available`,
+    # over a window nobody chose. The stock date is a fact the engine already holds, so
+    # the guard reads the fact. (Since ADR-026 the summary carries no cut at all — the
+    # figures are cut at load from this run's date — so a surviving summary can no longer
+    # carry an old one either.)
     # `.strip()` is not decoration: a whitespace-only value is truthy, so `if not
     # as_of` alone let "   " through to date.fromisoformat() in _sales_import, which
     # raises — a capability_error, which is a worse answer than an honest refusal.
@@ -144,6 +147,17 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
                          source=pos_vintage.get("as_of_source")) is None:
         return CapabilityOutput.unavailable(RECON, SPEC, "unknown_stock_date")
 
+    # ADR-026: the window is carved from the one boundary load_inputs cut the figures at,
+    # so the period published beside the arithmetic is the period of the arithmetic. That
+    # boundary is null exactly when load_inputs found the stock date unusable. The check
+    # above can still pass beside it: usable_stock_date reads the wall clock, so a count
+    # dated tomorrow at load is dated today here if the run crosses UTC midnight. That is
+    # the same unknown, and it gets the same honest refusal, never a window carved from
+    # nothing and never a crash.
+    reconcile_before = ((inputs.vintages or {}).get("sales") or {}).get("reconcile_before")
+    if reconcile_before is None:
+        return CapabilityOutput.unavailable(RECON, SPEC, "unknown_stock_date")
+
     # The second: the date is known, but it precedes every month we have, so no
     # month is inside the reconciliation window. Every row then carries
     # reconcile_receipts 0.0, the `receipts <= 0` skip below swallows all of them,
@@ -155,12 +169,20 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
             (row.get("reconcile_months") or 0) > 0 for row in inputs.sales_summary.values()):
         return CapabilityOutput.unavailable(RECON, SPEC, "no_sales_evidence")
 
-    flagged = _detection_entries(inputs)
+    # The same strict `<` the cut applies, over the same monthly rows, so the window is the
+    # months the figures were summed over. Through load_inputs the guard above leaves at
+    # least one; handed inputs that leave none, a window of no months is refused rather than
+    # published as "None..None" beside findings.
+    window = evidence_window([m for m in inputs.window.months if m < reconcile_before],
+                             inputs.policy.full_annual_cycle_months)
+    if not window.months:
+        return CapabilityOutput.unavailable(RECON, SPEC, "no_sales_evidence")
+    flagged = _detection_entries(inputs, window)
     return CapabilityOutput(
-        id=RECON, spec=SPEC, status="available", window=inputs.window,
+        id=RECON, spec=SPEC, status="available", window=window,
         thresholds={}, counts={"flagged": len(flagged)}, entries=flagged,
         figures=[Figure("flagged", len(flagged), "products", ["pos", "sales"],
-                        {"window": inputs.window.window_id})])
+                        {"window": window.window_id})])
 
 
 def run_hygiene(inputs: EngineInputs) -> CapabilityOutput:
