@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import csv
 import re
+import sys
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -82,6 +83,40 @@ def read_report(path: Path) -> tuple[Optional[str], list[dict]]:
     return month, out
 
 
+def _collapse_reprinted(rows: list[dict]) -> tuple[list[dict], int, int]:
+    """One report's lines, with each barcode's month counted once (#156).
+
+    The report is sales per barcode joined to the POS item master, so a barcode with two
+    master rows prints its sales once per row. Measured over the seven real reports: 28
+    such pairs, every one identical in units, cost of sales and receipts, differing only in
+    master fields. Summing them counted one month twice.
+
+    Lines that agree on what was sold, received and charged become one row. The purchase
+    price survives only if they agree on it too: where two master rows disagree, the cost is
+    not known, and ADR-019 forbids picking one. Lines that disagree on units or receipts are
+    not that mechanism, so nothing is inferred from them: they stay as printed, and are
+    counted so the import can say so.
+
+    Returns the rows, how many barcodes were collapsed, and how many were kept as printed.
+    """
+    by_barcode: dict[str, list[dict]] = defaultdict(list)
+    for row in rows:
+        by_barcode[row["barcode"]].append(row)
+    out, collapsed, kept = [], 0, 0
+    for lines in by_barcode.values():
+        if len(lines) == 1:
+            out.append(lines[0])
+            continue
+        if len({(r["units"], r["receipts"], r["selling_price"]) for r in lines}) > 1:
+            out.extend(lines)
+            kept += 1
+            continue
+        costs = {r["cost_price"] for r in lines}
+        out.append({**lines[0], "cost_price": costs.pop() if len(costs) == 1 else None})
+        collapsed += 1
+    return out, collapsed, kept
+
+
 MONTHLY_SCHEMA = pa.schema([("barcode", pa.string()), ("month", pa.string()), ("product_name", pa.string()),
                             ("units", pa.float64()), ("receipts", pa.float64()), ("revenue", pa.float64()),
                             ("cost_price", pa.float64()), ("selling_price", pa.float64()),
@@ -101,14 +136,21 @@ def import_sales(directory: Path, *, full_cycle_months: int = 12,
     imported_at = imported_at or datetime.now(timezone.utc).isoformat()
     monthly: list[dict] = []
     months: list[str] = []
+    collapsed = kept = 0
     for path in sorted(directory.glob("*.csv")):
         month, rows = read_report(path)
         if month is None or not rows:
             continue
+        rows, n_collapsed, n_kept = _collapse_reprinted(rows)
+        collapsed += n_collapsed
+        kept += n_kept
         months.append(month)
         monthly.extend(rows)
+    if kept:
+        print(f"WARNING  {kept} barcode-month(s) printed on lines that disagree on units or receipts; "
+              f"kept as printed, not collapsed (#156)", file=sys.stderr)
     if not months:
-        return {"window": None, "monthly_rows": 0, "products": 0}
+        return {"window": None, "monthly_rows": 0, "products": 0, "reprinted_collapsed": 0, "reprinted_kept": 0}
 
     window = evidence_window(months, full_cycle_months)
 
@@ -134,4 +176,5 @@ def import_sales(directory: Path, *, full_cycle_months: int = 12,
                    silver_dir / "sales_monthly.parquet", compression="snappy")
     pq.write_table(pa.Table.from_pylist(summary, schema=SUMMARY_SCHEMA),
                    silver_dir / "sales_summary.parquet", compression="snappy")
-    return {"window": window.to_dict(), "monthly_rows": len(monthly), "products": len(summary)}
+    return {"window": window.to_dict(), "monthly_rows": len(monthly), "products": len(summary),
+            "reprinted_collapsed": collapsed, "reprinted_kept": kept}
