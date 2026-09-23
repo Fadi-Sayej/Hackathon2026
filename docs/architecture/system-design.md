@@ -1386,7 +1386,7 @@ Design elements: **E** engine module · **P** publisher/artefact · **C** `compo
 | NFR-042, C-43 | Firestore + cache | ADR-003 | AC-090 |
 | INV-045 | questions ask only for facts from his own records (cost) | — | — |
 | §11 storage unavailable | panel not shown | 9.4 | — |
-| OQ-503 | questions occupy their own panel (provisional) | ADR-006 | — |
+| OQ-503 | questions occupy their own panel at the top of the daily page, above the action list, and take none of its places (resolved 2026-09-23 by the repository owner) | ADR-006 | — |
 
 ### SPEC-006 — Daily action surface
 
@@ -1482,7 +1482,7 @@ Everything not in this table is removed (§5.4).
 |---|---|---|
 | `surface.unvalued_places` | 3 of 10 | OQ-602 |
 | Unvalued precedence for one-product-one-place and interleaving (`surface.unvalued_order`) | reconciliation → competitor_position → idle → hygiene (hygiene last: 1,155 finite cleanup records, §9.2) | OQ-601 |
-| Questions placement | own panel, not surface places | OQ-503 |
+| Questions placement | own panel above the action list, not surface places — **resolved 2026-09-23** | OQ-503 |
 | Deferral lapse | 4 h / tomorrow / next week (existing) | OQ-604 |
 | Decline permanence | stands for the entry id; changed value does not reopen | OQ-605 |
 | `freshness_days` | 14 | OQ-306 |
