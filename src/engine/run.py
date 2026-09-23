@@ -60,16 +60,12 @@ def _pull_owner_state() -> OwnerState:
 def _sales_import(sales_dir: Optional[Path] = None, silver_dir: Optional[Path] = None) -> dict:
     sales_dir = sales_dir or SALES_DIR
     silver_dir = silver_dir or SILVER_DIR
-    from datetime import date
-    from src.internal_pos.pos_importer import read_pos_vintage
-    from src.engine.stock_date import usable_stock_date
     from src.internal_pos.sales_importer import import_sales
-    vintage = read_pos_vintage(silver_dir)
-    # Same question, same answer, or the summary carries figures the capability would have
-    # refused — which is the failure stock_date.py exists to close.
-    as_of = usable_stock_date(vintage.get("as_of") if vintage else None,
-                              source=vintage.get("as_of_source") if vintage else None)
-    return import_sales(sales_dir, inventory_as_of=as_of, silver_dir=silver_dir)
+    # No stock date: ADR-026 cuts the reconcile window once per run, in load_inputs. This
+    # step used to ask for the date and cut the summary with it, which made the boundary a
+    # fact decided at import and decided again at load — and the two disagreed on the day
+    # no report parsed after a new stock count.
+    return import_sales(sales_dir, silver_dir=silver_dir)
 
 
 def _market_chain(skip: bool) -> list:

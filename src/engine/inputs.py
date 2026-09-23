@@ -2,6 +2,7 @@
 """Everything a capability may read, loaded once per run (design.md §11.1)."""
 from __future__ import annotations
 
+from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -165,6 +166,45 @@ def _window_from_summary(monthly, policy: Policy) -> Optional[EvidenceWindow]:
     return evidence_window(months, policy.full_annual_cycle_months) if months else None
 
 
+def _cut_reconcile_window(summary_rows: list, monthly: Optional[list],
+                          reconcile_before: Optional[str]) -> list:
+    """ADR-026. The reconcile figures, cut once per run where the stock date meets the reports.
+
+    The importer used to cut them when it wrote the summary, and this module derived the
+    boundary again when it published it (#144): one fact, decided at two moments. They
+    agreed every normal night and disagreed on the day no report parsed after a new stock
+    count, when a summary cut for the old count survived beside the new one. Measured over a
+    copy of the real silver tables, that day published 139 findings cut at February beside an
+    August count; a clean import on the August date publishes 439.
+
+    Only months STRICTLY BEFORE the boundary count, because sales after a stock count cannot
+    explain a shortfall observed at it. `reconcile_before is None` means the stock date is
+    unusable, and then the three figures are None, never a full-history sum: a window nobody
+    chose is not a window (#102). Measured against the real reports, treating unknown as
+    "every month" flagged 443 products where the true vintage flags 360.
+
+    `reconcile_months` counts distinct months, as its name says. A report can print one
+    barcode's line twice (#156), and that is still one month.
+
+    Rows are summed in (barcode, month) order, the order the importer summed them in, so a
+    normal night publishes the same figures it did when the importer made the cut.
+    """
+    known = reconcile_before is not None
+    before = defaultdict(list)
+    if known:
+        for r in sorted(monthly or [], key=lambda r: (r["barcode"], r["month"])):
+            if r["month"] < reconcile_before:
+                before[r["barcode"]].append(r)
+    out = []
+    for row in summary_rows:
+        rows = before.get(row["barcode"], [])
+        out.append({**row,
+                    "reconcile_units": sum(r["units"] for r in rows) if known else None,
+                    "reconcile_receipts": sum(r["receipts"] for r in rows) if known else None,
+                    "reconcile_months": len({r["month"] for r in rows}) if known else None})
+    return out
+
+
 def _competitor_vintage(observations: Optional[list]) -> dict:
     """Where the competitor half of a run came from, in terms a reader can check.
 
@@ -219,7 +259,6 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
                             if products_raw else (None, None))
     monthly = _rows(silver_dir / "sales_monthly.parquet")
     summary_rows = _rows(silver_dir / "sales_summary.parquet")
-    summary = {r["barcode"]: r for r in summary_rows} if summary_rows else None
     window = _window_from_summary(monthly, policy) if monthly else None
     latest_signal = sorted(signals_dir.glob("*.parquet")) if signals_dir.exists() else []
     signals = _rows(latest_signal[-1]) if latest_signal else None
@@ -250,25 +289,28 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
         "owner_state": {"pulled_at": owner.pulled_at, "status": owner.status,
                         "reason": owner.reason, "devices": device_register(owner)},
     }
-    # The boundary reconciliation actually used, published because OQ-201 was closed on the
-    # words "window vintages published so misalignment is visible" (§21) — and this is the
-    # one window that was not. `vintages.sales` spans every monthly row; reconciliation
-    # counts only the months BEFORE the stock count, so the two differ whenever the count
-    # predates the last report. Measured on the 2026-09-21 artefact: the published window
-    # said seven months while no entry used more than five.
+    # The boundary the reconcile figures are cut at, published because OQ-201 was closed on
+    # the words "window vintages published so misalignment is visible" (§21) — and this was
+    # the one window that was not (#144). `vintages.sales` spans every monthly row;
+    # reconciliation counts only the months BEFORE the stock count.
     #
-    # `usable_stock_date` rather than a second derivation, so this and the capability's own
-    # refusal (reconciliation.run) cannot disagree about what the date is — the single
-    # definition that module exists to be.
+    # ADR-026: this is also where the cut is MADE, once per run, so the figures, this
+    # published boundary and the capability's window are one fact and cannot disagree.
+    # `usable_stock_date` rather than a second derivation, so the cut and the capability's
+    # own refusal (reconciliation.run) cannot disagree about what the date is.
     #
     # Null means the same thing it means there: we do not know when the stock was counted,
     # so there is no boundary. It is never the full span by default.
     _as_of = usable_stock_date((vintages["pos"] or {}).get("as_of"),
                                source=(vintages["pos"] or {}).get("as_of_source"))
-    vintages["sales"]["reconcile_before"] = _as_of.strftime("%Y-%m") if _as_of else None
+    reconcile_before = _as_of.strftime("%Y-%m") if _as_of else None
+    vintages["sales"]["reconcile_before"] = reconcile_before
+    summary = ({r["barcode"]: r for r in _cut_reconcile_window(summary_rows, monthly, reconcile_before)}
+               if summary_rows else None)
     vintages["sales"] = {k: vintages["sales"][k]
                          for k in ("months", "first", "last", "full_annual_cycle", "reconcile_before")}
-    digest = _digest(products, summary_rows, monthly, observations, matches, policy, owner)
+    digest = _digest(products, summary_rows, monthly, observations, matches, policy, owner,
+                     reconcile_before)
     return EngineInputs(products=products, inventory=inventory or None,
                         sales_monthly=monthly, sales_summary=summary, window=window,
                         observations=observations, matches=matches, stores=stores, withdrawn=None, idle=None, conflicting=conflicting,
@@ -293,7 +335,8 @@ def _content_only(row):
     return {k: v for k, v in row.items() if k not in _NOT_CONTENT}
 
 
-def _digest(products, summary_rows, monthly, observations, matches, policy, owner) -> str:
+def _digest(products, summary_rows, monthly, observations, matches, policy, owner,
+            reconcile_before: Optional[str]) -> str:
     """A hex digest over the CONTENT the run read, not over the files it read them from.
 
     Content, because a parquet rewritten with identical rows is the same input and must
@@ -322,6 +365,12 @@ def _digest(products, summary_rows, monthly, observations, matches, policy, owne
     feed("products", products)
     feed("sales_summary", summary_rows)
     feed("sales_monthly", monthly)
+    # ADR-026: the reconcile figures are cut here at load, so the boundary they are cut at is
+    # an input like the rows it cuts. It used to reach the digest only through sums the
+    # importer baked into the summary; without this line two runs over identical files, with
+    # counts in different months, would share a digest while publishing different findings.
+    # The month, not the date: two counts within one month cut identically.
+    feed("reconcile_before", [{"month": reconcile_before}])
     feed("observations", observations)
     feed("matches", matches)
     feed("policy", policy.as_dict())

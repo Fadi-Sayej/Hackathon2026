@@ -1,9 +1,9 @@
 """Is the published stock-count date usable as a reconciliation boundary?
 
-One question, asked in two places that must agree: `_sales_import` decides whether
-to window the summary, and `reconciliation.run` decides whether to reconcile at all.
-If they disagree, the summary carries figures the capability then publishes over a
-window it would have refused — which is the failure this module exists to close.
+One question, asked in two places that must agree: `load_inputs` decides where to cut
+the reconcile window (ADR-026), and `reconciliation.run` decides whether to reconcile at
+all. If they disagree, the capability publishes figures over a window it would have
+refused — which is the failure this module exists to close.
 
 `resolve_as_of` validates nothing (`src/internal_pos/pos_importer.py`): `--as-of`
 is taken verbatim, and `schemas/dashboard.schema.json` types the field as a bare
