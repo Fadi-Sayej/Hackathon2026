@@ -43,16 +43,25 @@ def balanced_reference(same_format_min: Optional[float], supermarket_min: Option
     return None                                                    # FR-044c: no comparison
 
 
-def _fresh(observed_at: Optional[str], run_at: datetime, days: int) -> bool:
+def _observed(observed_at: Optional[str]) -> Optional[datetime]:
+    """When the price was seen, or None when the observation does not say."""
     if not observed_at:
-        return False
+        return None
     try:
         seen = datetime.fromisoformat(str(observed_at).replace("Z", "+00:00"))
     except ValueError:
-        return False
-    if seen.tzinfo is None:
-        seen = seen.replace(tzinfo=timezone.utc)
-    return seen >= run_at - timedelta(days=days)
+        return None
+    return seen if seen.tzinfo is not None else seen.replace(tzinfo=timezone.utc)
+
+
+def _fresh(observed_at: Optional[str], run_at: datetime, days: int) -> bool:
+    seen = _observed(observed_at)
+    return seen is not None and seen >= run_at - timedelta(days=days)
+
+
+def _seen_at(obs: list) -> Optional[str]:
+    """The date of the newest observation: how recent the best evidence is."""
+    return max((o.get("observed_at") or "") for o in obs)[:10] or None
 
 
 def _is_structurally_uncomparable(p: dict, policy) -> bool:
@@ -79,14 +88,17 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
 
     approved = {m["internal_barcode"] for m in inputs.matches if m.get("approved", True)}
     by_barcode: dict = {}
-    stale_only: set = set()
+    # Dated, and older than the bound. An undated observation is refused by _fresh too, but
+    # lands in neither: "too old" is a claim about its age, and its age is unknown.
+    stale: dict = {}
     for o in inputs.observations:
         if o["barcode"] not in approved and inputs.matches:
             pass                                                   # observations are already barcode-keyed
         if not _fresh(o["observed_at"], run_at, policy.freshness_days):
-            stale_only.add(o["barcode"]); continue
+            if _observed(o["observed_at"]) is not None:
+                stale.setdefault(o["barcode"], []).append(o)
+            continue
         by_barcode.setdefault(o["barcode"], []).append(o)
-    stale_only -= set(by_barcode)
 
     # Format allowance, measured once over products holding BOTH a supermarket and a
     # same-format price (FR-044b).
@@ -101,7 +113,10 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
     counts = {"catalogue": len(inputs.products), "comparable_population": 0, "matched": 0,
               "structurally_uncomparable": 0, "no_comparison": 0, "evaluated": 0, "breaches": 0,
               "attention": 0, "review": 0, "purchase_cost_findings": 0, "no_cost_skipped": 0,
-              "stale_skipped": len(stale_only)}
+              # Counted in the product loop, over the comparable population like every other
+              # coverage count. It used to be every stale barcode in the competitor feed: 1,085
+              # on 2026-09-23, where this reads 53. 1,028 were barcodes the store does not sell.
+              "stale_skipped": 0}
     entries: list[Entry] = []
     position: dict = {}
     # FR-102's problem in this capability's own terms (#137). Six findings reach the owner
@@ -114,6 +129,9 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
     # nothing for a product skipped as stale — indistinguishable, to the owner, from "no
     # competitor sells this". That is rule 8 and D-3: when a number cannot be stated, say so,
     # do not fall silent. Measured, the two options differ by 1 KB gzipped.
+    #
+    # So does every product seen ONLY in stale observations. It is not matched — nothing
+    # fresh — and until 2026-09-23 that meant no row, which was exactly the silence above.
     comparison: list = []
 
     for p in inputs.products:
@@ -127,6 +145,16 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
         obs = by_barcode.get(b) or []
         if not obs:
             counts["no_comparison"] += 1
+            old = stale.get(b)
+            if old:
+                # SCN-047: not surfaced, and any display marks the observation's age — which
+                # needs the age published. Our own missing price is named first, as below.
+                reason = "stale" if p["shelf_price"] else "no_shelf_price"
+                if reason == "stale":
+                    counts["stale_skipped"] += 1
+                comparison.append({"barcode": b, "shelf_price": p["shelf_price"], "stores": len(old),
+                                   "observed_at": _seen_at(old), "reference": None, "premium_pct": None,
+                                   "uncompared_reason": reason})
             continue
         counts["matched"] += 1
 
@@ -147,7 +175,7 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
         sup = [o for o in obs if o["store_format"] in SUPERMARKET_FORMATS]
         reference = balanced_reference(min((o["price"] for o in same), default=None),
                                        min((o["price"] for o in sup), default=None), allowance_pct)
-        seen_at = max((o.get("observed_at") or "") for o in obs)[:10] or None
+        seen_at = _seen_at(obs)
         # Barcode and figures only. `product_name` and `department` are in catalogue.json
         # (ADR-024) against the same barcode, and a page showing this needs that file
         # anyway — carrying them here too costs 41 KB gzipped for a second copy of the
