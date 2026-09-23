@@ -1,20 +1,21 @@
 ---
 ID: ADR-027
 Title: A question whose money is unknown carries no figure, and ranks after every question that has one
-Status: Ready for review
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-09-23
 Parent: [System Design](../system-design.md) §19
 Related Specs: F5-S1, F6-S1
 Inputs: [docs/features/F5-owner-knowledge-capture/specs/F5-S1-owner-knowledge-capture.md, ADR-001, ADR-012, ADR-019, src/engine/owner_questions.py, src/questions/QuestionPanel.jsx, public/data/dashboard.json (2026-09-23), CLAUDE.md rules 8, 11, #130, #156]
-Updated: 2026-09-23
+Updated: 2026-09-24
 ---
 
 # ADR-027 — A question whose money is unknown carries no figure, and ranks after every question that has one
 
-**Status:** Ready for review · **Recorded in:** [System Design](../system-design.md) §19 ·
-proposed by `smartshelf-architect` for #130. A role may not approve its own output
-(HANDOVER rule 2), so this waits for the repository owner.
+**Status:** Accepted (2026-09-24, by the repository owner) · **Recorded in:**
+[System Design](../system-design.md) §19 · proposed by `smartshelf-architect` for #130 and
+held at `Ready for review` until he decided it, because a role may not approve its own output
+(HANDOVER rule 2). Asked directly and answered directly, on PR #159.
 
 ## Context
 
