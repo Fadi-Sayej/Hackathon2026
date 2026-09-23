@@ -1,211 +1,248 @@
 import { useMemo, useState } from 'react'
-import { MetricCard } from '../components/shared/MetricCard.jsx'
-import { StatusBadge } from '../components/shared/StatusBadge.jsx'
-import { EmptyState } from '../components/shared/EmptyState.jsx'
-import { useT } from '../lib/i18n/index.js'
 import { Button } from '../components/shared/Button.jsx'
-import { formatCurrency } from '../components/shared/formatters.js'
-import { DATA_FRESHNESS } from '../data/marketData.js'
-import { credibleLoss } from '../lib/analytics/actionPriority.js'
+import { EmptyState } from '../components/shared/EmptyState.jsx'
+import { StatusBadge } from '../components/shared/StatusBadge.jsx'
+import { unavailableReason } from '../lib/i18n/unavailableReason.js'
+import { useI18n } from '../lib/i18n/index.js'
+import { formatDate, formatShekel } from '../lib/utils/format.js'
+import { dirProps } from '../lib/utils/rtl.js'
 
 /**
- * Competitor price comparison — the strongest evidence this product has.
+ * Your shelf price against what nearby shops charge, product by product.
  *
- * Backed by real matched barcodes against Dor Alon, Rami Levy and Shufersal. Unlike
- * anything stock-based, these numbers do not depend on the POS stock counts the
- * manager has told us are unreliable.
+ * Built on `capabilities.competitor_position.comparison` (ADR-025): one row per product the
+ * engine matched, carrying either its comparison or the reason there is none. Names come from
+ * `catalogue.json` by barcode (ADR-024), which is why the row carries none of its own.
  *
- * Every price carries `ageDays`. It is shown on every single row, always. A competitor
- * price is a claim about another business: stated flatly it is a liability, stated with
- * its age it is useful. One wrong claim costs more trust than every correct one earns.
+ * WHAT THE PAGE DOES NOT DO
+ *   It computes no price, no gap and no verdict (ADR-001). The percentage is the engine's
+ *   `premium_pct`; the page groups rows by its sign and sorts them. There is no shekel
+ *   difference column because that would be browser arithmetic over money, and there is no
+ *   below-cost tab because `margin_below_cost` owns that on its own page — the version this
+ *   replaces computed it here and got 63 where the engine said 34.
+ *
+ *   `reference` is the balanced policy reference the breach judgement is made against. It is
+ *   NOT the cheapest price anyone charges (ADR-025 measured the gap at 14%), so nothing here
+ *   calls it that. The old page did, from a file frozen on 2026-08-09.
+ *
+ * Laid out as the owner approved it on 2026-09-23: three tabs, 25 rows at a time, a flag on
+ * a product that is a finding, and a reason on every product that could not be compared.
  */
 
-const VIEWS = {
-  DEARER: 'dearer',
-  CHEAPER: 'cheaper',
-  BELOW_COST: 'below_cost',
+const PAGE_SIZE = 25
+const TABS = ['dearer', 'cheaper', 'none']
+const ISOLATE = (text) => `⁦${text}⁩`
+
+/**
+ * `premium_pct` is in percentage POINTS. `formatPercent` treats anything between -1 and 1 as
+ * a ratio and multiplies it by 100, so a product 0.5% dearer would read "+50%". Whole
+ * numbers from 10 up, one decimal below, two only when one would round a real gap to zero.
+ */
+function formatPremium(pct) {
+  let decimals = Math.abs(pct) >= 10 ? 0 : 1
+  if (pct !== 0 && Number(pct.toFixed(decimals)) === 0) decimals = 2
+  const size = Math.abs(pct).toFixed(decimals).replace(/\.0+$/, '')
+  const sign = Number(size) === 0 ? '' : pct > 0 ? '+' : '−'
+  return ISOLATE(`${sign}${size}%`)
 }
 
-const TOP_N = 25
-
-function ageTone(days) {
-  if (days == null) return 'neutral'
-  if (days <= 30) return 'success'
-  if (days <= 120) return 'info'
-  return 'warning'
+/** Today, yesterday, or the date — the age SCN-047 asks every display to mark. */
+function seenLabel(date, now, t) {
+  if (!date) return '—'
+  const today = new Date(now).toISOString().slice(0, 10)
+  const days = Math.round((Date.parse(today) - Date.parse(date)) / 86_400_000)
+  if (days === 0) return t('prices.when.today')
+  if (days === 1) return t('prices.when.yesterday')
+  return formatDate(date)
 }
 
-function ageLabel(days) {
-  if (days == null) return 'age unknown'
-  if (days === 0) return 'seen today'
-  if (days === 1) return 'seen yesterday'
-  if (days < 30) return `seen ${days} days ago`
-  const months = Math.round(days / 30)
-  return months <= 1 ? 'seen about a month ago' : `seen about ${months} months ago`
+/** Why a product was not compared. A reason this build has no words for says "not compared"
+ *  rather than printing its key — the engine can add one before the page learns it. */
+function whyText(reason, t) {
+  const key = `prices.why.${reason}`
+  const text = t(key)
+  return text === key ? t('prices.why.unknown') : text
 }
 
-export function PriceGapPage({ products = [] }) {
-  const t = useT()
-  const [view, setView] = useState(VIEWS.DEARER)
+function tabOf(row) {
+  if (row.premium_pct === null || row.premium_pct === undefined) return 'none'
+  return row.premium_pct > 0 ? 'dearer' : 'cheaper'
+}
 
-  const rows = useMemo(() => {
-    const out = []
-    for (const product of products) {
-      const competitor = product.competitor
-      const cheapest = competitor?.cheapestCompetitorPrice
-      const ours = product.price
+const byBarcode = (a, b) => String(a.barcode).localeCompare(String(b.barcode))
+const ORDER = {
+  dearer: (a, b) => b.premium_pct - a.premium_pct || byBarcode(a, b),
+  cheaper: (a, b) => a.premium_pct - b.premium_pct || byBarcode(a, b),
+  // Most shops first: a product sold widely nearby and still uncompared is the one worth
+  // knowing about.
+  none: (a, b) => (b.stores ?? 0) - (a.stores ?? 0) || byBarcode(a, b),
+}
 
-      if (ours == null || ours <= 0) continue
+export function PriceGapPage({ artefact, catalogue, now, onOpenFinding }) {
+  const { t } = useI18n()
+  const [view, setView] = useState('dearer')
+  const [query, setQuery] = useState('')
+  const [shown, setShown] = useState(PAGE_SIZE)
 
-      // Same credibility guard the action list uses, so the two screens can never
-      // report different numbers of below-cost products.
-      const belowCost = credibleLoss(ours, product.cost)
+  const capability = artefact?.capabilities?.competitor_position
+  const comparison = capability?.comparison
 
-      if (cheapest == null) {
-        if (belowCost != null) {
-          out.push({ product, ours, cheapest: null, delta: null, belowCost, ageDays: null })
-        }
-        continue
-      }
-
-      out.push({
-        product,
-        ours,
-        cheapest,
-        delta: ours - cheapest,
-        belowCost,
-        ageDays: competitor?.priceAgeDays ?? null,
-      })
+  const names = useMemo(() => {
+    const map = new Map()
+    for (const p of catalogue?.products || []) {
+      if (p.barcode) map.set(String(p.barcode), p.product_name)
     }
+    return map
+  }, [catalogue])
+
+  const findings = useMemo(
+    () => new Set((capability?.entries || []).map((e) => String(e.barcode))),
+    [capability],
+  )
+
+  const grouped = useMemo(() => {
+    const out = { dearer: [], cheaper: [], none: [] }
+    if (!Array.isArray(comparison)) return out
+    const q = query.trim().toLowerCase()
+    for (const row of comparison) {
+      const name = names.get(String(row.barcode)) || ''
+      if (q && !name.toLowerCase().includes(q) && !String(row.barcode).includes(q)) continue
+      out[tabOf(row)].push(row)
+    }
+    for (const id of TABS) out[id].sort(ORDER[id])
     return out
-  }, [products])
+  }, [comparison, names, query])
 
-  const dearer = useMemo(
-    () => rows.filter((r) => r.delta != null && r.delta > 0).sort((a, b) => b.delta - a.delta),
-    [rows],
-  )
-  const cheaper = useMemo(
-    () => rows.filter((r) => r.delta != null && r.delta < 0).sort((a, b) => a.delta - b.delta),
-    [rows],
-  )
-  const belowCost = useMemo(
-    () => rows.filter((r) => r.belowCost != null).sort((a, b) => b.belowCost - a.belowCost),
-    [rows],
-  )
-
-  const active = view === VIEWS.DEARER ? dearer : view === VIEWS.CHEAPER ? cheaper : belowCost
-
-  if (!products.length) {
-    return <EmptyState title={t('pg.noData')} description={t('pg.noDataDesc')} />
+  if (!capability) {
+    // Absent is not empty: rendering nothing would read as "no competitor sells anything".
+    return (
+      <section className="capability capability__missing" {...dirProps()}>
+        <p>{t('capability.missing')}</p>
+      </section>
+    )
   }
 
+  if (capability.status === 'unavailable') {
+    // AC-107. No tabs and no counts: "Dearer 0" would read as a finding, and nothing ran.
+    return (
+      <section className="capability" {...dirProps()}>
+        <p className="capability__unavailable">{unavailableReason(t, capability.unavailable_reason)}</p>
+      </section>
+    )
+  }
+
+  if (!Array.isArray(comparison)) {
+    return (
+      <section className="capability" {...dirProps()}>
+        <p className="capability__unavailable">{t('prices.notPublished')}</p>
+      </section>
+    )
+  }
+
+  const competitor = artefact.vintages?.competitor || {}
+  const when = competitor.snapshot_date ? seenLabel(competitor.snapshot_date, now, t) : null
+  const active = grouped[view]
+  const visible = active.slice(0, shown)
+  const remaining = active.length - visible.length
+  const compared = view !== 'none'
+
+  const choose = (id) => { setView(id); setShown(PAGE_SIZE) }
+  const search = (value) => { setQuery(value); setShown(PAGE_SIZE) }
+
   return (
-    <>
-      <section className="metric-grid">
-        <MetricCard
-          label={t('pg.belowCost')}
-          value={belowCost.length}
-          detail={t('pg.belowCostDetail')}
-          tone="danger"
-        />
-        <MetricCard
-          label={t('pg.dearer')}
-          value={dearer.length}
-          detail={t('pg.dearerDetail')}
-          tone="warning"
-        />
-        <MetricCard label={t('pg.cheaper')} value={cheaper.length} detail={t('pg.cheaperDetail')} tone="success" />
-        <MetricCard
-          label={t('pg.compared')}
-          value={DATA_FRESHNESS?.priceCount ?? rows.length}
-          detail={t('pg.medianAge', { n: DATA_FRESHNESS?.medianPriceAgeDays ?? '?' })}
-          tone="info"
-        />
-      </section>
-
-      <section className="panel">
-        <div className="panel-heading">
-          <div>
-            <p className="eyebrow">{t('eb.competitorPrices')}</p>
-            <h2>{t('pg.title')}</h2>
-            <p className="page-description" style={{ marginTop: '0.25rem' }}>
-              {t('pg.matchedNote')}
-              <strong>{t('pg.referenceNote')}</strong> {t('pg.everyRowShows')}
-              price was last seen. Check before acting on a price that is months old.
+    <section className="panel" {...dirProps()}>
+      <div className="panel-heading">
+        <div>
+          {when ? (
+            <p className="eyebrow">
+              {competitor.store_count != null
+                ? t('prices.seen', { when, n: competitor.store_count })
+                : t('prices.seenNoShops', { when })}
             </p>
-          </div>
+          ) : null}
         </div>
+      </div>
 
-        <div className="recommendation-actions" style={{ flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
-          <Button tone={view === VIEWS.BELOW_COST ? 'primary' : 'ghost'} onClick={() => setView(VIEWS.BELOW_COST)}>
-            Below cost ({belowCost.length})
+      <div className="recommendation-actions" style={{ flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
+        {TABS.map((id) => (
+          <Button key={id} tone={view === id ? 'primary' : 'ghost'} aria-pressed={view === id}
+            onClick={() => choose(id)}>
+            {t(`prices.tab.${id}`, { n: grouped[id].length.toLocaleString('en-US') })}
           </Button>
-          <Button tone={view === VIEWS.DEARER ? 'primary' : 'ghost'} onClick={() => setView(VIEWS.DEARER)}>
-            We are dearer ({dearer.length})
-          </Button>
-          <Button tone={view === VIEWS.CHEAPER ? 'primary' : 'ghost'} onClick={() => setView(VIEWS.CHEAPER)}>
-            We are cheaper ({cheaper.length})
-          </Button>
-        </div>
+        ))}
+        <input
+          className="operational-search"
+          type="search"
+          value={query}
+          onChange={(event) => search(event.target.value)}
+          placeholder={t('prices.search')}
+          aria-label={t('prices.searchLabel')}
+        />
+      </div>
 
-        {active.length === 0 ? (
-          <EmptyState title={t('pg.nothingHere')} description={t('pg.nothingHereDesc')} />
-        ) : (
-          <div className="price-table-scroll">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>{t('common.product')}</th>
-                  <th className="numeric">Our price</th>
-                  {view === VIEWS.BELOW_COST ? (
-                    <>
-                      <th className="numeric">Costs us</th>
-                      <th className="numeric">Loss / sale</th>
-                    </>
-                  ) : (
-                    <>
-                      <th className="numeric">Cheapest nearby</th>
-                      <th className="numeric">Difference</th>
-                      <th>{t('pg.priceSeen')}</th>
-                    </>
-                  )}
-                </tr>
-              </thead>
-              <tbody>
-                {active.slice(0, TOP_N).map((row) => (
-                  <tr key={row.product.id}>
-                    <td dir="auto">{row.product.name}</td>
-                    <td className="numeric">{formatCurrency(row.ours)}</td>
-                    {view === VIEWS.BELOW_COST ? (
-                      <>
-                        <td className="numeric">{formatCurrency(row.product.cost)}</td>
-                        <td className="numeric negative">−{formatCurrency(row.belowCost)}</td>
-                      </>
-                    ) : (
-                      <>
-                        <td className="numeric">{formatCurrency(row.cheapest)}</td>
-                        <td className={`numeric ${row.delta > 0 ? 'negative' : 'positive'}`}>
-                          {row.delta > 0 ? '+' : '−'}
-                          {formatCurrency(Math.abs(row.delta))}
-                        </td>
-                        <td>
-                          <StatusBadge tone={ageTone(row.ageDays)}>{ageLabel(row.ageDays)}</StatusBadge>
-                        </td>
-                      </>
-                    )}
+      {view === 'cheaper' ? <p className="page-description">{t('prices.packWarning')}</p> : null}
+
+      {active.length === 0 ? (
+        <EmptyState title={t('pg.nothingHere')} description={t('pg.nothingHereDesc')} />
+      ) : (
+        <div className="price-table-scroll">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>{t('common.product')}</th>
+                {compared ? <th className="numeric">{t('prices.col.gap')}</th> : null}
+                <th className="numeric">{t('prices.col.yours')}</th>
+                {compared
+                  ? <th className="numeric">{t('prices.col.reference')}</th>
+                  : <th>{t('prices.col.why')}</th>}
+                <th className="numeric">{t('prices.col.shops')}</th>
+                <th>{t('prices.col.seen')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {visible.map((row) => {
+                const barcode = String(row.barcode)
+                const isFinding = findings.has(barcode)
+                return (
+                  <tr key={barcode} data-barcode={barcode}>
+                    <td dir="auto">
+                      {names.get(barcode) || barcode}
+                      {isFinding ? (
+                        <Button tone="ghost" aria-label={t('prices.finding')} onClick={onOpenFinding}>⚑</Button>
+                      ) : null}
+                      {row.uncompared_reason === 'no_cost' ? (
+                        <StatusBadge tone="neutral">{t('prices.notJudged')}</StatusBadge>
+                      ) : null}
+                    </td>
+                    {compared ? (
+                      <td className={`numeric ${row.premium_pct > 0 ? 'negative' : row.premium_pct < 0 ? 'positive' : ''}`}>
+                        {formatPremium(row.premium_pct)}
+                      </td>
+                    ) : null}
+                    <td className="numeric">{formatShekel(row.shelf_price)}</td>
+                    {compared
+                      ? <td className="numeric">{formatShekel(row.reference?.value)}</td>
+                      : <td>{whyText(row.uncompared_reason, t)}</td>}
+                    <td className="numeric">{row.stores ?? '—'}</td>
+                    <td>{seenLabel(row.observed_at, now, t)}</td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-        {active.length > TOP_N && (
-          <p className="page-description">
-            Showing the {TOP_N} largest of {active.length}.
-          </p>
-        )}
-      </section>
-    </>
+      {remaining > 0 ? (
+        <Button tone="ghost" onClick={() => setShown(shown + PAGE_SIZE)}>
+          {t('prices.more', { n: Math.min(PAGE_SIZE, remaining) })}
+        </Button>
+      ) : null}
+
+      {visible.some((row) => findings.has(String(row.barcode)))
+        ? <p className="page-description">{t('prices.legend.finding')}</p> : null}
+      {compared && visible.some((row) => row.uncompared_reason === 'no_cost')
+        ? <p className="page-description">{t('prices.legend.notJudged')}</p> : null}
+    </section>
   )
 }
