@@ -1213,6 +1213,7 @@ own, so their rows say so rather than grade it after the fact.
 | [ADR-024](decisions/ADR-024-the-catalogue-is-published-beside-the-artefact.md) | The product catalogue is published beside the artefact, not inside it | Not stated |
 | [ADR-025](decisions/ADR-025-the-comparison-behind-the-finding-is-published.md) | The comparison behind a competitor finding is published, not only the finding | Not stated |
 | [ADR-026](decisions/ADR-026-reconciliation-publishes-the-span-it-reconciled.md) | The reconcile window is cut once per run, at the run's own stock date, and reconciliation publishes that cut | Easy |
+| [ADR-027](decisions/ADR-027-a-question-whose-money-is-unknown-carries-no-figure.md) | A question whose money is unknown carries no figure, and ranks after every question that has one — **`Ready for review`** | Easy |
 
 ---
 
@@ -1376,7 +1377,7 @@ Design elements: **E** engine module · **P** publisher/artefact · **C** `compo
 | FR-082, FR-082a, INV-041 | suppression over `withdrawn` and `idle` | 9.4 | AC-081 |
 | FR-083 | `questions.suppressed {withdrawn, idle, no_effect}` | 11.4 | AC-082 |
 | FR-084, INV-040, D-8, C-40 | `questions.limit = 3`; panel slices | U | AC-080 |
-| FR-085, C-41, NFR-041 | expected value = money at stake × yield (deterministic) | E | AC-083 |
+| FR-085, C-41, NFR-041 | expected value = money at stake × yield (deterministic); where the money cannot be computed none is published, and the question ranks after every question that has one (ADR-027) | E | AC-083 |
 | FR-086 | panel renders no queue/total/progress | U | AC-089 |
 | FR-087, INV-042 | owner cost precedence; engine read-only | ADR-003 | AC-085 |
 | FR-088, FR-093 | pulled at next run; every capability reads `OwnerState` | 9.4 | AC-084 |
