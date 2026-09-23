@@ -237,8 +237,8 @@ keep, and the boundary is a property of the run, not of the product.
 - A degraded #105-type day publishes a different, aligned flagged set.
 - The boundary must be added to `inputs_digest` explicitly.
 - The importer's window tests move to `load_inputs`, where the cut now lives.
-- The committed browser fixture's reconciliation window stops resembling what the engine
-  publishes, so it is refreshed in the same change.
+- The committed browser fixture needs no change: its stock date is 2026-08-02, so the cut
+  keeps every month before 2026-08, which is the `2026-01..2026-07` it already carries.
 
 **We gain:**
 - One cut per run. #144's field, #150's window and the figures agree by construction, every
@@ -281,7 +281,9 @@ change reverts with the code.
   - `src/engine/run.py`: `_sales_import` stops reading the POS vintage.
   - `src/engine/reconciliation.py`: the carved window.
   - `scripts/import_yomyom_sales.py`: drop its date.
-  - `src/__fixtures__/dashboard.fixture.json`: the reconciliation window and `vintages.sales`.
+  - `src/engine/stock_date.py`: its docstring only. It names `_sales_import` as one of the two
+    places that ask for the stock date; after the change they are `load_inputs` and
+    `reconciliation.run`.
 - Test:
   - `tests/engine/test_unknown_reconcile_window.py`: re-point the importer tests at
     `load_inputs`; `:401` and `:420` keep their meaning.
@@ -290,6 +292,8 @@ change reverts with the code.
     existing window, including `:51`, holds.
   - `tests/engine/test_inputs.py`
   - `tests/engine/test_run.py`
+  - `tests/internal_pos/test_sales_importer.py`: its three `import_sales` calls pass
+    `inventory_as_of`, and one asserts reconcile figures the importer no longer writes.
 
 **Interfaces:**
 - Summary parquet rows lose the three `reconcile_*` columns.
