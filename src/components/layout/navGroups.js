@@ -45,7 +45,14 @@ export const navGroups = [
       // are the owner's request; this one is the pilot's acceptance criteria, and dropping it
       // was a side effect of the restore that nobody decided. Both now exist.
       { id: 'daily' },
-      { id: 'operational' },
+      // `operational` — the pre-cut-over Today page — was removed on 2026-09-23 at the
+      // owner's decision: "combine the first 2, i don't need 2 today work". `daily` is the
+      // Today page now, and the only one.
+      //
+      // Safe to remove only because its findings have somewhere else to go. Until this
+      // release `margin_below_cost` was reachable through it and nowhere else, so removing
+      // it earlier would have taken 34 below-cost products off the product silently. That
+      // capability is routed above, in this same change, deliberately.
       { id: 'recommendations' },
       { id: 'orders' },
     ],
@@ -80,7 +87,16 @@ export const navGroups = [
   },
   {
     id: 'group.system',
-    items: [{ id: 'catalogue_lifecycle' }, { id: 'competitor_position' }, { id: 'data-source' }],
+    items: [
+      // `margin_below_cost` has no other door. compose excludes it (SPEC-GAP-A: no
+      // specification produces it, so it is browse-only until SPEC-008), and it was
+      // reachable only through the old Today page — 71 entries, 34 of them products sold
+      // below what they cost. Routing it here is what makes removing that page safe.
+      { id: 'margin_below_cost' },
+      { id: 'catalogue_lifecycle' },
+      { id: 'competitor_position' },
+      { id: 'data-source' },
+    ],
   },
 ]
 

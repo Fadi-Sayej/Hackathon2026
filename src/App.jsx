@@ -7,14 +7,12 @@ import './surface/pages.css'
 
 import { AppShell } from './components/layout/AppShell.jsx'
 import { loadDashboard } from './lib/dataAdapters/loadDashboard.js'
-import { artefactToOperational } from './lib/dataAdapters/artefactToOperational.js'
 import { loadCatalogue } from './lib/dataAdapters/loadCatalogue.js'
 import { catalogueToProducts } from './lib/dataAdapters/catalogueToProducts.js'
 import { analyzeProducts } from './lib/analytics/inventoryEngine.js'
 import { ProductsPage } from './pages/ProductsPage.jsx'
 import { clearOutcome, loadOwnerState, recordOutcome } from './owner/ownerState.js'
 import { DailyPage } from './surface/DailyPage.jsx'
-import { OperationalPage } from './pages/OperationalPage.jsx'
 import { DataPage } from './pages/DataPage.jsx'
 import { CapabilityPage } from './pages/CapabilityPage.jsx'
 import { PageAwaitingData } from './pages/PageAwaitingData.jsx'
@@ -33,6 +31,9 @@ import { useI18n } from './lib/i18n/index.js'
  * synthesised from a monthly mean (rule 5). Rebuilding it to fill these screens would put
  * that invented figure back. So they come back present and empty rather than confident.
  */
+/** Nav ids that are a capability rendered whole by CapabilityPage (FR-102, AC-110). */
+const CAPABILITY_PAGES = new Set(['margin_below_cost', 'catalogue_lifecycle', 'competitor_position'])
+
 /** Pages that fetch `catalogue.json`. Everything else never pays for it. */
 const NEEDS_CATALOGUE = new Set(['products'])
 
@@ -169,45 +170,9 @@ export default function App() {
     refreshOwnerState()
   }, [refreshOwnerState])
 
-  // Every artefact entry by its id, so a decision made on a restored page can be recorded
-  // with the `signal_family` ADR-016 requires — `entry_id` is a hash with no inverse, so an
-  // outcome written without it loses the only durable grouping key F13 will have.
-  const entriesById = useMemo(() => {
-    const index = new Map()
-    for (const cap of Object.values(load.artefact?.capabilities || {})) {
-      for (const entry of cap.entries || []) index.set(entry.id, entry)
-    }
-    return index
-  }, [load.artefact])
-
-  /**
-   * A decision taken on a restored page, written where the engine will actually read it.
-   *
-   * `OperationalPage` keeps its own cache in `smartshelf.operationalActions.v1` and tells us
-   * afterwards. That cache is now a UI convenience, not the record: this writes through to
-   * `smartshelf.ownerState.v2`, which is what `compose.js` suppresses on, what #95 pushes to
-   * Firestore, and what the engine's owner-state pull reads.
-   *
-   * The two stores do not diverge, because the ids are the same one. The old UI used to key
-   * on `recommendation_id` and the new UI on ADR-009's `entry_id`, two spaces with an
-   * intersection of exactly zero — but `artefactToOperational` carries `entry.id` straight
-   * through, so a restored page decides against the engine's own id. Without that, an outcome
-   * recorded here would reach Firestore under an id no capability entry has, never suppress
-   * anything, and still be counted by whatever F13 measures.
-   */
-  const onDecide = useCallback(async (decision) => {
-    const entry = entriesById.get(decision?.id)
-    if (!entry) return            // not ours to record; the page keeps its local cache
-    const status = decision.status === 'DONE' ? 'acted'
-      : decision.status === 'SNOOZED' ? 'deferred'
-        : 'declined'
-    await recordOutcome(entry, {
-      status,
-      reason: status === 'declined' ? (decision.reason ?? 'not_worth_it') : null,
-      deferredUntil: status === 'deferred' ? (decision.snoozeUntil ?? null) : null,
-    })
-    refreshOwnerState()
-  }, [entriesById, refreshOwnerState])
+  // `entriesById` and `onDecide` went with the old Today page on 2026-09-23. They existed to
+  // let a restored page record against the engine's own ADR-009 entry id; the daily surface
+  // reaches `recordOutcome` through `onOutcome` directly and never needed the index.
 
   // `catalog` and `competitor` are the keys AppShell reads, and they are the whole reason
   // this object exists in the shape it does. Until #111 this returned only generatedAt /
@@ -256,27 +221,7 @@ export default function App() {
       )
     }
 
-    // The old Today page, fed by the live engine rather than the frozen operational.json.
-    // The adapter also enforces D-1 on the way through: `CHECK_STOCK_DISCREPANCY` arrives
-    // with no cost, so the old ranker states no figure rather than the ₪103,828.75 it would
-    // otherwise compute from stock counts the manager says are unreliable.
-    if (activePage === 'operational') {
-      return (
-        <OperationalPage
-          operationalData={artefactToOperational(artefact)}
-          // `decisions`, not `actions`. OperationalPage destructures `decisions = {}` and has
-          // no `actions` prop, so this arrived as nothing and `mergeDecisions` seeded from an
-          // empty object every time. An entry the owner settled on the daily surface still
-          // showed as open here — which is precisely what commit 2d1f63a claimed could not
-          // happen: "the two surfaces write through the same path, so they cannot disagree
-          // about what the owner has already dealt with". True of the writes. The reads were
-          // never wired, and no test caught it because both sides are exercised separately.
-          decisions={ownerState.outcomes || {}}
-          onDecide={onDecide}
-        />
-      )
-    }
-    if (activePage === 'catalogue_lifecycle' || activePage === 'competitor_position') {
+    if (CAPABILITY_PAGES.has(activePage)) {
       return <CapabilityPage artefact={artefact} capabilityId={activePage} />
     }
     if (activePage === 'data-source') {
