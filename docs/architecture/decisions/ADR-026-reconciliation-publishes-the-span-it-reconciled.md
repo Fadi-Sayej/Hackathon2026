@@ -1,7 +1,7 @@
 ---
 ID: ADR-026
 Title: The reconcile window is cut once per run, at the run's own stock date, and reconciliation publishes that cut
-Status: Ready for review
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-09-23
 Parent: [System Design](../system-design.md) §19
@@ -12,10 +12,10 @@ Updated: 2026-09-23
 
 # ADR-026 — The reconcile window is cut once per run, at the run's own stock date, and reconciliation publishes that cut
 
-**Status:** Ready for review · **Recorded in:** [System Design](../system-design.md) §19 ·
-proposed by `smartshelf-architect` for #150 and held here, because a role may not approve its
-own output (HANDOVER rule 2). The decision is the repository owner's: it changes a value the
-owner reads.
+**Status:** Accepted (2026-09-23, by the repository owner) · **Recorded in:**
+[System Design](../system-design.md) §19 · proposed by `smartshelf-architect` for #150 and held
+at `Ready for review` until he decided it, because a role may not approve its own output
+(HANDOVER rule 2). Asked directly and answered directly, on PR #157.
 
 ## Context
 

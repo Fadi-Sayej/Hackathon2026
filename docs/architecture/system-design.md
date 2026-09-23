@@ -543,7 +543,7 @@ never do, because in the current code it does.
 | Component | Responsibility | Owns | Inputs → Outputs | Depends on | Forbidden |
 |---|---|---|---|---|---|
 | **POS importer** (`pos_importer.py`) | Turn the POS inventory CSV into typed silver tables, preserving values raw | `silver_pos/{products,inventory,margins}.parquet`, POS vintage (`--as-of`, default: file mtime) | CSV → 3 parquet tables + quality report | `configs/pos_schema_mapping.yaml` | Writing the sales table; clamping, rounding or dropping negative stock; inferring anything |
-| **Sales importer** (`import_yomyom_sales.py`, refactored) | Turn the monthly reports into month-grained evidence | `silver_pos/sales_monthly.parquet` (barcode, month, units, receipts, revenue, cost) and the derived `silver_pos/sales_summary.parquet` (per product: months present, total units, last month with units, receipts in the reconcile window, units in the reconcile window) | CSVs → 2 parquet tables + the **evidence window** record `{months:[…], first, last, count, full_annual_cycle}` | inventory vintage (reconcile window ends before the POS month) | Synthesising `units_sold_7d`; writing any row for a product absent from every report (absence stays absence) |
+| **Sales importer** (`import_yomyom_sales.py`, refactored) | Turn the monthly reports into month-grained evidence | `silver_pos/sales_monthly.parquet` (barcode, month, units, receipts, revenue, cost) and the derived `silver_pos/sales_summary.parquet` (per product: months present, total units, last month with units) | CSVs → 2 parquet tables + the **evidence window** record `{months:[…], first, last, count, full_annual_cycle}` | — (needs no stock date: the reconcile window is cut in the engine, once per run — ADR-026) | Synthesising `units_sold_7d`; writing any row for a product absent from every report (absence stays absence) |
 | **Competitor observation builder** (`competitor_product_signals.py`) | One row per (barcode, store) with the freshest price and observation time | `data/signals/competitor_product_signals_<ts>.parquet` | rehydrated silver → signals | `rehydrate_silver.py` | Dropping stores; interpreting formats |
 | **Matcher** (`product_matching.py`) | Our barcode ↔ competitor products with method and confidence | `data/matching/product_matches.parquet`, review queue | products + signals → matches | rapidfuzz | Collapsing to one store per product; auto-approving fuzzy matches above the stated band |
 | **Store registry** (`store_types.py`) | Format and affinity per store; client-store flag | `configs/store_types.yaml` (hand-maintained, C-22) | — | — | Inferring over a manual classification |
@@ -916,10 +916,10 @@ never read by the browser.
 | Field | Type | Absent means |
 |---|---|---|
 | `products`, `inventory`, `margins` | frames or `None` | POS import missing → every capability unavailable |
-| `sales_monthly`, `sales_summary`, `window: EvidenceWindow` | frames or `None` | reconciliation, lifecycle, questions unavailable |
+| `sales_monthly`, `sales_summary`, `window: EvidenceWindow` | frames or `None`; `sales_summary` rows carry `reconcile_units`, `reconcile_receipts` and `reconcile_months` (distinct months), cut here from `sales_monthly` at the month of the run's usable stock date, and null when there is none (ADR-026) | reconciliation, lifecycle, questions unavailable |
 | `observations`, `matches`, `stores` | frames or `None` | competitor_position unavailable |
 | `withdrawn: set[barcode] | None` | from lifecycle, fed to the others in the same run | `None` → no exclusion (INV-036) |
-| `vintages` | `{pos: {file, as_of}, sales: {months, first, last, full_annual_cycle}, competitor: {snapshot_date, sources: [...]}, owner_state: {pulled_at | null, status}}` | required |
+| `vintages` | `{pos: {file, as_of}, sales: {months, first, last, full_annual_cycle, imported_this_run (ADR-017), reconcile_before (the month this run's reconcile figures were cut at — ADR-026)}, competitor: {snapshot_date, sources: [...]}, owner_state: {pulled_at | null, status}}` | required |
 | `owner: OwnerState` | §10.3 | `status: unavailable` |
 | `policy: Policy` | `configs/policy.yaml` | required |
 
@@ -939,7 +939,7 @@ CapabilityOutput
   unavailable_reason?: str         # names the missing input(s) or the rule-level reason
                                    #   'no_delivery_prices' | 'no_sales_evidence' | 'no_comparable_source'
                                    #   | 'observations_stale' | 'answer_storage_unavailable' | 'ceiling_degenerate' | …
-  window?: EvidenceWindow          # lifecycle, reconciliation
+  window?: EvidenceWindow          # lifecycle: the sales span · reconciliation: the span it reconciled (ADR-026)
   thresholds: dict                 # every value a count depends on (FR-005, FR-046, FR-061)
   counts: dict[str, int | None]    # None = unstatable, never 0-for-missing
   entries: list[Entry]             # full set (FR-102); ordered by ordering_key
@@ -1212,7 +1212,7 @@ own, so their rows say so rather than grade it after the fact.
 | [ADR-023](decisions/ADR-023-the-engine-publishes-the-pilot-measurement.md) | The engine publishes the pilot measurement; the browser renders it — **`Ready for review`** | Not stated |
 | [ADR-024](decisions/ADR-024-the-catalogue-is-published-beside-the-artefact.md) | The product catalogue is published beside the artefact, not inside it | Not stated |
 | [ADR-025](decisions/ADR-025-the-comparison-behind-the-finding-is-published.md) | The comparison behind a competitor finding is published, not only the finding | Not stated |
-| [ADR-026](decisions/ADR-026-reconciliation-publishes-the-span-it-reconciled.md) | The reconcile window is cut once per run, at the run's own stock date, and reconciliation publishes that cut — **`Ready for review`** | Easy |
+| [ADR-026](decisions/ADR-026-reconciliation-publishes-the-span-it-reconciled.md) | The reconcile window is cut once per run, at the run's own stock date, and reconciliation publishes that cut | Easy |
 
 ---
 
@@ -1311,10 +1311,10 @@ Design elements: **E** engine module · **P** publisher/artefact · **C** `compo
 
 | Requirement | Design element | Flow / contract | Verification |
 |---|---|---|---|
-| FR-020, FR-021, FR-022 | E `reconciliation`: implied opening < 0 with receipts > 0 in the reconcile window — where that window is cut: [ADR-026](decisions/ADR-026-reconciliation-publishes-the-span-it-reconciled.md), `Ready for review`, not yet accepted | 11.1 `sales_summary` | AC-020 |
+| FR-020, FR-021, FR-022 | E `reconciliation`: implied opening < 0 with receipts > 0 in the reconcile window, cut once per run at load (ADR-026) | 11.1 `sales_summary` | AC-020 |
 | FR-023, FR-025, FR-026, INV-010, INV-011 | `value_policy: none`; publisher assertion; no cost on the row; i18n copy for "not determinable before a count" | ADR-012 | AC-021, AC-022, AC-023 |
 | FR-024 | `ordering_key: gap_ratio` | 11.3 | AC-020 |
-| FR-027, NFR-010 | `evidence: {recorded_stock, receipts, units_sold, unaccounted, window}` — which window: [ADR-026](decisions/ADR-026-reconciliation-publishes-the-span-it-reconciled.md), `Ready for review`, not yet accepted | 11.3 | AC-024 |
+| FR-027, NFR-010 | `evidence: {recorded_stock, receipts, units_sold, unaccounted, window}`, where `window` is the span reconciled (ADR-026) | 11.3 | AC-024 |
 | FR-028, FR-029, FR-030, INV-013, C-12 | E `hygiene` — a capability of its own (ADR-014), `value_policy: none`, one `variant` per reason (negative_stock, no_identifier, absent_price), own badge and own page | 11.2, 11.4 | AC-025 |
 | FR-031, FR-032, INV-014 | no standing kind exists in V1; `value_kinds_present` | ADR-012 | AC-026 |
 | FR-033, INV-015 | `action: count_product`; no cause strings | §14 | AC-027 |
@@ -1322,7 +1322,7 @@ Design elements: **E** engine module · **P** publisher/artefact · **C** `compo
 | NFR-011, AC-028 | determinism; `figures` | R | AC-028 |
 | C-13, SCN-028 | outcomes persist independent of flag | O | AC-029 |
 | §11 unavailable rows | `reconciliation.requires` names `sales_summary`, `hygiene.requires` does not; `status` is computed from `requires`, so receipts absent → `reconciliation: unavailable` while `hygiene` stays available | 11.2, ADR-014 | AC-107 + the rule-12 independence probe (§14) |
-| OQ-201/202 | no floor applied (FR-103(4)); window vintages published so misalignment is visible; the capability's own window: [ADR-026](decisions/ADR-026-reconciliation-publishes-the-span-it-reconciled.md), `Ready for review`, not yet accepted | 11.4 | — |
+| OQ-201/202 | no floor applied (FR-103(4)); window vintages published so misalignment is visible; the capability's own window is the span it reconciled, and `vintages.sales.reconcile_before` the boundary it was cut at (ADR-026) | 11.4 | — |
 
 ### SPEC-003 — Competitor price position
 
