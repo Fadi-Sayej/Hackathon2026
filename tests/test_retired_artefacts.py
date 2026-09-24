@@ -54,9 +54,10 @@ def test_check_signals_points_at_the_v1_probes():
     name was exercising the legacy JS ranking over `market-context.json`, a path no V1 page
     reads since the Task 2.7 cut-over.
 
-    The legacy probe itself is not deleted here: `collect-daily.yml` still calls it by path
-    while `market-context.json` is still committed, and §20.2 schedules its removal for
-    Phase 4 with the reorder engine it exercises. It keeps a name of its own until then.
+    The legacy probe itself was retired on 2026-09-24 (Phase 4 Task 4.2, #77, ADR-028): the
+    nightly stopped calling it, and it was the last reader of the reorder engine, the demo
+    data and the LLM layer that ADR-028 removes. Its name must not come back either, or a
+    developer following an old note would run a probe over code that no longer exists.
     """
     import json
 
@@ -70,8 +71,11 @@ def test_check_signals_points_at_the_v1_probes():
     assert "check_v1_signals.py" in scripts["check:signals:v1"]
     assert "check_independence.py" in scripts["check:independence"]
 
-    # Still reachable by name while the nightly needs it.
-    assert "check_signals_live.mjs" in scripts["check:signals:legacy"]
+    # Retired, and not reachable by any name.
+    assert "check:signals:legacy" not in scripts
+    assert not (ROOT / "scripts" / "check_signals_live.mjs").exists()
+    nightly = (ROOT / ".github" / "workflows" / "collect-daily.yml").read_text(encoding="utf-8")
+    assert "check_signals_live" not in nightly, "the nightly still runs the retired probe"
 
 
 def test_importing_pos_does_not_resurrect_a_retired_artefact(tmp_path, monkeypatch):
