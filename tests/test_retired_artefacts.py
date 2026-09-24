@@ -95,6 +95,7 @@ def test_importing_pos_does_not_resurrect_a_retired_artefact(tmp_path, monkeypat
                    encoding="utf-8")
     monkeypatch.setattr(imp, "SILVER_POS_DIR", tmp_path / "silver")
     monkeypatch.setattr(imp, "QUALITY_REPORT_DIR", tmp_path / "q")
+    monkeypatch.setattr(imp, "SNAPSHOTS_DIR", tmp_path / "snapshots")
 
     result = imp.import_pos_file(csv, as_of="2026-08-02")
 

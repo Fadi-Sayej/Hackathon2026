@@ -54,17 +54,17 @@ def _num(value: Any) -> float | None:
     return None
 
 
-def _latest_import_id() -> str | None:
+def _latest_import_id(snapshots_root: Path | None = None) -> str | None:
     """Which import the most recent snapshot came from, or None."""
     from src.snapshots.velocity import list_usable_snapshots, snapshot_import_id
 
-    snapshots = list_usable_snapshots()
+    snapshots = list_usable_snapshots(snapshots_root)
     if not snapshots:
         return None
     return snapshot_import_id(snapshots[-1][1])
 
 
-def _current_import_id() -> str | None:
+def _current_import_id(silver_dir: Path | None = None) -> str | None:
     """Import identity of the LIVE silver tables.
 
     Deliberately not snapshot_import_id(): inside a snapshot the files are named
@@ -73,7 +73,7 @@ def _current_import_id() -> str | None:
     duplicate check and let another full copy be archived every run.
     """
     for name in ("yomyom_products.parquet", "yomyom_inventory.parquet"):
-        path = SILVER_POS_ROOT / name
+        path = (silver_dir or SILVER_POS_ROOT) / name
         if not path.exists():
             continue
         try:
@@ -89,7 +89,9 @@ def _current_import_id() -> str | None:
     return None
 
 
-def archive_current_silver(imported_at: str | None = None, force: bool = False) -> Path | None:
+def archive_current_silver(imported_at: str | None = None, force: bool = False, *,
+                           silver_dir: Path | None = None,
+                           snapshots_root: Path | None = None) -> Path | None:
     """Copy the current silver products + inventory tables into a new snapshot dir.
 
     Skips when the silver tables come from the SAME import as the last snapshot.
@@ -100,19 +102,27 @@ def archive_current_silver(imported_at: str | None = None, force: bool = False) 
     (This is exactly how 8 snapshots accumulated from a single import.)
 
     Pass force=True to archive regardless.
+
+    silver_dir and snapshots_root default to the real roots. The importer passes its own,
+    so an import pointed somewhere else archives what IT wrote, into the snapshots it was
+    given. Until 2026-09-24 this always read the real silver and wrote the real, git-tracked
+    snapshots, so a test that redirected only the importer's silver archived real POS tables
+    under the test's timestamp: a record of an import that never happened.
     """
-    products = SILVER_POS_ROOT / "yomyom_products.parquet"
-    inventory = SILVER_POS_ROOT / "yomyom_inventory.parquet"
+    silver_dir = silver_dir or SILVER_POS_ROOT
+    snapshots_root = snapshots_root or SNAPSHOTS_ROOT
+    products = silver_dir / "yomyom_products.parquet"
+    inventory = silver_dir / "yomyom_inventory.parquet"
     if not products.exists():
         return None
 
     if not force:
-        current = _current_import_id()
-        if current is not None and current == _latest_import_id():
+        current = _current_import_id(silver_dir)
+        if current is not None and current == _latest_import_id(snapshots_root):
             return None
 
     ts = _now().strftime("%Y%m%dT%H%M%SZ")
-    dest = SNAPSHOTS_ROOT / ts
+    dest = snapshots_root / ts
     dest.mkdir(parents=True, exist_ok=True)
     shutil.copy2(products, dest / "products.parquet")
     if inventory.exists():
