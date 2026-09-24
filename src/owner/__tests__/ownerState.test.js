@@ -37,53 +37,41 @@ beforeEach(() => {
   resetCacheForTests()
 })
 
-describe('migrations', () => {
-  it('maps the legacy action enums and survives a second load without doubling', () => {
-    globalThis.localStorage.setItem(LEGACY_ACTIONS, JSON.stringify({
-      old1: { status: 'DONE', at: 1 },
-      old2: { status: 'DISMISSED', at: 2, reason: 'wrong_data' },
-      old3: { status: 'SNOOZED', at: 3, snoozeUntil: 99 },
-    }))
-    const first = loadOwnerState()
-    expect(first.outcomes.old1.status).toBe('acted')
-    expect(first.outcomes.old2.status).toBe('declined')
-    expect(first.outcomes.old3.status).toBe('deferred')
-    expect(first.outcomes.old3.deferred_until).toBe(99)
+// Phase 4 Task 4.3 (#78). The one-shot migration from these three keys was removed once the
+// owner confirmed, on 2026-09-24, that every device had opened the app since the cut-over,
+// so each already holds smartshelf.ownerState.v2. The keys are still there on those devices.
+// Nothing reads them, and nothing may delete them: removing the migration is reversible,
+// deleting a user's data is not.
+describe('the pre-V1 keys (Task 4.3)', () => {
+  const legacy = {
+    [LEGACY_ACTIONS]: JSON.stringify({ old1: { status: 'DONE', at: 1 } }),
+    [LEGACY_ANSWERS]: JSON.stringify({ carried: { '123': 4.5 } }),
+    [LEGACY_DEMO]: JSON.stringify({ recommendationDecisions: { rec9: { status: 'DONE', at: 7 } } }),
+  }
 
-    resetCacheForTests()
-    const second = loadOwnerState()
-    expect(Object.keys(second.outcomes)).toHaveLength(3)
+  it('are not read: a device holding only pre-V1 keys starts with an empty state', () => {
+    for (const [key, value] of Object.entries(legacy)) globalThis.localStorage.setItem(key, value)
+    const state = loadOwnerState()
+    expect(state.outcomes).toEqual({})
+    expect(state.answers).toEqual({})
   })
 
-  it('records a migrated outcome with signal_family null, present and not guessed', () => {
-    globalThis.localStorage.setItem(LEGACY_ACTIONS, JSON.stringify({ old1: { status: 'DONE', at: 1 } }))
-    const snapshot = loadOwnerState().outcomes.old1.snapshot
-    expect('signal_family' in snapshot).toBe(true)
-    expect(snapshot.signal_family).toBeNull()
-  })
-
-  it('carries the legacy answers across', () => {
-    globalThis.localStorage.setItem(LEGACY_ANSWERS, JSON.stringify({ carried: { '123': 4.5 } }))
-    expect(loadOwnerState().answers['123'].cost_price.value).toBe(4.5)
-  })
-
-  it('carries the demo recommendation decisions across', () => {
-    globalThis.localStorage.setItem(LEGACY_DEMO, JSON.stringify({
-      recommendationDecisions: { rec9: { status: 'DONE', at: 7 } },
-    }))
-    expect(loadOwnerState().outcomes.rec9.status).toBe('acted')
-  })
-
-  it('leaves the legacy keys in place, unread but not destroyed', () => {
-    globalThis.localStorage.setItem(LEGACY_ACTIONS, JSON.stringify({ old1: { status: 'DONE', at: 1 } }))
+  it('are left in place and unchanged, unread but not destroyed', () => {
+    for (const [key, value] of Object.entries(legacy)) globalThis.localStorage.setItem(key, value)
     loadOwnerState()
-    expect(globalThis.localStorage.getItem(LEGACY_ACTIONS)).not.toBeNull()
+    for (const [key, value] of Object.entries(legacy)) {
+      expect(globalThis.localStorage.getItem(key)).toBe(value)
+    }
   })
 
-  it('does not re-run once v2 exists', () => {
-    globalThis.localStorage.setItem(STORAGE_KEY, JSON.stringify({ meta: { schema: 2 }, outcomes: {}, answers: {}, revivals: {} }))
-    globalThis.localStorage.setItem(LEGACY_ACTIONS, JSON.stringify({ old1: { status: 'DONE', at: 1 } }))
-    expect(loadOwnerState().outcomes).toEqual({})
+  it('do not disturb a device that holds v2 state', () => {
+    const v2 = {
+      meta: { schema: 2 }, revivals: {}, answers: {},
+      outcomes: { a1: { status: 'acted', at: 5, reason: null, snapshot: { signal_family: 'price.inverted' } } },
+    }
+    globalThis.localStorage.setItem(STORAGE_KEY, JSON.stringify(v2))
+    for (const [key, value] of Object.entries(legacy)) globalThis.localStorage.setItem(key, value)
+    expect(loadOwnerState().outcomes).toEqual(v2.outcomes)
   })
 })
 

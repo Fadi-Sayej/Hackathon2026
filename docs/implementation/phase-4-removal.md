@@ -664,10 +664,18 @@ a quarter has passed".
 > that have written. Stating the wrong bound is worse than stating none (rule 13's own
 > distinction), and the row still states it. **smartshelf-architect.**
 
-- [ ] **Step 1:** confirm with the owner that every device has been used since the cut-over
-- [ ] **Step 2:** remove the migration and its tests; keep the three legacy keys **unread
+- [x] **Step 1:** confirm with the owner that every device has been used since the cut-over
+- [x] **Step 2:** remove the migration and its tests; keep the three legacy keys **unread
       but not deleted** — removing the migration is reversible, deleting a user's data is not
-- [ ] **Step 3:** full suite, bundle, commit
+- [x] **Step 3:** full suite, bundle, commit
+
+> **Done 2026-09-24 (#78).** The owner confirmed on 2026-09-24 that every phone and
+> computer used for SmartShelf had opened it since the 12 September cut-over, against the
+> register above (4 profiles). `migrate()`, `migratedOutcome()` and the legacy status map
+> are gone from `src/owner/ownerState.js`. A device with no v2 record now starts empty, and
+> the three pre-V1 keys stay where they are: a test asserts they are left unchanged, and
+> another that they are not read. The migration is at `v1-attic-2026-09-24` if it is ever
+> wanted back.
 
 ---
 
@@ -684,7 +692,7 @@ a quarter has passed".
 
 > **Where it stands, 2026-09-24.** Not closable yet. Task 4.2 keeps `operational.json` and
 > `loadOperationalData.js` until F13 (#83) rebuilds the telemetry surface, and Task 4.3
-> waits on the owner. Each check as it reads today, on `phase4/checkpoint-4` over `b0ce7ba`:
+> waits on the owner. *(Later the same day: the owner confirmed, and Task 4.3 is done, #78.)* Each check as it reads today, on `phase4/checkpoint-4` over `b0ce7ba`:
 >
 > | Check | Result |
 > |---|---|
