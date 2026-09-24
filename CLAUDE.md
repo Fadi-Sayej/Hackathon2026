@@ -201,7 +201,7 @@ particular: no role quotes a figure it has not read from the artifact that produ
 - `src/` (JS) — `pages/` one file per screen · `lib/analytics/` ranking and money
   rules · `lib/dataAdapters/` reads `public/data/*.json` · `lib/i18n/` he/en · `data/`
   generated, committed.
-- `scripts/` — 67 entry points (52 `.py`, 12 `.mjs`, 3 `.sh`, counted with `ls`). Only the
+- `scripts/` — 68 entry points (53 `.py`, 12 `.mjs`, 3 `.sh`, counted with `ls` on 2026-09-24). Only the
   handful in the System Design §7 are the product.
 
 ## Commands
@@ -209,8 +209,8 @@ particular: no role quotes a figure it has not read from the artifact that produ
 ```bash
 npm run dev            # Vite dev server
 npm run data:refresh   # rebuild every dashboard input (see rule 5)
-npm run test           # 645 JS tests
-npm run test:py        # 501 Python tests
+npm run test           # the JS suite (vitest) — it prints its own count
+npm run test:py        # the Python suite (pytest) — likewise
 npm run lint
 python3 scripts/analyse_sales_movement.py   # T8: measured calendar weights
 git mine               # log without the daily snapshot commits

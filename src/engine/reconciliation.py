@@ -135,10 +135,11 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
     # as_of` alone let "   " through to date.fromisoformat() in _sales_import, which
     # raises — a capability_error, which is a worse answer than an honest refusal.
     # Found by mutation, then by the test written against it.
-    # usable_stock_date is the single definition both halves ask, so the summary
-    # cannot be windowed on a date the capability would have refused, or refused on
-    # one the summary used. It rejects a blank, an unparseable string and a future
-    # date alike — all three are "we do not know when the stock was counted".
+    # usable_stock_date is the single definition both halves ask — load_inputs, which
+    # cuts the figures (ADR-026), and this guard — so the figures cannot be cut on a date
+    # the capability would have refused, or refused on one they were cut at. It rejects
+    # a blank, an unparseable string and a future date alike — all three are "we do not
+    # know when the stock was counted".
     # `as_of_source` travels with `as_of` for the reason inputs.py already gives: a date is
     # not provenance until you know how it was arrived at. A `file_mtime` date is the
     # checkout time, not a stock count — see stock_date.UNUSABLE_SOURCES.
