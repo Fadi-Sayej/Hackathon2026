@@ -4,13 +4,13 @@ Title: The owner conversation — what to ask, and why each answer changes the b
 Status: Ready for review
 Owner: smartshelf-pm
 Parent: [PRD](../product/PRD.md)
-Inputs: [GAP-009, GAP-011, F13-S1 §14, docs/reviews/system-design-readiness.md run 3, data/internal/silver_pos/*.parquet]
-Updated: 2026-09-13
+Inputs: [GAP-009, GAP-011, F13-S1 §14, F8-S1 (OQ-903, OQ-904), docs/reviews/system-design-readiness.md run 3, data/internal/silver_pos/*.parquet]
+Updated: 2026-09-25 (#7 and #8 added for F8-S1)
 ---
 
 # The owner conversation
 
-Six questions. Four are his to answer and two are ours to check with him. Every figure below
+Eight questions. Six are his to answer and two are ours to check with him. Every figure below
 was read from his own export, not from a document (rule 11).
 
 **Bring the product list in §1 on a phone.** It is the whole of GAP-009 and it takes about
@@ -136,6 +136,22 @@ decides it.
 
 ---
 
+## 7, 8 — the two facts F8-S1 needs before it can suggest any order
+
+[F8-S1](../features/F8-order-quantity/specs/F8-S1-order-quantity.md) is written and
+`Ready for review`. It cannot publish a single quantity until he answers these two. They
+cannot be guessed: the repository owner asked on 2026-09-25 that they not be.
+
+| # | Question | Arabic | Why it blocks |
+|---|---|---|---|
+| 7 | **Can the POS export sales per product, per day?** (Or at least per week) | هل يستطيع نظام الـPOS تصدير المبيعات لكل صنف لكل يوم؟ أو لكل أسبوع على الأقل؟ | The seven monthly reports cannot be divided into days or weeks (rule 13), so without this no order quantity exists (OQ-904) |
+| 8 | **Which departments does he order every day, which every week, and which less often?** | أيّ الأقسام تطلبها كل يوم، وأيّها كل أسبوع، وأيّها أقل من ذلك؟ | Each suggestion covers sales until the next order of its department. No supplier is recorded for any product he sells, so the department is all we can group by (OQ-903) |
+
+**#1 matters to F8 too.** If the departments missing from every report sell through another
+till, F8 must not treat their absence as "sold nothing" (F8-S1 FR-156).
+
+---
+
 ## What to bring back
 
 1. Do the five zero-coverage departments sell through a different till? *(→ GAP-009, ADR-020)*
@@ -144,6 +160,8 @@ decides it.
 4. The success ₪ number, and whether it is prices-only. *(→ F13-S1 §14, OQ-801)*
 5. The subscription price. *(→ PRD §8)*
 6. Data cadence and who sends it. *(→ F13-S1 FR-141)*
+7. Whether the POS can export sales per product per day, or per week. *(→ F8-S1 OQ-904)*
+8. Which departments he orders daily, weekly, or less often. *(→ F8-S1 OQ-903)*
 
 Answers go into [gaps-and-open-questions.md](../features/gaps-and-open-questions.md) with the
 date, and the three F13 numbers into F13-S1 §14. Nothing here is quoted onward until it is
