@@ -2,20 +2,24 @@
 ID: F8-INTENT
 Title: F8 — Order Quantity
 Status: Registered — not specified
+Owner: smartshelf-pm
 Release: V2
 Parent: [PRD](../../product/PRD.md)
 Intent IDs: INT-004
 Specs: none
+Inputs: [docs/product/intent-register.md (D-18 … D-20), docs/product/open-decisions/F8-ordering.md, docs/features/gaps-and-open-questions.md (GAP-008)]
+Updated: 2026-09-24
 ---
 
 # F8 — ماذا أطلب اليوم وبأي كمية؟ · Order Quantity
 
-> **Status: registered, deliberately NOT specified.** No `F#-S#` document exists for
-> this feature and none may be written until the product decisions named below are
-> taken. The reason is recorded in
-> [SPEC-000 §4](../../product/intent-register.md#4-intents-deliberately-not-specified-in-this-phase),
-> and it is not scheduling: writing requirements now would mean inventing those answers.
-> Content moved verbatim from the pre-migration `intent.md` (§6); nothing added.
+> **Status: registered, not yet specified.** No `F#-S#` document exists for this feature.
+> The three product decisions named below were taken on 2026-09-24, by the repository
+> owner, as [D-18 … D-20](../../product/intent-register.md#3-decisions-already-made-by-the-intent-layer).
+> The status stays until the owner asks for a spec, because moving past it is his act, not
+> this file's (HANDOVER rule 2). What the decisions leave open for design is recorded under
+> GAP-008, and the dependencies under *Related* stand. Content moved verbatim from the
+> pre-migration `intent.md` (§6), except the dated note under *Blocking product decisions*.
 
 ## Problem
 
@@ -50,6 +54,16 @@ Specs: none
 - ماذا يحدث حين تتعارض حركة السوق مع حركته.
 
 Tracked as **GAP-008** in [gaps and open questions](../gaps-and-open-questions.md).
+
+> **Added 2026-09-24 (not part of the migrated content).** All three are decided, by the
+> repository owner:
+> - the market is the nearby stores of a format comparable to his, three today (D-18);
+> - his own sales set the quantity, and the market only adjusts it (D-19);
+> - a disagreement is asked on screen, saved, and not asked again (D-20).
+>
+> The 527 above no longer describes anything. The last artefact carrying `WATCH_PRODUCT`
+> was generated on 2026-09-12, and nothing has run its recommender since 2026-09-13
+> (GAP-008a).
 
 ## Related
 

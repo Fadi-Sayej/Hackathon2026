@@ -5,6 +5,9 @@ Status: Living
 Version: 0.1 (content unchanged from `specs.md` v1.1)
 Parent: [Intent Register (SPEC-000)](../product/intent-register.md)
 Related Specs: all F#-S# documents under `docs/features/`
+Owner: smartshelf-pm
+Inputs: [docs/product/intent-register.md, docs/features/F#-*/intent.md, docs/features/F#-*/specs/]
+Updated: 2026-09-24 (GAP-008 resolved as D-18 … D-20)
 ---
 
 > **Migration note.** Moved verbatim from the pre-migration monolithic `specs.md`. It spans
@@ -243,7 +246,15 @@ number that can change without restructuring anything.
 
 ---
 
-#### GAP-008 — The V2 ordering intent states an order of inputs, not a rule
+#### ~~GAP-008 — The V2 ordering intent states an order of inputs, not a rule~~ — resolved 2026-09-24
+
+**Resolved** by the repository owner as **D-18 … D-20**:
+- the market is the nearby stores of a format comparable to his;
+- his own sales set the quantity, and the market only adjusts it;
+- a disagreement is asked on screen, saved, and not asked again.
+
+F8 is still not specified. The record of how it was decided follows, and after it what the
+decisions leave open.
 
 **Source:** `intent.md` §6 (INT-004).
 
@@ -272,6 +283,44 @@ that this does not block V1.
 > four new open questions, **GAP-008a … GAP-008d**, one of which is blocking: the
 > `WATCH_PRODUCT` population is 527 in F8's intent and 1,857 in `public/data/operational.json`
 > (2026-09-10).
+
+> **Added 2026-09-24: what D-18 … D-20 leave open.** Measured on 2026-09-24 from
+> `configs/delivery_targets.yaml` (enabled stores that are not the client),
+> `configs/store_types.yaml` (format and the 0.3 floor), the 2026-09-24 delivery-catalogue
+> snapshot, `public/data/catalogue.json` (7,523 products, 7,275 with a barcode) and
+> `data/internal/silver_pos/sales_summary.parquet`:
+>
+> | Of his 7,275 barcoded products | The eight nearby stores | F8's market: those at or above the floor (D-18) |
+> |---|---|---|
+> | Stores | 8, of which 7 list barcodes. Bingo's 129 products carry none | 3: Wolt Market, Rami Levy in the Neighbourhood, Super Alonit Einat |
+> | Products they list | 779 | 410 |
+> | … of those, with his own sales rows (1,518 in all) | 339 | 207 |
+>
+> The other five (four supermarkets, and Bingo, whose format is unknown) are context only.
+>
+> - **GAP-008a is moot.** Both counts (527 in F8's intent, 1,857 on 2026-09-10) came from
+>   `src/recommendations/product_recommendations.py`, which nothing has run since 2026-09-13
+>   (`src/context/demand_signals.py`). `public/data/operational.json` was last generated on
+>   2026-09-12. The owner's screens no longer read it (`src/App.jsx`); only the telemetry
+>   page does (CLAUDE.md rule 5). F8's list will come from D-19's rule.
+> - **GAP-008b is answered by the table:** three stores.
+> - **GAP-008c is answered by D-19:** a quantity is proposed wherever he has sales rows.
+> - **GAP-008d is answered.** Each snapshot row's `source_product_url` carries the venue slug
+>   that ends the matching `url` in `configs/delivery_targets.yaml`: 9 of 9 venues on
+>   2026-09-24. `scripts/measure_baselines.py` already matches on it.
+> - **GAP-008e (new; architect, then engineer): the nearby stores have no "running out"
+>   signal.** D-19 needs one. Today's (`src/context/competitor_stockouts.py`) reads the
+>   national Alonit price file: 157 branches over 45 days, 2026-08-11 … 2026-09-24. D-18
+>   does not count that file as F8's market. The nearby catalogues are already read as a
+>   presence series (`load_presence(source_id="delivery_catalog")`: 42 usable days,
+>   2026-08-13 … 2026-09-24, 8 venues including his own). What is missing is the
+>   classification. `src/market/concentration.py` tells a stockout from a delisting by how
+>   synchronised the drops are across one chain's branches, and D-18's market is three
+>   stores of three chains. Whether `market-context.json` keeps publishing the national
+>   signal (ADR-028 keeps it for V2) is the architect's call.
+> - **For the spec: where D-20's answer is kept.** F5 already stores his answers, but F5-S1
+>   FR-089 lets an answered question be asked again on a demonstrable change in the fact,
+>   and D-20 does not provide for that. A spec that wants it goes back to the owner.
 
 ---
 
@@ -414,7 +463,7 @@ comes, and the divergence stays visible rather than being resolved silently.
 
 **Resolved** by the repository owner as **D-15 … D-17**: explain F8's order suggestions; a model
 writes the sentence once a night under three conditions; no due date. F14 now waits on F8
-(GAP-008). The record of how it was decided follows.
+being specified; F8's own decisions are D-18 … D-20. The record of how it was decided follows.
 
 **Source:** issue #54 (track T9), the #80 triage. The repository owner confirmed the promise
 still stands on 2026-09-24.

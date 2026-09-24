@@ -23,7 +23,7 @@ decision the existing fourteen ADRs do not cover.
 
 **Mode two — make one feature ready for development.**
 Trigger: the user names a feature. **Never choose one yourself.**
-Inputs: that intent, the PRD rows with its `F#`, the settled decisions `D-1 … D-13`, and
+Inputs: that intent, the PRD rows with its `F#`, every settled decision (`D-1` onward, intent register §3), and
 the ADRs that bind it.
 Output: `docs/features/F#-<slug>/specs/F#-S#-<slug>.md`, carrying the feature's `F#`.
 
