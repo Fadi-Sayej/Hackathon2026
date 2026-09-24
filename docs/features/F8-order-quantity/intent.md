@@ -62,8 +62,8 @@ Tracked as **GAP-008** in [gaps and open questions](../gaps-and-open-questions.m
 > - a disagreement is asked on screen, saved, and not asked again (D-20).
 >
 > The 527 above no longer describes anything. The last artefact carrying `WATCH_PRODUCT`
-> was generated on 2026-09-12, and nothing has run its recommender since 2026-09-13
-> (GAP-008a).
+> was generated on 2026-09-12. Its recommender stopped running on 2026-09-13 and was
+> deleted on 2026-09-24 (GAP-008a).
 
 ## Related
 
