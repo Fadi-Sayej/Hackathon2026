@@ -3,11 +3,10 @@
 import { readFileSync, existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { cleanup, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, waitFor } from '@testing-library/react'
 
 import { renderWithI18n } from '../../test/renderWithI18n.jsx'
-import { V1Spine } from '../V1Spine.jsx'
-import { V1_PAGES } from '../pages.js'
+import App from '../../App.jsx'
 import { compose } from '../compose.js'
 import { resetCacheForTests } from '../../owner/ownerState.js'
 import { ar } from '../../lib/i18n/dictionaries/ar.js'
@@ -24,14 +23,18 @@ import { ar } from '../../lib/i18n/dictionaries/ar.js'
  * trimmed and cannot exhibit the pilot's shape: the FR-106 allocation defect passed every
  * fixture test and was only visible when 53 confirmed losses met a bound of ten.
  *
- * Not Playwright yet. The spine is deliberately not the app's default (D-14 / GAP-009), so
- * there is no URL to drive. When the cut-over happens this becomes e2e/daily-surface.spec.js
- * unchanged in substance.
+ * It renders App — the app the owner runs — and walks App's own nav. Until 2026-09-24 it
+ * rendered V1Spine, which App stopped mounting at the cut-over, and a ten-page list of the
+ * pre-restore nav: so every check here held of a component no screen showed, which is how
+ * the cost questions and the receiving capture could vanish from the app with this gate
+ * green (ADR-028).
  */
 
 const ARTEFACT = resolve(process.cwd(), 'public/data/dashboard.json')
+const CATALOGUE = resolve(process.cwd(), 'public/data/catalogue.json')
 const present = existsSync(ARTEFACT)
 const artefact = present ? JSON.parse(readFileSync(ARTEFACT, 'utf8')) : null
+const catalogue = existsSync(CATALOGUE) ? JSON.parse(readFileSync(CATALOGUE, 'utf8')) : null
 const NOW = Date.parse('2026-09-12T12:00:00Z')
 
 function createStorage() {
@@ -40,28 +43,44 @@ function createStorage() {
     getItem: (k) => (backing.has(k) ? backing.get(k) : null),
     setItem: (k, v) => backing.set(k, v),
     removeItem: (k) => backing.delete(k),
+    clear: () => backing.clear(),
   }
 }
 
-beforeEach(() => { globalThis.localStorage = createStorage(); resetCacheForTests() })
+beforeEach(() => {
+  globalThis.localStorage = createStorage()
+  resetCacheForTests()
+  globalThis.fetch = async (url) => (String(url).includes('catalogue.json') && catalogue
+    ? { ok: true, status: 200, json: async () => catalogue }
+    : { ok: true, status: 200, json: async () => artefact })
+})
 afterEach(cleanup)
 
-const ok = async () => ({ ok: true, status: 200, json: async () => artefact })
+async function openApp() {
+  renderWithI18n(<App />)
+  await waitFor(() => expect(document.querySelector('.spine__loading')).toBeNull())
+}
+
+/** Every nav entry App renders, in order. */
+const navIds = () => [...document.querySelectorAll('.nav-item[data-nav]')].map((n) => n.dataset.nav)
+
+async function openPage(id) {
+  fireEvent.click(document.querySelector(`.nav-item[data-nav="${id}"]`))
+  await waitFor(() => expect(document.querySelector('.page-body .spine__loading')).toBeNull())
+}
 
 const describeIf = present ? describe : describe.skip
 
 describeIf('Checkpoint 2 — against the artefact the engine produced', () => {
   it('AC-100 — the surface holds at most the published bound', async () => {
-    renderWithI18n(<V1Spine page="daily" fetchImpl={ok} now={NOW} />)
-    await waitFor(() => expect(document.querySelector('.spine__loading')).toBeNull())
+    await openApp()
     const cards = document.querySelectorAll('.entry-card')
     expect(cards.length).toBeLessThanOrEqual(artefact.thresholds.surface.bound)
   })
 
   it('AC-101 — no count of what is not shown appears anywhere', async () => {
-    renderWithI18n(<V1Spine page="daily" fetchImpl={ok} now={NOW} />)
-    await waitFor(() => expect(document.querySelector('.spine__loading')).toBeNull())
-    const text = document.body.textContent
+    await openApp()
+    const text = document.querySelector('.page-body').textContent
     expect(text).not.toMatch(/\b\d+\s*(?:more|remaining|others?|hidden)\b/i)
     expect(text).not.toMatch(/\bof\s+\d{2,}\b/i)
   })
@@ -74,13 +93,12 @@ describeIf('Checkpoint 2 — against the artefact the engine produced', () => {
   })
 
   it('AC-107 — an unavailable capability never reads as zero findings', async () => {
+    await openApp()
     for (const [id, capability] of Object.entries(artefact.capabilities)) {
-      if (capability.status !== 'unavailable') continue
-      renderWithI18n(<V1Spine page={id} fetchImpl={ok} now={NOW} />)
-      await waitFor(() => expect(document.querySelector('.spine__loading')).toBeNull())
+      if (capability.status !== 'unavailable' || id === 'owner_questions') continue
+      await openPage(id)
       expect(document.querySelector('.capability__unavailable')).not.toBeNull()
       expect(document.querySelector('.capability__counts')).toBeNull()
-      cleanup()
     }
   })
 
@@ -103,27 +121,30 @@ describeIf('Checkpoint 2 — against the artefact the engine produced', () => {
     }
   })
 
-  it('AC-112 — every key the surface asks for resolves in Arabic', async () => {
+  it('AC-112 — every key the app asks for resolves in Arabic, on every page of the nav', async () => {
     // The translator falls back to the key itself, so an unresolved key is visible only as
     // a dotted identifier in the page text.
-    for (const page of V1_PAGES) {
-      renderWithI18n(<V1Spine page={page} fetchImpl={ok} now={NOW} />)
-      await waitFor(() => expect(document.querySelector('.spine__loading')).toBeNull())
+    await openApp()
+    const ids = navIds()
+    expect(ids.length).toBeGreaterThan(0)
+    for (const id of ids) {
+      await openPage(id)
       const leaked = [...document.body.textContent.matchAll(/\b([a-z][a-z_]*\.[a-z][a-zA-Z_.]+)\b/g)]
         .map((m) => m[1])
-        .filter((candidate) => candidate in ar === false && /^(daily|entry|value|outcome|questions|data|spine|capability|count|threshold|unavailable|characterisation|evidence)\./.test(candidate))
-      expect(leaked, `unresolved keys on ${page}`).toEqual([])
-      cleanup()
+        .filter((candidate) => candidate in ar === false && /^(daily|entry|value|outcome|questions|data|spine|capability|count|threshold|unavailable|characterisation|evidence|prices|awaiting|page)\./.test(candidate))
+      expect(leaked, `unresolved keys on ${id}`).toEqual([])
     }
   })
 
-  it('every capability the engine published has a page that renders', async () => {
+  it('every capability the engine published has a page in the nav that renders it', async () => {
+    await openApp()
+    const ids = new Set(navIds())
     for (const id of Object.keys(artefact.capabilities)) {
-      if (id === 'owner_questions') continue
-      renderWithI18n(<V1Spine page={id} fetchImpl={ok} now={NOW} />)
-      await waitFor(() => expect(document.querySelector('.spine__loading')).toBeNull())
+      if (id === 'owner_questions') continue                  // its surface is the panel on Today
+      expect(ids.has(id), `${id} has no nav entry`).toBe(true)
+      await openPage(id)
       expect(document.querySelector('.capability__missing')).toBeNull()
-      cleanup()
+      expect(document.querySelector(`.page-body section.capability[data-capability="${id}"]`)).not.toBeNull()
     }
   })
 })

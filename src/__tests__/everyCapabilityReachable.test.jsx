@@ -22,8 +22,8 @@ import { resetCacheForTests } from '../owner/ownerState.js'
  *     published eleven questions nothing could show (#158).
  *
  *   Nothing caught either, because nothing renders App and asks what it can reach.
- *   QuestionPanel's tests render the panel; `check:surface` renders pages through V1Spine,
- *   which App has not mounted since the cut-over; the e2e nav walk asserts that every nav
+ *   QuestionPanel's tests render the panel; `check:surface` rendered pages through V1Spine,
+ *   which App had not mounted since the cut-over (it renders App since 2026-09-24, ADR-028); the e2e nav walk asserts that every nav
  *   entry renders SOMETHING, from a list edited whenever the nav is.
  *
  * WHAT COUNTS AS REACHED

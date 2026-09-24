@@ -22,9 +22,9 @@ import { en } from '../lib/i18n/dictionaries/en.js'
  *   owner's screen could show one or record his answer.
  *
  *   Nothing failed. QuestionPanel's own tests passed, and so did `check:surface`, because
- *   both render components directly: the panel through V1Spine, which the app has not
+ *   both rendered components directly: the panel through V1Spine, which the app had not
  *   mounted since the cut-over. The loss was one layer up, in App, which no test rendered
- *   with questions in it.
+ *   with questions in it. (check:surface renders App since 2026-09-24, ADR-028.)
  *
  * WHERE THEY GO
  *   At the top of Today, above the action list: the repository owner's decision on
