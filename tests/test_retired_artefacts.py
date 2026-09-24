@@ -28,6 +28,7 @@ sys.path.insert(0, str(ROOT))
 # path relative to the repo root -> the decision that retired it
 RETIRED = {
     "public/data/sources.json": "ADR-005 / design §20.2 — retires at the browser cut-over",
+    "public/data/assortment_gap.json": "design §20.1 — its one reader, AssortmentGapPage, left in #174",
 }
 
 

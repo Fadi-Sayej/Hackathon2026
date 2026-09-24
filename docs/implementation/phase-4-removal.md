@@ -567,6 +567,10 @@ reachable afterwards.
 > Task 4.2. The assortment-gap trio and `public/data/assortment_gap.json` are unblocked,
 > because #174 removed their only reader. `tenbis_connector.py` and the alonit pipeline are
 > live and stay. "17 unreferenced scripts" names no paths, so there is nothing to act on.
+>
+> *(Later the same day:* the assortment-gap trio and `assortment_gap.json` are deleted, and
+> the Kaggle chain went with Task 4.2's writers. What remains of the row is the two live
+> entries and the unnamed seventeen, so **Task 4.1 is complete**.)
 
 ---
 
