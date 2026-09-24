@@ -192,6 +192,7 @@ jobs:
         run: node scripts/check_signals_live.mjs
 
       - name: Commit the owner's artefact
+        id: artefact
         # The step this workflow was missing. The engine published dashboard.json into
         # the runner's workspace every night and the job then threw it away: nothing here
         # ever added it to a commit. Before the cut-over that was invisible, because the
@@ -225,6 +226,40 @@ jobs:
           git commit -q -m "engine: artefact for ${DAY}"
           git pull --rebase --autostash origin main || true
           git push origin HEAD:main
+          echo "committed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy what was just committed (#167)
+        # The push above does not reach the owner by itself. Vercel's Hobby plan blocks a
+        # Git-triggered deployment of any commit whose author is not on the team, and this
+        # workflow commits as smartshelf-collector. Measured 2026-09-24 over 100 production
+        # deployments: 0 of 22 collector commits deployed, 78 of 78 human ones did. So the
+        # owner's screen moved only when somebody merged something, 6.7 to 88.8 hours late.
+        #
+        # A Deploy Hook is triggered by the project rather than by a commit's author, and it
+        # builds the head of main, which is the commit just pushed. Right after the commit, and
+        # before the rules check below, for the reason that check gives: an unrelated failure
+        # must not withhold correct data from the owner.
+        #
+        # The hook only QUEUES a build. Whether Vercel then built it shows on the project's
+        # Deployments page; hook deployments do not appear in GitHub's deployment records.
+        # A missing secret is a warning, not a pass: the artefact would then reach the owner
+        # only with the next human merge. A hook that answers without a job fails the night.
+        if: steps.artefact.outputs.committed == 'true'
+        env:
+          VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$VERCEL_DEPLOY_HOOK_URL" ]; then
+            echo "::warning::VERCEL_DEPLOY_HOOK_URL is not set, so tonight's artefact reaches the owner only with the next human merge (#167)."
+            exit 0
+          fi
+          # A bare POST is refused with 415 Unsupported Media Type (measured 2026-09-24):
+          # the hook wants a JSON body. -f turns an HTTP error into a failed step.
+          response=$(curl -fsS -X POST -H 'Content-Type: application/json' -d '{}' "$VERCEL_DEPLOY_HOOK_URL")
+          echo "$response"
+          case "$response" in
+            *'"job"'*) ;;
+            *) echo "::error::The deploy hook answered but did not queue a job (#167)."; exit 1 ;;
+          esac
 
       - name: Are the deployed Firestore rules the ones in this repository?
         # The pilot's data isolation rests on two lines of firestore.rules: one store is

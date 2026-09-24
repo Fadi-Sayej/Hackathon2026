@@ -209,6 +209,45 @@ so it cannot regenerate the JSON. Option 3 waits on B-2/B-6. Committing the arti
 clean Vercel build produce a working site, and `nagham.md` B-1 is explicit that the pilot cannot
 depend on someone's laptop.
 
+### The nightly deploys itself through a Deploy Hook (#167, 2026-09-24)
+
+**Committing the artefact is not the same as serving it.** Vercel's Hobby plan blocks a
+Git-triggered deployment of any commit whose author is not on the team, and
+`collect-daily.yml` commits as `smartshelf-collector`. Measured on 2026-09-24 over 100
+production deployments (GitHub's deployment records, whose statuses Vercel writes):
+
+- **0 of 22** collector commits deployed, every one `Deployment was blocked`;
+- **78 of 78** human-authored commits deployed.
+
+So a nightly artefact reached the owner only when a human merge happened to deploy `main`,
+**6.7 to 88.8 hours** later.
+
+Since #167:
+
+- **The hook.** A Deploy Hook for `main` (Vercel → Settings → Git → Deploy Hooks, named
+  `nightly`) is stored as the repository secret `VERCEL_DEPLOY_HOOK_URL`. The repository
+  owner set it on 2026-09-24.
+- **The step.** *Deploy what was just committed* in `collect-daily.yml` runs right after the
+  artefact commit, and only when one was made. It POSTs to the hook with a JSON body, since a
+  bare POST is refused with 415. It fails the night if the hook answers without a job, and
+  warns if the secret is missing.
+- **The test.** `tests/test_nightly_deploy_step.py` runs the step's own script against a
+  stand-in `curl`.
+
+**How to verify a night.** The hook only queues a build, and hook deployments do not appear
+in GitHub's deployment records. So the check is the Vercel project's **Deployments** page:
+the build the hook triggered after the collector's `engine: artefact for …` commit should be
+**Ready**.
+
+*Unverified until the first nightly after this change:* whether the hook's build of a
+collector-authored head passes the Hobby block. The expectation is that it does, because
+the hook is triggered by the project, not by a commit's author.
+
+**What production serves, read without the Basic Auth credentials.** For Git-triggered
+deploys, the latest `success` in
+`gh api "repos/Fadi-Sayej/Hackathon2026/deployments?environment=Production"` names the commit.
+Read `public/data/dashboard.json` at that sha, not at `main`.
+
 Read from `public/data/dashboard.json` on 2026-09-13 (schema 2, generated
 2026-09-12T13:21:36Z) — **3,533 entries** across seven capabilities:
 
