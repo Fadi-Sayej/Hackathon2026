@@ -6,7 +6,7 @@ Version: 1.0 (assembled 2026-09-08 from the approved `intent.md` §1, §8–§13
 Supersedes: docs/archive/pre-pivot/PRODUCT_REQUIREMENTS.md, docs/archive/pre-pivot/BUSINESS_CASE.md, docs/archive/pre-pivot/PILOT_PLAN.md
 Related: [Intent register (SPEC-000)](intent-register.md) · [Feature intents](../features/) · [System Design](../architecture/system-design.md)
 Owner: smartshelf-pm
-Updated: 2026-09-24 (F14 registered; F14's and F8's decisions D-15 … D-20 recorded)
+Updated: 2026-09-25 (F8's spec F8-S1 registered)
 ---
 
 # SmartShelf — وثيقة المنتج · Product Requirements
@@ -50,7 +50,7 @@ Updated: 2026-09-24 (F14 registered; F14's and F8's decisions D-15 … D-20 reco
 | [F5](../features/F5-owner-knowledge-capture/intent.md) | INT-010 | «أكمل بياناتي الناقصة — بأقل إزعاج» | [F5-S1](../features/F5-owner-knowledge-capture/specs/F5-S1-owner-knowledge-capture.md) | **V1** |
 | [F6](../features/F6-daily-action-surface/intent.md) | INT-NS | الشاشة الواحدة كل صباح — لا أكثر من 10 إجراءات | [F6-S1](../features/F6-daily-action-surface/specs/F6-S1-daily-action-surface.md) | **V1** |
 | [F7](../features/F7-figure-provenance/intent.md) | INT-PROV | كل رقم يُعاد حسابه بأمر واحد | [F7-S1](../features/F7-figure-provenance/specs/F7-S1-figure-provenance.md) | **V1** |
-| [F8](../features/F8-order-quantity/intent.md) | INT-004 | «ماذا أطلب اليوم وبأي كمية؟» | — | V2 · حُسمت قراراته — D-18 … D-20 |
+| [F8](../features/F8-order-quantity/intent.md) | INT-004 | «ماذا أطلب اليوم وبأي كمية؟» | [F8-S1](../features/F8-order-quantity/specs/F8-S1-order-quantity.md) | V2 · حُسمت قراراته — D-18 … D-20 |
 | [F9](../features/F9-assortment-gap/intent.md) | INT-005 | «ماذا يبيع السوق ولا أبيعه أنا؟» | — | V2 |
 | [F10](../features/F10-expiry-bounded-ordering/intent.md) | INT-007 | «كم أطلب حتى لا يتلف؟» | — | V2 |
 | [F11](../features/F11-supplier-lead-times/intent.md) | INT-008 | «متى يصل كل مورّد فعلاً؟» | — | V3 |

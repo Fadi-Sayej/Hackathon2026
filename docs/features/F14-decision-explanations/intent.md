@@ -8,7 +8,7 @@ Parent: [PRD](../../product/PRD.md)
 Intent IDs: INT-EXPL
 Specs: none
 Inputs: [docs/product/PRD.md, docs/product/intent-register.md (D-15 … D-20), issue #54, PR #178, tag v1-attic-2026-09-24, docs/features/F8-order-quantity/intent.md, docs/product/open-decisions/F14-decision-explanations.md, ADR-007]
-Updated: 2026-09-24
+Updated: 2026-09-25
 ---
 
 # F14 — لماذا هذا القرار؟ · Decision Explanations
@@ -20,9 +20,9 @@ Updated: 2026-09-24
 > - a model writes the sentence **once a night**, under three conditions;
 > - it has **no due date**.
 >
-> A spec is forbidden until F8 exists, because the orders it explains do not. F8's
-> decisions are taken ([D-18 … D-20](../../product/intent-register.md)), but it is not yet
-> specified.
+> A spec is forbidden until F8 exists, because the orders it explains do not. F8 is
+> specified as [F8-S1](../F8-order-quantity/specs/F8-S1-order-quantity.md)
+> (`Ready for review`), but nothing of it is built yet.
 
 ## Problem
 
@@ -68,8 +68,8 @@ published artefact):
 
 ## Related
 
-- **Depends on F8** (`Registered — not specified`; its decisions are D-18 … D-20). There
-  is nothing to explain until F8 publishes order suggestions and the facts behind them.
+- **Depends on F8** (specified as F8-S1, `Ready for review`; not built). There is nothing
+  to explain until F8 publishes order suggestions and the facts behind them (F8-S1 FR-154).
 - **Bound by F7.** A figure an explanation states must be one the engine published, and so
   recomputable.
 
@@ -88,7 +88,7 @@ published artefact):
 
 None of F14's own; GAP-012 is resolved as D-15 … D-17. F8's three decisions were taken too,
 on 2026-09-24, as D-18 … D-20 ([GAP-008](../gaps-and-open-questions.md)). F14 now waits only
-on F8 being specified.
+on F8 being built (F8-S1).
 
 ## Open questions
 
