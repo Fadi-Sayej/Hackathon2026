@@ -780,6 +780,8 @@ export const en = {
   'questions.none': "No questions today — everything that would change a figure is known.",
   'questions.costOf': "What do you pay for {product}?",
   'questions.save': "Save",
+  'questions.saved': "✓ Saved: {value} — your figures update after tonight's run",
+  'questions.change': "Change",
   'questions.why': "Affects ₪{money} across {window}",
   'questions.whyNoPrice': "No shelf price, so no amount — {units} sold across {window}",
   'questions.failed': "We could not save the answer — it was not recorded.",

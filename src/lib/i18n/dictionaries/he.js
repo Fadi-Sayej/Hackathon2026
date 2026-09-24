@@ -781,6 +781,8 @@ export const he = {
   'questions.none': "אין שאלות היום — כל מה שמשנה מספר ידוע.",
   'questions.costOf': "בכמה אתה קונה {product}?",
   'questions.save': "שמור",
+  'questions.saved': "✓ נשמר: {value} — המספרים שלך יתעדכנו אחרי הריצה של הלילה",
+  'questions.change': "שנה",
   'questions.why': "נוגע ל-{money} ₪ במהלך {window}",
   'questions.whyNoPrice': "אין מחיר מדף, ולכן אין סכום — נמכרו {units} במהלך {window}",
   'questions.failed': "לא הצלחנו לשמור — לא נרשם.",

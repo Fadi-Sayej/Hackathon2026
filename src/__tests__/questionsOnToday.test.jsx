@@ -89,6 +89,9 @@ describe("the owner's cost questions on Today", () => {
 
     await waitFor(() => expect(loadOwnerState().answers['7290110578978']?.cost_price?.value).toBe(31.5))
     expect(loadOwnerState().answers['7290110578978'].cost_price.status).toBe('answered')
+    // …and Today shows that it was saved, rather than the same empty field (2026-09-24).
+    await waitFor(() => expect(document.querySelector('.page-body .question__saved')).not.toBeNull())
+    expect(screen.queryByLabelText(en['questions.costOf'].replace('{product}', 'קפה טורקי'))).toBeNull()
   })
 
   it('say so, rather than vanish, when there is nowhere to record an answer', async () => {
