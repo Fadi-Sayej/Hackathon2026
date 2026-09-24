@@ -49,6 +49,22 @@ test('prices renders the comparison, named in Hebrew, against the reference', as
   await expect(table).toContainText(/[\u0590-\u05FF]/)
 })
 
+// On a phone the table's first column was the product name and every figure sat one
+// sideways swipe away. Below 900px the rows are cards (approved 2026-09-24); the table stays
+// for wider screens. Only a real browser applies the media query, so the switch is proved here.
+test('prices shows cards on a phone and the table on a desktop', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.locator('.nav-item[data-nav="prices"]').click()
+  const card = page.locator('.price-cards .price-card').first()
+  await expect(card).toBeVisible()
+  await expect(page.locator('.price-table-scroll')).toBeHidden()
+  await expect(card.locator('.price-card__gap')).toHaveText(/^[\u2066]?[+−]?\d+(\.\d+)?%[\u2069]?$/)
+
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await expect(page.locator('.price-table-scroll')).toBeVisible()
+  await expect(page.locator('.price-cards')).toBeHidden()
+})
+
 // Returned 2026-09-21, when the nightly published the first catalogue.json and Products was
 // routed at it. This is the invariant it was skipped to protect: the manager searches the
 // shelf and the invoice in Hebrew, so a translated product name breaks the only link to the

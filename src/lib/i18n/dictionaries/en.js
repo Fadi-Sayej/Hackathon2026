@@ -1005,5 +1005,7 @@ export const en = {
   'prices.why.stale': "price too old to use",
   'prices.why.unknown': "not compared",
   'prices.more': "Show {n} more",
+  'prices.card.against': "{yours} against {reference}",
+  'prices.card.meta': "{n} shops · {seen}",
   'prices.notPublished': "This run did not publish the comparison, so there is nothing to show yet.",
 }

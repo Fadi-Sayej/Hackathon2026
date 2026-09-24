@@ -2786,6 +2786,68 @@ input[type='radio'] {
 .data-table td.negative { color: var(--rose); font-weight: 600; }
 .data-table td.positive { color: var(--forest); font-weight: 600; }
 
+/* Prices on a phone: one card per product (approved 2026-09-24). Below 900px the table's
+   first column was the product name and every figure sat one sideways swipe away. The card
+   carries the same row in the shape of Today's entry cards, so the two pages read alike. */
+.price-cards {
+  display: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.price-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius-xl);
+  background: var(--paper-100);
+  box-shadow: var(--shadow-sm);
+}
+
+.price-card + .price-card { margin-top: 10px; }
+
+.price-card__name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink-900);
+  overflow-wrap: anywhere;
+}
+
+.price-card__figures {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--ink-600);
+}
+
+.price-card__gap { font-weight: 700; white-space: nowrap; }
+.price-card__gap.negative { color: var(--rose); }
+.price-card__gap.positive { color: var(--forest); }
+
+.price-card__meta {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--ink-400);
+}
+
+@media (max-width: 900px) {
+  .price-table-scroll { display: none; }
+  .price-cards { display: block; }
+}
+
 /* ── Phone layout ────────────────────────────────────────────────────────── */
 
 @media (max-width: 640px) {
