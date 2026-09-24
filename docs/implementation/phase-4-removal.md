@@ -747,6 +747,23 @@ a quarter has passed".
 >   explanation, `gap.*`). Unlike the modules, these **ship**, so they are the one deletion
 >   left that can move the ratchet. It needs its own unit, with a usage sweep that counts
 >   keys built at runtime.
+>
+> **Later on 2026-09-24: the strings and styles went**, approved by the owner on the
+> condition that the screenshots show no change (the front-end rule makes CSS his to
+> approve even when nothing visible moves). 549 unused keys left each dictionary, 361 unused
+> rules left `App.css`, and `src/styles/planogram.css` went whole, since nothing had imported
+> it since #174. "Unused" was decided conservatively. A key counts as used if any shipped
+> file names it, or if it sits under one of the 17 prefixes built at runtime
+> (`page.${id}`, `prices.tab.${id}`, …). A class counts as used if any identifier-like token
+> in shipped code, the HTML entries or the committed artefacts matches it, or if a runtime
+> prefix (`btn-${tone}`) covers it. Measured: `index.html` 417 → 314 KB, total output 976
+> → 873 KB, the stylesheet 62.9 → 30.0 KB. `CEILING_KB` comes down to 900.
+>
+> Nothing on screen changed. 126 screenshots (the 18 nav entries plus the three Prices tabs,
+> in he, ar and en, at phone and desktop widths) were taken twice before and twice after.
+> Every one has an after-render byte-identical to a before-render. The only differences
+> between runs of one build are a few antialiased pixels on the phone Prices page, and they
+> appear in the before pair too.
 
 ---
 

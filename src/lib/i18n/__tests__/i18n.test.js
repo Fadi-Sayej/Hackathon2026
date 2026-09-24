@@ -33,14 +33,14 @@ describe('dictionary parity', () => {
 
 describe('translator', () => {
   it('returns the string for the chosen language', () => {
-    expect(createTranslator('en')('common.print')).toBe('Print')
-    expect(createTranslator('he')('common.print')).toBe('הדפסה')
-    expect(createTranslator('ar')('common.print')).toBe('طباعة')
+    expect(createTranslator('en')('common.yes')).toBe('yes')
+    expect(createTranslator('he')('common.yes')).toBe('כן')
+    expect(createTranslator('ar')('common.yes')).toBe('نعم')
   })
 
   it('substitutes named placeholders', () => {
     const t = createTranslator('en')
-    expect(t('sp.violations', { n: 3 })).toBe('3 violations')
+    expect(t('prices.more', { n: 3 })).toBe('Show 3 more')
   })
 
   it('returns the key itself when it is unknown, so the gap is visible', () => {
@@ -51,11 +51,11 @@ describe('translator', () => {
     const t = createTranslator('he')
     // Every key exists in all three today; the fallback is what protects the
     // screen when a future key lands in ar.js first.
-    expect(t('common.print')).toBeTruthy()
+    expect(t('common.yes')).toBeTruthy()
   })
 
   it('leaves a placeholder alone when no value is supplied', () => {
-    expect(createTranslator('en')('sp.violations')).toContain('{n}')
+    expect(createTranslator('en')('prices.more')).toContain('{n}')
   })
 })
 
