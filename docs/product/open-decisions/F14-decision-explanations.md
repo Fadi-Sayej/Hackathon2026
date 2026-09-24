@@ -1,17 +1,27 @@
 ---
 ID: F14-DECISIONS
 Title: F14 Decision Explanations — the three decisions that must be taken before a spec exists
-Status: Ready for review
+Status: Superseded
 Owner: smartshelf-pm
 Parent: [SPEC-GAPS · GAP-012](../../features/gaps-and-open-questions.md)
 Supersedes: —
-Superseded-by: — (on resolution, becomes the next free D-n in the intent register §3)
+Superseded-by: [intent register §3, D-15 … D-17](../intent-register.md) — decided by the repository owner 2026-09-24
 Related Intents: INT-EXPL
 Inputs: [docs/features/F14-decision-explanations/intent.md, docs/features/gaps-and-open-questions.md, docs/product/intent-register.md, docs/product/PRD.md §5, issue #54, PR #178, tag v1-attic-2026-09-24 (src/lib/ai/factsGuard.js), ADR-007, public/data/dashboard.json (generated 2026-09-24T02:46:37Z)]
 Updated: 2026-09-24
 ---
 
 # F14 — the three decisions
+
+> **Decided 2026-09-24, by the repository owner.** Recorded as D-15 … D-17 in the
+> [intent register §3](../intent-register.md), which is the authority; this brief is kept as
+> the record of how they were reached.
+>
+> | Decision | Answer |
+> |---|---|
+> | 1 — what is explained first | **B, order suggestions** (D-15). F14 waits on F8 |
+> | 2 — who writes the sentence | **B, a model once a night**, with a paid account, a monthly ceiling and an alert, and the mechanical figure check (D-16) |
+> | 3 — when it is due | **No due date** (D-17) |
 
 [GAP-012](../../features/gaps-and-open-questions.md) records that the promise to YomYom, *an
 assistant that explains the decision* (#54), still stands. The repository owner confirmed

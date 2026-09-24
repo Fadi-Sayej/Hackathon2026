@@ -6,7 +6,7 @@ Version: 0.1 (content unchanged from `specs.md` v1.1)
 Parent: [PRD](PRD.md)
 Related Specs: every F#-S# document under `docs/features/`
 Owner: smartshelf-pm
-Updated: 2026-09-24 (INT-EXPL registered as a proposal)
+Updated: 2026-09-24 (INT-EXPL registered; D-15 … D-17 recorded)
 ---
 
 > **Migration note.** This is `SPEC-000` from the pre-migration monolithic `specs.md`,
@@ -49,7 +49,7 @@ owner.
 | **INT-NS** | The fixed north star: one morning screen, actions ranked by money, **no more than 10** | V1 | SPEC-006 |
 | **INT-PROV** | Every figure must be recomputable on demand; no figure asserted from a stale document | V1 | SPEC-007 |
 | **INT-MEAS** | The pilot's decision criterion: after 30 days of V1, how much ₪ recovered — corrected prices, explained stock, cleaned catalogue — measured automatically | V1 | Not specified — see §4 |
-| **INT-EXPL** | The promise made to the client: an assistant that explains each decision — one reason beside every recommendation, built only from figures the engine published | V2 (proposed) | Not specified — see §4 |
+| **INT-EXPL** | The promise made to the client: an assistant that explains each decision — one reason beside every recommendation, built only from figures the engine published | V2 (with F8) | Not specified — see §4 |
 
 `INT-MEAS` is stated in `intent.md` §11.1, which describes it as measured automatically by
 an existing surface. It is registered here rather than left unnamed, because a capability
@@ -98,6 +98,9 @@ These are settled. A specification may operationalize them; it may not reopen th
 | D-12 | The product is **single-store, single-user, single-POS-import**. Multiple stores, user accounts and further point-of-sale integrations are out of scope until one store has proven value | `intent.md` §9.2 |
 | D-13 | Real-time shelf monitoring by fixed sensors or cameras is **permanently excluded**, not deferred | `intent.md` §9.1 |
 | D-14 | **No figure put in front of the owner may depend on automatic withdrawal until GAP-009 is closed.** Withdrawal rests on "absent from the monthly reports" meaning "sold nothing" — true of 3,932 of 3,932 withdrawable products, of which exactly one appears in the reports with an observed zero. That is the none-vs-zero conflation rule 13 and D-3 forbid, applied to 51% of the catalogue | GAP-009; decided 2026-09-12 |
+| D-15 | **F14 explains order suggestions — the quantities F8 will recommend — not V1's findings.** "The decision" in the promise to the client is the order. V1's findings keep showing their evidence as they do. F14 therefore cannot be specified before F8 exists | GAP-012 decision 1; decided by the repository owner 2026-09-24 |
+| D-16 | **The reason sentence is written by a language model once a night, from the suggestion's published facts, and published with it — never at request time.** Three conditions come with it: a paid model account; a monthly spending ceiling with an alert; and a mechanical check, before publishing, that the sentence states no figure its suggestion's facts do not carry (the successor to `factsGuard.js`, tag `v1-attic-2026-09-24`) | GAP-012 decision 2; decided by the repository owner 2026-09-24 |
+| D-17 | **F14 has no due date.** It follows F8 in V2, and no date is committed | GAP-012 decision 3; decided by the repository owner 2026-09-24 |
 
 ---
 
@@ -139,13 +142,13 @@ obligations follow and are recorded rather than assumed:
   D-1 and SPEC-002 FR-023. What that component may contain instead — a count of products
   counted and closed, rather than an amount — is **OQ-801 (P1)**.
 
-**INT-EXPL** (registered 2026-09-24, as a proposal awaiting the owner's approval) is not
-specified because three decisions about keeping a promise made to the client have not been
-taken: what is explained first, who writes the sentence, and when it is due. That is
-GAP-012, and the choices the evidence supports are in the
-[F14 brief](open-decisions/F14-decision-explanations.md). Whatever is chosen, the sentence
-adds no figure and no cause that the explained item's own published evidence does not carry
-(D-1, D-3, D-10).
+**INT-EXPL** (registered 2026-09-24) had three open decisions, and the owner took them the
+same day as **D-15 … D-17**. It explains F8's order suggestions. A language model writes the
+sentence once a night, under three conditions. There is no due date. It is still not
+specified, and now for F8's reason: the orders it explains do not exist until F8 is specified
+(GAP-008). The sentence adds no figure and no cause that its suggestion's own facts do not
+carry (D-1, D-3, D-10, D-16). The brief that posed the questions is kept,
+`Superseded`, as the record: [F14 brief](open-decisions/F14-decision-explanations.md).
 
 These are tracked as open questions in SPEC-GAPS at P1/P2. They must be specified
 before their releases are designed, not before V1 is designed.

@@ -410,7 +410,11 @@ comes, and the divergence stays visible rather than being resolved silently.
 
 ---
 
-#### GAP-012 — The AI-explanation promise stands, and nothing decides how it is kept
+#### ~~GAP-012 — The AI-explanation promise stands, and nothing decides how it is kept~~ — resolved 2026-09-24
+
+**Resolved** by the repository owner as **D-15 … D-17**: explain F8's order suggestions; a model
+writes the sentence once a night under three conditions; no due date. F14 now waits on F8
+(GAP-008). The record of how it was decided follows.
 
 **Source:** issue #54 (track T9), the #80 triage. The repository owner confirmed the promise
 still stands on 2026-09-24.
