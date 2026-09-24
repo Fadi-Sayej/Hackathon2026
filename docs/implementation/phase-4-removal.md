@@ -77,6 +77,21 @@ only on one machine is not a rollback.
 > If any REMOVE path is modified before Task 4.1 starts, that stops being true, and the tag
 > should be re-cut rather than trusted. Re-run that diff before the first deletion.
 
+> **Re-cut on 2026-09-24, before the first deletion under ADR-028.** The diff was re-run over
+> ADR-028's 91 files: 86 were identical at `v1-attic`, 4 had changed since it was cut
+> (`PlacementReasonPanel.jsx`, `DashboardPage.jsx`, `OperationalPage.jsx`,
+> `RecommendationsPage.jsx`), and `artefactToOperational.js` did not exist in it. So a second
+> tag holds them:
+>
+> | | |
+> |---|---|
+> | tag | `v1-attic-2026-09-24` |
+> | tag object | `1fdeee603b1e2f96a9fecec1b533ea44ac7d75bd` |
+> | tagged commit | `959a572` (main, the merge of ADR-028) |
+> | holds | all 91 of ADR-028's files, verified with `git cat-file -e` per path |
+>
+> `v1-attic` is left where it is. It is history, and it still holds 86 of the 91 as they were.
+
 ---
 
 ### Task 4.1: Delete the §20.1 REMOVE list
