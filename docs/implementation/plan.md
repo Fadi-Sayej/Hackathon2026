@@ -1,7 +1,10 @@
 ---
 ID: PLAN
 Title: SmartShelf V1 Implementation Plan
-Status: Partial — Phases 0, 1, 2 and 3 built (Task 2.7's cut-over done 2026-09-12, once ADR-020 removed D-14 as a blocker); Phase 4 written, not started, gated on Checkpoint 3
+Status: Partial — Phases 0, 1, 2 and 3 built (Task 2.7's cut-over done 2026-09-12, once ADR-020 removed D-14 as a blocker); Phase 4 in progress: Tasks 4.0 and 4.1 done (4.1 re-scoped by ADR-028, less §20.1's scripts row), Task 4.2 partly done, Task 4.3 waiting on the owner, Checkpoint 4 open
+Owner: smartshelf-architect
+Inputs: [docs/architecture/system-design.md, docs/features/F1-*/specs … F7-*/specs, docs/architecture/decisions/]
+Updated: 2026-09-24
 Version: 1.1 (written 2026-09-08 against System Design v1.0; refreshed the same day against v1.1)
 Parent: [System Design](../architecture/system-design.md)
 Related Specs: F1-S1 … F7-S1 (see the System Design's §21 traceability matrix)

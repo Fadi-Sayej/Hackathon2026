@@ -106,7 +106,7 @@ LLM layer (`src/lib/ai/*`, `src/api/llm_proxy.py`), telemetry, the MCP server, a
 
 **Interfaces:** none produced. This task only removes.
 
-- [ ] **Step 1: Prove each is unread.** For every path, `git grep` for importers **outside
+- [x] **Step 1: Prove each is unread.** For every path, `git grep` for importers **outside
       the removal set**. Anything with a live reader comes off the list and is reported —
       it is not dead, it is unfinished.
 
@@ -424,13 +424,13 @@ Two of the three preconditions are now met and one is not, as of 2026-09-13:
 And Step 1 run 2 above adds a fourth, which is code rather than calendar: `check:signals`
 and `doctor` still import the demo spine, so Task 4.1's largest group cannot start until
 they are repointed or removed.
-- [ ] **Step 2: Delete, in groups, one commit per group** — demo spine, V2/V4 analytics,
+- [x] **Step 2: Delete, in groups, one commit per group** — demo spine, V2/V4 analytics,
       LLM, telemetry, MCP, scripts. A single 200-file commit cannot be reviewed or
       reverted selectively.
-- [ ] **Step 3:** after each group, `npm run lint && npx vitest run && npm run build &&
+- [x] **Step 3:** after each group, `npm run lint && npx vitest run && npm run build &&
       npm run check:bundle`, and **lower `CEILING_KB`** to the new measured size. A group
       that does not move the bundle deleted nothing that shipped.
-- [ ] **Step 4:** delete the e2e specs covering removed pages (`shelf-planning.spec.js`,
+- [x] **Step 4:** delete the e2e specs covering removed pages (`shelf-planning.spec.js`,
       the V2/V4 parts of `navigation.spec.js`) **in the same commit as their subject**, so
       no commit leaves a test pointing at nothing.
 
@@ -532,6 +532,42 @@ reachable afterwards.
 > a measured figure has a timestamp. Re-measure before arguing from it, especially in a
 > tree where another session is landing work.
 
+> **Done under ADR-028, 2026-09-24: six groups, one PR each, and not one byte of the build
+> moved.**
+>
+> | Group | PR | Removed |
+> |---|---|---|
+> | 1 | #173 | `V1Spine.jsx` and `surface/pages.js`, once `check:surface` rendered `App` |
+> | 2 | #174 | the eleven pre-V1 page components: the eight behind the awaiting shells, `OperationalPage`, `DataSourcePage`, `ExpiryPage` |
+> | 3 | #175 | the planogram libraries and components, and `e2e/shelf-planning.spec.js` |
+> | 4 | #176 | the components, questions code and adapters nothing imported |
+> | 5 | #178 | the V2/V4 analytics (the reorder, demand, competitor, affinity, compliance and planogram engines and their helpers), `explainReorder.js`, and the LLM layer with its proxy |
+> | 6 | #180 | the demo spine, its generator, the POS connectors, the adapters that read them, and the browser's market context |
+>
+> #177 went between groups 4 and 5. It is Task 4.2's retirement of `check_signals_live.mjs`,
+> the last reader groups 5 and 6 had. Before ADR-028 the MCP group (#115), the Firestore
+> writer and market-params generator (#117) and `audit-store-format.mjs` (`6567976`) had gone.
+>
+> **Rule 3, read against ADR-028.** The ratchet did not move, and here that is the claim
+> rather than a failure of it. ADR-028 deletes exactly what the production build does not
+> ship, so a build that changed would have meant something shipped had been taken. Measured
+> by building each side and hashing every file in `dist/`:
+>
+> | Span | Before → after | `dist/` |
+> |---|---|---|
+> | groups 1–4 | `c7fdb29` → `603ba60` | all 20 files byte-identical |
+> | #177, groups 5–6 | `6ebc575` → `b0ce7ba` | all 20 files byte-identical |
+>
+> The one merge between the two spans, #179, is a wording change and not a deletion.
+> `CEILING_KB` stays at 1000 KB for the reason its own comment gives: it moves when bytes
+> leave, and none did. It is re-measured when Checkpoint 4 closes.
+>
+> **What is left of this task is §20.1's scripts row**, split there on 2026-09-24. The Kaggle
+> chain and `export_competitor_market_data.py` run only from `pilot_daily.sh` and go with
+> Task 4.2. The assortment-gap trio and `public/data/assortment_gap.json` are unblocked,
+> because #174 removed their only reader. `tenbis_connector.py` and the alonit pipeline are
+> live and stay. "17 unreferenced scripts" names no paths, so there is nothing to act on.
+
 ---
 
 ### Task 4.2: Stop writing `operational.json`
@@ -545,6 +581,22 @@ reachable afterwards.
 > with `operational.json`. The last two wait on F13 (#83), because the telemetry surface
 > still reads them.
 
+> **Where the steps stand, 2026-09-24, after the ADR-028 groups.** Step 2 is met: the nightly
+> committed `dashboard.json` on each of the twelve days 2026-09-13 … 09-24
+> (`git log -- public/data/dashboard.json`). Step 4 is done (#177). Step 1 is not:
+> `src/telemetry/TelemetryDashboard.jsx` still imports `loadOperationalData`, and F13 (#83)
+> replaces it.
+>
+> **The writers need not wait for F13.** The telemetry surface reads the frozen file, not
+> the code that wrote it. `refresh_pipeline.py` has not run since 2026-09-13, and
+> `pilot_daily.sh` (`npm run pilot:daily`), which ends in `export_dashboard_data.py`, is run
+> by no workflow. `pilot_daily.sh` also broke today in a small way: its soft
+> `export_competitor_market_data.py` step now fails at the write, because #180 removed
+> `src/data/`. So this task splits cleanly. The writers go now, with the scripts only
+> `pilot_daily.sh` runs and CLAUDE.md rules 4, 5 and 10, which describe them. The file and
+> its reader go after F13. **smartshelf-architect**, for the split; the owner, only if he
+> still runs `npm run pilot:daily` by hand.
+
 **Files:**
 - Modify: `.github/workflows/collect-daily.yml` — drop the `refresh_pipeline.py` step
 - Delete: `scripts/refresh_pipeline.py`, `scripts/export_dashboard_data.py`,
@@ -557,9 +609,9 @@ nightly by Task 3.4. Until both are true this task does not start.
 
 - [ ] **Step 1:** confirm no `loadOperationalData` caller remains (Task 2.7 removed the
       last one; verify rather than assume)
-- [ ] **Step 2:** confirm the nightly has committed `dashboard.json` on consecutive days
+- [x] **Step 2:** confirm the nightly has committed `dashboard.json` on consecutive days
 - [ ] **Step 3:** delete, run everything, lower the ceiling
-- [ ] **Step 4:** `check:signals` loses its reorder probes with the engine; `check:signals:v1`
+- [x] **Step 4:** `check:signals` loses its reorder probes with the engine; `check:signals:v1`
       becomes `check:signals`
 
 ---
@@ -593,6 +645,13 @@ a quarter has passed".
 > `count` is `null` rather than `0` deliberately: nobody having opened the app and nobody
 > having registered are different facts, and only one of them is known here
 > (ARCH-DRIVER-002, rule 8).
+
+> **Step 1's evidence, read 2026-09-24** off `public/data/dashboard.json` (`run_at`
+> 2026-09-24T02:46Z): `devices` is `available`, `count` **4**, last seen 2026-09-16,
+> 09-17, 09-22 and 09-23. So four browser profiles have written owner state since #95
+> deployed. Per ADR-021's finding 4 that is neither a floor nor a ceiling on the physical
+> devices. What is left is the owner's confirmation that every device he uses is among
+> them, and it was put to him on 2026-09-24.
 >
 > **Step 1 becomes:** read `count` and `last_seen_at` off `public/data/dashboard.json`, show
 > the owner that list of dates, and ask him to confirm it covers every device he uses. The
@@ -622,6 +681,40 @@ a quarter has passed".
 - [ ] `git grep` finds no reference to anything removed, in code **or** in docs outside
       `docs/archive/`
 - [ ] `v1-attic` resolves on the remote and builds
+
+> **Where it stands, 2026-09-24.** Not closable yet. Task 4.2 keeps `operational.json` and
+> `loadOperationalData.js` until F13 (#83) rebuilds the telemetry surface, and Task 4.3
+> waits on the owner. Each check as it reads today, on `phase4/checkpoint-4` over `b0ce7ba`:
+>
+> | Check | Result |
+> |---|---|
+> | `check:bundle` | `index.html` **417 KB**, under the 500 KB target; total **976 KB**, under `CEILING_KB` 1000. Not lowered, because no deletion moved it (Task 4.1 above). Lowered when this checkpoint closes, after Task 4.2 and F13 have changed what ships |
+> | lint, vitest, `test:py`, build | green: vitest 479/479, pytest 585 passed and 7 skipped |
+> | `check:surface`, `check:signals`, `check:independence` | green. `check:signals` needs `data/internal/silver_pos/`, and refuses without it, correctly |
+> | `git grep` for anything removed | swept: `810d9b3` (code, 33 files) and `f7c54d3` (docs, 5 files). See below |
+> | `v1-attic`, `v1-attic-2026-09-24` | both resolve on the remote (`bf1d47a`, `959a572`) and build |
+>
+> **How the grep criterion was read.** Taken literally it cannot pass: this file, ADR-028,
+> §20.1 and every dated review exist to name what was removed. So the sweep asked a
+> narrower question of each hit: does it present a removed file as present, as the thing
+> that reads, enforces or consumes something now, or as a command to run? Those were
+> rewritten, and history was left as history. Method: every file deleted since `v1-attic`
+> outside `data/` (133, `git diff --diff-filter=D`), searched by name (by path where the
+> name is generic or still in use elsewhere) over the tree outside `docs/archive/` and
+> `data/`. 96 code lines and 332 documentation lines matched.
+>
+> **Left for their owners:**
+>
+> - F3's intent (line 44) names `storeFormat.js` as the gate that labels a supermarket
+>   comparison. The engine does that now (`competitor_position.py`, `role: comparable |
+>   context`). **smartshelf-pm.**
+> - `.ai-codex/lib.md` is an export index generated on 2026-08-02 that nothing regenerates,
+>   and much of it lists removed modules. Regenerate it or delete it, whoever uses it.
+> - `src/App.css` still carries rules for the removed components, and the three
+>   dictionaries still carry strings for the removed pages (`sp.*`, the reorder
+>   explanation, `gap.*`). Unlike the modules, these **ship**, so they are the one deletion
+>   left that can move the ratchet. It needs its own unit, with a usage sweep that counts
+>   keys built at runtime.
 
 ---
 
