@@ -536,6 +536,15 @@ reachable afterwards.
 
 ### Task 4.2: Stop writing `operational.json`
 
+> **The legacy probe is retired, 2026-09-24 (#77).** `scripts/check_signals_live.mjs` and the
+> `check:signals:legacy` script are deleted, and `collect-daily.yml` no longer runs it (nor
+> sets up Node, which only it needed). It was the last reader of the reorder engine, the demo
+> data and `src/lib/ai/factsGuard.js`, so ADR-028's remaining groups can now go.
+> `check:signals` runs the two V1 probes, which stay blocking in the nightly. **Still open in
+> this task:** `refresh_pipeline.py`, `export_dashboard_data.py`, and `loadOperationalData.js`
+> with `operational.json`. The last two wait on F13 (#83), because the telemetry surface
+> still reads them.
+
 **Files:**
 - Modify: `.github/workflows/collect-daily.yml` — drop the `refresh_pipeline.py` step
 - Delete: `scripts/refresh_pipeline.py`, `scripts/export_dashboard_data.py`,

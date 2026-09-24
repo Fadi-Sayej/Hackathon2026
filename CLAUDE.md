@@ -171,10 +171,10 @@ particular: no role quotes a figure it has not read from the artifact that produ
     Both probes run in `collect-daily.yml` before `dashboard.json` is committed,
     and both are **blocking** since the cut-over.
 
-    `npm run check:signals:legacy` is the pre-V1 probe over the reorder ranking.
-    The nightly still calls it while `market-context.json` is committed; §20.2
-    removes it in Phase 4 with the reorder engine it exercises. It is not the one
-    this rule means.
+    The pre-V1 probe over the reorder ranking, `check:signals:legacy`
+    (`check_signals_live.mjs`), was retired on 2026-09-24 (Phase 4 Task 4.2, #77)
+    with the reorder engine it exercised (ADR-028). The two probes above are the
+    ones this rule means, and the only ones there are.
 
 13. **The seven sales reports are MONTHLY, and that caps what T8 can claim.** One
     row per product per month, no date column in any of the seven files — so STL

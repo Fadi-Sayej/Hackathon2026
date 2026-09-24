@@ -44,13 +44,6 @@ jobs:
           python-version: '3.11'
           cache: pip
 
-      - uses: actions/setup-node@v4
-        with:
-          # .nvmrc, for the same reason as ci.yml. This workflow survived Node 20 only
-          # because check_signals_live.mjs imports nothing from node_modules; the moment it
-          # does, it would fail the way ci.yml did.
-          node-version-file: '.nvmrc'
-
       - run: pip install -r requirements.txt
 
       - name: Health check before collecting
@@ -183,13 +176,6 @@ jobs:
 
       - name: Do detection and hygiene still fail independently?
         run: python3 scripts/check_independence.py
-
-      - name: Is every signal still reaching an output?
-        # A run can succeed while a signal quietly stops applying — that has happened
-        # four times in this project, each time with unit tests green. Reads
-        # public/data/market-context.json, which run_engine() writes through its own
-        # market_context step, so this still guards a file we are about to commit.
-        run: node scripts/check_signals_live.mjs
 
       - name: Commit the owner's artefact
         id: artefact
