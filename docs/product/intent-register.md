@@ -6,7 +6,7 @@ Version: 0.1 (content unchanged from `specs.md` v1.1)
 Parent: [PRD](PRD.md)
 Related Specs: every F#-S# document under `docs/features/`
 Owner: smartshelf-pm
-Updated: 2026-09-24 (INT-EXPL registered; D-15 … D-17 recorded)
+Updated: 2026-09-24 (INT-EXPL registered; D-15 … D-20 recorded)
 ---
 
 > **Migration note.** This is `SPEC-000` from the pre-migration monolithic `specs.md`,
@@ -101,6 +101,9 @@ These are settled. A specification may operationalize them; it may not reopen th
 | D-15 | **F14 explains order suggestions — the quantities F8 will recommend — not V1's findings.** "The decision" in the promise to the client is the order. V1's findings keep showing their evidence as they do. F14 therefore cannot be specified before F8 exists | GAP-012 decision 1; decided by the repository owner 2026-09-24 |
 | D-16 | **The reason sentence is written by a language model once a night, from the suggestion's published facts, and published with it — never at request time.** Three conditions come with it: a paid model account; a monthly spending ceiling with an alert; and a mechanical check, before publishing, that the sentence states no figure its suggestion's facts do not carry (the successor to `factsGuard.js`, tag `v1-attic-2026-09-24`) | GAP-012 decision 2; decided by the repository owner 2026-09-24 |
 | D-17 | **F14 has no due date.** It follows F8 in V2, and no date is committed | GAP-012 decision 3; decided by the repository owner 2026-09-24 |
+| D-18 | **F8's market is the nearby stores: the stores the collector follows in `configs/delivery_targets.yaml`, not stores of his format elsewhere in the country.** There are eight today, one reference and seven competitors, and three are of a format comparable to his (`configs/store_types.yaml`). Together they list 779 of his 7,275 products, and the three comparable ones list 410 (2026-09-24; the measurement is under GAP-008). The national Alonit price file is not F8's market | GAP-008 decision 1; decided by the repository owner 2026-09-24 |
+| D-19 | **His own sales set the quantity; the market only adjusts it, and the reason is shown with it.** When the nearby stores (D-18) run out of a product he sells, its quantity rises by one fixed, stated amount, the same for every product: today 15% (`stockout_demand_lift` in `configs/demand_windows.yaml`, which calls it a starting figure, not a measurement). A product with no sales row gets no quantity (D-3). Where the nearby stores give a signal for it, the signal is put to him as a question instead (D-8) | GAP-008 decision 2; decided by the repository owner 2026-09-24 |
+| D-20 | **When the market and his own sales disagree about a product, he is asked on screen, his answer is saved, and he is not asked about that product again.** Questions come at most three at a time (D-8), and the answer is kept with his other answers (F5). Letting an answer change future quantities automatically is left for later. This settles F8's case only; F9's decision (INT-005, §4) is not taken by it | GAP-008 decision 3; decided by the repository owner 2026-09-24 |
 
 ---
 
@@ -113,13 +116,15 @@ The reason is not scheduling. Each rests on a product decision that the intent l
 has explicitly left open, and writing requirements now would mean inventing those
 answers rather than surfacing them:
 
-- **INT-004** depends on how market movement and the store's own movement combine into
-  one quantity, and on what geographic radius defines "the market". Both open —
-  `intent.md` §6 states the ordering of inputs, not the rule. The three decisions are
-  posed as answerable questions, with the options the data supports, in
-  [open-decisions/F8-ordering.md](open-decisions/F8-ordering.md). **That brief is not
-  authority** — when the decisions are taken they are recorded as `D-14 …` in §3 above,
-  and the brief is set `Superseded`.
+- **INT-004** had three open decisions (GAP-008), and the owner took them on 2026-09-24
+  as **D-18 … D-20**: the market is the nearby stores; his own sales set the quantity and
+  the market only adjusts it; a disagreement is asked once, saved, and not asked again. It
+  is still not specified. Moving past that is the owner's act, and its dependencies on
+  F10's shelf-life cap and F4's sales evidence stand. The decisions leave two design
+  questions for the architect, recorded under GAP-008: the "running out" signal D-19 needs
+  does not exist yet for the nearby stores (GAP-008e), and ADR-008 does not say whether its
+  format floor applies to market movement (GAP-008f). The brief that posed the questions is
+  kept, `Superseded`, as the record: [F8 brief](open-decisions/F8-ordering.md).
 - **INT-005** depends on what the owner is expected to *do* with a "strong in the
   market, weak here" finding. `intent.md` §6 phrases it as a conversation opener, which
   is not yet a decision the system can record.

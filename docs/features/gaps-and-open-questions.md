@@ -5,6 +5,9 @@ Status: Living
 Version: 0.1 (content unchanged from `specs.md` v1.1)
 Parent: [Intent Register (SPEC-000)](../product/intent-register.md)
 Related Specs: all F#-S# documents under `docs/features/`
+Owner: smartshelf-pm
+Inputs: [docs/product/intent-register.md, docs/features/F#-*/intent.md, docs/features/F#-*/specs/]
+Updated: 2026-09-24 (GAP-008 resolved as D-18 … D-20)
 ---
 
 > **Migration note.** Moved verbatim from the pre-migration monolithic `specs.md`. It spans
@@ -243,7 +246,15 @@ number that can change without restructuring anything.
 
 ---
 
-#### GAP-008 — The V2 ordering intent states an order of inputs, not a rule
+#### ~~GAP-008 — The V2 ordering intent states an order of inputs, not a rule~~ — resolved 2026-09-24
+
+**Resolved** by the repository owner as **D-18 … D-20**:
+- the market is the nearby stores;
+- his own sales set the quantity, and the market only adjusts it;
+- a disagreement is asked on screen, saved, and not asked again.
+
+F8 is still not specified. The record of how it was decided follows, and after it what the
+decisions leave open.
 
 **Source:** `intent.md` §6 (INT-004).
 
@@ -272,6 +283,38 @@ that this does not block V1.
 > four new open questions, **GAP-008a … GAP-008d**, one of which is blocking: the
 > `WATCH_PRODUCT` population is 527 in F8's intent and 1,857 in `public/data/operational.json`
 > (2026-09-10).
+
+> **Added 2026-09-24: what D-18 … D-20 leave open.** Measured on 2026-09-24 from
+> `configs/delivery_targets.yaml` (enabled stores that are not the client),
+> `configs/store_types.yaml` (format and the 0.3 floor), the 2026-09-24 delivery-catalogue
+> snapshot, `public/data/catalogue.json` and `data/internal/silver_pos/sales_summary.parquet`:
+>
+> | Of his 7,275 products | All nearby stores (D-18) | The comparable ones |
+> |---|---|---|
+> | Stores | 8, of which 7 list barcodes. Bingo's 129 products carry none | 3: Wolt Market, Rami Levy in the Neighbourhood, Super Alonit Einat |
+> | Products they list | 779 | 410 |
+> | … of those, with his own sales rows (1,518 in all) | 339 | 207 |
+>
+> - **GAP-008a is moot.** Both counts (527 in F8's intent, 1,857 on 2026-09-10) came from
+>   `src/recommendations/product_recommendations.py`, which nothing has run since 2026-09-13
+>   (`src/context/demand_signals.py`). `public/data/operational.json` was last generated on
+>   2026-09-12. The owner's screens no longer read it (`src/App.jsx`); only the telemetry
+>   page does (CLAUDE.md rule 5). F8's list will come from D-19's rule.
+> - **GAP-008b is answered by the table:** three stores.
+> - **GAP-008c is answered by D-19:** a quantity is proposed wherever he has sales rows.
+> - **GAP-008d is still unanswered, and nothing needs it yet.** The snapshot's store ids are
+>   Wolt venue ids, the config's keys are names, and nothing maps one to the other. It does
+>   not matter yet, because D-18 takes every configured store.
+> - **GAP-008e (new; architect, then engineer): the nearby stores have no "running out"
+>   signal.** D-19 needs one. Today's signal (`src/context/competitor_stockouts.py`, reading
+>   `src/market/presence.py`) comes from the national Alonit price file: 157 branches over 45
+>   days, 2026-08-11 … 2026-09-24. D-18 does not count that file as F8's market. Reading the
+>   signal off the nearby stores' daily delivery catalogues is new work, under `presence.py`'s
+>   own rule that a day with no snapshot is not a day of absence. Whether `market-context.json`
+>   keeps publishing the national signal (ADR-028 keeps it for V2) is the architect's call.
+> - **GAP-008f (new; architect): does ADR-008's format floor apply to market movement?**
+>   ADR-008 decides the price reference and does not say. The answer is the difference
+>   between the table's two columns.
 
 ---
 

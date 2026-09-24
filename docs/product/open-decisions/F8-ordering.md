@@ -1,17 +1,31 @@
 ---
 ID: F8-DECISIONS
 Title: F8 Order Quantity — the three decisions that must be taken before a spec exists
-Status: Ready for review
+Status: Superseded
 Owner: smartshelf-pm
 Parent: [SPEC-GAPS · GAP-008](../../features/gaps-and-open-questions.md)
 Supersedes: —
-Superseded-by: — (on resolution, becomes D-14 … D-16 in the intent register §3)
+Superseded-by: [intent register §3, D-18 … D-20](../intent-register.md) — decided by the repository owner 2026-09-24
 Related Intents: INT-004, INT-005
 Inputs: [docs/features/F8-order-quantity/intent.md, docs/features/gaps-and-open-questions.md, docs/product/intent-register.md, configs/delivery_targets.yaml, configs/store_types.yaml, public/data/operational.json, data/external/snapshots/2026-09-05/]
-Updated: 2026-09-12
+Updated: 2026-09-24
 ---
 
 # F8 — the three decisions
+
+> **Decided 2026-09-24, by the repository owner.** Recorded as **D-18 … D-20** in the
+> [intent register §3](../intent-register.md), which is the authority. They are not the
+> D-14 … D-16 this brief names below: other decisions took those numbers first. This brief
+> is kept as the record of how they were reached.
+>
+> | Decision | Answer |
+> |---|---|
+> | 1 — what geography is the market | **A, the nearby stores as configured** (D-18). Eight today, three of them of a comparable format |
+> | 2 — how the two become one quantity | **B, his own sales set the quantity**, and the market also adjusts it: a fixed, stated rise when the nearby stores run out, and a question where he has no sales row (D-19) |
+> | 3 — what happens when they disagree | **B, save his answer and stop asking**, at most three questions at a time (D-20). C, letting the answer change future quantities, is left for later |
+>
+> What the decisions leave open, GAP-008a … GAP-008f, is recorded under
+> [GAP-008](../../features/gaps-and-open-questions.md).
 
 [GAP-008](../../features/gaps-and-open-questions.md) says INT-004 states an order of inputs,
 not a rule, and names three decisions that must be taken first. It does not say what the
