@@ -3,7 +3,7 @@ import { DEVICE_KEY, deviceField, localDevice } from '../deviceRegister'
 
 /**
  * ADR-021's browser half. The register answers "how many profiles have written owner state",
- * and Task 4.3 deletes the legacy migration on the strength of that answer — so the tests
+ * and Task 4.3 deleted the legacy migration on the strength of that answer — so the tests
  * here are about the ways the answer could be wrong: an id that changes, an id that is not
  * random, and a profile counted once per page view because it cannot keep one.
  */
@@ -69,7 +69,7 @@ describe('the device register mints one opaque id per browser profile', () => {
   })
 
   it('writes the id under its own key, not into the owner-state key', () => {
-    // A migration rewrites smartshelf.ownerState.v2 whole; the id must survive that.
+    // Every owner-state write rewrites smartshelf.ownerState.v2 whole; the id must survive that.
     localDevice()
     expect(JSON.parse(globalThis.localStorage.getItem(DEVICE_KEY)).id).toBeTruthy()
     expect(globalThis.localStorage.getItem('smartshelf.ownerState.v2')).toBeNull()

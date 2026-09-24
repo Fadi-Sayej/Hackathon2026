@@ -2,11 +2,12 @@
  * deviceRegister — ADR-021, the browser half.
  *
  * WHY THIS EXISTS
- *   Phase 4 Task 4.3 (#78) deletes the one-shot migration that carries the three pre-V1
- *   localStorage keys into `smartshelf.ownerState.v2`. Its precondition is that every pilot
- *   device has opened the app since the cut-over, and nothing measured that. What the
+ *   Phase 4 Task 4.3 (#78) deleted the one-shot migration that carried the three pre-V1
+ *   localStorage keys into `smartshelf.ownerState.v2`. Its precondition was that every pilot
+ *   device had opened the app since the cut-over, and nothing measured that. What the
  *   precondition protects — the owner's own recorded decisions — cannot be restored if the
- *   guess is wrong, so the precondition is made checkable instead of guessed.
+ *   guess is wrong, so the precondition was made checkable instead of guessed. The owner
+ *   confirmed against this register (4 profiles) on 2026-09-24, and the migration went.
  *
  * WHAT IT IS, EXACTLY
  *   One random opaque id per browser profile, minted once and kept in localStorage. It is
@@ -22,7 +23,7 @@
 
 /** Its own key, not a field of `smartshelf.ownerState.v2`: the id is not the owner's state,
  *  it identifies the profile holding a copy of it, and it must survive that key being
- *  rewritten by a migration. */
+ *  rewritten whole, which every owner-state write does. */
 export const DEVICE_KEY = 'smartshelf.device.v1'
 
 /** 128 bits from the platform CSPRNG. `Math.random` is deliberately not a fallback — ids that

@@ -1281,8 +1281,8 @@ own, so their rows say so rather than grade it after the fact.
 | Transition | Temporary mechanism | Removed when |
 |---|---|---|
 | Artefact cut-over | The engine publishes `dashboard.json`; the browser reads only `dashboard.json` from its first cut-over build. `operational.json` keeps being written for **one** release so a rolled-back browser still works; `sources.json` stops immediately | End of Phase 2 |
-| Outcome ids | One-shot legacy id translation in `ownerState.js` (ADR-009), needs the last `operational.json` to be fetchable | End of Phase 4 |
-| Owner-state keys | One-shot migration of `smartshelf.operationalActions.v1`, `smartshelf.ownerAnswers.v1`, `smartshelf.demoState.v1.recommendationDecisions` into `smartshelf.ownerState.v2`; old keys left in place but unread | End of Phase 4 |
+| Outcome ids | One-shot legacy id translation in `ownerState.js` (ADR-009), needs the last `operational.json` to be fetchable | Never built: `migrate()` copied legacy ids verbatim (verified 2026-09-16, Phase 4 Task 4.2 note). Moot since 2026-09-24, when the migration it would have extended was removed (#78) |
+| Owner-state keys | One-shot migration of `smartshelf.operationalActions.v1`, `smartshelf.ownerAnswers.v1`, `smartshelf.demoState.v1.recommendationDecisions` into `smartshelf.ownerState.v2`; old keys left in place but unread | Phase 4 — **done 2026-09-24** (#78), once the owner confirmed every device had opened the app since the cut-over. The old keys stay, unread |
 | `check:signals` | Runs old (reorder) probes until the reorder engine leaves the build, then only V1 probes | Phase 4 — **done 2026-09-24** (#77): only the V1 probes remain |
 | Firestore off → on | Until the six `VITE_FIREBASE_*` values and the CI secret exist, the system behaves as "owner state unavailable" honestly (§13); it is *not* silently local | Phase 0 prerequisite |
 
