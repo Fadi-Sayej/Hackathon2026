@@ -20,8 +20,9 @@ Updated: 2026-09-24
 > - a model writes the sentence **once a night**, under three conditions;
 > - it has **no due date**.
 >
-> A spec is forbidden until F8 exists, because the orders it explains do not
-> ([GAP-008](../gaps-and-open-questions.md)).
+> A spec is forbidden until F8 exists, because the orders it explains do not. F8's
+> decisions are taken ([D-18 … D-20](../../product/intent-register.md)), but it is not yet
+> specified.
 
 ## Problem
 

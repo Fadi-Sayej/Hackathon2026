@@ -20,11 +20,11 @@ Updated: 2026-09-24
 >
 > | Decision | Answer |
 > |---|---|
-> | 1 — what geography is the market | **A, the nearby stores as configured** (D-18). Eight today, three of them of a comparable format |
-> | 2 — how the two become one quantity | **B, his own sales set the quantity**, and the market also adjusts it: a fixed, stated rise when the nearby stores run out, and a question where he has no sales row (D-19) |
+> | 1 — what geography is the market | **C, the comparable formats among the configured nearby stores** (D-18): the option he was shown as "nearby stores only, 410 products at most". Three stores today; the other five are context only |
+> | 2 — how the two become one quantity | **Closest to B, but the market also moves the quantity** (D-19). His own sales set it, and it rises by one fixed, stated amount when the nearby stores run out. Where he has no sales row and the nearby stores give a signal, the signal becomes a question |
 > | 3 — what happens when they disagree | **B, save his answer and stop asking**, at most three questions at a time (D-20). C, letting the answer change future quantities, is left for later |
 >
-> What the decisions leave open, GAP-008a … GAP-008f, is recorded under
+> What the decisions leave open, GAP-008a … GAP-008e, is recorded under
 > [GAP-008](../../features/gaps-and-open-questions.md).
 
 [GAP-008](../../features/gaps-and-open-questions.md) says INT-004 states an order of inputs,

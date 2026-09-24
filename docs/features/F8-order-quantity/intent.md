@@ -57,7 +57,7 @@ Tracked as **GAP-008** in [gaps and open questions](../gaps-and-open-questions.m
 
 > **Added 2026-09-24 (not part of the migrated content).** All three are decided, by the
 > repository owner:
-> - the market is the nearby stores (D-18);
+> - the market is the nearby stores of a format comparable to his, three today (D-18);
 > - his own sales set the quantity, and the market only adjusts it (D-19);
 > - a disagreement is asked on screen, saved, and not asked again (D-20).
 >
