@@ -17,7 +17,7 @@ import { ReceivingCaptureForm } from '../components/receiving/ReceivingCaptureFo
  * The summary returns when there is something to summarise — the counter starts on the day
  * the owner's staff begin recording, which is what this form is for.
  */
-export function ReceivingPage() {
+export function ReceivingPage({ products = [] }) {
   const t = useT()
 
   return (
@@ -33,7 +33,7 @@ export function ReceivingPage() {
         {t('exp.receivingDesc2')}
       </p>
 
-      <ReceivingCaptureForm products={[]} />
+      <ReceivingCaptureForm products={products} />
     </section>
   )
 }

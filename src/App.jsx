@@ -12,6 +12,7 @@ import { catalogueToProducts } from './lib/dataAdapters/catalogueToProducts.js'
 import { analyzeProducts } from './lib/analytics/inventoryEngine.js'
 import { ProductsPage } from './pages/ProductsPage.jsx'
 import { PriceGapPage } from './pages/PriceGapPage.jsx'
+import { ReceivingPage } from './pages/ReceivingPage.jsx'
 import { clearOutcome, loadOwnerState, recordAnswer, recordOutcome } from './owner/ownerState.js'
 import { DailyPage } from './surface/DailyPage.jsx'
 import { QuestionPanel } from './questions/QuestionPanel.jsx'
@@ -40,7 +41,7 @@ const CAPABILITY_PAGES = new Set([
 ])
 
 /** Pages that fetch `catalogue.json`. Everything else never pays for it. */
-const NEEDS_CATALOGUE = new Set(['products', 'prices'])
+const NEEDS_CATALOGUE = new Set(['products', 'prices', 'expiry'])
 
 const AWAITING = {
   recommendations: 'demand',
@@ -140,6 +141,16 @@ export default function App() {
     const rows = catalogueToProducts(catalogue.catalogue)
     return rows ? analyzeProducts(rows, {}) : null
   }, [catalogue.catalogue])
+
+  // The receiving form's product lookup: a scanned barcode shows its name before the line is
+  // saved, which is how a mis-scan is caught. It used to be handed an empty list, so every
+  // scan read "not found in the catalog" whatever the barcode.
+  const receivingProducts = useMemo(
+    () => (catalogue.catalogue?.products || [])
+      .filter((p) => p.barcode)
+      .map((p) => ({ id: String(p.barcode), name: p.product_name })),
+    [catalogue.catalogue],
+  )
 
   const refreshOwnerState = useCallback(() => setOwnerState({ ...loadOwnerState() }), [])
 
@@ -258,6 +269,17 @@ export default function App() {
         return <p className="spine__loading">{t('spine.loading')}</p>
       }
       return <PageAwaitingData pageId={activePage} needs="catalogue" />
+    }
+    // The receiving capture, below the Expiry page's waiting note: the repository owner's
+    // decision on 2026-09-24. The 2026-09-16 restore had removed it with the `receiving` nav
+    // entry, and left a note saying the page "fills as the receiving screen is used".
+    if (activePage === 'expiry') {
+      return (
+        <>
+          <PageAwaitingData pageId={activePage} needs="expiry" />
+          <ReceivingPage products={receivingProducts} />
+        </>
+      )
     }
     if (AWAITING[activePage]) {
       return <PageAwaitingData pageId={activePage} needs={AWAITING[activePage]} />
