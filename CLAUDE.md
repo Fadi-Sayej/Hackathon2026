@@ -120,11 +120,13 @@ particular: no role quotes a figure it has not read from the artifact that produ
    figures. It now reports those as `orphans` and warns. Believe the clone, not the
    laptop.
 
-7. **`normalize:data` will overwrite committed frontend data.** With
-   `data/internal/silver_pos/` absent (its normal state on a fresh clone) it falls
-   back to a ~30-product demo set and overwrites `src/data/demoProducts.js` and five
-   other committed generated files. It refuses unless you pass
-   `-- --allow-demo-fallback`. Never pass that flag to "make it run".
+7. **There is no demo data, and nothing generates it.** `normalize:data` used to fall
+   back, on a fresh clone, to a ~30-product demo set that overwrote
+   `src/data/demoProducts.js` and five other committed files, and it refused only
+   without `--allow-demo-fallback`. The demo spine, its generator and that flag were
+   removed on 2026-09-24 (ADR-028): no screen had read it since the cut-over. The owner's
+   screens read `public/data/*.json`, which the engine writes (rule 5). If a page needs
+   data the artefact does not carry, the answer is the engine, never a generated file.
 
 8. **Never sum a per-sale figure with a one-off figure.** `actionPriority.js` splits
    them deliberately (`IMPACT_KIND`). Adding them once produced a meaningless
@@ -199,8 +201,7 @@ particular: no role quotes a figure it has not read from the artifact that produ
   `external/` connectors · `common/` paths and status · `expiry/`, `internal/`
   receiving.
 - `src/` (JS) — `pages/` one file per screen · `lib/analytics/` ranking and money
-  rules · `lib/dataAdapters/` reads `public/data/*.json` · `lib/i18n/` he/en · `data/`
-  generated, committed.
+  rules · `lib/dataAdapters/` reads `public/data/*.json` · `lib/i18n/` he/en.
 - `scripts/` — 68 entry points (53 `.py`, 12 `.mjs`, 3 `.sh`, counted with `ls` on 2026-09-24). Only the
   handful in the System Design §7 are the product.
 
