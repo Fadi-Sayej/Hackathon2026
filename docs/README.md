@@ -52,7 +52,7 @@ globally unique across the specification layer and were **not** renumbered by th
 | F5 — Owner Knowledge Capture | [intent](features/F5-owner-knowledge-capture/intent.md) | [F5-S1](features/F5-owner-knowledge-capture/specs/F5-S1-owner-knowledge-capture.md) | V1 |
 | F6 — Daily Action Surface | [intent](features/F6-daily-action-surface/intent.md) | [F6-S1](features/F6-daily-action-surface/specs/F6-S1-daily-action-surface.md) | V1 |
 | F7 — Figure Provenance | [intent](features/F7-figure-provenance/intent.md) | [F7-S1](features/F7-figure-provenance/specs/F7-S1-figure-provenance.md) | V1 |
-| F8 — Order Quantity | [intent](features/F8-order-quantity/intent.md) | *not specified* | V2 |
+| F8 — Order Quantity | [intent](features/F8-order-quantity/intent.md) | [F8-S1](features/F8-order-quantity/specs/F8-S1-order-quantity.md) — `Ready for review` | V2 |
 | F9 — Assortment Gap | [intent](features/F9-assortment-gap/intent.md) | *not specified* | V2 |
 | F10 — Expiry-Bounded Ordering | [intent](features/F10-expiry-bounded-ordering/intent.md) | *not specified* | V2 |
 | F11 — Supplier Lead Times | [intent](features/F11-supplier-lead-times/intent.md) | *not specified* | V3 |
