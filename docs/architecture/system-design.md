@@ -1456,14 +1456,14 @@ needed" is a decision still to be written; none is taken here.
 
 | Requirement | Design element | Flow / contract | Verification |
 |---|---|---|---|
-| FR-143 … FR-146, INV-070, INV-072 | I a per-day sales import, beside the monthly one; E an order-quantity capability over the four-week window | ADR needed: the import's grain, its missing-day rule, the freshness limit | AC-136 … AC-140 |
+| FR-143 … FR-146, INV-070, INV-072 | I a per-day import of sales and deliveries, beside the monthly one; E an order-quantity capability over the 28-day window | ADR needed: the import's grain, its missing-day rule, the freshness limit | AC-136 … AC-140 |
 | FR-147, FR-148, INV-074 | E a running-out signal over the D-18 stores, separately unavailable (ADR-014); OQ-905 | ADR needed: stockout classification across three chains | AC-141, AC-142 |
-| FR-149, FR-150, INV-073 | E stock usability from `vintages.pos`, the F2-S1 flags and per-day sales since the count | 11.4 | AC-143, AC-144 |
+| FR-149, FR-150, INV-073 | E stock now from `vintages.pos`, the F2-S1 flags, and the per-day sales and deliveries since the count, carried to the order day | 11.4 | AC-143, AC-144, AC-157 |
 | FR-151 … FR-153, INV-071 | E the shelf-life cap from the stated store facts; later F10 | ADR needed once F10 is specified | AC-145, AC-146, AC-148 |
 | FR-154, NFR-067 | P suggestion facts in the artefact; R print mode | ADR-002, ADR-005 | AC-149 |
 | FR-155, FR-156 | E per-department reasons for no quantity; evidence states (ADR-011) | 11.3 | AC-139, AC-146, AC-147 |
-| FR-157, NFR-068 | I the store facts (order days, shelf life per department), recorded once as the owner's statements, in one place | ADR needed: where they live, so one fact is never held twice | AC-146, AC-156 |
-| FR-158, FR-159, INV-075 | E the disagreement question in the owner-question population, ordered by ADR-027; O answers | ADR-003, ADR-027 | AC-150, AC-151, AC-155 |
+| FR-157, NFR-068 | I the store facts (order schedule, shelf life per department), recorded once as the owner's statements, in one place | ADR needed: where they live, so one fact is never held twice | AC-146, AC-156 |
+| FR-158, FR-159, INV-075 | E the disagreement question in the owner-question population, ordered by ADR-027; O answers | ADR-003, ADR-027 | AC-150, AC-151, AC-155, AC-158 |
 | FR-160 … FR-163, INV-069, INV-077, INV-078 | U the Reorder and Approved orders entries leave their awaiting shells (ADR-028 §1); O outcomes keyed on product and order day (ADR-003, ADR-009, ADR-016) | ADR needed: the suggestion's entry identity per order day | AC-136, AC-152, AC-153, AC-154 |
 
 ### Cross-cutting decisions
