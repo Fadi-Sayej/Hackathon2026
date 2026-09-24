@@ -34,11 +34,6 @@ mcp>=1.0
 # Fuzzy string matching (product-matching layer — Pass 3 WRatio scorer)
 rapidfuzz>=3.0
 
-# LLM proxy server (enables real AI explanations via Gemini)
-fastapi>=0.111
-uvicorn>=0.29
-google-generativeai>=0.7
-
 # (Future collectors will add: selectolax, lxml, etc.)
 
 # Testing (velocity engine correctness gates — see PLAN.md §3)
