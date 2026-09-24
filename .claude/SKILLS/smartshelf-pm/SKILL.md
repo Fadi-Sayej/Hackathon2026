@@ -25,7 +25,7 @@ Read the pitch, write the PRD, then an intent for every feature in it.
 ## Procedure
 
 1. Read `CLAUDE.md`, `docs/README.md`, then `docs/product/PRD.md` and
-   `docs/product/intent-register.md` §3 (the settled decisions `D-1 … D-13`).
+   `docs/product/intent-register.md` §3 (every settled decision, `D-1` onward).
 2. Read `references/prd-register-template.md` and `references/intent-template.md`.
 3. Give every new feature the next free `F#`. Rank it against the existing register.
 4. Write `docs/features/F#-<slug>/intent.md` using the same `F#`.
@@ -63,7 +63,7 @@ intent register §4 bullet for that intent, and the doc map's Product table.
 The PRD says **what the product must do**, across all features, ranked, per release.
 An intent says **why one feature exists**, in six fields, for that feature only.
 The intent register says **which INT-id maps to which spec**, and carries the settled
-decisions `D-1 … D-13` that every downstream role is bound by.
+decisions, `D-1` onward, that every downstream role is bound by.
 
 One feature, one intent, one `F#`. If you cannot write a coherent intent for a feature,
 the feature is too big — split it in the register and give each half its own `F#`.
