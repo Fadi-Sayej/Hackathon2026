@@ -144,8 +144,8 @@ cannot be guessed: the repository owner asked on 2026-09-25 that they not be.
 
 | # | Question | Arabic | Why it blocks |
 |---|---|---|---|
-| 7 | **Can the POS export sales per product, per day?** (Or at least per week) | هل يستطيع نظام الـPOS تصدير المبيعات لكل صنف لكل يوم؟ أو لكل أسبوع على الأقل؟ | The seven monthly reports cannot be divided into days or weeks (rule 13), so without this no order quantity exists (OQ-904) |
-| 8 | **Which departments does he order every day, which every week, and which less often?** | أيّ الأقسام تطلبها كل يوم، وأيّها كل أسبوع، وأيّها أقل من ذلك؟ | Each suggestion covers sales until the next order of its department. No supplier is recorded for any product he sells, so the department is all we can group by (OQ-903) |
+| 7 | **Can the POS export sales per product, per day?** And can it be sent at least weekly? | هل يستطيع نظام الـPOS تصدير المبيعات لكل صنف لكل يوم؟ وهل يمكن إرسالها مرة في الأسبوع على الأقل؟ | The seven monthly reports cannot be divided into days (rule 13), so without this no order quantity exists (OQ-904) |
+| 8 | **For each department: on which days does he order it, and how long do its products keep?** | لكل قسم: في أيّ أيام تطلبه؟ وكم يوماً تبقى منتجاته صالحة؟ | A suggestion is for a department's next order day and is capped by what sells before it spoils. Neither may be guessed, so a department he cannot answer for gets no suggestion until he can (OQ-903, OQ-908) |
 
 **#1 matters to F8 too.** If the departments missing from every report sell through another
 till, F8 must not treat their absence as "sold nothing" (F8-S1 FR-156).
@@ -160,8 +160,8 @@ till, F8 must not treat their absence as "sold nothing" (F8-S1 FR-156).
 4. The success ₪ number, and whether it is prices-only. *(→ F13-S1 §14, OQ-801)*
 5. The subscription price. *(→ PRD §8)*
 6. Data cadence and who sends it. *(→ F13-S1 FR-141)*
-7. Whether the POS can export sales per product per day, or per week. *(→ F8-S1 OQ-904)*
-8. Which departments he orders daily, weekly, or less often. *(→ F8-S1 OQ-903)*
+7. Whether the POS can export sales per product per day, and send them at least weekly. *(→ F8-S1 OQ-904)*
+8. Per department: the days he orders it, and how long its products keep. *(→ F8-S1 OQ-903, OQ-908)*
 
 Answers go into [gaps-and-open-questions.md](../features/gaps-and-open-questions.md) with the
 date, and the three F13 numbers into F13-S1 §14. Nothing here is quoted onward until it is

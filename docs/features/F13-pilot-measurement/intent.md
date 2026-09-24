@@ -10,7 +10,7 @@ Specs: none
 
 # F13 — رقم النجاح · Pilot Measurement
 
-> **Status: registered, deliberately NOT specified — for a different reason from F8–F12.**
+> **Status: registered, deliberately NOT specified — for a different reason from F9–F12.**
 > [SPEC-000 §4](../../product/intent-register.md#4-intents-deliberately-not-specified-in-this-phase)
 > declines to specify it because `intent.md` §11.1 states it is *already measured by an
 > existing surface*, so no new capability was being designed. Content below is verbatim

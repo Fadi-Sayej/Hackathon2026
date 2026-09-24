@@ -109,12 +109,13 @@ These are settled. A specification may operationalize them; it may not reopen th
 
 ### 4. Intents deliberately not specified in this phase
 
-**INT-004, INT-005, INT-007, INT-008 (V2/V3) and INT-006 (V4)** are not given
-specifications here.
+**INT-005, INT-007, INT-008 (V2/V3) and INT-006 (V4)** are not given specifications here.
+INT-004 now is (F8-S1, 2026-09-25); its entry below keeps the record of how its decisions
+were taken.
 
 The reason is not scheduling. Each rests on a product decision that the intent layer
-has explicitly left open (INT-004's were taken on 2026-09-24, as its entry below records),
-and writing requirements now would mean inventing those answers rather than surfacing them:
+has explicitly left open, and writing requirements now would mean inventing those answers
+rather than surfacing them:
 
 - **INT-004** had three open decisions (GAP-008), and the owner took them on 2026-09-24
   as **D-18 … D-20**: the market is the nearby stores of a format comparable to his; his
