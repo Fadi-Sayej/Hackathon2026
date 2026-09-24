@@ -58,15 +58,9 @@ else
   bad "public/data/operational.json missing — run: bash scripts/pilot_daily.sh"
 fi
 
-if git ls-files --error-unmatch src/data/marketData.js >/dev/null 2>&1; then
-  if git diff --quiet src/data/marketData.js 2>/dev/null; then
-    ok "marketData.js committed and matches the working tree"
-  else
-    warn "marketData.js has uncommitted changes — deployed price ages will be older than local"
-  fi
-else
-  bad "src/data/marketData.js not committed — competitor prices would be missing"
-fi
+# src/data/marketData.js used to be checked here. It was the demo spine's frozen price file,
+# removed on 2026-09-24 (ADR-028); competitor prices reach the owner through
+# public/data/dashboard.json, which the engine writes and the nightly commits.
 
 # ---------------------------------------------------------------- 3. entries
 head_ "3. Build output"
