@@ -146,8 +146,8 @@ def main() -> int:
 
     if recognised:
         print()
-        print("Next: python3 scripts/pilot_daily.sh <file>  — velocity switches to")
-        print("      measured sales automatically and the snapshot proxy stands down.")
+        print("Next: npm run data:refresh -- --input <file>  — the engine imports the")
+        print("      export first, then runs every capability on it.")
         return 0
 
     if unmapped:

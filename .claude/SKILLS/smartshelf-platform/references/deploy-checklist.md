@@ -11,12 +11,12 @@ Work it in order. A box is ticked only after you ran the thing, not after you re
 
 ## Data path — where this project's deploys actually fail
 - [ ] A clean clone was actually tried, and what it can and cannot rebuild is written down
-- [ ] `public/data/operational.json` is present and committed; `data/**` is gitignored (rule 6)
-- [ ] Every directory the exporter globs exists — a missing one yields a silent
-      `competitorSignals: 0`, not an error (rule 4)
-- [ ] `npm run data:refresh` was run in full after new POS data or a scrape, not
-      `data:dashboard` alone (rule 5)
-- [ ] The export was non-empty; no fallback flag was used to make it pass (rules 7, 10)
+- [ ] `public/data/dashboard.json` and `catalogue.json` are present and committed;
+      `data/**` is gitignored (rule 6)
+- [ ] No capability in `dashboard.json` is `unavailable` for a reason that should not be
+      true on this deploy (rule 4)
+- [ ] `npm run data:refresh` was run in full after new POS data or a scrape (rule 5)
+- [ ] The artefact came from a full run; no flag was used to make it pass (rules 7, 10)
 - [ ] `silver/` was rebuilt by `rehydrate_silver.py`, not committed (rule 9)
 - [ ] `npm run check:signals` runs in `collect-daily.yml` **before** the dashboard is
       committed (rule 12)

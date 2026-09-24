@@ -13,7 +13,6 @@
 #   - src/common/store_types.py        (Python API: affinity, comparable_stores)
 #   - src/engine/inputs.py             (stamps each competitor observation's affinity)
 #   - src/engine/competitor_position.py  (enforcement point: the comparability floor, ADR-008)
-#   - scripts/export_competitor_market_data.py  (legacy chain, retired by Phase 4 Task 4.2)
 
 version: 1
 
@@ -129,10 +128,11 @@ min_affinity: 0.3
 #   sku_count     — inferred from a full catalog's distinct SKU count.
 #
 # Store IDs reuse the identifiers that already exist:
-#   - the `storeId` values in scripts/export_competitor_market_data.py (CHAIN_META, OUR_STORE)
+#   - the four static ids below, first defined for the Kaggle chains (their importer and
+#     exporter were removed on 2026-09-24; the ids stay in use by src/common/store_types.py)
 #   - the Wolt platform `store_id` for delivery-catalog venues
 stores:
-  # -- our store, and the static chains in CHAIN_META --------------------------
+  # -- our store, and the static chains ---------------------------------------
   yomyom-kq-01:
     store_type: gas_convenience
     role: client
@@ -166,10 +166,10 @@ stores:
   # SKUs each, which is a sampling artefact and says nothing about the branch —
   # SKU inference is deliberately refused on them (see min_skus_for_inference).
   #
-  # These IDs do not currently reach the frontend: CHAIN_ALIASES in
-  # export_competitor_market_data.py folds Wolt prices into the static store IDs
-  # above. They matter to comparable_stores() and to whatever consumes venue-level
-  # prices next, so they are classified now rather than left blank.
+  # These IDs reached no screen through the legacy exporter, whose CHAIN_ALIASES folded
+  # Wolt prices into the static store IDs above (removed 2026-09-24). They matter to
+  # comparable_stores() and to the engine, which stamps each competitor observation with
+  # its affinity (src/engine/inputs.py), so they are classified rather than left blank.
   65daeb8779ca7f0a9bf964f3:
     store_type: urban_minimarket
     verified: manual

@@ -33,10 +33,10 @@ dist
 dist-ssr
 *.local
 
-# public/data/*.json is generated, but it IS committed: docs/DEPLOYMENT.md
-# "Data Refresh" option 1. Vercel's build image has no Python, no pyarrow and
-# no data/** parquet, so it cannot regenerate these. Refresh with
-# `npm run data:dashboard` and commit the result.
+# public/data/*.json is generated, but it IS committed: docs/operations/deployment.md
+# "Data Refresh". Vercel's build image has no Python, no pyarrow and no data/**
+# parquet, so it cannot regenerate these. Refresh with `npm run data:refresh` and
+# commit the result; the nightly does both.
 
 # Editor directories and files
 .vscode/*

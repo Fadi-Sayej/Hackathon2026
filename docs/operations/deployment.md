@@ -283,7 +283,8 @@ git push                                                            # Vercel red
 `refresh_pipeline.py` stopped running on 2026-09-13: its `product_recommendations` step
 required `silver_pos/yomyom_sales.parquet`, which Task 0.6 deleted on purpose because its
 `units_sold_30d` was synthesised from a monthly mean (rule 13). Frozen is the correct state
-for a rollback target — see §20.2. Phase 4 deletes the chain.
+for a rollback target — see §20.2. Phase 4 deleted the chain on 2026-09-24; the file stays,
+frozen, until F13 (#83) replaces the telemetry page that reads it.
 
 `vercel.json` serves `/data/*` with **`Cache-Control: no-cache`**, so a redeploy is picked
 up immediately rather than serving a manager yesterday's actions.

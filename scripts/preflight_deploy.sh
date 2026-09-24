@@ -49,13 +49,13 @@ if [ -f public/data/operational.json ]; then
     if [ "$COUNT" -gt 0 ]; then
       ok "operational.json committed, $COUNT recommendations"
     else
-      bad "operational.json is committed but EMPTY — the app will show 'No actions yet'"
+      bad "operational.json is committed but EMPTY — the telemetry page, its one reader until F13 (#83), will show nothing"
     fi
   else
     bad "operational.json exists but is NOT COMMITTED — Vercel builds from git, so the deploy would ship without it"
   fi
 else
-  bad "public/data/operational.json missing — run: bash scripts/pilot_daily.sh"
+  bad "public/data/operational.json missing — nothing regenerates it since 2026-09-24; restore it: git checkout -- public/data/operational.json"
 fi
 
 # src/data/marketData.js used to be checked here. It was the demo spine's frozen price file,

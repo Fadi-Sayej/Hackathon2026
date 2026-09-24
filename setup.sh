@@ -34,13 +34,7 @@ echo "▶ Installing Python dependencies (requirements.txt)..."
 pip install -r requirements.txt --break-system-packages -q
 echo "  ✔ Python packages installed"
 
-# ── 4. Extra Python packages needed for new features ─────────────────────────
-echo ""
-echo "▶ Installing extra Python packages (Kaggle)..."
-pip install kaggle --break-system-packages -q
-echo "  ✔ kaggle installed"
-
-# ── 5. Playwright (used by Wolt scraper) ─────────────────────────────────────
+# ── 4. Playwright (used by Wolt scraper) ─────────────────────────────────────
 echo ""
 echo "▶ Installing Playwright + Chromium browser..."
 pip install playwright --break-system-packages -q
@@ -74,11 +68,6 @@ echo ""
 echo "  Import real YomYom inventory (already fixed, ready to run):"
 echo "    python scripts/import_yomyom_pos.py --input yomyom-inventory.csv"
 echo ""
-echo "  Download Kaggle competitor prices (needs KAGGLE_API_TOKEN in .env):"
-echo "    python scripts/download_kaggle_datasets.py"
-echo "    python scripts/import_kaggle_supermarkets.py"
-echo ""
 echo "  Keys needed in .env:"
-echo "    KAGGLE_API_TOKEN     → kaggle.com → Settings → API → Create New Token"
 echo "    GEMINI_API_KEY       → Google Cloud Console → APIs & Services → Credentials"
 echo ""

@@ -27,17 +27,18 @@ Read `CLAUDE.md` first — all thirteen rules and the handover protocol — then
 
 This project's deployment failures have all been data failures, not build failures.
 
-- **`data/**` is gitignored; `public/data/operational.json` is committed.** A fresh clone
-  has the dashboard JSON and nothing to rebuild it from. (Rule 6.)
-- **`npm run data:refresh` is the one command** after new POS data or a scrape, and it
-  runs in dependency order. `data:dashboard` runs the exporter alone and leaves the market
-  half stale. (Rule 5.)
-- **A missing directory is not an error.** The exporter globs by mtime and succeeds with
-  `competitorSignals: 0`. If the dashboard looks thin, check the directories exist before
-  debugging code. (Rule 4.)
-- **An empty export is a failure, not a result.** `EmptyExportError` exists because a
-  clean clone once overwrote a committed 3,035-recommendation file with 0 and exited 0.
-  Never reach for `--allow-no-competitor` to get a green run. (Rule 10.)
+- **`data/**` is gitignored; `public/data/*.json` is committed.** A fresh clone has
+  `dashboard.json` and `catalogue.json` and nothing to rebuild them from without the POS
+  import. (Rule 6.)
+- **`npm run data:refresh` is the one command** after new POS data or a scrape: it runs the
+  engine, which drives its own market chain and sales import. (Rule 5.)
+- **A missing input is published, not hidden.** The engine marks a capability
+  `unavailable`, with its reason, when an input is missing. If the dashboard looks thin,
+  read the capability's `unavailable_reason` in `dashboard.json` before debugging code.
+  (Rule 4.)
+- **An empty result is a failure, not a result.** A clean clone once overwrote a committed
+  3,035-recommendation file with 0 and exited 0. Never reach for a flag to get a green
+  run. (Rule 10.)
 - **CI commits `data/external/snapshots/` only.** `silver/` is derived and rebuilt by
   `rehydrate_silver.py`. Never "fix" a stale market half by committing `silver/`. (Rule 9.)
 - **`check:signals` runs in `collect-daily.yml` before the dashboard is committed.** If

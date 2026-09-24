@@ -114,7 +114,7 @@ def test_skip_market_skips_the_market_context_too():
 
     Nothing in the engine reads that file. Its consumers were the legacy chain:
     reorderEngine.js and check_signals_live.mjs, removed on 2026-09-24 (ADR-028), and
-    product_recommendations.py, which nothing runs. So skipping it costs no capability
+    product_recommendations.py, deleted the same day (Phase 4 Task 4.2). So skipping it costs no capability
     an input. The nightly runs without --skip-market, so the committed context still
     refreshes there, and ADR-028 keeps it published for V2.
     """

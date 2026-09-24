@@ -75,39 +75,36 @@ particular: no role quotes a figure it has not read from the artifact that produ
    siblings `src/internal/receiving.py` and `restock_reconcile.py` are live — do not
    confuse the package with the deleted module.
 
-4. **The pipelines couple through the filesystem, by mtime.**
-   `export_dashboard_data.py` globs the newest `operational_recommendations_*.parquet`
-   and `product_recommendations_*.parquet`. **A missing directory is not an error** —
-   the export succeeds and silently reports `competitorSignals: 0`. If the dashboard
-   looks thin, check the directories exist before debugging the code.
+4. **The legacy pipelines coupled through the filesystem, by mtime; the engine does not.**
+   `export_dashboard_data.py` globbed the newest `operational_recommendations_*.parquet`
+   and `product_recommendations_*.parquet`, and a missing directory was not an error: the
+   export succeeded and reported `competitorSignals: 0`. That chain was deleted on
+   2026-09-24 (Phase 4 Task 4.2). The engine reads named inputs and says which it lacks: a
+   capability whose input is missing is published `unavailable`, with its reason, and
+   `npm run check:signals` proves the declarations are honest (rule 12). If a page looks
+   thin, read its capability's `unavailable_reason` in `dashboard.json` first.
 
 5. **One pipeline. `public/data/dashboard.json` is what the owner reads.**
-   The split this rule used to describe is over — it said the front end still read the
-   old artefact and that the cut-over was unplanned work. Task 2.7 cut over on
-   2026-09-12, and `refresh_pipeline.py` stopped running on 2026-09-13.
+   Task 2.7 cut the browser over to it on 2026-09-12. `npm run data:refresh` runs
+   `run_engine.py`, which writes `public/data/dashboard.json` (schema 2), `catalogue.json`
+   and `market-context.json`. `loadDashboard.js` is the only adapter a V1 page uses, and
+   `collect-daily.yml` runs the engine nightly and **commits** the result. So after new POS
+   data or a scrape, `npm run data:refresh` is the whole job.
 
-   | | writes | read by | run by |
-   |---|---|---|---|
-   | `npm run data:refresh` → `run_engine.py` | `public/data/dashboard.json` (schema 2), `market-context.json` | **the owner's screen** — `loadDashboard.js` is the only adapter a V1 page uses | `collect-daily.yml` nightly, which **commits** it; and a human |
-   | `python3 scripts/refresh_pipeline.py` | `public/data/operational.json` | nothing reachable — only `src/telemetry/` imports `loadOperationalData` | **nobody** |
-
-   So after new POS data or a scrape, `npm run data:refresh` is the whole job.
-
-   `refresh_pipeline.py` is **not** a fallback and must not be restarted. Its
-   `product_recommendations` step requires `silver_pos/yomyom_sales.parquet`, which Task
-   0.6 deleted deliberately: its `units_sold_30d` was synthesised from a monthly mean,
-   which rule 13 forbids. Rebuilding that table re-introduces the invented figure;
-   `--allow-no-competitor` to get a green export is rule 10. `operational.json` is frozen
-   at its last good value. Phase 4 deletes the chain. The whole story is in
+   The old chain, `refresh_pipeline.py` → `export_dashboard_data.py` →
+   `public/data/operational.json`, and `pilot_daily.sh`, which ran the same chain, stopped
+   running on 2026-09-13 and were deleted on 2026-09-24 (Phase 4 Task 4.2). It could not be
+   repaired honestly: its `product_recommendations` step needed
+   `silver_pos/yomyom_sales.parquet`, which Task 0.6 deleted because its `units_sold_30d` was
+   synthesised from a monthly mean (rule 13). The whole story is in
    [`docs/reviews/nightly-2026-09-13-incident.md`](docs/reviews/nightly-2026-09-13-incident.md).
 
-   **This rule used to say `operational.json` survives because "ADR-009's one-shot
-   outcome-id translation needs" it. That translation does not exist in code**
-   (verified 2026-09-16 — `migrate()` in `src/owner/ownerState.js` is synchronous,
-   copies legacy ids verbatim, and nothing under `src/owner/` mentions
-   `operational.json`). So that is not a reason to keep the file. What is: the last
-   reader is `src/telemetry/TelemetryDashboard.jsx`, which F13 replaces. Do not plan
-   Phase 4 Task 4.2 around a translation that was never built.
+   `operational.json` itself stays, frozen at its last good value, because its last reader,
+   `src/telemetry/TelemetryDashboard.jsx`, is still there. F13 (#83) replaces it, and the
+   file and `loadOperationalData.js` go then. Nothing regenerates the file: if it is ever
+   lost, restore it from git. ADR-009's one-shot outcome-id translation was never a reason to
+   keep it: it was never built (verified 2026-09-16), and the migration it would have
+   extended was itself removed on 2026-09-24.
 
 6. **`data/**` is gitignored; `public/data/*.json` is committed.** A fresh clone has the
    artefacts and nothing to rebuild them from, so regenerating needs the POS import
@@ -142,10 +139,12 @@ particular: no role quotes a figure it has not read from the artifact that produ
    snapshots. If competitor counts look wrong, run `data:refresh`, not the
    collector.
 
-10. **An empty export is a failure, not a result.** `export_dashboard_data.py`
-    raises `EmptyExportError` before writing when either recommendation family is
-    empty — a clean clone once overwrote a committed 3,035-recommendation file with
-    0 and exited 0. Pass `--allow-no-competitor` only for a deliberate POS-only run.
+10. **An empty export is a failure, not a result.** The legacy `export_dashboard_data.py`
+    raised `EmptyExportError` before writing when either recommendation family was empty,
+    after a clean clone once overwrote a committed 3,035-recommendation file with 0 and
+    exited 0. That exporter was deleted on 2026-09-24 (Phase 4 Task 4.2). The principle
+    binds the engine: a capability it cannot compute is published `unavailable`, with its
+    reason, never as an empty list or a zero (rules 8 and 12).
 
 11. **Verify before you document.** Counts in this repo drifted badly: docs claimed
     14,406 barcode matches where the artifact holds 2,848, and 2,183 recommendations
@@ -196,13 +195,12 @@ particular: no role quotes a figure it has not read from the artifact that produ
 
 ## Layout
 
-- `src/` (Python) — `internal_pos/` POS import · `signals/` competitor signals ·
-  `matching/` product matching · `recommendations/` both recommendation families ·
-  `external/` connectors · `common/` paths and status · `expiry/`, `internal/`
-  receiving.
+- `src/` (Python) — `engine/` the V1 rule engine and its capabilities · `internal_pos/`
+  POS import · `signals/` competitor signals · `matching/` product matching · `external/`
+  connectors · `common/` paths and status · `expiry/`, `internal/` receiving.
 - `src/` (JS) — `pages/` one file per screen · `lib/analytics/` ranking and money
   rules · `lib/dataAdapters/` reads `public/data/*.json` · `lib/i18n/` he/en.
-- `scripts/` — 62 entry points (52 `.py`, 7 `.mjs`, 3 `.sh`, counted with `ls` on 2026-09-24, after Phase 4's deletions). Only the
+- `scripts/` — 53 entry points (44 `.py`, 7 `.mjs`, 2 `.sh`, counted with `ls` on 2026-09-24, after Phase 4's deletions). Only the
   handful in the System Design §7 are the product.
 
 ## Commands

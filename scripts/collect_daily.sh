@@ -5,8 +5,8 @@
 #   bash scripts/collect_daily.sh
 #   bash scripts/collect_daily.sh --date 2026-08-11
 #
-# SEPARATE FROM pilot_daily.sh ON PURPOSE.
-# pilot_daily.sh is POS-driven and aborts on an internal quality gate. If the
+# SEPARATE FROM THE POS PIPELINE ON PURPOSE. That pipeline was pilot_daily.sh until
+# 2026-09-24; the POS side is now the engine's (scripts/run_engine.py). If the
 # market collectors lived inside it, a bad POS export would take the market
 # collector down with it — and unlike the POS file, market data cannot be
 # re-fetched tomorrow. The price-transparency server keeps only the current day

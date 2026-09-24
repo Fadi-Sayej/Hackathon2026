@@ -1,16 +1,21 @@
 """
-smoke_test_pipeline.py — fast end-to-end sanity check of the internal pipeline.
+smoke_test_pipeline.py — fast sanity check of the pipeline stages outside the engine.
 
-Runs the chain that feeds the dashboard and asserts each stage produced what the next
-stage expects, so a silent breakage is caught before a demo. Does NOT require a POS
-CSV argument — it exercises whatever silver data already exists.
+Asserts that the expiry report builds and that the POS snapshot comparison runs, so a
+silent breakage in either is caught before a demo. Does NOT require a POS CSV argument —
+it exercises whatever silver data already exists. The engine has its own gates
+(`npm run check:signals`, `npm run figures`); this covers what they do not reach.
+
+It used to check the legacy chain too: operational recommendations, the dashboard export,
+`operational.json` and `sources.json`. That chain was deleted on 2026-09-24 (Phase 4
+Task 4.2), and the `sources.json` check had been failing since the file was retired on
+2026-09-13, unnoticed, because nothing runs this in CI.
 
 Exit code 0 = all checks passed, 1 = at least one failed.
 """
 
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
 
@@ -26,20 +31,7 @@ def check(name: str, passed: bool, detail: str = "") -> None:
 
 
 def main() -> int:
-    # 1. Operational recommendations generate
-    try:
-        from src.recommendations.operational_recommendations import generate_operational_recommendations
-
-        gen = generate_operational_recommendations()
-        check(
-            "operational_recommendations",
-            gen.get("status") in {"ok", "readiness_only"},
-            f"status={gen.get('status')} count={gen.get('recommendation_count')}",
-        )
-    except Exception as exc:
-        check("operational_recommendations", False, f"{type(exc).__name__}: {exc}")
-
-    # 2. Expiry report builds
+    # 1. Expiry report builds
     try:
         from src.expiry.expiry_tracking import build_expiry_report
 
@@ -48,39 +40,7 @@ def main() -> int:
     except Exception as exc:
         check("expiry_report", False, f"{type(exc).__name__}: {exc}")
 
-    # 3. Dashboard export
-    try:
-        from scripts.export_dashboard_data import export
-
-        result = export()
-        check("dashboard_export", result.get("status") == "ok", f"recs={result.get('recommendation_count')}")
-    except Exception as exc:
-        check("dashboard_export", False, f"{type(exc).__name__}: {exc}")
-
-    # 4. operational.json well-formed
-    try:
-        payload = json.loads((ROOT / "public" / "data" / "operational.json").read_text(encoding="utf-8"))
-        ok = (
-            isinstance(payload.get("recommendations"), list)
-            and "posHealth" in payload
-            and "sources" in payload
-            and "expiry" in payload
-        )
-        check("operational_json", ok, f"keys={sorted(payload.keys())}")
-    except Exception as exc:
-        check("operational_json", False, f"{type(exc).__name__}: {exc}")
-
-    # 5. sources.json well-formed
-    try:
-        from src.common.source_status import load_sources
-
-        sources = load_sources()
-        check("sources_contract", len(sources) > 0 and all("status" in s for s in sources.values()),
-              f"sources={len(sources)}")
-    except Exception as exc:
-        check("sources_contract", False, f"{type(exc).__name__}: {exc}")
-
-    # 6. Snapshot comparison runs (ok OR need_two_snapshots are both valid)
+    # 2. Snapshot comparison runs (ok OR need_two_snapshots are both valid)
     try:
         from src.snapshots.pos_snapshots import build_snapshot_comparison_report
 

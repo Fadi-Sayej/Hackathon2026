@@ -123,7 +123,6 @@ data/
     silver/           ← cleaned, cross-source Parquet
   matching/           ← barcode / product-name matching tables
   signals/            ← market signals (price gaps, trends, …)
-  recommendations/    ← product & planogram recommendation outputs
 reports/
   quality/            ← per-run JSON quality reports
 logs/                 ← loguru log files (future)

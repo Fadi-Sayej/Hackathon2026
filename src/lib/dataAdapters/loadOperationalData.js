@@ -1,6 +1,7 @@
-// Loads pipeline-derived operational data exported by scripts/export_dashboard_data.py
-// into public/data/operational.json. Degrades gracefully when the file is missing or
-// the scraping/import pipeline has not produced data yet.
+// Loads public/data/operational.json, which scripts/export_dashboard_data.py wrote until the
+// legacy chain stopped on 2026-09-13. The exporter was deleted on 2026-09-24 and the file is
+// frozen. Its one reader is the telemetry surface, and F13 (#83) removes both. Degrades
+// gracefully when the file is missing.
 
 export const EMPTY_OPERATIONAL_DATA = {
   meta: {

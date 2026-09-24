@@ -8,7 +8,7 @@ The moment YomYom sends a real sales report, two things must hold:
   2. we can tell in seconds whether the file they sent is usable.
 
 The first is the dangerous one. This module rewrites the whole sales table, so
-without a guard the first `pilot_daily` run after importing a real sales report
+without a guard the first velocity rebuild (`npm run data:velocity`) after importing a real sales report
 would replace measured units with nulls — silently, on the day the data finally
 arrived.
 """
