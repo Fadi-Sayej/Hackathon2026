@@ -737,9 +737,10 @@ a quarter has passed".
 >
 > **Left for their owners:**
 >
-> - F3's intent (line 44) names `storeFormat.js` as the gate that labels a supermarket
+> - ~~F3's intent (line 44) names `storeFormat.js` as the gate that labels a supermarket
 >   comparison. The engine does that now (`competitor_position.py`, `role: comparable |
->   context`). **smartshelf-pm.**
+>   context`). **smartshelf-pm.**~~ Done 2026-09-25 (#193): a dated note under the line,
+>   which is kept as migrated.
 > - `.ai-codex/lib.md` is an export index generated on 2026-08-02 that nothing regenerates,
 >   and much of it lists removed modules. Regenerate it or delete it, whoever uses it.
 > - `src/App.css` still carries rules for the removed components, and the three
