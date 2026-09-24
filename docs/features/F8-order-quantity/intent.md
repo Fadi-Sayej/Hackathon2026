@@ -1,25 +1,25 @@
 ---
 ID: F8-INTENT
 Title: F8 — Order Quantity
-Status: Registered — not specified
+Status: Approved — for specification, by the repository owner on 2026-09-25
 Owner: smartshelf-pm
 Release: V2
 Parent: [PRD](../../product/PRD.md)
 Intent IDs: INT-004
 Specs: none
 Inputs: [docs/product/intent-register.md (D-18 … D-20), docs/product/open-decisions/F8-ordering.md, docs/features/gaps-and-open-questions.md (GAP-008)]
-Updated: 2026-09-24
+Updated: 2026-09-25
 ---
 
 # F8 — ماذا أطلب اليوم وبأي كمية؟ · Order Quantity
 
-> **Status: registered, not yet specified.** No `F#-S#` document exists for this feature.
-> The three product decisions named below were taken on 2026-09-24, by the repository
-> owner, as [D-18 … D-20](../../product/intent-register.md#3-decisions-already-made-by-the-intent-layer).
-> The status stays until the owner asks for a spec, because moving past it is his act, not
-> this file's (HANDOVER rule 2). What the decisions leave open for design is recorded under
-> GAP-008, and the dependencies under *Related* stand. Content moved verbatim from the
-> pre-migration `intent.md` (§6), except the dated note under *Blocking product decisions*.
+> **Status: approved for specification.** The three product decisions named below were
+> taken on 2026-09-24, by the repository owner, as
+> [D-18 … D-20](../../product/intent-register.md#3-decisions-already-made-by-the-intent-layer),
+> and on 2026-09-25 he asked for this feature's spec — the act this status was waiting for.
+> What the decisions leave open for design is recorded under GAP-008, and the dependencies
+> under *Related* stand. Content moved verbatim from the pre-migration `intent.md` (§6),
+> except the dated note under *Blocking product decisions*.
 
 ## Problem
 
