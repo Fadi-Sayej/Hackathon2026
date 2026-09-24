@@ -410,6 +410,33 @@ comes, and the divergence stays visible rather than being resolved silently.
 
 ---
 
+#### GAP-012 — The AI-explanation promise stands, and nothing decides how it is kept
+
+**Source:** issue #54 (track T9), the #80 triage. The repository owner confirmed the promise
+still stands on 2026-09-24.
+
+**Problem:**
+YomYom was promised, in person, *a recommendation system with an AI assistant that explains
+the decision*. The pre-V1 track that carried it is gone. Its model-backed explanation layer
+and proxy were deleted on 2026-09-24 (#178), with the reorder engine they explained, because
+no screen shipped them; the code is kept at tag `v1-attic-2026-09-24`. ADR-007 keeps the
+product a static site with no service running at request time. Until F14, the PRD registered
+no feature for the promise at all.
+
+**Why it matters:**
+A promise with no register entry can be neither scheduled nor withdrawn deliberately, and
+the client was told it would exist. It also carries a known hazard. The one real trial
+against a model, recorded in `factsGuard.js` at that tag, produced an invented figure
+("order 20 units" was written as "25 units"), and the owner checks these numbers against
+his own shelf.
+
+**Recommended resolution:**
+Take the three decisions in the
+[F14 brief](../product/open-decisions/F14-decision-explanations.md): what is explained
+first, who writes the sentence, and when the promise is due. They are recorded as the next
+free D-n, and F14 is then specified. **Owner:** the repository owner, and the client for
+the due date.
+
 ### Part 2 — Open Questions by Priority
 
 #### P0 — blocks system design

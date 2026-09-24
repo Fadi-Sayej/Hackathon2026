@@ -5,6 +5,8 @@ Status: Approved
 Version: 1.0 (assembled 2026-09-08 from the approved `intent.md` §1, §8–§13 — no content added)
 Supersedes: docs/archive/pre-pivot/PRODUCT_REQUIREMENTS.md, docs/archive/pre-pivot/BUSINESS_CASE.md, docs/archive/pre-pivot/PILOT_PLAN.md
 Related: [Intent register (SPEC-000)](intent-register.md) · [Feature intents](../features/) · [System Design](../architecture/system-design.md)
+Owner: smartshelf-pm
+Updated: 2026-09-24 (F14 registered as a proposal; the register row says so)
 ---
 
 # SmartShelf — وثيقة المنتج · Product Requirements
@@ -54,6 +56,7 @@ Related: [Intent register (SPEC-000)](intent-register.md) · [Feature intents](.
 | [F11](../features/F11-supplier-lead-times/intent.md) | INT-008 | «متى يصل كل مورّد فعلاً؟» | — | V3 |
 | [F12](../features/F12-planogram/intent.md) | INT-006 | «رتّب رفوفي لأربح أكثر» | — | V4 |
 | [F13](../features/F13-pilot-measurement/intent.md) | INT-MEAS | رقم النجاح بعد 30 يوماً | — | V1 · غير محدَّد |
+| [F14](../features/F14-decision-explanations/intent.md) | INT-EXPL | «اشرح لي لماذا» — مساعد يشرح كل قرار، وعدٌ للعميل (#54) | — | V2 · **مقترح** — [GAP-012](../features/gaps-and-open-questions.md) |
 
 ### النوايا كما وردت في `intent.md` §1 (verbatim)
 
@@ -180,6 +183,7 @@ Related: [Intent register (SPEC-000)](intent-register.md) · [Feature intents](.
 - **سؤال ₪919,170:** هل يثق بعمود المخزون؟ جوابه يحكم إن كان الراكد يحمل مبلغاً في V2.
 - **إيقاع تصدير الـPOS** (§10) — يومي أم أسبوعي، ومن يرسله.
 - الـ12 سؤال تكلفة.
+- **وعد المساعد الذي يشرح القرار (F14):** ماذا يُشرح أولاً، ومن يكتب الجملة، ومتى يُستحق — [الموجز](open-decisions/F14-decision-explanations.md).
 
 ---
 

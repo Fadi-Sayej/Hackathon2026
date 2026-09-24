@@ -5,6 +5,8 @@ Status: Approved
 Version: 0.1 (content unchanged from `specs.md` v1.1)
 Parent: [PRD](PRD.md)
 Related Specs: every F#-S# document under `docs/features/`
+Owner: smartshelf-pm
+Updated: 2026-09-24 (INT-EXPL registered as a proposal)
 ---
 
 > **Migration note.** This is `SPEC-000` from the pre-migration monolithic `specs.md`,
@@ -47,6 +49,7 @@ owner.
 | **INT-NS** | The fixed north star: one morning screen, actions ranked by money, **no more than 10** | V1 | SPEC-006 |
 | **INT-PROV** | Every figure must be recomputable on demand; no figure asserted from a stale document | V1 | SPEC-007 |
 | **INT-MEAS** | The pilot's decision criterion: after 30 days of V1, how much ₪ recovered — corrected prices, explained stock, cleaned catalogue — measured automatically | V1 | Not specified — see §4 |
+| **INT-EXPL** | The promise made to the client: an assistant that explains each decision — one reason beside every recommendation, built only from figures the engine published | V2 (proposed) | Not specified — see §4 |
 
 `INT-MEAS` is stated in `intent.md` §11.1, which describes it as measured automatically by
 an existing surface. It is registered here rather than left unnamed, because a capability
@@ -135,6 +138,14 @@ obligations follow and are recorded rather than assumed:
 - Its money component «مخزون مفسّر» ("stock explained") cannot be expressed in money under
   D-1 and SPEC-002 FR-023. What that component may contain instead — a count of products
   counted and closed, rather than an amount — is **OQ-801 (P1)**.
+
+**INT-EXPL** (registered 2026-09-24, as a proposal awaiting the owner's approval) is not
+specified because three decisions about keeping a promise made to the client have not been
+taken: what is explained first, who writes the sentence, and when it is due. That is
+GAP-012, and the choices the evidence supports are in the
+[F14 brief](open-decisions/F14-decision-explanations.md). Whatever is chosen, the sentence
+adds no figure and no cause that the explained item's own published evidence does not carry
+(D-1, D-3, D-10).
 
 These are tracked as open questions in SPEC-GAPS at P1/P2. They must be specified
 before their releases are designed, not before V1 is designed.
