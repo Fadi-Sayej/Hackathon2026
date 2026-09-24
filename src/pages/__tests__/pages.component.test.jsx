@@ -4,29 +4,18 @@ import { screen } from '@testing-library/react'
 
 import { renderWithI18n } from '../../test/renderWithI18n.jsx'
 import { analyzeProducts } from '../../lib/analytics/inventoryEngine.js'
-import { EMPTY_OPERATIONAL_DATA } from '../../lib/dataAdapters/loadOperationalData.js'
 
-import { ApprovedOrdersPage } from '../ApprovedOrdersPage.jsx'
-import { AssortmentGapPage } from '../AssortmentGapPage.jsx'
-import { DashboardPage } from '../DashboardPage.jsx'
-import { DataSourcePage } from '../DataSourcePage.jsx'
-import { ExpiryPage } from '../ExpiryPage.jsx'
-import { OperationalPage } from '../OperationalPage.jsx'
-import { PriceGapPage } from '../PriceGapPage.jsx'
 import { ProductsPage } from '../ProductsPage.jsx'
-import { RecommendationsPage } from '../RecommendationsPage.jsx'
-import { ReportPage } from '../ReportPage.jsx'
-import { ShelfPlanPage } from '../ShelfPlanPage.jsx'
-import { StoreLayoutPage } from '../StoreLayoutPage.jsx'
 
 /**
- * Every page renders, in every language, without throwing.
+ * The Products page renders, in every language, without throwing or leaking a key.
  *
- * This is the cheapest test that would have caught the whole class of bug this
- * work introduced: a page reading `t()` without the provider, a translation key
- * that does not exist, a helper that lost an argument during the i18n pass. The
- * unit tests never touch a component, and the end-to-end suite is too slow to
- * run thirty-nine combinations.
+ * This file used to render all twelve pre-V1 pages from demo props. Eleven of them left the
+ * build under ADR-028 (2026-09-24): no screen had rendered them since the restore, where the
+ * nav shows each entry's awaiting state instead, and their tests went with them. Products is
+ * the one pre-V1 page still live, routed at the published catalogue, so its checks stay.
+ * Every page's heading and body are asserted in all three languages by the App-level walk in
+ * `src/surface/__tests__/checkpoint2.test.jsx` and by `e2e/v1-navigation.spec.js`.
  */
 
 const products = analyzeProducts([
@@ -64,69 +53,22 @@ const products = analyzeProducts([
   },
 ])
 
-const baseProps = {
-  analyzedProducts: products,
-  products,
-  operationalData: EMPTY_OPERATIONAL_DATA,
-  operationalStatus: 'ready',
-  recommendations: [],
-  approvedOrders: [],
-  productIndex: new Map(products.map((product) => [product.id, product])),
-  dashboardStats: {
-    totalProducts: products.length,
-    highRiskStockouts: 0,
-    reorderSuggestions: 0,
-    estimatedOrderCost: 0,
-    overstockedItems: 0,
-    wasteRisk: 0,
-  },
-  inventorySummary: { total: products.length, stockoutRisks: 0, lowStock: 0, overstocked: 0 },
-  competitorSummary: {},
-  affinitySuggestions: [],
-  affinitySummary: {},
-  planogramItems: [],
-  planogramSummary: { totalItems: 0, eyeLevelItems: 0, totalFacings: 0, topScore: 0 },
-  shelfGroups: [],
-  marketContext: {},
-  dataProvenance: { catalog: 'demo', competitor: 'demo' },
-  storeData: { connectorMode: 'DEMO', products },
-  connectorStatus: { state: 'ready', message: 'ok' },
-  decisions: {},
-}
-
-const PAGES = [
-  ['OperationalPage', OperationalPage],
-  ['RecommendationsPage', RecommendationsPage],
-  ['ApprovedOrdersPage', ApprovedOrdersPage],
-  ['PriceGapPage', PriceGapPage],
-  ['AssortmentGapPage', AssortmentGapPage],
-  ['StoreLayoutPage', StoreLayoutPage],
-  ['ShelfPlanPage', ShelfPlanPage],
-  ['ProductsPage', ProductsPage],
-  ['ExpiryPage', ExpiryPage],
-  ['DashboardPage', DashboardPage],
-  ['ReportPage', ReportPage],
-  ['DataSourcePage', DataSourcePage],
-]
-
-describe.each(['ar', 'he', 'en'])('every page renders in %s', (language) => {
-  it.each(PAGES)('%s', (_name, Page) => {
-    expect(() => renderWithI18n(<Page {...baseProps} />, { language })).not.toThrow()
+describe.each(['ar', 'he', 'en'])('the Products page renders in %s', (language) => {
+  it('without throwing', () => {
+    expect(() => renderWithI18n(<ProductsPage analyzedProducts={products} />, { language })).not.toThrow()
   })
-})
 
-describe('no untranslated keys leak to the screen', () => {
-  it.each(['ar', 'he', 'en'])('%s renders no raw dotted keys', (language) => {
-    renderWithI18n(<StoreLayoutPage {...baseProps} />, { language })
-    // A missing translation renders as its key, e.g. `sl.totalRun`. That is by
-    // design so it is noticeable — this test is what notices.
-    expect(document.body.textContent).not.toMatch(/\b(sl|sp|op|nav|page|common)\.[a-zA-Z]+\b/)
+  it('with no raw dotted keys', () => {
+    renderWithI18n(<ProductsPage analyzedProducts={products} />, { language })
+    // A missing translation renders as its key. That is by design so it is noticeable, and
+    // this is what notices.
+    expect(document.body.textContent).not.toMatch(/\b(pr|inv|nav|page|common|status)\.[a-zA-Z]+\b/)
   })
 })
 
 describe('product names are never translated', () => {
   it.each(['ar', 'he', 'en'])('keeps Hebrew product names in %s', (language) => {
-    renderWithI18n(<ProductsPage {...baseProps} />, { language })
+    renderWithI18n(<ProductsPage analyzedProducts={products} />, { language })
     // The manager searches the shelf and the invoice in Hebrew. Translating the
     // name would break the only string tying the screen to the physical product.
     expect(screen.getAllByText(/פסטה 500 גרם/).length).toBeGreaterThan(0)
