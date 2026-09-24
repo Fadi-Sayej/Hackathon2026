@@ -1,7 +1,7 @@
 ---
 ID: ADR-028
 Title: The nav is the owner's, and §20.1 removes only the code no screen runs
-Status: Ready for review
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-09-24
 Parent: [System Design](../system-design.md) §19, §20.1
@@ -12,9 +12,12 @@ Updated: 2026-09-24
 
 # ADR-028 — The nav is the owner's, and §20.1 removes only the code no screen runs
 
-**Status:** Ready for review · **Recorded in:** [System Design](../system-design.md) §19 ·
-proposed by `smartshelf-architect` to unblock Phase 4. A role may not approve its own output
-(HANDOVER rule 2), so this waits for the repository owner.
+**Status:** Accepted (2026-09-24, by the repository owner) · **Recorded in:**
+[System Design](../system-design.md) §19 · proposed by `smartshelf-architect` to unblock
+Phase 4, and held at `Ready for review` until he decided it, because a role may not approve
+its own output (HANDOVER rule 2). He asked for the whole list before deciding, was shown it
+group by group with the two that touch his priorities named (the old Reorder and Planogram
+code, and the LLM layer against #54's promise), and accepted it whole on PR #171.
 
 ## Context
 

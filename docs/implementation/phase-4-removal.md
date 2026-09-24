@@ -81,7 +81,7 @@ only on one machine is not a rollback.
 
 ### Task 4.1: Delete the §20.1 REMOVE list
 
-> **Re-scoped by [ADR-028](../architecture/decisions/ADR-028-the-nav-is-the-owners-and-only-unshipped-code-leaves.md) (`Ready for review`, 2026-09-24).** The list below predates the owner's nav decisions of 2026-09-16 … 2026-09-24. It names three things that are live: `PriceGapPage`, `ProductsPage` and `inventoryEngine`. Once ADR-028 is accepted, this task's file list is its 91 unshipped modules, less whatever a script, the nightly or a live harness still reads. The nav entries behind the awaiting shells stay. Until then nothing here is actioned, which is what #74 and #75 already say.
+> **Re-scoped by [ADR-028](../architecture/decisions/ADR-028-the-nav-is-the-owners-and-only-unshipped-code-leaves.md) (accepted by the repository owner, 2026-09-24).** The list below predates the owner's nav decisions of 2026-09-16 … 2026-09-24. It names three things that are live: `PriceGapPage`, `ProductsPage` and `inventoryEngine`. This task's file list is now ADR-028's 91 unshipped modules, less whatever a script, the nightly or a live harness still reads. The nav entries behind the awaiting shells stay. #74 and #75's "do not action as written" is lifted for exactly that list.
 
 **Files:** §20.1's REMOVE rows — the demo spine (`src/data/*.js`, `normalize-datasets.mjs`,
 `loadDemoStoreData`, `posConnectors/*`), the V2/V4 analytics (`reorderEngine`,
