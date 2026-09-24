@@ -4,14 +4,15 @@
  * THE design tokens. One source of truth, for the whole app.
  *
  * There used to be three competing palettes: this file's cool Material set, a
- * warm one redefining `:root` again in App.css, and a third in planogram.css.
+ * warm one redefining `:root` again in App.css, and a third in planogram.css (deleted
+ * with the planogram on 2026-09-24).
  * App.css loaded last and won, which quietly made most of this file dead code
  * and left the planogram a different green from everything around it.
  *
  * The palette below is the one from the SmartShelf design project — deep teal
  * on warm paper. It is defined ONCE here, and both older naming vocabularies
  * (`--color-*` and `--ink`/`--forest`/`--paper`) are kept as aliases pointing at
- * it. That is deliberate: it lets three thousand lines of existing CSS adopt the
+ * it. That is deliberate: it let the existing CSS, three thousand lines of it then, adopt the
  * new palette without a single rule being rewritten, and it means a colour
  * changes in one place from now on.
  *

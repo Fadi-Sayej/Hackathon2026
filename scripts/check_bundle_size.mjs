@@ -45,10 +45,12 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const CEILING_KB = 1000        // measured 928 KB, 2026-09-13. Unmoved by the motion split:
-                               // that redistributed bytes off index.html without deleting any,
-                               // so lowering the ratchet here would take headroom Task 4.1's
-                               // deletions are meant to earn. It moves when bytes actually leave.
+const CEILING_KB = 900         // measured 873 KB, 2026-09-24, once the strings and styles the
+                               // removed pages left behind were deleted: 549 keys from each of
+                               // the three dictionaries took 103 KB off index.html. It stood at
+                               // 1000 over a measured 928 KB from 2026-09-13, unmoved by the
+                               // motion split and by ADR-028's deletions, neither of which took
+                               // a byte out of the build. It moves when bytes actually leave.
 const TARGET_KB = 500          // Checkpoint 4 (design §22)
 const DIST = 'dist'
 const DIR = join(DIST, 'assets')
