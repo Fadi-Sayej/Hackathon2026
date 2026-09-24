@@ -49,31 +49,19 @@ python scripts/inspect_yomyom_pos_file.py --input <path-to-pos.csv>
 # Import a YomYom POS CSV into internal silver tables
 python scripts/import_yomyom_pos.py --input <path-to-pos.csv>
 
-# Generate product recommendations when real POS + matching + competitor signals exist
-python scripts/generate_product_recommendations.py
-
-# One command after every new POS export or scrape: rebuilds silver from the
-# committed snapshots, then competitor signals → matching → product recs →
-# expiry → operational recs → dashboard JSON + sources.json
-npm run data:refresh                 # or: python scripts/refresh_pipeline.py
+# One command after every new POS export or scrape: the engine rebuilds silver
+# from the committed snapshots, runs its own market chain and sales import, and
+# publishes public/data/dashboard.json and catalogue.json (CLAUDE.md rule 5)
+npm run data:refresh
 npm run data:refresh -- --input data/internal/raw_pos/yomyom/all4shop_Mlai.csv
-
-# Export only the dashboard JSON (public/data/operational.json + sources.json)
-npm run data:dashboard               # or: python scripts/export_dashboard_data.py
 ```
 
 Import outputs:
 
 - `data/internal/silver_pos/yomyom_products.parquet`
-- `data/internal/silver_pos/yomyom_sales.parquet`
 - `data/internal/silver_pos/yomyom_inventory.parquet`
 - `data/internal/silver_pos/yomyom_margins.parquet`
 - `reports/quality/yomyom_pos_quality_<timestamp>.json`
-
-Recommendation outputs:
-
-- `data/recommendations/product_recommendations/product_recommendations_<timestamp>.parquet`
-- `reports/recommendations/product_recommendations_<timestamp>.md`
 
 ### Expiry Tracking at Receiving
 

@@ -125,13 +125,12 @@ jobs:
       # imports loadOperationalData — only src/telemetry/ does — so nothing the owner
       # opens reads it. Phase 4 deletes the chain.
       #
-      # sources.json is left frozen too, deliberately, and NOT added to the commit below
-      # even though competitor_product_signals.py still rewrites it on every engine run.
-      # Its two writers disagree about what a row is: the legacy exporter recorded
-      # 17,165,316 alonit rows where the engine's own chain records 560,596 after dedup,
-      # and 161,270 wolt rows against 7,414. Until someone decides which of those the
-      # owner is being shown, committing either nightly would bake in a number nobody
-      # can source (rule 11).
+      # sources.json is gone. It was deleted on 2026-09-13 (ADR-005), and the three
+      # code paths that kept rewriting it stopped; its writers disagreed about
+      # what a row is (the figures are in tests/test_retired_artefacts.py), so
+      # committing either would have baked in a number nobody can source (rule 11).
+      # The only writer left is export_dashboard_data.py, on the chain above that
+      # nothing runs. tests/test_retired_artefacts.py keeps the file deleted.
       - name: Run the engine and publish the artefact
         id: engine
         # The V1 engine, and now the only pipeline here. run_engine() drives its own

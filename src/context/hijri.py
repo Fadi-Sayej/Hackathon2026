@@ -1,11 +1,10 @@
 """
 hijri.py — tabular Islamic (civil) calendar arithmetic.
 
-Deliberately the same calendar the browser uses. src/lib/context/hijri.js reads the
-Hijri date from `Intl.DateTimeFormat('en-u-ca-islamic-civil')`; this reimplements that
-same tabular civil calendar so Python and JavaScript cannot disagree about which day
-Ramadan starts. Verified against the browser's own output across a multi-year span in
-tests/test_islamic_context.py.
+Deliberately the same calendar the browser used: src/lib/context/hijri.js (removed
+2026-09-24, ADR-028) read the Hijri date from `Intl.DateTimeFormat('en-u-ca-islamic-civil')`,
+and this reimplements that same tabular civil calendar. Verified against Intl's own output
+across a multi-year span in tests/test_islamic_context.py.
 
 ACCURACY, STATED HONESTLY
     The tabular calendar can differ from local moon-sighting by a day. That is

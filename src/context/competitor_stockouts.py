@@ -4,8 +4,10 @@ competitor_stockouts.py — a competitor being out of stock is demand coming his
 WHAT THIS IS AND IS NOT
     It is an ADJUSTMENT to a demand rate. It is not a gate. Whether the shop should
     reorder is decided entirely from his own stock, corrected demand, lead time and
-    shelf life (src/lib/analytics/reorderEngine.js); this only nudges the rate when
-    the surrounding branches have stopped carrying something he sells.
+    shelf life; this only nudges the rate when the surrounding branches have stopped
+    carrying something he sells. That decision lived in src/lib/analytics/reorderEngine.js
+    until ADR-028 removed it on 2026-09-24. The adjustment is still published in
+    public/data/market-context.json (src/context/build.py), which ADR-028 keeps for V2.
 
     Until 2026-09-07 competitor data GATED the reorder decision — a product with no
     competitor match could not be ordered at all — which is exactly backwards.

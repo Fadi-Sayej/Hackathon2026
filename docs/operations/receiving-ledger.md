@@ -116,31 +116,13 @@ above does without it):
 
 ```bash
 npm run data:lead-times     # receipts.csv -> data/internal/receiving/supplier_lead_times.json
-npm run normalize:data      # picks up the new lead-time ledger (see below)
 ```
 
 `npm run data:lead-times` runs `scripts/export_supplier_lead_times.py`, which reads
-every receipt and writes the measured per-supplier lead times and the
-barcode → supplier map that `normalize-datasets.mjs` consumes.
-
-### `npm run normalize:data` refuses to run against an absent silver Parquet
-
-If `data/internal/silver_pos/` is **absent** — which is its state on a fresh clone,
-because it is git-ignored — falling through to the 30-product demo connector would
-overwrite the committed `src/data/demoProducts.js` (7,451 real products, 141,572
-lines) and five other committed generated files with demo data. This was a
-pre-existing hazard in the pipeline, not something this ledger introduced, but the
-ledger workflow is what turns `npm run normalize:data` into a routine step, so it now
-guards against it directly: the script counts the products already committed in
-`src/data/demoProducts.js`, and if that count is above a small threshold (300 — well
-past any hand-authored demo set, well under the real dataset) and the silver Parquet
-is missing, it **refuses to run and exits non-zero** instead of silently overwriting
-anything. The message it prints explains what would have happened and how to proceed:
-import the real POS data first (see the root `CLAUDE.md` Python pipeline commands) so
-`data/internal/silver_pos/` is populated, then re-run. For the rare case where the
-demo dataset is genuinely wanted with no real POS data present, pass
-`--allow-demo-fallback` to opt in explicitly: `npm run normalize:data --
---allow-demo-fallback`.
+every receipt and writes the measured per-supplier lead times and a barcode → supplier
+map. **Nothing reads that file today.** Its consumer, `normalize-datasets.mjs`, fed the
+browser's reorder screen and was removed with it on 2026-09-24 (ADR-028); V2 rebuilds
+reorder on real per-day demand. Whether the export stays for that is open on #76.
 
 ## The schema — `RECEIVING_COLUMNS`
 
@@ -173,6 +155,12 @@ whole-row comparison (`_row_identity`), precisely so those two real deliveries b
 survive an import.
 
 ## When a lead time becomes real
+
+> **The browser code this section names was removed on 2026-09-24** (ADR-028), with the
+> reorder screen it served: `leadTimeResolver.js`, `productAdapter.js`, `reorderEngine.js`,
+> `mockAI.js` and `normalize-datasets.mjs`. The ledger and `supplier_lead_times()` are
+> unchanged, and nothing reads their result now. What that code did with a lead time is
+> kept below, because it is the requirement the next reader inherits.
 
 `supplier_lead_times()` counts **distinct delivery dates** per supplier, not receipt
 lines — twenty items on one delivery note is one delivery, not twenty. Confidence is
@@ -226,7 +214,8 @@ next-day calls, this number will overstate what has to be covered.
 
 The field is **not renamed** despite the mismatch: too many consumers read
 `leadTimeDays`, and a rename would spread the confusion rather than fix it. The
-assumption is documented here and at `scripts/normalize-datasets.mjs` instead.
+assumption was documented here and at `scripts/normalize-datasets.mjs`; with that script
+removed, here is the only place.
 
 ## Checking the ledger against the shelves
 

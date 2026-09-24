@@ -29,21 +29,17 @@ def isolated_report_output(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> N
     """Redirect build_expiry_report's real-path side effects into tmp_path.
 
     build_expiry_report writes Parquet/JSON/Markdown under the module-level
-    EXPIRY_SIGNALS_DIR/EXPIRY_REPORTS_DIR constants, and separately calls
-    update_source() (imported inside the function from src.common.source_status),
-    which persists to the git-tracked public/data/sources.json. None of that is
-    parameterized by build_expiry_report's own arguments, so any test that calls
-    it must redirect these paths itself or it both dirties the working tree and
-    leaves stray timestamped files behind on every run. update_source() is
-    imported fresh inside build_expiry_report on each call, but it still looks up
-    SOURCES_JSON as a global in its *defining* module (source_status), so that is
-    the module we patch — patching a name in expiry_tracking would not work,
-    since expiry_tracking never binds SOURCES_JSON itself.
+    EXPIRY_SIGNALS_DIR/EXPIRY_REPORTS_DIR constants. Neither is parameterized by
+    build_expiry_report's own arguments, so any test that calls it must redirect
+    them itself or it both dirties the working tree and leaves stray timestamped
+    files behind on every run.
+
+    It also used to call update_source(), which wrote public/data/sources.json. That
+    call went with the file (ADR-005, 2026-09-13), so there is nothing left to
+    redirect, and tests/test_retired_artefacts.py fails while the file exists.
     """
-    import src.common.source_status as source_status
     import src.expiry.expiry_tracking as expiry_tracking
 
-    monkeypatch.setattr(source_status, "SOURCES_JSON", tmp_path / "sources.json")
     monkeypatch.setattr(expiry_tracking, "EXPIRY_SIGNALS_DIR", tmp_path / "signals" / "expiry")
     monkeypatch.setattr(expiry_tracking, "EXPIRY_REPORTS_DIR", tmp_path / "reports" / "expiry")
 

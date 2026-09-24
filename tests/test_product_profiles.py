@@ -12,10 +12,11 @@ The fourth reason to test this file is the one the issue is loudest about:
   > The chametz flag does not ship on LLM confidence alone. One error means a
   > forbidden sale in our client's store.
 
-The engine already refuses to fire a gate on an unreviewed profile
-(`gateMayFire` in demandEngine.js, covered there). What is tested here is the
-other half: that every profile this script writes STARTS unreviewed, and that
-the review sheet actually contains everything a human must look at.
+The gate that read these profiles, `gateMayFire` in demandEngine.js, refused to
+fire on an unreviewed one. ADR-028 removed it on 2026-09-24, and nothing reads a
+profile today. What is tested here is the half that stays: that every profile
+this script writes STARTS unreviewed, and that the review sheet actually
+contains everything a human must look at.
 """
 
 from __future__ import annotations

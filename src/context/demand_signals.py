@@ -2,8 +2,8 @@
 demand_signals.py — turn market context into per-category demand multipliers.
 
 WHY THIS MOVED OUT OF THE BROWSER
-    reorderEngine.js reads `marketContext.demandSignals[product.category]` and
-    multiplies its velocity by it. The signal table it read shipped English keys
+    reorderEngine.js read `marketContext.demandSignals[product.category]` and
+    multiplied its velocity by it. The signal table it read shipped English keys
     ('Cold Drinks', 'Snacks', 'Ice Cream') while every category in the YomYom
     catalog is Hebrew ('משקאות', 'חטיפים מלוחים', 'גלידות'). Verified on
     2026-09-05: the intersection is empty, so the multiplier was 1 for every real
@@ -12,7 +12,10 @@ WHY THIS MOVED OUT OF THE BROWSER
 
     Multipliers are now computed here, keyed on the categories that actually exist,
     written into public/data/market-context.json, and applied by the Python
-    recommender. reorderEngine.js consumes the result instead of deciding it.
+    recommender, product_recommendations.py, which nothing has run since 2026-09-13
+    (CLAUDE.md rule 5). reorderEngine.js consumed the result until ADR-028 removed it
+    on 2026-09-24. So nothing applies these multipliers today; ADR-028 keeps them
+    published for V2.
 
 THESE ARE STARTING VALUES, NOT MEASUREMENTS
     Nothing in the data yet proves any of these numbers: a full Ramadan has not been

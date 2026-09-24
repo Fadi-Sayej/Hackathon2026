@@ -19,8 +19,8 @@
 import { credibleGap, credibleLoss, toNumber } from './credibility.js'
 
 // Re-exported so existing consumers keep importing it from here; the guard
-// thresholds themselves now live in credibility.js and are shared with
-// reorderEngine's valueAtStake (Issue #39).
+// thresholds themselves now live in credibility.js (Issue #39), which the reorder
+// engine's valueAtStake also read until ADR-028 removed it on 2026-09-24.
 export { credibleLoss }
 
 export const ACTION_GROUP = {

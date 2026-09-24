@@ -1,4 +1,5 @@
-"""The JSON contract between the Python ledger and scripts/normalize-datasets.mjs."""
+"""The JSON contract of the lead-time export. Its reader, scripts/normalize-datasets.mjs,
+was removed on 2026-09-24 (ADR-028); see scripts/export_supplier_lead_times.py."""
 
 from __future__ import annotations
 

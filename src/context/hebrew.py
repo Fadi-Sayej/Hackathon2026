@@ -1,6 +1,6 @@
 """hebrew.py — Hebrew calendar and the chametz windows, from Hebcal (free, no key).
 
-Ported from src/lib/context/hebcal.js. The window lengths live in
+Ported from src/lib/context/hebcal.js (removed 2026-09-24, ADR-028). The window lengths live in
 configs/demand_windows.yaml alongside the Islamic ones, so both calendars are tuned
 in one place rather than one in YAML and one hardcoded in JS.
 """

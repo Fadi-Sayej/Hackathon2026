@@ -202,7 +202,7 @@ particular: no role quotes a figure it has not read from the artifact that produ
   receiving.
 - `src/` (JS) — `pages/` one file per screen · `lib/analytics/` ranking and money
   rules · `lib/dataAdapters/` reads `public/data/*.json` · `lib/i18n/` he/en.
-- `scripts/` — 68 entry points (53 `.py`, 12 `.mjs`, 3 `.sh`, counted with `ls` on 2026-09-24). Only the
+- `scripts/` — 62 entry points (52 `.py`, 7 `.mjs`, 3 `.sh`, counted with `ls` on 2026-09-24, after Phase 4's deletions). Only the
   handful in the System Design §7 are the product.
 
 ## Commands

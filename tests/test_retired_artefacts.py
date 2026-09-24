@@ -46,7 +46,7 @@ def test_check_signals_points_at_the_v1_probes():
 
     Design §20.2: "`check:signals` runs old (reorder) probes until the reorder engine leaves
     the build, then only V1 probes"; §649 and §406 say the same, and `check_v1_signals.py`'s
-    own docstring says it "replaces the reorder-era probes in scripts/check_signals_live.mjs".
+    own docstring says it "replaced the reorder-era probes in scripts/check_signals_live.mjs".
 
     The replacement was written, wired into the nightly and made blocking — and the npm
     script still pointed at the old one. CLAUDE.md rule 12 tells every developer to run

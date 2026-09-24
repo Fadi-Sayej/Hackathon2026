@@ -26,8 +26,9 @@ from src.context.islamic import (  # noqa: E402
     load_windows,
 )
 
-# Sampled from Intl.DateTimeFormat('en-u-ca-islamic-civil') — the calendar
-# src/lib/context/hijri.js reads in the browser. Regenerate rather than hand-type:
+# Sampled from Intl.DateTimeFormat('en-u-ca-islamic-civil') — the calendar the
+# browser's src/lib/context/hijri.js read until ADR-028 removed it on 2026-09-24.
+# Regenerate rather than hand-type:
 #   node -e "const p=new Intl.DateTimeFormat('en-u-ca-islamic-civil-nu-latn',
 #     {year:'numeric',month:'numeric',day:'numeric',timeZone:'UTC'})
 #     .formatToParts(new Date('2026-01-15T12:00:00Z'));console.log(p)"

@@ -1,8 +1,8 @@
 # Demand-shaping windows — RECOMMENDED DEFAULTS, for the store owner to confirm.
 #
 # These are business decisions, not religious or astronomical facts. They say how
-# far ahead of an event ordering should change, mirroring the way
-# src/lib/context/hebcal.js gates on CHAMETZ_STOP_REORDER_DAYS rather than on
+# far ahead of an event ordering should change, the way the Hebrew calendar
+# (src/context/hebrew.py) gates on chametz_stop_reorder_days below rather than on
 # Pesach itself. Every value here is a starting recommendation from the analysis,
 # NOT a measured optimum: nothing in the data yet proves any of them, because a
 # full Ramadan has not been observed with this pipeline running.
@@ -13,7 +13,7 @@ islamic:
   # Ramadan reshapes the whole trading day: daytime food demand collapses, and
   # iftar/suhoor demand spikes. 21 days sits between Hebcal's 30-day stop-reorder
   # and 14-day clear-stock gates — one full supplier cycle plus slack, given that
-  # real supplier lead times are still unmeasured (see docs/RECEIVING_LEDGER.md).
+  # real supplier lead times are still unmeasured (see docs/operations/receiving-ledger.md).
   ramadan_build_up_days: 21
 
   # Eid al-Fitr demand (sweets, gifts, holiday goods) peaks in the last third of
@@ -28,8 +28,9 @@ islamic:
   eid_tail_days: 3
 
 jewish:
-  # Mirrors the constants already in src/lib/context/hebcal.js. Kept here so both
-  # calendars are tuned in one place rather than one in YAML and one in JS.
+  # Read by src/context/hebrew.py, which falls back to these same values when this
+  # file cannot be read. The browser's copy (src/lib/context/hebcal.js) was removed
+  # on 2026-09-24 (ADR-028), so both calendars are tuned here and only here.
   chametz_stop_reorder_days: 30
   chametz_clear_stock_days: 14
   pesach_length_days: 8

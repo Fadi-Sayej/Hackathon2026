@@ -11,8 +11,9 @@
 #
 # Consumers:
 #   - src/common/store_types.py        (Python API: affinity, comparable_stores)
-#   - src/data/storeTypes.js           (generated — scripts/export_store_types.py)
-#   - src/lib/analytics/competitorEngine.js  (enforcement point)
+#   - src/engine/inputs.py             (stamps each competitor observation's affinity)
+#   - src/engine/competitor_position.py  (enforcement point: the comparability floor, ADR-008)
+#   - scripts/export_competitor_market_data.py  (legacy chain, retired by Phase 4 Task 4.2)
 
 version: 1
 

@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { credibleGap, credibleLoss } from '../credibility.js'
 
 // Shared credibility guards (#39): the single source of "is this ₪ figure
-// defensible?" used by both the operational action list (actionPriority) and the
-// reorder/dashboard exposure sort (reorderEngine).
+// defensible?" for the operational action list (actionPriority). The reorder /
+// dashboard exposure sort (reorderEngine) shared it until its removal on 2026-09-24.
 
 describe('credibleLoss', () => {
   it('reports a genuine below-cost loss (₪24.90 sold vs ₪30.00 cost)', () => {

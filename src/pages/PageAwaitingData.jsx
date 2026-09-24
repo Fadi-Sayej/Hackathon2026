@@ -8,8 +8,9 @@ import { dirProps } from '../lib/utils/rtl.js'
  *   The twelve-page nav came back on 2026-09-16 because the ten-page V1 surface had dropped
  *   Reorder and the two planogram screens — the features the business is being built around.
  *   Bringing the pages back was the right call. Filling them was not available: every one of
- *   them reads `product.salesLast7Days` / `salesLast30Days`, and outside
- *   `src/data/demoProducts.js` those fields cannot be computed honestly. Not for want of a
+ *   them read `product.salesLast7Days` / `salesLast30Days`, and outside the demo data
+ *   (`src/data/demoProducts.js`, removed on 2026-09-24 under ADR-028) those fields cannot be
+ *   computed honestly. Not for want of a
  *   column — `sales_monthly.parquet` carries units, receipts and revenue. For want of a
  *   DATE: the seven reports are monthly, one row per product per month, none with a date
  *   column, so a daily rate is not measurable (rule 13). The repository already built the

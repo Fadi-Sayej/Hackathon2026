@@ -295,11 +295,11 @@ def generate_product_recommendations() -> dict[str, Any]:
         # matching changed. Whether the shop should reorder milk must not depend
         # on whether a competitor happens to list it.
         #
-        # The decision now belongs solely to src/lib/analytics/reorderEngine.js,
-        # which runs on his own stock, corrected demand, lead time and shelf life
-        # across the whole catalogue and never consults a competitor to decide
-        # WHETHER to order. Competitor data adjusts the rate there; it does not
-        # gate it. WATCH_PRODUCT stays below because it genuinely is a competitor
+        # The decision then moved to src/lib/analytics/reorderEngine.js, which ran
+        # on his own stock, corrected demand, lead time and shelf life across the
+        # whole catalogue and never consulted a competitor to decide WHETHER to
+        # order. ADR-028 removed it on 2026-09-24; V2 rebuilds reorder on real
+        # per-day demand. WATCH_PRODUCT stays below because it genuinely is a competitor
         # signal.
         elif (
             competitor.get("appears_in_delivery_catalog")

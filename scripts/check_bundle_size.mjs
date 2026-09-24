@@ -37,9 +37,10 @@
  *
  *   Note on the old comment here: it said the 4.36 MB demo spine was "the whole budget"
  *   and that the target was unreachable until Phase 4 deleted it. That stopped being true
- *   at the cut-over — the demo spine and planogram are unreachable from any entry, so Vite
- *   already tree-shakes them out. Verified by grepping dist/assets for demoProducts,
+ *   at the cut-over — the demo spine and planogram were unreachable from any entry, so Vite
+ *   already tree-shook them out. Verified by grepping dist/assets for demoProducts,
  *   loadDemoStoreData, packageGeometry, FIXTURE_PRESETS and allocationEngine: zero hits.
+ *   Phase 4 deleted both on 2026-09-24 (ADR-028).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'

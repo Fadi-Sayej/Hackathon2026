@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """
-export_supplier_lead_times.py — publish measured lead times to the frontend pipeline.
+export_supplier_lead_times.py — publish measured lead times from the receiving ledger.
 
 scripts/normalize-datasets.mjs hardcoded `leadTimeDays: 3` for all 7,674 products
-because no real delivery interval had ever been observed. This writes what the
-receiving ledger now knows so that script can stop guessing.
+because no real delivery interval had ever been observed. This wrote what the
+receiving ledger knows so that script could stop guessing. That script and the
+browser's lead-time resolver were removed on 2026-09-24 (ADR-028), so nothing reads
+the output today. Whether it stays for V2 is open on #76.
 
 Usage:
     python3 scripts/export_supplier_lead_times.py
