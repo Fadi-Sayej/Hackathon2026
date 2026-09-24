@@ -2,10 +2,13 @@
 ID: F3-INTENT
 Title: F3 — Competitor Price Position
 Status: Approved
+Owner: smartshelf-pm
 Release: V1
 Parent: [PRD](../../product/PRD.md)
 Intent IDs: INT-003
 Specs: [F3-S1](specs/F3-S1-competitor-price-position.md)
+Inputs: [docs/product/PRD.md, docs/product/intent-register.md, ADR-008, ADR-028]
+Updated: 2026-09-25 (dated note: storeFormat.js deleted; the engine labels context)
 ---
 
 # F3 — هل أسعاري معقولة مقابل الجيران؟ · Competitor Price Position
@@ -42,6 +45,12 @@ Specs: [F3-S1](specs/F3-S1-competitor-price-position.md)
 **وفوق 200%: صفر أصناف.** المخاوف من فروق مبالغ فيها مشروعة، والواقع أنظف منها — وهذه أيضاً ورقة تُقال.
 
 **تحذير على كل مقارنة مع سوبرماركت:** *"هذا سوبرماركت لا كازية — جزء من الفارق طبيعي."* الكود يملك بوّابة `storeFormat.js` تفعل هذا جزئياً؛ المطلوب أن تُستخدم **كسياق موسوم، لا أن تُلغى** — فارق 90% مع رامي ليفي إشارة حقيقية مهما اختلف التصنيف.
+
+> **Added 2026-09-25 (not part of the migrated content).** `storeFormat.js` no longer exists:
+> it was deleted on 2026-09-24 (a740b96, ADR-028). The requirement in the line above is met
+> by the engine instead. `src/engine/competitor_position.py` marks every store `comparable`
+> or `context` against the comparability floor (ADR-008), so a supermarket comparison is shown
+> as labelled context and is not dropped (F3-S1 C-21). Only the file reference was stale.
 
 
 
