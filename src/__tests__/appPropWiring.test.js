@@ -67,6 +67,7 @@ const app = read('src/App.jsx')
 const PAGES = [
   ['ProductsPage', 'src/pages/ProductsPage.jsx'],
   ['PriceGapPage', 'src/pages/PriceGapPage.jsx'],
+  ['ReceivingPage', 'src/pages/ReceivingPage.jsx'],
   ['CapabilityPage', 'src/pages/CapabilityPage.jsx'],
   ['DataPage', 'src/pages/DataPage.jsx'],
   ['PageAwaitingData', 'src/pages/PageAwaitingData.jsx'],
