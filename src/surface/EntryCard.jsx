@@ -1,4 +1,5 @@
 import { useI18n } from '../lib/i18n/index.js'
+import { formatWindowId } from '../lib/i18n/formatPeriod.js'
 import { dirProps } from '../lib/utils/rtl.js'
 
 /**
@@ -12,9 +13,16 @@ import { dirProps } from '../lib/utils/rtl.js'
  *     empty currency symbol (D-3). Absence is shown by absence.
  */
 export function EntryCard({ entry, onOutcome, formatMoney }) {
-  const { t } = useI18n()
+  const { t, language } = useI18n()
   const value = entry.value && Number.isFinite(entry.value.amount) ? entry.value : null
   const estimated = value?.certainty === 'estimated'
+  // A period is published as the engine's id (`2026-01..2026-05`); the owner reads months
+  // (F2-V7). Every other evidence value is shown as published.
+  const evidenceText = (key, raw) => {
+    if (typeof raw === 'boolean') return t(raw ? 'common.yes' : 'common.no')
+    if (key === 'window_id') return formatWindowId(raw, t, language)
+    return String(raw)
+  }
 
   return (
     <article className="entry-card" data-capability={entry.capability} data-entry-id={entry.id} {...dirProps()}>
@@ -39,7 +47,7 @@ export function EntryCard({ entry, onOutcome, formatMoney }) {
         {Object.entries(entry.evidence || {}).map(([key, raw]) => (
           <div key={key}>
             <dt>{t(`evidence.${key}`)}</dt>
-            <dd>{typeof raw === 'boolean' ? t(raw ? 'common.yes' : 'common.no') : String(raw)}</dd>
+            <dd>{evidenceText(key, raw)}</dd>
           </div>
         ))}
       </dl>
