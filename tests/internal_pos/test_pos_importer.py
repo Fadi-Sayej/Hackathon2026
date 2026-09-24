@@ -18,6 +18,7 @@ def test_import_preserves_negative_stock_and_records_vintage(tmp_path, monkeypat
     silver = tmp_path / "silver"
     monkeypatch.setattr(imp, "SILVER_POS_DIR", silver)
     monkeypatch.setattr(imp, "QUALITY_REPORT_DIR", tmp_path / "q")
+    monkeypatch.setattr(imp, "SNAPSHOTS_DIR", tmp_path / "snapshots")
     result = imp.import_pos_file(csv, as_of="2026-08-02")
     assert result["status"] == "ok"
     inv = pq.read_table(silver / "yomyom_inventory.parquet").to_pylist()[0]
@@ -29,6 +30,30 @@ def test_import_preserves_negative_stock_and_records_vintage(tmp_path, monkeypat
     assert imp.read_pos_vintage(silver) == {"file": "yomyom-inventory.csv",
                                             "as_of": "2026-08-02",
                                             "as_of_source": "declared"}
+
+
+def test_the_import_archives_the_silver_it_wrote_into_the_snapshots_it_was_given(tmp_path, monkeypatch):
+    """A snapshot is the import's own record, so it must hold what that import wrote.
+
+    Until 2026-09-24 archive_current_silver() read the real silver and wrote into the real,
+    git-tracked data/internal/snapshots/, while the tests redirected only the importer's
+    silver. On any machine holding real POS tables, a test run archived them under the
+    test's timestamp: a snapshot of an import that never happened, in a tracked directory.
+    """
+    csv = tmp_path / "yomyom-inventory.csv"
+    csv.write_text("﻿" + HEADER + "1,0012,מים,רגיל,-5,2.00,4.00,4.00,משקאות,יח',משקאות,\n", encoding="utf-8")
+    silver, snapshots = tmp_path / "silver", tmp_path / "snapshots"
+    monkeypatch.setattr(imp, "SILVER_POS_DIR", silver)
+    monkeypatch.setattr(imp, "QUALITY_REPORT_DIR", tmp_path / "q")
+    monkeypatch.setattr(imp, "SNAPSHOTS_DIR", snapshots)
+
+    assert imp.import_pos_file(csv, as_of="2026-08-02")["status"] == "ok"
+
+    archived = sorted(p for p in snapshots.iterdir() if p.is_dir()) if snapshots.exists() else []
+    assert len(archived) == 1, "the import did not archive into the snapshots directory it was given"
+    wrote = [r["barcode"] for r in pq.read_table(silver / "yomyom_products.parquet").to_pylist()]
+    kept = [r["barcode"] for r in pq.read_table(archived[0] / "products.parquet").to_pylist()]
+    assert len(wrote) == 1 and kept == wrote
 
 
 def test_missing_silver_has_no_vintage(tmp_path):
@@ -169,6 +194,7 @@ def test_the_vintage_source_reaches_the_reader(tmp_path, monkeypatch):
     silver = tmp_path / "silver"
     monkeypatch.setattr(imp, "SILVER_POS_DIR", silver)
     monkeypatch.setattr(imp, "QUALITY_REPORT_DIR", tmp_path / "q")
+    monkeypatch.setattr(imp, "SNAPSHOTS_DIR", tmp_path / "snapshots")
 
     assert imp.import_pos_file(csv)["status"] == "ok"
 

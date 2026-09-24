@@ -17,6 +17,7 @@ from src.internal_pos.pos_quality import build_quality_report, classify_source_f
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 CONFIG_PATH = PROJECT_ROOT / "configs" / "pos_schema_mapping.yaml"
 SILVER_POS_DIR = PROJECT_ROOT / "data" / "internal" / "silver_pos"
+SNAPSHOTS_DIR = PROJECT_ROOT / "data" / "internal" / "snapshots"
 QUALITY_REPORT_DIR = PROJECT_ROOT / "reports" / "quality"
 
 
@@ -241,7 +242,9 @@ def import_pos_file(
     try:
         from src.snapshots.pos_snapshots import archive_current_silver
 
-        archive_current_silver(imported_at)
+        # What this import wrote, into the snapshots this module was given: a caller that
+        # redirects SILVER_POS_DIR must not have the real silver archived under its name.
+        archive_current_silver(imported_at, silver_dir=SILVER_POS_DIR, snapshots_root=SNAPSHOTS_DIR)
     except Exception:  # snapshotting must never break the import
         pass
 
