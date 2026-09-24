@@ -210,8 +210,7 @@ def build_expiry_report(
 
     # A receipt carrying an expiry date is an expiry observation and belongs in
     # this report. Imported inside the function because receiving.py imports
-    # parse_expiry_date from this module — same local-import idiom as
-    # update_source() below.
+    # parse_expiry_date from this module.
     from src.internal.receiving import RECEIPTS_CSV, receipts_as_expiry_scans
 
     scans = load_expiry_scans(path) + receipts_as_expiry_scans(

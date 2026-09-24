@@ -36,10 +36,9 @@ echo "  ✔ Python packages installed"
 
 # ── 4. Extra Python packages needed for new features ─────────────────────────
 echo ""
-echo "▶ Installing extra Python packages (LLM proxy + Kaggle)..."
-# Prefer Google's Gemini client for LLM integration
-pip install google-generative-ai fastapi uvicorn kaggle --break-system-packages -q
-echo "  ✔ google-generative-ai, fastapi, uvicorn, kaggle installed"
+echo "▶ Installing extra Python packages (Kaggle)..."
+pip install kaggle --break-system-packages -q
+echo "  ✔ kaggle installed"
 
 # ── 5. Playwright (used by Wolt scraper) ─────────────────────────────────────
 echo ""
@@ -78,9 +77,6 @@ echo ""
 echo "  Download Kaggle competitor prices (needs KAGGLE_API_TOKEN in .env):"
 echo "    python scripts/download_kaggle_datasets.py"
 echo "    python scripts/import_kaggle_supermarkets.py"
-echo ""
-echo "  Start the LLM proxy (needs GEMINI_API_KEY in .env):"
-echo "    uvicorn src.api.llm_proxy:app --port 8000 --reload"
 echo ""
 echo "  Keys needed in .env:"
 echo "    KAGGLE_API_TOKEN     → kaggle.com → Settings → API → Create New Token"

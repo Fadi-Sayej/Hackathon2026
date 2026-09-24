@@ -1,10 +1,10 @@
-// Per-item completion-action state for OperationalPage (Issue #31).
-//
-// OperationalPage is the store-floor home screen. Staff clear a recommendation
-// once they have acted on it (Done), hide ones that don't apply (Dismiss), or
-// defer ones they'll handle later (Snooze). This module owns the pure state and
-// persistence logic so it can be unit-tested without rendering React, and so a
-// future networked store can replace `persistActions` without touching the page.
+// Per-item completion-action state (Issue #31), written for OperationalPage — the
+// store-floor home screen until the cut-over, removed on 2026-09-24 (ADR-028). Staff
+// cleared a recommendation once they had acted on it (Done), hid ones that didn't
+// apply (Dismiss), or deferred ones to handle later (Snooze). This module owns the
+// pure state and persistence logic so it can be unit-tested without rendering React.
+// What still reads it is the telemetry surface (src/telemetry/), for the statuses and
+// the dismissal-reason enum below, until F13 rebuilds that surface (#83).
 //
 // It is also the single canonical home for the dismissal-reason enum. PLAN.md §5
 // and nagham.md B-3 grade the pilot on *why* a manager rejected an alert — "wrong

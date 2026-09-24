@@ -1,8 +1,8 @@
 """weather.py — current conditions from Open-Meteo (free, no API key).
 
 Ported from src/lib/context/weather.js so the ordering decision can use weather at
-pipeline time instead of at render time. Same endpoint, same classification bands,
-so the pipeline and the browser cannot describe the same day differently.
+pipeline time instead of at render time: same endpoint, same classification bands.
+The browser's copy was removed on 2026-09-24 (ADR-028), so this is the only one.
 """
 
 from __future__ import annotations

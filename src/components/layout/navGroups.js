@@ -17,16 +17,18 @@
  * built around, so a nav that omits them is the wrong shape however well the ten work.
  * That is a product judgement and it is his to make; this file follows it.
  *
- * Nothing was recovered from the attic to do this. All twelve page components are still on
- * `main`, byte-identical to the tag `v1-attic`, and all 52 `page.<id>.*` strings and all
- * twelve nav icons were still in place — the cut-over stopped rendering them, it never
- * removed them.
+ * Nothing was recovered from the attic to do this. On 2026-09-16 all twelve page components
+ * were still on `main`, byte-identical to the tag `v1-attic`, and all 52 `page.<id>.*`
+ * strings and all twelve nav icons were still in place — the cut-over stopped rendering
+ * them, it never removed them. The page components behind the awaiting shells were deleted
+ * on 2026-09-24; the entries stay (ADR-028).
  *
  * WHAT THE OWNER SEES ON THE TWO FEATURES HE CARES MOST ABOUT
  *   Reorder and the planogram screens come back PRESENT AND EMPTY, each saying what it is
  *   waiting for. They read `product.salesLast7Days` / `salesLast30Days`, and those fields
- *   exist in exactly three places — `src/data/demoProducts.js`, the generator that writes
- *   it, and the engines that consume it. Not for want of a sales COLUMN: sales_monthly.parquet
+ *   existed in exactly three places — `src/data/demoProducts.js`, the generator that wrote
+ *   it, and the engines that consumed it, all removed on 2026-09-24 (ADR-028). Not for want
+ *   of a sales COLUMN: sales_monthly.parquet
  *   carries units, receipts and revenue. For want of a DATE — the seven reports are monthly,
  *   one row per product per month, so a daily rate is not measurable (rule 13), and the
  *   30-day table that would supply one was deleted for being synthesised from a monthly mean

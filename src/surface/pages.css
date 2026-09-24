@@ -8,10 +8,10 @@
  *
  * WHAT IS IN SCOPE
  *   An audit of every className in src/**\/*.jsx against every rule in src/**\/*.css found
- *   67 unstyled classes across 15 files. Most are in V2/V4 code that no longer appears in
- *   the nav and that Phase 4 deletes — RecommendationsPage, AssortmentGapPage,
- *   OperationalPage, the planogram panels, TelemetryDashboard. Styling those would be
- *   dressing code on its way out.
+ *   67 unstyled classes across 15 files. Most were in V2/V4 code that no longer appeared in
+ *   the nav — RecommendationsPage, AssortmentGapPage, OperationalPage and the planogram
+ *   panels, all deleted on 2026-09-24 (ADR-028) — and TelemetryDashboard, which F13
+ *   rebuilds (#83). Styling those would have been dressing code on its way out.
  *
  *   These are the ones the owner can actually reach:
  *

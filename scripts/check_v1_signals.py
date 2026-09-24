@@ -15,8 +15,8 @@ Two failures are possible and both are silent without this:
 
 The second is CLAUDE.md rule 12 in its exact form. It has happened four times here.
 
-Replaces the reorder-era probes in `scripts/check_signals_live.mjs`, which exercise an
-engine that leaves the build at Phase 4 (§20.1).
+Replaced the reorder-era probes in `scripts/check_signals_live.mjs`, which exercised the
+reorder engine. Both were removed on 2026-09-24 (Phase 4, #77 and ADR-028).
 """
 from __future__ import annotations
 

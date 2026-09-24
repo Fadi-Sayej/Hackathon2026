@@ -61,7 +61,8 @@ export function toProduct(row) {
     // The store's own delivery listing. Named for what it is so no caller mistakes it for a
     // rival's price. See note 1.
     deliveryPrice: num(row.delivery_price),
-    // Not in the catalogue. ApprovedOrdersPage groups by it and will group under one heading.
+    // Not in the catalogue, so null, and ProductsPage shows '—'. ApprovedOrdersPage grouped by
+    // it until the page was removed on 2026-09-24 (ADR-028).
     supplier: null,
     // Not competitor data. See note 1.
     competitor: null,

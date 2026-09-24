@@ -7,7 +7,6 @@ import json
 
 import pyarrow.parquet as pq
 
-import src.common.source_status as source_status
 import src.internal_pos.pos_importer as imp
 
 HEADER = "קוד פריט ,ברקוד ,תאור פריט ,סוג פריט ,מלאי נוכחי ,מחיר קניה ,מחיר מכירה ,WOLT,שם מחלקה ,יחידת מידה ,שם מחלקה ,\n"
@@ -19,10 +18,6 @@ def test_import_preserves_negative_stock_and_records_vintage(tmp_path, monkeypat
     silver = tmp_path / "silver"
     monkeypatch.setattr(imp, "SILVER_POS_DIR", silver)
     monkeypatch.setattr(imp, "QUALITY_REPORT_DIR", tmp_path / "q")
-    # import_pos_file calls update_source(), which writes public/data/sources.json —
-    # a COMMITTED artefact. Without this the one-row fixture rewrites the real file's
-    # yomyom_pos row_count from 7,674 to 1.
-    monkeypatch.setattr(source_status, "SOURCES_JSON", tmp_path / "sources.json")
     result = imp.import_pos_file(csv, as_of="2026-08-02")
     assert result["status"] == "ok"
     inv = pq.read_table(silver / "yomyom_inventory.parquet").to_pylist()[0]

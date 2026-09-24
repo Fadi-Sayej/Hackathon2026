@@ -2,9 +2,9 @@
  * credibility.js — shared "is this ₪ figure defensible?" guards (Issue #39).
  *
  * The pilot commits to one definition of a credible money figure, and BOTH
- * ranking surfaces must honour it: the operational action list
+ * ranking surfaces had to honour it: the operational action list
  * (`actionPriority.js`, ₪ per sale) and the reorder / dashboard exposure sort
- * (`reorderEngine.js`, total ₪ at stake). Before #39 these lived only in
+ * (`reorderEngine.js`, total ₪ at stake, removed on 2026-09-24 by ADR-028). Before #39 these lived only in
  * actionPriority, so `valueAtStake` could report a loss actionPriority would
  * have refused to state — two screens one nav click apart disagreeing about the
  * same product. This module is the single source of those thresholds so they

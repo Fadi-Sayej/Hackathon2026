@@ -101,10 +101,10 @@ export function ProductsPage({ analyzedProducts }) {
               </tr>
             </thead>
             <tbody>
-              {/* 76 of the 7,451 catalogue rows share an id: products with no barcode
-                  fall back to `ym-<name>` in normalize-datasets.mjs and identical names
-                  collide. The index disambiguates the render; the data issue itself is
-                  recorded in CLAUDE.md. */}
+              {/* Ids come from catalogueToProducts: `b:<barcode>`, or `n:<name>` for a row
+                  with no barcode (ADR-022). Two unbarcoded rows with one name would collide,
+                  so the index stays in the key. None do today: 7,523 rows, 7,523 distinct
+                  ids, measured on 2026-09-24. */}
               {visibleProducts.map((product, index) => (
                 <tr key={`${product.id}:${index}`}>
                   <td className="table-cell-hebrew">

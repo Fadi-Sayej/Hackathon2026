@@ -7,8 +7,8 @@ import { dirProps } from '../lib/utils/rtl.js'
  * The owner's cost questions — the engine's, never the browser's.
  *
  * `src/lib/questions/openQuestions.js` and `proposeGroup.js` asked questions computed in
- * the browser from data the browser could not see all of. They are replaced, not adapted
- * (§20.1): the engine knows which answers would change a figure and which would change
+ * the browser from data the browser could not see all of. They were replaced, not adapted
+ * (§20.1), and removed on 2026-09-24 (ADR-028): the engine knows which answers would change a figure and which would change
  * nothing, and it suppresses the rest with a counted reason.
  *
  * The limit is read from the artefact, not hard-coded. D-8 caps it at three today; a

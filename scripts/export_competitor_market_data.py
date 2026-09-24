@@ -3,6 +3,10 @@ Export competitor price data to src/data/marketData.js.
 Reads: data/matching/barcode_matches.parquet
        data/external/silver/products/delivery_catalog/
 Writes: src/data/marketData.js
+
+src/data/ was removed on 2026-09-24 (ADR-028), so this now fails at the write. It runs
+only from scripts/pilot_daily.sh, as a soft step on the legacy chain that Phase 4 Task
+4.2 retires, and is held until then (#76).
 """
 import polars as pl
 import json
