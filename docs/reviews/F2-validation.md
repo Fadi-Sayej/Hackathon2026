@@ -4,54 +4,64 @@ Title: F2 — Stock Reconciliation and Data Hygiene · validation
 Status: Ready for review
 Owner: smartshelf-validator
 Parent: [F2-S1](../features/F2-stock-truth/specs/F2-S1-stock-reconciliation-and-hygiene.md)
-Inputs: [docs/features/F2-stock-truth/specs/F2-S1-stock-reconciliation-and-hygiene.md, docs/features/F2-stock-truth/intent.md, docs/operations/deployment.md, public/data/dashboard.json, src/engine/reconciliation.py, src/surface/compose.js]
-Updated: 2026-09-16
+Inputs: [docs/features/F2-stock-truth/specs/F2-S1-stock-reconciliation-and-hygiene.md, docs/features/F2-stock-truth/intent.md, docs/operations/deployment.md, public/data/dashboard.json (2026-09-24), src/engine/reconciliation.py, src/engine/inputs.py, src/surface/compose.js, src/surface/EntryCard.jsx, src/lib/i18n/dictionaries/, GitHub deployment records (Production)]
+Updated: 2026-09-24
 ---
 
 # Validation F2 — Stock Reconciliation and Data Hygiene
 
-Deployed URL: `https://hackathon2026-fadi19.vercel.app` (gate returns 401, verified 2026-09-16)
-Commit: `8f2646a`
-Artefact read: `public/data/dashboard.json` at `origin/main`, `generated_at 2026-09-15T03:02:35Z`
+- **Deployed URL:** `https://hackathon2026-fadi19.vercel.app`. It returns 401 without credentials (verified 2026-09-24).
+- **Commit in production:** `3bb38ce`. GitHub deployment `6635446258`, `success`, 2026-09-24 10:21Z.
+- **Artefact read:** `public/data/dashboard.json` at `3bb38ce`, `generated_at 2026-09-24T02:46:37Z`, run `ok`.
+- **Replaces** the 2026-09-16 record (last changed in `50abc45`; git holds it). What became of each of its findings is under *Since 2026-09-16*.
 
 ## Verdict
 
-**Conformance passes on all ten acceptance criteria.** Fidelity passes — this is the one
-feature whose intent was rewritten *because* the first answer was wrong, and the code
-honours the correction. **Usefulness is where it is weakest, and there are two findings,
-one of which puts a wrong number in front of the owner today.**
+**Conformance passes on nine of ten acceptance criteria. AC-023 is partial**, and the 09-16
+record marked it met on half its evidence. Fidelity passes, with one sentence missing, and
+it is the intent's own. **Usefulness improved and is still where F2 is weakest:**
+- The count is now honest: 355, where the 09-16 record found a vintage bug publishing 439.
+- ADR-026 made each finding's period the months actually summed.
+- But the owner's screen does not follow the nightly: every nightly deploy is blocked
+  (#167). And every finding rests on one stock count from 2026-06-06, which is 110 days old
+  today.
 
 ---
 
 ## Pass one — conformance
 
-| id | Criterion | Verdict | Evidence |
-|---|---|---|---|
-| AC-020 | negative implied opening flagged, others not, no-receipts never flagged, ordered by gap ratio desc | **met** | Artefact: 439 entries, `ordering_key.name` is `gap_ratio` for all, values descending 9.5 → 0.0033; **0** flagged with `receipts` absent or zero; **439 of 439** carry `unaccounted > 0` |
-| AC-021 | no flagged product carries money | **met** | **0 of 439** entries have a `value` |
-| AC-022 | no aggregate in currency | **met** | `counts` = `{flagged: 439}`; figure units across F2 are only `products` and `records` — no currency unit anywhere |
-| AC-023 | size of the loss stated as not determinable, no figure offered | **met** | `src/engine/reconciliation.py` — every `Entry` is constructed `value=None` (lines 48, 70, 98); no bound, no illustration |
-| AC-024 | every flagged product shows the three quantities and the unaccounted | **met** | Entry `evidence` keys: `recorded_stock`, `receipts`, `units_sold`, `unaccounted`, plus `window_id`, `reconcile_months` |
-| AC-025 | no hygiene record carries money | **met** | **0 of 1,117** hygiene entries have a `value` |
-| AC-026 | no surface sums a recurring and a standing figure | **met** | `src/surface/compose.js:70` — kinds ordered as contiguous runs, never interleaved (D-2 / AC-103) |
-| AC-027 | no output states or implies a cause | **met** | One signal family, `recon.impossible_opening`; one characterisation, `inconsistent`; the owner reads *"Numbers that do not add up"* and *"Received and sold do not balance"*. No wording names theft, breakage or entry error |
-| AC-028 | recomputation reproduces the flagged set and its ordering | **met** | Two consecutive `run_engine(mode="print")` runs: same 355 ids, same gap-ratio ordering, entries **byte-identical** under `json.dumps(sort_keys=True)` |
-| AC-029 | a decision survives the product ceasing to be flagged | **met** | `src/owner/ownerState.js` keys `outcomes` by `entry.id` in a map independent of the artefact; ADR-009 makes that id stable across runs |
-
-### §19 traceability
-
-Both intents are traced. `INT-002` → AC-020, AC-021, AC-023, AC-024, AC-027, AC-028.
-`INT-002B` → AC-025. No `INT-` row is left without an `AC-`.
+| Source | id | Criterion | Verdict | Evidence |
+|---|---|---|---|---|
+| spec §15 | AC-020 | negative implied opening flagged, others not; no receipts, never flagged; gap ratio descending | **met** | 355 entries, `ordering_key.name` `gap_ratio` for all, descending 6.3855 → 0.0036. **0** flagged with receipts ≤ 0. For **355 of 355**, `recorded_stock − receipts + units_sold < 0` recomputes from the entry's own published evidence |
+| spec §15 | AC-021 | no flagged product carries money | **met** | **0 of 355** entries carry a `value` |
+| spec §15 | AC-022 | no aggregate in currency | **met** | `counts` = `{flagged: 355}`. The only units in F2's figures are `products` and `records` |
+| spec §15 | AC-023 | asked the size of the loss, the system states it is not determinable before a count, and offers no figure | **partial** | *No figure* is met: every entry is `value=None`, and `EntryCard.jsx` renders no value area for one ("not a dash, not a zero"). *States it is not determinable* has **no surface**: nothing in V1 lets the owner ask, and the copy System Design §21 names for FR-026 ("i18n copy for 'not determinable before a count'") exists in **no** dictionary. The page's description says only that received and sold do not balance |
+| spec §15 | AC-024 | every flagged product shows the three quantities and the unaccounted | **met** | All of `recorded_stock`, `receipts`, `units_sold`, `unaccounted` are present and non-null on **355 of 355**. Since ADR-026 the period beside them is the span they were summed over: `window_id` `2026-01..2026-05` on every entry, `reconcile_before` `2026-06` |
+| spec §15 | AC-025 | no hygiene record carries money | **met** | **0 of 1,117** hygiene entries carry a `value` (578 negative stock · 248 no identifier · 223 absent price · 68 conflicting duplicate) |
+| spec §15 | AC-026 | no surface sums a recurring and a standing figure | **met** | `src/surface/compose.js:70-75` orders kinds as contiguous runs, never interleaved |
+| spec §15 | AC-027 | no output states or implies a cause | **met** | One family (`recon.impossible_opening`), one characterisation (`inconsistent` → *"Numbers that do not add up"*), one action (`count_product`). No wording names theft, breakage or entry error |
+| spec §15 | AC-028 | recomputation reproduces the flagged set and its ordering | **met** | Two local `run_engine(mode="print")` runs over a copy of the silver tables are identical. More than the criterion asks: that local run equals **CI's published 2026-09-24 artefact** entry for entry (ids, evidence, ordering, actionability), for both `reconciliation` and `hygiene` |
+| spec §15 | AC-029 | a decision survives the product ceasing to be flagged | **met, as mechanism** | Outcomes are keyed on `entry.id` (`src/owner/ownerState.js`), and ADR-009 keeps that id stable. **Not exercised:** see *Not checked* |
+| spec §7 | INV-010, INV-011, INV-013 | no money on a flagged product, an aggregate or a hygiene record | **met** | As AC-021, AC-022 and AC-025 |
+| spec §7 | INV-012 | detection valid whatever the sign of an input | **met** | **81** of the 355 flagged products have negative recorded stock. The rule reads raw stock and clamps nothing |
+| spec §7 | INV-014 | per-sale and standing never summed | **met** | As AC-026 |
+| spec §7 | INV-015 | never asserts where the stock went | **met** | As AC-027 |
+| boundary probe | rule 12 | detection and hygiene fail independently; each capability depends on exactly what it declares | **met** | On `3bb38ce` over copied data, `check_independence` exits 0: *"detection 355 flagged with the reports, unavailable (no_sales_evidence) without them"*, hygiene 1,117 → 1,117. `check_v1_signals` exits 0: *"every capability depends on exactly what it declares"* |
+| spec §19 | INT-002, INT-002B, INT-PROV, protected | traced to an AC | **met** | INT-002 → AC-020–024, 026, 027. INT-002B → AC-025. INT-PROV → AC-028. Protected behaviour → AC-029. No row is without an AC |
 
 ### Scope drift
 
-None found. `src/engine/reconciliation.py`, `src/engine/hygiene` families and
-`compose.js`'s allocation are all named in the plan's Phase 1 tasks and in spec §3.
+This covers the changes that reached F2 since 2026-09-16.
+
+| Change | In a plan task's `Files:` list? | In spec §3 scope? | Note |
+|---|---|---|---|
+| #160: the reconcile cut moved to `load_inputs` (ADR-026) | **yes**, ADR-026's Implementation list as corrected in `630667c` | yes | The correction was an engineer's edit to an accepted ADR; the owner ratified it 2026-09-24 (#164) |
+| #163: the importer collapses a report's reprinted lines | **no plan task.** Traced to issue #156, not to a spec id | yes (the inputs of FR-020) | Its own verification (#163) reports the published artefact unchanged; not re-measured here. Recorded because handover rule 6 asks for a traceable id and an issue is not one |
+| #165: a comment in `reconciliation.py` | n/a (comment only) | n/a | — |
 
 ### Shipped but never requested
 
-Nothing. The 12th hygiene family (`conflicting_duplicate`) traces to ADR-019 and, since
-2026-09-15, ADR-022.
+Nothing new.
 
 ---
 
@@ -59,107 +69,118 @@ Nothing. The 12th hygiene family (`conflicting_duplicate`) traces to ADR-019 and
 
 *Spec and PRD closed. Read only `docs/features/F2-stock-truth/intent.md`.*
 
-**PROBLEM — is the owner measurably less stuck?** Partly, and honestly so. He can see 439
-products whose arithmetic cannot close, ordered worst-first, each showing the three
-quantities he would check. He cannot see *how much* it cost him, and the intent says that
-is correct.
+**PROBLEM (INT-002, «أين يختفي مخزوني؟»): is the owner measurably less stuck?** On the
+list, yes:
+- 355 products whose arithmetic cannot close, worst first.
+- Each has the three quantities and, since this week, the true period they cover. An owner
+  can now check a card against his own January–May records and get the same totals, which
+  was not true before ADR-026.
 
-**Is the SUCCESS line countable?** The intent sets no numeric success line — deliberately.
-Its claim is negative: *no money on a quantity-derived signal*. That is countable, and it
-counts **zero**: no entry, aggregate or figure in either capability carries currency.
+Whether he *has* acted on it is **not measurable from any artifact here**. The artefact
+publishes that 4 devices have written owner state (the last on 2026-09-23), but no outcome
+counts. The pilot measurement that would count them is ADR-023, still `Ready for review`.
 
-**Would the owner recognise this as built for them?** Yes. Hebrew product names, his
-departments, his own recorded stock, and page names in his language — *"Stock that does not
-add up"*, *"Received and sold do not balance"*. Not `reconciliation`.
+**SUCCESS: is it countable?** The intent sets no numeric line. Its claim is negative (*no
+amount, by deliberate decision*), and that counts **zero**: no entry, aggregate or figure in
+either half carries currency.
 
-**Did anything in NOT NOW get built anyway?** No. The three exclusions hold: no correct
-quantity is proposed, no cause is apportioned, and nothing writes to the POS.
+**USER: would the owner or the stocktaker recognise it as built for them?** Mostly.
+- Product names are his Hebrew listings. The action is *count this product*, which is the
+  stocktaker's job.
+- Five of the six evidence labels on the Hebrew card are Hebrew. **The sixth is English:
+  `evidence.reconcile_months` → "reconcile months" in `he.js`.**
+- The period prints as the raw id `2026-01..2026-05`. `EntryCard.jsx` renders evidence with
+  `String(raw)`, so the period is now true but still not in his language.
 
-**Would you write the same intent again?** Yes, and it is the strongest intent in the
-project. It was rewritten *because* the first answer was wrong — ₪63,572 split into
-"coherent" and "estimated" — and the rewrite names the exact rows that exposed it
-(`בקבוק נביעות 1.5 ליטר`: 1,533 recorded, 4,274 "missing"). The governing sentence is the
-one the rest of the repository keeps rediscovering: **a positive number is not a
-trustworthy number; it is only a non-negative one.**
+**NOT NOW: did anything deferred get built?** No. No correct quantity is proposed, no cause
+is apportioned, and nothing writes to the POS.
+
+**Would you write the same intent again?** Yes. But its governing sentence has no
+owner-facing sentence in the product. *«والرقم الحقيقي يُعرف بعد العدّ، لا قبله»*, "the real
+number is known after the count, not before", is exactly what FR-026 and AC-023 owe him, and
+it is the half of AC-023 that is missing. The product withholds the figure correctly and
+never tells him why.
 
 ---
 
 ## Pass three — usefulness
 
-**Contribution to the daily surface: 3 of 10 places.** Computed by running
-`compose(artefact, {outcomes:{},answers:{}})` over the committed artefact: the surface is
-`{price_consistency: 7, reconciliation: 3}`.
-
-**Turn the signal off.** `npm run check:signals`, 2026-09-16: withholding the sales
-reports takes `reconciliation` to `unavailable (no_sales_evidence)` while `hygiene` still
-emits 1,117 records — the ADR-014 independence probe, passing. **The feature moves
-something**, which is more than four signals in this project's history managed.
-
-**Rule 8.** Honoured in full. Zero money on either half, and no zero substituted for an
-absent number.
-
-**Rule 13.** Honoured. The window is month-grained (`window_id: 2026-01..2026-07`,
-`reconcile_months`), and nothing claims a resolution the seven monthly reports cannot carry.
+| Question | Answer | Read from |
+|---|---|---|
+| Entries F2 contributes to the daily surface today | **3 of 10**: the surface is `{price_consistency: 7, reconciliation: 3}`. **Hygiene: 0 of 1,117** | the real `compose()` from `src/surface/compose.js`, run over the 2026-09-24 artefact with no outcomes |
+| `generated_at` of the artefact read | 2026-09-24T02:46:37Z | `public/data/dashboard.json` at `3bb38ce` |
+| Does the count match what it should be? | **yes**: 355 on the true stock date (`as_of 2026-06-06`, `declared_sidecar`). The 09-16 record measured 355 as the honest count against a published 439 | artefact `vintages.pos`, `counts` |
+| Turn the signal off | withholding the reports takes `reconciliation` to `unavailable (no_sales_evidence)`, while hygiene still emits 1,117 | `check_independence`, exit 0, 2026-09-24 |
+| Rule 8 (kinds not summed · no shekel figure on a quantity signal · no number rather than zero) | **yes**. Where the stock date is unusable, the cut leaves all three reconcile figures `None`, never a full-history sum (pinned by `test_adr_026_an_unusable_stock_date_cuts_nothing`) | artefact; `tests/engine/test_unknown_reconcile_window.py` |
+| Anything claimed beyond what monthly data supports (rule 13) | **no**. The window is month-grained and now names the months summed. The count's own month (June) is excluded whole, because its flows straddle the count: *not measurable* at monthly grain, and stated as such (OQ-201) | artefact `window`, `reconcile_before` |
 
 ---
 
-## Findings
+## Since 2026-09-16
 
-### F2-V1 — the published flagged count is inflated by 24%, and the cause is a vintage bug. **smartshelf-engineer.**
+| Finding | Now | Evidence |
+|---|---|---|
+| **F2-V1:** the published count was inflated by 24% (439 against 355), caused by a vintage bug | **resolved** | The 2026-09-24 artefact publishes 355 on `as_of 2026-06-06` from `declared_sidecar`. The fix was #109's sidecar, and ADR-026 then made the window match the cut |
+| **F2-V2:** INT-002B reaches the daily surface never, by construction | **still open, unchanged** | `compose()` over today's artefact gives hygiene **0 of 10**. Reconciliation takes all three unvalued places |
+| **F2-V3:** not checked (rendered page, AC-029 end to end, the owner's view) | **still not checked** | below |
 
-The artefact says **439**. The honest count is **355**.
+## New findings
 
-`reconciliation`'s window depends on the POS vintage, and the vintage on `main` is wrong:
-the 09-14 and 09-15 nightlies both published `pos.as_of: 2026-09-14` while
-`yomyom-inventory.csv` has not changed since 2026-06-06. `git log -1 -- <file>` in
-`actions/checkout`'s default one-commit clone attributes the file to the checkout commit.
+### F2-V4: AC-023's statement has no surface. **smartshelf-architect**, then the owner for the wording.
 
-Proved rather than inferred, on 2026-09-16:
+FR-026 owes the owner a sentence: the amount is not determinable before a physical count. V1
+has no place for it. Nothing lets him ask, and the copy System Design §21 names is in no
+dictionary. The 09-16 record marked AC-023 met on the absence of a figure alone. The
+architect decides where the sentence lives. The words are the owner's to approve
+(front-end rule).
 
-```
-import with the sidecar (2026-06-06)   → reconciliation flagged 355
-import forced to 2026-09-14            → reconciliation flagged 439   ← matches the artefact
-```
+### F2-V5: the owner's screen does not follow the nightly. **The repository owner** (Vercel console), then **smartshelf-platform**. Filed as #167.
 
-So 84 of the 439 products on that page are flagged because the system believes the stock
-count is three months newer than it is. Fix is open as **PR #109**; this validation is the
-first evidence that the bug changes a number the owner reads, not only a provenance field.
+- **Every** production deploy of a commit authored by `smartshelf-collector` is blocked:
+  22 of 22 since 2026-09-13, against 78 of 78 human-authored.
+- A nightly artefact reaches the owner only when a later human merge deploys `main`.
+  Measured lags run from 6.7 h to **88.8 h**, and from 09-18 to 09-21 the screen showed
+  09-17's data.
+- Today's artefact, carrying ADR-026's corrected period, went live 7.5 h late, and only
+  because an unrelated tidy PR (#165) merged.
 
-*It does not change the daily surface.* `reconciliation` is first in `unvalued_order` and
-takes all three reserved places either way.
+### F2-V6: every finding rests on one stock count, 110 days old. **The repository owner** (a fresh POS export from the store).
 
-### F2-V2 — INT-002B reaches the daily surface never, by construction. **smartshelf-architect.**
+`vintages.pos.as_of` is 2026-06-06, and every nightly since has re-published the same count.
+ADR-026 made that visible, with the period stopping at May. So the 355 describe June's
+shelf, not today's. Nothing in the product asks for a newer export, and the list will not
+change until one arrives.
 
-`hygiene` publishes **1,117** records and contributes **0** places to the screen the owner
-opens each morning.
+### F2-V7: on the Hebrew card, one label is English and the period is a raw id. **smartshelf-engineer**, after the owner approves the wording.
 
-Not a defect — it is the configured policy — but the policy's consequence is not recorded
-anywhere. `thresholds.surface` reserves `unvalued_places: 3` and orders them
-`["reconciliation", "competitor_position", "catalogue_lifecycle", "hygiene"]`. Hygiene is
-**last of four competing for three places**, behind a capability that currently has 439
-entries. It can only surface on a day `reconciliation` yields fewer than three.
+`evidence.reconcile_months` is "reconcile months" in `he.js`. `window_id` renders as
+`2026-01..2026-05` through `String(raw)`. Neither is wrong; both fall short of *"in his
+language, on his screen"*.
 
-The intent treats INT-002 and INT-002B as two halves of one problem. In delivery one half
-is a daily prompt and the other is browse-only. That may well be right — *"Records to fix"*
-is a task for a quiet afternoon, not a morning decision — but the intent does not say so,
-and nobody has decided it out loud.
+## Not checked, and why
 
-### F2-V3 — what I did not check
+- **The rendered page.** The gate returns 401 and this session has no Basic Auth
+  credentials. Every figure above was read from the artefact at the commit production
+  serves, which GitHub's deployment record ties to `3bb38ce`.
+- **AC-029 end to end.** Whether any owner outcome exists on a reconciliation entry is not
+  published. The committed mirror (pulled 2026-09-12) holds none, and no product has yet
+  left the list while carrying a decision.
+- **Whether the 355 are worth the owner's time.** No artifact answers that, and given
+  F2-V6, the more useful question may be when the next stock count is coming.
 
-- **The deployed URL's rendered output.** The gate returns 401 and the Basic Auth
-  credentials are not available to this session, so every artefact figure here was read
-  from `public/data/dashboard.json` at `origin/main` — the file the deployment serves —
-  and not from the rendered page.
-- **AC-029 end to end.** The mechanism is verified by reading `ownerState.js` and ADR-009.
-  It has never been exercised against a product that actually stopped being flagged,
-  because no owner outcome exists yet — write-through only landed today (#95).
-- **Whether the owner agrees the 439 are worth his time.** That is the usefulness question
-  no artefact answers, and it needs him.
+## What surprised me
 
-### What surprised me
+The week's most owner-visible correction, ADR-026's period, was right, merged, published by
+the nightly and reproduced to the byte on a laptop, and it still reached the owner only by
+accident. An unrelated PR happened to merge. Every check this project runs is green on a
+morning when the owner's screen is a day old, because nothing looks at the last step.
 
-That the count on the owner's screen turned out to be wrong for a reason that lives three
-layers away — in how a CI runner clones a repository. Nothing about `reconciliation` is
-broken. It read the vintage it was given, and the vintage was a checkout timestamp wearing
-a `git_commit` label. The nightly was green, every probe passed, all ten acceptance
-criteria hold, and the number is still 24% too high.
+## Open items
+
+| Item | Owning role | Why it matters |
+|---|---|---|
+| F2-V4: a surface for FR-026's statement | smartshelf-architect; wording by the owner | The intent's governing sentence never reaches the owner |
+| F2-V5 / #167: nightly deploys are blocked | the repository owner (Vercel), then smartshelf-platform | The owner sees data only as fresh as the last human merge |
+| F2-V6: a fresh POS export | the repository owner, with the store | All 355 findings describe June |
+| F2-V7: one English label, and a raw period id | smartshelf-engineer, after the owner approves the wording | Language on the owner's screen |
+| F2-V2: hygiene has no daily place | smartshelf-architect and smartshelf-pm | Still undecided out loud |
