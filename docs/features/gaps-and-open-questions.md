@@ -299,10 +299,11 @@ that this does not block V1.
 > The other five (four supermarkets, and Bingo, whose format is unknown) are context only.
 >
 > - **GAP-008a is moot.** Both counts (527 in F8's intent, 1,857 on 2026-09-10) came from
->   `src/recommendations/product_recommendations.py`, which nothing has run since 2026-09-13
->   (`src/context/demand_signals.py`). `public/data/operational.json` was last generated on
->   2026-09-12. The owner's screens no longer read it (`src/App.jsx`); only the telemetry
->   page does (CLAUDE.md rule 5). F8's list will come from D-19's rule.
+>   the Python recommender `product_recommendations.py`, which stopped running on 2026-09-13
+>   and was deleted on 2026-09-24 (0a88154; `src/context/demand_signals.py` records both).
+>   `public/data/operational.json` was last generated on 2026-09-12. The owner's screens no
+>   longer read it (`src/App.jsx`); only the telemetry page does (CLAUDE.md rule 5). F8's
+>   list will come from D-19's rule.
 > - **GAP-008b is answered by the table:** three stores.
 > - **GAP-008c is answered by D-19:** a quantity is proposed wherever he has sales rows.
 > - **GAP-008d is answered.** Each snapshot row's `source_product_url` carries the venue slug
