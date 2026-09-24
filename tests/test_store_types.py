@@ -183,21 +183,13 @@ def test_every_decided_store_records_what_the_decision_rests_on():
             assert record.basis in ("branch_known", "chain_format"), store_id
 
 
-def test_the_static_chains_in_chain_meta_are_all_classified():
-    """Store IDs are reused from export_competitor_market_data.py — a rename there
-    without one here would silently make a chain `unknown`."""
+def test_the_static_store_ids_stay_classified():
+    """Our store and the three static chains keep their classification. The Kaggle chain and
+    the exporter that first defined these ids were removed on 2026-09-24; the ids live on in
+    this config and src/common/store_types.py, so losing one would make a chain `unknown`."""
     for store_id in ("yomyom-kq-01", "dor-alon-kq-01", "rami-levy-pt-01", "shufersal-pt-01"):
         assert CONFIG.store(store_id) is not None, f"{store_id} lost its classification"
         assert CONFIG.store(store_id).is_verified
-
-
-def test_chain_meta_store_ids_match_the_config():
-    pytest.importorskip("polars", reason="export_competitor_market_data imports polars")
-    from scripts.export_competitor_market_data import CHAIN_META, OUR_STORE
-
-    assert CONFIG.store(OUR_STORE["storeId"]) is not None
-    for meta in CHAIN_META.values():
-        assert CONFIG.store(meta["storeId"]) is not None, meta["storeId"]
 
 
 def test_client_stores_are_never_references():

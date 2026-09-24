@@ -390,7 +390,7 @@ def test_empty_velocity_clears_stale_values(tmp_path):
 
 
 def test_apply_is_idempotent(tmp_path):
-    """pilot_daily.sh may run twice in a morning; the second run must not corrupt the table."""
+    """The velocity build may run twice in a morning; the second run must not corrupt the table."""
     snaps = _snapshots(tmp_path / "snaps", [
         (BASE, {"111": 100}),
         (BASE + timedelta(days=2), {"111": 80}),

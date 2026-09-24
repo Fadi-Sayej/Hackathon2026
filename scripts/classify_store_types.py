@@ -36,8 +36,9 @@ from src.common.store_types import INFERRED_CONFIG_PATH, UNKNOWN, load_store_typ
 PRODUCTS_SILVER = EXTERNAL_SILVER_ROOT / "products"
 
 # Kaggle chain dumps are full catalogs and carry no per-branch identity, so their
-# SKU count describes the chain's format. These map onto the branch IDs already
-# used in scripts/export_competitor_market_data.py — do not invent new ones.
+# SKU count describes the chain's format. These map onto the static branch IDs in
+# configs/store_types.yaml — do not invent new ones. The Kaggle importer was removed on
+# 2026-09-24, so only silver data already on disk still classifies here.
 CHAIN_DIR_TO_STORE_ID = {
     "kaggle_dor_alon": "dor-alon-kq-01",
     "kaggle_rami_levy": "rami-levy-pt-01",

@@ -91,9 +91,10 @@ jobs:
       # shipping competitorSignals: 0 — the entire market half of the product
       # absent, with every run reporting success.
       #
-      # Safe to automate only now: export_dashboard_data.py raises
-      # EmptyExportError BEFORE writing, so a failed rebuild leaves the last good
-      # dashboard on disk instead of replacing it with an empty one.
+      # It became safe to automate once the exporter refused to write an empty file
+      # (EmptyExportError). That exporter went with the legacy chain on 2026-09-24
+      # (Phase 4 Task 4.2); the engine step below publishes what it cannot compute as
+      # `unavailable` instead.
       - name: Rebuild silver POS from the committed exports
         # data/internal/ is gitignored, so a runner starts with no POS tables at all.
         # Both source files ARE committed; this importer turns yomyom-inventory.csv into
@@ -105,7 +106,7 @@ jobs:
         # despite the data/** ignore. Calling it first was simply the same import twice.
         run: python3 scripts/import_yomyom_pos.py --input yomyom-inventory.csv
 
-      # ── Why refresh_pipeline.py is no longer run here (2026-09-13) ──────────
+      # ── Why refresh_pipeline.py stopped running here (2026-09-13) ────────────
       #
       # It cannot be repaired honestly. Its product_recommendations step required
       # silver_pos/yomyom_sales.parquet, and Task 0.6 deleted that table on purpose:
@@ -123,14 +124,15 @@ jobs:
       # public/data/operational.json therefore freezes at its last good value, which is
       # the correct state for a rollback target (§20.2): after the cut-over no V1 page
       # imports loadOperationalData — only src/telemetry/ does — so nothing the owner
-      # opens reads it. Phase 4 deletes the chain.
+      # opens reads it. Phase 4 deleted the chain on 2026-09-24; the file stays until
+      # F13 (#83) replaces the telemetry page that reads it.
       #
       # sources.json is gone. It was deleted on 2026-09-13 (ADR-005), and the three
       # code paths that kept rewriting it stopped; its writers disagreed about
       # what a row is (the figures are in tests/test_retired_artefacts.py), so
       # committing either would have baked in a number nobody can source (rule 11).
-      # The only writer left is export_dashboard_data.py, on the chain above that
-      # nothing runs. tests/test_retired_artefacts.py keeps the file deleted.
+      # Its last writer, export_dashboard_data.py, went with that chain on 2026-09-24.
+      # tests/test_retired_artefacts.py keeps the file deleted.
       - name: Run the engine and publish the artefact
         id: engine
         # The V1 engine, and now the only pipeline here. run_engine() drives its own

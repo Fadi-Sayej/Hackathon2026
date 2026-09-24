@@ -567,6 +567,10 @@ reachable afterwards.
 > Task 4.2. The assortment-gap trio and `public/data/assortment_gap.json` are unblocked,
 > because #174 removed their only reader. `tenbis_connector.py` and the alonit pipeline are
 > live and stay. "17 unreferenced scripts" names no paths, so there is nothing to act on.
+>
+> *(Later the same day:* the assortment-gap trio and `assortment_gap.json` are deleted, and
+> the Kaggle chain went with Task 4.2's writers. What remains of the row is the two live
+> entries and the unnamed seventeen, so **Task 4.1 is complete**.)
 
 ---
 
@@ -596,6 +600,26 @@ reachable afterwards.
 > `pilot_daily.sh` runs and CLAUDE.md rules 4, 5 and 10, which describe them. The file and
 > its reader go after F13. **smartshelf-architect**, for the split; the owner, only if he
 > still runs `npm run pilot:daily` by hand.
+
+> **The writers are deleted, 2026-09-24**, on the owner's word the same day that nobody runs
+> `npm run pilot:daily` by hand. Gone: `pilot_daily.sh`, `refresh_pipeline.py`,
+> `export_dashboard_data.py` with `tests/test_export_empty_guard.py`, `src/recommendations/`
+> with its two `generate_*` scripts, and the scripts only that chain ran or fed:
+> `join_yomyom_kaggle.py`, `export_competitor_market_data.py`, and the Kaggle chain
+> (`kaggle_supermarket_importer.py`, `import_kaggle_supermarkets.py`,
+> `download_kaggle_datasets.py`). The npm scripts `pilot:daily` and `data:dashboard` went
+> with them. CLAUDE.md rules 4, 5 and 10 now describe what replaced them, under the same
+> numbers. Swept first: no workflow, npm script, test or live module imports any of them,
+> and the engine reads its own `product_matches.parquet`, not the Kaggle join's
+> `barcode_matches.parquet`.
+>
+> **Kept, and why.** `build_velocity_from_snapshots.py` has its own npm script,
+> `data:velocity`. `build_expiry_report.py` is the README's command for the expiry report,
+> whose module §20.1 keeps for V2. `smoke_test_pipeline.py` keeps its two live checks, the
+> expiry report and the snapshot comparison. Its `sources.json` check had been failing since
+> that file was retired on 2026-09-13, unnoticed, because CI never runs it.
+>
+> **Still open:** `operational.json` and `loadOperationalData.js`, until F13 (#83).
 
 **Files:**
 - Modify: `.github/workflows/collect-daily.yml` — drop the `refresh_pipeline.py` step

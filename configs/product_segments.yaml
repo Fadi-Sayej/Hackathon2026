@@ -22,7 +22,7 @@
 #   skipped. Until then, this keeps the pipeline honest instead of blocked.
 #
 # Consumers:
-#   - scripts/build_assortment_gap.py   (tags each gap product)
+#   - scripts/derive_store_policy.py    (reads the segments)
 #   - configs/store_policy.yaml         (decides what to do with the tag)
 
 version: 1

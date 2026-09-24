@@ -93,8 +93,9 @@ def archive_current_silver(imported_at: str | None = None, force: bool = False) 
     """Copy the current silver products + inventory tables into a new snapshot dir.
 
     Skips when the silver tables come from the SAME import as the last snapshot.
-    pilot_daily.sh runs this every time, so without the check a re-run with no new
-    POS export produces another full copy of identical data: pure repo weight that
+    The POS importer runs this on every import (src/internal_pos/pos_importer.py), so
+    without the check a re-import of the same export produces another full copy of
+    identical data: pure repo weight that
     can never yield velocity, because velocity.py rejects same-import pairs anyway.
     (This is exactly how 8 snapshots accumulated from a single import.)
 

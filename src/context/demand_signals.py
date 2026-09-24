@@ -12,10 +12,10 @@ WHY THIS MOVED OUT OF THE BROWSER
 
     Multipliers are now computed here, keyed on the categories that actually exist,
     written into public/data/market-context.json, and applied by the Python
-    recommender, product_recommendations.py, which nothing has run since 2026-09-13
-    (CLAUDE.md rule 5). reorderEngine.js consumed the result until ADR-028 removed it
-    on 2026-09-24. So nothing applies these multipliers today; ADR-028 keeps them
-    published for V2.
+    recommender, product_recommendations.py, until it stopped running on 2026-09-13; it
+    was deleted on 2026-09-24 (Phase 4 Task 4.2). reorderEngine.js consumed the result
+    until ADR-028 removed it the same day. So nothing applies these multipliers today;
+    ADR-028 keeps them published for V2.
 
 THESE ARE STARTING VALUES, NOT MEASUREMENTS
     Nothing in the data yet proves any of these numbers: a full Ramadan has not been
