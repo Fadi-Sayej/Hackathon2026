@@ -235,6 +235,15 @@
   color: var(--ink-400);
 }
 
+/* A saved answer: what he said, and when it takes effect (approved 2026-09-24). In the ok
+   colour of the Save button that produced it, so the two read as one exchange. */
+.question__saved {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ok);
+}
+
 /* ── the data page ───────────────────────────────────────────────────────── */
 
 .data__run {

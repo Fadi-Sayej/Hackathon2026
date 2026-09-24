@@ -786,6 +786,8 @@ export const ar = {
   'questions.none': "لا أسئلة اليوم — كل ما يغيّر رقماً معروف.",
   'questions.costOf': "كم تشتري {product}؟",
   'questions.save': "حفظ",
+  'questions.saved': "✓ حُفظ: {value} — تتحدّث أرقامك بعد تشغيل الليلة",
+  'questions.change': "تغيير",
   'questions.why': "يخص {money} ₪ خلال {window}",
   'questions.whyNoPrice': "لا يوجد سعر رف، فلا مبلغ — بيع منه {units} خلال {window}",
   'questions.failed': "لم نستطع حفظ الإجابة — لم تُسجَّل.",

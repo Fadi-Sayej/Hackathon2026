@@ -218,7 +218,7 @@ export default function App() {
       // and only the daily surface came back.
       return (
         <>
-          <QuestionPanel artefact={artefact} onAnswer={onAnswer} />
+          <QuestionPanel artefact={artefact} answers={ownerState.answers} onAnswer={onAnswer} />
           <DailyPage artefact={artefact} ownerState={ownerState} onOutcome={onOutcome}
             onUndoOutcome={onUndoOutcome} now={now} />
         </>

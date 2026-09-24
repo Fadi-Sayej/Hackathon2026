@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, screen } from '@testing-library/react'
+import { cleanup, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { renderWithI18n } from '../../test/renderWithI18n.jsx'
@@ -113,5 +113,40 @@ describe('ADR-027 — a question with no shelf price shows no figure', () => {
     expect(first.textContent).toBe(dict['questions.whyNoPrice'].replace('{units}', '80').replace('{window}', '2026-01..2026-07'))
     expect(first.textContent).not.toContain('₪')
     expect(second.textContent).toContain('₪')                     // a priced question keeps its figure
+  })
+})
+
+describe('an answer he has saved says so', () => {
+  // Approved by the repository owner on 2026-09-24. The engine only drops an answered
+  // question at the next nightly run, so until then it looked exactly as before he answered:
+  // an empty field, as if nothing had happened.
+  const answers = { bc1: { cost_price: { value: 31.5, status: 'answered', at: 1 } } }
+  const renderWith = (onAnswer = vi.fn()) => {
+    renderWithI18n(
+      <QuestionPanel artefact={{ schema_version: 2, capabilities: { owner_questions: cap({ items: [item(1), item(2)] }) } }}
+        answers={answers} onAnswer={onAnswer} />,
+      { language: 'en' },
+    )
+    return onAnswer
+  }
+
+  it('shows his saved value in place of the empty field', () => {
+    renderWith()
+    const saved = document.querySelector('[data-question-id="q1"] .question__saved')
+    expect(saved.textContent.replace(/[⁦-⁩]/g, '')).toBe(
+      en['questions.saved'].replace('{value}', '₪31.50'))
+    expect(screen.queryByLabelText(/Product 1/)).toBeNull()
+    expect(screen.getByLabelText(/Product 2/)).toBeTruthy()            // an unanswered one keeps its field
+  })
+
+  it('reopens the field with his value when he wants to change it', async () => {
+    const onAnswer = renderWith()
+    await userEvent.click(screen.getByRole('button', { name: en['questions.change'] }))
+    const input = screen.getByLabelText(/Product 1/)
+    expect(input.value).toBe('31.5')
+    await userEvent.clear(input)
+    await userEvent.type(input, '29')
+    await userEvent.click(within(document.querySelector('[data-question-id="q1"]')).getByRole('button', { name: /save/i }))
+    expect(onAnswer).toHaveBeenCalledWith('bc1', { value: 29, status: 'answered' })
   })
 })
