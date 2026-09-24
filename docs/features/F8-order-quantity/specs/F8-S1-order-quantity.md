@@ -3,7 +3,7 @@ ID: F8-S1
 Title: Order Quantity — what to order, and how much, for the next order
 Status: Ready for review
 Owner: smartshelf-architect
-Version: 0.3 (2026-09-25, after two review rounds)
+Version: 0.4 (2026-09-25, after three review rounds)
 Parent: [F8 — Order Quantity](../intent.md)
 Related Intents: INT-004, INT-010
 Inputs: [docs/features/F8-order-quantity/intent.md, docs/product/PRD.md §5 §6 §7 §10, docs/product/intent-register.md (D-1, D-3, D-7, D-8, D-10, D-18, D-19, D-20), docs/features/gaps-and-open-questions.md (GAP-008, GAP-009), F2-S1, F5-S1, F7-S1, F10 intent, ADR-001, ADR-002, ADR-003, ADR-004, ADR-005, ADR-007, ADR-008, ADR-009, ADR-011, ADR-012, ADR-014, ADR-016, ADR-017, ADR-024, ADR-027, ADR-028, CLAUDE.md, the repository owner's answers of 2026-09-25 (§17), public/data/dashboard.json and catalogue.json (generated 2026-09-24T02:46Z), data/internal/silver_pos/*.parquet]
@@ -89,8 +89,8 @@ It also serves:
 - The reason written as a sentence. That is F14 (D-15, D-16); F8 publishes the facts it
   will be written from.
 - Letting a disagreement answer change a quantity. D-20 leaves that for later.
-- Products he does not stock, including withdrawn ones: whether to carry them is F9's
-  question (INT-005), whose decision stays open.
+- Products he does not stock (§5): whether to carry them is F9's question (INT-005), whose
+  decision stays open.
 - Seasonal forecasting (PRD §6 #5), and pack or case sizes, which are not recorded.
 
 ---
@@ -116,9 +116,9 @@ It also serves:
 | **Order cycle** | The days from the next order day up to, but not including, the scheduled day after it. What a suggestion must cover |
 | **Shelf life** | How many whole days a department's products keep, as the store owner states it (OQ-908). Once F10 exists, it is also what F10 measures (FR-151). "Does not spoil" is a statement too |
 | **Report day** | A day for which the POS export of that day's sales and deliveries per product was received |
-| **Evidence window** | The 28 consecutive report days ending on the latest day up to which all 28 were received, provided that day is no more than 7 days before the run (FR-144). Its **weeks** are the four 7-day blocks counted back from its last day |
+| **Evidence window** | The 28 days ending on the latest report day, which must be no more than 7 days before the run (FR-144). Days with no report are left out. Its **weeks** are the four 7-day blocks counted back from its last day |
 | **Moving product** | One that sold in each of the window's four weeks (FR-145) |
-| **Daily mean** | The units a product sold in the window, divided by its 28 days: a mean of observed days, not a division of any report |
+| **Daily mean** | The units a product sold on the window's report days, divided by the number of those days: a mean of observed days, not a division of any report |
 | **Adjusted daily mean** | The daily mean times the lift when the market is running out of the product; otherwise the daily mean (FR-147) |
 | **Expected sales** | The adjusted daily mean times the days in the order cycle (FR-146) |
 | **The market** | The nearby stores at or above the format floor (D-18). Three today |
@@ -128,6 +128,7 @@ It also serves:
 | **Stock at the order day** | The stock now less the adjusted daily mean times the days from the run to the next order day, never below zero |
 | **Gross quantity** | The expected sales, read as "you'll sell about X before your next order" |
 | **Net quantity** | The expected sales less the stock at the order day, never below zero |
+| **He stocks** | A product he stocks is one the window records a sale or a delivery of. In a department the evidence does not itemise (FR-156), it is one his latest recorded count shows above zero. Never F4's withdrawn class, which D-14 keeps off his screen |
 | **Disagreement** | The market running out of a product he stocks but that is not moving (FR-158) |
 | **Suggestion** | One product's quantity for its department's next order day, with the facts it was computed from |
 
@@ -142,10 +143,14 @@ per day. A longer report is never divided into days. So the seven monthly report
 only sales evidence, supply no quantity at all (CLAUDE.md rules 5 and 13; ADR-028 §4), and
 neither would a weekly one.
 
-**FR-144** — The evidence window is the 28 consecutive report days that end on the latest day
-up to which all 28 were received. That day must be no more than 7 days before the run. A day
-with no report is missing; it is not a day of zero sales. The 28 days and the 7 days are
-policy values, both provisional (OQ-906). So the export must arrive at least weekly.
+**FR-144** — The evidence window is the 28 days ending on the latest report day, and that
+day must be no more than 7 days before the run.
+- A day with no report is missing, not a day of zero sales, and is left out of every mean.
+- The window exists only when it holds at least 21 report days, with at least one in each of
+  its four weeks. One late or missing export therefore thins the evidence, but does not blank
+  F8.
+- The 28 days, the 21 days and the 7 days are policy values, all provisional (OQ-906). So the
+  export must arrive at least weekly.
 
 **FR-145** — A product is moving when it sold in each of the window's four weeks. Only a
 moving product gets a quantity (D-19; PRD §6 #3).
@@ -207,7 +212,8 @@ table of starting guesses is not an input to F8.
 - A product whose expected sales for the cycle are below one unit gets no quantity. Less
   than one sells per cycle, so any whole quantity would be a guess about which cycle it sells
   in.
-- A need is rounded up to a whole unit.
+- A need is rounded to the nearest whole unit, halves up, so that over many cycles the units
+  ordered match the units expected. Always rounding up would turn 1.14 a day into 2 a day.
 - A quantity the cap sets is rounded down, so rounding never orders past what sells before
   it spoils. A cap that rounds down to zero or below yields no quantity, and the suggestion
   says why.
@@ -420,7 +426,7 @@ THEN Approved orders lists 20 for Sunday, and the suggested 12 is recorded besid
 **SCN-144 — A missing day**
 GIVEN one day's report is missing inside the latest 28 days
 WHEN the engine runs
-THEN the window moves back to the latest 28 complete days if they end within seven days of the run; otherwise no quantity is published, and Reorder says a report is missing.
+THEN that day is left out of every mean and suggestions continue. Only fewer than 21 report days, a week with none, or a latest report day more than seven days old leaves no window, and then Reorder says which.
 
 **SCN-145 — The same order, several nights**
 GIVEN a department ordered on Sundays, and a suggestion he approved on Thursday
@@ -488,7 +494,7 @@ persists is the owner's.
 | Condition | Required behavior |
 |---|---|
 | No report days, or no window within the freshness limit | The capability is unavailable and names the missing input; Reorder says what it waits for (FR-160). An empty list is a failure, not a result (CLAUDE.md rule 10) |
-| Some export days missing | The window moves back to the latest 28 complete days within the freshness limit (FR-144). Beyond it there is no quantity, and Reorder names the missing report |
+| Some export days missing | Those days are left out of the mean (FR-144). Below 21 report days, or with a week that has none, there is no window, and Reorder names the missing reports |
 | A department's order schedule or shelf life not stated | No quantity for that department. Reorder names the missing fact (FR-155) |
 | Deliveries missing from a report day | No count taken before that day is usable. The suggestion is gross (FR-149) |
 | Stock now below zero | The count is not used; the suggestion is gross and says the stock evidence is inconsistent (FR-149) |
@@ -507,7 +513,8 @@ persists is the owner's.
 | He says a department's products do not spoil | No shelf-life cap for that department (FR-151) |
 | The run is not on an order day | The suggestion is for the next order day, and a net one deducts what sells before it (FR-149) |
 | Goods sold by weight | The quantity is in the report's unit, rounded to a whole unit of it (FR-153) |
-| A product F4 withdrew | He does not stock it, so it is not moving, is not suggested, and raises no disagreement. Whether to carry it is F9's question |
+| A product with no sale and no delivery in the window | He does not stock it (§5): not suggested, and raises no disagreement. Whether to carry it is F9's question |
+| A day the store is closed and sends no export | A missing day, left out of the mean. Regular closing days inside a cycle would make its expected sales too high (OQ-906) |
 | Net quantity of zero | Not suggested; counted as covered by stock (FR-150) |
 | He changes a department's schedule | The next run uses it. Earlier outcomes keep their order days |
 | A disagreement product that later starts moving | It gets a quantity. If he already answered, the disagreement stays retired |
@@ -554,9 +561,11 @@ prevails, because a settled decision outranks an approved spec. It differs on:
   may be asked about;
 - F5-S1's out-of-scope line on his commercial reasoning: the question asks why.
 
-FR-082 still holds, and D-19 does not override it. A withdrawn product has no stock, so
-asking why it does not sell becomes asking whether to carry it. That is F9's question, and
-D-20 leaves it open.
+FR-082 still holds, and D-19 does not override it. A product he does not stock (§5) has no
+sale and no delivery in the window, so asking why it does not sell becomes asking whether to
+carry it. That is F9's question, and D-20 leaves it open. The test is his stocking, read
+from the window, and never F4's withdrawn class, because D-14 keeps anything that depends on
+automatic withdrawal off his screen.
 
 Otherwise F5-S1 applies: FR-084 (three at once), FR-086, FR-087, FR-090 and FR-091.
 
@@ -581,15 +590,16 @@ missing input. *(FR-143, FR-160, INV-070, SCN-132)*
 **AC-137** — No quantity comes from a report longer than a day, and none equals such a
 report's units divided into days. *(FR-143, INV-070)*
 
-**AC-138** — A missing day never counts as zero sales. The window is 28 complete days,
-within the freshness limit. *(FR-144, INV-072, SCN-144)*
+**AC-138** — A missing day never counts as zero sales: it is left out of the mean. The
+window needs at least 21 report days, one in each week, and must end within 7 days of the
+run. *(FR-144, INV-072, SCN-144)*
 
 **AC-139** — A product that did not sell in each of the window's four weeks has no quantity,
 not a zero. *(FR-145, FR-155, INV-076)*
 
-**AC-140** — The published daily mean equals the window's units divided by 28, and the
-expected sales equal the adjusted daily mean times the days in the cycle. *(FR-146, FR-154,
-NFR-067)*
+**AC-140** — The published daily mean equals the units sold on the window's report days
+divided by their number, and the expected sales equal the adjusted daily mean times the days
+in the cycle. A need is rounded to the nearest unit. *(FR-146, FR-153, FR-154, NFR-067)*
 
 **AC-141** — When the market is running out, the published adjusted daily mean equals the
 daily mean times the stated lift, applied once. A store below the floor never produces an
@@ -688,6 +698,9 @@ F10 will measure per product.
 **ASM-070** — An order placed on an order day arrives that day. Lead times are F11 (V3). A
 later delivery would leave the cycle's first days uncovered.
 
+**ASM-071** — A recorded count reflects the end of its date. The sales and deliveries of the
+count's own day are already in it, and only later days are applied (FR-149).
+
 ---
 
 ### 17. Open Questions
@@ -724,10 +737,11 @@ different chain.
 (FR-147, FR-158)
 
 **OQ-906 (P2) — Are the provisional values right?** They are:
-- a window of 28 days;
+- a window of 28 days, holding at least 21 report days with one in each week;
 - a freshness limit of 7 days;
 - a product counted as moving only if it sold in each of the window's four weeks;
-- no quantity below one unit per cycle.
+- no quantity below one unit per cycle, and needs rounded to the nearest unit;
+- closed days treated as missing days.
 
 · owner: the architect, calibrated with the owner after the first month · blocks: nothing
 
