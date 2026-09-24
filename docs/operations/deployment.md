@@ -196,8 +196,10 @@ service-account files, or `.vercel/`.
 
 ## Data Refresh
 
-The committed bundle already contains the real YomYom product catalog in `src/data/demoProducts.js`.
-That is enough for the deployed app to show real product names, categories, prices, and inventory.
+The deployed app carries no product data of its own. It reads the catalogue from
+`public/data/catalogue.json` and its findings from `public/data/dashboard.json`, both written
+by the engine and committed by the nightly. The bundled demo catalogue,
+`src/data/demoProducts.js`, was removed on 2026-09-24 (ADR-028).
 
 **Since the Task 2.7 cut-over, the artefact the owner reads is
 `public/data/dashboard.json`,** not `operational.json`. `loadDashboard.js` is the only
@@ -277,7 +279,7 @@ git commit -m "data: refresh the engine artefact"
 git push                                                            # Vercel redeploys
 ```
 
-`public/data/operational.json` and `sources.json` are **frozen** and no longer refreshed.
+`public/data/operational.json` is **frozen** and no longer refreshed; `sources.json` was deleted on 2026-09-13 (ADR-005).
 `refresh_pipeline.py` stopped running on 2026-09-13: its `product_recommendations` step
 required `silver_pos/yomyom_sales.parquet`, which Task 0.6 deleted on purpose because its
 `units_sold_30d` was synthesised from a monthly mean (rule 13). Frozen is the correct state
