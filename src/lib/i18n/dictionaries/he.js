@@ -1004,5 +1004,7 @@ export const he = {
   'prices.why.stale': "המחיר ישן מכדי להשתמש בו",
   'prices.why.unknown': "לא הושווה",
   'prices.more': "הצג עוד {n}",
+  'prices.card.against': "{yours} מול {reference}",
+  'prices.card.meta': "{n} חנויות · {seen}",
   'prices.notPublished': "הריצה הזו לא פרסמה את ההשוואה, כך שעדיין אין מה להציג.",
 }

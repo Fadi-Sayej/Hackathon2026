@@ -233,6 +233,50 @@ export function PriceGapPage({ artefact, catalogue, now, onOpenFinding }) {
         </div>
       )}
 
+      {/* The same rows as cards, for a phone: below 900px the table's first column is the
+          name and every figure sat one sideways swipe away. CSS shows one or the other;
+          both come from `visible`, so they can never disagree about what is on screen.
+          Approved by the repository owner on 2026-09-24. */}
+      {active.length > 0 ? (
+        <ul className="price-cards">
+          {visible.map((row) => {
+            const barcode = String(row.barcode)
+            return (
+              <li key={barcode} className="price-card" data-barcode={barcode}>
+                <p className="price-card__name" dir="auto">
+                  {names.get(barcode) || barcode}
+                  {findings.has(barcode) ? (
+                    <Button tone="ghost" aria-label={t('prices.finding')} onClick={onOpenFinding}>⚑</Button>
+                  ) : null}
+                  {row.uncompared_reason === 'no_cost' ? (
+                    <StatusBadge tone="neutral">{t('prices.notJudged')}</StatusBadge>
+                  ) : null}
+                </p>
+                {compared ? (
+                  <p className="price-card__figures">
+                    <span className={`price-card__gap numeric ${row.premium_pct > 0 ? 'negative' : row.premium_pct < 0 ? 'positive' : ''}`}>
+                      {formatPremium(row.premium_pct)}
+                    </span>
+                    <span>{t('prices.card.against', {
+                      yours: formatShekel(row.shelf_price),
+                      reference: formatShekel(row.reference?.value),
+                    })}</span>
+                  </p>
+                ) : (
+                  <p className="price-card__figures">
+                    <span className="numeric">{formatShekel(row.shelf_price)}</span>
+                    <span>{whyText(row.uncompared_reason, t)}</span>
+                  </p>
+                )}
+                <p className="price-card__meta">
+                  {t('prices.card.meta', { n: row.stores ?? '—', seen: seenLabel(row.observed_at, now, t) })}
+                </p>
+              </li>
+            )
+          })}
+        </ul>
+      ) : null}
+
       {remaining > 0 ? (
         <Button tone="ghost" onClick={() => setShown(shown + PAGE_SIZE)}>
           {t('prices.more', { n: Math.min(PAGE_SIZE, remaining) })}

@@ -1009,5 +1009,7 @@ export const ar = {
   'prices.why.stale': "السعر أقدم من أن يُعتمد عليه",
   'prices.why.unknown': "لم تتم المقارنة",
   'prices.more': "اعرض {n} أخرى",
+  'prices.card.against': "{yours} مقابل {reference}",
+  'prices.card.meta': "{n} محلات · {seen}",
   'prices.notPublished': "هذا التشغيل لم ينشر المقارنة، فلا شيء لعرضه بعد.",
 }

@@ -201,6 +201,51 @@ describe('the Prices page, on the published comparison', () => {
   })
 })
 
+describe('the Prices page on a phone: a card per product', () => {
+  // Approved by the repository owner on 2026-09-24. On a phone the table's first column is
+  // the product name and every figure sat one sideways swipe away. Below 900px the same rows
+  // render as cards (CSS chooses which one shows); the table stays for wider screens.
+  const cards = () => [...document.querySelectorAll('.price-cards .price-card')]
+  const cardFor = (barcode) => document.querySelector(`.price-cards .price-card[data-barcode="${barcode}"]`)
+
+  it('renders one card per visible row, in the same order', () => {
+    renderPage()
+    expect(cards().map((c) => c.dataset.barcode)).toEqual(rows().map((r) => r.dataset.barcode))
+    fireEvent.click(tab('No comparison'))
+    expect(cards().map((c) => c.dataset.barcode)).toEqual(rows().map((r) => r.dataset.barcode))
+  })
+
+  it('puts the gap, both prices, the shops and when it was seen on the card', () => {
+    renderPage()
+    const soda = plain(cardFor('7290017888729'))
+    expect(soda).toContain('שופס סודה ליטר')
+    expect(soda).toContain('+77%')
+    expect(soda).toContain('₪9.90 against ₪5.59')
+    expect(soda).toContain('118 shops · today')
+    expect(within(cardFor('7290017888729')).getByRole('button', { name: 'Open the finding' })).toBeTruthy()
+  })
+
+  it('keeps "not judged" and every no-comparison reason on the card', () => {
+    renderPage()
+    fireEvent.click(tab('Same or cheaper'))
+    expect(plain(cardFor('7290000000042'))).toContain('not judged')
+    fireEvent.click(tab('No comparison'))
+    const stale = plain(cardFor('305210464728'))
+    expect(stale).toContain('price too old to use')
+    expect(stale).toContain('2026-09-03')
+    expect(plain(cardFor('7290000000066'))).toContain('you have no shelf price for it')
+  })
+
+  it('pages the cards with the table', () => {
+    const many = Array.from({ length: 30 }, (_, i) =>
+      compared(String(7290100000000 + i), 10.0, 9.0, 30 - i, 5, '2026-09-23'))
+    renderPage({ artefact: fixture({ comparison: many }) })
+    expect(cards()).toHaveLength(25)
+    fireEvent.click(screen.getByRole('button', { name: 'Show 5 more' }))
+    expect(cards()).toHaveLength(30)
+  })
+})
+
 describe('the Prices page, over the artefact the nightly actually published', () => {
   // Rule 12 at the page: the fixture above is shaped by hand, and a hand-shaped fixture is
   // exactly what let four signals pass every test and change nothing. This reads the real
