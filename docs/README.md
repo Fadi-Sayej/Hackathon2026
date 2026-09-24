@@ -34,7 +34,7 @@ carries a banner saying so.
 |---|---|
 | [PRD](product/PRD.md) | Problem · user · feature register (F1–F14) · releases · not-in-scope · owner commitments · decision criterion · figures · open decisions |
 | [Release phases](product/release-phases.md) | Three customer-facing delivery phases with dates · **proposes a change to PRD §5's dates, does not take it** |
-| [Intent register (SPEC-000)](product/intent-register.md) | INT-id ↔ spec map · **settled decisions D-1 … D-20** · why F8–F14 are deliberately unspecified |
+| [Intent register (SPEC-000)](product/intent-register.md) | INT-id ↔ spec map · **settled decisions D-1 … D-20** · why F9–F14 are deliberately unspecified |
 | [Open decisions](product/open-decisions/) | One brief per feature blocked on a product decision · poses the choices the data supports · **not authority** — answers land as `D-n` in the intent register §3, then the brief is `Superseded` |
 
 ## Features
@@ -52,7 +52,7 @@ globally unique across the specification layer and were **not** renumbered by th
 | F5 — Owner Knowledge Capture | [intent](features/F5-owner-knowledge-capture/intent.md) | [F5-S1](features/F5-owner-knowledge-capture/specs/F5-S1-owner-knowledge-capture.md) | V1 |
 | F6 — Daily Action Surface | [intent](features/F6-daily-action-surface/intent.md) | [F6-S1](features/F6-daily-action-surface/specs/F6-S1-daily-action-surface.md) | V1 |
 | F7 — Figure Provenance | [intent](features/F7-figure-provenance/intent.md) | [F7-S1](features/F7-figure-provenance/specs/F7-S1-figure-provenance.md) | V1 |
-| F8 — Order Quantity | [intent](features/F8-order-quantity/intent.md) | *not specified* | V2 |
+| F8 — Order Quantity | [intent](features/F8-order-quantity/intent.md) | [F8-S1](features/F8-order-quantity/specs/F8-S1-order-quantity.md) — `Ready for review` | V2 |
 | F9 — Assortment Gap | [intent](features/F9-assortment-gap/intent.md) | *not specified* | V2 |
 | F10 — Expiry-Bounded Ordering | [intent](features/F10-expiry-bounded-ordering/intent.md) | *not specified* | V2 |
 | F11 — Supplier Lead Times | [intent](features/F11-supplier-lead-times/intent.md) | *not specified* | V3 |
@@ -156,7 +156,7 @@ chain above.
 |---|---|
 | [Handover — Arabic](pilot/handover-yomyom-ar.md) | **The version actually handed over.** Arabic is the language of every exchange with the manager |
 | [Handover — English](pilot/handover-yomyom-en.md) | Source text for the Arabic handover; keep the two in sync |
-| [Owner conversation — 2026-09](pilot/owner-conversation-2026-09.md) | **The current one.** Six questions: GAP-009 (and the evidence that its assumption is wrong), GAP-011, and the three numbers F13-S1 is blocked on |
+| [Owner conversation — 2026-09](pilot/owner-conversation-2026-09.md) | **The current one.** Eight questions: GAP-009 (and the evidence that its assumption is wrong), GAP-011, the three numbers F13-S1 is blocked on, and the two facts F8-S1 needs |
 | [Questions for YomYom](pilot/questions-for-yomyom.md) | The August pilot-setup questions, each drawn from his own export. Superseded for the 09-2026 conversation by the row above |
 | [Release phases — Arabic](pilot/release-phases-ar.html) | **The version shown to the owner on 12/9.** Three dated phases, each a working product |
 | [`app-qr.png`](pilot/app-qr.png) · [`app-share-qr.png`](pilot/app-share-qr.png) | QR codes for the deployed pilot app |

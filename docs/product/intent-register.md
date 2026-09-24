@@ -6,7 +6,7 @@ Version: 0.1 (content unchanged from `specs.md` v1.1)
 Parent: [PRD](PRD.md)
 Related Specs: every F#-S# document under `docs/features/`
 Owner: smartshelf-pm
-Updated: 2026-09-24 (INT-EXPL registered; D-15 … D-20 recorded)
+Updated: 2026-09-25 (INT-004 specified as F8-S1)
 ---
 
 > **Migration note.** This is `SPEC-000` from the pre-migration monolithic `specs.md`,
@@ -39,7 +39,7 @@ owner.
 | **INT-002** | "Where is my stock disappearing?" — **products whose quantities cannot reconcile**, deliberately carrying no money figure | V1 | SPEC-002 |
 | **INT-002B** | "Where is my stock disappearing?" — **data hygiene**, deliberately carrying no money figure | V1 | SPEC-002 |
 | **INT-003** | "Are my prices reasonable against my neighbours?" | V1 | SPEC-003 |
-| **INT-004** | "What do I order today, and how much?" | V2 | Not specified — see §4 |
+| **INT-004** | "What do I order today, and how much?" | V2 | F8-S1 (Ready for review) |
 | **INT-005** | "What does the market sell that I don't?" | V2 | Not specified — see §4 |
 | **INT-006** | "Arrange my shelves so I earn more" | V4 | Not specified — see §4 |
 | **INT-007** | "How much do I order so it does not spoil?" | V2 | Not specified — see §4 |
@@ -109,18 +109,20 @@ These are settled. A specification may operationalize them; it may not reopen th
 
 ### 4. Intents deliberately not specified in this phase
 
-**INT-004, INT-005, INT-007, INT-008 (V2/V3) and INT-006 (V4)** are not given
-specifications here.
+**INT-005, INT-007, INT-008 (V2/V3) and INT-006 (V4)** are not given specifications here.
+INT-004 now is (F8-S1, 2026-09-25); its entry below keeps the record of how its decisions
+were taken.
 
 The reason is not scheduling. Each rests on a product decision that the intent layer
-has explicitly left open (INT-004's were taken on 2026-09-24, as its entry below records),
-and writing requirements now would mean inventing those answers rather than surfacing them:
+has explicitly left open, and writing requirements now would mean inventing those answers
+rather than surfacing them:
 
 - **INT-004** had three open decisions (GAP-008), and the owner took them on 2026-09-24
   as **D-18 … D-20**: the market is the nearby stores of a format comparable to his; his
   own sales set the quantity and the market only adjusts it; a disagreement is asked once,
-  saved, and not asked again. It is still not specified. Moving past that is the owner's
-  act, and its dependencies on F10's shelf-life cap and F4's sales evidence stand. The
+  saved, and not asked again. On 2026-09-25 he asked for its spec:
+  [F8-S1](../features/F8-order-quantity/specs/F8-S1-order-quantity.md), `Ready for review`.
+  Its dependencies on F10's shelf-life cap and F4's sales evidence stand. The
   decisions leave the architect one design question, recorded under GAP-008: the "running
   out" signal D-19 needs does not exist yet for the nearby stores (GAP-008e). The brief that
   posed the questions is kept, `Superseded`, as the record:

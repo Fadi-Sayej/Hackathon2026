@@ -7,7 +7,7 @@ Parent: [Intent Register (SPEC-000)](../product/intent-register.md)
 Related Specs: all F#-S# documents under `docs/features/`
 Owner: smartshelf-pm
 Inputs: [docs/product/intent-register.md, docs/features/F#-*/intent.md, docs/features/F#-*/specs/]
-Updated: 2026-09-24 (GAP-008 resolved as D-18 … D-20)
+Updated: 2026-09-25 (F8-S1 written against GAP-008)
 ---
 
 > **Migration note.** Moved verbatim from the pre-migration monolithic `specs.md`. It spans
@@ -253,7 +253,8 @@ number that can change without restructuring anything.
 - his own sales set the quantity, and the market only adjusts it;
 - a disagreement is asked on screen, saved, and not asked again.
 
-F8 is still not specified. The record of how it was decided follows, and after it what the
+F8 is specified as [F8-S1](F8-order-quantity/specs/F8-S1-order-quantity.md), `Ready for review` since 2026-09-25,
+where GAP-008e is OQ-905. The record of how it was decided follows, and after it what the
 decisions leave open.
 
 **Source:** `intent.md` §6 (INT-004).
