@@ -6,7 +6,7 @@
 #
 # Checks the things that actually break a first deploy, in the order they bite:
 #   1. a clean build from a clean install (Vercel runs `npm ci`, not `npm install`)
-#   2. the data the app reads is committed, not sitting untracked on this laptop
+#   2. the data the app reads is committed, and would pass the engine's own validation
 #   3. both entry points exist in dist/
 #   4. the Basic Auth gate is covered and fails closed
 #   5. whether B-2 (Firestore) will activate or silently stay on localStorage
@@ -43,19 +43,22 @@ fi
 
 # ---------------------------------------------------------------- 2. data
 head_ "2. Data the deployed app reads"
-if [ -f public/data/operational.json ]; then
-  if git ls-files --error-unmatch public/data/operational.json >/dev/null 2>&1; then
-    COUNT=$(python3 -c "import json;print(len(json.load(open('public/data/operational.json'))['recommendations']))" 2>/dev/null || echo 0)
-    if [ "$COUNT" -gt 0 ]; then
-      ok "operational.json committed, $COUNT recommendations"
-    else
-      bad "operational.json is committed but EMPTY — the telemetry page, its one reader until F13 (#83), will show nothing"
-    fi
-  else
-    bad "operational.json exists but is NOT COMMITTED — Vercel builds from git, so the deploy would ship without it"
-  fi
-else
-  bad "public/data/operational.json missing — nothing regenerates it since 2026-09-24; restore it: git checkout -- public/data/operational.json"
+# dashboard.json and catalogue.json are what the owner's app reads; operational.json is the
+# telemetry page's frozen input until F13 (#83). Until 2026-09-24 this section checked only
+# operational.json, which no owner page has read since the cut-over. The checks, and why
+# each exists, are in scripts/check_deploy_data.py (tests/test_check_deploy_data.py).
+DATA_OUT=$(python3 scripts/check_deploy_data.py 2>&1); DATA_RC=$?
+while IFS= read -r line; do
+  [ -z "$line" ] && continue
+  case "$line" in
+    "OK "*)   ok "${line#OK }" ;;
+    "WARN "*) warn "${line#WARN }" ;;
+    "BAD "*)  bad "${line#BAD }" ;;
+    *)        bad "check_deploy_data.py: $line" ;;
+  esac
+done <<< "$DATA_OUT"
+if [ "$DATA_RC" -ne 0 ] && ! grep -q '^BAD ' <<< "$DATA_OUT"; then
+  bad "check_deploy_data.py did not finish (exit $DATA_RC)"
 fi
 
 # src/data/marketData.js used to be checked here. It was the demo spine's frozen price file,
@@ -123,7 +126,7 @@ else
 
   Then check, in this order:
     1. open the URL in a private window  → must ask for username/password
-    2. log in                            → "Today's Actions" with Hebrew product names
+    2. log in                            → "شغل اليوم" (Today's work; the app opens in Arabic)
     3. open /telemetry.html              → must ask for the SAME login
     4. reload a page directly            → must not 404 (SPA rewrite)
     5. open it on your phone             → cards readable, buttons tappable
