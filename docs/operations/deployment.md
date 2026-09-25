@@ -72,9 +72,55 @@ Set these in Vercel before any preview or production deployment:
 |---|---|---|
 | `BASIC_AUTH_USER` | Preview and Production | Login username for the pilot URL. |
 | `BASIC_AUTH_PASSWORD` | Preview and Production | Login password for the pilot URL. |
-| `VITE_LLM_PROXY_URL` | Optional | HTTPS URL for the deployed LLM proxy. Leave unset to use rule-based explanations. |
-| `VITE_FIREBASE_*` | Optional (B-2) | Client Firebase web config to activate Firestore persistence + cross-device telemetry. Unset ⇒ localStorage only. Also enable Anonymous sign-in and deploy `firestore.rules` (`firebase deploy --only firestore:rules`). |
+| `VITE_FIREBASE_*` | Optional (B-2) | Client Firebase web config to activate Firestore persistence + cross-device telemetry. Unset ⇒ localStorage only. Also enable Anonymous sign-in and deploy `firestore.rules` (`firebase deploy --only firestore:rules`); anonymous until the ADR-029 switch-over below. |
 | `VITE_STORE_ID` | **Production `yomyom-kafr-qasim`; Preview `preview-sandbox`** | Firestore store namespace (code default `yomyom-kafr-qasim`). The two environments differ **on purpose** — see below. |
+
+### Switching to sign-in (ADR-029)
+
+ADR-029's code ships **switched off**. Until the switch-over the site keeps Basic Auth and
+anonymous Firebase, exactly as described above. The switch is three environment variables, one
+rules deploy and a few console steps, in this order. Only the repository owner can do the
+console and Vercel steps.
+
+| Variable | Value | Read by |
+|---|---|---|
+| `AUTH_MODE` | `firebase` | the edge gate, `middleware.ts` |
+| `VITE_AUTH_MODE` | `firebase` | the app build, for the sign-in screens |
+| `FIREBASE_PROJECT_ID` | `hackathon26-a6ebd` | the edge gate, to check a token was issued for this project |
+
+1. **Firebase console, once.**
+   - Authentication → Sign-in method: enable **Google**, and enable **Email/Password** with
+     **Email link (passwordless sign-in)**.
+   - Authentication → Settings → Authorised domains: add `hackathon2026-fadi19.vercel.app`
+     and the preview domain you rehearse on.
+2. **Rehearse on a preview.** Set the three variables for **Preview** only and redeploy a
+   preview. Previews use store id `preview-sandbox`, which the rules refuse (below), so
+   nothing touches the pilot's data.
+3. **Everyone signs in once there**: the two team members, then the owner. Each sees "This
+   account has no access".
+4. **Give each account its role**, with the service account the nightly uses:
+   `python3 scripts/set_user_role.py <email> team` for each team member, and
+   `python3 scripts/set_user_role.py <email> owner` for the owner. Check one with `--show`.
+   No email is written anywhere by this.
+5. **Check on the preview.** Reload the page.
+   - A team account lands on `/telemetry.html`, and sees the owner's app read-only.
+   - The owner lands on his app, and `/telemetry.html` refuses him.
+6. **Switch production, in one sitting.**
+   - Deploy the role rules, and commit them so the nightly's drift check (#97) agrees:
+     `cp firestore.roles.rules firestore.rules && firebase deploy --only firestore:rules`,
+     then commit `firestore.rules`.
+   - Set the three variables for **Production** and redeploy.
+   - Between the rules deploy and the redeploy, the live app's anonymous saves are refused,
+     so keep that gap short.
+7. **After a day of normal use**:
+   - disable **Anonymous** sign-in in the console;
+   - remove `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD`;
+   - remove the Basic Auth branch of `middleware.ts`.
+
+**Rolling back:**
+- unset the three variables and redeploy, which brings Basic Auth back;
+- redeploy the previous `firestore.rules` from git;
+- re-enable Anonymous sign-in if it was disabled.
 
 ### Preview must not be able to write the pilot's data (2026-09-13)
 

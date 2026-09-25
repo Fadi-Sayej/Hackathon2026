@@ -75,8 +75,9 @@ done
 head_ "4. Access gate (this is a real store's cost data)"
 if [ -f middleware.ts ]; then
   ok "middleware.ts present"
-  if npx vitest run src/__tests__/middleware.test.js >/tmp/preflight_auth.log 2>&1; then
-    ok "gate tests pass (blocks anonymous, rejects wrong creds, fails closed 503)"
+  # Both gates: Basic Auth (live until the ADR-029 switch-over) and the signed-in gate.
+  if npx vitest run src/__tests__/middleware.test.js src/__tests__/middlewareSignIn.test.js >/tmp/preflight_auth.log 2>&1; then
+    ok "gate tests pass (Basic Auth, and the sign-in gate: forged and expired tokens refused, owner kept off the team's page, fails closed 503)"
   else
     bad "gate tests FAIL — do not deploy. See /tmp/preflight_auth.log"
   fi

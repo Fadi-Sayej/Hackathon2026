@@ -186,3 +186,23 @@ sign-in restores today's posture. Roles on accounts are harmless if unused. The
 
 The owner's sign-in email. The build and its tests use the two team accounts; the owner's
 role is set with the script before the live site switches over.
+
+## Implementation notes (2026-09-25)
+
+Recorded here because they are how the decision was built, not changes to it.
+
+- **It ships switched off.** `AUTH_MODE=firebase` (the edge) and `VITE_AUTH_MODE=firebase`
+  (the build) turn it on. Without them, Basic Auth and anonymous Firebase run exactly as
+  before. So the code merges without touching the live site, and the switch-over is the
+  sequence in `docs/operations/deployment.md` ("Switching to sign-in").
+- **The role rules are staged in `firestore.roles.rules`**, not written into
+  `firestore.rules`. The nightly fails on any difference between the deployed rules and
+  `firestore.rules` (#97), and deploying early would refuse the live app's anonymous saves.
+  `tests/test_firestore_roles_rules.py` checks the staged file statement by statement: both
+  roles read, only the owner writes, and nothing is granted by sign-in alone. The switch-over
+  copies it over `firestore.rules` and deploys both together. `scripts/check_firestore_rules.py`
+  is unchanged and then checks the new rules as it checks the old.
+- **"Sent to sign-in" means the app itself.** The app shell and its code are public, since
+  they hold no store data. The shell renders the sign-in page while there is no session. What
+  the gate refuses without a valid token is every `/data/` file (401) and the team's page (a
+  redirect to `/?next=…`), as §3's table says.
