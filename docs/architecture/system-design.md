@@ -1449,7 +1449,7 @@ Design elements: **E** engine module · **P** publisher/artefact · **C** `compo
 
 ### F8-S1 — Order quantity (V2: not yet designed)
 
-**Nothing in this table exists yet.** F8-S1 (`Ready for review`, 2026-09-25) is the first V2
+**Nothing in this table exists yet.** F8-S1 (`Approved`, 2026-09-25) is the first V2
 spec, and this design covers V1 only. Each row names the design element a group of its
 requirements will need, so that V2's first mode-one round starts from them. Every "ADR
 needed" is a decision still to be written; none is taken here.

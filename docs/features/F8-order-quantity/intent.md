@@ -6,7 +6,7 @@ Owner: smartshelf-pm
 Release: V2
 Parent: [PRD](../../product/PRD.md)
 Intent IDs: INT-004
-Specs: [F8-S1](specs/F8-S1-order-quantity.md) (Ready for review)
+Specs: [F8-S1](specs/F8-S1-order-quantity.md) (Approved 2026-09-25)
 Inputs: [docs/product/intent-register.md (D-18 … D-20), docs/product/open-decisions/F8-ordering.md, docs/features/gaps-and-open-questions.md (GAP-008)]
 Updated: 2026-09-25
 ---

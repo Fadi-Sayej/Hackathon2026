@@ -1,7 +1,7 @@
 ---
 ID: F8-S1
 Title: Order Quantity — what to order, and how much, for the next order
-Status: Ready for review
+Status: Approved — by the repository owner, 2026-09-25
 Owner: smartshelf-architect
 Version: 0.5 (2026-09-25, D-21: the market boost is a model's pick)
 Parent: [F8 — Order Quantity](../intent.md)

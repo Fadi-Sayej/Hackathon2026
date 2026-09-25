@@ -139,7 +139,7 @@ decides it.
 ## 7, 8 — the two facts F8-S1 needs before it can suggest any order
 
 [F8-S1](../features/F8-order-quantity/specs/F8-S1-order-quantity.md) is written and
-`Ready for review`. It cannot publish a single quantity until he answers these two. They
+approved (2026-09-25). It cannot publish a single quantity until he answers these two. They
 cannot be guessed: the repository owner asked on 2026-09-25 that they not be.
 
 | # | Question | Arabic | Why it blocks |
