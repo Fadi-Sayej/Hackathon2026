@@ -43,8 +43,9 @@ function SignedIn({ children }) {
             }
           }
         }
-        stop = s.watchSession(({ user, role }) => {
+        stop = s.watchSession(({ user, role, error }) => {
           if (!live) return
+          if (error) { setCurrentRole(null); setState({ status: 'signedOut', error: true }); return }
           if (!user) {
             setCurrentRole(null)
             // Waiting on an email link is not "signed out": keep that screen.

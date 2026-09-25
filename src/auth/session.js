@@ -44,15 +44,21 @@ export function watchSession(onChange) {
   document.addEventListener('visibilitychange', onVisible)
   const stop = onIdTokenChanged(a, async (user) => {
     if (!user) { writeCookie(null); onChange({ user: null, role: null }); return }
-    const result = await user.getIdTokenResult()
-    const role = ROLES.has(result.claims.role) ? result.claims.role : null
-    if (!role && !forced) {
-      forced = true
-      await user.getIdToken(true) // fires this listener again, with any role set since
-      return
+    try {
+      const result = await user.getIdTokenResult()
+      const role = ROLES.has(result.claims.role) ? result.claims.role : null
+      if (!role && !forced) {
+        forced = true
+        await user.getIdToken(true) // fires this listener again, with any role set since
+        return
+      }
+      writeCookie(result.token)
+      onChange({ user, role })
+    } catch {
+      // A token that cannot be read or renewed (offline with an expired token, say) must not
+      // leave the page on its loading screen: say so, and let the person try again.
+      onChange({ user: null, role: null, error: true })
     }
-    writeCookie(result.token)
-    onChange({ user, role })
   })
   return () => { stop(); document.removeEventListener('visibilitychange', onVisible) }
 }
