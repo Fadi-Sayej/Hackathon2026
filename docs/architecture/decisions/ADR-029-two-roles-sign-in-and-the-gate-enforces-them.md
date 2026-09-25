@@ -1,7 +1,7 @@
 ---
 ID: ADR-029
 Title: Two roles sign in, and the edge gate enforces them
-Status: Ready for review
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-09-25
 Parent: [System Design](../system-design.md) §15
@@ -12,8 +12,9 @@ Updated: 2026-09-25
 
 # ADR-029 — Two roles sign in, and the edge gate enforces them
 
-**Status:** Ready for review. Proposed by `smartshelf-architect` on the repository owner's
-decisions of 2026-09-25, and held until he accepts it (HANDOVER rule 2).
+**Status:** Accepted (2026-09-25, by the repository owner, on PR #196). Proposed by
+`smartshelf-architect` on his decisions of the same day, and held at `Ready for review` until
+he accepted it (HANDOVER rule 2).
 
 ## Context
 
