@@ -37,6 +37,7 @@
  */
 
 import { deviceField } from './deviceRegister.js'
+import { canWriteOwnerState } from '../auth/current.js'
 
 /** design §10.3 `meta: { schema: 1, updated_at }`. MUST equal `SCHEMA` in
  *  src/owner_state/model.py, which rejects anything else as `owner_state_schema`. */
@@ -67,6 +68,9 @@ function report(error) {
 
 /** Resolve a usable remote, or say why there is none. Never throws. */
 async function connect() {
+  // ADR-029 §4–5: only the owner's account records owner state. A team account is shown the
+  // app read-only, and nothing it does is sent under the owner's name. The rules refuse it too.
+  if (!canWriteOwnerState()) return { reason: 'read_only' }
   const r = await loader()
   if (!r.isConfigured()) return { reason: 'unconfigured' }
   const user = await r.ensureAuth()

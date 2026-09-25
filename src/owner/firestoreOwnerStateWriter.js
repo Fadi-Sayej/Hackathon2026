@@ -9,12 +9,12 @@
  * tree-shaken Firestore code the telemetry entry already carries.
  */
 import { FieldPath, doc, setDoc } from 'firebase/firestore'
-import { STORE_ID, ensureAnonymousAuth, getDb, isFirebaseConfigured } from '../firebase.js'
+import { STORE_ID, ensureAuthForMode, getDb, isFirebaseConfigured } from '../firebase.js'
 
 export const remote = {
   storeId: STORE_ID,
   isConfigured: isFirebaseConfigured,
-  ensureAuth: ensureAnonymousAuth,
+  ensureAuth: ensureAuthForMode,
   getDb,
   doc,
   setDoc,

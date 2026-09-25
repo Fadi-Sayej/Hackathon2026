@@ -27,6 +27,7 @@ import {
   persistentMultipleTabManager,
 } from 'firebase/firestore'
 import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth'
+import { authMode } from './auth/mode.js'
 
 // import.meta.env is a plain object at build time; guard so this module can also
 // be imported from Node (tests, tooling) without Vite's define step.
@@ -153,6 +154,26 @@ export function ensureAnonymousAuth() {
   })
 
   return authPromise
+}
+
+/**
+ * The signed-in user, for Firestore reads and writes, under the build's access model.
+ *
+ * `basic` (before ADR-029's switch-over): anonymous sign-in, exactly as before.
+ * `firebase`: the account the person signed in with (Google or email link). It never falls
+ * back to an anonymous session, which the role rules would refuse anyway. Resolves null
+ * when nobody is signed in.
+ */
+export async function ensureAuthForMode() {
+  if (authMode() !== 'firebase') return ensureAnonymousAuth()
+  if (!isFirebaseConfigured()) return null
+  try {
+    const auth = getAuth(getFirebaseApp())
+    await auth.authStateReady()
+    return auth.currentUser
+  } catch {
+    return null
+  }
 }
 
 export default getFirebaseApp
