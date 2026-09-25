@@ -253,7 +253,7 @@ number that can change without restructuring anything.
 - his own sales set the quantity, and the market only adjusts it;
 - a disagreement is asked on screen, saved, and not asked again.
 
-F8 is specified as [F8-S1](F8-order-quantity/specs/F8-S1-order-quantity.md), `Ready for review` since 2026-09-25,
+F8 is specified as [F8-S1](F8-order-quantity/specs/F8-S1-order-quantity.md), `Approved` on 2026-09-25,
 where GAP-008e is OQ-905. The record of how it was decided follows, and after it what the
 decisions leave open.
 

@@ -8,21 +8,22 @@ Parent: [PRD](../../product/PRD.md)
 Intent IDs: INT-EXPL
 Specs: none
 Inputs: [docs/product/PRD.md, docs/product/intent-register.md (D-15 … D-20), issue #54, PR #178, tag v1-attic-2026-09-24, docs/features/F8-order-quantity/intent.md, docs/product/open-decisions/F14-decision-explanations.md, ADR-007]
-Updated: 2026-09-25
+Updated: 2026-09-25 (F8-S1 approved; F14's gate met)
 ---
 
 # F14 — لماذا هذا القرار؟ · Decision Explanations
 
-> **Status: registered, deliberately NOT specified, and now for F8's reason.** The promise
+> **Status: registered, not yet specified.** The promise
 > stands: the repository owner confirmed it on 2026-09-24. How it is kept was decided the same
 > day, as [D-15 … D-17](../../product/intent-register.md):
 > - it explains **F8's order suggestions**;
 > - a model writes the sentence **once a night**, under three conditions;
 > - it has **no due date**.
 >
-> A spec is forbidden until F8 exists, because the orders it explains do not. F8 is
-> specified as [F8-S1](../F8-order-quantity/specs/F8-S1-order-quantity.md)
-> (`Ready for review`), but nothing of it is built yet.
+> F14 had to wait until F8 existed, because the orders it explains did not. F8 is now
+> specified: [F8-S1](../F8-order-quantity/specs/F8-S1-order-quantity.md) was approved on
+> 2026-09-25, and nothing of it is built yet. That meets the register's gate ("until F8 is
+> specified"). F14's spec now waits only on the owner asking for it.
 
 ## Problem
 
@@ -31,7 +32,7 @@ Updated: 2026-09-25
 رقم بلا سبب أمرٌ من آلة؛ ورقم بسببه نصيحةٌ من شيء يفهم متجره.
 
 اليوم لا يشرح المنتج شيئاً بجملة، ولا يقترح طلبيات أصلاً: اقتراح الكمية هو F8، ومواصفته
-F8-S1 بانتظار الموافقة، ولم يُبنَ منه شيء بعد. والطبقة التي كُتبت لهذا الوعد، شرحٌ بنموذج لغوي عبر خادم وسيط، حُذفت من المنتج في
+F8-S1 اعتُمدت في 2026-09-25، ولم يُبنَ منه شيء بعد. والطبقة التي كُتبت لهذا الوعد، شرحٌ بنموذج لغوي عبر خادم وسيط، حُذفت من المنتج في
 2026-09-24 (#178) مع محرّك الطلبيات الذي كانت تشرحه، لأن أيّ شاشة لم تعرضها؛ والشيفرة محفوظة
 في الوسم `v1-attic-2026-09-24`.
 
@@ -68,7 +69,7 @@ published artefact):
 
 ## Related
 
-- **Depends on F8** (specified as F8-S1, `Ready for review`; not built). There is nothing
+- **Depends on F8** (specified as F8-S1, approved 2026-09-25; not built). There is nothing
   to explain until F8 publishes order suggestions and the facts behind them (F8-S1 FR-154).
 - **Bound by F7.** A figure an explanation states must be one the engine published, and so
   recomputable.
@@ -87,8 +88,9 @@ published artefact):
 ## Blocking product decisions
 
 None of F14's own; GAP-012 is resolved as D-15 … D-17. F8's three decisions were taken too,
-on 2026-09-24, as D-18 … D-20 ([GAP-008](../gaps-and-open-questions.md)). F14 now waits only
-on F8's spec, F8-S1, being approved: "until F8 is specified", as the intent register §4 says.
+on 2026-09-24, as D-18 … D-20 ([GAP-008](../gaps-and-open-questions.md)), and F8-S1 was
+approved on 2026-09-25, which meets the register's gate ("until F8 is specified"). Nothing
+blocks a spec now except the owner asking for one.
 
 ## Open questions
 
