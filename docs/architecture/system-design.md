@@ -844,7 +844,7 @@ entry id, which does not include the ceiling (C-4, AC-009).
 | **Store** | store_id | name, chain, format, affinity to the client format, `role: client | competitor`, provenance (branch_known | chain_format) | Hand-maintained |
 | **Match** | (barcode, external_key) | method (barcode_exact | name_normalized | fuzzy_name), confidence, approved | Per run, content-addressed |
 | **Classification** | barcode | living | withdrawable | idle; plus excluded reasons (negative_stock, no_identifier); `provisional` | Per run |
-| **Entry** | `entry_id = sha256(signal_family ‖ barcode ‖ variant)[:16]`. `signal_family` is a permanent identity string (`recon.impossible_opening`, `hygiene.negative_stock`, `hygiene.no_identifier`, `hygiene.absent_price`, `price.inverted`, `price.above_ceiling`, `competitor.policy_breach`, `competitor.purchase_cost`, `catalogue.idle`, `catalogue.implausible_quantity`, `margin.below_cost`) fixed once and **never** reused or renamed. It is *not* the routing `capability` id — see ADR-009 | capability, signal_family, action, characterisation, evidence{}, value?, ordering_key, actionable, attention | Per run; outcomes reference it across runs |
+| **Entry** | `entry_id = sha256(signal_family ‖ barcode ‖ variant)[:16]`. `signal_family` is a permanent identity string (`recon.impossible_opening`, `hygiene.negative_stock`, `hygiene.no_identifier`, `hygiene.absent_price`, `price.inverted`, `price.above_ceiling`, `competitor.policy_breach`, `competitor.purchase_cost`, `catalogue.idle`, `catalogue.implausible_quantity`, `margin.below_cost`; V2 adds `order.suggestion` and `order.disagreement`, ADR-034) fixed once and **never** reused or renamed. It is *not* the routing `capability` id — see ADR-009 | capability, signal_family, action, characterisation, evidence{}, value?, ordering_key, actionable, attention | Per run; outcomes reference it across runs |
 | **Value** | — | `{amount: number, kind: 'per_sale', certainty: 'confirmed' | 'estimated'}` — the only kind in V1 | — |
 | **Question** | `question_id = sha256('cost_price' ‖ barcode)` | product, fact, why (products affected, money at stake), expected value | open → answered | deferred |
 | **Figure** | name | value | null, unit, inputs (vintage keys), thresholds | Per run |
@@ -1221,6 +1221,11 @@ own, so their rows say so rather than grade it after the fact.
 | [ADR-027](decisions/ADR-027-a-question-whose-money-is-unknown-carries-no-figure.md) | A question whose money is unknown carries no figure, and ranks after every question that has one | Easy |
 | [ADR-028](decisions/ADR-028-the-nav-is-the-owners-and-only-unshipped-code-leaves.md) | The nav is the owner's, and §20.1 removes only the code no screen runs | Easy |
 | [ADR-029](decisions/ADR-029-two-roles-sign-in-and-the-gate-enforces-them.md) | Two roles sign in, and the edge gate enforces them (D-22) | Moderate |
+| [ADR-030](decisions/ADR-030-own-sales-arrive-as-daily-reports.md) | F8's own sales arrive as daily reports, one file per day, and a missing day stays missing — **`Ready for review`** | Easy |
+| [ADR-031](decisions/ADR-031-running-out-is-a-short-absence-after-steady-presence.md) | "Running out" is a short absence after steady presence in the market's daily catalogues — **`Ready for review`** | Easy |
+| [ADR-032](decisions/ADR-032-the-boost-is-a-pinned-model-validated-and-recorded.md) | The boost is picked by a pinned Claude model in the nightly run, checked mechanically, and recorded in the artefact — **`Ready for review`** | Easy |
+| [ADR-033](decisions/ADR-033-store-facts-are-a-committed-file.md) | The store facts are a committed file the team records from the owner; owner state never holds them — **`Ready for review`** | Easy |
+| [ADR-034](decisions/ADR-034-a-suggestion-is-identified-by-product-and-order-day.md) | An order suggestion is identified by its product and order day; a disagreement by its product — **`Ready for review`** | Easy |
 
 ---
 
@@ -1448,24 +1453,24 @@ Design elements: **E** engine module · **P** publisher/artefact · **C** `compo
 | NFR-063, C-61, GAP-005 | committed inputs + rehydrate + recompute → fresh clone reproduces; coverage figures now come from E | ADR-002 | AC-128 |
 | C-62 | D-1/D-4/D-3 mechanisms above | §14 | AC-123/124 |
 
-### F8-S1 — Order quantity (V2: not yet designed)
+### F8-S1 — Order quantity (V2: designed, not built)
 
-**Nothing in this table exists yet.** F8-S1 (`Approved`, 2026-09-25) is the first V2
-spec, and this design covers V1 only. Each row names the design element a group of its
-requirements will need, so that V2's first mode-one round starts from them. Every "ADR
-needed" is a decision still to be written; none is taken here.
+**Nothing in this table is built yet.** F8-S1 (`Approved`, 2026-09-25) is the first V2
+spec. Its design decisions are ADR-030 … ADR-034, all `Ready for review`: each row names the
+ADR that answers it. Until they are accepted, no implementation-plan task may be written
+against them (HANDOVER rule 1).
 
 | Requirement | Design element | Flow / contract | Verification |
 |---|---|---|---|
-| FR-143 … FR-146, INV-070, INV-072 | I a per-day import of sales and deliveries, beside the monthly one; E an order-quantity capability over the 28-day window | ADR needed: the import's grain, its missing-day rule, the freshness limit | AC-136 … AC-140 |
-| FR-147, FR-148, FR-164, INV-074, INV-079 | E a running-out signal over the D-18 stores, separately unavailable (ADR-014), OQ-905; E the model's nightly boost per product, recorded as an input (D-21) | ADR needed: stockout classification across three chains; ADR needed: the boost model, what it is given, its record and its spending cap | AC-141, AC-142, AC-160, AC-161 |
+| FR-143 … FR-146, INV-070, INV-072 | I a per-day import of sales and deliveries, beside the monthly one; E an order-quantity capability over the 28-day window | ADR-030 | AC-136 … AC-140 |
+| FR-147, FR-148, FR-164, INV-074, INV-079 | E a running-out signal over the D-18 stores, separately unavailable (ADR-014), OQ-905; E the model's nightly boost per product, recorded as an input (D-21) | ADR-031 (running out); ADR-032 (the boost) | AC-141, AC-142, AC-160, AC-161 |
 | FR-149, FR-150, INV-073 | E stock now from `vintages.pos`, the F2-S1 flags, and the per-day sales and deliveries since the count, carried to the order day | 11.4 | AC-143, AC-144, AC-157 |
-| FR-151 … FR-153, INV-071 | E the shelf-life cap from the stated store facts; later F10 | ADR needed once F10 is specified | AC-145, AC-146, AC-148 |
+| FR-151 … FR-153, INV-071 | E the shelf-life cap from the stated store facts; later F10 | ADR-033 (the stated shelf life); F10's own ADR once it is specified | AC-145, AC-146, AC-148 |
 | FR-154, NFR-067 | P suggestion facts in the artefact; R print mode | ADR-002, ADR-005 | AC-149 |
 | FR-155, FR-156 | E per-department reasons for no quantity; evidence states (ADR-011) | 11.3 | AC-139, AC-146, AC-147 |
-| FR-157, NFR-068 | I the store facts (order schedule, shelf life per department), recorded once as the owner's statements, in one place | ADR needed: where they live, so one fact is never held twice | AC-146, AC-156 |
+| FR-157, NFR-068 | I the store facts (order schedule, shelf life per department), recorded once as the owner's statements, in one place | ADR-033 | AC-146, AC-156 |
 | FR-158, FR-159, INV-075 | E the disagreement question in the owner-question population, ordered by ADR-027; O answers | ADR-003, ADR-027 | AC-150, AC-151, AC-155, AC-158 |
-| FR-160 … FR-163, INV-069, INV-077, INV-078 | U the Reorder and Approved orders entries leave their awaiting shells (ADR-028 §1); O outcomes keyed on product and order day (ADR-003, ADR-009, ADR-016) | ADR needed: the suggestion's entry identity per order day | AC-136, AC-152, AC-153, AC-154 |
+| FR-160 … FR-163, INV-069, INV-077, INV-078 | U the Reorder and Approved orders entries leave their awaiting shells (ADR-028 §1); O outcomes keyed on product and order day (ADR-003, ADR-009, ADR-016) | ADR-034 | AC-136, AC-152, AC-153, AC-154 |
 
 ### Cross-cutting decisions
 

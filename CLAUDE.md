@@ -16,7 +16,7 @@ PRD  →  Feature Intents  →  Feature Specs  →  System Design + ADRs  →  I
 | Feature specs (F1-S1 … F8-S1, F13-S1) | [`docs/features/F#-*/specs/`](docs/features/) |
 | Gaps, open questions, assumptions | [`docs/features/gaps-and-open-questions.md`](docs/features/gaps-and-open-questions.md) |
 | System Design | [`docs/architecture/system-design.md`](docs/architecture/system-design.md) |
-| ADR-001 … ADR-029 | [`docs/architecture/decisions/`](docs/architecture/decisions/) |
+| ADR-001 … ADR-034 | [`docs/architecture/decisions/`](docs/architecture/decisions/) |
 | Quality gates | [`docs/reviews/`](docs/reviews/) |
 | Implementation plan | [`docs/implementation/plan.md`](docs/implementation/plan.md) |
 | Deploy / run / data durability | [`docs/operations/`](docs/operations/) |
