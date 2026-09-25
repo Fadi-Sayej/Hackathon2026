@@ -19,7 +19,7 @@ PRD                     what the product is, for whom, and what is out of scope
 2. [**Feature Intents**](features/) — `features/F#-*/intent.md`
 3. [**Approved Feature Specs**](features/) — `features/F#-*/specs/F#-S#-*.md`
 4. [**System Design**](architecture/system-design.md) — the single authoritative architecture
-5. [**ADRs**](architecture/decisions/) — ADR-001 … ADR-028
+5. [**ADRs**](architecture/decisions/) — ADR-001 … ADR-029
 6. [**Implementation Plan**](implementation/plan.md)
 7. **Code** — evidence of what exists, never product authority
 
@@ -66,7 +66,7 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 
 - [**System Design**](architecture/system-design.md) — one document, system-level, answering
   all seven approved specs as one coherent system. Not owned by any feature.
-- [**ADRs**](architecture/decisions/) — ADR-001 … ADR-028, one file each.
+- [**ADRs**](architecture/decisions/) — ADR-001 … ADR-029, one file each.
 
 | ADR | Decision |
 |---|---|
@@ -98,8 +98,9 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 | [ADR-026](architecture/decisions/ADR-026-reconciliation-publishes-the-span-it-reconciled.md) | The reconcile window is cut once per run, at the run's own stock date, and reconciliation publishes that cut — accepted 2026-09-23 |
 | [ADR-027](architecture/decisions/ADR-027-a-question-whose-money-is-unknown-carries-no-figure.md) | A question whose money is unknown carries no figure, and ranks after every question that has one — accepted 2026-09-24 |
 | [ADR-028](architecture/decisions/ADR-028-the-nav-is-the-owners-and-only-unshipped-code-leaves.md) | The nav is the owner's, and §20.1 removes only the code no screen runs — accepted 2026-09-24 |
+| [ADR-029](architecture/decisions/ADR-029-two-roles-sign-in-and-the-gate-enforces-them.md) | Two roles sign in, and the edge gate enforces them — accepted 2026-09-25 |
 
-ADR-001 … ADR-022 and ADR-024 … ADR-028 are `Accepted`. ADR-023 is `Ready for review`. ADR-022 amends a sentence of ADR-019 and was accepted on 2026-09-13, after the defect it fixes was verified end to end: `entry_id` falls back to `product_name`, and `compose.js` skips any entry whose id carries a settled outcome, so two barcode-less rows sharing a name settled together on the owner's screen. ADR-020 was accepted on 2026-09-13 **conditional on GAP-009**:
+ADR-001 … ADR-022 and ADR-024 … ADR-029 are `Accepted`. ADR-023 is `Ready for review`. ADR-022 amends a sentence of ADR-019 and was accepted on 2026-09-13, after the defect it fixes was verified end to end: `entry_id` falls back to `product_name`, and `compose.js` skips any entry whose id carries a settled outcome, so two barcode-less rows sharing a name settled together on the owner's screen. ADR-020 was accepted on 2026-09-13 **conditional on GAP-009**:
 `published_population: whole` is the right value while that question is open, and becomes
 `living` when it closes.
 
