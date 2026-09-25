@@ -1220,6 +1220,7 @@ own, so their rows say so rather than grade it after the fact.
 | [ADR-026](decisions/ADR-026-reconciliation-publishes-the-span-it-reconciled.md) | The reconcile window is cut once per run, at the run's own stock date, and reconciliation publishes that cut | Easy |
 | [ADR-027](decisions/ADR-027-a-question-whose-money-is-unknown-carries-no-figure.md) | A question whose money is unknown carries no figure, and ranks after every question that has one | Easy |
 | [ADR-028](decisions/ADR-028-the-nav-is-the-owners-and-only-unshipped-code-leaves.md) | The nav is the owner's, and §20.1 removes only the code no screen runs | Easy |
+| [ADR-029](decisions/ADR-029-two-roles-sign-in-and-the-gate-enforces-them.md) | Two roles sign in, and the edge gate enforces them (D-22) | Moderate |
 
 ---
 
