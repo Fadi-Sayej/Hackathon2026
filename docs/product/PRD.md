@@ -6,7 +6,7 @@ Version: 1.0 (assembled 2026-09-08 from the approved `intent.md` §1, §8–§13
 Supersedes: docs/archive/pre-pivot/PRODUCT_REQUIREMENTS.md, docs/archive/pre-pivot/BUSINESS_CASE.md, docs/archive/pre-pivot/PILOT_PLAN.md
 Related: [Intent register (SPEC-000)](intent-register.md) · [Feature intents](../features/) · [System Design](../architecture/system-design.md)
 Owner: smartshelf-pm
-Updated: 2026-09-25 (F8's spec F8-S1 registered)
+Updated: 2026-09-25 (F8's spec F8-S1 registered; D-21 recorded)
 ---
 
 # SmartShelf — وثيقة المنتج · Product Requirements
@@ -74,7 +74,7 @@ Updated: 2026-09-25 (F8's spec F8-S1 registered)
 | 8 | "متى يصل كل مورّد فعلاً؟" | ❌ تُقاس بعد 3 تسليمات لكل مورّد | مهلة حقيقية بدل الافتراض | دقة توصيات V2 | **V3** |
 | 6 | "رتّب رفوفي لأربح أكثر" | ❌ — تحتاج صورة الرف + طلب V2 + قواعده | "ضع هذه الأصناف بهذه الواجهات" | +20–68% هامش لكل متر خطّي | **V4** |
 
-## 4. Settled decisions (D-1 … D-20)
+## 4. Settled decisions (D-1 … D-21)
 
 القرارات التي حسمتها طبقة النوايا. **لا تُعاد فتحها في أي طبقة أدنى.** النصّ الكامل في
 [سجلّ النوايا §3](intent-register.md#3-decisions-already-made-by-the-intent-layer).
