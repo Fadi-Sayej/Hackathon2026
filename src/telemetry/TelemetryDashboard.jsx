@@ -101,6 +101,9 @@ export function TelemetryDashboard() {
           <button className="t-reload" onClick={() => setDecisions(loadRecommendationDecisions())}>
             Reload
           </button>
+          {/* ADR-029 §3: team accounts land here after sign-in; this is the way to the owner's
+              app, which they see read-only. */}
+          <a className="t-reload" href="/">Open the owner's app</a>
         </div>
       </header>
 
@@ -289,6 +292,7 @@ const STYLES = `
 .t-reload { margin-left: .5rem; background: #1c2635; color: #cdd7e6; border: 1px solid #33415a;
   border-radius: 7px; padding: .3rem .6rem; cursor: pointer; font-size: .8rem; }
 .t-reload:hover { background: #24324a; }
+a.t-reload { display: inline-block; text-decoration: none; }
 .t-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: .9rem; margin-bottom: 1.75rem; }
 .t-card { background: #141b27; border: 1px solid #232f42; border-radius: 12px; padding: 1rem 1.1rem; }
 .t-card-good { border-color: #2f6b52; }

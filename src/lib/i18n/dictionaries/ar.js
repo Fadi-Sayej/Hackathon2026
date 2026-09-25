@@ -453,4 +453,20 @@ export const ar = {
   'prices.card.against': "{yours} مقابل {reference}",
   'prices.card.meta': "{n} محلات · {seen}",
   'prices.notPublished': "هذا التشغيل لم ينشر المقارنة، فلا شيء لعرضه بعد.",
+
+  // ── Sign-in and the team's read-only view (ADR-029; wording approved 2026-09-25) ──
+  'auth.signin.title': "تسجيل الدخول",
+  'auth.signin.lead': "للدخول إلى SmartShelf، استخدم حساب Google أو بريدك الإلكتروني.",
+  'auth.signin.google': "المتابعة باستخدام Google",
+  'auth.signin.or': "أو",
+  'auth.signin.email': "البريد الإلكتروني",
+  'auth.signin.sendLink': "أرسل لي رابط الدخول",
+  'auth.linkSent.title': "افتح بريدك الإلكتروني",
+  'auth.linkSent.body': "أرسلنا رابط الدخول إلى {email}. افتحه على هذا الجهاز.",
+  'auth.linkSent.other': "استخدام بريد آخر",
+  'auth.noAccess.title': "لا يملك هذا الحساب صلاحية الدخول",
+  'auth.noAccess.body': "دخلت باسم {email}. اطلب من الفريق منح هذا الحساب صلاحية.",
+  'auth.noAccess.signOut': "الخروج والدخول بحساب آخر",
+  'auth.team.banner': "عرض الفريق — للقراءة فقط. لا يُحفظ شيء تضغطه هنا.",
+  'auth.error': "تعذّر تسجيل الدخول. حاول مرة أخرى.",
 }

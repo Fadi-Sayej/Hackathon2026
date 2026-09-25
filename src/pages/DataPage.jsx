@@ -24,7 +24,7 @@ function Field({ id, label, children, empty }) {
   )
 }
 
-export function DataPage({ artefact, ownerState, onRestore, now }) {
+export function DataPage({ artefact, ownerState, onRestore, now, readOnly = false }) {
   const { t } = useI18n()
   if (!artefact) return null
 
@@ -151,7 +151,7 @@ export function DataPage({ artefact, ownerState, onRestore, now }) {
                 <span className="data__hidden-when">
                   {at ? new Date(at).toLocaleDateString() : t('data.none')}
                 </span>
-                <button type="button" className="data__hidden-restore"
+                <button type="button" className="data__hidden-restore" disabled={readOnly}
                   data-restore={entry.id} onClick={() => onRestore(entry.id)}>
                   {t('data.hidden.restore')}
                 </button>

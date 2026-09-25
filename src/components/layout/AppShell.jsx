@@ -31,8 +31,15 @@ function renderNavIcon(id) {
   return Icon ? <Icon /> : null
 }
 
+/**
+ * `bare` is the signed-out shell (ADR-029): the brand and the language switch, with no nav
+ * and no page header, so the sign-in screens sit in the app the owner knows without
+ * offering pages he cannot open yet.
+ */
 export function AppShell({
   activePage,
+  bare = false,
+  notice = null,
   children,
   dataProvenance,
   hasDemoState = false,
@@ -57,6 +64,7 @@ export function AppShell({
           </div>
         </div>
 
+        {bare ? null : (
         <nav className="sidebar-nav" aria-label={t('app.nav')}>
           {navGroups.map((group) => {
             // A collapsible group opens itself when the active page is inside it, so landing
@@ -124,6 +132,7 @@ export function AppShell({
             )
           })}
         </nav>
+        )}
 
         <div className="sidebar-foot">
           <label className="lang-switch">
@@ -142,7 +151,7 @@ export function AppShell({
             </select>
           </label>
 
-          {hasDemoState && (
+          {hasDemoState && !bare && (
             <Button className="sidebar-reset-btn" onClick={onResetDemoState} tone="ghost">
               {t('app.resetDemo')}
             </Button>
@@ -151,6 +160,8 @@ export function AppShell({
       </aside>
 
       <main className="main-panel">
+        {notice}
+        {bare ? null : (
         <header className="topbar">
           <div>
             <h1>{t(`page.${activePage}.title`)}</h1>
@@ -165,6 +176,7 @@ export function AppShell({
             <span className="pill">{t('provenance.poc')}</span>
           </div>
         </header>
+        )}
 
         <ErrorBoundary key={activePage}>
           <div className="page-body">{children}</div>

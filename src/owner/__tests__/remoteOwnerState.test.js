@@ -4,6 +4,8 @@ import {
   ANSWER_STATUS, OUTCOME_STATUS, STORAGE_KEY, loadOwnerState, recordAnswer, recordOutcome, resetCacheForTests,
 } from '../ownerState'
 import { createFakeFirestore } from './fakeFirestore'
+import { setAuthModeForTests } from '../../auth/mode.js'
+import { setCurrentRole } from '../../auth/current.js'
 
 // #94. Owner state was written to localStorage and nowhere else, while the engine reads it
 // only from Firestore. Every test below crosses the seam that was never crossed: what the
@@ -231,5 +233,36 @@ describe('the device register rides this path (ADR-021)', () => {
     await settle()
     expect(fake.doc('devices')).toBeUndefined()
     expect(fake.doc('answers')['7290000041445'].cost_price.value).toBe(7.5)
+  })
+})
+
+describe('ADR-029: only the owner writes owner state', () => {
+  afterEach(() => { setAuthModeForTests(null); setCurrentRole(null) })
+
+  it('sends nothing for a team account, and says why', async () => {
+    setAuthModeForTests('firebase')
+    setCurrentRole('team')
+    const fake = createFakeFirestore()
+    setRemoteLoaderForTests(fake.loader)
+    expect(await writeThrough('outcomes', 'e1', { status: 'acted', at: 1 })).toEqual({ written: false, reason: 'read_only' })
+    expect(await pushAll({ outcomes: { e1: { status: 'acted', at: 1 } } })).toEqual({ written: false, reason: 'read_only' })
+    expect(fake.calls).toHaveLength(0)
+  })
+
+  it('sends nothing for an account with no role', async () => {
+    setAuthModeForTests('firebase')
+    const fake = createFakeFirestore()
+    setRemoteLoaderForTests(fake.loader)
+    expect(await writeThrough('outcomes', 'e1', { status: 'acted', at: 1 })).toEqual({ written: false, reason: 'read_only' })
+    expect(fake.calls).toHaveLength(0)
+  })
+
+  it('writes for the owner, as before', async () => {
+    setAuthModeForTests('firebase')
+    setCurrentRole('owner')
+    const fake = createFakeFirestore()
+    setRemoteLoaderForTests(fake.loader)
+    expect(await writeThrough('outcomes', 'e1', { status: 'acted', at: 5 })).toEqual({ written: true })
+    expect(fake.doc('outcomes')).toEqual({ e1: { status: 'acted', at: 5 } })
   })
 })

@@ -1,0 +1,39 @@
+rules_version = '2';
+
+// SmartShelf Firestore rules with roles: ADR-029, STAGED.
+//
+// ⚠️ NOT DEPLOYED YET. This file replaces firestore.rules at the ADR-029 switch-over, in the
+// same step as the deploy (docs/operations/deployment.md, "Switching to sign-in"):
+//
+//   cp firestore.roles.rules firestore.rules && firebase deploy --only firestore:rules
+//
+// It is kept apart until then because the nightly fails on any difference between the
+// deployed rules and firestore.rules (scripts/check_firestore_rules.py, #97), and deploying
+// it early would refuse the anonymous sessions the live app still uses.
+//
+// What changes from firestore.rules. The earlier posture, anonymous sign-in where anyone who
+// loaded the app could mint a token and read or write the store's subtree, is closed.
+// Access now needs a Firebase account with a `role` custom claim, set per account by
+// scripts/set_user_role.py with the service account. The claim is the single source the edge
+// gate (middleware.ts) also reads, so no email is written here or anywhere in the repository.
+//
+//   owner  reads and writes the store's owner state (answers, outcomes, the device register)
+//   team   reads it, and writes nothing: a team account's view of the owner's app is
+//          read-only, so nothing the team presses is recorded as the owner's decision
+//
+// The engine's nightly pull uses the service account, which these rules do not govern.
+// Pinned to the one pilot store, as before: must match VITE_STORE_ID (src/firebase.js).
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /stores/yomyom-kafr-qasim/{document=**} {
+      allow read: if request.auth != null && request.auth.token.role in ['owner', 'team'];
+      allow write: if request.auth != null && request.auth.token.role == 'owner';
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

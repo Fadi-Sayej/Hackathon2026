@@ -30,7 +30,7 @@ import {
 import {
   getDb,
   isFirebaseConfigured,
-  ensureAnonymousAuth,
+  ensureAuthForMode,
   STORE_ID,
 } from '../../firebase.js'
 import {
@@ -215,11 +215,12 @@ let started = false
 export function startSync() {
   if (started || !isFirebaseConfigured()) return
   started = true
-  // Sign in (anonymously) first, then hydrate — the rules require an auth token.
-  ensureAnonymousAuth().then(() => hydrateAndReconcile())
+  // Sign in first, then hydrate — the rules require an auth token. Anonymous before the
+  // ADR-029 switch-over, the person's own account after it.
+  ensureAuthForMode().then(() => hydrateAndReconcile())
   if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
     window.addEventListener('online', () => {
-      ensureAnonymousAuth().then(() => hydrateAndReconcile())
+      ensureAuthForMode().then(() => hydrateAndReconcile())
     })
   }
 }

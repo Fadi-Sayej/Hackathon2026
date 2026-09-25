@@ -23,7 +23,7 @@ import { EntryCard } from './EntryCard.jsx'
  * why compose takes it as a parameter — a deferral that lapses must do so because time
  * passed in the app's state, not because a component happened to re-render.
  */
-export function DailyPage({ artefact, ownerState, onOutcome, onUndoOutcome, now }) {
+export function DailyPage({ artefact, ownerState, onOutcome, onUndoOutcome, now, readOnly = false }) {
   const { t } = useI18n()
   const [error, setError] = useState(null)
   // The last entry settled on this screen, so it can be taken back.
@@ -104,7 +104,7 @@ export function DailyPage({ artefact, ownerState, onOutcome, onUndoOutcome, now 
         <ol className="daily__entries">
           {entries.map((entry) => (
             <li key={entry.id}>
-              <EntryCard entry={entry} onOutcome={handleOutcome} formatMoney={formatCurrency} />
+              <EntryCard entry={entry} onOutcome={handleOutcome} formatMoney={formatCurrency} readOnly={readOnly} />
             </li>
           ))}
         </ol>
