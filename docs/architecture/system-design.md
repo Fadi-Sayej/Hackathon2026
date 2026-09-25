@@ -1457,7 +1457,7 @@ needed" is a decision still to be written; none is taken here.
 | Requirement | Design element | Flow / contract | Verification |
 |---|---|---|---|
 | FR-143 … FR-146, INV-070, INV-072 | I a per-day import of sales and deliveries, beside the monthly one; E an order-quantity capability over the 28-day window | ADR needed: the import's grain, its missing-day rule, the freshness limit | AC-136 … AC-140 |
-| FR-147, FR-148, INV-074 | E a running-out signal over the D-18 stores, separately unavailable (ADR-014); OQ-905 | ADR needed: stockout classification across three chains | AC-141, AC-142 |
+| FR-147, FR-148, FR-164, INV-074, INV-079 | E a running-out signal over the D-18 stores, separately unavailable (ADR-014), OQ-905; E the model's nightly boost per product, recorded as an input (D-21) | ADR needed: stockout classification across three chains; ADR needed: the boost model, what it is given, its record and its spending cap | AC-141, AC-142, AC-160, AC-161 |
 | FR-149, FR-150, INV-073 | E stock now from `vintages.pos`, the F2-S1 flags, and the per-day sales and deliveries since the count, carried to the order day | 11.4 | AC-143, AC-144, AC-157 |
 | FR-151 … FR-153, INV-071 | E the shelf-life cap from the stated store facts; later F10 | ADR needed once F10 is specified | AC-145, AC-146, AC-148 |
 | FR-154, NFR-067 | P suggestion facts in the artefact; R print mode | ADR-002, ADR-005 | AC-149 |

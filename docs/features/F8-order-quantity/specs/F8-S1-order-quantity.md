@@ -3,17 +3,17 @@ ID: F8-S1
 Title: Order Quantity — what to order, and how much, for the next order
 Status: Ready for review
 Owner: smartshelf-architect
-Version: 0.4 (2026-09-25, after three review rounds)
+Version: 0.5 (2026-09-25, D-21: the market boost is a model's pick)
 Parent: [F8 — Order Quantity](../intent.md)
 Related Intents: INT-004, INT-010
-Inputs: [docs/features/F8-order-quantity/intent.md, docs/product/PRD.md §5 §6 §7 §10, docs/product/intent-register.md (D-1, D-3, D-7, D-8, D-10, D-18, D-19, D-20), docs/features/gaps-and-open-questions.md (GAP-008, GAP-009), F2-S1, F5-S1, F7-S1, F10 intent, ADR-001, ADR-002, ADR-003, ADR-004, ADR-005, ADR-007, ADR-008, ADR-009, ADR-011, ADR-012, ADR-014, ADR-016, ADR-017, ADR-024, ADR-027, ADR-028, CLAUDE.md, the repository owner's answers of 2026-09-25 (§17), public/data/dashboard.json and catalogue.json (generated 2026-09-24T02:46Z), data/internal/silver_pos/*.parquet]
+Inputs: [docs/features/F8-order-quantity/intent.md, docs/product/PRD.md §5 §6 §7 §10, docs/product/intent-register.md (D-1, D-3, D-7, D-8, D-10, D-16, D-18, D-19, D-20, D-21), docs/features/gaps-and-open-questions.md (GAP-008, GAP-009), F2-S1, F5-S1, F7-S1, F10 intent, ADR-001, ADR-002, ADR-003, ADR-004, ADR-005, ADR-007, ADR-008, ADR-009, ADR-011, ADR-012, ADR-014, ADR-016, ADR-017, ADR-024, ADR-027, ADR-028, CLAUDE.md, the repository owner's answers of 2026-09-25 (§17), public/data/dashboard.json and catalogue.json (generated 2026-09-24T02:46Z), data/internal/silver_pos/*.parquet]
 Answered by: [System Design](../../../architecture/system-design.md) §21 — a placeholder until V2's first design round
 Updated: 2026-09-25
 ---
 
 # F8-S1 — Order Quantity
 
-> **The first V2 spec, and what it rests on.** It turns D-18 … D-20 into requirements, and
+> **The first V2 spec, and what it rests on.** It turns D-18 … D-21 into requirements, and
 > the four answers the repository owner gave on 2026-09-25 (§17: OQ-901 … OQ-903, OQ-908).
 > It can be reviewed and designed now. **It cannot publish a single quantity until the store
 > owner supplies three things that do not exist today:**
@@ -26,7 +26,7 @@ Updated: 2026-09-25
 
 Implements intent F8. Bound by ADR-001, ADR-003, ADR-005, ADR-007, ADR-008, ADR-009,
 ADR-011, ADR-012, ADR-014, ADR-016, ADR-027 and ADR-028, and by settled decisions D-1, D-3,
-D-7, D-8, D-10, D-18, D-19 and D-20.
+D-7, D-8, D-10, D-16, D-18, D-19, D-20 and D-21.
 
 ---
 
@@ -35,7 +35,8 @@ D-7, D-8, D-10, D-18, D-19 and D-20.
 Tells the owner, product by product, how many to order on each department's next order day.
 The quantity is:
 - **set by his own sales** (D-19);
-- **raised by one fixed, stated amount** when the stores near him run out (D-18, D-19);
+- **raised by a boost a model picks for the product, from 0% to 25%,** when the stores near
+  him run out (D-18, D-21);
 - **capped** by what sells before it spoils, using the shelf life he states (F10, OQ-908);
 - **reduced by his stock** only when the count is recent and checks out (OQ-902).
 
@@ -67,8 +68,8 @@ It also serves:
 
 - A quantity per product for its department's next order day, for products with enough of
   his own sales (D-19).
-- The market adjustment: one fixed, stated rise when the market of D-18 runs out of the
-  product (D-19).
+- The market adjustment: a boost a language model picks for the product, from 0% to 25%,
+  when the market of D-18 runs out of it (D-21).
 - Reducing it by his stock, only when the count is recent and checks out (OQ-902).
 - A shelf-life cap from the shelf life he states for the department (OQ-908), or later from
   F10.
@@ -119,7 +120,8 @@ It also serves:
 | **Evidence window** | The 28 days ending on the latest report day, which must be no more than 7 days before the run (FR-144). Days with no report are left out. Its **weeks** are the four 7-day blocks counted back from its last day |
 | **Moving product** | One that sold in each of the window's four weeks (FR-145) |
 | **Daily mean** | The units a product sold on the window's report days, divided by the number of those days: a mean of observed days, not a division of any report |
-| **Adjusted daily mean** | The daily mean times the lift when the market is running out of the product; otherwise the daily mean (FR-147) |
+| **Boost** | The percentage a language model picks for a product, once a night, when the market is running out of it (D-21). Accepted only from 0% to 25% (FR-147, FR-164) |
+| **Adjusted daily mean** | The daily mean times one plus the product's accepted boost, when the market is running out of it; otherwise the daily mean (FR-147) |
 | **Expected sales** | The adjusted daily mean times the days in the order cycle (FR-146) |
 | **The market** | The nearby stores at or above the format floor (D-18). Three today |
 | **Running out** | The market's stockout classification for a product (FR-147, OQ-905) |
@@ -161,14 +163,25 @@ gives cycles of three and four days, and each suggestion covers its own.
 
 #### The market adjustment
 
-**FR-147** — When the market (D-18) is running out of a moving product, its daily mean is
-multiplied by the stated lift, once, giving the adjusted daily mean that every expectation of
-this product then uses. The lift is 15% today (D-19). A store below the format floor never
-triggers it, and neither does the national price file (D-18).
+**FR-147** — When the market (D-18) is running out of a moving product, a language model
+picks the product's boost, once a night (D-21).
+- A pick from 0% to 25% is accepted. The product's daily mean is multiplied by one plus it,
+  once, giving the adjusted daily mean that every expectation of this product then uses.
+- A pick outside that range gives no boost at all, not a clipped one, and the suggestion says
+  the pick was rejected.
+- No pick, because the model was unavailable or the spending cap was reached, gives no
+  boost, and the suggestion says why.
+- A store below the format floor never triggers a boost, and neither does the national price
+  file (D-18).
 
 **FR-148** — The market adjustment can become unavailable on its own (ADR-014). When the
 running-out signal cannot be computed, suggestions are still published, unadjusted, and
 each says that the market signal was unavailable and why.
+
+**FR-164** — The model is given only facts F8 publishes for the product (FR-154) and the
+market's running-out facts: nothing it sees is absent from the artefact. It returns a
+percentage and a one-line reason. Both are recorded and published with the suggestion,
+labelled the model's estimate (D-10, D-21). Nothing else it returns is used (INV-079).
 
 #### Stock
 
@@ -223,7 +236,8 @@ table of starting guesses is not an input to F8.
 - the department's order schedule, and the dates of the cycle it covers;
 - the window's dates, and the units sold in each of its weeks;
 - the daily mean;
-- whether the market adjustment applied, with the adjusted daily mean, or why it did not;
+- whether the market adjustment applied, and why not if it did not; when it did, the model's
+  pick, its reason, the model it came from, and the adjusted daily mean;
 - the expected sales;
 - the recorded count, its date, and whether it was used and why;
 - when used: the deliveries and sales since the count, the stock now, and the stock at the
@@ -345,7 +359,8 @@ subtracted only through the stock now, meaning deliveries added and sales deduct
 was taken, and never when that stock now is below zero.
 
 **INV-074** — The market adjustment is applied at most once per suggestion, by exactly the
-stated lift, and only from the market of D-18.
+recorded, accepted pick, and only from the market of D-18. A pick outside 0% to 25% is never
+applied, not even in part (D-21).
 
 **INV-075** — A disagreement is raised at most once per product, and never without an
 evidence window except in FR-156's case. Once answered it is never raised again, and its
@@ -358,6 +373,11 @@ never receives a quantity, whether zero or small (D-19, D-3).
 
 **INV-078** — The same order is never suggested twice. A department's suggestion for an order
 day is one entry, however many nights it is published.
+
+**INV-079** — The model moves one number only: the boost, within 0% to 25%. Nothing else it
+returns is used as a figure. It cannot set a quantity, a count, a shelf life or a date. That
+is the failure F14's intent records, a model turning "order 20" into "25", closed by
+construction.
 
 ---
 
@@ -385,8 +405,8 @@ THEN the suggestion is gross, and names the flag as the reason the count was not
 
 **SCN-136 — The market runs out**
 GIVEN the market's signal says it is running out of a moving product
-WHEN the engine runs
-THEN the published facts show the daily mean and the adjusted daily mean, 15% higher, once, and the suggestion says why.
+WHEN the engine runs and the model picks 10% for it
+THEN the published facts show the daily mean, the pick with its reason, and the adjusted daily mean 10% higher, once, and the suggestion says why.
 
 **SCN-137 — Market signal unavailable**
 GIVEN the nearby stores' snapshots cannot be read
@@ -453,6 +473,16 @@ GIVEN a department ordered every day, and a product sold in each of the window's
 WHEN the engine runs
 THEN its expected sales for the one-day cycle are below one unit, so it gets no quantity, and Reorder says it sells less than one per cycle.
 
+**SCN-150 — A pick above the limit**
+GIVEN the market is running out of a moving product
+WHEN the engine runs and the model picks 40% for it
+THEN no boost is applied, not even 25%, and the suggestion says the pick was rejected as above the 25% limit.
+
+**SCN-151 — The model is unavailable**
+GIVEN the market is running out of moving products, and the model cannot be reached or the month's spending cap is reached
+WHEN the engine runs
+THEN suggestions publish without a boost, each saying why.
+
 ---
 
 ### 9. Inputs and Observable Outputs
@@ -464,7 +494,7 @@ THEN its expected sales for the one-day cycle are below one unit, so it gets no 
 | Recorded stock and its date | The POS export, as F2-S1 reads it | No. Without a usable count, the suggestion is gross |
 | Reconciliation and hygiene flags | F2-S1 | No. Needed only to use a count |
 | The market's running-out signal | The daily delivery snapshots of the D-18 stores (OQ-905) | No. Without it, no adjustment and no disagreement |
-| The lift | The configured `stockout_demand_lift`, 1.15 today | Yes, when the signal applies |
+| The boost per product | A language model, nightly, on a paid account under a monthly spending cap (D-21). The configured `stockout_demand_lift` of 1.15 is no longer used | No. Without an accepted pick, no boost |
 | Catalogue membership, department and stock | The published catalogue (ADR-024) | Yes |
 | His disagreement answers and outcomes | Owner state (ADR-003) | No |
 
@@ -499,6 +529,8 @@ persists is the owner's.
 | Deliveries missing from a report day | No count taken before that day is usable. The suggestion is gross (FR-149) |
 | Stock now below zero | The count is not used; the suggestion is gross and says the stock evidence is inconsistent (FR-149) |
 | Market snapshots missing or unclassifiable | The adjustment becomes unavailable on its own; suggestions still publish (FR-148) |
+| Model unavailable, or the monthly spending cap reached | No boost. Suggestions still publish, each saying why (FR-147) |
+| A pick outside 0% to 25%, or not a number | No boost, not a clipped one. The suggestion says the pick was rejected (FR-147) |
 | Owner state unreachable | As ADR-003 and ADR-017 define: the run is degraded, and the answers and outcomes it uses are those of the last owner state it holds, stated with that state's date |
 
 ---
@@ -523,11 +555,13 @@ persists is the owner's.
 
 ### 13. Non-Functional Requirements
 
-**NFR-066 (Determinism)** — The same inputs, policy, store facts and owner state produce the
-same suggestions, questions and facts.
+**NFR-066 (Determinism)** — The same inputs, policy, store facts, owner state and recorded
+boosts produce the same suggestions, questions and facts. The model's picks themselves are
+not deterministic, which is why each is recorded (D-21).
 
-**NFR-067 (Recomputability)** — Every quantity is reproducible from its published facts by
-the engine in print mode (ADR-002, F7-S1).
+**NFR-067 (Recomputability)** — Every quantity is reproducible from its published facts,
+the recorded boost included, by the engine in print mode (ADR-002, F7-S1). The boost is
+replayed from its record, never recomputed from the evidence (D-21).
 
 **NFR-068 (Owner effort)** — F8 asks on screen only about disagreements, at most once per
 product (D-20), within D-8's limit. The store facts are gathered once, not asked in the panel
@@ -580,6 +614,17 @@ never as "zero sales".
 **C-70** — ADR-028: F8 lights the existing Reorder and Approved orders entries, and does so
 on real per-day demand, not on the monthly reports (§4).
 
+**C-71** — F7-S1 and D-21: the boost is a figure whose source is a model, not the evidence.
+It is published as an input with provenance: the model, the date, and the facts it was given.
+It is labelled the model's estimate before it can be questioned (D-10). Where F7-S1 would
+require recomputation from the evidence, D-21 prevails and the figure is replayed from its
+record.
+
+**C-72** — D-16 and ADR-007: D-16 governs only F14's reason sentence. The boost is one of the
+suggestion's published facts, so that sentence may cite it. The model runs only in the
+nightly run, never at request time, and on a paid account under a monthly spending cap
+(D-21).
+
 ---
 
 ### 15. Acceptance Criteria
@@ -601,9 +646,9 @@ not a zero. *(FR-145, FR-155, INV-076)*
 divided by their number, and the expected sales equal the adjusted daily mean times the days
 in the cycle. A need is rounded to the nearest unit. *(FR-146, FR-153, FR-154, NFR-067)*
 
-**AC-141** — When the market is running out, the published adjusted daily mean equals the
-daily mean times the stated lift, applied once. A store below the floor never produces an
-adjustment. *(FR-147, INV-074, SCN-136)*
+**AC-141** — When the market is running out and the model's pick is accepted, the published
+adjusted daily mean equals the daily mean times one plus the recorded pick, applied once. A
+store below the floor never produces an adjustment. *(FR-147, INV-074, SCN-136)*
 
 **AC-142** — With the market signal withheld, suggestions still publish, unadjusted, each
 saying why, and no disagreement is raised. *(FR-148, SCN-137)*
@@ -668,6 +713,14 @@ with no row in any evidence. *(FR-158, INV-075, SCN-148)*
 **AC-159** — A product expected to sell less than one unit in its cycle gets no quantity.
 *(FR-153, FR-155, INV-076, SCN-149)*
 
+**AC-160** — Every boost is published with the model's pick, its reason and the model it came
+from, labelled the model's estimate. The quantity replays from the recorded pick. *(FR-154,
+FR-164, NFR-067, C-71)*
+
+**AC-161** — A pick above 25% or below 0% gives no boost, not a clipped one, and the suggestion
+says the pick was rejected. No pick gives no boost, and says why. No figure other than the
+boost is ever taken from the model. *(FR-147, INV-074, INV-079, SCN-150, SCN-151)*
+
 ---
 
 ### 16. Assumptions
@@ -700,6 +753,10 @@ later delivery would leave the cycle's first days uncovered.
 
 **ASM-071** — A recorded count reflects the end of its date. The sales and deliveries of the
 count's own day are already in it, and only later days are applied (FR-149).
+
+**ASM-072** — A model can pick a useful boost from the facts it is given. This is untested.
+Nothing yet measures how his sales respond when the nearby stores run out, so nothing checks
+whether a pick was right (§21).
 
 ---
 
@@ -755,6 +812,20 @@ life in the same conversation as its schedule, and until he has, the department'
 get no quantity (FR-152). The category defaults and an uncapped quantity were the options he
 declined.
 
+**OQ-909 — RESOLVED (2026-09-25, by the repository owner).** Should the market boost be one
+fixed amount for every product? No: "15% shouldn't be a fixed value". A language model picks
+it per product (D-21). He chose this over a boost measured per product, with or without 15%
+until then, and over keeping 15% for all, after being told its picks cannot be recomputed or
+checked.
+
+**OQ-910 — RESOLVED (2026-09-25, by the repository owner).** What is the most the model may
+raise an order by? Up to 25%. A pick above it gives no boost, and the suggestion says it was
+rejected (FR-147).
+
+**OQ-911 (P2) — Once his per-day sales overlap enough nearby run-outs to measure a product's
+real response, should the measured boost replace the model's pick?** Not needed before then.
+· owner: the repository owner · blocks: nothing
+
 ---
 
 ### 18. Non-Goals
@@ -777,7 +848,7 @@ declined.
 |---|---|---|---|
 | INT-004 | FR-143, FR-144 | SCN-132, SCN-144 | AC-136, AC-137, AC-138 |
 | INT-004 | FR-145, FR-146 | SCN-133 | AC-139, AC-140 |
-| INT-004 (D-18, D-19) | FR-147, FR-148 | SCN-136, SCN-137 | AC-141, AC-142 |
+| INT-004 (D-18, D-21) | FR-147, FR-148, FR-164 | SCN-136, SCN-137, SCN-150, SCN-151 | AC-141, AC-142, AC-160, AC-161 |
 | INT-004 | FR-149, FR-150 | SCN-133, SCN-134, SCN-135, SCN-147 | AC-143, AC-144, AC-157 |
 | INT-004 (F10) | FR-151, FR-152 | SCN-138, SCN-139, SCN-146 | AC-145, AC-146 |
 | INT-004 | FR-153, FR-154 | SCN-133, SCN-138, SCN-149 | AC-145, AC-148, AC-149, AC-159 |
@@ -791,7 +862,7 @@ declined.
 | Protected behavior (rule 13) | INV-070, INV-072 | SCN-132, SCN-144 | AC-137, AC-138, AC-147 |
 | Protected behavior (D-3) | INV-071, INV-076 | SCN-140, SCN-146, SCN-149 | AC-139, AC-146, AC-159 |
 | Protected behavior | INV-073 | SCN-134, SCN-135, SCN-147 | AC-143, AC-144, AC-157 |
-| Protected behavior (D-18) | INV-074 | SCN-136 | AC-141 |
+| Protected behavior (D-18, D-21) | INV-074, INV-079, C-71, C-72 | SCN-136, SCN-150 | AC-141, AC-160, AC-161 |
 | Protected behavior (D-20) | INV-075, C-67 | SCN-141, SCN-148 | AC-150, AC-151, AC-158 |
 | Protected behavior (D-7) | INV-077 | — | AC-153 |
 | Protected behavior | INV-078 | SCN-145 | AC-154 |
@@ -810,6 +881,7 @@ names the probe task when it adds that import.
 | `npm run check:signals`, extended: withhold the report days | The capability claiming `available` with no window, or reading the monthly reports as a substitute | `collect-daily.yml` |
 | … withhold the deliveries from the report days | A net quantity computed without them | `collect-daily.yml` |
 | … withhold the store facts | Quantities published for departments whose schedule or shelf life is not stated | `collect-daily.yml` |
+| … withhold the model | Suggestions vanishing because the boost was wrongly required, or a boost applied from no pick |
 | … withhold the market snapshots | Suggestions vanishing because the adjustment was wrongly required, or an adjustment applied from nothing | `collect-daily.yml` |
 | … withhold owner state | Disagreements raised again that he already answered | `collect-daily.yml` |
 | `scripts/check_independence.py`, extended | The adjustment and the suggestions failing together | `collect-daily.yml` |
@@ -826,7 +898,7 @@ CLAUDE.md rule 13. None of the claims below is "measured and not significant". E
 | "The market sells a lot of X" | not measurable | Competitor volumes are not observed. Only listings and running out are |
 | Weekday or payday patterns in his sales | not measurable from the monthly reports | Rule 13. Measurable once report days exist, but not used in this version |
 | Seasonal effects (Ramadan, summer) | not measurable | Seven months, one of each season (PRD §6 #5) |
-| That a 15% raise is right | not measured | The configuration calls it a starting figure. No stockout has yet been observed alongside his till data |
+| That the model's boost is right | not measured | It is a model's estimate (D-21). Nothing yet records how his sales respond when the nearby stores run out, so no pick can be checked (ASM-072) |
 | That a quantity prevents a stockout | not measured | Nothing records stockouts at his shop |
 | The stock on his shelf right now | not known without report days | The monthly reports record deliveries (receipts on 2,269 of their 3,942 rows), but per month, so they cannot place a delivery before or after a count. Only report days can (FR-149) |
 | An order schedule or a shelf life | not inferred at all | Stated by the owner, or measured by F10 (INV-071) |
