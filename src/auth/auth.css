@@ -44,3 +44,12 @@
   font-weight: 600;
   line-height: 1.45;
 }
+
+/* A team account's view of the owner's app: every control that would save reads as off. */
+.entry-card__actions button:disabled,
+.questions input:disabled,
+.questions button:disabled,
+.data__hidden-restore:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

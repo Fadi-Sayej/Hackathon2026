@@ -12,7 +12,7 @@ import { dirProps } from '../lib/utils/rtl.js'
  *   - an entry with no value renders no value area at all — not a dash, not a zero, not an
  *     empty currency symbol (D-3). Absence is shown by absence.
  */
-export function EntryCard({ entry, onOutcome, formatMoney }) {
+export function EntryCard({ entry, onOutcome, formatMoney, readOnly = false }) {
   const { t, language } = useI18n()
   const value = entry.value && Number.isFinite(entry.value.amount) ? entry.value : null
   const estimated = value?.certainty === 'estimated'
@@ -53,14 +53,15 @@ export function EntryCard({ entry, onOutcome, formatMoney }) {
       </dl>
 
       <footer className="entry-card__actions">
-        <button type="button" data-outcome="acted" onClick={() => onOutcome(entry, { status: 'acted' })}>
+        {/* readOnly: a team account's view (ADR-029 §5). Nothing it presses is the owner's. */}
+        <button type="button" data-outcome="acted" disabled={readOnly} onClick={() => onOutcome(entry, { status: 'acted' })}>
           {t('outcome.acted')}
         </button>
-        <button type="button" data-outcome="declined"
+        <button type="button" data-outcome="declined" disabled={readOnly}
                 onClick={() => onOutcome(entry, { status: 'declined', reason: 'not_worth_it' })}>
           {t('outcome.declined')}
         </button>
-        <button type="button" data-outcome="deferred" onClick={() => onOutcome(entry, { status: 'deferred' })}>
+        <button type="button" data-outcome="deferred" disabled={readOnly} onClick={() => onOutcome(entry, { status: 'deferred' })}>
           {t('outcome.deferred')}
         </button>
       </footer>

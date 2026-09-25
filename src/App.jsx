@@ -20,6 +20,8 @@ import { DataPage } from './pages/DataPage.jsx'
 import { CapabilityPage } from './pages/CapabilityPage.jsx'
 import { PageAwaitingData } from './pages/PageAwaitingData.jsx'
 import { useI18n } from './lib/i18n/index.js'
+import { useAuth } from './auth/useAuth.js'
+import { TeamBanner } from './auth/SignInPage.jsx'
 
 /**
  * What each restored page is waiting for, when the artefact cannot feed it.
@@ -86,6 +88,10 @@ const AWAITING = {
  */
 export default function App() {
   const { t } = useI18n()
+  // ADR-029 §5: a team account sees this app read-only. Its controls are disabled and these
+  // handlers refuse, so a team click never reaches owner state; the Firestore rules refuse
+  // the write as well.
+  const { readOnly } = useAuth()
   // The daily surface stays the landing page. Restoring the twelve pages took it off the
   // nav entirely, and with it AC-100 (ten places, all filled), AC-103 (per-sale and one-off
   // money never interleaved), AC-105 (an outcome survives a reload), AC-107 (unavailable
@@ -159,24 +165,27 @@ export default function App() {
   // page, which keys on the same ADR-009 entry id, so the two surfaces cannot disagree about
   // what the owner has already dealt with.
   const onOutcome = useCallback(async (entry, outcome) => {
+    if (readOnly) return
     await recordOutcome(entry, outcome)
     refreshOwnerState()
-  }, [refreshOwnerState])
+  }, [readOnly, refreshOwnerState])
 
   // Taking an outcome back. Needed because "Later" sends no date and an outcome with no
   // `deferred_until` is deferred forever, so the gentlest-sounding button on the surface
   // was the destructive one (OQ-604, #139).
   const onUndoOutcome = useCallback(async (entryId) => {
+    if (readOnly) return
     await clearOutcome(entryId)
     refreshOwnerState()
-  }, [refreshOwnerState])
+  }, [readOnly, refreshOwnerState])
 
   // The owner's answer to a cost question. It throws on an unusable value or a failed cache
   // write, and QuestionPanel keeps what he typed when it does (§9.3).
   const onAnswer = useCallback(async (barcode, answer) => {
+    if (readOnly) return
     await recordAnswer(barcode, answer)
     refreshOwnerState()
-  }, [refreshOwnerState])
+  }, [readOnly, refreshOwnerState])
 
   // `entriesById` and `onDecide` went with the old Today page on 2026-09-23. They existed to
   // let a restored page record against the engine's own ADR-009 entry id; the daily surface
@@ -229,9 +238,10 @@ export default function App() {
       // and only the daily surface came back.
       return (
         <>
-          <QuestionPanel artefact={artefact} answers={ownerState.answers} onAnswer={onAnswer} />
+          <QuestionPanel artefact={artefact} answers={ownerState.answers} onAnswer={onAnswer}
+            readOnly={readOnly} />
           <DailyPage artefact={artefact} ownerState={ownerState} onOutcome={onOutcome}
-            onUndoOutcome={onUndoOutcome} now={now} />
+            onUndoOutcome={readOnly ? null : onUndoOutcome} now={now} readOnly={readOnly} />
         </>
       )
     }
@@ -241,7 +251,8 @@ export default function App() {
     }
     if (activePage === 'data-source') {
       return (
-        <DataPage artefact={artefact} ownerState={ownerState} onRestore={onUndoOutcome} now={now} />
+        <DataPage artefact={artefact} ownerState={ownerState} onRestore={onUndoOutcome} now={now}
+          readOnly={readOnly} />
       )
     }
 
@@ -290,6 +301,7 @@ export default function App() {
   return (
     <AppShell
       activePage={activePage}
+      notice={readOnly ? <TeamBanner /> : null}
       dataProvenance={provenance}
       hasDemoState={false}
       onResetDemoState={null}

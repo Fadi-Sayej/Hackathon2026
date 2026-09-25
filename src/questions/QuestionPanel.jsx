@@ -14,7 +14,7 @@ import { dirProps } from '../lib/utils/rtl.js'
  * The limit is read from the artefact, not hard-coded. D-8 caps it at three today; a
  * component that hard-codes three would silently ignore a policy change.
  */
-export function QuestionPanel({ artefact, answers = {}, onAnswer }) {
+export function QuestionPanel({ artefact, answers = {}, onAnswer, readOnly = false }) {
   const { t } = useI18n()
   const capability = artefact?.capabilities?.owner_questions
   const [drafts, setDrafts] = useState({})
@@ -80,7 +80,7 @@ export function QuestionPanel({ artefact, answers = {}, onAnswer }) {
                     <p className="question__saved" role="status">
                       {t('questions.saved', { value: formatShekel(saved.value) })}
                     </p>
-                    <button type="button" onClick={() => {
+                    <button type="button" disabled={readOnly} onClick={() => {
                       setEditing((prev) => ({ ...prev, [item.question_id]: true }))
                       setDrafts((prev) => ({ ...prev, [item.question_id]: String(saved.value) }))
                     }}>{t('questions.change')}</button>
@@ -91,10 +91,11 @@ export function QuestionPanel({ artefact, answers = {}, onAnswer }) {
                     <input
                       id={`q-${item.question_id}`}
                       inputMode="decimal"
+                      disabled={readOnly}
                       value={drafts[item.question_id] ?? ''}
                       onChange={(event) => setDrafts((prev) => ({ ...prev, [item.question_id]: event.target.value }))}
                     />
-                    <button type="button" onClick={() => submit(item)}>{t('questions.save')}</button>
+                    <button type="button" disabled={readOnly} onClick={() => submit(item)}>{t('questions.save')}</button>
                     {/* The window travels with the figure that justifies the question
                         (ARCH-DRIVER-007): an answer worth asking for over seven months is not
                         worth the same over one. */}

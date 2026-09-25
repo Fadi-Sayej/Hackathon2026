@@ -39,6 +39,7 @@ function renderNavIcon(id) {
 export function AppShell({
   activePage,
   bare = false,
+  notice = null,
   children,
   dataProvenance,
   hasDemoState = false,
@@ -159,6 +160,7 @@ export function AppShell({
       </aside>
 
       <main className="main-panel">
+        {notice}
         {bare ? null : (
         <header className="topbar">
           <div>
