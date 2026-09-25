@@ -1,0 +1,46 @@
+/* ADR-029 screens, as approved on 2026-09-25 (docs: the adr-029 mockups). */
+.auth-card {
+  max-width: 420px;
+  margin: 28px auto 0;
+  padding: 24px;
+  background: var(--paper-100);
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-soft);
+}
+.auth-card h1 { font-size: 24px; line-height: 1.25; margin: 0 0 8px; color: var(--ink-900); }
+.auth-card p { color: var(--ink-600); margin: 0 0 20px; line-height: 1.55; }
+.auth-card .auth-card__full {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 44px;
+}
+.auth-card__or { display: flex; align-items: center; gap: 12px; margin: 18px 0; color: var(--ink-400); }
+.auth-card__or::before,
+.auth-card__or::after { content: ''; flex: 1; height: 1px; background: var(--ink-line); }
+.auth-card__label { display: block; font-size: 13px; color: var(--ink-600); margin-bottom: 6px; }
+.auth-card__input {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 44px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--ink-line-strong);
+  border-radius: var(--radius-md);
+  font: inherit;
+  background: var(--paper-100);
+}
+.auth-card p.auth-card__error { color: var(--danger); margin-bottom: 16px; }
+
+.team-banner {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background: var(--info-wash);
+  color: var(--info);
+  font-weight: 600;
+  line-height: 1.45;
+}

@@ -448,4 +448,20 @@ export const he = {
   'prices.card.against': "{yours} מול {reference}",
   'prices.card.meta': "{n} חנויות · {seen}",
   'prices.notPublished': "הריצה הזו לא פרסמה את ההשוואה, כך שעדיין אין מה להציג.",
+
+  // ── Sign-in and the team's read-only view (ADR-029; wording approved 2026-09-25) ──
+  'auth.signin.title': "כניסה",
+  'auth.signin.lead': "כדי להיכנס ל-SmartShelf, התחברו עם חשבון Google או עם האימייל שלכם.",
+  'auth.signin.google': "המשך עם Google",
+  'auth.signin.or': "או",
+  'auth.signin.email': "אימייל",
+  'auth.signin.sendLink': "שלחו לי קישור כניסה",
+  'auth.linkSent.title': "בדקו את האימייל",
+  'auth.linkSent.body': "שלחנו קישור כניסה אל {email}. פתחו אותו במכשיר הזה.",
+  'auth.linkSent.other': "שימוש באימייל אחר",
+  'auth.noAccess.title': "לחשבון הזה אין גישה",
+  'auth.noAccess.body': "נכנסת בתור {email}. בקשו מהצוות לתת לחשבון הזה גישה.",
+  'auth.noAccess.signOut': "התנתקות וכניסה עם חשבון אחר",
+  'auth.team.banner': "תצוגת צוות — לקריאה בלבד. שום דבר שתלחצו כאן לא נשמר.",
+  'auth.error': "הכניסה נכשלה. נסו שוב.",
 }

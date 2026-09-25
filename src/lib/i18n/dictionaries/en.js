@@ -449,4 +449,20 @@ export const en = {
   'prices.card.against': "{yours} against {reference}",
   'prices.card.meta': "{n} shops · {seen}",
   'prices.notPublished': "This run did not publish the comparison, so there is nothing to show yet.",
+
+  // ── Sign-in and the team's read-only view (ADR-029; wording approved 2026-09-25) ──
+  'auth.signin.title': "Sign in",
+  'auth.signin.lead': "To open SmartShelf, sign in with your Google account or your email.",
+  'auth.signin.google': "Continue with Google",
+  'auth.signin.or': "or",
+  'auth.signin.email': "Email",
+  'auth.signin.sendLink': "Email me a sign-in link",
+  'auth.linkSent.title': "Check your email",
+  'auth.linkSent.body': "We sent a sign-in link to {email}. Open it on this device.",
+  'auth.linkSent.other': "Use a different email",
+  'auth.noAccess.title': "This account has no access",
+  'auth.noAccess.body': "You're signed in as {email}. Ask the team to give this account access.",
+  'auth.noAccess.signOut': "Sign out and use another account",
+  'auth.team.banner': "Team view — read only. Nothing you press here is saved.",
+  'auth.error': "Sign-in didn't work. Try again.",
 }

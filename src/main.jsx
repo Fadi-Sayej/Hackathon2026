@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
+import { AuthGate } from './auth/AuthGate.jsx'
 import { I18nProvider } from './lib/i18n/I18nProvider.jsx'
 import { SmoothScrollProvider } from './lib/motion/SmoothScrollProvider.jsx'
 
@@ -13,7 +14,11 @@ createRoot(document.getElementById('root')).render(
       {/* Inside I18n, because a direction flip resets scroll and Lenis should
           re-read the document after that, not before. */}
       <SmoothScrollProvider>
-        <App />
+        {/* ADR-029: nothing of the app renders until the account has a role. In `basic`
+            mode (before the switch-over) this renders App untouched and loads nothing. */}
+        <AuthGate>
+          <App />
+        </AuthGate>
       </SmoothScrollProvider>
     </I18nProvider>
   </StrictMode>,
