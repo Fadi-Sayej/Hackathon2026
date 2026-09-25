@@ -36,9 +36,17 @@ open (F8-S1 OQ-904, owner conversation #7).
 
 1. **The input is the same report, run for one day.**
    - One file per day, named with the ISO date: `דוח מכירות יום YYYY-MM-DD.csv`.
-   - The files are committed under `data/internal/raw_pos/yomyom/sales_daily/`. A
-     `.gitignore` negation for that directory makes a plain `git add` work. CLAUDE.md rule 6
-     records it as the second exception, beside `data/internal/snapshots/`.
+   - The files are committed under `data/internal/raw_pos/yomyom/sales_daily/`.
+   - Git cannot re-include a path under an ignored directory, so a plain negation would not
+     work. The ignore rules are restructured instead:
+     - `data/internal/raw_pos/*`
+     - `!data/internal/raw_pos/yomyom/`
+     - `data/internal/raw_pos/yomyom/*`
+     - `!data/internal/raw_pos/yomyom/sales_daily/`
+
+     Tested on a scratch repository: the daily files are tracked, and every sibling stays
+     ignored. The implementation task makes the change, and adds it to CLAUDE.md rule 6 as the
+     second exception, beside `data/internal/snapshots/`.
    - The day comes from the file name, exactly as the month does today, because the report
      carries no date.
    - Seven daily files sent together once a week are equally valid.
@@ -49,8 +57,13 @@ open (F8-S1 OQ-904, owner conversation #7).
      records `deliveries_reported: true | false`. A day without it cannot carry a stock count
      forward (F8-S1 FR-149).
    - A product absent from a day's file gets **no row** (ADR-011). Inside a department the
-     evidence itemises, F8-S1 reads that as no sale and no delivery that day. That is ASM-065,
-     here extended to deliveries (FR-156).
+     evidence itemises, F8-S1 reads that as no sale that day (ASM-065).
+   - **It says nothing about deliveries.** The report lists only products that sold: none of
+     the 3,942 monthly rows has zero units (`sales_monthly.parquet`). So a delivery of a
+     product that did not sell that day is invisible. For a product-day with no row,
+     deliveries are **unknown, never zero**. A stock count can therefore be carried forward
+     only across days on which the product has a row (F8-S1 FR-149). Otherwise the
+     suggestion is gross.
 3. **Report days are the files that parsed; everything else is missing.**
    - A calendar day with no file, or with a file that failed to parse, is a **missing day**.
      It is recorded as such and never read as zero sales (INV-072).
@@ -89,8 +102,9 @@ Forbidden three times over: CLAUDE.md rule 13 (weekday cycles are not measurable
 (the deleted `units_sold_30d`), and ADR-028 §4. It is also F8-S1 INV-070.
 
 ### Keep the directory ignored, and force-add every file
-That is how the monthly files got in (a3aca1e). For a file arriving every day it is a trap:
-a forgotten `-f` leaves the file out without a word, and the engine then reads a missing day.
+That is how the monthly files got in (a3aca1e). For a file arriving every day it is a trap.
+A forgotten `-f` is refused, with a warning that is easy to miss in a batch of seven files.
+The file stays out, and the engine then reads a missing day.
 
 ### Accept weekly reports as well
 A week's total cannot size a daily order cycle without dividing it. F8-S1 is per-day only
@@ -111,7 +125,9 @@ today, and the owner's commitment (PRD §7) is an export, not an integration.
 
 **We gain:**
 - Per-day demand without inventing it.
-- Deliveries per day, which is what lets a stock count be carried forward (F8-S1 FR-149).
+- Deliveries per day, which let a stock count be carried forward. That works only for
+  products that sell every day, because the report lists no one else (Decision 2). Every
+  other suggestion is gross.
 - One importer shape for both grains.
 
 **We will know it was wrong if:**

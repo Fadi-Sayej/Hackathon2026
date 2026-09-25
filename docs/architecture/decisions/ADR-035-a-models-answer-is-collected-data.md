@@ -33,13 +33,20 @@ The rule-12 probes also run the engine in print mode (`check_v1_signals.py`,
 1. **A pick is an external source's answer, captured on the night it was given, like the
    delivery catalogues.** It is not a computation of this engine.
 2. **Each night's picks are sealed as a snapshot**, under
-   `data/external/snapshots/<day>/boost_picks/`.
+   `data/external/snapshots/<day>/boost_picks/`. `<day>` is the day of the market evidence
+   the picks answered, meaning the latest usable day of ADR-031's signal, which the artefact
+   publishes. It is not the date on which a run or a reproduction happens.
    - The file is `picks.json`. For each product it holds `{barcode, model, prompt_version,
      requested_at, inputs_digest, boost_pct, reason, accepted, rejected_because?}`.
    - A `_manifest.json` records the requests made, the ceiling (ADR-032) and whether the step
      completed.
-   - CI commits it with the other snapshots. That is rule 9 as written, so it needs no new
+   - It is committed in **its own step, right after the engine and before the blocking
+     probes**. So picks already paid for are kept whatever the probes decide. Neither
+     existing commit covers it: `collect-daily.yml` commits snapshots before the engine runs,
+     and commits only `public/data/` after it. It is still a snapshot, so rule 9 needs no new
      exception.
+   - **Merge-never-replace**, the snapshot convention (§12). A same-day re-run asks only for
+     products that have no pick yet, and never replaces a pick already sealed.
 3. **The live run and reproduction differ in one step only.**
    - **The live run** asks the model (ADR-032), writes the day's snapshot, then reads it back
      as an input.
@@ -51,7 +58,12 @@ The rule-12 probes also run the engine in print mode (`check_v1_signals.py`,
    pairing an old answer with new facts.
 5. **The probes follow from Decision 3.** `check:signals` withholds the model by withholding
    the `boost_picks` snapshot (F8-S1 §20). Suggestions must then publish unboosted, and no
-   boost may appear from nothing.
+   boost may appear from nothing. F8's probes have to run **with** the market inputs. Today's
+   probes run with `skip_market=True` (`check_v1_signals.py`), and withholding the picks
+   there would exercise nothing. The implementation plan names that probe task.
+6. **Where the authority comes from.** FR-125 is read together with F8-S1 C-71, which
+   carries D-21: a pick is replayed from its record. This ADR's part is to make that record
+   collected data, so reproduction still reads only committed inputs.
 
 ## Rejected options
 
@@ -91,4 +103,4 @@ Easy. The snapshot is additive. Dropping the boost leaves past snapshots as hist
 | F# | How this constrains it |
 |---|---|
 | F8 | NFR-066, NFR-067, C-71 and AC-160: the pick is replayed from this snapshot |
-| F7 | FR-125 holds. The pick is read as current collected data, not as a previous computation |
+| F7 | FR-125 is read with F8-S1 C-71 (D-21): the pick is replayed from a committed snapshot, the only kind of record reproduction reads |

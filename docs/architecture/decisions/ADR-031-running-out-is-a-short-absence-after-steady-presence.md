@@ -34,7 +34,7 @@ those three stores:
 | Listed product-store-days on usable days, and those marked not orderable (`is_online_available` false) | 20,853, of which **5** were marked, on 3 products |
 | Product-store pairs | 858 |
 | Temporary gaps: absent, then listed again | **300, on 187 products**. By length in usable days: 1: 79, 2: 59, 3: 28, 4: 26, 5: 20, 6: 13, 7: 9, 8 or more: 66 |
-| Share of a store's steady listings that vanish on one day | Median 1.6% (Rami Levy, Super Alonit) and 2.6% (Wolt Market). Maximum 7.5% and 3.8% at the first two. Wolt Market: **37.1% on 2026-09-15** (209 of 564), 18.9% on 08-31, 17.3% on 09-01 |
+| Share of a store's steady listings that vanish on one day | On ordinary days, a few percent: at the 90th percentile, 2.9% at Rami Levy and 3.2% at Super Alonit. At the maximum, 7.5% and 3.8%. Wolt Market: **37.1% on 2026-09-15** (209 of 564), 18.9% on 08-31, 17.3% on 09-01 |
 
 The stores do not mark sold-out items; they drop them. So running out has to be read from
 absence. And on 2026-09-15 Wolt Market replaced a third of its range in one day, keeping its
@@ -81,7 +81,7 @@ where the chain-level one cannot.
 | | Products flagged per night | Distinct products |
 |---|---|---|
 | Without Decision 2 | 10 to 93, and **89 to 93 on each night 09-16 … 09-21**, after Wolt Market's change | — |
-| With Decision 2 at 10% | **10 to 40, median 31**. It excludes exactly three store-days: Wolt Market 08-31, 09-01 and 09-15 | 141 |
+| With Decision 2 at 10% | **10 to 40, a median of about 30**. It excludes exactly three store-days: Wolt Market 08-31, 09-01 and 09-15 | 141 |
 | With Decision 2 at 15% | The same as at 10% | 141 |
 | With Decision 2 at 5% | 7 to 29, median 21. It also excludes six ordinary store-days | 109 |
 
@@ -112,6 +112,9 @@ rule 2).
 - The first two days of a real stockout are missed.
 - A stockout longer than seven days stops counting.
 - A real stockout that begins on one of a store's catalogue-change days is missed.
+- A change spread over several days, each under 10%, passes the guard. So does the
+  aftershock of one: Wolt Market lost 7.8% of its steady listings on 09-16, the day after its
+  change.
 - A delisting can look like running out for up to seven days. The boost is bounded by D-21's
   25% and by the shelf-life cap.
 

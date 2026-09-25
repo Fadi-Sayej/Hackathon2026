@@ -53,9 +53,12 @@ How a pick is kept, so the run can be reproduced, is a separate decision: ADR-03
    - It must parse, and `boost_pct` must be a number from 0 to the policy maximum: 25,
      D-21's limit, read from `configs/policy.yaml`. Otherwise the pick is **rejected**: the
      product gets no boost, and the suggestion says the pick was rejected (FR-147).
-   - The reason may contain **no digit**. This is D-16's figure check, applied here. A reason
-     that fails is withheld, and the suggestion says the model's reason was withheld because
-     it stated a figure. An accepted pick stays accepted.
+   - The reason may contain **no digit**: none of 0–9, the Arabic-Indic ٠–٩ or the Extended
+     Arabic-Indic ۰–۹. This is D-16's figure check, applied here. A reason that fails is
+     withheld, and the suggestion says the model's reason was withheld because it stated a
+     figure. An accepted pick stays accepted.
+   - A number spelled out in words cannot be caught mechanically. The prompt forbids it, and
+     that is a stated residual, not a guarantee.
    - Only `boost_pct` is ever used as a figure (INV-079).
 5. **Spending has two limits.**
    - The account's own monthly spend limit, set by the repository owner in the provider's
