@@ -40,7 +40,8 @@ department:
   - `weekdays: [sun, wed]`;
   - `every_days: 14` with `from: 2026-10-04`;
   - `no_fixed_days: true`.
-- **`shelf_life_days`** is a whole number of days, or `does_not_spoil: true`.
+- **`shelf_life_days`** is a whole number of days, or `does_not_spoil: true`. `0` records
+  "keeps less than a day", which gives no quantity (F8-S1 FR-151, SCN-139).
 - **Provenance on every entry:** `stated_by: owner`, `stated_on: <date>`, `recorded_by: team`.
   No name or email is written (D-22).
 
