@@ -6,7 +6,7 @@ Owner: smartshelf-architect
 Date: 2026-09-25
 Parent: [System Design](../system-design.md) §19
 Related Specs: F8-S1 (FR-143, FR-144, FR-149, INV-070, INV-072, ASM-064, ASM-065, OQ-904)
-Inputs: [docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md, CLAUDE.md rules 5 and 13, ADR-011, ADR-017, ADR-019, ADR-028 §4, D-12, D-22, src/internal_pos/sales_importer.py, .github/workflows/collect-daily.yml, data/internal/raw_pos/yomyom/sales/]
+Inputs: [docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md, CLAUDE.md rules 5, 6 and 13, .gitignore, commit a3aca1e, ADR-011, ADR-017, ADR-019, ADR-028 §4, D-12, D-22, src/internal_pos/sales_importer.py, .github/workflows/collect-daily.yml, data/internal/raw_pos/yomyom/sales/]
 Updated: 2026-09-25
 ---
 
@@ -24,8 +24,10 @@ Dividing them into days is what Task 0.6 deleted `units_sold_30d` for (CLAUDE.md
 The monthly reports are the POS's own sales report, «דוח מכירות». They carry units (`מכר`)
 and deliveries (`כניסות מלאי`), and have no date column. The importer reads the month from the
 file name (`month_from_filename`). The files are committed under
-`data/internal/raw_pos/yomyom/sales/`, which is how the nightly run can read them, since the
-rest of `data/internal/` is gitignored (`collect-daily.yml`).
+`data/internal/raw_pos/yomyom/sales/`, which is how the nightly run can read them. That
+directory is gitignored (`.gitignore`, `data/internal/raw_pos/`): the seven files are tracked
+only because commit a3aca1e force-added them. The column map also reads a missing
+`כניסות מלאי` column as 0.0, which would turn "not reported" into "zero deliveries".
 
 Whether the POS can run that report for a single day, and who sends it how often, is still
 open (F8-S1 OQ-904, owner conversation #7).
@@ -34,27 +36,38 @@ open (F8-S1 OQ-904, owner conversation #7).
 
 1. **The input is the same report, run for one day.**
    - One file per day, named with the ISO date: `דוח מכירות יום YYYY-MM-DD.csv`.
-   - The files are committed under `data/internal/raw_pos/yomyom/sales_daily/`.
+   - The files are committed under `data/internal/raw_pos/yomyom/sales_daily/`. A
+     `.gitignore` negation for that directory makes a plain `git add` work. CLAUDE.md rule 6
+     records it as the second exception, beside `data/internal/snapshots/`.
    - The day comes from the file name, exactly as the month does today, because the report
      carries no date.
    - Seven daily files sent together once a week are equally valid.
 2. **A daily importer sits beside the monthly one.**
    - It reuses the monthly importer's column map and its duplicate-line rule (ADR-019).
    - It writes `silver_pos/sales_daily.parquet`: `barcode, day, units, receipts`.
-   - A product absent from a day's file gets **no row** (ADR-011). F8-S1 reads that as "no
-     sale" only inside a department the evidence itemises (ASM-065, FR-156).
+   - `receipts` is **null, never 0**, when a file has no `כניסות מלאי` column. Each report day
+     records `deliveries_reported: true | false`. A day without it cannot carry a stock count
+     forward (F8-S1 FR-149).
+   - A product absent from a day's file gets **no row** (ADR-011). Inside a department the
+     evidence itemises, F8-S1 reads that as no sale and no delivery that day. That is ASM-065,
+     here extended to deliveries (FR-156).
 3. **Report days are the files that parsed; everything else is missing.**
    - A calendar day with no file, or with a file that failed to parse, is a **missing day**.
      It is recorded as such and never read as zero sales (INV-072).
    - A file that fails is named in the run's steps.
-4. **The vintage says what arrived.** `vintages.sales_daily` carries:
+4. **The vintage says what arrived**, read from the files present with no memory of
+   earlier runs (ADR-004). `vintages.sales_daily` carries:
    - `first_day` and `last_day`;
    - `report_days`, a count;
-   - `missing_days`, the list within the last 35 days;
-   - `imported_this_run`.
+   - `missing_days`, the list within the window plus the freshness limit (F8-S1 FR-144's
+     policy);
+   - `deliveries_missing_days`.
 
-   ADR-017's rule extends to it: a run that received no new report day is `degraded`, not
-   `ok`.
+   ADR-017's rule extends to it in one case only. **Once daily files have started to arrive**,
+   a run whose latest report day is older than the freshness limit is `degraded`. Before the
+   first file, F8 is unavailable and says it waits for daily sales, and the run is not
+   degraded by it. A weekly batch therefore leaves the run `ok` on the six nights between
+   batches.
 5. **The monthly reports stay as they are.** They keep feeding F2 and F4, and never F8
    (INV-070).
 6. **The window and freshness values are policy, not import logic.** The 28 days, 21
@@ -75,6 +88,10 @@ snapshot-delta velocity as inert (§4, S14).
 Forbidden three times over: CLAUDE.md rule 13 (weekday cycles are not measurable), Task 0.6
 (the deleted `units_sold_30d`), and ADR-028 §4. It is also F8-S1 INV-070.
 
+### Keep the directory ignored, and force-add every file
+That is how the monthly files got in (a3aca1e). For a file arriving every day it is a trap:
+a forgotten `-f` leaves the file out without a word, and the engine then reads a missing day.
+
 ### Accept weekly reports as well
 A week's total cannot size a daily order cycle without dividing it. F8-S1 is per-day only
 (FR-143). Weekly *batches of daily files* stay allowed (Decision 1).
@@ -87,8 +104,8 @@ today, and the owner's commitment (PRD §7) is an export, not an integration.
 ## Consequences
 
 **We accept:**
-- Someone must export and commit a file for every day, at least weekly (F8-S1 FR-144). Until
-  OQ-904 is answered, F8 publishes nothing.
+- Someone must export the daily files and commit them at least weekly (F8-S1 FR-144). A
+  missing day is tolerated, not required. Until OQ-904 is answered, F8 publishes nothing.
 - The daily files are committed to the repository, with the same exposure the monthly ones
   already have.
 
