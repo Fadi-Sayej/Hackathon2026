@@ -185,20 +185,34 @@ def test_the_hook_is_gone():
 
 # ── The deployment check ─────────────────────────────────────────────────────
 
-def _fakes(tmp_path: Path, answers: list) -> Path:
-    """A `gh` that gives the next queued answer on each call (none left = empty, which is
-    what the real one prints when there is no deployment yet), and a `sleep` that only
-    counts. Answers use \\t between a status's state and its description; `!fail` makes
-    that call fail the way an API error does."""
+def _fakes(tmp_path: Path, own: list, statuses: dict, latest: list, compare: list) -> Path:
+    """A `gh` that answers by endpoint, each from its own queue: `own` for this sha's
+    deployments, `statuses[id]` for one deployment's statuses, `latest` for the newest
+    production deployment ("<id> <sha>"), `compare` for how two commits relate. A queue that
+    has run out answers empty, which is what the real one prints when there is nothing yet.
+    `!fail` makes that call fail the way an API error does. Own statuses use \\t between the
+    state and its description. And a `sleep` that only counts."""
     bin_dir = tmp_path / "bin"
     bin_dir.mkdir()
-    (tmp_path / "answers").write_text("".join(f"{a}\n" for a in answers), encoding="utf-8")
+    queues = {"own": own, "latest": latest, "compare": compare,
+              **{f"statuses-{i}": a for i, a in statuses.items()}}
+    for key, answers in queues.items():
+        (tmp_path / f"answers-{key}").write_text("".join(f"{a}\n" for a in answers), encoding="utf-8")
     gh = bin_dir / "gh"
     gh.write_text("#!/bin/bash\n"
-                  f'printf "%s\\n" "$*" >> "{tmp_path}/gh-calls"\n'
-                  f'n=$(( $(cat "{tmp_path}/gh-count" 2>/dev/null || echo 0) + 1 ))\n'
-                  f'echo "$n" > "{tmp_path}/gh-count"\n'
-                  f'answer=$(sed -n "${{n}}p" "{tmp_path}/answers")\n'
+                  f'T="{tmp_path}"\n'
+                  'printf "%s\\n" "$*" >> "$T/gh-calls"\n'
+                  'path="$2"\n'
+                  'case "$path" in\n'
+                  '  *"/deployments?sha="*) key=own ;;\n'
+                  '  *"/deployments?environment=Production&per_page=1") key=latest ;;\n'
+                  '  *"/statuses") id=${path%/statuses}; key="statuses-${id##*/}" ;;\n'
+                  '  *"/compare/"*) key=compare ;;\n'
+                  '  *) echo "unexpected gh call: $*" >&2; exit 99 ;;\n'
+                  'esac\n'
+                  'n=$(( $(cat "$T/count-$key" 2>/dev/null || echo 0) + 1 ))\n'
+                  'echo "$n" > "$T/count-$key"\n'
+                  'answer=$(sed -n "${n}p" "$T/answers-$key" 2>/dev/null)\n'
                   'if [ "$answer" = "!fail" ]; then echo "HTTP 502" >&2; exit 1; fi\n'
                   'printf "%b" "$answer"\n',
                   encoding="utf-8")
@@ -209,8 +223,8 @@ def _fakes(tmp_path: Path, answers: list) -> Path:
     return bin_dir
 
 
-def _check(tmp_path: Path, answers: list, sha: str = "abc1234def"):
-    bin_dir = _fakes(tmp_path, answers)
+def _check(tmp_path: Path, *, own=(), statuses=None, latest=(), compare=(), sha="abc1234def"):
+    bin_dir = _fakes(tmp_path, list(own), statuses or {}, list(latest), list(compare))
     env = {**os.environ, "PATH": f"{bin_dir}:{os.environ['PATH']}",
            "REPO": "Fadi-Sayej/Hackathon2026", "SHA": sha, "GH_TOKEN": "t"}
     return subprocess.run(["bash", "-e", "-c", _run_script(CHECK_STEP)],
@@ -222,22 +236,30 @@ def _sleeps(tmp_path: Path) -> int:
     return len(f.read_text().split()) if f.exists() else 0
 
 
+def _calls(tmp_path: Path) -> list:
+    f = tmp_path / "gh-calls"
+    return f.read_text().splitlines() if f.exists() else []
+
+
+DONE = "success\\tDeployment has completed"
+
+
 def test_a_completed_deployment_passes(tmp_path):
-    out = _check(tmp_path, ["4242", "success\\tDeployment has completed"])
+    out = _check(tmp_path, own=["4242"], statuses={4242: [DONE]})
     assert out.returncode == 0, out.stderr
     assert "Deployment has completed" in out.stdout
 
 
 def test_a_blocked_deployment_fails_the_night(tmp_path):
     """The case #167 is about: 0 of 22 collector commits deployed, and every run was green."""
-    out = _check(tmp_path, ["4242", "failure\\tDeployment was blocked"])
+    out = _check(tmp_path, own=["4242"], statuses={4242: ["failure\\tDeployment was blocked"]})
     assert out.returncode != 0
     assert "::error::" in out.stdout and "Deployment was blocked" in out.stdout
     assert "#167" in out.stdout
 
 
 def test_an_errored_build_fails_the_night(tmp_path):
-    out = _check(tmp_path, ["4242", "error\\tDeployment has failed"])
+    out = _check(tmp_path, own=["4242"], statuses={4242: ["error\\tDeployment has failed"]})
     assert out.returncode != 0
     assert "Deployment has failed" in out.stdout
 
@@ -245,14 +267,15 @@ def test_an_errored_build_fails_the_night(tmp_path):
 def test_it_waits_while_the_record_is_missing_or_pending(tmp_path):
     """Vercel writes the record some time after the push. A missing record or a pending
     status is a reason to look again, not a verdict."""
-    out = _check(tmp_path, ["", "", "4242", "pending\\t", "4242", "success\\tDeployment has completed"])
+    out = _check(tmp_path, own=["", "", "4242", "4242"], statuses={4242: ["pending\\t", DONE]})
     assert out.returncode == 0, out.stderr
     assert _sleeps(tmp_path) == 3
 
 
 def test_a_failed_api_call_is_one_more_look_not_a_verdict(tmp_path):
     """One 502 from GitHub used to end the step red under bash -e, with nothing lost."""
-    out = _check(tmp_path, ["!fail", "4242", "!fail", "4242", "success\\tDeployment has completed"])
+    out = _check(tmp_path, own=["!fail", "4242", "4242"], statuses={4242: ["!fail", DONE]},
+                 latest=["!fail"])
     assert out.returncode == 0, out.stderr
     assert _sleeps(tmp_path) == 2
 
@@ -260,26 +283,63 @@ def test_a_failed_api_call_is_one_more_look_not_a_verdict(tmp_path):
 def test_an_empty_sha_is_refused_before_any_lookup(tmp_path):
     """An empty sha would match every production deployment, and the newest may be a success
     from another day."""
-    out = _check(tmp_path, ["4242", "success\\tDeployment has completed"], sha="")
+    out = _check(tmp_path, own=["4242"], statuses={4242: [DONE]}, sha="")
     assert out.returncode != 0
     assert "no sha" in out.stdout
-    assert not (tmp_path / "gh-calls").exists()
+    assert _calls(tmp_path) == []
 
 
 def test_no_deployment_at_all_fails_after_thirty_looks(tmp_path):
     """No record at all is not a pass: the owner may still be on yesterday's artefact."""
-    out = _check(tmp_path, [])
+    out = _check(tmp_path)
     assert out.returncode != 0
     assert "No finished production deployment" in out.stdout
     assert _sleeps(tmp_path) == 30
-    assert (tmp_path / "gh-count").read_text().strip() == "30"
+    assert (tmp_path / "count-own").read_text().strip() == "30"
 
 
 def test_it_reads_the_production_record_for_exactly_this_sha(tmp_path):
-    _check(tmp_path, ["4242", "success\\tDeployment has completed"], sha="0123abcd")
-    calls = (tmp_path / "gh-calls").read_text().splitlines()
+    _check(tmp_path, own=["4242"], statuses={4242: [DONE]}, sha="0123abcd")
+    calls = _calls(tmp_path)
     assert calls[0].startswith("api repos/Fadi-Sayej/Hackathon2026/deployments?sha=0123abcd&environment=Production")
     assert calls[1].startswith("api repos/Fadi-Sayej/Hackathon2026/deployments/4242/statuses")
+
+
+# A later commit reached production first. On 2026-09-26 #201's merge (639dc54) never got a
+# record: #209 merged four minutes later and production went to 8e7fbad, which contains it.
+
+def test_a_later_production_deployment_that_contains_the_artefact_passes(tmp_path):
+    out = _check(tmp_path, latest=["9999 8e7fbad"], statuses={9999: ["success"]},
+                 compare=["ahead"], sha="639dc54")
+    assert out.returncode == 0, out.stderr
+    assert "8e7fbad" in out.stdout and "contains it" in out.stdout
+    assert any(c.startswith("api repos/Fadi-Sayej/Hackathon2026/compare/639dc54...8e7fbad")
+               for c in _calls(tmp_path))
+
+
+def test_a_later_deployment_that_does_not_contain_it_is_not_a_pass(tmp_path):
+    """A rollback or a promotion of an older commit is newer, but it is not tonight's."""
+    out = _check(tmp_path, latest=["9999 0ld0ld"] * 30, statuses={9999: ["success"] * 30},
+                 compare=["behind"] * 30)
+    assert out.returncode != 0
+    assert "No finished production deployment" in out.stdout
+
+
+def test_a_later_deployment_that_did_not_succeed_is_not_asked_about(tmp_path):
+    out = _check(tmp_path, latest=["9999 later"] * 30, statuses={9999: ["failure"] * 30})
+    assert out.returncode != 0
+    assert not (tmp_path / "count-compare").exists()
+
+
+def test_a_blocked_record_of_its_own_wins_over_a_later_deployment(tmp_path):
+    """Blocked means the author rule broke. Something later deploying the artefact by luck
+    does not make that green, and the check does not even look."""
+    out = _check(tmp_path, own=["4242"], statuses={4242: ["failure\\tDeployment was blocked"],
+                                                   9999: ["success"]},
+                 latest=["9999 later"], compare=["ahead"])
+    assert out.returncode != 0
+    assert "Deployment was blocked" in out.stdout
+    assert not (tmp_path / "count-latest").exists()
 
 
 def test_it_runs_after_a_commit_even_when_an_earlier_check_failed():
