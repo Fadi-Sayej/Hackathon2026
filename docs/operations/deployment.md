@@ -77,7 +77,15 @@ Set these in Vercel before any preview or production deployment:
 
 ### Switching to sign-in (ADR-029)
 
-ADR-029's code ships **switched off**. Until the switch-over the site keeps Basic Auth and
+> **Switched over on 2026-09-26**, on the repository owner's decision to go before every
+> account had its role:
+> - Preview and Production carry the three variables below.
+> - `firestore.rules` is the role ruleset, and is deployed.
+> - Email-link sign-in and the two domains are enabled.
+> - Google sign-in still needs its one console toggle.
+> - The steps below are kept as the record, and for a rollback.
+
+ADR-029's code shipped **switched off**. Until the switch-over the site keeps Basic Auth and
 anonymous Firebase, exactly as described above. The switch is three environment variables, one
 rules deploy and a few console steps, in this order. Only the repository owner can do the
 console and Vercel steps.
