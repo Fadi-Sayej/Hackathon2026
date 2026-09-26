@@ -59,6 +59,13 @@ describe('a team account on Today', () => {
     expect(banner.compareDocumentPosition(topbar) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
+  it('gets a button to the telemetry page, in the notice', async () => {
+    asTeam(<App />)
+    const button = await screen.findByRole('link', { name: en['auth.team.toTelemetry'] })
+    expect(button.getAttribute('href')).toBe('/telemetry.html')
+    expect(button.closest('.team-banner')).not.toBeNull()
+  })
+
   it('cannot answer a cost question', async () => {
     asTeam(<App />)
     const input = await screen.findByLabelText(en['questions.costOf'].replace('{product}', 'קפה טורקי'))
@@ -81,6 +88,8 @@ describe('the owner on Today', () => {
     renderWithI18n(<App />, { language: 'en' })
     await waitFor(() => expect(document.querySelectorAll('.entry-card__actions button').length).toBeGreaterThan(0))
     expect(screen.queryByText(en['auth.team.banner'])).toBeNull()
+    expect(screen.queryByRole('link', { name: en['auth.team.toTelemetry'] })).toBeNull()
+    expect(document.querySelector('a[href="/telemetry.html"]')).toBeNull()
     expect([...document.querySelectorAll('.entry-card__actions button')].some((b) => b.disabled)).toBe(false)
   })
 })
