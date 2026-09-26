@@ -1,13 +1,13 @@
 ---
 ID: PLAN
 Title: SmartShelf V1 Implementation Plan
-Status: Partial — Phases 0, 1, 2 and 3 built (Task 2.7's cut-over done 2026-09-12, once ADR-020 removed D-14 as a blocker); Phase 4 in progress: Tasks 4.0 and 4.1 done (4.1 re-scoped by ADR-028, less §20.1's scripts row), Task 4.2 done except `operational.json` and its loader, which wait on F13 (#83), Task 4.3 done, Checkpoint 4 open
+Status: Partial — Phases 0, 1, 2 and 3 built (Task 2.7's cut-over done 2026-09-12, once ADR-020 removed D-14 as a blocker); Phase 4 in progress: Tasks 4.0 and 4.1 done (4.1 re-scoped by ADR-028, less §20.1's scripts row), Task 4.2 done except `operational.json` and its loader, which wait on F13 (#83), Task 4.3 done, Checkpoint 4 open; Phase 5 (V2, F8) approved 2026-09-26, not started
 Owner: smartshelf-architect
-Inputs: [docs/architecture/system-design.md, docs/features/F1-*/specs … F7-*/specs, docs/architecture/decisions/]
-Updated: 2026-09-24
+Inputs: [docs/architecture/system-design.md, docs/features/F1-*/specs … F8-*/specs, docs/architecture/decisions/]
+Updated: 2026-09-26 (Phase 5, V2 F8, approved by the repository owner)
 Version: 1.1 (written 2026-09-08 against System Design v1.0; refreshed the same day against v1.1)
 Parent: [System Design](../architecture/system-design.md)
-Related Specs: F1-S1 … F7-S1 (see the System Design's §21 traceability matrix)
+Related Specs: F1-S1 … F7-S1 for Phases 0–4; F8-S1 for Phase 5 (see the System Design's §21 traceability matrix)
 ---
 
 > **Refreshed against System Design v1.1 on 2026-09-08.** The 2026-09-08 documentation
@@ -66,6 +66,7 @@ Copied verbatim from `docs/architecture/system-design.md`; every task's requirem
 - Determinism: same inputs + policy → same artefact except `generated_at`/`run_id`. Sorted iteration everywhere; no clock reads inside capabilities (run time is an input).
 - The three rule definitions the readiness gate left open are declared as provisional policy, not invented in code: `question_money_basis` (ARCH-GATE-002 — §18 action 3), `uncomparable_min_barcode_digits` (ARCH-GATE-004 — action 4), and the ceiling's population, derived **after** the FR-074 withdrawn exclusion and published with the figure (ARCH-GATE-006 — action 5).
 - Policy constants live only in `configs/policy.yaml`: `price_policy_pct: 60`, `attention_pct: 100`, `cost_floor_pct: 10`, `freshness_days: 14`, `artefact_min_price: 0.5`, `artefact_cost_ratio: 2`, `max_credible_gap_pct: 300`, `surface: {bound: 10, unvalued_places: 3, unvalued_order: [reconciliation, competitor_position, catalogue_lifecycle, hygiene]}`, `question_limit: 3`, `question_money_basis: window_revenue_at_shelf_price`, `question_yield_factor: 1.0`, `uncomparable_min_barcode_digits: 8`, `ceiling_derivation: {band_pct: 2, drop_ratio: 0.75, min_band_count: 20}`, `implausible_revenue_share: 0.10`, `full_annual_cycle_months: 12`, `withdraw_with_stock: false`.
+- **Phase 5 (V2) extends two of the constraints above:** the registry grows from seven ids to ten, and `SIGNAL_FAMILIES` holds thirteen once `order.suggestion` is added. The twelfth, `hygiene.conflicting_duplicate`, came with ADR-019. Its file says in which task each happens.
 - Commit style: small, imperative subject, body explains *why*. Never commit `data/**` except `data/owner/owner_state.json` (CI only) and the existing snapshot rule.
 
 ## Plans, in dependency order
@@ -77,6 +78,7 @@ Copied verbatim from `docs/architecture/system-design.md`; every task's requirem
 | Phase 2 — Browser ✅ *(cut-over deferred)* | [`phase-2-browser.md`](phase-2-browser.md) | Phase 1 artefact | `loadDashboard`, owner state, `compose`, DailyPage, capability pages, questions, data page, migrations. **Checkpoint 2:** AC-100…AC-112 and e2e invariants pass |
 | Phase 3 — Reproduction & gates | [`phase-3-reproduction.md`](phase-3-reproduction.md) | Phases 1–2 | `figures.py` as engine print mode, content addressing, V1 signal probes, nightly workflow. **Checkpoint 3:** fresh clone `npm run figures` ≤ 2 min and equals the artefact's `figures{}` |
 | Phase 4 — Removal | [`phase-4-removal.md`](phase-4-removal.md) | Checkpoint 3 | Tag `v1-attic`; delete §5.4's list; stop `operational.json`; drop migrations. **Checkpoint 4:** bundle < 500 KB; CI green |
+| Phase 5 — V2: Order quantity (F8-S1) — **`Approved` 2026-09-26, not started** | [`phase-5-v2-order-quantity.md`](phase-5-v2-order-quantity.md) | F8-S1 (Approved), ADR-030 … ADR-035 (Accepted); independent of Phase 4 | Per-day import, store facts, the market's running-out signal, the model's boost (sealed snapshot), the quantity, the disagreement question, then the Reorder and Approved orders pages after their mockups are approved. **Checkpoint 5:** all green on fixtures; on real data `order_quantity` is unavailable with `no_daily_sales` and says so |
 
 ## Prerequisites that are not code (do before Phase 0, Task 0.13 checks them)
 
