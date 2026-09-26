@@ -176,9 +176,17 @@ particular: no role quotes a figure it has not read from the artifact that produ
     Both probes run in `collect-daily.yml` before `dashboard.json` is committed,
     and both are **blocking** since the cut-over.
 
+    F8 (Phase 5) adds a third, **`npm run check:order-signals`**, also part of
+    `check:signals`. It withholds each of F8's inputs (the daily reports, their
+    deliveries, the store facts, the market snapshots, the boost picks, an
+    answered disagreement) over a fixture world built by
+    `tests/fixtures/order_signals/build.py`, because real data has no daily
+    reports yet. It warns until the committed artefact first shows
+    `order_quantity` available on real data, and blocks from then on.
+
     The pre-V1 probe over the reorder ranking, `check:signals:legacy`
     (`check_signals_live.mjs`), was retired on 2026-09-24 (Phase 4 Task 4.2, #77)
-    with the reorder engine it exercised (ADR-028). The two probes above are the
+    with the reorder engine it exercised (ADR-028). The three probes above are the
     ones this rule means, and the only ones there are.
 
 13. **The seven sales reports are MONTHLY, and that caps what T8 can claim.** One
