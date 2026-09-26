@@ -9,7 +9,8 @@ This is the B-1 deployment runbook for the current Vite app.
 - Build command: `npm run build`.
 - Install command: `npm ci`.
 - Output directory: `dist`.
-- Access protection: Vercel Routing Middleware with HTTP Basic Auth.
+- Access protection: Vercel Routing Middleware that verifies a Firebase sign-in and its role
+  (ADR-029). It replaced HTTP Basic Auth on 2026-09-26.
 - Production deploy command: `npx vercel deploy --prod`.
 - **Use `npx`, not a global install.** `npm i -g vercel` fails on macOS with
   `EACCES: permission denied, mkdir '/usr/local/lib/node_modules/vercel'`, and
@@ -35,15 +36,21 @@ both have since been done.
 | 4 | `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD` set in Vercel for Production **and** Preview | **pass** (2026-09-13) | `npx vercel env ls` lists both, both environments, created 35d ago. Confirmed live, not just present: `curl https://hackathon2026-fadi19.vercel.app` → **401**, which is the gate working. A 503 would mean a variable was missing |
 | 5 | GitHub secret `FIREBASE_SERVICE_ACCOUNT_JSON` for a read-only service account | **pass** (2026-09-13) | `gh api repos/Fadi-Sayej/Hackathon2026/actions/secrets` → `total_count: 1`, `FIREBASE_SERVICE_ACCOUNT_JSON` |
 
+Items 2 and 4 describe the site before ADR-029's sign-in. On 2026-09-26 anonymous sign-in was
+disabled and the Basic Auth variables and code were removed; what replaced them is under
+[Switching to sign-in](#switching-to-sign-in-adr-029).
+
 ### What items 4 and 5 cost while they were unmet
 
 Kept here because both failure modes are silent and will look the same if either is ever
 unset again.
 
-**4 — Basic Auth.** `middleware.ts` fails closed: with either variable unset every request
+**4 — the access gate.** `middleware.ts` fails closed: without its variable every request
 returns HTTP 503 (design §11.7). The failure is safe but **total**, and invisible until
-someone opens the URL. An unset pair takes the pilot app down on the day it is shown.
-`curl` the URL and read the status code — 401 is healthy, 503 is a missing variable.
+someone opens the URL. It takes the pilot app down on the day it is shown. Until 2026-09-26
+the variables were `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD`; since then it is
+`FIREBASE_PROJECT_ID`. `curl` a data file, `/data/dashboard.json`, and read the status code:
+401 is healthy, 503 is a missing variable.
 
 **5 — the CI secret.** Without it the nightly workflow cannot pull owner state, so every
 CI-produced artefact carries `owner_state: unavailable` and `owner_questions` publishes
@@ -70,29 +77,29 @@ Set these in Vercel before any preview or production deployment:
 
 | Name | Environment | Purpose |
 |---|---|---|
-| `BASIC_AUTH_USER` | Preview and Production | Login username for the pilot URL. |
-| `BASIC_AUTH_PASSWORD` | Preview and Production | Login password for the pilot URL. |
-| `VITE_FIREBASE_*` | Optional (B-2) | Client Firebase web config to activate Firestore persistence + cross-device telemetry. Unset ⇒ localStorage only. Also enable Anonymous sign-in and deploy `firestore.rules` (`firebase deploy --only firestore:rules`); anonymous until the ADR-029 switch-over below. |
+| `FIREBASE_PROJECT_ID` | Preview and Production | `hackathon26-a6ebd`. The edge gate checks a sign-in was issued for this project; unset, every request is a 503. |
+| `VITE_AUTH_MODE` | Preview and Production | `firebase`. The build shows the sign-in screens; unset, the app skips sign-in and the gate refuses it every data file. |
+| `VITE_FIREBASE_*` | Optional (B-2) | Client Firebase web config to activate Firestore persistence + cross-device telemetry. Unset ⇒ localStorage only. Also deploy `firestore.rules` (`firebase deploy --only firestore:rules`), the role rules of ADR-029. |
 | `VITE_STORE_ID` | **Production `yomyom-kafr-qasim`; Preview `preview-sandbox`** | Firestore store namespace (code default `yomyom-kafr-qasim`). The two environments differ **on purpose** — see below. |
 
 ### Switching to sign-in (ADR-029)
 
 > **Switched over on 2026-09-26**, on the repository owner's decision to go before every
 > account had its role:
-> - Preview and Production carry the three variables below.
+> - Preview and Production carry the variables below.
 > - `firestore.rules` is the role ruleset, and is deployed.
-> - Email-link sign-in and the two domains are enabled.
-> - Google sign-in still needs its one console toggle.
-> - The steps below are kept as the record, and for a rollback.
+> - Google and email-link sign-in are enabled, and anonymous sign-in is disabled.
+> - The same day, on the same decision, step 7 was done without waiting the day: the Basic
+>   Auth variables and code are gone, and `middleware.ts` no longer reads `AUTH_MODE`.
+> - The steps below are kept as the record.
 
-ADR-029's code shipped **switched off**. Until the switch-over the site keeps Basic Auth and
-anonymous Firebase, exactly as described above. The switch is three environment variables, one
-rules deploy and a few console steps, in this order. Only the repository owner can do the
-console and Vercel steps.
+ADR-029's code shipped **switched off**. Until the switch-over the site kept Basic Auth and
+anonymous Firebase. The switch was three environment variables, one rules deploy and a few
+console steps, in this order. Only the repository owner can do the console and Vercel steps.
 
 | Variable | Value | Read by |
 |---|---|---|
-| `AUTH_MODE` | `firebase` | the edge gate, `middleware.ts` |
+| `AUTH_MODE` | `firebase` | the edge gate, until step 7 removed the switch; no longer read |
 | `VITE_AUTH_MODE` | `firebase` | the app build, for the sign-in screens |
 | `FIREBASE_PROJECT_ID` | `hackathon26-a6ebd` | the edge gate, to check a token was issued for this project |
 
@@ -122,13 +129,13 @@ console and Vercel steps.
      so keep that gap short.
 7. **After a day of normal use**:
    - disable **Anonymous** sign-in in the console;
-   - remove `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD`;
+   - remove `BASIC_AUTH_USER` / `BASIC_AUTH_PASSWORD` and `AUTH_MODE`;
    - remove the Basic Auth branch of `middleware.ts`.
 
-**Rolling back:**
-- unset the three variables and redeploy, which brings Basic Auth back;
-- redeploy the previous `firestore.rules` from git;
-- re-enable Anonymous sign-in if it was disabled.
+**Rolling back.** There is no password gate to switch back to: step 7 removed it. If sign-in
+breaks, fix it forward. A Vercel deployment keeps the variables it was built with, so
+`vercel rollback` to a deployment from before the switch-over still runs the password gate, but
+it serves that day's data, and its anonymous Firestore saves are refused by the role rules.
 
 ### Preview must not be able to write the pilot's data (2026-09-13)
 
@@ -242,7 +249,7 @@ One thing this still does **not** prove, and it belongs to whoever signs #96:
    sign-in. After #95 merges, #96 step 2 settles the same question more directly, by a real
    answer appearing under `stores/yomyom-kafr-qasim/ownerState/answers`.
 
-The middleware fails closed: if either Basic Auth variable is absent, every request returns HTTP 503
+The middleware fails closed: if `FIREBASE_PROJECT_ID` is absent, every request returns HTTP 503
 instead of serving store data publicly.
 
 Do not commit passwords, API keys, cookies, Vercel project metadata, `.env`, `.env.local`,
@@ -299,7 +306,7 @@ the build the hook triggered after the collector's `engine: artefact for …` co
 collector-authored head passes the Hobby block. The expectation is that it does, because
 the hook is triggered by the project, not by a commit's author.
 
-**What production serves, read without the Basic Auth credentials.** For Git-triggered
+**What production serves, read without signing in.** For Git-triggered
 deploys, the latest `success` in
 `gh api "repos/Fadi-Sayej/Hackathon2026/deployments?environment=Production"` names the commit.
 Read `public/data/dashboard.json` at that sha, not at `main`.
@@ -397,7 +404,7 @@ After deployment:
 
 The build emits a second entry, `telemetry.html`, from the same `vite build` (multi-page input in
 `vite.config.js`). It is served at **`/telemetry.html`** on the same deployment, behind the same
-Basic Auth gate — Vercel serves the built file directly (the filesystem is checked before the SPA
+sign-in gate, to team accounts only (ADR-029). Vercel serves the built file directly (the filesystem is checked before the SPA
 rewrite), so no `vercel.json` rewrite change is needed. It is the internal read-only pilot
 dashboard (alerts shown vs acted-on, acceptance by type, ₪ impact). It reads decisions from
 Firestore when `VITE_FIREBASE_*` is set, otherwise from that device's localStorage.

@@ -8,7 +8,7 @@ export default defineConfig({
   build: {
     // Two entry points: the store app (index.html) and the internal pilot
     // telemetry dashboard (telemetry.html, nagham.md B-3). Both are static and
-    // ship behind the same Vercel Basic Auth gate. Vercel serves the built
+    // ship behind the same sign-in gate, middleware.ts. Vercel serves the built
     // /telemetry.html directly (the filesystem is checked before the SPA
     // rewrite in vercel.json), so no rewrite change is needed.
     rollupOptions: {

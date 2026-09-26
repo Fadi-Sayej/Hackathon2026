@@ -1,8 +1,11 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import middleware, { setKeyFetcherForTests, verifyIdToken } from '../../middleware.ts'
 
-// ADR-029: with AUTH_MODE=firebase the edge gate verifies a Firebase ID token and its
-// `role` claim instead of Basic Auth. These tests sign real RS256 tokens with a throwaway
+// ADR-029: the edge gate verifies a Firebase ID token and its `role` claim on every request.
+// It is the only gate: Basic Auth was removed on 2026-09-26, once sign-in had been live in
+// production. middleware.ts is not covered by eslint (the config matches **/*.{js,jsx} only),
+// and Vite does not run Vercel middleware, so its behaviour is pinned here, by importing the
+// module directly. These tests sign real RS256 tokens with a throwaway
 // key pair, so the signature check is exercised, not mocked: a forged key, `alg: none`, an
 // expired token, the wrong project and an unverified email must all fail, and the
 // owner/team split must hold on every path the ADR's table names.
@@ -49,14 +52,12 @@ beforeAll(async () => {
 })
 
 beforeEach(() => {
-  process.env.AUTH_MODE = 'firebase'
   process.env.FIREBASE_PROJECT_ID = PROJECT
   fetches = 0
   setKeyFetcherForTests(async () => { fetches += 1; return { keys: jwks, maxAge: 3600 } })
 })
 
 afterEach(() => {
-  delete process.env.AUTH_MODE
   delete process.env.FIREBASE_PROJECT_ID
   setKeyFetcherForTests(null)
 })
@@ -137,16 +138,21 @@ describe('the gate, by path and role', () => {
     expect(await middleware(req('/data/dashboard.json', await owner(), 'theme=dark; '))).toBeUndefined()
   })
 
-  it('never caches a refusal', async () => {
-    expect((await middleware(req('/data/dashboard.json'))).headers.get('cache-control')).toBe('no-store')
+  it('never caches or indexes a refusal', async () => {
+    const res = await middleware(req('/data/dashboard.json'))
+    expect(res.headers.get('cache-control')).toBe('no-store')
+    expect(res.headers.get('x-robots-tag')).toContain('noindex')
   })
 
-  it('leaves Basic Auth in charge until AUTH_MODE says otherwise', async () => {
-    delete process.env.AUTH_MODE
+  it('opens nothing to the old shared password, even with its variables still set', async () => {
     process.env.BASIC_AUTH_USER = 'u'
     process.env.BASIC_AUTH_PASSWORD = 'p'
     try {
-      expect(middleware(req('/data/dashboard.json', await owner())).status).toBe(401)
+      const res = await middleware(new Request('https://pilot.test/data/dashboard.json', {
+        headers: { authorization: `Basic ${btoa('u:p')}` },
+      }))
+      expect(res.status).toBe(401)
+      expect(res.headers.get('www-authenticate')).toBeNull()
     } finally {
       delete process.env.BASIC_AUTH_USER
       delete process.env.BASIC_AUTH_PASSWORD

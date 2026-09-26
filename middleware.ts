@@ -1,16 +1,3 @@
-const REALM = 'SmartShelf pilot'
-
-function authChallenge() {
-  return new Response('Authentication required', {
-    status: 401,
-    headers: {
-      'WWW-Authenticate': `Basic realm="${REALM}", charset="UTF-8"`,
-      'Cache-Control': 'no-store',
-      'X-Robots-Tag': 'noindex, nofollow, noarchive',
-    },
-  })
-}
-
 function protectionNotConfigured() {
   return new Response('Deployment access protection is not configured.', {
     status: 503,
@@ -21,30 +8,12 @@ function protectionNotConfigured() {
   })
 }
 
-function parseBasicAuth(header) {
-  if (!header?.startsWith('Basic ')) return null
-
-  try {
-    const decoded = atob(header.slice('Basic '.length))
-    const separator = decoded.indexOf(':')
-    if (separator < 0) return null
-
-    return {
-      user: decoded.slice(0, separator),
-      password: decoded.slice(separator + 1),
-    }
-  } catch {
-    return null
-  }
-}
-
 // ── ADR-029: the signed-in gate ──────────────────────────────────────────────────────────
 //
-// With AUTH_MODE=firebase the gate stops checking Basic Auth and verifies a Firebase ID token
-// instead, carried in the `__session` cookie the app sets after sign-in, plus its `role`
-// claim (set per account by scripts/set_user_role.py). Until then Basic Auth stays in charge,
-// so this code ships dormant and the switch-over is two environment variables and a rules
-// deploy (docs/operations/deployment.md).
+// The gate verifies a Firebase ID token, carried in the `__session` cookie the app sets after
+// sign-in, plus its `role` claim (set per account by scripts/set_user_role.py). It is the only
+// gate: the shared Basic Auth password it replaced was removed on 2026-09-26. Without
+// FIREBASE_PROJECT_ID it fails closed, with a 503 on every request.
 //
 // What is public: the app shell and its code, which hold no store data and render the
 // sign-in page themselves. What is not: every /data/ file (any role), and the team's
@@ -166,7 +135,7 @@ function refuse(status, text) {
   })
 }
 
-async function signedInGate(request) {
+export default async function middleware(request) {
   const projectId = process.env.FIREBASE_PROJECT_ID
   if (!projectId) return protectionNotConfigured()
 
@@ -188,25 +157,6 @@ async function signedInGate(request) {
   if (!ROLES.has(claims.role)) return refuse(403, 'This account has no access')
   if (teamOnly && claims.role !== 'team') return refuse(403, 'Not available for this account')
   return undefined
-}
-
-export default function middleware(request) {
-  if (process.env.AUTH_MODE === 'firebase') return signedInGate(request)
-
-  const expectedUser = process.env.BASIC_AUTH_USER
-  const expectedPassword = process.env.BASIC_AUTH_PASSWORD
-
-  if (!expectedUser || !expectedPassword) {
-    return protectionNotConfigured()
-  }
-
-  const credentials = parseBasicAuth(request.headers.get('authorization'))
-  if (
-    credentials?.user !== expectedUser ||
-    credentials.password !== expectedPassword
-  ) {
-    return authChallenge()
-  }
 }
 
 export const config = {

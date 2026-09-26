@@ -211,7 +211,7 @@ is silent on the three findings that matter most for design (§3.4).
 | Runtime | What it is | Evidence |
 |---|---|---|
 | **Static SPA** on Vercel | React 19 + Vite 8, two build entries (`index.html`, `telemetry.html`), navigation is `useState` (no URL routing), Arabic default, `<html dir>` switching | `vite.config.js`, `vercel.json`, `src/App.jsx:89,632-656` |
-| **Edge middleware** | HTTP Basic Auth on every path; fails closed (503) when the two env vars are unset — and they are unset in `.env` | `middleware.ts` |
+| **Edge middleware** | Verifies a Firebase sign-in and its `role` claim before any `/data/` file or the team's page (ADR-029, since 2026-09-26; HTTP Basic Auth before); fails closed (503) when `FIREBASE_PROJECT_ID` is unset | `middleware.ts` |
 | **Nightly GitHub Actions job** | 00:00 UTC: collect Alonit price file (FTPS) + 9 Wolt venues → seal + commit snapshot → import POS CSV + 7 sales CSVs → `refresh_pipeline.py` → `check_signals_live.mjs` → commit `public/data/*.json` | `.github/workflows/collect-daily.yml` |
 | **Watchdog job** | 12:00 UTC health check only | `collection-health.yml` |
 | **Firestore** (project `hackathon26-a6ebd`) | Rules pinned to `/stores/yomyom-kafr-qasim/**`, anonymous auth. **Inert at runtime**: `VITE_FIREBASE_API_KEY` and `APP_ID` are empty, so `isFirebaseConfigured()` is false and persistence is localStorage only — the state `check_firebase_config.mjs` itself calls "the worst state" | `src/firebase.js:57-65`, `src/lib/persistence/persistence.js:9`, `firestore.rules` |
@@ -502,7 +502,7 @@ and CI infrastructure. Roughly 40 % of the current source tree.
            │                     public/data/dashboard.json  (committed by CI)
            │                                        │ fetch (no-store)
   ┌────────┴───────────────────────────────────────▼───────────────────────────────┐
-  │  BROWSER  (static SPA, Vercel, Basic Auth)                                      │
+  │  BROWSER  (static SPA, Vercel, sign-in gate)                                    │
   │  loadDashboard (schema-validated) → compose() → DailyPage (≤10)                 │
   │  capability pages (full sets, counts, thresholds, window) · QuestionPanel (≤3)  │
   │  ownerState (answers · outcomes · revivals) → localStorage cache → Firestore    │
@@ -626,7 +626,7 @@ and a named missing input when a figure is unavailable — never a remembered va
 | **Publisher → Browser** | `public/data/dashboard.json` (schema v2, `schemas/dashboard.schema.json`) | Immutable per run; validated on both sides against the same schema file | The only coupling between Python and JS; a contract test guards it (§18) |
 | **Browser → Owner state** | `ownerState.js` → adapters → Firestore | LWW by `updatedAt`; browser is the sole writer | Durability (NFR-042/052) without a server |
 | **Engine ↔ Reproduction** | none — the same code | `--print` vs `--publish` flag | INV-065 by construction |
-| **Trust boundary** | Vercel Basic Auth (site) · Firestore rules pinned to one store path (owner state) · GitHub secrets (service account, FTPS) | see §15 | Single-user pilot |
+| **Trust boundary** | Vercel sign-in gate with two roles (site, ADR-029) · Firestore rules pinned to one store path and the same roles (owner state) · GitHub secrets (service account, FTPS) | see §15 | Single-user pilot |
 | **Model/AI boundary** | none in V1 | — | No specification asks for a model; the legacy layer is removed (§5.4) |
 | **V2/V4 boundary** | receiving capture writes its own queue; nothing in V1 reads it; the nightly run still produces `market-context.json` for V2 but no V1 component reads it | — | Keeps the data capture running from 12/9 without coupling V1 to unspecified capabilities |
 
@@ -1030,7 +1030,7 @@ budget: two minutes on the pilot data (NFR-060), measured at the Phase 3 checkpo
 | Dor Alon price transparency (FTPS) | daily `*pricef*`/`*promof*`/`*store*` files; one day kept server-side | day lost → manifest `partial`; watchdog |
 | Wolt venue pages | `query-state` JSON; prices in minor units | venue 503 → other venues continue; 0 products = error |
 | Firestore | rules pinned to one store path; anonymous auth for the browser; service account for CI | see 9.1 / 9.3 |
-| Vercel | static build; Basic Auth middleware; `/data/*` `no-store` | 503 if credentials unset (fail closed) |
+| Vercel | static build; sign-in middleware (ADR-029); `/data/*` `no-store` | 503 if `FIREBASE_PROJECT_ID` unset (fail closed) |
 
 ---
 
@@ -1124,10 +1124,10 @@ business's cost prices, margins, stock and the owner's decisions.
 
 | Concern | Design |
 |---|---|
-| **Trust boundary 1 — the site** | Vercel Edge middleware on every path (`middleware.ts`, fail-closed) verifies a Firebase ID token and its `role` claim ([ADR-029](decisions/ADR-029-two-roles-sign-in-and-the-gate-enforces-them.md), replacing the one shared Basic Auth credential). `owner` is refused the telemetry page, its chunks and `measurement.json`; `team` is served everything. `X-Robots-Tag: noindex`. Until ADR-029 is built, the one shared Basic Auth credential stays |
+| **Trust boundary 1 — the site** | Vercel Edge middleware on every path (`middleware.ts`, fail-closed) verifies a Firebase ID token and its `role` claim ([ADR-029](decisions/ADR-029-two-roles-sign-in-and-the-gate-enforces-them.md), replacing the one shared Basic Auth credential). `owner` is refused the telemetry page, its chunks and `measurement.json`; `team` is served everything. `X-Robots-Tag: noindex`. Live since 2026-09-26; the shared Basic Auth credential was removed the same day |
 | **Trust boundary 2 — owner state** | Firestore rules pinned to `/stores/yomyom-kafr-qasim/**`: read for `owner` and `team`, write for `owner` only ([ADR-029](decisions/ADR-029-two-roles-sign-in-and-the-gate-enforces-them.md), D-22). Sign-in is Google or email link; anonymous sign-in is removed. Until ADR-029 is built, the pilot keeps the earlier posture: anonymous sign-in, and anyone who loads the app can mint a token and read/write that subtree |
 | **Trust boundary 3 — CI** | FTPS credentials (public read-only account), Firebase service account JSON (`FIREBASE_SERVICE_ACCOUNT_JSON`) as GitHub secrets; the engine's pull is read-only and the service account should be granted read-only on Firestore |
-| **Sensitive data paths** | `dashboard.json` carries cost prices and margins (as `operational.json` does today) — behind Basic Auth, `no-store`. The inventory CSV and sales reports are committed to a private repository. No new exposure class is introduced; the mirror `data/owner/owner_state.json` adds the owner's outcomes and answers to the repo, which already holds his cost column |
+| **Sensitive data paths** | `dashboard.json` carries cost prices and margins (as `operational.json` does today) — behind the sign-in gate, for either role, `no-store`. The inventory CSV and sales reports are committed to a private repository. No new exposure class is introduced; the mirror `data/owner/owner_state.json` adds the owner's outcomes and answers to the repo, which already holds his cost column |
 | **Secrets in the bundle** | The Gemini key path is removed with the LLM layer. `VITE_*` remains the only browser-visible namespace; `check_firebase_config.mjs` is kept as a pre-deploy guard |
 | **Validation boundaries** | Owner-state records are validated on write (closed enums, numeric cost > 0) and on pull (schema); the artefact is validated on both sides; CSV imports are validated by the mapping YAML. Comment/answer text is never rendered as HTML |
 | **Removed attack surface** | No runtime server (LLM proxy, MCP server gone); no browser file upload; no second Firestore schema |

@@ -153,7 +153,7 @@ chain above.
 
 | Document | What it is |
 |---|---|
-| [Deployment](operations/deployment.md) | Vercel release runbook: build, env, the Basic-Auth gate, what must be committed |
+| [Deployment](operations/deployment.md) | Vercel release runbook: build, env, the sign-in gate, what must be committed |
 | [Snapshot durability](operations/snapshot-durability.md) | Why the daily market snapshot is committed and what a lost day costs |
 | [Receiving ledger](operations/receiving-ledger.md) | The `received` term the POS never records: operator flow, CSV shape, lead times |
 
