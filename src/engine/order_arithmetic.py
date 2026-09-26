@@ -108,7 +108,7 @@ def stock_now(count: Optional[float], count_date, flagged: bool, rows: Iterable[
     lines = defaultdict(list)
     for r in rows:
         lines[r["day"]].append(r)
-    moved = 0.0
+    delivered = sold = 0.0
     for i in range(age):
         day = (count_date + timedelta(days=i)).isoformat()
         if day not in deliveries_reported:
@@ -119,11 +119,13 @@ def stock_now(count: Optional[float], count_date, flagged: bool, rows: Iterable[
         if (not printed or any(r.get("units") is None or r.get("receipts") is None for r in printed)
                 or len({(r["units"], r["receipts"]) for r in printed}) > 1):
             return refused("no_row_since_count")
-        moved += printed[0]["receipts"] - printed[0]["units"]
-    value = count + moved
+        delivered += printed[0]["receipts"]
+        sold += printed[0]["units"]
+    value = count + delivered - sold
     if _settled(value) < 0:
         return refused("stock_inconsistent")
-    return {"stock_now": value, "not_used_because": None}
+    # The deliveries and sales it was carried across are published with it (FR-154).
+    return {"stock_now": value, "not_used_because": None, "deliveries_since": delivered, "sales_since": sold}
 
 
 def stock_at_order_day(stock: float, daily_mean: float, run_date, order_day) -> float:

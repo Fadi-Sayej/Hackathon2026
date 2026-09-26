@@ -53,6 +53,11 @@ CAPABILITIES = {
     # F8 (V2). The model's picks, checked and sealed; the quantity reads them (ADR-032, ADR-035).
     "market_boost":        CapabilitySpec("market_boost",        "F8-S1",    "none",     False, "boost_pct",
                                           ("running_out", "boost_picks"), published_from="2026-09-27"),
+    # F8 (V2). The suggestions themselves (ADR-034). It names products, their departments and
+    # their counts, so the POS catalogue is as much an input as the two F8 ones.
+    "order_quantity":      CapabilitySpec("order_quantity",      "F8-S1",    "none",     False, "units_in_window",
+                                          ("products", "sales_daily", "store_facts"),
+                                          published_from="2026-09-27"),
 }
 
 # The reason belongs to the missing input, not to the capability: catalogue_lifecycle with
@@ -71,6 +76,10 @@ INPUT_REASONS = {
     # ADR-035: no sealed picks for the day. A live run with a key always seals a manifest,
     # so the only live night without one is a night with no key.
     "boost_picks": "no_boost_key",
+    # ADR-030: no daily report has arrived yet. F8 waits for them, and says so.
+    "sales_daily": "no_daily_sales",
+    # ADR-033: the store facts file itself is absent (an empty one is a file with no facts).
+    "store_facts": "no_store_facts",
 }
 
 # Admitted capabilities that may never carry money (D-1). Their precedence for the three

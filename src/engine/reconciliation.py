@@ -112,11 +112,35 @@ def _detection_entries(inputs: EngineInputs, window) -> list:
     return sorted(out, key=lambda e: (-e.ordering_key["value"], e.barcode))
 
 
-def run(inputs: EngineInputs) -> CapabilityOutput:
-    """The detection half. Unavailable without receipts — never 'available with zero'."""
+def flagged_barcodes(inputs: EngineInputs) -> dict:
+    """{barcode: [the families that flag it]}, from exactly what the two capabilities publish.
+
+    F8's usable count must be "flagged by neither reconciliation nor hygiene" (F8-S1 FR-149).
+    This reads the same entry functions the capabilities publish from, under the same guards,
+    so a flag is one derivation at one moment and cannot differ from the published list.
+    A capability that cannot run flags nothing: its absence is published on its own.
+    """
+    out: dict = {}
+    entries = []
+    if derive_status(HYGIENE, inputs)[0] == "available":
+        entries += _hygiene_entries(inputs)
+    window, _reason = _detection_window(inputs)
+    if window is not None:
+        entries += _detection_entries(inputs, window)
+    for e in entries:
+        if e.barcode:
+            families = out.setdefault(e.barcode, [])
+            if e.signal_family not in families:
+                families.append(e.signal_family)
+    return {b: sorted(families) for b, families in out.items()}
+
+
+def _detection_window(inputs: EngineInputs):
+    """(the reconcile window, None), or (None, why detection cannot run). run() and
+    flagged_barcodes() both ask this, so they cannot disagree about when it runs."""
     status, reason = derive_status(RECON, inputs)
     if status == "unavailable":
-        return CapabilityOutput.unavailable(RECON, SPEC, reason)
+        return None, reason
 
     # Two rule-level unavailabilities, neither expressible by a `requires` list.
     # derive_status's contract allows a capability to make itself MORE unavailable,
@@ -146,7 +170,7 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
     pos_vintage = ((inputs.vintages or {}).get("pos") or {})
     if usable_stock_date(pos_vintage.get("as_of"),
                          source=pos_vintage.get("as_of_source")) is None:
-        return CapabilityOutput.unavailable(RECON, SPEC, "unknown_stock_date")
+        return None, "unknown_stock_date"
 
     # ADR-026: the window is carved from the one boundary load_inputs cut the figures at,
     # so the period published beside the arithmetic is the period of the arithmetic. That
@@ -157,7 +181,7 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
     # nothing and never a crash.
     reconcile_before = ((inputs.vintages or {}).get("sales") or {}).get("reconcile_before")
     if reconcile_before is None:
-        return CapabilityOutput.unavailable(RECON, SPEC, "unknown_stock_date")
+        return None, "unknown_stock_date"
 
     # The second: the date is known, but it precedes every month we have, so no
     # month is inside the reconciliation window. Every row then carries
@@ -168,7 +192,7 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
     # literally what this is — there is none before the count.
     if inputs.sales_summary and not any(
             (row.get("reconcile_months") or 0) > 0 for row in inputs.sales_summary.values()):
-        return CapabilityOutput.unavailable(RECON, SPEC, "no_sales_evidence")
+        return None, "no_sales_evidence"
 
     # The same strict `<` the cut applies, over the same monthly rows, so the window is the
     # months the figures were summed over. Through load_inputs the guard above leaves at
@@ -177,7 +201,15 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
     window = evidence_window([m for m in inputs.window.months if m < reconcile_before],
                              inputs.policy.full_annual_cycle_months)
     if not window.months:
-        return CapabilityOutput.unavailable(RECON, SPEC, "no_sales_evidence")
+        return None, "no_sales_evidence"
+    return window, None
+
+
+def run(inputs: EngineInputs) -> CapabilityOutput:
+    """The detection half. Unavailable without receipts — never 'available with zero'."""
+    window, reason = _detection_window(inputs)
+    if window is None:
+        return CapabilityOutput.unavailable(RECON, SPEC, reason)
     flagged = _detection_entries(inputs, window)
     return CapabilityOutput(
         id=RECON, spec=SPEC, status="available", window=window,

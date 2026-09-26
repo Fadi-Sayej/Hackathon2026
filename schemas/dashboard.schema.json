@@ -190,6 +190,49 @@
             }
           }
         },
+        "sales_daily": {
+          "type": "object",
+          "description": "ADR-030 (Phase 5 Task 5.2): what the daily sales reports say arrived, read from the rows present. missing_days and deliveries_missing_days look back over the evidence window plus the freshness limit. NOT required: artefacts published before the daily reports existed do not carry it.",
+          "required": [
+            "first_day",
+            "last_day",
+            "report_days",
+            "missing_days",
+            "deliveries_missing_days"
+          ],
+          "properties": {
+            "first_day": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "last_day": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "report_days": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "missing_days": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "deliveries_missing_days": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
         "owner_state": {
           "type": "object",
           "required": [
@@ -384,7 +427,8 @@
             "competitor.purchase_cost",
             "catalogue.idle",
             "catalogue.implausible_quantity",
-            "margin.below_cost"
+            "margin.below_cost",
+            "order.suggestion"
           ]
         },
         "capability": {
@@ -415,7 +459,8 @@
             "fix_record",
             "decide_idle",
             "review_policy",
-            "check_purchase_cost"
+            "check_purchase_cost",
+            "place_order"
           ]
         },
         "characterisation": {
@@ -460,7 +505,73 @@
             "review"
           ]
         }
-      }
+      },
+      "allOf": [
+        {
+          "comment": "F8-S1 FR-154 and INV-069 (Phase 5 Task 5.8): an order suggestion publishes the facts it was computed from, and never a value. publish.py also refuses any money-named field at any depth, which a schema cannot say.",
+          "if": {
+            "properties": {
+              "signal_family": {
+                "const": "order.suggestion"
+              }
+            },
+            "required": [
+              "signal_family"
+            ]
+          },
+          "then": {
+            "properties": {
+              "action": {
+                "const": "place_order"
+              },
+              "value": {
+                "type": "null"
+              },
+              "evidence": {
+                "type": "object",
+                "required": [
+                  "order_day",
+                  "cycle",
+                  "schedule",
+                  "schedule_changed",
+                  "window",
+                  "weekly_units",
+                  "daily_mean",
+                  "boost",
+                  "adjusted_daily_mean",
+                  "expected_sales",
+                  "count",
+                  "stock_now",
+                  "stock_at_order_day",
+                  "shelf_life",
+                  "capped",
+                  "kind",
+                  "quantity"
+                ],
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "net",
+                      "gross"
+                    ]
+                  },
+                  "quantity": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "boost": {
+                    "type": "object",
+                    "required": [
+                      "applied",
+                      "not_applied_because"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
     },
     "capability": {
       "comment": "Extra properties are allowed: catalogue_lifecycle adds withdrawn/statement/provisional and owner_questions adds limit/items/suppressed (design §11.4).",

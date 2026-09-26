@@ -54,6 +54,10 @@ KNOWN = {
     # Phase 5 Task 5.6 (ADR-032 Decision 6): no key for the model, or no answer from it.
     "no_boost_key",
     "boost_unavailable",
+    # Phase 5 Task 5.8 (ADR-030, ADR-033): no daily reports yet, stale ones, or no facts file.
+    "no_daily_sales",
+    "stale_daily_sales",
+    "no_store_facts",
 }
 
 

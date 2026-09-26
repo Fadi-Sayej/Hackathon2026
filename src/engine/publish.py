@@ -4,12 +4,45 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from pathlib import Path
 
 import jsonschema
 
 from src.engine.model import CapabilityOutput
+from src.engine.policy import D21_MAX_BOOST_PCT
 from src.engine.registry import CAPABILITIES
+
+# INV-069: no order suggestion carries a ₪ figure. Checked by name at every depth of its
+# evidence, because a nested `unit_cost` is exactly what a schema written for the top level
+# would let through, and a suggestion is the one place a total would tempt someone.
+MONEY_FIELD = re.compile(r"price|cost|revenue|margin|shekel|money|amount|₪", re.IGNORECASE)
+
+
+def _money_fields(obj, path=""):
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            here = f"{path}.{key}" if path else str(key)
+            if MONEY_FIELD.search(str(key)):
+                yield here
+            yield from _money_fields(value, here)
+    elif isinstance(obj, list):
+        for i, value in enumerate(obj):
+            yield from _money_fields(value, f"{path}[{i}]")
+
+
+def _check_order_suggestion(entry: dict, max_pct: float) -> None:
+    fields = list(_money_fields(entry.get("evidence") or {}))
+    if fields:
+        raise PublishRefused(f"order_quantity entry {entry['id']} carries money-named fields {fields} (INV-069)")
+    boost = (entry.get("evidence") or {}).get("boost") or {}
+    if boost.get("applied"):
+        pct = boost.get("pct")
+        # Only an APPLIED boost is checked. A rejected pick is published as the fact it is,
+        # "the model said 40", and applying nothing is exactly what FR-147 asks for.
+        if not isinstance(pct, (int, float)) or isinstance(pct, bool) or not 0 <= pct <= max_pct:
+            raise PublishRefused(f"order_quantity entry {entry['id']} applies a boost of {pct!r}, outside "
+                                 f"0–{max_pct} (D-21, FR-147)")
 
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMA_PATH = ROOT / "schemas" / "dashboard.schema.json"
@@ -78,6 +111,11 @@ def validate_artefact(artefact: dict, *, require_complete_registry: bool = False
             for e in cap["entries"]:
                 if e.get("value") is not None:
                     raise PublishRefused(f"value_policy none: {cap_id} entry {e['id']} carries a value (D-1)")
+        if cap_id == "order_quantity":
+            declared = ((artefact.get("thresholds") or {}).get("market_boost") or {}).get("max_pct")
+            max_pct = min(D21_MAX_BOOST_PCT, declared) if isinstance(declared, (int, float)) else D21_MAX_BOOST_PCT
+            for e in cap["entries"]:
+                _check_order_suggestion(e, max_pct)
     # FR-105: the single-kind premise is derived, and V1 permits at most one kind.
     if len(artefact["value_kinds_present"]) > 1:
         raise PublishRefused("more than one value kind present; FR-106 allocation must be re-derived (GAP-002)")

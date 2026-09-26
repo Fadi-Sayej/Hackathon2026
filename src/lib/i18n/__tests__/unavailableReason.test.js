@@ -40,6 +40,8 @@ const ENGINE_REASONS = [
   'no_competitor_data',
   'market_signal_thin',
   'no_boost_key',
+  'no_daily_sales',
+  'no_store_facts',
   // rule-level, raised by the capabilities themselves
   'ceiling_degenerate',
   'no_delivery_prices',
@@ -48,6 +50,7 @@ const ENGINE_REASONS = [
   'unknown_stock_date',
   'market_signal_stale',
   'boost_unavailable',
+  'stale_daily_sales',
   // run-level
   'capability_error',
 ]
