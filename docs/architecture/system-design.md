@@ -1223,7 +1223,7 @@ own, so their rows say so rather than grade it after the fact.
 | [ADR-029](decisions/ADR-029-two-roles-sign-in-and-the-gate-enforces-them.md) | Two roles sign in, and the edge gate enforces them (D-22) | Moderate |
 | [ADR-030](decisions/ADR-030-own-sales-arrive-as-daily-reports.md) | F8's own sales arrive as daily reports, one file per day, and a missing day stays missing | Easy |
 | [ADR-031](decisions/ADR-031-running-out-is-a-short-absence-after-steady-presence.md) | "Running out" is a short absence after steady presence in the market's daily catalogues | Easy |
-| [ADR-032](decisions/ADR-032-the-boost-is-a-pinned-model-validated-and-recorded.md) | The boost is picked by a pinned model in the nightly run, and checked mechanically before it is used — accepted except the choice of model, which is open | Easy |
+| [ADR-032](decisions/ADR-032-the-boost-is-a-pinned-model-validated-and-recorded.md) | The boost is picked by a pinned Claude model (Sonnet 5) in the nightly run, and checked mechanically before it is used | Easy |
 | [ADR-033](decisions/ADR-033-store-facts-are-a-committed-file.md) | The store facts are a committed file the team records from the owner; owner state never holds them | Easy |
 | [ADR-034](decisions/ADR-034-a-suggestion-is-identified-by-product-and-order-day.md) | An order suggestion is identified by its product and order day; a disagreement is a question keyed by its product | Easy before first use |
 | [ADR-035](decisions/ADR-035-a-models-answer-is-collected-data.md) | A model's answer is collected data: sealed as a daily snapshot, and reproduction reads it like any other | Easy |
@@ -1458,7 +1458,7 @@ Design elements: **E** engine module · **P** publisher/artefact · **C** `compo
 
 **Nothing in this table is built yet.** F8-S1 (`Approved`, 2026-09-25) is the first V2
 spec. Its design decisions are ADR-030 … ADR-035, accepted by the repository owner on
-2026-09-26. ADR-032 was accepted without its choice of model, which is still his to make.
+2026-09-26. The boost model is Claude Sonnet 5, his choice the same day (ADR-032).
 Each row names the ADR that answers it, and the implementation plan may now be written
 against them.
 
