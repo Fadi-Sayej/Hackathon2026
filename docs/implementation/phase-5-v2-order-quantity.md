@@ -54,7 +54,18 @@ This is the part the first draft got wrong, so it is stated before any task.
 4. **A capability is registered in the same task as its runner.** The publisher refuses a
    real run whose artefact lacks a registered id (`publish.py`, `require_complete_registry`).
    A registry entry without a runner stops the nightly publishing. Each such task also
-   updates `tests/engine/test_run_capabilities.py`, the exact id set.
+   updates `tests/engine/test_run_capabilities.py` and `tests/engine/test_registry.py`, the
+   exact id sets.
+
+   **The committed artefact lags the registry by one nightly** (found in Task 5.4, 2026-09-26).
+   `scripts/check_deploy_data.py` validates the committed `public/data/dashboard.json`
+   against the complete registry, and its test runs on every PR. Only the nightly
+   regenerates that file, so a newly registered id is missing from it until the first
+   nightly after the merge, and every CI run in between would fail. So each new registry
+   entry carries **`published_from`**, the date of the first nightly that can publish it.
+   The deploy check reports it missing as WARN in an artefact generated before that date,
+   and as BAD from then on. The publisher's own rule is unchanged: a real run must publish
+   every registered id.
 5. **Nothing new reaches the owner's screens before Task 5.12's mockups are approved.**
    - Today and Data list every capability by id (`DailyPage.jsx`, `DataPage.jsx`).
    - `compose.js` admits every capability not in its `NOT_ADMITTED` set.
@@ -267,9 +278,14 @@ These apply on top of the index's Global Constraints.
   - `src/lib/i18n/dictionaries/{he,ar,en}.js`: copy for `market_signal_thin` and
     `market_signal_stale`.
   - `tests/engine/helpers.py`, `tests/engine/test_run_capabilities.py` (eight ids).
+  - `tests/engine/test_registry.py`: eight ids, and a spec named `F#-S#` as well as
+    `SPEC-NNN`. Added 2026-09-26; the first draft missed that this test pins both.
+  - `src/engine/registry.py`: `CapabilitySpec.published_from`, with `market_running_out`'s.
+    `scripts/check_deploy_data.py`: the WARN-before-that-date rule (item 4 above). Both
+    added 2026-09-26.
 - Test: `tests/test_presence.py`, `tests/test_running_out.py`,
   `tests/engine/test_market_running_out.py`, `tests/engine/test_unavailable_reasons.py`,
-  `src/lib/i18n/__tests__/unavailableReason.test.js`
+  `src/lib/i18n/__tests__/unavailableReason.test.js`, `tests/test_check_deploy_data.py`
 
 **Interfaces:**
 - **`running_out(series, market_store_ids, policy, on_day)`** returns `{barcode: {stores_out,
@@ -332,7 +348,8 @@ These apply on top of the index's Global Constraints.
   - `src/engine/registry.py`: the `market_boost` entry, `INPUT_REASONS`, and the reasons
     `no_boost_key` and `boost_unavailable`.
   - `src/lib/i18n/dictionaries/{he,ar,en}.js`, `tests/engine/helpers.py`,
-    `tests/engine/test_run_capabilities.py` (nine ids).
+    `tests/engine/test_run_capabilities.py` and `tests/engine/test_registry.py` (nine ids).
+    The `market_boost` entry carries `published_from` (item 4).
 - Test: `tests/engine/test_market_boost.py`, `tests/engine/test_unavailable_reasons.py`,
   `src/lib/i18n/__tests__/unavailableReason.test.js`
 
@@ -429,7 +446,9 @@ These apply on top of the index's Global Constraints.
     and is never checked as an applied boost.
   - `src/engine/registry.py`, `src/engine/run.py`, `src/lib/i18n/dictionaries/{he,ar,en}.js`
     (the reasons `no_daily_sales`, `stale_daily_sales`, `no_store_facts`),
-    `tests/engine/helpers.py`, `tests/engine/test_run_capabilities.py` (ten ids).
+    `tests/engine/helpers.py`, `tests/engine/test_run_capabilities.py` and
+    `tests/engine/test_registry.py` (ten ids). The `order_quantity` entry carries
+    `published_from` (item 4).
 - Test: `tests/engine/test_order_quantity.py`, `tests/engine/test_publish.py`,
   `tests/engine/test_reconciliation.py`, `tests/engine/test_unavailable_reasons.py`,
   `src/lib/i18n/__tests__/unavailableReason.test.js`
