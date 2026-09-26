@@ -22,8 +22,8 @@ Work it in order. A box is ticked only after you ran the thing, not after you re
       committed (rule 12)
 
 ## Access and secrets
-- [ ] Basic Auth credentials set for Preview and Production
-- [ ] Middleware verified to fail closed — missing credentials return 503, not store data
+- [ ] `FIREBASE_PROJECT_ID` and `VITE_AUTH_MODE=firebase` set for Preview and Production (ADR-029)
+- [ ] Middleware verified to fail closed — a missing `FIREBASE_PROJECT_ID` returns 503, not store data
 - [ ] No `.env`, `.env.local`, `secrets/`, `.vercel/`, key or service-account file in the diff
 - [ ] The diff was read before the commit, not after
 

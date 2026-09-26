@@ -464,5 +464,6 @@ export const en = {
   'auth.noAccess.body': "You're signed in as {email}. Ask the team to give this account access.",
   'auth.noAccess.signOut': "Sign out and use another account",
   'auth.team.banner': "Team view — read only. Nothing you press here is saved.",
+  'auth.team.toTelemetry': "Open the telemetry page",
   'auth.error': "Sign-in didn't work. Try again.",
 }

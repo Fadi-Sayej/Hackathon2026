@@ -468,5 +468,6 @@ export const ar = {
   'auth.noAccess.body': "دخلت باسم {email}. اطلب من الفريق منح هذا الحساب صلاحية.",
   'auth.noAccess.signOut': "الخروج والدخول بحساب آخر",
   'auth.team.banner': "عرض الفريق — للقراءة فقط. لا يُحفظ شيء تضغطه هنا.",
+  'auth.team.toTelemetry': "فتح صفحة قياس التجربة",
   'auth.error': "تعذّر تسجيل الدخول. حاول مرة أخرى.",
 }

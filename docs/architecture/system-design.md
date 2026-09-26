@@ -211,7 +211,7 @@ is silent on the three findings that matter most for design (§3.4).
 | Runtime | What it is | Evidence |
 |---|---|---|
 | **Static SPA** on Vercel | React 19 + Vite 8, two build entries (`index.html`, `telemetry.html`), navigation is `useState` (no URL routing), Arabic default, `<html dir>` switching | `vite.config.js`, `vercel.json`, `src/App.jsx:89,632-656` |
-| **Edge middleware** | HTTP Basic Auth on every path; fails closed (503) when the two env vars are unset — and they are unset in `.env` | `middleware.ts` |
+| **Edge middleware** | Verifies a Firebase sign-in and its `role` claim before any `/data/` file or the team's page (ADR-029, since 2026-09-26; HTTP Basic Auth before); fails closed (503) when `FIREBASE_PROJECT_ID` is unset | `middleware.ts` |
 | **Nightly GitHub Actions job** | 00:00 UTC: collect Alonit price file (FTPS) + 9 Wolt venues → seal + commit snapshot → import POS CSV + 7 sales CSVs → `refresh_pipeline.py` → `check_signals_live.mjs` → commit `public/data/*.json` | `.github/workflows/collect-daily.yml` |
 | **Watchdog job** | 12:00 UTC health check only | `collection-health.yml` |
 | **Firestore** (project `hackathon26-a6ebd`) | Rules pinned to `/stores/yomyom-kafr-qasim/**`, anonymous auth. **Inert at runtime**: `VITE_FIREBASE_API_KEY` and `APP_ID` are empty, so `isFirebaseConfigured()` is false and persistence is localStorage only — the state `check_firebase_config.mjs` itself calls "the worst state" | `src/firebase.js:57-65`, `src/lib/persistence/persistence.js:9`, `firestore.rules` |
@@ -502,7 +502,7 @@ and CI infrastructure. Roughly 40 % of the current source tree.
            │                     public/data/dashboard.json  (committed by CI)
            │                                        │ fetch (no-store)
   ┌────────┴───────────────────────────────────────▼───────────────────────────────┐
-  │  BROWSER  (static SPA, Vercel, Basic Auth)                                      │
+  │  BROWSER  (static SPA, Vercel, sign-in gate)                                    │
   │  loadDashboard (schema-validated) → compose() → DailyPage (≤10)                 │
   │  capability pages (full sets, counts, thresholds, window) · QuestionPanel (≤3)  │
   │  ownerState (answers · outcomes · revivals) → localStorage cache → Firestore    │
@@ -626,7 +626,7 @@ and a named missing input when a figure is unavailable — never a remembered va
 | **Publisher → Browser** | `public/data/dashboard.json` (schema v2, `schemas/dashboard.schema.json`) | Immutable per run; validated on both sides against the same schema file | The only coupling between Python and JS; a contract test guards it (§18) |
 | **Browser → Owner state** | `ownerState.js` → adapters → Firestore | LWW by `updatedAt`; browser is the sole writer | Durability (NFR-042/052) without a server |
 | **Engine ↔ Reproduction** | none — the same code | `--print` vs `--publish` flag | INV-065 by construction |
-| **Trust boundary** | Vercel Basic Auth (site) · Firestore rules pinned to one store path (owner state) · GitHub secrets (service account, FTPS) | see §15 | Single-user pilot |
+| **Trust boundary** | Vercel sign-in gate with two roles (site, ADR-029) · Firestore rules pinned to one store path and the same roles (owner state) · GitHub secrets (service account, FTPS) | see §15 | Single-user pilot |
 | **Model/AI boundary** | none in V1 | — | No specification asks for a model; the legacy layer is removed (§5.4) |
 | **V2/V4 boundary** | receiving capture writes its own queue; nothing in V1 reads it; the nightly run still produces `market-context.json` for V2 but no V1 component reads it | — | Keeps the data capture running from 12/9 without coupling V1 to unspecified capabilities |
 
@@ -844,9 +844,9 @@ entry id, which does not include the ceiling (C-4, AC-009).
 | **Store** | store_id | name, chain, format, affinity to the client format, `role: client | competitor`, provenance (branch_known | chain_format) | Hand-maintained |
 | **Match** | (barcode, external_key) | method (barcode_exact | name_normalized | fuzzy_name), confidence, approved | Per run, content-addressed |
 | **Classification** | barcode | living | withdrawable | idle; plus excluded reasons (negative_stock, no_identifier); `provisional` | Per run |
-| **Entry** | `entry_id = sha256(signal_family ‖ barcode ‖ variant)[:16]`. `signal_family` is a permanent identity string (`recon.impossible_opening`, `hygiene.negative_stock`, `hygiene.no_identifier`, `hygiene.absent_price`, `price.inverted`, `price.above_ceiling`, `competitor.policy_breach`, `competitor.purchase_cost`, `catalogue.idle`, `catalogue.implausible_quantity`, `margin.below_cost`) fixed once and **never** reused or renamed. It is *not* the routing `capability` id — see ADR-009 | capability, signal_family, action, characterisation, evidence{}, value?, ordering_key, actionable, attention | Per run; outcomes reference it across runs |
+| **Entry** | `entry_id = sha256(signal_family ‖ barcode ‖ variant)[:16]`. `signal_family` is a permanent identity string (`recon.impossible_opening`, `hygiene.negative_stock`, `hygiene.no_identifier`, `hygiene.absent_price`, `price.inverted`, `price.above_ceiling`, `competitor.policy_breach`, `competitor.purchase_cost`, `catalogue.idle`, `catalogue.implausible_quantity`, `margin.below_cost`; V2 adds `order.suggestion`, ADR-034) fixed once and **never** reused or renamed. It is *not* the routing `capability` id — see ADR-009 | capability, signal_family, action, characterisation, evidence{}, value?, ordering_key, actionable, attention | Per run; outcomes reference it across runs |
 | **Value** | — | `{amount: number, kind: 'per_sale', certainty: 'confirmed' | 'estimated'}` — the only kind in V1 | — |
-| **Question** | `question_id = sha256('cost_price' ‖ barcode)` | product, fact, why (products affected, money at stake), expected value | open → answered | deferred |
+| **Question** | `question_id = sha256(fact ‖ barcode)`: V1's fact is `cost_price`; V2 adds `market_disagreement` (ADR-034) | product, fact, why (products affected, money at stake), expected value | open → answered | deferred |
 | **Figure** | name | value | null, unit, inputs (vintage keys), thresholds | Per run |
 
 ### 10.2 Value semantics (the D-1/D-2 model)
@@ -1030,7 +1030,7 @@ budget: two minutes on the pilot data (NFR-060), measured at the Phase 3 checkpo
 | Dor Alon price transparency (FTPS) | daily `*pricef*`/`*promof*`/`*store*` files; one day kept server-side | day lost → manifest `partial`; watchdog |
 | Wolt venue pages | `query-state` JSON; prices in minor units | venue 503 → other venues continue; 0 products = error |
 | Firestore | rules pinned to one store path; anonymous auth for the browser; service account for CI | see 9.1 / 9.3 |
-| Vercel | static build; Basic Auth middleware; `/data/*` `no-store` | 503 if credentials unset (fail closed) |
+| Vercel | static build; sign-in middleware (ADR-029); `/data/*` `no-store` | 503 if `FIREBASE_PROJECT_ID` unset (fail closed) |
 
 ---
 
@@ -1124,10 +1124,10 @@ business's cost prices, margins, stock and the owner's decisions.
 
 | Concern | Design |
 |---|---|
-| **Trust boundary 1 — the site** | Vercel Edge middleware on every path (`middleware.ts`, fail-closed) verifies a Firebase ID token and its `role` claim ([ADR-029](decisions/ADR-029-two-roles-sign-in-and-the-gate-enforces-them.md), replacing the one shared Basic Auth credential). `owner` is refused the telemetry page, its chunks and `measurement.json`; `team` is served everything. `X-Robots-Tag: noindex`. Until ADR-029 is built, the one shared Basic Auth credential stays |
+| **Trust boundary 1 — the site** | Vercel Edge middleware on every path (`middleware.ts`, fail-closed) verifies a Firebase ID token and its `role` claim ([ADR-029](decisions/ADR-029-two-roles-sign-in-and-the-gate-enforces-them.md), replacing the one shared Basic Auth credential). `owner` is refused the telemetry page, its chunks and `measurement.json`; `team` is served everything. `X-Robots-Tag: noindex`. Live since 2026-09-26; the shared Basic Auth credential was removed the same day |
 | **Trust boundary 2 — owner state** | Firestore rules pinned to `/stores/yomyom-kafr-qasim/**`: read for `owner` and `team`, write for `owner` only ([ADR-029](decisions/ADR-029-two-roles-sign-in-and-the-gate-enforces-them.md), D-22). Sign-in is Google or email link; anonymous sign-in is removed. Until ADR-029 is built, the pilot keeps the earlier posture: anonymous sign-in, and anyone who loads the app can mint a token and read/write that subtree |
 | **Trust boundary 3 — CI** | FTPS credentials (public read-only account), Firebase service account JSON (`FIREBASE_SERVICE_ACCOUNT_JSON`) as GitHub secrets; the engine's pull is read-only and the service account should be granted read-only on Firestore |
-| **Sensitive data paths** | `dashboard.json` carries cost prices and margins (as `operational.json` does today) — behind Basic Auth, `no-store`. The inventory CSV and sales reports are committed to a private repository. No new exposure class is introduced; the mirror `data/owner/owner_state.json` adds the owner's outcomes and answers to the repo, which already holds his cost column |
+| **Sensitive data paths** | `dashboard.json` carries cost prices and margins (as `operational.json` does today) — behind the sign-in gate, for either role, `no-store`. The inventory CSV and sales reports are committed to a private repository. No new exposure class is introduced; the mirror `data/owner/owner_state.json` adds the owner's outcomes and answers to the repo, which already holds his cost column |
 | **Secrets in the bundle** | The Gemini key path is removed with the LLM layer. `VITE_*` remains the only browser-visible namespace; `check_firebase_config.mjs` is kept as a pre-deploy guard |
 | **Validation boundaries** | Owner-state records are validated on write (closed enums, numeric cost > 0) and on pull (schema); the artefact is validated on both sides; CSV imports are validated by the mapping YAML. Comment/answer text is never rendered as HTML |
 | **Removed attack surface** | No runtime server (LLM proxy, MCP server gone); no browser file upload; no second Firestore schema |
@@ -1220,6 +1220,13 @@ own, so their rows say so rather than grade it after the fact.
 | [ADR-026](decisions/ADR-026-reconciliation-publishes-the-span-it-reconciled.md) | The reconcile window is cut once per run, at the run's own stock date, and reconciliation publishes that cut | Easy |
 | [ADR-027](decisions/ADR-027-a-question-whose-money-is-unknown-carries-no-figure.md) | A question whose money is unknown carries no figure, and ranks after every question that has one | Easy |
 | [ADR-028](decisions/ADR-028-the-nav-is-the-owners-and-only-unshipped-code-leaves.md) | The nav is the owner's, and §20.1 removes only the code no screen runs | Easy |
+| [ADR-029](decisions/ADR-029-two-roles-sign-in-and-the-gate-enforces-them.md) | Two roles sign in, and the edge gate enforces them (D-22) | Moderate |
+| [ADR-030](decisions/ADR-030-own-sales-arrive-as-daily-reports.md) | F8's own sales arrive as daily reports, one file per day, and a missing day stays missing | Easy |
+| [ADR-031](decisions/ADR-031-running-out-is-a-short-absence-after-steady-presence.md) | "Running out" is a short absence after steady presence in the market's daily catalogues | Easy |
+| [ADR-032](decisions/ADR-032-the-boost-is-a-pinned-model-validated-and-recorded.md) | The boost is picked by a pinned Claude model (Sonnet 5) in the nightly run, and checked mechanically before it is used | Easy |
+| [ADR-033](decisions/ADR-033-store-facts-are-a-committed-file.md) | The store facts are a committed file the team records from the owner; owner state never holds them | Easy |
+| [ADR-034](decisions/ADR-034-a-suggestion-is-identified-by-product-and-order-day.md) | An order suggestion is identified by its product and order day; a disagreement is a question keyed by its product | Easy before first use |
+| [ADR-035](decisions/ADR-035-a-models-answer-is-collected-data.md) | A model's answer is collected data: sealed as a daily snapshot, and reproduction reads it like any other | Easy |
 
 ---
 
@@ -1447,24 +1454,25 @@ Design elements: **E** engine module · **P** publisher/artefact · **C** `compo
 | NFR-063, C-61, GAP-005 | committed inputs + rehydrate + recompute → fresh clone reproduces; coverage figures now come from E | ADR-002 | AC-128 |
 | C-62 | D-1/D-4/D-3 mechanisms above | §14 | AC-123/124 |
 
-### F8-S1 — Order quantity (V2: not yet designed)
+### F8-S1 — Order quantity (V2: designed, not built)
 
-**Nothing in this table exists yet.** F8-S1 (`Approved`, 2026-09-25) is the first V2
-spec, and this design covers V1 only. Each row names the design element a group of its
-requirements will need, so that V2's first mode-one round starts from them. Every "ADR
-needed" is a decision still to be written; none is taken here.
+**Nothing in this table is built yet.** F8-S1 (`Approved`, 2026-09-25) is the first V2
+spec. Its design decisions are ADR-030 … ADR-035, accepted by the repository owner on
+2026-09-26. The boost model is Claude Sonnet 5, his choice the same day (ADR-032).
+Each row names the ADR that answers it, and the implementation plan may now be written
+against them.
 
 | Requirement | Design element | Flow / contract | Verification |
 |---|---|---|---|
-| FR-143 … FR-146, INV-070, INV-072 | I a per-day import of sales and deliveries, beside the monthly one; E an order-quantity capability over the 28-day window | ADR needed: the import's grain, its missing-day rule, the freshness limit | AC-136 … AC-140 |
-| FR-147, FR-148, FR-164, INV-074, INV-079 | E a running-out signal over the D-18 stores, separately unavailable (ADR-014), OQ-905; E the model's nightly boost per product, recorded as an input (D-21) | ADR needed: stockout classification across three chains; ADR needed: the boost model, what it is given, its record and its spending cap | AC-141, AC-142, AC-160, AC-161 |
-| FR-149, FR-150, INV-073 | E stock now from `vintages.pos`, the F2-S1 flags, and the per-day sales and deliveries since the count, carried to the order day | 11.4 | AC-143, AC-144, AC-157 |
-| FR-151 … FR-153, INV-071 | E the shelf-life cap from the stated store facts; later F10 | ADR needed once F10 is specified | AC-145, AC-146, AC-148 |
-| FR-154, NFR-067 | P suggestion facts in the artefact; R print mode | ADR-002, ADR-005 | AC-149 |
+| FR-143 … FR-146, INV-070, INV-072 | I a per-day import of sales and deliveries, beside the monthly one; E an order-quantity capability over the 28-day window | ADR-030 | AC-136 … AC-140 |
+| FR-147, FR-148, FR-164, INV-074, INV-079 | E a running-out signal over the D-18 stores, separately unavailable (ADR-014), OQ-905; E the model's nightly boost per product, recorded as an input (D-21) | ADR-031 (running out); ADR-032 (the boost); ADR-035 (its record) | AC-141, AC-142, AC-160, AC-161 |
+| FR-149, FR-150, INV-073 | E stock now from `vintages.pos`, the F2-S1 flags, and the per-day sales and deliveries since the count, carried to the order day | ADR-030 (deliveries per day); 11.4 | AC-143, AC-144, AC-157 |
+| FR-151 … FR-153, INV-071 | E the shelf-life cap from the stated store facts; later F10 | ADR-033 (the stated shelf life); F10's own ADR once it is specified | AC-145, AC-146, AC-148 |
+| FR-154, NFR-067 | P suggestion facts in the artefact; R print mode, reading the picks snapshot | ADR-002, ADR-005, ADR-035 | AC-149, AC-160 |
 | FR-155, FR-156 | E per-department reasons for no quantity; evidence states (ADR-011) | 11.3 | AC-139, AC-146, AC-147 |
-| FR-157, NFR-068 | I the store facts (order schedule, shelf life per department), recorded once as the owner's statements, in one place | ADR needed: where they live, so one fact is never held twice | AC-146, AC-156 |
-| FR-158, FR-159, INV-075 | E the disagreement question in the owner-question population, ordered by ADR-027; O answers | ADR-003, ADR-027 | AC-150, AC-151, AC-155, AC-158 |
-| FR-160 … FR-163, INV-069, INV-077, INV-078 | U the Reorder and Approved orders entries leave their awaiting shells (ADR-028 §1); O outcomes keyed on product and order day (ADR-003, ADR-009, ADR-016) | ADR needed: the suggestion's entry identity per order day | AC-136, AC-152, AC-153, AC-154 |
+| FR-157, NFR-068 | I the store facts (order schedule, shelf life per department), recorded once as the owner's statements, in one place | ADR-033 | AC-146, AC-156 |
+| FR-158, FR-159, INV-075 | E the disagreement question in the owner-question population, ordered by ADR-027; O answers | ADR-003, ADR-027, ADR-031 (the trigger), ADR-034 (the question id) | AC-150, AC-151, AC-155, AC-158 |
+| FR-160 … FR-163, INV-069, INV-077, INV-078 | U the Reorder and Approved orders entries leave their awaiting shells (ADR-028 §1); O outcomes keyed on product and order day (ADR-003, ADR-009, ADR-016) | ADR-034 | AC-136, AC-152, AC-153, AC-154 |
 
 ### Cross-cutting decisions
 

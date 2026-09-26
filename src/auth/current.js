@@ -9,8 +9,8 @@ let currentRole = null
 export function setCurrentRole(role) { currentRole = role }
 
 /**
- * Only the owner records owner state (ADR-029 §4–5). Before the switch-over everyone who
- * passes Basic Auth could, and still can, so nothing changes until the mode does.
+ * Only the owner records owner state (ADR-029 §4–5). A build without sign-in (local dev, the
+ * tests) acts as the owner, as the app always has.
  */
 export function canWriteOwnerState() {
   return authMode() !== 'firebase' || currentRole === 'owner'

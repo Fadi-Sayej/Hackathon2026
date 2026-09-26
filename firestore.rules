@@ -1,49 +1,29 @@
 rules_version = '2';
 
-// SmartShelf pilot Firestore rules.
+// SmartShelf Firestore rules with roles: ADR-029, live since the switch-over on 2026-09-26.
 //
-// The app sits behind the Vercel Basic Auth gate, but Firestore is reachable
-// directly over the internet, so these rules — not the gate — are the only thing
-// standing in front of the store's data.
+// Deployed by hand: `firebase deploy --only firestore:rules`. The nightly checks that the
+// deployed ruleset is byte-identical to this file (scripts/check_firestore_rules.py, #97).
 //
-// ⚠️ BE CLEAR ABOUT WHAT THIS DOES AND DOES NOT BUY.
+// What changes from firestore.rules. The earlier posture, anonymous sign-in where anyone who
+// loaded the app could mint a token and read or write the store's subtree, is closed.
+// Access now needs a Firebase account with a `role` custom claim, set per account by
+// scripts/set_user_role.py with the service account. The claim is the single source the edge
+// gate (middleware.ts) also reads, so no email is written here or anywhere in the repository.
 //
-// Pilot posture: a single store, clients sign in anonymously (src/firebase.js →
-// ensureAnonymousAuth). `request.auth != null` therefore blocks unauthenticated
-// scrapers and nothing more: anonymous sign-in is open by design, and the web
-// API key ships in the client bundle, so anyone who loads the app — or reads the
-// bundle — can mint a token and then read and write the whole /stores subtree.
-// That subtree holds a real business's cost prices, margins and decisions.
+//   owner  reads and writes the store's owner state (answers, outcomes, the device register)
+//   team   reads it, and writes nothing: a team account's view of the owner's app is
+//          read-only, so nothing the team presses is recorded as the owner's decision
 //
-// We accept that for a short single-store pilot on an unadvertised URL. It is a
-// deliberate trade, not a safe default, and it MUST be revisited before the
-// pilot is extended, a second store is added, or the URL is shared more widely.
-//
-// To actually harden it: turn on App Check (blocks tokens not issued to our own
-// app), pin the storeId below instead of matching a wildcard, and move to real
-// per-user accounts so `request.auth.uid` means something.
-//
-// SETUP: enable Anonymous sign-in in the Firebase console
-//   Authentication → Sign-in method → Anonymous → Enable
-// and deploy these rules:
-//   firebase deploy --only firestore:rules
-//
-// Before multi-store or wider exposure, tighten this: pin to specific store
-// ids, add per-user ownership, and turn on App Check.
+// The engine's nightly pull uses the service account, which these rules do not govern.
+// Pinned to the one pilot store, as before: must match VITE_STORE_ID (src/firebase.js).
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Pinned to the one pilot store rather than matching any {storeId}. An
-    // anonymous token is trivial to obtain, so the wildcard let anyone create and
-    // write arbitrary store subtrees inside our project. Pinning does not stop a
-    // determined reader of this store's data — only App Check does that — but it
-    // caps the blast radius at the single store we already accepted exposing.
-    //
-    // Must match VITE_STORE_ID (src/firebase.js → STORE_ID). If you change one,
-    // change the other, or every write starts failing with permission-denied.
     match /stores/yomyom-kafr-qasim/{document=**} {
-      allow read, write: if request.auth != null;
+      allow read: if request.auth != null && request.auth.token.role in ['owner', 'team'];
+      allow write: if request.auth != null && request.auth.token.role == 'owner';
     }
 
     match /{document=**} {

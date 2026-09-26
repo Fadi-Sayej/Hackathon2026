@@ -7,7 +7,7 @@ Date: 2026-09-25
 Parent: [System Design](../system-design.md) §15
 Related Specs: F6-S1, F13-S1
 Inputs: [the repository owner's decisions of 2026-09-25 (to be recorded as D-22), D-12, system-design.md §15, ADR-003, ADR-021, ADR-023, middleware.ts, src/firebase.js, firestore.rules]
-Updated: 2026-09-25
+Updated: 2026-09-26
 ---
 
 # ADR-029 — Two roles sign in, and the edge gate enforces them
@@ -206,3 +206,11 @@ Recorded here because they are how the decision was built, not changes to it.
   they hold no store data. The shell renders the sign-in page while there is no session. What
   the gate refuses without a valid token is every `/data/` file (401) and the team's page (a
   redirect to `/?next=…`), as §3's table says.
+- **Switched over on 2026-09-26.** The role rules moved into `firestore.rules` and were
+  deployed, and Production carries the three variables. It happened before the owner's
+  account had its role, on the repository owner's decision.
+- **Basic Auth removed the same day**, again on the repository owner's decision rather than
+  after the day of use the runbook asked for. `middleware.ts` has one gate and no longer
+  reads `AUTH_MODE`; `BASIC_AUTH_USER`, `BASIC_AUTH_PASSWORD` and `AUTH_MODE` were deleted
+  from Vercel, and anonymous sign-in was disabled. There is no longer a switch back to the
+  shared password: a fault in sign-in is fixed forward.

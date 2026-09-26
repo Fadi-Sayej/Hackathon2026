@@ -16,7 +16,7 @@ PRD  →  Feature Intents  →  Feature Specs  →  System Design + ADRs  →  I
 | Feature specs (F1-S1 … F8-S1, F13-S1) | [`docs/features/F#-*/specs/`](docs/features/) |
 | Gaps, open questions, assumptions | [`docs/features/gaps-and-open-questions.md`](docs/features/gaps-and-open-questions.md) |
 | System Design | [`docs/architecture/system-design.md`](docs/architecture/system-design.md) |
-| ADR-001 … ADR-029 | [`docs/architecture/decisions/`](docs/architecture/decisions/) |
+| ADR-001 … ADR-035 | [`docs/architecture/decisions/`](docs/architecture/decisions/) |
 | Quality gates | [`docs/reviews/`](docs/reviews/) |
 | Implementation plan | [`docs/implementation/plan.md`](docs/implementation/plan.md) |
 | Deploy / run / data durability | [`docs/operations/`](docs/operations/) |
@@ -109,7 +109,11 @@ particular: no role quotes a figure it has not read from the artifact that produ
 6. **`data/**` is gitignored; `public/data/*.json` is committed.** A fresh clone has the
    artefacts and nothing to rebuild them from, so regenerating needs the POS import
    first — `scripts/import_yomyom_pos.py --input yomyom-inventory.csv`, then
-   `npm run data:refresh`. Checkpoint 3 measured that path end to end.
+   `npm run data:refresh`. Checkpoint 3 measured that path end to end. Under
+   `data/internal/`, three things are committed all the same: the POS snapshots
+   (`snapshots/`), the seven monthly sales reports (`raw_pos/yomyom/sales/`, force-added in
+   a3aca1e), and the daily sales reports (`raw_pos/yomyom/sales_daily/`, ADR-030), which the
+   ignore rules re-include so that a plain `git add` takes them.
 
    `data/external/silver/` is the exception worth knowing about: `rehydrate_silver.py`
    copies committed snapshots into it and never removes anything, so a long-lived working
@@ -304,7 +308,7 @@ is `Approved`.
 | Status | Means | May a downstream role start? |
 |---|---|---|
 | `Approved` | Settled. Intents and specs use this. | Yes |
-| `Accepted` | Settled. **ADRs use this instead of `Approved`** — ADR-001 … ADR-022 and ADR-024 … ADR-029 all do. | Yes |
+| `Accepted` | Settled. **ADRs use this instead of `Approved`** — ADR-001 … ADR-022 and ADR-024 … ADR-035 all do. | Yes |
 | `Registered — not specified` | The intent is settled, and writing a spec is **deliberately forbidden** until a named decision is taken. F9 … F14 are in this state. | **No** — and not because it is unfinished. Point at the blocking `GAP-` id and stop. |
 | `Living` | Continuously updated by design; never "finished". The gaps register is one. | Yes, as a reference — never cite it as settled |
 | `Partial — <what is missing>` | Part written, part not. The implementation plan is here. | Only for the parts named as written |
@@ -315,7 +319,7 @@ is `Approved`.
 | `Superseded` | Replaced. Carries `Superseded-by:`. | No — follow the pointer |
 
 **`Accepted` and `Approved` are the same gate.** If you treat an ADR's `Accepted` as
-"not approved" you will block the whole chain on all twenty-eight of them.
+"not approved" you will block the whole chain on all thirty-four of them.
 
 ### The handover rules
 
