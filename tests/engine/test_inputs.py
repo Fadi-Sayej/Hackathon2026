@@ -456,3 +456,74 @@ def test_89_a_missing_inventory_still_reads_as_none_not_zero():
     from src.engine.inputs import _shape_products
     products, _ = _shape_products([{"barcode": "1", "product_name": "a"}], None, OwnerState.unavailable("x"))
     assert products[0]["recorded_stock"] is None
+
+
+# ── Phase 5 Task 5.2: the daily sales reports (ADR-030) ──────────────────────────────────
+#
+# Written through the real importer, so the rows load_inputs reads are the rows it writes.
+
+from src.internal_pos.sales_daily_importer import import_sales_daily
+
+DAILY_HEADER = "תאור פריט,ברקוד/קוד,מכר,מחיר קניה,מחיר מכירה,עלות המכר (חנות),כניסות מלאי,מחיר קניה נטו,הנחה,קוד מחלקה,\n"
+DAILY_NO_DELIVERIES = "תאור פריט,ברקוד/קוד,מכר,מחיר קניה,מחיר מכירה,עלות המכר (חנות),מחיר קניה נטו,הנחה,קוד מחלקה,\n"
+RUN_AT = datetime(2026, 9, 8, 6, 0, tzinfo=timezone.utc)
+
+
+def _daily(tmp_path, days, *, units="10", no_deliveries=()):
+    reports = tmp_path / "sales_daily"; reports.mkdir(parents=True, exist_ok=True)
+    silver = tmp_path / "silver"; silver.mkdir(parents=True, exist_ok=True)
+    for day in days:
+        header = DAILY_NO_DELIVERIES if day in no_deliveries else DAILY_HEADER
+        line = f"מים,123,{units},2,4,20,2,0,1," if day in no_deliveries else f"מים,123,{units},2,4,20,3,2,0,1,"
+        (reports / f"דוח מכירות יום {day}.csv").write_text("﻿" + header + line + "\n", encoding="utf-8")
+    import_sales_daily(reports, silver_dir=silver)
+    return silver
+
+
+def _load_at(silver, tmp_path, run_at=RUN_AT, policy=None):
+    return load_inputs(policy=policy or load_policy(), owner=OwnerState.unavailable("x"), run_at=run_at,
+                       silver_dir=silver, signals_dir=tmp_path / "nosig", matches_path=tmp_path / "nomatch.parquet")
+
+
+def test_no_daily_report_means_no_daily_input(tmp_path):
+    """Before the first file, sales_daily is absent, not an empty series (ADR-030 §4)."""
+    inputs = _load_at(_daily(tmp_path, []), tmp_path)
+    assert inputs.sales_daily is None
+    assert inputs.vintages["sales_daily"] == {"first_day": None, "last_day": None, "report_days": 0,
+                                              "missing_days": [], "deliveries_missing_days": []}
+
+
+def test_the_daily_rows_are_read_and_the_vintage_says_what_arrived(tmp_path):
+    silver = _daily(tmp_path, ["2026-08-30", "2026-08-31", "2026-09-02", "2026-09-05", "2026-09-07"],
+                    no_deliveries={"2026-09-02"})
+    inputs = _load_at(silver, tmp_path)
+
+    assert sorted((r["day"], r["units"]) for r in inputs.sales_daily)[0] == ("2026-08-30", 10.0)
+    assert len(inputs.sales_daily) == 5
+    assert inputs.vintages["sales_daily"] == {
+        "first_day": "2026-08-30", "last_day": "2026-09-07", "report_days": 5,
+        # Every calendar day from the first report to the day before the run that has no report.
+        "missing_days": ["2026-09-01", "2026-09-03", "2026-09-04", "2026-09-06"],
+        "deliveries_missing_days": ["2026-09-02"],
+    }
+
+
+def test_the_vintage_looks_back_only_over_the_window_and_the_freshness_limit(tmp_path):
+    """28 + 7 days before the run: the longest span that could ever feed a window (FR-144).
+    Days older than that are no longer missing from anything F8 could use."""
+    silver = _daily(tmp_path, ["2026-07-01", "2026-09-07"], no_deliveries={"2026-07-01"})
+    vintage = _load_at(silver, tmp_path).vintages["sales_daily"]
+    assert vintage["first_day"] == "2026-07-01" and vintage["report_days"] == 2
+    assert vintage["missing_days"][0] == "2026-08-04" and vintage["missing_days"][-1] == "2026-09-06"
+    assert len(vintage["missing_days"]) == 34
+    assert vintage["deliveries_missing_days"] == []
+
+
+def test_a_changed_daily_report_changes_the_digest(tmp_path):
+    same_a = _load_at(_daily(tmp_path / "a", ["2026-09-07"]), tmp_path)
+    same_b = _load_at(_daily(tmp_path / "b", ["2026-09-07"]), tmp_path)
+    changed = _load_at(_daily(tmp_path / "c", ["2026-09-07"], units="11"), tmp_path)
+    none = _load_at(_daily(tmp_path / "d", []), tmp_path)
+    assert same_a.inputs_digest == same_b.inputs_digest
+    assert same_a.inputs_digest != changed.inputs_digest
+    assert none.inputs_digest != same_a.inputs_digest

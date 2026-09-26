@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 import time
 import uuid
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Callable, Optional
 
@@ -21,6 +21,8 @@ from src.owner_state.pull import MIRROR_PATH, pull, read_mirror, write_mirror
 
 SILVER_DIR = SILVER_POS_ROOT
 SALES_DIR = Path(__file__).resolve().parents[2] / "data" / "internal" / "raw_pos" / "yomyom" / "sales"
+# ADR-030: the same report, one file per day, committed beside the monthly ones.
+DAILY_SALES_DIR = SALES_DIR.parent / "sales_daily"
 # The market half, named here for the same reason the two above are: a caller must be
 # able to run the whole engine over a copy of the data with an input withheld. Without
 # them, a run that isolates silver still reads production signals and matches — which is
@@ -66,6 +68,37 @@ def _sales_import(sales_dir: Optional[Path] = None, silver_dir: Optional[Path] =
     # fact decided at import and decided again at load — and the two disagreed on the day
     # no report parsed after a new stock count.
     return import_sales(sales_dir, silver_dir=silver_dir)
+
+
+def _sales_daily_import(daily_dir: Optional[Path] = None, silver_dir: Optional[Path] = None) -> dict:
+    from src.internal_pos.sales_daily_importer import import_sales_daily
+    return import_sales_daily(daily_dir or DAILY_SALES_DIR, silver_dir=silver_dir or SILVER_DIR)
+
+
+def _daily_age(result, now: datetime) -> Optional[int]:
+    """Days between the latest daily report day and the run, or None before the first one.
+
+    The one place this is derived: the step's verdict and the run's status both read it, so
+    the step can never say "stale" on a run that is not degraded, or the reverse.
+    """
+    days = (result or {}).get("report_days") or []
+    return (now.date() - date.fromisoformat(days[-1])).days if days else None
+
+
+def _sales_daily_verdict(result, *, now: datetime, freshness_days: int) -> tuple:
+    """ADR-030. A failed file is a missing day, and is named. Staleness is the run's concern
+    too: once daily reports have started to arrive, a latest one older than the freshness
+    limit degrades the run (§4). Before the first report there is nothing to be stale."""
+    problems = []
+    failed = (result or {}).get("failed_files") or []
+    if failed:
+        problems.append("failed_files: " + "; ".join(f"{f['file']} ({f['reason']})" for f in failed)
+                        + ". Those days are missing, never zero")
+    age = _daily_age(result, now)
+    if age is not None and age > freshness_days:
+        problems.append(f"stale: the latest report day, {result['report_days'][-1]}, is {age} days "
+                        f"before the run, and the limit is {freshness_days}")
+    return ("degraded", "; ".join(problems)) if problems else ("ok", None)
 
 
 def _market_chain(skip: bool) -> list:
@@ -124,12 +157,13 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
                now: Optional[datetime] = None, silver_dir: Optional[Path] = None,
                sales_dir: Optional[Path] = None, population: Optional[str] = None,
                signals_dir: Optional[Path] = None, matches_path: Optional[Path] = None,
-               catalogue_path: Optional[Path] = None) -> dict:
+               catalogue_path: Optional[Path] = None, daily_sales_dir: Optional[Path] = None) -> dict:
     # Resolved here, not in the signature: a default bound at import time cannot be
     # redirected by a caller that patches the module global, which is how Task 1.9
     # runs the engine over a copy of the data with an input withheld.
     silver_dir = silver_dir or SILVER_DIR
     sales_dir = sales_dir or SALES_DIR
+    daily_sales_dir = daily_sales_dir or DAILY_SALES_DIR
     signals_dir = signals_dir or SIGNALS_DIR
     matches_path = matches_path or MATCHES_PATH
     now = now or datetime.now(timezone.utc)
@@ -150,6 +184,10 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
     # ADR-017: None when the step raised — unknown, not false. A failed import is already
     # reported as an error; asserting the reports did not arrive would add a claim.
     imported_this_run = None if sales is None else bool(sales.get("monthly_rows"))
+    daily = _step(steps, "sales_daily_import", lambda: _sales_daily_import(daily_sales_dir, silver_dir),
+                  verdict=lambda r: _sales_daily_verdict(r, now=now, freshness_days=policy.order_freshness_days))
+    daily_age = _daily_age(daily, now)
+    daily_stale = daily_age is not None and daily_age > policy.order_freshness_days
     for name, fn in _market_chain(skip_market):
         _step(steps, name, fn)
 
@@ -183,6 +221,7 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
         status = "partial"
     elif (owner.status != "available"
           or imported_this_run is False
+          or daily_stale
           or any(o.unavailable_reason == "capability_error" for o in outputs)):
         status = "degraded"
 
@@ -245,5 +284,8 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
 def _no_inputs_vintages(owner: OwnerState) -> dict:
     return {"pos": {"file": None, "as_of": None},
             "sales": {"months": [], "first": None, "last": None, "full_annual_cycle": False},
+            # Unknown, not zero: the inputs did not load, so nothing says what arrived.
+            "sales_daily": {"first_day": None, "last_day": None, "report_days": None,
+                            "missing_days": [], "deliveries_missing_days": []},
             "competitor": {"snapshot_date": None, "sources": []},
             "owner_state": {"pulled_at": owner.pulled_at, "status": owner.status}}

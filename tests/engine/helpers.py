@@ -52,6 +52,7 @@ def make_inputs(**kw):
         # the stock table is not a test about the stock table being absent.
         inventory=kw.get("inventory", [] if kw.get("products") is not None else None),
         sales_monthly=kw.get("sales_monthly"),
+        sales_daily=kw.get("sales_daily"),
         sales_summary={s["barcode"]: s for s in sales_summary} if sales_summary is not None else None,
         window=kw.get("window"), observations=kw.get("observations"), matches=kw.get("matches"),
         stores=load_store_types(), withdrawn=kw.get("withdrawn"), conflicting=kw.get("conflicting", []), inputs_digest=kw.get("inputs_digest", "0" * 64), idle=kw.get("idle"),
@@ -60,6 +61,8 @@ def make_inputs(**kw):
                   # derives it from the POS date above, so it follows that date: 2026-08.
                   "sales": {"months": [], "first": None, "last": None, "full_annual_cycle": False,
                             "reconcile_before": "2026-08"},
+                  "sales_daily": {"first_day": None, "last_day": None, "report_days": 0,
+                                  "missing_days": [], "deliveries_missing_days": []},
                   "competitor": {"snapshot_date": "2026-09-08", "sources": []},
                   "owner_state": {"pulled_at": owner.pulled_at, "status": owner.status,
                                   "devices": device_register(owner)}},
