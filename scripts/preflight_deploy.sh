@@ -8,7 +8,7 @@
 #   1. a clean build from a clean install (Vercel runs `npm ci`, not `npm install`)
 #   2. the data the app reads is committed, and would pass the engine's own validation
 #   3. both entry points exist in dist/
-#   4. the Basic Auth gate is covered and fails closed
+#   4. the sign-in gate (ADR-029) is covered and fails closed
 #   5. whether B-2 (Firestore) will activate or silently stay on localStorage
 #
 # It cannot log into Vercel or Firebase for you — those need your accounts. It
@@ -75,9 +75,8 @@ done
 head_ "4. Access gate (this is a real store's cost data)"
 if [ -f middleware.ts ]; then
   ok "middleware.ts present"
-  # Both gates: Basic Auth (live until the ADR-029 switch-over) and the signed-in gate.
-  if npx vitest run src/__tests__/middleware.test.js src/__tests__/middlewareSignIn.test.js >/tmp/preflight_auth.log 2>&1; then
-    ok "gate tests pass (Basic Auth, and the sign-in gate: forged and expired tokens refused, owner kept off the team's page, fails closed 503)"
+  if npx vitest run src/__tests__/middlewareSignIn.test.js >/tmp/preflight_auth.log 2>&1; then
+    ok "gate tests pass (forged and expired tokens refused, owner kept off the team's page, fails closed 503)"
   else
     bad "gate tests FAIL — do not deploy. See /tmp/preflight_auth.log"
   fi
@@ -118,22 +117,24 @@ else
 
     # Set on BOTH Production and Preview. Setting only Production makes every
     # preview deploy serve the "not configured" 503 and look like a broken build.
-    npx vercel env add BASIC_AUTH_USER production
-    npx vercel env add BASIC_AUTH_USER preview
-    npx vercel env add BASIC_AUTH_PASSWORD production
-    npx vercel env add BASIC_AUTH_PASSWORD preview
+    # The values: hackathon26-a6ebd and firebase (docs/operations/deployment.md).
+    npx vercel env add FIREBASE_PROJECT_ID production
+    npx vercel env add FIREBASE_PROJECT_ID preview
+    npx vercel env add VITE_AUTH_MODE production
+    npx vercel env add VITE_AUTH_MODE preview
 
     npx vercel deploy --prod
 
   Then check, in this order:
-    1. open the URL in a private window  → must ask for username/password
-    2. log in                            → "شغل اليوم" (Today's work; the app opens in Arabic)
-    3. open /telemetry.html              → must ask for the SAME login
-    4. reload a page directly            → must not 404 (SPA rewrite)
-    5. open it on your phone             → cards readable, buttons tappable
+    1. open the URL in a private window  → must show the sign-in page
+    2. open /data/dashboard.json there   → must answer 401, not the file
+    3. sign in as the owner              → "شغل اليوم" (Today's work; the app opens in Arabic)
+    4. open /telemetry.html as the owner → must answer 403 (it is the team's page)
+    5. reload a page directly            → must not 404 (SPA rewrite)
+    6. open it on your phone             → cards readable, buttons tappable
 
-  If step 1 does NOT prompt, stop and remove the deployment: the env vars did not
-  apply and a real store's cost data is public.
+  If step 2 returns the file, stop and remove the deployment: a real store's cost
+  data is public.
 NEXT
 fi
 

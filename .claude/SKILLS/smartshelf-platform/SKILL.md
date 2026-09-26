@@ -51,7 +51,7 @@ This project's deployment failures have all been data failures, not build failur
 - **No secrets in the repository.** Environment variables only, with `.env.example`
   listing every name and no real values. `.env`, `.env.local`, `secrets/`, `.vercel/` and
   service-account files never enter a diff. Read the diff before every commit.
-- **The middleware fails closed.** If Basic Auth credentials are absent, every request
+- **The middleware fails closed.** If `FIREBASE_PROJECT_ID` is absent, every request
   must return 503 rather than serving a real store's data publicly. Verify this, do not
   assume it.
 - **A cost alert is mandatory** for anything that calls a model. Set a monthly ceiling and

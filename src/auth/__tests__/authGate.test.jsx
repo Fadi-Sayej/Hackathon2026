@@ -9,8 +9,8 @@ import { useAuth } from '../useAuth.js'
 import { setAuthModeForTests } from '../mode.js'
 import { canWriteOwnerState, setCurrentRole } from '../current.js'
 
-// Until the switch-over (AUTH_MODE unset) the gate must be invisible: the app renders as it
-// does today and the owner may write, exactly as before ADR-029.
+// In a build without sign-in (VITE_AUTH_MODE unset: local dev and the tests) the gate must be
+// invisible: the app renders as it always has and the owner may write.
 
 afterEach(() => { cleanup(); setAuthModeForTests(null); setCurrentRole(null) })
 
