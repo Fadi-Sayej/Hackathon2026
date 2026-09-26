@@ -68,10 +68,15 @@ jobs:
         # Runs even when collection was partial — a partial day is still history,
         # and the manifest records exactly what was and was not captured. Only a
         # wholly failed day has nothing to commit.
+        #
+        # The address is GitHub Actions' own no-reply one. Until 2026-09-26 it was
+        # collector@users.noreply.github.com, which is GitHub's old no-reply form for the
+        # account `collector` (id 1460107, a stranger's), so every nightly commit was
+        # attributed to them.
         if: always() && steps.collect.outcome != 'cancelled'
         run: |
           git config user.name  "smartshelf-collector"
-          git config user.email "collector@users.noreply.github.com"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -f data/external/snapshots/ || true
           if git diff --cached --quiet; then
             echo "No new snapshot data to commit."
@@ -188,7 +193,7 @@ jobs:
         # nothing (rule 12).
         run: |
           git config user.name  "smartshelf-collector"
-          git config user.email "collector@users.noreply.github.com"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           # The artefact's add is UNCONDITIONAL and comes first. `git add` with a missing
           # pathspec exits 128 and stages NOTHING — not even the paths that did exist — and
           # this step runs under `bash -e`, so one absent file would abort before the commit
