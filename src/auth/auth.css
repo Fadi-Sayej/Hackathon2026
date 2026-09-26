@@ -36,6 +36,11 @@
 .auth-card p.auth-card__error { color: var(--danger); margin-bottom: 16px; }
 
 .team-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
   margin: 0 0 12px;
   padding: 10px 14px;
   border-radius: var(--radius-md);
@@ -44,6 +49,7 @@
   font-weight: 600;
   line-height: 1.45;
 }
+.team-banner .team-banner__button { text-decoration: none; white-space: nowrap; }
 
 /* A team account's view of the owner's app: every control that would save reads as off. */
 .entry-card__actions button:disabled,

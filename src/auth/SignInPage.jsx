@@ -100,8 +100,17 @@ export function SignInPage({
   )
 }
 
-/** The line at the top of the owner's app when a team account is looking at it (ADR-029 §5). */
+/**
+ * The line at the top of the owner's app when a team account is looking at it (ADR-029 §5),
+ * with the team's way to its own page. Only a team account ever renders this, so the owner
+ * never sees the button, and the edge gate refuses him the page regardless.
+ */
 export function TeamBanner() {
   const { t } = useI18n()
-  return <div role="status" className="team-banner">{t('auth.team.banner')}</div>
+  return (
+    <div role="status" className="team-banner">
+      <span>{t('auth.team.banner')}</span>
+      <a className="btn btn-ghost team-banner__button" href="/telemetry.html">{t('auth.team.toTelemetry')}</a>
+    </div>
+  )
 }

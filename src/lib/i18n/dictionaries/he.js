@@ -463,5 +463,6 @@ export const he = {
   'auth.noAccess.body': "נכנסת בתור {email}. בקשו מהצוות לתת לחשבון הזה גישה.",
   'auth.noAccess.signOut': "התנתקות וכניסה עם חשבון אחר",
   'auth.team.banner': "תצוגת צוות — לקריאה בלבד. שום דבר שתלחצו כאן לא נשמר.",
+  'auth.team.toTelemetry': "פתיחת דף מדידת הפיילוט",
   'auth.error': "הכניסה נכשלה. נסו שוב.",
 }
