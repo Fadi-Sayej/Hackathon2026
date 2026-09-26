@@ -225,6 +225,8 @@ export const he = {
   'unavailable.capability_error': "משהו השתבש אצלנו בחישוב. זו אשמתנו, לא הנתונים שלך.",
   'unavailable.unknown': "לא הצלחנו להפיק את זה היום.",
   'unavailable.unknown_stock_date': "איננו יודעים באיזה יום נספר המלאי, ולכן לא ניתן לבדוק זאת.",
+  'unavailable.market_signal_thin': "אין מספיק ימים אחרונים מרשימות החנויות הסמוכות כדי לדעת מה חסר אצלן.",
+  'unavailable.market_signal_stale': "הרשימות של החנויות הסמוכות אינן עדכניות, ולכן איננו יכולים לומר מה חסר אצלן היום.",
   'data.title': "מאיפה הגיעו המספרים",
   'data.none': "אין",
   'data.hidden.title': "פריטים שהסתרת",

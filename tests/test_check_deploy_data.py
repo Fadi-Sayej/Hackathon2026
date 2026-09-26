@@ -126,6 +126,43 @@ def test_the_telemetry_input_is_still_checked_until_f13(repo):
     assert "BAD" in _levels(check(repo, now=_generated_at(repo)), "operational.json")
 
 
+def _without(repo: Path, cap_id: str, generated_at: str) -> None:
+    path = repo / "public/data/dashboard.json"
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    doc["capabilities"].pop(cap_id, None)
+    doc["generated_at"] = generated_at
+    path.write_text(json.dumps(doc), encoding="utf-8")
+    _git(repo, "commit", "-qam", f"an artefact without {cap_id}")
+
+
+def test_a_capability_registered_after_the_artefact_is_expected_to_be_missing(repo):
+    """Phase 5: only the nightly regenerates this file, so a newly registered capability is
+    missing from it until the first nightly after the merge. That is a WARN, not a blocked
+    deploy: the capability renders nowhere yet (NOT_YET_SHOWN)."""
+    from src.engine.registry import CAPABILITIES
+    since = CAPABILITIES["market_running_out"].published_from
+    before = (datetime.fromisoformat(since) - timedelta(days=1)).strftime("%Y-%m-%dT03:00:00+00:00")
+    _without(repo, "market_running_out", before)
+    findings = check(repo, now=datetime.fromisoformat(before))
+    assert not [f for f in findings if f[0] == "BAD"], findings
+    assert any(level == "WARN" and "predates market_running_out" in message for level, message in findings)
+
+
+def test_the_same_capability_missing_from_a_later_artefact_blocks_the_deploy(repo):
+    from src.engine.registry import CAPABILITIES
+    since = CAPABILITIES["market_running_out"].published_from
+    _without(repo, "market_running_out", f"{since}T03:00:00+00:00")
+    findings = check(repo, now=datetime.fromisoformat(f"{since}T03:00:00+00:00"))
+    assert any(level == "BAD" and "market_running_out" in message for level, message in findings), findings
+
+
+def test_a_capability_with_no_date_is_always_required(repo):
+    """The seven V1 capabilities were published before the nightly began: no date excuses one."""
+    _without(repo, "hygiene", "2020-01-01T03:00:00+00:00")
+    findings = check(repo, now=datetime(2020, 1, 1, 3, tzinfo=timezone.utc))
+    assert any(level == "BAD" and "hygiene" in message for level, message in findings), findings
+
+
 def test_the_real_committed_data_passes():
     """What the repository holds today must pass, or the preflight blocks every deploy."""
     if shutil.which("git") is None:

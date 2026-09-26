@@ -34,11 +34,14 @@ MATCHES_PATH = MATCHING_ROOT / "product_matches.parquet"
 # Filled by Phase 1: capability id -> callable(inputs) -> CapabilityOutput
 def _runners() -> dict:
     from src.engine import (catalogue_lifecycle, competitor_position, margin_below_cost,
-                            owner_questions, price_consistency, reconciliation)
+                            market_running_out, owner_questions, price_consistency, reconciliation)
     return {"catalogue_lifecycle": catalogue_lifecycle.run, "price_consistency": price_consistency.run,
             "reconciliation": reconciliation.run, "hygiene": reconciliation.run_hygiene,
             "competitor_position": competitor_position.run,
-            "margin_below_cost": margin_below_cost.run, "owner_questions": owner_questions.run}
+            "margin_below_cost": margin_below_cost.run, "owner_questions": owner_questions.run,
+            # Registered in the same change as its registry entry: a real run whose artefact
+            # lacks a registered id is refused (publish.require_complete_registry).
+            "market_running_out": market_running_out.run}
 
 
 DEFAULT_RUNNERS: dict = {}          # populated lazily by run_engine
@@ -168,7 +171,7 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
                sales_dir: Optional[Path] = None, population: Optional[str] = None,
                signals_dir: Optional[Path] = None, matches_path: Optional[Path] = None,
                catalogue_path: Optional[Path] = None, daily_sales_dir: Optional[Path] = None,
-               store_facts_path: Optional[Path] = None) -> dict:
+               store_facts_path: Optional[Path] = None, snapshots_root: Optional[Path] = None) -> dict:
     # Resolved here, not in the signature: a default bound at import time cannot be
     # redirected by a caller that patches the module global, which is how Task 1.9
     # runs the engine over a copy of the data with an input withheld.
@@ -202,10 +205,13 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
     for name, fn in _market_chain(skip_market):
         _step(steps, name, fn)
 
-    facts_path = {"store_facts_path": store_facts_path} if store_facts_path else {}
+    # Named only when the caller named them, so a test that redirects neither reads the
+    # committed store facts and market snapshots exactly as the nightly does.
+    sources = {"store_facts_path": store_facts_path, "snapshots_root": snapshots_root}
+    sources = {k: v for k, v in sources.items() if v}
     inputs = _step(steps, "load_inputs", lambda: load_inputs(policy=policy, owner=owner, run_at=now, silver_dir=silver_dir,
                                                            signals_dir=signals_dir, matches_path=matches_path,
-                                                           **facts_path))
+                                                           **sources))
     if inputs is not None:
         _step(steps, "store_facts", lambda: inputs.store_facts, verdict=_store_facts_verdict)
     outputs: list[CapabilityOutput] = []

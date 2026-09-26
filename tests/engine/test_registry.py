@@ -38,15 +38,19 @@ def test_margin_below_cost_is_not_admitted_to_the_surface():
 
 
 def test_every_capability_names_its_spec():
+    """V1's specs were numbered SPEC-NNN; since the 2026-09-08 restructure a spec is F#-S#."""
+    import re
     for cap in CAPABILITIES.values():
-        assert cap.spec.startswith("SPEC-") or cap.spec == "UNSPECIFIED"
+        assert re.fullmatch(r"SPEC-\d{3}|F\d+-S\d+", cap.spec) or cap.spec == "UNSPECIFIED", cap
 
 
 def test_hygiene_is_a_capability_of_its_own_and_spec_002_produces_two():
     """ADR-014: the smallest independently-unavailable unit. SPEC-002 yields two."""
     assert set(CAPABILITIES) == {"price_consistency", "reconciliation", "hygiene",
                                  "competitor_position", "catalogue_lifecycle",
-                                 "owner_questions", "margin_below_cost"}
+                                 "owner_questions", "margin_below_cost",
+                                 # Phase 5 Task 5.4: F8's market signal (ADR-031)
+                                 "market_running_out"}
     assert CAPABILITIES["hygiene"].spec == CAPABILITIES["reconciliation"].spec == "SPEC-002"
     assert "sales_summary" not in CAPABILITIES["hygiene"].requires
 

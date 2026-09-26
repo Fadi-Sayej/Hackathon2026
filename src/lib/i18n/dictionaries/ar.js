@@ -230,6 +230,8 @@ export const ar = {
   'unavailable.capability_error': "حدث خلل عندنا أثناء الحساب. المشكلة منّا لا من بياناتك.",
   'unavailable.unknown': "لم نتمكّن من استخراج هذا اليوم.",
   'unavailable.unknown_stock_date': "لا نعرف يوم جرد المخزون، فلا يمكن فحص هذا.",
+  'unavailable.market_signal_thin': "لا تتوفّر أيام حديثة كافية من قوائم المتاجر القريبة لمعرفة ما ينفد لديها.",
+  'unavailable.market_signal_stale': "قوائم المتاجر القريبة ليست محدّثة، فلا نستطيع أن نقول ما ينفد لديها اليوم.",
   'data.title': "من أين جاءت الأرقام",
   'data.none': "لا يوجد",
   'data.hidden.title': "عناصر أخفيتها",
