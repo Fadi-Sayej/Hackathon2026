@@ -16,6 +16,7 @@ from src.engine.model import EvidenceWindow, norm_barcode
 from src.engine.policy import Policy
 from src.internal_pos.pos_importer import read_pos_vintage
 from src.engine.stock_date import usable_stock_date
+from src.engine.store_facts import DEFAULT_PATH as STORE_FACTS_PATH, load_store_facts
 from src.owner_state.model import OwnerState, answered_cost, device_register
 
 OUR_FORMAT = "gas_convenience"
@@ -35,6 +36,7 @@ class EngineInputs:
     withdrawn: Optional[set]
     idle: Optional[set]
     conflicting: Optional[list]   # ADR-019: barcodes whose rows disagree
+    store_facts: Optional[dict]   # ADR-033: {facts, rejected}; None when the file is absent
     inputs_digest: str            # Task 3.1: content addressing over what was read
     vintages: dict
     owner: OwnerState
@@ -290,12 +292,17 @@ def _shape_observations(signals, stores: StoreTypeConfig) -> Optional[list]:
 def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_dir: Path = SILVER_POS_ROOT,
                 signals_dir: Path = SIGNALS_ROOT / "competitor_product_signals",
                 matches_path: Path = MATCHING_ROOT / "product_matches.parquet",
-                stores: Optional[StoreTypeConfig] = None) -> EngineInputs:
+                stores: Optional[StoreTypeConfig] = None,
+                store_facts_path: Path = STORE_FACTS_PATH) -> EngineInputs:
     stores = stores or load_store_types()
     products_raw = _rows(silver_dir / "yomyom_products.parquet")
     inventory = _rows(silver_dir / "yomyom_inventory.parquet")
     products, conflicting = (_shape_products(products_raw, inventory, owner)
                             if products_raw else (None, None))
+    # ADR-033. Checked against the departments the catalogue actually prints, so a stated
+    # fact can only ever attach to a department that exists. Absent file, absent input.
+    store_facts = (load_store_facts(store_facts_path, {p["department"] for p in products or [] if p["department"]})
+                   if Path(store_facts_path).exists() else None)
     monthly = _rows(silver_dir / "sales_monthly.parquet")
     # ADR-030. The importer writes this table only when a daily report parsed, and removes an
     # older one when none did, so its absence is the honest "nothing has arrived yet".
@@ -353,11 +360,11 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
     vintages["sales"] = {k: vintages["sales"][k]
                          for k in ("months", "first", "last", "full_annual_cycle", "reconcile_before")}
     digest = _digest(products, summary_rows, monthly, observations, matches, policy, owner,
-                     reconcile_before, sales_daily)
+                     reconcile_before, sales_daily, store_facts)
     return EngineInputs(products=products, inventory=inventory or None,
                         sales_monthly=monthly, sales_daily=sales_daily, sales_summary=summary, window=window,
                         observations=observations, matches=matches, stores=stores, withdrawn=None, idle=None, conflicting=conflicting,
-                        inputs_digest=digest,
+                        store_facts=store_facts, inputs_digest=digest,
                         vintages=vintages, owner=owner, policy=policy, run_at=run_at)
 
 
@@ -380,7 +387,8 @@ def _content_only(row):
 
 
 def _digest(products, summary_rows, monthly, observations, matches, policy, owner,
-            reconcile_before: Optional[str], sales_daily: Optional[list] = None) -> str:
+            reconcile_before: Optional[str], sales_daily: Optional[list] = None,
+            store_facts: Optional[dict] = None) -> str:
     """A hex digest over the CONTENT the run read, not over the files it read them from.
 
     Content, because a parquet rewritten with identical rows is the same input and must
@@ -418,6 +426,10 @@ def _digest(products, summary_rows, monthly, observations, matches, policy, owne
     # ADR-030. F8's quantities are computed from these rows, so they are an input like the
     # monthly ones. Absent before the first daily report, and hashed as absent.
     feed("sales_daily", sales_daily)
+    # ADR-033. The facts a quantity is computed from, with the day each was stated: a
+    # corrected schedule is a different input even when nothing else moved. Rejected entries
+    # are not facts, and computing nothing from them is the same whatever they said.
+    feed("store_facts", None if store_facts is None else store_facts["facts"])
     feed("observations", observations)
     feed("matches", matches)
     feed("policy", policy.as_dict())

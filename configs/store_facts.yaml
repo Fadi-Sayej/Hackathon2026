@@ -1,0 +1,32 @@
+# configs/store_facts.yaml — the store owner's own statements, per department (ADR-033).
+#
+# Two facts per department that only he holds, recorded by the team from what he says
+# (F8-S1 FR-157). Nothing here is ever defaulted, inferred or copied from another department
+# (INV-071). A department left out has no facts, and F8 gives its products no quantity and
+# says what is missing (FR-155). "I don't know" is left out too.
+#
+# This is NOT configs/shelf_life.yaml. That file is category-level guesses; this one is only
+# what he stated. F8 never reads the guesses (FR-152).
+#
+# One entry per department, named exactly as the catalogue prints it (three names carry two
+# spaces; a name that differs is rejected and the run's steps give the catalogue's spelling):
+#
+#   departments:
+#     <department>:
+#       order_schedule:               # exactly one of:
+#         weekdays: [sun, wed]        #   the days he orders it (sun … sat; all seven = every day)
+#         # every_days: 14            #   a fixed interval, from a first order day he states
+#         # from: 2026-10-04
+#         # no_fixed_days: true       #   he orders it when needed: it gets no quantity
+#       shelf_life_days: 3            # whole days; 0 means "keeps less than a day"
+#       # does_not_spoil: true        # instead of shelf_life_days, when he says so
+#       stated_by: owner
+#       stated_on: 2026-10-01         # the day he said it; published with the fact
+#       recorded_by: team
+#
+# Either fact may be left out while he has not stated it. No name or email is written here
+# (D-22). A change is a reviewed commit, and the history is the record of when he said what.
+#
+# OQ-903 and OQ-908 are open: he has not been asked yet, so no department is listed.
+
+departments: {}

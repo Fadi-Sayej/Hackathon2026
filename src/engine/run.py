@@ -101,6 +101,16 @@ def _sales_daily_verdict(result, *, now: datetime, freshness_days: int) -> tuple
     return ("degraded", "; ".join(problems)) if problems else ("ok", None)
 
 
+def _store_facts_verdict(store_facts) -> tuple:
+    """ADR-033 Decision 2: a rejected entry is reported here, by department and reason. It is
+    not the run's failure: that department simply has no facts, and F8 says so per product."""
+    rejected = (store_facts or {}).get("rejected") or []
+    if not rejected:
+        return "ok", None
+    return "degraded", "rejected: " + "; ".join(
+        f"{r['department'] if r['department'] is not None else 'the file'} ({r['reason']})" for r in rejected)
+
+
 def _market_chain(skip: bool) -> list:
     """The market half of a run, or nothing when the caller asked to skip it.
 
@@ -157,7 +167,8 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
                now: Optional[datetime] = None, silver_dir: Optional[Path] = None,
                sales_dir: Optional[Path] = None, population: Optional[str] = None,
                signals_dir: Optional[Path] = None, matches_path: Optional[Path] = None,
-               catalogue_path: Optional[Path] = None, daily_sales_dir: Optional[Path] = None) -> dict:
+               catalogue_path: Optional[Path] = None, daily_sales_dir: Optional[Path] = None,
+               store_facts_path: Optional[Path] = None) -> dict:
     # Resolved here, not in the signature: a default bound at import time cannot be
     # redirected by a caller that patches the module global, which is how Task 1.9
     # runs the engine over a copy of the data with an input withheld.
@@ -191,8 +202,12 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
     for name, fn in _market_chain(skip_market):
         _step(steps, name, fn)
 
+    facts_path = {"store_facts_path": store_facts_path} if store_facts_path else {}
     inputs = _step(steps, "load_inputs", lambda: load_inputs(policy=policy, owner=owner, run_at=now, silver_dir=silver_dir,
-                                                           signals_dir=signals_dir, matches_path=matches_path))
+                                                           signals_dir=signals_dir, matches_path=matches_path,
+                                                           **facts_path))
+    if inputs is not None:
+        _step(steps, "store_facts", lambda: inputs.store_facts, verdict=_store_facts_verdict)
     outputs: list[CapabilityOutput] = []
     if inputs is not None:
         # catalogue_lifecycle runs first so its withdrawn set reaches the others (FR-074).
