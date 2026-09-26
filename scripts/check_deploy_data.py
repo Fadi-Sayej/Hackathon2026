@@ -37,6 +37,7 @@ if str(ROOT) not in sys.path:
 
 from src.engine.catalogue import validate_catalogue  # noqa: E402
 from src.engine.publish import PublishRefused, validate_artefact  # noqa: E402
+from src.engine.registry import CAPABILITIES  # noqa: E402
 
 Finding = Tuple[str, str]
 
@@ -81,9 +82,26 @@ def _check_dashboard(root: Path, now: datetime) -> List[Finding]:
     if doc is None:
         return findings
     try:
-        validate_artefact(doc, require_complete_registry=True)
-    except (PublishRefused, KeyError, TypeError) as err:
+        validate_artefact(doc, require_complete_registry=False)
+        generated_day = _when(doc["generated_at"]).date().isoformat()
+    except (PublishRefused, KeyError, TypeError, ValueError) as err:
         return findings + [("BAD", f"{DASHBOARD} would be refused by the engine's own publisher: {err}")]
+    # The registry, less what this artefact could not yet carry. A capability registered after
+    # it was generated is published by the first nightly from its `published_from` on; until
+    # then it is expected to be missing, and it renders nowhere (the browser's NOT_YET_SHOWN).
+    missing = sorted(set(CAPABILITIES) - set(doc["capabilities"]))
+    later = [c for c in missing if CAPABILITIES[c].published_from
+             and generated_day < CAPABILITIES[c].published_from]
+    missing = [c for c in missing if c not in later]
+    if missing:
+        return findings + [("BAD", f"{DASHBOARD} would be refused by the engine's own publisher: "
+                                   f"capabilities{{}} must be exactly the registry (ADR-014); missing "
+                                   f"{missing}. An absent capability renders as 'nothing to act on', "
+                                   "not as 'unavailable'.")]
+    for cap_id in later:
+        findings.append(("WARN", f"{DASHBOARD} predates {cap_id}: it was generated on "
+                                 f"{generated_day}, and the nightly of "
+                                 f"{CAPABILITIES[cap_id].published_from} is the first to publish it"))
 
     caps = doc["capabilities"]
     available = [c for c, cap in caps.items() if cap["status"] == "available"]

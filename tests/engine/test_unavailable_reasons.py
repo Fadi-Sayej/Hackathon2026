@@ -48,6 +48,9 @@ KNOWN = {
     "answer_storage_unavailable",
     "capability_error",
     "unknown_stock_date",
+    # Phase 5 Task 5.4 (ADR-031 Decision 5): the market signal is too thin, or too old.
+    "market_signal_thin",
+    "market_signal_stale",
 }
 
 

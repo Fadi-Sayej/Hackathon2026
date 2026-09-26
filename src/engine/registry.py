@@ -23,6 +23,13 @@ class CapabilitySpec:
     admitted: bool             # may its entries reach the daily surface?
     ordering_key: str          # name of the per-capability ordering key
     requires: Tuple[str, ...]  # EngineInputs fields it cannot compute without, most fundamental first
+    # The first nightly that can publish it (YYYY-MM-DD), for a capability registered after the
+    # nightly began committing the artefact. The committed dashboard.json is regenerated only
+    # by the nightly, so it lacks a new id until then; scripts/check_deploy_data.py reads an
+    # artefact generated before this date as expected to lack it, and one from this date on
+    # as broken. None: published since the registry began. The publisher ignores it: a real
+    # run publishes every registered id, whatever this says.
+    published_from: Optional[str] = None
 
 
 CAPABILITIES = {
@@ -40,6 +47,9 @@ CAPABILITIES = {
                                           ("products",)),
     "margin_below_cost":   CapabilitySpec("margin_below_cost",   "UNSPECIFIED", "per_sale", False, "loss_per_sale",
                                           ("products",)),
+    # F8 (V2). A fact the quantity reads, never an entry: no value, never admitted (ADR-031).
+    "market_running_out":  CapabilitySpec("market_running_out",  "F8-S1",    "none",     False, "days_absent",
+                                          ("running_out",), published_from="2026-09-27"),
 }
 
 # The reason belongs to the missing input, not to the capability: catalogue_lifecycle with
@@ -53,6 +63,8 @@ INPUT_REASONS = {
     "window": "no_sales_evidence",
     "observations": "no_competitor_data",
     "matches": "no_competitor_data",
+    # ADR-031 Decision 5: the market was not observed on enough of the last fortnight.
+    "running_out": "market_signal_thin",
 }
 
 # Admitted capabilities that may never carry money (D-1). Their precedence for the three

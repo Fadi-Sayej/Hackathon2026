@@ -183,3 +183,48 @@ def test_load_presence_still_skips_a_failed_manifest(tmp_path):
     series = load_presence(root=tmp_path)
     assert len(series.days) == 2
     assert "failed" in series.skipped[DAY0 + timedelta(days=1)]
+
+
+# ---------------------------------------------------------------------------
+# Phase 5 Task 5.4: not orderable (ADR-031 Decision 1)
+# ---------------------------------------------------------------------------
+
+def write_delivery_day(root, day, rows):
+    day_dir = root / day.isoformat()
+    src = day_dir / "delivery_catalog" / "01"
+    src.mkdir(parents=True, exist_ok=True)
+    pl.DataFrame(rows).write_parquet(src / "products_silver.parquet")
+    (day_dir / "_manifest.json").write_text(json.dumps({
+        "date": day.isoformat(), "status": "ok",
+        "sources": {"delivery_catalog": {"status": "ok", "files": 1}},
+    }))
+
+
+def test_a_listed_item_marked_not_orderable_is_recorded_and_still_listed(tmp_path):
+    """The stores mostly drop a sold-out item, but a few mark it instead. Running out reads
+    those as absent; every existing reader of `listings` still sees them listed."""
+    write_delivery_day(tmp_path, DAY0, [
+        {"barcode": "0072900001", "store_id": "w", "is_online_available": True},
+        {"barcode": "72900002", "store_id": "w", "is_online_available": False},
+        {"barcode": "72900003", "store_id": "w", "is_online_available": None},   # unknown, not absent
+    ])
+    series = load_presence(root=tmp_path, source_id="delivery_catalog")
+    assert series.listings[DAY0] == {("72900001", "w"), ("72900002", "w"), ("72900003", "w")}
+    assert series.unavailable[DAY0] == {("72900002", "w")}
+
+
+def test_a_source_without_the_flag_marks_nothing_unavailable(tmp_path):
+    write_delivery_day(tmp_path, DAY0, [{"barcode": "72900001", "store_id": "w"}])
+    series = load_presence(root=tmp_path, source_id="delivery_catalog")
+    assert series.unavailable[DAY0] == set()
+
+
+def test_a_pair_any_line_calls_orderable_is_not_unavailable(tmp_path):
+    """Two collection runs in one day can print one pair twice. One "not orderable" beside
+    one "orderable" is not a stockout."""
+    write_delivery_day(tmp_path, DAY0, [
+        {"barcode": "72900001", "store_id": "w", "is_online_available": False},
+        {"barcode": "72900001", "store_id": "w", "is_online_available": True},
+    ])
+    series = load_presence(root=tmp_path, source_id="delivery_catalog")
+    assert series.unavailable[DAY0] == set()

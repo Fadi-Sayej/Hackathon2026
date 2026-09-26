@@ -224,6 +224,8 @@ export const en = {
   'unavailable.capability_error': "Something went wrong working this out. It is on us, not on your data.",
   'unavailable.unknown': "We could not work this out today.",
   'unavailable.unknown_stock_date': "We do not know the day the stock was counted, so this cannot be checked.",
+  'unavailable.market_signal_thin': "We have too few recent days of the nearby stores' listings to tell what they are running out of.",
+  'unavailable.market_signal_stale': "The nearby stores' listings are out of date, so we cannot say what they are running out of today.",
   'data.title': "Where the numbers came from",
   'data.none': "none",
   'data.hidden.title': "Items you hid",

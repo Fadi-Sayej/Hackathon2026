@@ -21,6 +21,12 @@ TWO RULES THAT MATTER MORE THAN THE CODE
    out. This module reports listing, never availability. Anything that needs
    availability has to combine it with the delivery catalog, which is the whole
    premise of #49.
+
+   The one exception is the delivery catalog's own flag. A store there mostly drops a
+   sold-out item, but occasionally lists it marked not orderable
+   (`is_online_available` false). Those pairs are recorded in `unavailable`, beside
+   `listings` and not instead of it, so every existing reader still sees them listed
+   and only a reader that asks for availability (ADR-031) reads them as absent.
 """
 
 from __future__ import annotations
@@ -69,6 +75,9 @@ class PresenceSeries:
     days: List[date] = field(default_factory=list)
     # day -> set of (barcode, store_id)
     listings: Dict[date, Set[Tuple[str, str]]] = field(default_factory=dict)
+    # day -> the listed pairs the source marked NOT orderable (ADR-031). A subset of that
+    # day's listings. A missing or null flag is not "unavailable": unknown is not absent.
+    unavailable: Dict[date, Set[Tuple[str, str]]] = field(default_factory=dict)
     # day -> why it was skipped, for days that exist but are not usable
     skipped: Dict[date, str] = field(default_factory=dict)
     product_names: Dict[str, str] = field(default_factory=dict)
@@ -111,12 +120,15 @@ def _manifest_status(day_dir: Path) -> Optional[str]:
         return None
 
 
-def _read_listings(source_dir: Path) -> Tuple[Set[Tuple[str, str]], Dict[str, str]]:
-    """(barcode, store_id) pairs and barcode -> name from one day's silver files."""
+def _read_listings(source_dir: Path) -> Tuple[Set[Tuple[str, str]], Dict[str, str], Set[Tuple[str, str]]]:
+    """(barcode, store_id) pairs, barcode -> name, and the pairs marked not orderable,
+    from one day's silver files."""
     pairs: Set[Tuple[str, str]] = set()
     names: Dict[str, str] = {}
+    not_orderable: Set[Tuple[str, str]] = set()
+    orderable: Set[Tuple[str, str]] = set()
     if not source_dir.exists():
-        return pairs, names
+        return pairs, names, not_orderable
 
     for path in sorted(source_dir.rglob("*.parquet")):
         # Bronze is the raw shape; silver is normalised. Only read silver so the
@@ -129,17 +141,61 @@ def _read_listings(source_dir: Path) -> Tuple[Set[Tuple[str, str]], Dict[str, st
             continue
         if "barcode" not in frame.columns or "store_id" not in frame.columns:
             continue
-        cols = ["barcode", "store_id"] + (["product_name"] if "product_name" in frame.columns else [])
+        cols = (["barcode", "store_id"] + (["product_name"] if "product_name" in frame.columns else [])
+                + (["is_online_available"] if "is_online_available" in frame.columns else []))
         for row in frame.select(cols).iter_rows(named=True):
             barcode = str(row.get("barcode") or "").strip().lstrip("0")
             store = str(row.get("store_id") or "").strip()
             if not barcode or not store:
                 continue
             pairs.add((barcode, store))
+            flag = row.get("is_online_available")
+            if flag is False:
+                not_orderable.add((barcode, store))
+            elif flag is True:
+                orderable.add((barcode, store))
             name = row.get("product_name")
             if name and barcode not in names:
                 names[barcode] = str(name)
-    return pairs, names
+    # A day's files can list one pair twice. Absent only if no line said it was orderable.
+    return pairs, names, not_orderable - orderable
+
+
+# One day's reading, kept while its files are unchanged. The engine now reads the delivery
+# catalogue on every run (ADR-031), and a test session runs the engine a hundred times over
+# the same committed snapshots: re-reading ~400 parquet files each time cost the suite 90
+# seconds. The key is every file's name, size and nanosecond mtime, so a rewritten file is
+# read again; callers get copies, so nothing they do reaches the cache.
+_DAY_CACHE: Dict[Tuple[str, str], Tuple[tuple, tuple]] = {}
+
+
+def _signature(day_dir: Path, source_id: str) -> tuple:
+    files = [day_dir / "_manifest.json"]
+    source = day_dir / source_id
+    if source.exists():
+        files += sorted(source.rglob("*.parquet"))
+    out = []
+    for path in files:
+        try:
+            st = path.stat()
+        except OSError:
+            continue
+        out.append((str(path), st.st_size, st.st_mtime_ns))
+    return tuple(out)
+
+
+def _read_day(day_dir: Path, source_id: str):
+    """(manifest status, pairs, names, not orderable) for one day directory, cached."""
+    key = (str(day_dir), source_id)
+    signature = _signature(day_dir, source_id)
+    cached = _DAY_CACHE.get(key)
+    if cached is None or cached[0] != signature:
+        status = _manifest_status(day_dir)
+        read = _read_listings(day_dir / source_id) if status in USABLE_STATUSES else (set(), {}, set())
+        cached = (signature, (status,) + read)
+        _DAY_CACHE[key] = cached
+    status, pairs, names, not_orderable = cached[1]
+    return status, set(pairs), dict(names), set(not_orderable)
 
 
 def load_presence(
@@ -157,7 +213,7 @@ def load_presence(
         if day is None:
             continue
 
-        status = _manifest_status(day_dir)
+        status, pairs, names, not_orderable = _read_day(day_dir, source_id)
         if status is None:
             # No manifest means we cannot tell a real absence from a failed
             # scrape, so the day is unusable regardless of what files exist.
@@ -167,13 +223,13 @@ def load_presence(
             series.skipped[day] = f"manifest status {status!r}"
             continue
 
-        pairs, names = _read_listings(day_dir / source_id)
         if not pairs:
             series.skipped[day] = "no listings in snapshot"
             continue
 
         series.days.append(day)
         series.listings[day] = pairs
+        series.unavailable[day] = not_orderable
         for barcode, name in names.items():
             series.product_names.setdefault(barcode, name)
 
@@ -207,3 +263,4 @@ def _drop_undercovered_days(
             )
             series.days.remove(day)
             del series.listings[day]
+            series.unavailable.pop(day, None)

@@ -53,9 +53,11 @@ def test_the_artefact_carries_every_capability_with_its_extras_and_vintages(tmp_
     assert caps["owner_questions"]["limit"] == 3
     assert "provenance.sales_months" in art["figures"]
     # Exactly the registry: catalogue and questions are capabilities like any other (ADR-014),
-    # and hygiene is its own — so the publisher's status rule runs over all seven.
+    # and hygiene is its own — so the publisher's status rule runs over all eight. The eighth
+    # is F8's market signal (Task 5.4), registered with its runner in the same change.
     assert set(caps) == {"catalogue_lifecycle", "price_consistency", "reconciliation", "hygiene",
-                         "competitor_position", "margin_below_cost", "owner_questions"}
+                         "competitor_position", "margin_below_cost", "owner_questions",
+                         "market_running_out"}
     assert all(c["status"] in ("available", "unavailable") for c in caps.values())
 
 

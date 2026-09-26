@@ -38,12 +38,14 @@ const ENGINE_REASONS = [
   'no_inventory_data',
   'no_sales_evidence',
   'no_competitor_data',
+  'market_signal_thin',
   // rule-level, raised by the capabilities themselves
   'ceiling_degenerate',
   'no_delivery_prices',
   'no_comparable_source',
   'answer_storage_unavailable',
   'unknown_stock_date',
+  'market_signal_stale',
   // run-level
   'capability_error',
 ]

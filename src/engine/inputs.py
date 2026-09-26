@@ -10,13 +10,15 @@ from typing import Optional
 
 import pyarrow.parquet as pq
 
-from src.common.paths import MATCHING_ROOT, SIGNALS_ROOT, SILVER_POS_ROOT
+from src.common.paths import EXTERNAL_SNAPSHOTS_ROOT, MATCHING_ROOT, SIGNALS_ROOT, SILVER_POS_ROOT
 from src.common.store_types import StoreTypeConfig, load_store_types
 from src.engine.model import EvidenceWindow, norm_barcode
 from src.engine.policy import Policy
 from src.internal_pos.pos_importer import read_pos_vintage
 from src.engine.stock_date import usable_stock_date
 from src.engine.store_facts import DEFAULT_PATH as STORE_FACTS_PATH, load_store_facts
+from src.market.presence import DELIVERY_CATALOG, load_presence
+from src.market.running_out import market_signal, market_store_ids
 from src.owner_state.model import OwnerState, answered_cost, device_register
 
 OUR_FORMAT = "gas_convenience"
@@ -37,6 +39,7 @@ class EngineInputs:
     idle: Optional[set]
     conflicting: Optional[list]   # ADR-019: barcodes whose rows disagree
     store_facts: Optional[dict]   # ADR-033: {facts, rejected}; None when the file is absent
+    running_out: Optional[dict]   # ADR-031: the market's signal; None when too thin to say
     inputs_digest: str            # Task 3.1: content addressing over what was read
     vintages: dict
     owner: OwnerState
@@ -293,7 +296,8 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
                 signals_dir: Path = SIGNALS_ROOT / "competitor_product_signals",
                 matches_path: Path = MATCHING_ROOT / "product_matches.parquet",
                 stores: Optional[StoreTypeConfig] = None,
-                store_facts_path: Path = STORE_FACTS_PATH) -> EngineInputs:
+                store_facts_path: Path = STORE_FACTS_PATH,
+                snapshots_root: Path = EXTERNAL_SNAPSHOTS_ROOT) -> EngineInputs:
     stores = stores or load_store_types()
     products_raw = _rows(silver_dir / "yomyom_products.parquet")
     inventory = _rows(silver_dir / "yomyom_inventory.parquet")
@@ -312,6 +316,12 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
     latest_signal = sorted(signals_dir.glob("*.parquet")) if signals_dir.exists() else []
     signals = _rows(latest_signal[-1]) if latest_signal else None
     observations = _shape_observations(signals, stores)
+    # ADR-031. Read from the committed delivery-catalogue snapshots, not from silver: the
+    # rule needs every day's listings, and silver holds only the latest. The market is
+    # D-18's, the stores at or above the floor less the client, and only days up to the run
+    # are read, so a run over an earlier date sees what that night saw.
+    presence = load_presence(root=snapshots_root, source_id=DELIVERY_CATALOG)
+    running_out = market_signal(presence, market_store_ids(presence, stores, OUR_FORMAT), policy, run_at.date())
     matches = _rows(matches_path)
     if matches:
         for m in matches:
@@ -360,11 +370,11 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
     vintages["sales"] = {k: vintages["sales"][k]
                          for k in ("months", "first", "last", "full_annual_cycle", "reconcile_before")}
     digest = _digest(products, summary_rows, monthly, observations, matches, policy, owner,
-                     reconcile_before, sales_daily, store_facts)
+                     reconcile_before, sales_daily, store_facts, running_out)
     return EngineInputs(products=products, inventory=inventory or None,
                         sales_monthly=monthly, sales_daily=sales_daily, sales_summary=summary, window=window,
                         observations=observations, matches=matches, stores=stores, withdrawn=None, idle=None, conflicting=conflicting,
-                        store_facts=store_facts, inputs_digest=digest,
+                        store_facts=store_facts, running_out=running_out, inputs_digest=digest,
                         vintages=vintages, owner=owner, policy=policy, run_at=run_at)
 
 
@@ -388,7 +398,7 @@ def _content_only(row):
 
 def _digest(products, summary_rows, monthly, observations, matches, policy, owner,
             reconcile_before: Optional[str], sales_daily: Optional[list] = None,
-            store_facts: Optional[dict] = None) -> str:
+            store_facts: Optional[dict] = None, running_out: Optional[dict] = None) -> str:
     """A hex digest over the CONTENT the run read, not over the files it read them from.
 
     Content, because a parquet rewritten with identical rows is the same input and must
@@ -430,6 +440,8 @@ def _digest(products, summary_rows, monthly, observations, matches, policy, owne
     # corrected schedule is a different input even when nothing else moved. Rejected entries
     # are not facts, and computing nothing from them is the same whatever they said.
     feed("store_facts", None if store_facts is None else store_facts["facts"])
+    # ADR-031. What the market was doing is an input to the quantity, like our own sales.
+    feed("running_out", running_out)
     feed("observations", observations)
     feed("matches", matches)
     feed("policy", policy.as_dict())
