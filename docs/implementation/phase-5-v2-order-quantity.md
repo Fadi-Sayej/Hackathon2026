@@ -55,13 +55,13 @@ This is the part the first draft got wrong, so it is stated before any task.
    real run whose artefact lacks a registered id (`publish.py`, `require_complete_registry`).
    A registry entry without a runner stops the nightly publishing. Each such task also
    updates `tests/engine/test_run_capabilities.py`, the exact id set.
-5. **Nothing new reaches the owner's screens before Task 5.13's mockups are approved.**
+5. **Nothing new reaches the owner's screens before Task 5.12's mockups are approved.**
    - Today and Data list every capability by id (`DailyPage.jsx`, `DataPage.jsx`).
    - `compose.js` admits every capability not in its `NOT_ADMITTED` set.
    - `QuestionPanel.jsx` renders every question as a cost question.
 
    So Task 5.0 adds a no-visible-change guard in the browser, and Task 5.9's questions are
-   published behind a policy flag that stays `false` until Task 5.15.
+   published behind a policy flag that stays `false` until Task 5.14.
 6. **Tests and probes never reach the network, and never rewrite a committed file.**
    - `run_engine` gains explicit paths: `daily_sales_dir`, `store_facts_path` and
      `snapshots_root`.
