@@ -40,6 +40,7 @@ class EngineInputs:
     conflicting: Optional[list]   # ADR-019: barcodes whose rows disagree
     store_facts: Optional[dict]   # ADR-033: {facts, rejected}; None when the file is absent
     running_out: Optional[dict]   # ADR-031: the market's signal; None when too thin to say
+    boost_picks: Optional[dict]   # ADR-035: the day's sealed picks; None when none were sealed
     inputs_digest: str            # Task 3.1: content addressing over what was read
     vintages: dict
     owner: OwnerState
@@ -322,6 +323,10 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
     # are read, so a run over an earlier date sees what that night saw.
     presence = load_presence(root=snapshots_root, source_id=DELIVERY_CATALOG)
     running_out = market_signal(presence, market_store_ids(presence, stores, OUR_FORMAT), policy, run_at.date())
+    # ADR-035: the picks sealed for the night the market evidence describes. Read, never asked
+    # for here: asking is the live step's, and print mode must read exactly what it sealed.
+    from src.engine.market_boost import read_picks      # local: market_boost imports this module
+    boost_picks = read_picks(snapshots_root, running_out["on_day"]) if running_out else None
     matches = _rows(matches_path)
     if matches:
         for m in matches:
@@ -370,11 +375,12 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
     vintages["sales"] = {k: vintages["sales"][k]
                          for k in ("months", "first", "last", "full_annual_cycle", "reconcile_before")}
     digest = _digest(products, summary_rows, monthly, observations, matches, policy, owner,
-                     reconcile_before, sales_daily, store_facts, running_out)
+                     reconcile_before, sales_daily, store_facts, running_out, boost_picks)
     return EngineInputs(products=products, inventory=inventory or None,
                         sales_monthly=monthly, sales_daily=sales_daily, sales_summary=summary, window=window,
                         observations=observations, matches=matches, stores=stores, withdrawn=None, idle=None, conflicting=conflicting,
-                        store_facts=store_facts, running_out=running_out, inputs_digest=digest,
+                        store_facts=store_facts, running_out=running_out, boost_picks=boost_picks,
+                        inputs_digest=digest,
                         vintages=vintages, owner=owner, policy=policy, run_at=run_at)
 
 
@@ -398,7 +404,8 @@ def _content_only(row):
 
 def _digest(products, summary_rows, monthly, observations, matches, policy, owner,
             reconcile_before: Optional[str], sales_daily: Optional[list] = None,
-            store_facts: Optional[dict] = None, running_out: Optional[dict] = None) -> str:
+            store_facts: Optional[dict] = None, running_out: Optional[dict] = None,
+            boost_picks: Optional[dict] = None) -> str:
     """A hex digest over the CONTENT the run read, not over the files it read them from.
 
     Content, because a parquet rewritten with identical rows is the same input and must
@@ -442,6 +449,9 @@ def _digest(products, summary_rows, monthly, observations, matches, policy, owne
     feed("store_facts", None if store_facts is None else store_facts["facts"])
     # ADR-031. What the market was doing is an input to the quantity, like our own sales.
     feed("running_out", running_out)
+    # ADR-035: a recorded pick is an input like a delivery catalogue, so the live run (which
+    # reloads after sealing) and a reproduction digest the same picks.
+    feed("boost_picks", boost_picks)
     feed("observations", observations)
     feed("matches", matches)
     feed("policy", policy.as_dict())

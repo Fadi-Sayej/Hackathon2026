@@ -226,6 +226,8 @@ export const en = {
   'unavailable.unknown_stock_date': "We do not know the day the stock was counted, so this cannot be checked.",
   'unavailable.market_signal_thin': "We have too few recent days of the nearby stores' listings to tell what they are running out of.",
   'unavailable.market_signal_stale': "The nearby stores' listings are out of date, so we cannot say what they are running out of today.",
+  'unavailable.no_boost_key': "The market adjustment is off: no key for the model has been set up.",
+  'unavailable.boost_unavailable': "We could not reach the model tonight, so no market adjustment was applied.",
   'data.title': "Where the numbers came from",
   'data.none': "none",
   'data.hidden.title': "Items you hid",

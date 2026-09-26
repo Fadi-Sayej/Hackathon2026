@@ -27,13 +27,21 @@ def _thresholds(policy) -> dict:
     return policy.as_dict()["market_running_out"]
 
 
+def is_stale(signal: dict, run_at, policy) -> bool:
+    """ADR-031 Decision 5: the latest usable day is too old to describe tonight.
+
+    The one place this is judged. The boost (ADR-032) asks nothing on a stale night and
+    publishes the same reason, so the two can never disagree about which nights are stale.
+    """
+    return (run_at.date() - date.fromisoformat(signal["on_day"])).days > policy.running_out_signal_max_age_days
+
+
 def run(inputs: EngineInputs) -> CapabilityOutput:
     status, reason = derive_status(CAP, inputs)
     if status == "unavailable":
         return CapabilityOutput.unavailable(CAP, SPEC, reason)
     policy, signal = inputs.policy, inputs.running_out
-    age = (inputs.run_at.date() - date.fromisoformat(signal["on_day"])).days
-    if age > policy.running_out_signal_max_age_days:
+    if is_stale(signal, inputs.run_at, policy):
         out = CapabilityOutput.unavailable(CAP, SPEC, "market_signal_stale")
         out.extras = {"on_day": signal["on_day"]}
         return out

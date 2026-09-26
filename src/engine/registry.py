@@ -50,6 +50,9 @@ CAPABILITIES = {
     # F8 (V2). A fact the quantity reads, never an entry: no value, never admitted (ADR-031).
     "market_running_out":  CapabilitySpec("market_running_out",  "F8-S1",    "none",     False, "days_absent",
                                           ("running_out",), published_from="2026-09-27"),
+    # F8 (V2). The model's picks, checked and sealed; the quantity reads them (ADR-032, ADR-035).
+    "market_boost":        CapabilitySpec("market_boost",        "F8-S1",    "none",     False, "boost_pct",
+                                          ("running_out", "boost_picks"), published_from="2026-09-27"),
 }
 
 # The reason belongs to the missing input, not to the capability: catalogue_lifecycle with
@@ -65,6 +68,9 @@ INPUT_REASONS = {
     "matches": "no_competitor_data",
     # ADR-031 Decision 5: the market was not observed on enough of the last fortnight.
     "running_out": "market_signal_thin",
+    # ADR-035: no sealed picks for the day. A live run with a key always seals a manifest,
+    # so the only live night without one is a night with no key.
+    "boost_picks": "no_boost_key",
 }
 
 # Admitted capabilities that may never carry money (D-1). Their precedence for the three
