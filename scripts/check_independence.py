@@ -92,6 +92,34 @@ def main() -> None:
           f"unavailable ({recon['unavailable_reason']}) without them")
     print(f"OK    hygiene {_total(hyg_w)} records with the reports, {_total(hyg)} without, "
           f"none lost (the withheld run excludes no withdrawn products, INV-036)")
+    _f8_independence()
+
+
+def _f8_independence() -> None:
+    """F8-S1 §20: the quantity and the boost fail independently. Real data has no daily
+    reports yet, so this runs over check_order_signals' fixture world, and it warns rather
+    than fails until the committed artefact first carries a real order_quantity, as that
+    probe does."""
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import check_order_signals as f8
+
+    with tempfile.TemporaryDirectory() as tmp:
+        built = Path(tmp) / "world"
+        f8.world.build(built)
+        no_picks = f8._copy(built, Path(tmp) / "no_picks")
+        for folder in no_picks["snapshots_root"].glob("*/boost_picks"):
+            shutil.rmtree(folder)
+        no_daily = f8._copy(built, Path(tmp) / "no_daily")
+        for path in no_daily["daily_sales_dir"].glob("*.csv"):
+            path.unlink()
+        problems = f8.independence_problems(f8._run(no_picks)[0], f8._run(no_daily)[0])
+    if not problems:
+        print("OK    order quantity and boost fail independently (F8 fixture world)")
+        return
+    if f8.blocking():
+        _fail(problems[0])
+    for line in problems:
+        print(f"::warning::F8 independence  {line}")
 
 
 if __name__ == "__main__":

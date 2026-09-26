@@ -1,0 +1,252 @@
+#!/usr/bin/env python3
+"""check_order_signals.py — does F8 depend on exactly what it should? (rule 12, F8-S1 §20)
+
+Each of F8's inputs is withheld AT SOURCE, the engine is run in print mode over a copy of a
+fixture world, and the PUBLISHED artefact is read, never a capability's return value:
+
+| Withheld | Must happen |
+|---|---|
+| the report days | order_quantity unavailable, with a monthly report right there to misuse |
+| the deliveries | no net suggestion: a count cannot be carried without them |
+| the store facts | no quantity at all |
+| the market snapshots | suggestions still publish, unadjusted, and no disagreement is raised |
+| the boost picks | no boost, and zero calls to the model |
+| an answered disagreement | it is not raised again (D-20) |
+
+It also proves the quantity and the boost fail independently: without the picks the quantity
+still publishes, and without the report days the boost is still available.
+
+The baseline must first show suggestions, a boost and a disagreement, or withholding an input
+would remove nothing and every check would pass vacuously.
+
+The world is built by tests/fixtures/order_signals/build.py on a fixed run date, and the
+market is never collected (`skip_market=True`): a probe must not call Open-Meteo or rewrite
+market-context.json. The disagreement question is published only while its policy flag is
+on, and the flag is off until Task 5.14, so the probe turns it on for its own runs.
+
+Blocking starts on its own. Until the committed artefact shows order_quantity available on
+real data, a failure is printed as a warning and the exit is 0: before then nothing the owner
+sees depends on F8. From that night on, a failure exits 1 and holds the artefact back.
+"""
+from __future__ import annotations
+
+import json
+import shutil
+import sys
+import tempfile
+from contextlib import contextmanager
+from dataclasses import replace
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "tests" / "fixtures" / "order_signals"))
+
+import src.engine.run as run_mod  # noqa: E402
+from src.engine.policy import load_policy  # noqa: E402
+import build as world  # noqa: E402
+
+ARTEFACT = ROOT / "public" / "data" / "dashboard.json"
+
+
+# ── What each case must show, as pure functions of the published artefact ────
+
+def _cap(art: dict, cap_id: str) -> dict:
+    return art["capabilities"][cap_id]
+
+
+def _suggestions(art: dict) -> list:
+    return _cap(art, "order_quantity")["entries"]
+
+
+def _disagreements(art: dict) -> list:
+    items = (_cap(art, "owner_questions").get("items") or [])
+    return [q for q in items if q.get("fact") == "market_disagreement"]
+
+
+def _boosted(art: dict) -> list:
+    return [e for e in _suggestions(art) if (e["evidence"].get("boost") or {}).get("applied")]
+
+
+def baseline_problems(art: dict) -> list:
+    out = []
+    if _cap(art, "order_quantity")["status"] != "available" or not _suggestions(art):
+        out.append("the baseline publishes no suggestion, so withholding an input would remove nothing")
+    if not [e for e in _suggestions(art) if e["evidence"]["kind"] == "net"]:
+        out.append("the baseline has no net suggestion, so withholding the deliveries proves nothing")
+    if not _boosted(art):
+        out.append("the baseline applies no boost, so withholding the picks proves nothing")
+    if not _disagreements(art):
+        out.append("the baseline raises no disagreement, so withholding the market proves nothing")
+    return out
+
+
+def withheld_daily_problems(art: dict) -> list:
+    cap = _cap(art, "order_quantity")
+    if cap["status"] != "unavailable" or cap["unavailable_reason"] != "no_daily_sales" or cap["entries"]:
+        return [f"without report days order_quantity published {cap['status']} ({cap['unavailable_reason']}) "
+                f"with {len(cap['entries'])} entries: a monthly report must never stand in for them (INV-070)"]
+    return []
+
+
+def withheld_deliveries_problems(art: dict) -> list:
+    net = [e["barcode"] for e in _suggestions(art) if e["evidence"]["kind"] == "net"]
+    return [f"without deliveries {net} are still net: a count was carried across unknown deliveries (FR-149)"] if net else []
+
+
+def withheld_facts_problems(art: dict) -> list:
+    got = _suggestions(art)
+    return [f"without the store facts {len(got)} quantities were published from a schedule or shelf life "
+            f"nobody stated (INV-071)"] if got else []
+
+
+def withheld_market_problems(art: dict) -> list:
+    out = []
+    if not _suggestions(art):
+        out.append("without the market snapshots the suggestions vanished: the adjustment was wrongly required (FR-148)")
+    if _boosted(art):
+        out.append("without the market snapshots a boost was still applied, from nothing")
+    if _disagreements(art):
+        out.append("without the market snapshots a disagreement was still raised (AC-142)")
+    return out
+
+
+def withheld_picks_problems(art: dict, calls: int) -> list:
+    out = []
+    if _boosted(art):
+        out.append("without the boost picks a boost was still applied: it came from no pick (ADR-035)")
+    if calls:
+        out.append(f"print mode called the model {calls} times: reproduction must never ask it (ADR-035)")
+    if not _suggestions(art):
+        out.append("without the boost picks the suggestions vanished: the boost was wrongly required (SCN-151)")
+    return out
+
+
+def answered_problems(art: dict, barcode: str) -> list:
+    again = [q for q in _disagreements(art) if q["barcode"] == barcode]
+    return [f"{barcode}'s disagreement was answered and raised again (D-20)"] if again else []
+
+
+def independence_problems(without_picks: dict, without_daily: dict) -> list:
+    out = []
+    if _cap(without_picks, "market_boost")["status"] != "unavailable" or not _suggestions(without_picks):
+        out.append("without the picks the boost must be unavailable while the quantity still publishes")
+    if (_cap(without_daily, "order_quantity")["status"] != "unavailable"
+            or _cap(without_daily, "market_boost")["status"] != "available"):
+        out.append("without the report days the quantity must be unavailable while the boost stays available")
+    return out
+
+
+# ── Running the engine over the world, with one input withheld ────────────────
+
+@contextmanager
+def _engine_as(owner):
+    """The probe's own runs: the disagreement flag on, and a fixture owner state."""
+    saved_policy, saved_owner = run_mod.load_policy, run_mod._pull_owner_state
+    run_mod.load_policy = lambda: replace(load_policy(), order_publish_disagreement_questions=True)
+    run_mod._pull_owner_state = lambda: owner
+    try:
+        yield
+    finally:
+        run_mod.load_policy, run_mod._pull_owner_state = saved_policy, saved_owner
+
+
+def _run(paths: dict, owner=None) -> tuple:
+    model = world.FakeModel()
+    with _engine_as(owner or world.owner()):
+        art = run_mod.run_engine(mode="print", skip_market=True, now=world.RUN_AT, boost_transport=model,
+                                 **paths)["artefact"]
+    return art, model.calls
+
+
+def _copy(built: Path, into: Path) -> dict:
+    shutil.copytree(built, into)
+    return world.roots(into)
+
+
+def _drop_deliveries(folder: Path) -> None:
+    """The same reports with the כניסות מלאי column gone, as a POS export without it arrives."""
+    for path in folder.glob("*.csv"):
+        lines = path.read_text(encoding="utf-8-sig").splitlines()
+        col = lines[0].split(",").index("כניסות מלאי")
+        path.write_text("﻿" + "\n".join(",".join(c for i, c in enumerate(line.split(",")) if i != col)
+                                             for line in lines) + "\n", encoding="utf-8")
+
+
+def probe(tmp: Path) -> tuple:
+    """(problems, lines to print). Every case runs over its own copy of the world."""
+    built = tmp / "world"
+    world.build(built)
+    problems, done = [], []
+
+    baseline, _ = _run(world.roots(built))
+    problems += baseline_problems(baseline)
+    done.append(f"baseline: {len(_suggestions(baseline))} suggestions, {len(_boosted(baseline))} boosted, "
+                f"{len(_disagreements(baseline))} disagreement")
+
+    paths = _copy(built, tmp / "no_daily")
+    for path in paths["daily_sales_dir"].glob("*.csv"):
+        path.unlink()
+    no_daily, _ = _run(paths)
+    problems += withheld_daily_problems(no_daily)
+    done.append("withholding the report days → order_quantity unavailable (no_daily_sales), monthly unused")
+
+    paths = _copy(built, tmp / "no_deliveries")
+    _drop_deliveries(paths["daily_sales_dir"])
+    problems += withheld_deliveries_problems(_run(paths)[0])
+    done.append("withholding the deliveries  → no net suggestion")
+
+    paths = _copy(built, tmp / "no_facts")
+    paths["store_facts_path"].unlink()
+    problems += withheld_facts_problems(_run(paths)[0])
+    done.append("withholding the store facts → no quantity")
+
+    paths = _copy(built, tmp / "no_market")
+    shutil.rmtree(paths["snapshots_root"])
+    paths["snapshots_root"].mkdir()
+    problems += withheld_market_problems(_run(paths)[0])
+    done.append("withholding the market      → suggestions unadjusted, no disagreement")
+
+    paths = _copy(built, tmp / "no_picks")
+    for folder in paths["snapshots_root"].glob("*/boost_picks"):
+        shutil.rmtree(folder)
+    no_picks, calls = _run(paths)
+    problems += withheld_picks_problems(no_picks, calls)
+    done.append("withholding the boost picks → no boost, no model call")
+
+    answered = world.owner(answered=[world.SLOW])
+    problems += answered_problems(_run(world.roots(built), owner=answered)[0], world.SLOW)
+    done.append("an answered disagreement    → not raised again")
+
+    problems += independence_problems(no_picks, no_daily)
+    done.append("quantity and boost fail independently")
+    return problems, done
+
+
+def blocking() -> bool:
+    """From the first night the committed artefact carries a real order_quantity, on."""
+    try:
+        art = json.loads(ARTEFACT.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return False
+    return ((art.get("capabilities") or {}).get("order_quantity") or {}).get("status") == "available"
+
+
+def main() -> int:
+    with tempfile.TemporaryDirectory() as tmp:
+        problems, done = probe(Path(tmp))
+    if not problems:
+        for line in done:
+            print(f"OK    {line}")
+        return 0
+    block = blocking()
+    for line in problems:
+        print(f"{'FAIL' if block else '::warning::F8 probe'}  {line}")
+    if not block:
+        print("order_quantity is not yet available on real data, so this warns rather than blocks")
+        return 0
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

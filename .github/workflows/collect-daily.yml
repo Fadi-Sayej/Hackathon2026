@@ -218,6 +218,13 @@ jobs:
       - name: Do detection and hygiene still fail independently?
         run: python3 scripts/check_independence.py
 
+      - name: Does F8 depend on exactly what it should?
+        # F8-S1 §20, Phase 5 Task 5.11. Withholds each of F8's inputs over a built fixture
+        # world and reads the published artefact. It warns, exiting 0, until the committed
+        # artefact first carries an available order_quantity on real data, and blocks from
+        # that night on, without anyone having to remember to switch it.
+        run: python3 scripts/check_order_signals.py
+
       - name: Commit the owner's artefact
         id: artefact
         # The step this workflow was missing. The engine published dashboard.json into
