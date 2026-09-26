@@ -74,7 +74,7 @@ MON = THU - timedelta(days=3)
 def test_a_recent_unflagged_count_with_every_day_reported_is_used():
     """SCN-134: the count plus the three days' deliveries, less their sales."""
     out = stock_now(20.0, MON, False, rows(MON, 3, units=2.0, receipts=1.0), reported(MON, 3), THU, POLICY)
-    assert out == {"stock_now": 17.0, "not_used_because": None}
+    assert out == {"stock_now": 17.0, "not_used_because": None, "deliveries_since": 3.0, "sales_since": 6.0}
 
 
 def test_an_old_count_is_not_used():

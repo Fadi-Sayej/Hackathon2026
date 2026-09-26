@@ -93,3 +93,46 @@ def test_an_artefact_without_a_digest_is_refused():
     art.pop("inputs_digest", None)
     with pytest.raises(PublishRefused, match="inputs_digest"):
         validate_artefact(art)
+
+
+# ── Phase 5 Task 5.8: order suggestions (INV-069, FR-147, AC-161) ─────────────
+
+def _suggestion(**evidence):
+    base = {"order_day": "2026-11-01", "cycle": {"first_day": "2026-11-01", "last_day": "2026-11-07", "days": 7},
+            "schedule": {"form": "weekdays", "weekdays": ["sun"], "stated_on": "2026-10-01"},
+            "schedule_changed": False, "window": {}, "weekly_units": [7.0, 7.0, 7.0, 7.0], "daily_mean": 1.0,
+            "boost": {"applied": False, "pct": None, "model_pick_pct": None, "not_applied_because": "no_boost_key"},
+            "adjusted_daily_mean": 1.0, "expected_sales": 7.0,
+            "count": {"recorded_stock": 5.0, "as_of": "2026-06-06", "used": False, "not_used_because": "count_too_old", "flags": []},
+            "stock_now": None, "stock_at_order_day": None, "shelf_life": {"days": 90, "stated_on": "2026-10-01"},
+            "capped": False, "kind": "gross", "quantity": 7}
+    e = Entry(id="0123456789abcdef", signal_family="order.suggestion", capability="order_quantity", barcode="1",
+              product_name="p", department="d", action="place_order", characterisation="order_suggestion",
+              evidence={**base, **evidence}, value=None, ordering_key={"name": "units_in_window", "value": 28.0})
+    return _artefact([CapabilityOutput(id="order_quantity", spec="F8-S1", status="available", entries=[e])])
+
+
+def test_an_order_suggestion_with_its_facts_is_published():
+    validate_artefact(_suggestion())
+
+
+def test_refuses_an_order_suggestion_carrying_a_money_field_at_any_depth():
+    """INV-069: no ₪ on any suggestion. A schema cannot see a nested key; the publisher can."""
+    with pytest.raises(PublishRefused, match="INV-069"):
+        validate_artefact(_suggestion(unit_cost=3.5))
+    with pytest.raises(PublishRefused, match="INV-069"):
+        validate_artefact(_suggestion(count={"recorded_stock": 5.0, "shelf_price": 4.0}))
+
+
+def test_refuses_an_applied_boost_outside_0_to_25():
+    """FR-147: a pick outside the range gives no boost. An applied one out of range is a bug."""
+    with pytest.raises(PublishRefused, match="boost"):
+        validate_artefact(_suggestion(boost={"applied": True, "pct": 30, "not_applied_because": None}))
+    with pytest.raises(PublishRefused, match="boost"):
+        validate_artefact(_suggestion(boost={"applied": True, "pct": -5, "not_applied_because": None}))
+
+
+def test_a_recorded_rejected_pick_is_a_fact_not_an_applied_boost():
+    """The model said 40; nothing applied it. That is published, and it is not a violation."""
+    validate_artefact(_suggestion(boost={"applied": False, "pct": None, "model_pick_pct": 40,
+                                         "not_applied_because": "above_limit"}))

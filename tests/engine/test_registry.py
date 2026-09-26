@@ -49,9 +49,9 @@ def test_hygiene_is_a_capability_of_its_own_and_spec_002_produces_two():
     assert set(CAPABILITIES) == {"price_consistency", "reconciliation", "hygiene",
                                  "competitor_position", "catalogue_lifecycle",
                                  "owner_questions", "margin_below_cost",
-                                 # Phase 5: F8's market signal (Task 5.4, ADR-031) and
-                                 # boost (Task 5.6, ADR-032)
-                                 "market_running_out", "market_boost"}
+                                 # Phase 5: F8's market signal (Task 5.4, ADR-031), boost
+                                 # (Task 5.6, ADR-032) and quantity (Task 5.8, ADR-034)
+                                 "market_running_out", "market_boost", "order_quantity"}
     assert CAPABILITIES["hygiene"].spec == CAPABILITIES["reconciliation"].spec == "SPEC-002"
     assert "sales_summary" not in CAPABILITIES["hygiene"].requires
 
