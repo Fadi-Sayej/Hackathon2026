@@ -1,18 +1,18 @@
 ---
 ID: ADR-034
 Title: An order suggestion is identified by its product and order day; a disagreement is a question keyed by its product
-Status: Ready for review
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-09-25
 Parent: [System Design](../system-design.md) §19
 Related Specs: F8-S1 (FR-158, FR-159, FR-161, FR-162, FR-163, INV-075, INV-078, C-67, C-68, AC-154); F5-S1 (FR-089, FR-090); F13-S1
 Inputs: [docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md, D-20, ADR-001, ADR-003, ADR-009, ADR-016, ADR-027, system-design.md §10.1, src/engine/owner_questions.py, src/owner/ownerState.js]
-Updated: 2026-09-25
+Updated: 2026-09-26
 ---
 
 # ADR-034 — An order suggestion is identified by its product and order day; a disagreement is a question keyed by its product
 
-**Status:** Ready for review · **Recorded in:** [System Design](../system-design.md) §19
+**Status:** Accepted (2026-09-26, by the repository owner, on PR #200) · **Recorded in:** [System Design](../system-design.md) §19
 
 ## Context
 

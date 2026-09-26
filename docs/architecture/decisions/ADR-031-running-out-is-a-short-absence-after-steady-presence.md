@@ -1,18 +1,18 @@
 ---
 ID: ADR-031
 Title: "Running out" is read from the market's daily catalogues, as a short absence after steady presence
-Status: Ready for review
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-09-25
 Parent: [System Design](../system-design.md) §19
 Related Specs: F8-S1 (FR-147, FR-148, FR-158, OQ-905); GAP-008e
 Inputs: [docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md, D-18, D-19, D-20, D-21, ADR-008, ADR-014, src/market/presence.py, src/market/concentration.py, src/context/competitor_stockouts.py, configs/store_types.yaml, data/external/snapshots/*/delivery_catalog/]
-Updated: 2026-09-25
+Updated: 2026-09-26
 ---
 
 # ADR-031 — "Running out" is read from the market's daily catalogues, as a short absence after steady presence
 
-**Status:** Ready for review · **Recorded in:** [System Design](../system-design.md) §19
+**Status:** Accepted (2026-09-26, by the repository owner, on PR #200) · **Recorded in:** [System Design](../system-design.md) §19
 
 ## Context
 

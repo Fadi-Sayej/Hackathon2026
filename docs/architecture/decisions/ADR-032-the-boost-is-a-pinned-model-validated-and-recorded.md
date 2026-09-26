@@ -1,18 +1,18 @@
 ---
 ID: ADR-032
-Title: The boost is picked by a pinned Claude model in the nightly run, and checked mechanically before it is used
-Status: Ready for review
+Title: The boost is picked by a pinned model in the nightly run, and checked mechanically before it is used
+Status: Accepted — except the choice of model (Decision 2), which the repository owner deferred on 2026-09-26
 Owner: smartshelf-architect
 Date: 2026-09-25
 Parent: [System Design](../system-design.md) §19
 Related Specs: F8-S1 (FR-147, FR-154, FR-164, INV-074, INV-079, NFR-066, C-72, AC-160, AC-161)
 Inputs: [docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md, D-16, D-21, ADR-001, ADR-007, ADR-014, ADR-031, ADR-035, .github/workflows/collect-daily.yml]
-Updated: 2026-09-25
+Updated: 2026-09-26
 ---
 
-# ADR-032 — The boost is picked by a pinned Claude model in the nightly run, and checked mechanically before it is used
+# ADR-032 — The boost is picked by a pinned model in the nightly run, and checked mechanically before it is used
 
-**Status:** Ready for review · **Recorded in:** [System Design](../system-design.md) §19
+**Status:** Accepted (2026-09-26, by the repository owner, on PR #200), **except Decision 2's choice of model**. He asked to see the choices first · **Recorded in:** [System Design](../system-design.md) §19
 
 ## Context
 
@@ -32,13 +32,18 @@ How a pick is kept, so the run can be reproduced, is a separate decision: ADR-03
 
 1. **Where it runs.** A step inside the nightly run, after the running-out signal (ADR-031)
    and before F8's quantities are computed. Never in the browser, never at request time.
-2. **Which model.** Anthropic's Claude, through its API, pinned to `claude-sonnet-5`.
-   - The model id and the prompt's version are recorded with every pick (ADR-035).
-   - Changing either is a commit, never a silent drift.
+2. **Which model: open.** The draft proposed Anthropic's `claude-sonnet-5`. The repository
+   owner accepted everything else on 2026-09-26, and deferred the model until he has seen the
+   choices. It spends on his account.
+   - **Until he chooses, the step does not run.** No product is boosted, and each suggestion
+     says the model is not chosen yet. That is FR-147's "no pick", so nothing else waits on
+     it.
+   - **When he chooses, the model id is pinned here** by an amendment to this ADR.
+   - Whichever model it is, its id and the prompt's version are recorded with every pick
+     (ADR-035). Changing either is a commit, never a silent drift.
    - No sampling parameter is set. Determinism comes from the record, not from the model.
-   - The key is a GitHub Actions secret, `ANTHROPIC_API_KEY`, set by the repository owner,
-     as he set `VERCEL_DEPLOY_HOOK_URL`. The vendor and the model tier spend on his account,
-     so accepting this ADR is his choice of both.
+   - The key is a GitHub Actions secret for the chosen provider, set by the repository owner
+     as he set `VERCEL_DEPLOY_HOOK_URL`.
 3. **What it is given.** One request per product that is running out. It contains only facts
    F8 publishes for that product:
    - the window's weekly units and the daily mean;

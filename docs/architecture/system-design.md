@@ -1221,12 +1221,12 @@ own, so their rows say so rather than grade it after the fact.
 | [ADR-027](decisions/ADR-027-a-question-whose-money-is-unknown-carries-no-figure.md) | A question whose money is unknown carries no figure, and ranks after every question that has one | Easy |
 | [ADR-028](decisions/ADR-028-the-nav-is-the-owners-and-only-unshipped-code-leaves.md) | The nav is the owner's, and §20.1 removes only the code no screen runs | Easy |
 | [ADR-029](decisions/ADR-029-two-roles-sign-in-and-the-gate-enforces-them.md) | Two roles sign in, and the edge gate enforces them (D-22) | Moderate |
-| [ADR-030](decisions/ADR-030-own-sales-arrive-as-daily-reports.md) | F8's own sales arrive as daily reports, one file per day, and a missing day stays missing — **`Ready for review`** | Easy |
-| [ADR-031](decisions/ADR-031-running-out-is-a-short-absence-after-steady-presence.md) | "Running out" is a short absence after steady presence in the market's daily catalogues — **`Ready for review`** | Easy |
-| [ADR-032](decisions/ADR-032-the-boost-is-a-pinned-model-validated-and-recorded.md) | The boost is picked by a pinned Claude model in the nightly run, and checked mechanically before it is used — **`Ready for review`** | Easy |
-| [ADR-033](decisions/ADR-033-store-facts-are-a-committed-file.md) | The store facts are a committed file the team records from the owner; owner state never holds them — **`Ready for review`** | Easy |
-| [ADR-034](decisions/ADR-034-a-suggestion-is-identified-by-product-and-order-day.md) | An order suggestion is identified by its product and order day; a disagreement is a question keyed by its product — **`Ready for review`** | Easy before first use |
-| [ADR-035](decisions/ADR-035-a-models-answer-is-collected-data.md) | A model's answer is collected data: sealed as a daily snapshot, and reproduction reads it like any other — **`Ready for review`** | Easy |
+| [ADR-030](decisions/ADR-030-own-sales-arrive-as-daily-reports.md) | F8's own sales arrive as daily reports, one file per day, and a missing day stays missing | Easy |
+| [ADR-031](decisions/ADR-031-running-out-is-a-short-absence-after-steady-presence.md) | "Running out" is a short absence after steady presence in the market's daily catalogues | Easy |
+| [ADR-032](decisions/ADR-032-the-boost-is-a-pinned-model-validated-and-recorded.md) | The boost is picked by a pinned model in the nightly run, and checked mechanically before it is used — accepted except the choice of model, which is open | Easy |
+| [ADR-033](decisions/ADR-033-store-facts-are-a-committed-file.md) | The store facts are a committed file the team records from the owner; owner state never holds them | Easy |
+| [ADR-034](decisions/ADR-034-a-suggestion-is-identified-by-product-and-order-day.md) | An order suggestion is identified by its product and order day; a disagreement is a question keyed by its product | Easy before first use |
+| [ADR-035](decisions/ADR-035-a-models-answer-is-collected-data.md) | A model's answer is collected data: sealed as a daily snapshot, and reproduction reads it like any other | Easy |
 
 ---
 
@@ -1457,9 +1457,10 @@ Design elements: **E** engine module · **P** publisher/artefact · **C** `compo
 ### F8-S1 — Order quantity (V2: designed, not built)
 
 **Nothing in this table is built yet.** F8-S1 (`Approved`, 2026-09-25) is the first V2
-spec. Its design decisions are ADR-030 … ADR-035, all `Ready for review`: each row names the
-ADR that answers it. Until they are accepted, no implementation-plan task may be written
-against them (HANDOVER rule 1).
+spec. Its design decisions are ADR-030 … ADR-035, accepted by the repository owner on
+2026-09-26. ADR-032 was accepted without its choice of model, which is still his to make.
+Each row names the ADR that answers it, and the implementation plan may now be written
+against them.
 
 | Requirement | Design element | Flow / contract | Verification |
 |---|---|---|---|

@@ -1,18 +1,18 @@
 ---
 ID: ADR-035
 Title: A model's answer is collected data: it is sealed as a daily snapshot, and reproduction reads it like any other
-Status: Ready for review
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-09-25
 Parent: [System Design](../system-design.md) §19
 Related Specs: F8-S1 (NFR-066, NFR-067, C-71, AC-160); F7-S1 (FR-125, FR-126)
 Inputs: [docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md, D-21, ADR-002, ADR-004, ADR-032, CLAUDE.md rules 6 and 9, scripts/check_v1_signals.py, scripts/check_independence.py]
-Updated: 2026-09-25
+Updated: 2026-09-26
 ---
 
 # ADR-035 — A model's answer is collected data: it is sealed as a daily snapshot, and reproduction reads it like any other
 
-**Status:** Ready for review · **Recorded in:** [System Design](../system-design.md) §19
+**Status:** Accepted (2026-09-26, by the repository owner, on PR #200) · **Recorded in:** [System Design](../system-design.md) §19
 
 ## Context
 

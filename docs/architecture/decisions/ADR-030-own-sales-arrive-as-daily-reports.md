@@ -1,18 +1,18 @@
 ---
 ID: ADR-030
 Title: F8's own sales arrive as daily reports, one file per day, and a missing day stays missing
-Status: Ready for review
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-09-25
 Parent: [System Design](../system-design.md) §19
 Related Specs: F8-S1 (FR-143, FR-144, FR-149, INV-070, INV-072, ASM-064, ASM-065, OQ-904)
 Inputs: [docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md, CLAUDE.md rules 5, 6 and 13, .gitignore, commit a3aca1e, ADR-011, ADR-017, ADR-019, ADR-028 §4, D-12, D-22, src/internal_pos/sales_importer.py, .github/workflows/collect-daily.yml, data/internal/raw_pos/yomyom/sales/]
-Updated: 2026-09-25
+Updated: 2026-09-26
 ---
 
 # ADR-030 — F8's own sales arrive as daily reports, one file per day, and a missing day stays missing
 
-**Status:** Ready for review · **Recorded in:** [System Design](../system-design.md) §19
+**Status:** Accepted (2026-09-26, by the repository owner, on PR #200) · **Recorded in:** [System Design](../system-design.md) §19
 
 ## Context
 

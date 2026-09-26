@@ -1,18 +1,18 @@
 ---
 ID: ADR-033
 Title: The store facts are a committed file the team records from the owner; owner state never holds them
-Status: Ready for review
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-09-25
 Parent: [System Design](../system-design.md) §19
 Related Specs: F8-S1 (FR-146, FR-151, FR-152, FR-155, FR-157, INV-071, OQ-903, OQ-908)
 Inputs: [docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md, D-22, ADR-003, ADR-029, F5-S1 C-40, configs/store_policy.yaml, configs/shelf_life.yaml]
-Updated: 2026-09-25
+Updated: 2026-09-26
 ---
 
 # ADR-033 — The store facts are a committed file the team records from the owner; owner state never holds them
 
-**Status:** Ready for review · **Recorded in:** [System Design](../system-design.md) §19
+**Status:** Accepted (2026-09-26, by the repository owner, on PR #200) · **Recorded in:** [System Design](../system-design.md) §19
 
 ## Context
 
