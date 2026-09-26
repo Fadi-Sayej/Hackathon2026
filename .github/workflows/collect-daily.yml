@@ -156,6 +156,11 @@ jobs:
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
           FIREBASE_PROJECT_ID: hackathon26-a6ebd
           VITE_STORE_ID: yomyom-kafr-qasim
+          # ADR-032: the boost's model key, the repository owner's secret. Under the engine's own
+          # name, not ANTHROPIC_API_KEY, so a developer's personal key is never spent by a local
+          # data:refresh. Unset, the engine asks nothing, says no_boost_key, and the next step
+          # prints it as a warning; the run is not degraded by it.
+          SMARTSHELF_ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python3 scripts/run_engine.py --json-out /tmp/engine.json
 
       - name: Say plainly what the engine run was
@@ -172,6 +177,30 @@ jobs:
               if s['status'] != 'ok':
                   print(f"::warning::step {s['step']} {s['status']} {s.get('error') or ''}")
           PY
+
+      - name: Commit tonight's boost picks
+        # ADR-035 Decision 2. The model's picks are paid for, and asking again would not give
+        # the same answers, so they are sealed as a snapshot here: after the engine and BEFORE
+        # the blocking probes, so a probe that fails never throws away what was bought. The
+        # snapshot step above ran before the engine, and the artefact step below commits only
+        # public/data/, so neither covers them.
+        #
+        # data/external/ is ignored, so the add is forced, and it names only the picks: the
+        # engine also rewrote silver/, which rule 9 keeps out of git. With no key there are no
+        # picks, the add matches nothing, and the step does nothing.
+        if: always() && steps.engine.outcome != 'cancelled'
+        run: |
+          git config user.name  "smartshelf-collector"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f -- ':(glob)data/external/snapshots/*/boost_picks/*.json' 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No boost picks to commit."
+            exit 0
+          fi
+          DAY=$(date -u +%Y-%m-%d)
+          git commit -q -m "snapshot: boost picks for ${DAY}"
+          git pull --rebase --autostash origin main || true
+          git push origin HEAD:main
 
       - name: Does each capability depend on what it declares?
         # The V1 equivalent, over the engine's artefact (Task 3.3). Withholds each
