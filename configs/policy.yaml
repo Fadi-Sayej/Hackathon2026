@@ -75,3 +75,43 @@ published_population: whole
 # between what he says and what he does stays visible. That divergence is more useful than
 # either number alone.
 owner_declared_ceiling_pct: null
+
+# ── F8-S1: order quantity (V2, Phase 5) ───────────────────────────────────────
+# Every key below is required: the loader supplies no default for any of them, because a
+# defaulted value would be published exactly like a declared one.
+
+# F8-S1 FR-144 / FR-149. OQ-906 provisional: the evidence window, how many report days it
+# must hold, how old its last day may be, and how old a stock count may be and still count.
+order:
+  window_days: 28
+  min_report_days: 21
+  freshness_days: 7
+  max_count_age_days: 7
+  # ADR-034. A disagreement is asked once and never again (D-20), and QuestionPanel renders
+  # every question as a cost question today. Off until Task 5.14 gives it its own panel.
+  publish_disagreement_questions: false
+
+# ADR-031, provisional until calibrated on the first month of per-day sales: a product is
+# running out at a store when it was listed on min_listed of the prior_days usable days and
+# has then been absent for min_absent to max_absent. A store-day where more than
+# catalogue_change_pct of its steady listings vanish, or its listed count is under
+# thin_collection_ratio of its median, is excluded. The signal is unavailable with fewer
+# than signal_min_usable usable days in the last 14, or a latest one older than
+# signal_max_age_days.
+running_out:
+  prior_days: 14
+  min_listed: 10
+  min_absent: 2
+  max_absent: 7
+  catalogue_change_pct: 10
+  thin_collection_ratio: 0.5
+  signal_min_usable: 10
+  signal_max_age_days: 2
+
+# ADR-032. The model is pinned (the repository owner's choice, 2026-09-26). max_pct is
+# D-21's limit and the loader refuses more; request_ceiling is provisional.
+boost:
+  model: claude-sonnet-5
+  max_pct: 25
+  request_ceiling: 200
+  prompt: configs/prompts/market_boost.v1.md

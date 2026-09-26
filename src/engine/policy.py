@@ -14,6 +14,10 @@ DEFAULT_PATH = ROOT / "configs" / "policy.yaml"
 # misconfiguration, not a fallback: the questions would be ordered by a rule nobody wrote.
 QUESTION_MONEY_BASES = ("window_revenue_at_shelf_price",)
 
+# D-21: the boost the model picks is accepted from 0% to 25% and no further. The policy may
+# lower the limit; it may not raise it.
+D21_MAX_BOOST_PCT = 25
+
 
 @dataclass(frozen=True)
 class Policy:
@@ -40,6 +44,24 @@ class Policy:
     withdraw_with_stock: bool
     published_population: str
     owner_declared_ceiling_pct: Optional[float]
+    # F8-S1 (Phase 5). No defaults: see _required.
+    order_window_days: int
+    order_min_report_days: int
+    order_freshness_days: int
+    order_max_count_age_days: int
+    order_publish_disagreement_questions: bool
+    running_out_prior_days: int
+    running_out_min_listed: int
+    running_out_min_absent: int
+    running_out_max_absent: int
+    running_out_catalogue_change_pct: float
+    running_out_thin_collection_ratio: float
+    running_out_signal_min_usable: int
+    running_out_signal_max_age_days: int
+    boost_model: str
+    boost_max_pct: float
+    boost_request_ceiling: int
+    boost_prompt: str
 
     def as_dict(self) -> dict:
         """The artefact's `thresholds` block, grouped as design §11.4 defines it.
@@ -84,10 +106,56 @@ class Policy:
                 "min_price": self.artefact_min_price,
                 "cost_ratio": self.artefact_cost_ratio,
             },
+            "order_quantity": {
+                "window_days": self.order_window_days,
+                "min_report_days": self.order_min_report_days,
+                "freshness_days": self.order_freshness_days,
+                "max_count_age_days": self.order_max_count_age_days,
+                "publish_disagreement_questions": self.order_publish_disagreement_questions,
+            },
+            "market_running_out": {
+                "prior_days": self.running_out_prior_days,
+                "min_listed": self.running_out_min_listed,
+                "min_absent": self.running_out_min_absent,
+                "max_absent": self.running_out_max_absent,
+                "catalogue_change_pct": self.running_out_catalogue_change_pct,
+                "thin_collection_ratio": self.running_out_thin_collection_ratio,
+                "signal_min_usable": self.running_out_signal_min_usable,
+                "signal_max_age_days": self.running_out_signal_max_age_days,
+            },
+            "market_boost": {
+                "model": self.boost_model,
+                "max_pct": self.boost_max_pct,
+                "request_ceiling": self.boost_request_ceiling,
+                "prompt": self.boost_prompt,
+            },
             "question_limit": self.question_limit,
             "published_population": self.published_population,
             "owner_declared_ceiling_pct": self.owner_declared_ceiling_pct,
         }
+
+
+def _required(raw: dict, group: str, key: str, kind):
+    """A value the policy file must state. F8's values have no default in code.
+
+    The older keys above fall back to a default when absent; these do not, because every one
+    of them is either the owner's provisional figure (OQ-906) or an ADR's, and a default here
+    would publish a number nobody declared as though someone had.
+    """
+    section = raw.get(group)
+    if not isinstance(section, dict):
+        raise ValueError(f"policy group {group!r} is missing; it holds F8-S1's declared values")
+    if key not in section or section[key] is None:
+        raise ValueError(f"policy value {group}.{key} is missing; it has no default (F8-S1)")
+    value = section[key]
+    if kind is bool:
+        # bool("false") is True. A quoted flag must not switch the questions on.
+        if not isinstance(value, bool):
+            raise ValueError(f"policy value {group}.{key} must be true or false, not {value!r}")
+        return value
+    if isinstance(value, bool):
+        raise ValueError(f"policy value {group}.{key} must be a {kind.__name__}, not {value!r}")
+    return kind(value)
 
 
 def load_policy(path: Path | str | None = None) -> Policy:
@@ -119,6 +187,24 @@ def load_policy(path: Path | str | None = None) -> Policy:
         published_population=str(raw.get("published_population", "living")),
         owner_declared_ceiling_pct=(None if raw.get("owner_declared_ceiling_pct") is None
                                    else float(raw["owner_declared_ceiling_pct"])),
+        order_window_days=_required(raw, "order", "window_days", int),
+        order_min_report_days=_required(raw, "order", "min_report_days", int),
+        order_freshness_days=_required(raw, "order", "freshness_days", int),
+        order_max_count_age_days=_required(raw, "order", "max_count_age_days", int),
+        order_publish_disagreement_questions=_required(
+            raw, "order", "publish_disagreement_questions", bool),
+        running_out_prior_days=_required(raw, "running_out", "prior_days", int),
+        running_out_min_listed=_required(raw, "running_out", "min_listed", int),
+        running_out_min_absent=_required(raw, "running_out", "min_absent", int),
+        running_out_max_absent=_required(raw, "running_out", "max_absent", int),
+        running_out_catalogue_change_pct=_required(raw, "running_out", "catalogue_change_pct", float),
+        running_out_thin_collection_ratio=_required(raw, "running_out", "thin_collection_ratio", float),
+        running_out_signal_min_usable=_required(raw, "running_out", "signal_min_usable", int),
+        running_out_signal_max_age_days=_required(raw, "running_out", "signal_max_age_days", int),
+        boost_model=_required(raw, "boost", "model", str),
+        boost_max_pct=_required(raw, "boost", "max_pct", float),
+        boost_request_ceiling=_required(raw, "boost", "request_ceiling", int),
+        boost_prompt=_required(raw, "boost", "prompt", str),
     )
     if policy.withdraw_with_stock:
         raise ValueError(
@@ -129,6 +215,12 @@ def load_policy(path: Path | str | None = None) -> Policy:
         raise ValueError("question_limit may not exceed 3 (D-8)")
     if policy.surface_bound > 10:
         raise ValueError("surface.bound may not exceed 10 (D-9)")
+    if policy.boost_max_pct > D21_MAX_BOOST_PCT:
+        raise ValueError(f"boost.max_pct may not exceed {D21_MAX_BOOST_PCT} (D-21)")
+    if policy.running_out_min_listed > policy.running_out_prior_days:
+        raise ValueError(
+            "running_out.min_listed may not exceed running_out.prior_days: a product cannot be "
+            "listed on more of the prior days than there are (ADR-031)")
     if policy.question_money_basis not in QUESTION_MONEY_BASES:
         raise ValueError(
             f"question_money_basis {policy.question_money_basis!r} is not implemented; "

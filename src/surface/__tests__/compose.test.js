@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { compose } from '../compose'
+import { compose, deferredEntries, NOT_YET_SHOWN } from '../compose'
 
 const NOW = 1_757_000_000_000
 
@@ -212,5 +212,44 @@ describe('FR-106 — unvalued entries are allocated places, not ranked against v
     const out = compose(artefact({ price_consistency: cap([valued(5)]), hygiene: cap(chores) }),
       state(), { now: NOW })
     expect(out.entries.filter((e) => e.value === null)).toHaveLength(3)
+  })
+})
+
+describe('Phase 5 Task 5.0 — the F8 capabilities reach no screen before their mockups are approved', () => {
+  // All three states a capability can be published in: unavailable with a reason, available
+  // with entries (valued and not), and available with none. Each would reach the owner today:
+  // an unavailable one as a line on Today, an available one as entries.
+  const f8 = () => ({
+    order_quantity: cap([], { status: 'unavailable', unavailable_reason: 'no_daily_sales' }),
+    market_running_out: cap([entry({ capability: 'market_running_out', signal_family: 'market.running_out' })]),
+    market_boost: cap([valued(9, { capability: 'market_boost' })]),
+  })
+
+  it('holds exactly the three F8 ids', () => {
+    expect([...NOT_YET_SHOWN].sort()).toEqual(['market_boost', 'market_running_out', 'order_quantity'])
+  })
+
+  it('composes an artefact carrying them exactly as one without them', () => {
+    const base = {
+      price_consistency: cap([valued(5)]),
+      reconciliation: cap([entry({ capability: 'reconciliation' })]),
+      hygiene: cap([], { status: 'unavailable', unavailable_reason: 'no_catalogue' }),
+    }
+    const without = compose(artefact(base), state(), { now: NOW })
+    const carrying = compose(artefact({ ...base, ...f8() }), state(), { now: NOW })
+    expect(carrying).toEqual(without)
+  })
+
+  it('does not name an unavailable one, and does not call the day empty because of one', () => {
+    const out = compose(artefact(f8()), state(), { now: NOW })
+    expect(out).toEqual({ entries: [], unavailable: [], nothingToDo: true })
+  })
+
+  it('does not offer one of their entries back as hidden', () => {
+    const caps = f8()
+    const id = caps.market_running_out.entries[0].id
+    const hidden = deferredEntries(artefact(caps),
+      state({ [id]: { status: 'deferred', at: NOW - 1 } }), { now: NOW })
+    expect(hidden).toEqual([])
   })
 })

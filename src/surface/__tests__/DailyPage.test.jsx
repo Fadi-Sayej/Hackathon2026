@@ -133,3 +133,28 @@ describe('#139 — pressing Later hands the store a date, not a permanent dismis
     }
   })
 })
+
+describe('Phase 5 Task 5.0 — an artefact carrying the F8 ids renders exactly as one without them', () => {
+  it('renders the same DOM: no line, no entry, and the same empty state', () => {
+    const base = {
+      price_consistency: cap([entry()]),
+      hygiene: cap([], { status: 'unavailable', unavailable_reason: 'no_catalogue' }),
+    }
+    const f8 = {
+      order_quantity: cap([], { status: 'unavailable', unavailable_reason: 'no_daily_sales' }),
+      market_running_out: cap([entry({ capability: 'market_running_out' })]),
+      market_boost: cap([entry({ capability: 'market_boost', value: { amount: 9, kind: 'per_sale', certainty: 'confirmed' } })]),
+    }
+    const draw = (capabilities) => {
+      const { container } = renderWithI18n(
+        <DailyPage artefact={artefact(capabilities)} ownerState={{ outcomes: {} }} onOutcome={vi.fn()} now={NOW} />,
+      )
+      const html = container.innerHTML
+      cleanup()
+      return html
+    }
+    expect(draw({ ...base, ...f8 })).toBe(draw(base))
+    // An artefact carrying only them is the "nothing to do" day, not a list of unavailable ones.
+    expect(draw(f8)).toBe(draw({}))
+  })
+})

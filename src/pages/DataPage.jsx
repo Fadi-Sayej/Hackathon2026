@@ -1,7 +1,7 @@
 import { unavailableReason } from '../lib/i18n/unavailableReason.js'
 import { useI18n } from '../lib/i18n/index.js'
 import { dirProps } from '../lib/utils/rtl.js'
-import { deferredEntries } from '../surface/compose.js'
+import { deferredEntries, NOT_YET_SHOWN } from '../surface/compose.js'
 
 /** Vintage sources a human wrote down, as opposed to the two the importer infers. */
 const DECLARED_VINTAGE = new Set(['declared', 'declared_sidecar'])
@@ -161,8 +161,10 @@ export function DataPage({ artefact, ownerState, onRestore, now, readOnly = fals
         </section>
       ) : null}
 
+      {/* NOT_YET_SHOWN: F8's capabilities are published before their screens are approved,
+          and a line here is a screen (Phase 5 Task 5.0). */}
       <ul className="data__capabilities">
-        {Object.entries(capabilities).map(([id, capability]) => (
+        {Object.entries(capabilities).filter(([id]) => !NOT_YET_SHOWN.has(id)).map(([id, capability]) => (
           <li key={id} data-capability-status={id}>
             {t(`capability.${id}`)} — {capability.status === 'unavailable'
               ? unavailableReason(t, capability.unavailable_reason)

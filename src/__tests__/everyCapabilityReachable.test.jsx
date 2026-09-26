@@ -1,12 +1,13 @@
 // @vitest-environment jsdom
 
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, waitFor } from '@testing-library/react'
 
 import { renderWithI18n } from '../test/renderWithI18n.jsx'
 import fixture from '../__fixtures__/dashboard.fixture.json'
 import App from '../App.jsx'
 import { resetCacheForTests } from '../owner/ownerState.js'
+import { NOT_YET_SHOWN } from '../surface/compose.js'
 
 /**
  * Every capability the engine publishes has a screen the owner can reach — asked of the app
@@ -35,6 +36,11 @@ import { resetCacheForTests } from '../owner/ownerState.js'
  *
  * The capabilities are read from the artefact, not listed here, so one the engine adds
  * later is required to have a screen without anyone editing this file.
+ *
+ * The one exemption is `NOT_YET_SHOWN` (Phase 5 Task 5.0): F8's capabilities are published
+ * before the owner has approved their screens, so for now they must reach NO screen, and
+ * the last block below asserts exactly that. Tasks 5.13 and 5.14 take them off the list,
+ * and from then on this test requires them to have one like every other.
  */
 
 function createStorage() {
@@ -42,14 +48,19 @@ function createStorage() {
   return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => m.set(k, v), removeItem: (k) => m.delete(k), clear: () => m.clear() }
 }
 
-beforeEach(() => {
+/** A fresh browser serving `artefact` as dashboard.json. */
+function serve(artefact) {
   globalThis.localStorage = createStorage()
   resetCacheForTests()
   globalThis.fetch = async (url) => (String(url).includes('dashboard.json')
-    ? { ok: true, status: 200, json: async () => fixture }
+    ? { ok: true, status: 200, json: async () => artefact }
     : { ok: false, status: 404, json: async () => ({}) })
-})
+}
+
+beforeEach(() => serve(fixture))
 afterEach(cleanup)
+
+const shown = Object.keys(fixture.capabilities).filter((id) => !NOT_YET_SHOWN.has(id))
 
 /** Walk every nav entry and collect the capabilities rendered whole on each page. */
 async function walkTheNav() {
@@ -70,8 +81,7 @@ async function walkTheNav() {
 describe('every capability the engine publishes has a screen', () => {
   it('reaches each one, whole, from the nav', async () => {
     const { reached } = await walkTheNav()
-    const published = Object.keys(fixture.capabilities)
-    expect(published.filter((id) => !reached.has(id))).toEqual([])
+    expect(shown.filter((id) => !reached.has(id))).toEqual([])
   })
 
   it('finds the questions on Today and nowhere else', async () => {
@@ -84,7 +94,60 @@ describe('every capability the engine publishes has a screen', () => {
     // nothing, and "no capability is missing" would hold of an app with no pages.
     const { reached, pages } = await walkTheNav()
     expect(pages).toContain('daily')
-    expect(pages.length).toBeGreaterThan(Object.keys(fixture.capabilities).length)
-    expect(reached.size).toBe(Object.keys(fixture.capabilities).length)
+    expect(pages.length).toBeGreaterThan(shown.length)
+    expect(reached.size).toBe(shown.length)
+  })
+})
+
+describe('Phase 5 Task 5.0 — the F8 capabilities reach no screen before their mockups are approved', () => {
+  // Each state a capability can be published in, so each path to a screen is tried: an
+  // unavailable one is a line on Today and on Data, an available one is entries and a line.
+  const carrying = {
+    ...fixture,
+    capabilities: {
+      ...fixture.capabilities,
+      order_quantity: { status: 'unavailable', unavailable_reason: 'no_daily_sales', counts: {}, thresholds: {}, entries: [] },
+      market_running_out: {
+        status: 'available', unavailable_reason: null, counts: { running_out: 1 }, thresholds: {},
+        entries: [{ ...fixture.capabilities.hygiene.entries[0], id: 'f8-running-out', capability: 'market_running_out' }],
+      },
+      market_boost: { status: 'available', unavailable_reason: null, counts: {}, thresholds: {}, entries: [] },
+    },
+  }
+
+  /** Every page's rendered body, by nav id. */
+  async function pagesOf(artefact) {
+    serve(artefact)
+    renderWithI18n(<App />, { language: 'en' })
+    await waitFor(() => expect(document.querySelector('.spine__loading')).toBeNull())
+    const bodies = {}
+    for (const item of document.querySelectorAll('.nav-item[data-nav]')) {
+      fireEvent.click(item)
+      bodies[item.dataset.nav] = document.querySelector('.page-body')?.innerHTML ?? null
+    }
+    cleanup()
+    return bodies
+  }
+
+  it('renders every page, Today and Data included, exactly as it would without them', async () => {
+    // App fixes `now` once per session from the clock; two sessions a moment apart must not
+    // differ for that reason alone.
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date('2026-09-26T08:00:00Z'))
+    try {
+      const plain = await pagesOf(fixture)
+      const withF8 = await pagesOf(carrying)
+      expect(Object.keys(withF8)).toEqual(Object.keys(plain))
+      expect(Object.keys(plain)).toEqual(expect.arrayContaining(['daily', 'data-source']))
+      for (const page of Object.keys(plain)) expect(withF8[page], page).toBe(plain[page])
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('reaches none of them from the nav', async () => {
+    serve(carrying)
+    const { reached } = await walkTheNav()
+    expect([...NOT_YET_SHOWN].filter((id) => reached.has(id))).toEqual([])
   })
 })
