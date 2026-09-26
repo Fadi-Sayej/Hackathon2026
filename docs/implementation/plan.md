@@ -1,10 +1,10 @@
 ---
 ID: PLAN
 Title: SmartShelf V1 Implementation Plan
-Status: Partial — Phases 0, 1, 2 and 3 built (Task 2.7's cut-over done 2026-09-12, once ADR-020 removed D-14 as a blocker); Phase 4 in progress: Tasks 4.0 and 4.1 done (4.1 re-scoped by ADR-028, less §20.1's scripts row), Task 4.2 done except `operational.json` and its loader, which wait on F13 (#83), Task 4.3 done, Checkpoint 4 open
+Status: Partial — Phases 0, 1, 2 and 3 built (Task 2.7's cut-over done 2026-09-12, once ADR-020 removed D-14 as a blocker); Phase 4 in progress: Tasks 4.0 and 4.1 done (4.1 re-scoped by ADR-028, less §20.1's scripts row), Task 4.2 done except `operational.json` and its loader, which wait on F13 (#83), Task 4.3 done, Checkpoint 4 open; Phase 5 (V2, F8) approved 2026-09-26, not started
 Owner: smartshelf-architect
 Inputs: [docs/architecture/system-design.md, docs/features/F1-*/specs … F8-*/specs, docs/architecture/decisions/]
-Updated: 2026-09-26 (Phase 5, V2 F8, written and Ready for review)
+Updated: 2026-09-26 (Phase 5, V2 F8, approved by the repository owner)
 Version: 1.1 (written 2026-09-08 against System Design v1.0; refreshed the same day against v1.1)
 Parent: [System Design](../architecture/system-design.md)
 Related Specs: F1-S1 … F7-S1 for Phases 0–4; F8-S1 for Phase 5 (see the System Design's §21 traceability matrix)
@@ -78,7 +78,7 @@ Copied verbatim from `docs/architecture/system-design.md`; every task's requirem
 | Phase 2 — Browser ✅ *(cut-over deferred)* | [`phase-2-browser.md`](phase-2-browser.md) | Phase 1 artefact | `loadDashboard`, owner state, `compose`, DailyPage, capability pages, questions, data page, migrations. **Checkpoint 2:** AC-100…AC-112 and e2e invariants pass |
 | Phase 3 — Reproduction & gates | [`phase-3-reproduction.md`](phase-3-reproduction.md) | Phases 1–2 | `figures.py` as engine print mode, content addressing, V1 signal probes, nightly workflow. **Checkpoint 3:** fresh clone `npm run figures` ≤ 2 min and equals the artefact's `figures{}` |
 | Phase 4 — Removal | [`phase-4-removal.md`](phase-4-removal.md) | Checkpoint 3 | Tag `v1-attic`; delete §5.4's list; stop `operational.json`; drop migrations. **Checkpoint 4:** bundle < 500 KB; CI green |
-| Phase 5 — V2: Order quantity (F8-S1) — **`Ready for review`** | [`phase-5-v2-order-quantity.md`](phase-5-v2-order-quantity.md) | F8-S1 (Approved), ADR-030 … ADR-035 (Accepted); independent of Phase 4 | Per-day import, store facts, the market's running-out signal, the model's boost (sealed snapshot), the quantity, the disagreement question, then the Reorder and Approved orders pages after their mockups are approved. **Checkpoint 5:** all green on fixtures; on real data `order_quantity` is unavailable with `no_daily_sales` and says so |
+| Phase 5 — V2: Order quantity (F8-S1) — **`Approved` 2026-09-26, not started** | [`phase-5-v2-order-quantity.md`](phase-5-v2-order-quantity.md) | F8-S1 (Approved), ADR-030 … ADR-035 (Accepted); independent of Phase 4 | Per-day import, store facts, the market's running-out signal, the model's boost (sealed snapshot), the quantity, the disagreement question, then the Reorder and Approved orders pages after their mockups are approved. **Checkpoint 5:** all green on fixtures; on real data `order_quantity` is unavailable with `no_daily_sales` and says so |
 
 ## Prerequisites that are not code (do before Phase 0, Task 0.13 checks them)
 

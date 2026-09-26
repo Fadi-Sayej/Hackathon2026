@@ -1,11 +1,11 @@
 ---
 ID: PLAN-PHASE-5
 Title: Phase 5 — V2, F8 Order Quantity (F8-S1)
-Status: Ready for review
+Status: Approved — by the repository owner, 2026-09-26
 Owner: smartshelf-architect
 Parent: [Implementation plan](plan.md)
 Inputs: [docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (Approved 2026-09-25), ADR-030, ADR-031, ADR-032, ADR-033, ADR-034, ADR-035 (Accepted 2026-09-26), docs/architecture/system-design.md §10.1 §19 §21, CLAUDE.md, .claude/SKILLS/HANDOVER.md, the code as of main 0c41353]
-Updated: 2026-09-26 (rewritten after an independent review against the code)
+Updated: 2026-09-26 (rewritten after an independent review against the code; approved by the repository owner the same day)
 ---
 
 # Phase 5 — V2, F8 Order Quantity
