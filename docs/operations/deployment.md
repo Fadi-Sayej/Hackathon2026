@@ -272,12 +272,12 @@ so it cannot regenerate the JSON. Option 3 waits on B-2/B-6. Committing the arti
 clean Vercel build produce a working site, and `nagham.md` B-1 is explicit that the pilot cannot
 depend on someone's laptop.
 
-### The nightly deploys itself through a Deploy Hook (#167, 2026-09-24)
+### The nightly's artefact commit is authored by the repository owner (#167, 2026-09-26)
 
-**Committing the artefact is not the same as serving it.** Vercel's Hobby plan blocks a
-Git-triggered deployment of any commit whose author is not on the team, and
-`collect-daily.yml` commits as `smartshelf-collector`. Measured on 2026-09-24 over 100
-production deployments (GitHub's deployment records, whose statuses Vercel writes):
+**Committing the artefact is not the same as serving it.** Vercel's Hobby plan builds a
+commit only when its **author** is the account owner. `collect-daily.yml` committed as
+`smartshelf-collector`. Measured on 2026-09-24 over 100 production deployments (GitHub's
+deployment records, whose statuses Vercel writes):
 
 - **0 of 22** collector commits deployed, every one `Deployment was blocked`;
 - **78 of 78** human-authored commits deployed.
@@ -285,29 +285,55 @@ production deployments (GitHub's deployment records, whose statuses Vercel write
 So a nightly artefact reached the owner only when a human merge happened to deploy `main`,
 **6.7 to 88.8 hours** later.
 
-Since #167:
+**Tried first, and blocked: a Deploy Hook** (#172, 2026-09-24). A hook builds the head of
+`main`, and the block looks at that head's author, so the hook's build of the collector's
+commit was blocked as well. Vercel's Deployments page showed it on 2026-09-26: the push and
+the hook build of `dbfe30b` were both **Blocked**. The step had been green because it only
+checked that the hook queued a job.
 
-- **The hook.** A Deploy Hook for `main` (Vercel → Settings → Git → Deploy Hooks, named
-  `nightly`) is stored as the repository secret `VERCEL_DEPLOY_HOOK_URL`. The repository
-  owner set it on 2026-09-24.
-- **The step.** *Deploy what was just committed* in `collect-daily.yml` runs right after the
-  artefact commit, and only when one was made. It POSTs to the hook with a JSON body, since a
-  bare POST is refused with 415. It fails the night if the hook answers without a job, and
-  warns if the secret is missing.
-- **The test.** `tests/test_nightly_deploy_step.py` runs the step's own script against a
-  stand-in `curl`.
+**What settled it: a probe on 2026-09-26.** An Actions job pushed two empty commits to
+throwaway branches. The one authored by the owner deployed; the one authored by the collector
+was blocked. Vercel ignores the committer and the pusher. Every merge commit already showed
+the committer part: `GitHub <noreply@github.com>` commits them, and they deploy.
 
-**How to verify a night.** The hook only queues a build, and hook deployments do not appear
-in GitHub's deployment records. So the check is the Vercel project's **Deployments** page:
-the build the hook triggered after the collector's `engine: artefact for …` commit should be
-**Ready**.
+Since then (the repository owner agreed on 2026-09-26):
 
-*Unverified until the first nightly after this change:* whether the hook's build of a
-collector-authored head passes the Hobby block. The expectation is that it does, because
-the hook is triggered by the project, not by a commit's author.
+- **The commit.** *Commit the owner's artefact* commits with
+  `--author="Fadi-Sayej <sayejfadi2004@gmail.com>"`. The committer stays
+  `smartshelf-collector`, so `git log --format='%an | %cn'` still shows that the nightly made
+  it. A rebase onto a newer `main` keeps the author. A rebase that stops on a conflict fails
+  the step and pushes nothing. It used to be ignored, and the step then reported a commit it
+  had not pushed.
+- **The snapshot commit stays the collector's.** Nothing under `data/` is in the built site,
+  so its push has nothing to deploy, and its `Deployment was blocked` is expected.
+- **The committer address.** Both commit steps use GitHub Actions' own no-reply address.
+  Until 2026-09-26 they used `collector@users.noreply.github.com`, which is GitHub's old
+  no-reply form for the account `collector` (id 1460107, a stranger's). So every nightly
+  commit until then is attributed to that account on GitHub.
+- **The check.** *Did Vercel deploy tonight's artefact?* runs after the health check, just
+  before *Fail loudly*. It reads GitHub's deployment record for the exact sha pushed. It fails
+  the night on `failure` or `error`, and fails it if there is no finished record after
+  10 minutes (30 looks, 20 s apart). A failed API call counts as one more look.
+- **The test.** `tests/test_nightly_deploy_step.py` runs both steps' own scripts. The commit
+  step runs against a local bare repository; the check runs against stand-in `gh` and `sleep`.
 
-**What production serves, read without signing in.** For Git-triggered
-deploys, the latest `success` in
+**How to verify a night.** Read the *Did Vercel deploy tonight's artefact?* step of the
+nightly run. Or read the record directly, as below: the `engine: artefact for …` sha should
+be the latest `success`.
+
+**When that step is red.** The artefact is on `main` either way; only the deploy is in doubt.
+- *Deployment was blocked*: Vercel's author rule is no longer what this section says. Read
+  #167 before changing anything. The next commit authored by the repository owner, such as any
+  merge, deploys `main` with the artefact in it.
+- *No finished production deployment*: look at Vercel's Deployments page for that sha.
+- **Do not re-run the whole job to get a deploy.** A re-run collects again, and it starts from
+  the original run's checkout, not from today's `main`.
+
+**Left in place, unused:** the Deploy Hook `nightly` in Vercel and the repository secret
+`VERCEL_DEPLOY_HOOK_URL`. Nothing calls either any more. Deleting the hook in Vercel (Settings
+→ Git → Deploy Hooks) retires the URL, which can still start a build.
+
+**What production serves, read without signing in.** The latest `success` in
 `gh api "repos/Fadi-Sayej/Hackathon2026/deployments?environment=Production"` names the commit.
 Read `public/data/dashboard.json` at that sha, not at `main`.
 

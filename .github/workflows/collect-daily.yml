@@ -31,11 +31,16 @@ concurrency:
 
 permissions:
   contents: write
+  # Read-only, for the last step: Vercel writes each deployment's outcome into GitHub's
+  # deployment records, and that step reads tonight's (#167).
+  deployments: read
 
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # Runs took 18 to 27 minutes from 2026-09-17 to 09-26. The deploy check at the end can
+    # wait up to 10 more for Vercel's build (#167), so 30 would cut a slow night short.
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
@@ -68,10 +73,16 @@ jobs:
         # Runs even when collection was partial — a partial day is still history,
         # and the manifest records exactly what was and was not captured. Only a
         # wholly failed day has nothing to commit.
+        #
+        # The address is GitHub Actions' own no-reply one. Until 2026-09-26 it was
+        # collector@users.noreply.github.com, which is GitHub's old no-reply form for the
+        # account `collector` (id 1460107, a stranger's), so every nightly commit was
+        # attributed to them. This commit stays the collector's: nothing under data/ is in
+        # the built site, so its push has nothing to deploy and Vercel blocking it is harmless.
         if: always() && steps.collect.outcome != 'cancelled'
         run: |
           git config user.name  "smartshelf-collector"
-          git config user.email "collector@users.noreply.github.com"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -f data/external/snapshots/ || true
           if git diff --cached --quiet; then
             echo "No new snapshot data to commit."
@@ -186,9 +197,18 @@ jobs:
         # browser read operational.json. After it, the owner's screen could only ever show
         # whatever artefact a human last committed by hand — a nightly run that moves
         # nothing (rule 12).
+        #
+        # AUTHORED BY THE REPOSITORY OWNER, committed by the collector (#167; the owner
+        # agreed on 2026-09-26). Vercel's Hobby plan builds a commit only when its author is
+        # the account owner. It ignores the committer and who pushed: on 2026-09-26 a probe
+        # pushed two empty commits from Actions, and the one authored by the owner deployed
+        # while the collector-authored one was blocked. Before this, 0 of 22 collector
+        # commits deployed, and neither did the Deploy Hook tried from 2026-09-24, because a
+        # hook builds the head of main and the block looks at that head's author. The committer
+        # line still says the nightly made it.
         run: |
           git config user.name  "smartshelf-collector"
-          git config user.email "collector@users.noreply.github.com"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           # The artefact's add is UNCONDITIONAL and comes first. `git add` with a missing
           # pathspec exits 128 and stages NOTHING — not even the paths that did exist — and
           # this step runs under `bash -e`, so one absent file would abort before the commit
@@ -210,43 +230,22 @@ jobs:
             exit 0
           fi
           DAY=$(date -u +%Y-%m-%d)
-          git commit -q -m "engine: artefact for ${DAY}"
-          git pull --rebase --autostash origin main || true
-          git push origin HEAD:main
-          echo "committed=true" >> "$GITHUB_OUTPUT"
-
-      - name: Deploy what was just committed (#167)
-        # The push above does not reach the owner by itself. Vercel's Hobby plan blocks a
-        # Git-triggered deployment of any commit whose author is not on the team, and this
-        # workflow commits as smartshelf-collector. Measured 2026-09-24 over 100 production
-        # deployments: 0 of 22 collector commits deployed, 78 of 78 human ones did. So the
-        # owner's screen moved only when somebody merged something, 6.7 to 88.8 hours late.
-        #
-        # A Deploy Hook is triggered by the project rather than by a commit's author, and it
-        # builds the head of main, which is the commit just pushed. Right after the commit, and
-        # before the rules check below, for the reason that check gives: an unrelated failure
-        # must not withhold correct data from the owner.
-        #
-        # The hook only QUEUES a build. Whether Vercel then built it shows on the project's
-        # Deployments page; hook deployments do not appear in GitHub's deployment records.
-        # A missing secret is a warning, not a pass: the artefact would then reach the owner
-        # only with the next human merge. A hook that answers without a job fails the night.
-        if: steps.artefact.outputs.committed == 'true'
-        env:
-          VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
-        run: |
-          if [ -z "$VERCEL_DEPLOY_HOOK_URL" ]; then
-            echo "::warning::VERCEL_DEPLOY_HOOK_URL is not set, so tonight's artefact reaches the owner only with the next human merge (#167)."
-            exit 0
+          git commit -q --author="Fadi-Sayej <sayejfadi2004@gmail.com>" -m "engine: artefact for ${DAY}"
+          # A rebase keeps the author, so the commit that lands is still the owner's.
+          #
+          # A failed rebase is a failed step. It used to be `|| true`: a human commit to
+          # public/data/ during the run made the rebase stop on a conflict with HEAD left on
+          # main's commit, the push below was then a no-op, and the step still said
+          # committed=true. The check at the end would then read that human commit, which had
+          # deployed, and call tonight's artefact live when it never landed.
+          if ! git pull --rebase --autostash origin main; then
+            git rebase --abort 2>/dev/null || true
+            echo "::error::Tonight's artefact could not be rebased onto main, so it was not pushed (#167)."
+            exit 1
           fi
-          # A bare POST is refused with 415 Unsupported Media Type (measured 2026-09-24):
-          # the hook wants a JSON body. -f turns an HTTP error into a failed step.
-          response=$(curl -fsS -X POST -H 'Content-Type: application/json' -d '{}' "$VERCEL_DEPLOY_HOOK_URL")
-          echo "$response"
-          case "$response" in
-            *'"job"'*) ;;
-            *) echo "::error::The deploy hook answered but did not queue a job (#167)."; exit 1 ;;
-          esac
+          git push origin HEAD:main
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "committed=true" >> "$GITHUB_OUTPUT"
 
       - name: Are the deployed Firestore rules the ones in this repository?
         # The pilot's data isolation rests on two lines of firestore.rules: one store is
@@ -290,6 +289,52 @@ jobs:
         # run, an empty source, a failed manifest — the job goes red while the
         # server still holds today's file and a rerun can still save it.
         run: python3 scripts/check_collection_health.py --max-age-days 1
+
+      - name: Did Vercel deploy tonight's artefact? (#167)
+        # Committing the artefact is not the same as serving it. The push above starts a
+        # Vercel build, and Vercel writes how it ended into GitHub's deployment records: this
+        # reads the record for the exact commit pushed. "Deployment was blocked" is what all
+        # 22 nightly commits measured on 2026-09-24 got, while the run stayed green; the
+        # Deploy Hook that came next was green on "queued" and was blocked too.
+        #
+        # Last, so the build has had the two checks above to finish in, and neither of them
+        # waits on it. `!cancelled()` because a failed health check does not stop the push
+        # from deploying, and the run should still say whether it did.
+        if: ${{ !cancelled() && steps.artefact.outputs.committed == 'true' }}
+        timeout-minutes: 12
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ steps.artefact.outputs.sha }}
+        run: |
+          # An empty sha would match every production deployment, and the newest may be a
+          # success that has nothing to do with tonight.
+          if [ -z "$SHA" ]; then
+            echo "::error::The commit step handed over no sha (#167)."
+            exit 1
+          fi
+          # 30 looks, 20 s apart. Builds took 29 s to 3 min 37 s on 2026-09-25 (Vercel's
+          # Deployments page); a blocked one is recorded within seconds of the push. A failed
+          # API call counts as one more look, not a verdict.
+          for _ in $(seq 30); do
+            id=$(gh api "repos/$REPO/deployments?sha=$SHA&environment=Production" --jq '.[0].id // empty') || id=""
+            if [ -n "$id" ]; then
+              line=$(gh api "repos/$REPO/deployments/$id/statuses" --jq '.[0] | [.state, (.description // "")] | @tsv') || line=""
+              state=${line%%$'\t'*}
+              description=${line#*$'\t'}
+              case "$state" in
+                success)
+                  echo "Vercel deployed $SHA to production: $description"
+                  exit 0 ;;
+                failure|error)
+                  echo "::error::Vercel did not deploy tonight's artefact ($SHA): $description. The owner still sees the last one that deployed (#167)."
+                  exit 1 ;;
+              esac
+            fi
+            sleep 20
+          done
+          echo "::error::No finished production deployment of $SHA after 10 minutes, so tonight's artefact may not be live (#167)."
+          exit 1
 
       - name: Fail loudly
         # A collector that dies silently in week 3 and is noticed in week 8 has
