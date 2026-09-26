@@ -39,10 +39,15 @@ CAP, SPEC = "order_quantity", "F8-S1"
 FAMILY, ACTION = "order.suggestion", "place_order"
 
 
-def _itemised_departments(inputs: EngineInputs) -> set:
-    """Departments with a sales row in any evidence, monthly reports included (FR-156)."""
-    dept_of = {p["barcode"]: p["department"] for p in inputs.products if p["barcode"]}
-    seen = {r.get("barcode") for r in (inputs.sales_monthly or [])} | {r["barcode"] for r in inputs.sales_daily}
+def itemised_departments(inputs: EngineInputs) -> set:
+    """Departments with a sales row in any evidence, monthly reports included (FR-156).
+
+    The one definition: the quantity and the disagreement question (owner_questions) both
+    read it, so a department cannot be itemised for one and not the other.
+    """
+    dept_of = {p["barcode"]: p["department"] for p in inputs.products or [] if p["barcode"]}
+    seen = ({r.get("barcode") for r in (inputs.sales_monthly or [])}
+            | {r["barcode"] for r in (inputs.sales_daily or [])})
     return {dept_of[b] for b in seen if b in dept_of}
 
 
@@ -93,7 +98,7 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
 
     window = evidence_window(report_days, policy, inputs.run_at)
     facts_by_dept = inputs.store_facts.get("facts") or {}
-    itemised = _itemised_departments(inputs)
+    itemised = itemised_departments(inputs)
     rows = defaultdict(list)
     delivered_on = defaultdict(bool)
     for r in inputs.sales_daily:

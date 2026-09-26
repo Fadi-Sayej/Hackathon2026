@@ -3,10 +3,16 @@
 
 V1 asks exactly one kind of question: a missing purchase cost on a LIVING product.
 Suppression does the work (NFR-040): withdrawn and idle products are never asked
-about, so 1,270 missing costs become the handful the intent names."""
+about, so 1,270 missing costs become the handful the intent names.
+
+V2 adds a second kind, `market_disagreement` (F8-S1 FR-158, ADR-034): the nearby market is
+running out of a product he stocks that does not sell here. It is asked once, ever (D-20),
+it changes no quantity, and it is published only while `order.publish_disagreement_questions`
+is on, because until Task 5.14 the panel renders every question as a cost question."""
 from __future__ import annotations
 
 import hashlib
+from collections import defaultdict
 
 from src.engine.inputs import EngineInputs
 from src.engine.model import CapabilityOutput, Figure
@@ -14,20 +20,81 @@ from src.engine.registry import derive_status
 
 CAP, SPEC = "owner_questions", "SPEC-005"
 FACT = "cost_price"
+DISAGREEMENT = "market_disagreement"
+# Permanent, like every name in design §10.1: an answer is stored under the fact.
+FACTS = (FACT, DISAGREEMENT)
+# FR-158: why it does not sell here. Only he knows; nothing consumes the answer but retirement.
+DISAGREEMENT_ANSWERS = ("shelf_place", "price", "weak_market", "sells_elsewhere")
 
 
-def _question_id(barcode: str) -> str:
-    return hashlib.sha256(f"{FACT}|{barcode}".encode("utf-8")).hexdigest()[:16]
+def _question_id(barcode: str, fact: str = FACT) -> str:
+    return hashlib.sha256(f"{fact}|{barcode}".encode("utf-8")).hexdigest()[:16]
 
 
-def _deferred(owner, barcode: str) -> bool:
-    rec = (owner.answers.get(barcode) or {}).get(FACT) or {}
-    return rec.get("status") == "deferred"
+def _record(owner, barcode: str, fact: str = FACT) -> dict:
+    return (owner.answers.get(barcode) or {}).get(fact) or {}
 
 
-def _answered(owner, barcode: str) -> bool:
-    rec = (owner.answers.get(barcode) or {}).get(FACT) or {}
-    return rec.get("status") == "answered"
+def _deferred(owner, barcode: str, fact: str = FACT) -> bool:
+    return _record(owner, barcode, fact).get("status") == "deferred"
+
+
+def _answered(owner, barcode: str, fact: str = FACT) -> bool:
+    return _record(owner, barcode, fact).get("status") == "answered"
+
+
+def _disagreements(inputs: EngineInputs) -> list:
+    """FR-158: the market is running out of a product he stocks, and it is not moving.
+
+    - Not asked without a window, because "not moving" is measured over one, except in a
+      department no evidence itemises at all (FR-156), where it says there is no sales row.
+    - Not asked without a market signal, or with a stale one (AC-142).
+    - Never suppressed as idle or withdrawn (C-67): the test is his stocking, read from the
+      window (Task 5.5), and a product he does not stock is never asked about (FR-082).
+    - Answered is retired for good, whatever the facts later say (D-20 over FR-089).
+    - Its `why` says only what was observed. It never claims the market sells a lot (§21).
+    """
+    from src.engine.market_running_out import is_stale
+    from src.engine.order_evidence import evidence_window, product_evidence, stocks
+    from src.engine.order_quantity import itemised_departments
+
+    signal, policy = inputs.running_out, inputs.policy
+    if signal is None or is_stale(signal, inputs.run_at, policy):
+        return []
+    daily = inputs.sales_daily or []
+    window = evidence_window({r["day"] for r in daily}, policy, inputs.run_at) if daily else None
+    itemised = itemised_departments(inputs)
+    rows = defaultdict(list)
+    for r in daily:
+        rows[r["barcode"]].append(r)
+    items = []
+    for p in inputs.products:
+        b = p["barcode"]
+        market = signal["products"].get(b) if b else None
+        if market is None:
+            continue
+        status = _record(inputs.owner, b, DISAGREEMENT).get("status")
+        if status in ("answered", "deferred"):
+            continue                                   # retired for good, or open and not presented
+        why = {"stores_out": len(market["stores_out"]), "days_absent": sorted(market["days_absent"].values())}
+        if p["department"] in itemised:
+            if window is None or not stocks(rows.get(b, []), window, p["recorded_stock"], itemised=True):
+                continue
+            evidence = product_evidence(rows.get(b, []), window)
+            if evidence["moving"]:
+                continue                               # it gets a quantity instead (D-19)
+            why.update(units_in_window=evidence["units_in_window"], weekly_units=evidence["weekly_units"],
+                       report_days=evidence["report_days"], no_sales_row=False)
+        else:
+            if not stocks([], None, p["recorded_stock"], itemised=False):
+                continue
+            why.update(units_in_window=None, weekly_units=None, report_days=None, no_sales_row=True)
+        items.append({"question_id": _question_id(b, DISAGREEMENT), "barcode": b,
+                      "product_name": p["product_name"], "department": p["department"],
+                      "fact": DISAGREEMENT, "why": why, "answers": list(DISAGREEMENT_ANSWERS),
+                      "expected_value": None})
+    # C-68: among its own kind, by units sold in the window, then barcode (ADR-027's tiebreak).
+    return sorted(items, key=lambda i: (-(i["why"]["units_in_window"] or 0.0), i["barcode"]))
 
 
 def run(inputs: EngineInputs) -> CapabilityOutput:
@@ -88,6 +155,13 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
                else (1, -i["why"]["units_sold"], i["barcode"]))
     counts = {"open": len(items), "suppressed_withdrawn": suppressed["withdrawn"], "suppressed_idle": suppressed["idle"],
               "suppressed_answered": suppressed["answered"], "suppressed_no_effect": suppressed["no_effect"]}
+    if inputs.policy.order_publish_disagreement_questions:
+        # After every question above, whose order is untouched: none of these carries a ₪
+        # figure (C-68, ADR-027). Off, nothing is even computed, so the items are byte for
+        # byte what V1 publishes.
+        disagreements = _disagreements(inputs)
+        items.extend(disagreements)
+        counts["open_disagreement"] = len(disagreements)
     out = CapabilityOutput(id=CAP, spec=SPEC, status="available",
                            thresholds={"question_limit": inputs.policy.question_limit}, counts=counts,
                            entries=[], figures=[Figure(k, v, "questions", ["pos", "sales", "owner_state"]) for k, v in counts.items()])

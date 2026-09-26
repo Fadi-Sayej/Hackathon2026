@@ -643,7 +643,136 @@
             "type": "string"
           }
         }
-      }
+      },
+      "allOf": [
+        {
+          "comment": "Phase 5 Task 5.9: every owner question, cost or disagreement, has one published shape.",
+          "if": {
+            "properties": {
+              "id": {
+                "const": "owner_questions"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "then": {
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/question"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "question": {
+      "comment": "SPEC-005 and F8-S1 FR-158 (ADR-034). A question is identified by fact and barcode, and its answer lives at answers[barcode][fact]. A disagreement carries no ₪ figure (C-68, ADR-027) and offers the four answers FR-158 names.",
+      "type": "object",
+      "required": [
+        "question_id",
+        "barcode",
+        "fact",
+        "why",
+        "expected_value"
+      ],
+      "properties": {
+        "question_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{16}$"
+        },
+        "barcode": {
+          "type": "string"
+        },
+        "product_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "department": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fact": {
+          "enum": [
+            "cost_price",
+            "market_disagreement"
+          ]
+        },
+        "why": {
+          "type": "object"
+        },
+        "expected_value": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "fact": {
+                "const": "market_disagreement"
+              }
+            },
+            "required": [
+              "fact"
+            ]
+          },
+          "then": {
+            "required": [
+              "answers"
+            ],
+            "properties": {
+              "expected_value": {
+                "type": "null"
+              },
+              "answers": {
+                "type": "array",
+                "items": {
+                  "enum": [
+                    "shelf_place",
+                    "price",
+                    "weak_market",
+                    "sells_elsewhere"
+                  ]
+                }
+              },
+              "why": {
+                "type": "object",
+                "required": [
+                  "stores_out",
+                  "days_absent",
+                  "no_sales_row"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "money_at_stake"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "money_basis"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      ]
     }
   }
 }
