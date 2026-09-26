@@ -206,3 +206,6 @@ Recorded here because they are how the decision was built, not changes to it.
   they hold no store data. The shell renders the sign-in page while there is no session. What
   the gate refuses without a valid token is every `/data/` file (401) and the team's page (a
   redirect to `/?next=…`), as §3's table says.
+- **Switched over on 2026-09-26.** The role rules moved into `firestore.rules` and were
+  deployed, and Production carries the three variables. It happened before the owner's
+  account had its role, on the repository owner's decision.

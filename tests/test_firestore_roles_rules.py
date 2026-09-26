@@ -1,9 +1,10 @@
-"""The staged role rules say what ADR-029 §4 says, before anyone deploys them.
+"""The Firestore rules say what ADR-029 §4 says.
 
-firestore.roles.rules replaces firestore.rules at the switch-over. There is no emulator in
-this repository, so the ruleset is checked as text, statement by statement, the way
-scripts/check_firestore_rules.py checks the deployed one. A rules file that let the team
-write, or let a role-less account read, would otherwise be found by the owner.
+Staged as firestore.roles.rules until the switch-over on 2026-09-26, and firestore.rules
+since. There is no emulator in this repository, so the ruleset is checked as text, statement
+by statement; scripts/check_firestore_rules.py checks that the deployed ruleset is this file.
+A rules file that let the team write, or let a role-less account read, would otherwise be
+found by the owner.
 """
 from __future__ import annotations
 
@@ -11,8 +12,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-STAGED = (ROOT / "firestore.roles.rules").read_text(encoding="utf-8")
-LIVE = (ROOT / "firestore.rules").read_text(encoding="utf-8")
+STAGED = (ROOT / "firestore.rules").read_text(encoding="utf-8")
 
 
 def _code(text: str) -> str:
@@ -39,8 +39,7 @@ def _block(text: str, path: str) -> str:
 STORE = "/stores/yomyom-kafr-qasim/{document=**}"
 
 
-def test_it_guards_the_same_pinned_store_as_the_live_rules():
-    assert f"match {STORE}" in _code(LIVE)
+def test_it_guards_the_pinned_pilot_store():
     assert f"match {STORE}" in _code(STAGED)
 
 
