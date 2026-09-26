@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
@@ -26,6 +26,7 @@ class EngineInputs:
     products: Optional[list]
     inventory: Optional[list]        # design §11.1: its own field, so its absence is statable
     sales_monthly: Optional[list]
+    sales_daily: Optional[list]      # ADR-030: one row per product per report day; None before the first
     sales_summary: Optional[dict]
     window: Optional[EvidenceWindow]
     observations: Optional[list]
@@ -216,6 +217,33 @@ def _cut_reconcile_window(summary_rows: list, monthly: Optional[list],
     return out
 
 
+def _sales_daily_vintage(rows: Optional[list], policy: Policy, run_at: datetime) -> dict:
+    """What the daily reports say arrived, read from the rows present (ADR-030 §4, ADR-004).
+
+    `missing_days` and `deliveries_missing_days` look back over the evidence window plus the
+    freshness limit, ending the day before the run: the longest span that could ever feed a
+    window (F8-S1 FR-144). Older days are missing from nothing F8 could use, and listing them
+    would grow the artefact by a day every night. Days before the first report are not
+    missing: the series had not started.
+
+    A report day's deliveries are missing when no row that day carries a receipts figure,
+    which is what a report without `כניסות מלאי` imports as (FR-149).
+    """
+    if not rows:
+        return {"first_day": None, "last_day": None, "report_days": 0,
+                "missing_days": [], "deliveries_missing_days": []}
+    days = sorted({r["day"] for r in rows})
+    with_deliveries = {r["day"] for r in rows if r.get("receipts") is not None}
+    run_day = run_at.date()
+    start = max(date.fromisoformat(days[0]),
+                run_day - timedelta(days=policy.order_window_days + policy.order_freshness_days))
+    span = [(start + timedelta(days=i)).isoformat() for i in range((run_day - start).days)]
+    present = set(days)
+    return {"first_day": days[0], "last_day": days[-1], "report_days": len(days),
+            "missing_days": [d for d in span if d not in present],
+            "deliveries_missing_days": [d for d in span if d in present and d not in with_deliveries]}
+
+
 def _competitor_vintage(observations: Optional[list]) -> dict:
     """Where the competitor half of a run came from, in terms a reader can check.
 
@@ -269,6 +297,9 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
     products, conflicting = (_shape_products(products_raw, inventory, owner)
                             if products_raw else (None, None))
     monthly = _rows(silver_dir / "sales_monthly.parquet")
+    # ADR-030. The importer writes this table only when a daily report parsed, and removes an
+    # older one when none did, so its absence is the honest "nothing has arrived yet".
+    sales_daily = _rows(silver_dir / "sales_daily.parquet")
     summary_rows = _rows(silver_dir / "sales_summary.parquet")
     window = _window_from_summary(monthly, policy) if monthly else None
     latest_signal = sorted(signals_dir.glob("*.parquet")) if signals_dir.exists() else []
@@ -285,6 +316,7 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
         # the file's mtime and `git clone` stamps that with the checkout time.
         "pos": read_pos_vintage(silver_dir) or {"file": None, "as_of": None, "as_of_source": None},
         "sales": (window.to_dict() if window else {"months": [], "first": None, "last": None, "full_annual_cycle": False}),
+        "sales_daily": _sales_daily_vintage(sales_daily, policy, run_at),
         "competitor": _competitor_vintage(observations),
         # `reason` travels, because without it a replayed mirror reads as a live pull.
         # _pull_owner_state() falls back to the committed replica when there is no
@@ -321,9 +353,9 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
     vintages["sales"] = {k: vintages["sales"][k]
                          for k in ("months", "first", "last", "full_annual_cycle", "reconcile_before")}
     digest = _digest(products, summary_rows, monthly, observations, matches, policy, owner,
-                     reconcile_before)
+                     reconcile_before, sales_daily)
     return EngineInputs(products=products, inventory=inventory or None,
-                        sales_monthly=monthly, sales_summary=summary, window=window,
+                        sales_monthly=monthly, sales_daily=sales_daily, sales_summary=summary, window=window,
                         observations=observations, matches=matches, stores=stores, withdrawn=None, idle=None, conflicting=conflicting,
                         inputs_digest=digest,
                         vintages=vintages, owner=owner, policy=policy, run_at=run_at)
@@ -348,7 +380,7 @@ def _content_only(row):
 
 
 def _digest(products, summary_rows, monthly, observations, matches, policy, owner,
-            reconcile_before: Optional[str]) -> str:
+            reconcile_before: Optional[str], sales_daily: Optional[list] = None) -> str:
     """A hex digest over the CONTENT the run read, not over the files it read them from.
 
     Content, because a parquet rewritten with identical rows is the same input and must
@@ -383,6 +415,9 @@ def _digest(products, summary_rows, monthly, observations, matches, policy, owne
     # counts in different months, would share a digest while publishing different findings.
     # The month, not the date: two counts within one month cut identically.
     feed("reconcile_before", [{"month": reconcile_before}])
+    # ADR-030. F8's quantities are computed from these rows, so they are an input like the
+    # monthly ones. Absent before the first daily report, and hashed as absent.
+    feed("sales_daily", sales_daily)
     feed("observations", observations)
     feed("matches", matches)
     feed("policy", policy.as_dict())

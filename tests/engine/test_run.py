@@ -23,6 +23,8 @@ def _isolate(monkeypatch, tmp_path):
     # test claims.
     monkeypatch.setattr(run_mod, "SIGNALS_DIR", tmp_path / "signals")
     monkeypatch.setattr(run_mod, "MATCHES_PATH", tmp_path / "matches.parquet")
+    # …and the daily reports (Task 5.2), so no test reads the repository's own.
+    monkeypatch.setattr(run_mod, "DAILY_SALES_DIR", tmp_path / "sales_daily")
 
 
 def test_empty_capability_set_publishes_a_valid_artefact(tmp_path, monkeypatch):
@@ -121,3 +123,87 @@ def test_skip_market_skips_the_market_context_too():
     assert run_mod._market_chain(skip=True) == []
     assert [name for name, _ in run_mod._market_chain(skip=False)] == [
         "market_context", "rehydrate_silver", "competitor_signals", "product_matching"]
+
+
+# ── Phase 5 Task 5.2: the daily sales reports in the run (ADR-030 §3, §4) ───────────────
+
+import pytest
+
+DAILY_HEADER = "תאור פריט,ברקוד/קוד,מכר,מחיר קניה,מחיר מכירה,עלות המכר (חנות),כניסות מלאי,מחיר קניה נטו,הנחה,קוד מחלקה,\n"
+
+
+def _otherwise_ok(monkeypatch, tmp_path):
+    """A run with nothing else to degrade it, so the verdict is the daily reports' alone."""
+    _isolate(monkeypatch, tmp_path)
+    monkeypatch.setattr(run_mod, "_pull_owner_state",
+                        lambda: OwnerState.from_dict({"status": "available", "pulled_at": "t"}))
+    monkeypatch.setattr(run_mod, "_sales_import", lambda *a, **k: {"window": None, "monthly_rows": 42})
+
+
+def _reports(tmp_path, days):
+    reports = tmp_path / "daily"; reports.mkdir(exist_ok=True)
+    for day in days:
+        (reports / f"דוח מכירות יום {day}.csv").write_text(
+            "\ufeff" + DAILY_HEADER + "מים,123,10,2,4,20,3,2,0,1,\n", encoding="utf-8")
+    return reports
+
+
+def _daily_run(tmp_path, days, now):
+    return run_mod.run_engine(mode="print", capability_runners={}, now=now,
+                              daily_sales_dir=_reports(tmp_path, days))
+
+
+def _week(first):
+    from datetime import date, timedelta
+    start = date.fromisoformat(first)
+    return [(start + timedelta(days=i)).isoformat() for i in range(7)]
+
+
+@pytest.mark.parametrize("days,now,verdict", [
+    # Before the first file F8 waits, and the run is not degraded by it.
+    ([], datetime(2026, 9, 20, tzinfo=timezone.utc), "ok"),
+    (["2026-09-15"], datetime(2026, 9, 20, tzinfo=timezone.utc), "ok"),          # five days old
+    (["2026-09-11"], datetime(2026, 9, 20, tzinfo=timezone.utc), "degraded"),    # nine days old
+    # A weekly batch (09-06 … 09-12), sent 09-13: every night until the next batch is ok,
+    # the last of them seven days after the latest report day.
+    *[(_week("2026-09-06"), datetime(2026, 9, d, tzinfo=timezone.utc), "ok") for d in range(13, 20)],
+    # …and the night the next batch is late, it is not.
+    (_week("2026-09-06"), datetime(2026, 9, 20, tzinfo=timezone.utc), "degraded"),
+])
+def test_the_run_is_degraded_only_when_the_daily_reports_have_gone_stale(tmp_path, monkeypatch, days, now, verdict):
+    _otherwise_ok(monkeypatch, tmp_path)
+    result = _daily_run(tmp_path, days, now)
+    assert result["status"] == verdict
+    step = next(s for s in result["steps"] if s["step"] == "sales_daily_import")
+    assert step["status"] == verdict
+    if verdict == "degraded":
+        assert "stale" in step["error"]
+
+
+def test_the_daily_step_runs_after_the_monthly_one(tmp_path, monkeypatch):
+    _otherwise_ok(monkeypatch, tmp_path)
+    names = [s["step"] for s in _daily_run(tmp_path, [], datetime(2026, 9, 20, tzinfo=timezone.utc))["steps"]]
+    assert names.index("sales_daily_import") == names.index("sales_import") + 1
+
+
+def test_a_failed_daily_file_is_named_and_does_not_degrade_the_run(tmp_path, monkeypatch):
+    """ADR-030 §3: a failed file is a missing day, named in the steps. §4: only staleness
+    degrades the run, so one bad file in a good week does not."""
+    _otherwise_ok(monkeypatch, tmp_path)
+    reports = _reports(tmp_path, ["2026-09-18"])
+    (reports / "דוח מכירות יום 2026-09-19.csv").write_text("﻿" + DAILY_HEADER, encoding="utf-8")
+    result = run_mod.run_engine(mode="print", capability_runners={}, daily_sales_dir=reports,
+                                now=datetime(2026, 9, 20, tzinfo=timezone.utc))
+    step = next(s for s in result["steps"] if s["step"] == "sales_daily_import")
+    assert step["status"] == "degraded"
+    assert "דוח מכירות יום 2026-09-19.csv" in step["error"] and "no_product_lines" in step["error"]
+    assert result["status"] == "ok"
+    assert result["artefact"]["vintages"]["sales_daily"]["missing_days"][-1] == "2026-09-19"
+
+
+def test_the_artefact_publishes_the_daily_vintage(tmp_path, monkeypatch):
+    _otherwise_ok(monkeypatch, tmp_path)
+    result = _daily_run(tmp_path, ["2026-09-17", "2026-09-19"], datetime(2026, 9, 20, tzinfo=timezone.utc))
+    assert result["artefact"]["vintages"]["sales_daily"] == {
+        "first_day": "2026-09-17", "last_day": "2026-09-19", "report_days": 2,
+        "missing_days": ["2026-09-18"], "deliveries_missing_days": []}
