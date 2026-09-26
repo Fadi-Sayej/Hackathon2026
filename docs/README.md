@@ -101,12 +101,12 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 | [ADR-029](architecture/decisions/ADR-029-two-roles-sign-in-and-the-gate-enforces-them.md) | Two roles sign in, and the edge gate enforces them — accepted 2026-09-25 |
 | [ADR-030](architecture/decisions/ADR-030-own-sales-arrive-as-daily-reports.md) | F8's own sales arrive as daily reports, one file per day, and a missing day stays missing — accepted 2026-09-26 |
 | [ADR-031](architecture/decisions/ADR-031-running-out-is-a-short-absence-after-steady-presence.md) | "Running out" is a short absence after steady presence, guarded per store against catalogue changes — accepted 2026-09-26 |
-| [ADR-032](architecture/decisions/ADR-032-the-boost-is-a-pinned-model-validated-and-recorded.md) | The boost is picked by a pinned model in the nightly run, and checked mechanically — accepted 2026-09-26; the model is still to be chosen |
+| [ADR-032](architecture/decisions/ADR-032-the-boost-is-a-pinned-model-validated-and-recorded.md) | The boost is picked by a pinned Claude model (Sonnet 5) in the nightly run, and checked mechanically — accepted 2026-09-26 |
 | [ADR-033](architecture/decisions/ADR-033-store-facts-are-a-committed-file.md) | The store facts are a committed file the team records from the owner — accepted 2026-09-26 |
 | [ADR-034](architecture/decisions/ADR-034-a-suggestion-is-identified-by-product-and-order-day.md) | A suggestion is identified by product and order day; a disagreement is a question keyed by product — accepted 2026-09-26 |
 | [ADR-035](architecture/decisions/ADR-035-a-models-answer-is-collected-data.md) | A model's answer is collected data, sealed as a daily snapshot — accepted 2026-09-26 |
 
-ADR-001 … ADR-022 and ADR-024 … ADR-035 are `Accepted`, ADR-032 without its choice of model, which is still open. ADR-023 is `Ready for review`. ADR-022 amends a sentence of ADR-019 and was accepted on 2026-09-13, after the defect it fixes was verified end to end: `entry_id` falls back to `product_name`, and `compose.js` skips any entry whose id carries a settled outcome, so two barcode-less rows sharing a name settled together on the owner's screen. ADR-020 was accepted on 2026-09-13 **conditional on GAP-009**:
+ADR-001 … ADR-022 and ADR-024 … ADR-035 are `Accepted`. ADR-023 is `Ready for review`. ADR-022 amends a sentence of ADR-019 and was accepted on 2026-09-13, after the defect it fixes was verified end to end: `entry_id` falls back to `product_name`, and `compose.js` skips any entry whose id carries a settled outcome, so two barcode-less rows sharing a name settled together on the owner's screen. ADR-020 was accepted on 2026-09-13 **conditional on GAP-009**:
 `published_population: whole` is the right value while that question is open, and becomes
 `living` when it closes.
 

@@ -1,7 +1,7 @@
 ---
 ID: ADR-032
-Title: The boost is picked by a pinned model in the nightly run, and checked mechanically before it is used
-Status: Accepted — except the choice of model (Decision 2), which the repository owner deferred on 2026-09-26
+Title: The boost is picked by a pinned Claude model (Sonnet 5) in the nightly run, and checked mechanically before it is used
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-09-25
 Parent: [System Design](../system-design.md) §19
@@ -10,9 +10,9 @@ Inputs: [docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md, D-16, D-
 Updated: 2026-09-26
 ---
 
-# ADR-032 — The boost is picked by a pinned model in the nightly run, and checked mechanically before it is used
+# ADR-032 — The boost is picked by a pinned Claude model (Sonnet 5) in the nightly run, and checked mechanically before it is used
 
-**Status:** Accepted (2026-09-26, by the repository owner, on PR #200), **except Decision 2's choice of model**. He asked to see the choices first · **Recorded in:** [System Design](../system-design.md) §19
+**Status:** Accepted (2026-09-26, by the repository owner, on PR #200). He chose the model the same day, after seeing the options (Decision 2) · **Recorded in:** [System Design](../system-design.md) §19
 
 ## Context
 
@@ -32,18 +32,27 @@ How a pick is kept, so the run can be reproduced, is a separate decision: ADR-03
 
 1. **Where it runs.** A step inside the nightly run, after the running-out signal (ADR-031)
    and before F8's quantities are computed. Never in the browser, never at request time.
-2. **Which model: open.** The draft proposed Anthropic's `claude-sonnet-5`. The repository
-   owner accepted everything else on 2026-09-26, and deferred the model until he has seen the
-   choices. It spends on his account.
-   - **Until he chooses, the step does not run.** No product is boosted, and each suggestion
-     says the model is not chosen yet. That is FR-147's "no pick", so nothing else waits on
-     it.
-   - **When he chooses, the model id is pinned here** by an amendment to this ADR.
-   - Whichever model it is, its id and the prompt's version are recorded with every pick
-     (ADR-035). Changing either is a commit, never a silent drift.
-   - No sampling parameter is set. Determinism comes from the record, not from the model.
-   - The key is a GitHub Actions secret for the chosen provider, set by the repository owner
-     as he set `VERCEL_DEPLOY_HOOK_URL`.
+2. **Which model: Anthropic's `claude-sonnet-5`**, chosen by the repository owner on
+   2026-09-26 after seeing four options (below). It spends on his account.
+   - The model id and the prompt's version are recorded with every pick (ADR-035). Changing
+     either is a commit, never a silent drift.
+   - No sampling parameter is set. Anthropic's current models reject `temperature` with an
+     error, and determinism comes from the record anyway.
+   - Requests go through the ordinary Messages API, not the Batch API (see Rejected options).
+   - The key is a GitHub Actions secret, `ANTHROPIC_API_KEY`, set by the repository owner as
+     he set `VERCEL_DEPLOY_HOOK_URL`.
+
+   **The options he was shown.** Prices are from Anthropic's pricing page
+   (platform.claude.com/docs/en/about-claude/pricing), read on 2026-09-26. The monthly
+   figures assume 700 input and 80 output tokens a request, at about 30 requests a night (the
+   ADR-031 replay's typical night) and at the 200-request ceiling:
+
+   | Model | Per million tokens, in / out | A month, typical | A month, at the ceiling |
+   |---|---|---|---|
+   | Haiku 4.5 (`claude-haiku-4-5-20251001`) | $1 / $5 | about $1 | about $6.60 |
+   | **Sonnet 5 (`claude-sonnet-5`), chosen** | $2 / $10 | **about $2** | about $13 |
+   | Opus 5.5 (`claude-opus-5-5`) | $4 / $20 | about $4 | about $26 |
+   | Fable 5.1 (`claude-fable-5-1`) | $10 / $50 | about $10 | about $66 |
 3. **What it is given.** One request per product that is running out. It contains only facts
    F8 publishes for that product:
    - the window's weekly units and the daily mean;
@@ -96,6 +105,12 @@ lets the model move one number, inside a mechanical range.
 The reason is shown to the owner beside a quantity. A reason that states a figure would put a
 number on his screen that no published fact carries. D-16 forbids exactly that for F14's
 sentence, and the same risk applies here.
+
+### Use the Batch API for half the price
+It halves every price above: about $1 a month saved at the typical night. But a batch is
+guaranteed only within 24 hours. The nightly run would have to submit one night and collect
+the next, so every boost would arrive a night late, for a saving smaller than the cost of
+the added machinery.
 
 ### Run an open model on the CI runner
 There is no GPU on the runner. It would add a second stack to maintain, for nothing D-21 asks
