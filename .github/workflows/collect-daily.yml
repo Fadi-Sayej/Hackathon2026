@@ -330,6 +330,26 @@ jobs:
                   echo "::error::Vercel did not deploy tonight's artefact ($SHA): $description. The owner still sees the last one that deployed (#167)."
                   exit 1 ;;
               esac
+            else
+              # No record for this sha can also mean Vercel built only a newer commit. On
+              # 2026-09-26 #201's merge never got a record: #209 merged four minutes later, and
+              # only that one reached production. The artefact is then live if the newest
+              # production deployment succeeded and contains it. A record of this sha's own
+              # (above) always wins: blocked stays red even if something later deployed it.
+              latest=$(gh api "repos/$REPO/deployments?environment=Production&per_page=1" --jq '.[0] // empty | "\(.id) \(.sha)"') || latest=""
+              if [ -n "$latest" ]; then
+                latest_id=${latest%% *}
+                latest_sha=${latest#* }
+                latest_state=$(gh api "repos/$REPO/deployments/$latest_id/statuses" --jq '.[0].state // empty') || latest_state=""
+                relation=""
+                if [ "$latest_state" = success ]; then
+                  relation=$(gh api "repos/$REPO/compare/$SHA...$latest_sha" --jq '.status') || relation=""
+                fi
+                if [ "$relation" = ahead ]; then
+                  echo "Tonight's artefact ($SHA) is live: production deployed $latest_sha, which contains it."
+                  exit 0
+                fi
+              fi
             fi
             sleep 20
           done

@@ -313,7 +313,11 @@ Since then (the repository owner agreed on 2026-09-26):
 - **The check.** *Did Vercel deploy tonight's artefact?* runs after the health check, just
   before *Fail loudly*. It reads GitHub's deployment record for the exact sha pushed. It fails
   the night on `failure` or `error`, and fails it if there is no finished record after
-  10 minutes (30 looks, 20 s apart). A failed API call counts as one more look.
+  10 minutes (30 looks, 20 s apart). A failed API call counts as one more look. With no
+  record for the sha, it also passes if the newest production deployment succeeded and
+  contains the sha. That happens when another commit reaches production first: #201's merge
+  (`639dc54`) never got a record, because #209 merged four minutes later. A record of the
+  sha's own always wins, so a blocked artefact commit stays red.
 - **The test.** `tests/test_nightly_deploy_step.py` runs both steps' own scripts. The commit
   step runs against a local bare repository; the check runs against stand-in `gh` and `sleep`.
 
