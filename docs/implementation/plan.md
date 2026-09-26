@@ -7,7 +7,7 @@ Inputs: [docs/architecture/system-design.md, docs/features/F1-*/specs … F8-*/s
 Updated: 2026-09-26 (Phase 5, V2 F8, written and Ready for review)
 Version: 1.1 (written 2026-09-08 against System Design v1.0; refreshed the same day against v1.1)
 Parent: [System Design](../architecture/system-design.md)
-Related Specs: F1-S1 … F7-S1 (see the System Design's §21 traceability matrix)
+Related Specs: F1-S1 … F7-S1 for Phases 0–4; F8-S1 for Phase 5 (see the System Design's §21 traceability matrix)
 ---
 
 > **Refreshed against System Design v1.1 on 2026-09-08.** The 2026-09-08 documentation
@@ -66,6 +66,7 @@ Copied verbatim from `docs/architecture/system-design.md`; every task's requirem
 - Determinism: same inputs + policy → same artefact except `generated_at`/`run_id`. Sorted iteration everywhere; no clock reads inside capabilities (run time is an input).
 - The three rule definitions the readiness gate left open are declared as provisional policy, not invented in code: `question_money_basis` (ARCH-GATE-002 — §18 action 3), `uncomparable_min_barcode_digits` (ARCH-GATE-004 — action 4), and the ceiling's population, derived **after** the FR-074 withdrawn exclusion and published with the figure (ARCH-GATE-006 — action 5).
 - Policy constants live only in `configs/policy.yaml`: `price_policy_pct: 60`, `attention_pct: 100`, `cost_floor_pct: 10`, `freshness_days: 14`, `artefact_min_price: 0.5`, `artefact_cost_ratio: 2`, `max_credible_gap_pct: 300`, `surface: {bound: 10, unvalued_places: 3, unvalued_order: [reconciliation, competitor_position, catalogue_lifecycle, hygiene]}`, `question_limit: 3`, `question_money_basis: window_revenue_at_shelf_price`, `question_yield_factor: 1.0`, `uncomparable_min_barcode_digits: 8`, `ceiling_derivation: {band_pct: 2, drop_ratio: 0.75, min_band_count: 20}`, `implausible_revenue_share: 0.10`, `full_annual_cycle_months: 12`, `withdraw_with_stock: false`.
+- **Phase 5 (V2) extends two of the constraints above:** the registry grows from seven ids to ten, and `SIGNAL_FAMILIES` holds thirteen once `order.suggestion` is added. The twelfth, `hygiene.conflicting_duplicate`, came with ADR-019. Its file says in which task each happens.
 - Commit style: small, imperative subject, body explains *why*. Never commit `data/**` except `data/owner/owner_state.json` (CI only) and the existing snapshot rule.
 
 ## Plans, in dependency order
