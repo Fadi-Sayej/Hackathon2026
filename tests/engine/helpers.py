@@ -55,7 +55,7 @@ def make_inputs(**kw):
         sales_daily=kw.get("sales_daily"),
         sales_summary={s["barcode"]: s for s in sales_summary} if sales_summary is not None else None,
         window=kw.get("window"), observations=kw.get("observations"), matches=kw.get("matches"),
-        stores=load_store_types(), withdrawn=kw.get("withdrawn"), conflicting=kw.get("conflicting", []), store_facts=kw.get("store_facts"), running_out=kw.get("running_out"), inputs_digest=kw.get("inputs_digest", "0" * 64), idle=kw.get("idle"),
+        stores=load_store_types(), withdrawn=kw.get("withdrawn"), conflicting=kw.get("conflicting", []), store_facts=kw.get("store_facts"), running_out=kw.get("running_out"), boost_picks=kw.get("boost_picks"), inputs_digest=kw.get("inputs_digest", "0" * 64), idle=kw.get("idle"),
         vintages={"pos": {"file": "f", "as_of": "2026-08-02"},
                   # ADR-026: reconciliation carves its window from this boundary, and load_inputs
                   # derives it from the POS date above, so it follows that date: 2026-08.

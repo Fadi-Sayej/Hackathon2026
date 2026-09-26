@@ -227,6 +227,8 @@ export const he = {
   'unavailable.unknown_stock_date': "איננו יודעים באיזה יום נספר המלאי, ולכן לא ניתן לבדוק זאת.",
   'unavailable.market_signal_thin': "אין מספיק ימים אחרונים מרשימות החנויות הסמוכות כדי לדעת מה חסר אצלן.",
   'unavailable.market_signal_stale': "הרשימות של החנויות הסמוכות אינן עדכניות, ולכן איננו יכולים לומר מה חסר אצלן היום.",
+  'unavailable.no_boost_key': "התאמת השוק כבויה: לא הוגדר מפתח למודל.",
+  'unavailable.boost_unavailable': "לא הצלחנו להגיע למודל הלילה, ולכן לא הוחלה התאמת שוק.",
   'data.title': "מאיפה הגיעו המספרים",
   'data.none': "אין",
   'data.hidden.title': "פריטים שהסתרת",

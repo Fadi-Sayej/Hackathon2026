@@ -9,7 +9,7 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Callable, Optional
 
-from src.common.paths import SILVER_POS_ROOT
+from src.common.paths import EXTERNAL_SNAPSHOTS_ROOT, SILVER_POS_ROOT
 from src.engine.inputs import load_inputs
 from src.engine.model import CapabilityOutput
 from src.engine.policy import load_policy
@@ -33,7 +33,7 @@ MATCHES_PATH = MATCHING_ROOT / "product_matches.parquet"
 
 # Filled by Phase 1: capability id -> callable(inputs) -> CapabilityOutput
 def _runners() -> dict:
-    from src.engine import (catalogue_lifecycle, competitor_position, margin_below_cost,
+    from src.engine import (catalogue_lifecycle, competitor_position, margin_below_cost, market_boost,
                             market_running_out, owner_questions, price_consistency, reconciliation)
     return {"catalogue_lifecycle": catalogue_lifecycle.run, "price_consistency": price_consistency.run,
             "reconciliation": reconciliation.run, "hygiene": reconciliation.run_hygiene,
@@ -41,7 +41,7 @@ def _runners() -> dict:
             "margin_below_cost": margin_below_cost.run, "owner_questions": owner_questions.run,
             # Registered in the same change as its registry entry: a real run whose artefact
             # lacks a registered id is refused (publish.require_complete_registry).
-            "market_running_out": market_running_out.run}
+            "market_running_out": market_running_out.run, "market_boost": market_boost.run}
 
 
 DEFAULT_RUNNERS: dict = {}          # populated lazily by run_engine
@@ -114,6 +114,18 @@ def _store_facts_verdict(store_facts) -> tuple:
         f"{r['department'] if r['department'] is not None else 'the file'} ({r['reason']})" for r in rejected)
 
 
+def _boost_verdict(result) -> tuple:
+    """ADR-032 Decision 6: the boost is an optional input, so its absence never degrades the
+    run. The step still says what happened, and the capability says it to the owner."""
+    if not result:
+        return "ok", None
+    if result.get("skipped"):
+        return "skipped", result["skipped"]
+    if not result.get("completed"):
+        return "degraded", f"boost_unavailable: {result.get('error')}"
+    return "ok", None
+
+
 def _market_chain(skip: bool) -> list:
     """The market half of a run, or nothing when the caller asked to skip it.
 
@@ -171,7 +183,8 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
                sales_dir: Optional[Path] = None, population: Optional[str] = None,
                signals_dir: Optional[Path] = None, matches_path: Optional[Path] = None,
                catalogue_path: Optional[Path] = None, daily_sales_dir: Optional[Path] = None,
-               store_facts_path: Optional[Path] = None, snapshots_root: Optional[Path] = None) -> dict:
+               store_facts_path: Optional[Path] = None, snapshots_root: Optional[Path] = None,
+               boost_transport=None) -> dict:
     # Resolved here, not in the signature: a default bound at import time cannot be
     # redirected by a caller that patches the module global, which is how Task 1.9
     # runs the engine over a copy of the data with an input withheld.
@@ -214,6 +227,20 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
                                                            **sources))
     if inputs is not None:
         _step(steps, "store_facts", lambda: inputs.store_facts, verdict=_store_facts_verdict)
+    if inputs is not None and mode == "publish":
+        # ADR-035 Decision 3: the one step the live run has and print mode does not. It asks the
+        # model, seals the picks, and the inputs are read again so the run uses exactly what
+        # a reproduction will read, digest included. The default transport makes a real call
+        # only with the key set; print mode never gets here.
+        from src.engine import market_boost
+        boost = _step(steps, "market_boost", lambda: market_boost.live_step(
+            inputs, snapshots_root=snapshots_root or EXTERNAL_SNAPSHOTS_ROOT,
+            key=os.environ.get(market_boost.KEY_ENV) or None,
+            transport=boost_transport or market_boost.urllib_transport, now=now), verdict=_boost_verdict)
+        if boost and boost.get("wrote"):
+            inputs = _step(steps, "load_inputs_with_picks", lambda: load_inputs(
+                policy=policy, owner=owner, run_at=now, silver_dir=silver_dir, signals_dir=signals_dir,
+                matches_path=matches_path, **sources)) or inputs
     outputs: list[CapabilityOutput] = []
     if inputs is not None:
         # catalogue_lifecycle runs first so its withdrawn set reaches the others (FR-074).

@@ -51,6 +51,9 @@ KNOWN = {
     # Phase 5 Task 5.4 (ADR-031 Decision 5): the market signal is too thin, or too old.
     "market_signal_thin",
     "market_signal_stale",
+    # Phase 5 Task 5.6 (ADR-032 Decision 6): no key for the model, or no answer from it.
+    "no_boost_key",
+    "boost_unavailable",
 }
 
 

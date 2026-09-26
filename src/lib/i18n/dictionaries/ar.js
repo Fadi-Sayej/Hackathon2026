@@ -232,6 +232,8 @@ export const ar = {
   'unavailable.unknown_stock_date': "لا نعرف يوم جرد المخزون، فلا يمكن فحص هذا.",
   'unavailable.market_signal_thin': "لا تتوفّر أيام حديثة كافية من قوائم المتاجر القريبة لمعرفة ما ينفد لديها.",
   'unavailable.market_signal_stale': "قوائم المتاجر القريبة ليست محدّثة، فلا نستطيع أن نقول ما ينفد لديها اليوم.",
+  'unavailable.no_boost_key': "تعديل السوق متوقّف: لم يُضبط مفتاح للنموذج.",
+  'unavailable.boost_unavailable': "لم نتمكّن من الوصول إلى النموذج الليلة، فلم يُطبَّق تعديل السوق.",
   'data.title': "من أين جاءت الأرقام",
   'data.none': "لا يوجد",
   'data.hidden.title': "عناصر أخفيتها",
