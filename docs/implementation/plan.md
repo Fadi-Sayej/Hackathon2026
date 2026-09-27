@@ -1,10 +1,10 @@
 ---
 ID: PLAN
 Title: SmartShelf V1 Implementation Plan
-Status: Partial — Phases 0, 1, 2 and 3 built (Task 2.7's cut-over done 2026-09-12, once ADR-020 removed D-14 as a blocker); Phase 4 in progress: Tasks 4.0 and 4.1 done (4.1 re-scoped by ADR-028, less §20.1's scripts row), Task 4.2 done except `operational.json` and its loader, which wait on F13 (#83), Task 4.3 done, Checkpoint 4 open; Phase 5 (V2, F8) approved 2026-09-26, not started
+Status: Partial — Phases 0, 1, 2 and 3 built (Task 2.7's cut-over done 2026-09-12, once ADR-020 removed D-14 as a blocker); Phase 4 in progress: Tasks 4.0 and 4.1 done (4.1 re-scoped by ADR-028, less §20.1's scripts row), Task 4.2 done except `operational.json` and its loader, which wait on F13 (#83), Task 4.3 done, Checkpoint 4 open; Phase 5 (V2, F8) built 2026-09-27 (Tasks 5.0–5.14, Checkpoint 5 met), and unavailable on real data until another store sends daily reports (D-23)
 Owner: smartshelf-architect
 Inputs: [docs/architecture/system-design.md, docs/features/F1-*/specs … F8-*/specs, docs/architecture/decisions/]
-Updated: 2026-09-26 (Phase 5, V2 F8, approved by the repository owner)
+Updated: 2026-09-27 (Phase 5 built; D-23: the pilot with the YomYom store ended)
 Version: 1.1 (written 2026-09-08 against System Design v1.0; refreshed the same day against v1.1)
 Parent: [System Design](../architecture/system-design.md)
 Related Specs: F1-S1 … F7-S1 for Phases 0–4; F8-S1 for Phase 5 (see the System Design's §21 traceability matrix)
@@ -103,6 +103,10 @@ Copied verbatim from `docs/architecture/system-design.md`; every task's requirem
 4. Basic Auth: `BASIC_AUTH_USER` and `BASIC_AUTH_PASSWORD` set in Vercel for every environment. `middleware.ts` fails closed with 503 when they are unset (design §11.7), so an unset pair takes the pilot app down rather than exposing it — ARCH-GATE-011, readiness gate §18 action 10.
 
 ## Release conditions (outside implementation; see design.md §22)
+
+> **2026-09-27 (D-23):** the pilot with the YomYom store has ended. Every condition below
+> that needs the store owner (GAP-009, GAP-011, ARCH-GATE-003's 30-day number) waits for
+> another store's owner, and none is assumed meanwhile.
 
 - **SPEC-GAP-A** — margin-below-cost has no producing specification; it is built as a browse-only capability and is *not admitted* to the daily surface until SPEC-008 exists.
 - **GAP-009** — before withdrawal ships, the owner confirms that absence from a monthly report means no sale (name twenty absent products).

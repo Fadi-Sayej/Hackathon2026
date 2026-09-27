@@ -7,7 +7,7 @@ Parent: [Intent Register (SPEC-000)](../product/intent-register.md)
 Related Specs: all F#-S# documents under `docs/features/`
 Owner: smartshelf-pm
 Inputs: [docs/product/intent-register.md, docs/features/F#-*/intent.md, docs/features/F#-*/specs/]
-Updated: 2026-09-25 (F8-S1 written against GAP-008)
+Updated: 2026-09-27 (D-23: GAP-009 and GAP-011 now wait on another store's owner)
 ---
 
 > **Migration note.** Moved verbatim from the pre-migration monolithic `specs.md`. It spans
@@ -328,6 +328,10 @@ that this does not block V1.
 
 #### GAP-009 — "Sold nothing" is, for every classified product in the pilot, "has no sales row"
 
+> **2026-09-27 (D-23):** the pilot with the YomYom store has ended, so its owner will not be
+> asked. This stays open until another store's owner answers it, and nothing assumes his
+> answer meanwhile.
+
 **Source:** `intent.md` §4 (INT-009) and SPEC-004 ASM-030, measured against the pilot data
 on 2026-09-08.
 
@@ -421,6 +425,10 @@ while disagreeing on stock.
 ---
 
 #### GAP-011 — The 18% ceiling is derived from his behaviour, not confirmed as his policy
+
+> **2026-09-27 (D-23):** the pilot with the YomYom store has ended, so its owner will not be
+> asked. This stays open until another store's owner answers it, and nothing assumes his
+> answer meanwhile.
 
 **Source:** [ADR-015](../architecture/decisions/ADR-015-ceiling-is-the-densest-qualifying-collapse.md),
 accepted 2026-09-12 with this condition.

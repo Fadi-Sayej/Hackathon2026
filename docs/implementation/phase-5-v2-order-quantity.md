@@ -5,7 +5,7 @@ Status: Approved — by the repository owner, 2026-09-26
 Owner: smartshelf-architect
 Parent: [Implementation plan](plan.md)
 Inputs: [docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (Approved 2026-09-25), ADR-030, ADR-031, ADR-032, ADR-033, ADR-034, ADR-035 (Accepted 2026-09-26), docs/architecture/system-design.md §10.1 §19 §21, CLAUDE.md, .claude/SKILLS/HANDOVER.md, the code as of main 0c41353]
-Updated: 2026-09-26 (rewritten after an independent review against the code; approved by the repository owner the same day)
+Updated: 2026-09-27 (Tasks 5.0–5.14 built, #207–#225; Checkpoint 5 met; release conditions wait on another store, D-23)
 ---
 
 # Phase 5 — V2, F8 Order Quantity
@@ -688,6 +688,12 @@ These apply on top of the index's Global Constraints.
 4. **The mockups are approved,** with the date recorded (Task 5.12).
 
 ## Release conditions (outside implementation)
+
+> **2026-09-27 (D-23):** the pilot with the YomYom store has ended, and none of these was met
+> with it. They wait for another store: its daily reports, its departments' facts, and its
+> answer on ASM-065. The model key is not needed until then, because without daily reports
+> no product is a candidate for the boost. `order_quantity` meanwhile publishes
+> `unavailable` with `no_daily_sales`, and nothing is simulated to fill it.
 
 - **The store owner's inputs:**
   - per-day sales and deliveries, at least weekly (OQ-904, owner conversation #7);

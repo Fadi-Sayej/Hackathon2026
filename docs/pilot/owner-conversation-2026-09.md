@@ -5,10 +5,15 @@ Status: Ready for review
 Owner: smartshelf-pm
 Parent: [PRD](../product/PRD.md)
 Inputs: [GAP-009, GAP-011, F13-S1 §14, F8-S1 (OQ-903, OQ-904), docs/reviews/system-design-readiness.md run 3, data/internal/silver_pos/*.parquet]
-Updated: 2026-09-25 (#7 and #8 added for F8-S1)
+Updated: 2026-09-27 (D-23: the pilot with the YomYom store ended; the questions stand for the next store's owner)
 ---
 
 # The owner conversation
+
+> **2026-09-27 (D-23):** the pilot with the YomYom store has ended, and this conversation will
+> not take place with its owner. The questions stand for the next store's owner. Their
+> figures describe YomYom's export, so they are re-measured on that store's data first
+> (rule 11).
 
 Eight questions. Six are his to answer and two are ours to check with him. Every figure below
 was read from his own export, not from a document (rule 11).
