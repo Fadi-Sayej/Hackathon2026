@@ -1454,13 +1454,17 @@ Design elements: **E** engine module · **P** publisher/artefact · **C** `compo
 | NFR-063, C-61, GAP-005 | committed inputs + rehydrate + recompute → fresh clone reproduces; coverage figures now come from E | ADR-002 | AC-128 |
 | C-62 | D-1/D-4/D-3 mechanisms above | §14 | AC-123/124 |
 
-### F8-S1 — Order quantity (V2: designed, not built)
+### F8-S1 — Order quantity (V2: built, dormant)
 
-**Nothing in this table is built yet.** F8-S1 (`Approved`, 2026-09-25) is the first V2
-spec. Its design decisions are ADR-030 … ADR-035, accepted by the repository owner on
+**Built as Phase 5, Tasks 5.0 … 5.14 (#207 … #223); Checkpoint 5 met on 2026-09-27.** It is
+dormant. Its release conditions wait for another store (D-23): its daily reports, its
+departments' facts and its answer on ASM-065. The nightly artefact of 2026-09-27 publishes
+`order_quantity` unavailable (`no_daily_sales`) and `market_boost` unavailable
+(`no_boost_key`), and nothing is simulated to fill either. F8-S1
+(`Approved`, 2026-09-25) is the first V2 spec. Its design decisions are ADR-030 … ADR-035, accepted by the repository owner on
 2026-09-26. The boost model is Claude Sonnet 5, his choice the same day (ADR-032).
-Each row names the ADR that answers it, and the implementation plan may now be written
-against them.
+Each row names the ADR that answers it. The plan that built them is
+[`phase-5-v2-order-quantity.md`](../implementation/phase-5-v2-order-quantity.md).
 
 | Requirement | Design element | Flow / contract | Verification |
 |---|---|---|---|
