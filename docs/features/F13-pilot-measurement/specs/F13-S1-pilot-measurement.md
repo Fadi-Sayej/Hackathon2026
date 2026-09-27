@@ -109,9 +109,10 @@ Phase 4 Task 4.2. Where the owner's outcomes are read from is open — §14 item
 > write-through built, `smartshelf.ownerState.v2` is per device: read on the team's screen it
 > measures the team. The requirement is corrected here; the source it needs is item 5.
 
-> **2026-09-27.** The source is the artefact's `measurement` block, which the engine computes
-> from the outcomes it pulls every run ([ADR-023](../../../architecture/decisions/ADR-023-the-engine-publishes-the-pilot-measurement.md),
-> §14 item 5). The surface reads `public/data/dashboard.json` and nothing else.
+> **2026-09-27.** The source is `public/data/measurement.json`, which the engine computes from
+> the outcomes it pulls every run and publishes beside the artefact ([ADR-023](../../../architecture/decisions/ADR-023-the-engine-publishes-the-pilot-measurement.md),
+> §14 item 5), in its own file so the edge gate keeps it from the owner (ADR-029 Decision 6).
+> The surface reads that file and nothing else.
 
 **FR-136** — Entries MUST be joined to outcomes on `signal_family` and `entry_id`. A surface
 that joins on a capability id is wrong by ADR-009, which makes `signal_family` permanent and
@@ -256,14 +257,14 @@ threshold, which D-24 removes. The plan task is [Phase 4 Task 4.5](../../../impl
 
 ### 15. Acceptance Criteria
 
-**AC-130** — The measurement surface reads `public/data/dashboard.json` only: its
-`measurement` block and its vintages. It reads no owner state on the device and nothing from
-`public/data/operational.json`. *(FR-135)*
+**AC-130** — The measurement surface reads `public/data/measurement.json` only. It reads no
+owner state on the device and nothing from `public/data/operational.json`, and the owner's
+account cannot fetch the file (ADR-029 Decision 6). *(FR-135)*
 
 **AC-131** — Decisions are joined to this run's entries on `entry_id` and counted by the
 snapshot's `signal_family`; no join or count uses a capability id. *(FR-136, ADR-009, ADR-016)*
 
-**AC-132** — The artefact states shown, decided, acted on, dismissed (`declined`), deferred and
+**AC-132** — The measurement states shown, decided, acted on, dismissed (`declined`), deferred and
 not in this run, per `signal_family` and in total, and the surface renders each. *(FR-137,
 SCN-128)*
 

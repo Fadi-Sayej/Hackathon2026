@@ -6,8 +6,8 @@ Owner: smartshelf-architect
 Date: 2026-09-13
 Parent: [System Design](../system-design.md) §19
 Related Specs: F13-S1 (§14 item 5), F6-S1, F7-S1
-Inputs: [ADR-001, ADR-004, ADR-005, ADR-016, ADR-021, D-23, D-24, docs/features/F13-pilot-measurement/specs/F13-S1-pilot-measurement.md, issue #94, issue #96, issue #83]
-Updated: 2026-09-27 (revised for D-23 and D-24: no target, and no reading of past artefacts; the block's shape stated)
+Inputs: [ADR-001, ADR-004, ADR-005, ADR-016, ADR-021, ADR-024, ADR-029, D-23, D-24, docs/features/F13-pilot-measurement/specs/F13-S1-pilot-measurement.md, issue #94, issue #96, issue #83]
+Updated: 2026-09-27 (revised for D-23 and D-24: no target, and no reading of past artefacts; the file's shape stated)
 ---
 
 # ADR-023 — The engine publishes the pilot measurement; the browser renders it
@@ -97,7 +97,14 @@ decisions: acted on out of decided.
 **No target (D-24).** Nothing is compared with a success figure, and `configs/policy.yaml`
 gains no threshold.
 
-**The block.** The artefact gains one top-level key, `measurement`:
+**The file.** It is published as `public/data/measurement.json`, beside `dashboard.json` and
+never inside it. ADR-029 Decision 6 (Accepted) put it there: the edge gate can keep a file from
+the owner, and already answers 403 to him for that path, but no gate can keep a field inside
+the file his app downloads. It is written like the catalogue (ADR-024): validated against
+`schemas/measurement.schema.json`, atomically, as its own step after the artefact, so a
+failure leaves the previous file and never the artefact. It names the run it was computed
+with (`generated_at`, `run_id`, `inputs_digest`) and carries ADR-021's device register, so
+the page needs no second file. Its fields:
 
 | Field | Meaning |
 |---|---|
@@ -120,8 +127,8 @@ publish different artefacts under one digest. The measurement adds a third reade
 fix is the same for all three: the decisions and the revivals join the digest. The pull time
 and the device register still do not (ADR-021).
 
-**Not a registered figure.** The block carries its own window and pull time, and it lives in
-the artefact that `npm run figures` reproduces. It is not added to `figures{}`: its input
+**Not a registered figure.** The file carries its own window and pull time, and the run that
+`npm run figures` reproduces computes it too. It is not added to `figures{}`: its input
 needs a credential, and `figures.py` already separates "needs a credential" from "does not
 reproduce". Registering it would make every machine without the service account report a
 missing figure.
@@ -150,8 +157,9 @@ does not. Deciding it now is what lets the build start the day the numbers land.
 
 ## Consequences
 
-**We accept:** the artefact gains a measurement block, and its schema with it. (The 2026-09-13
-text also accepted reading past artefacts; the revision drops that.)
+**We accept:** a fourth published file beside the artefact, with its own schema, which the
+nightly commits with the artefact. (The 2026-09-13 text also accepted reading past artefacts;
+the revision drops that.)
 
 **We gain:** one implementation of recovered ₪, in the language that owns every other figure,
 provenanced by F7-S1 like the rest, and available to any surface that reads the artefact
