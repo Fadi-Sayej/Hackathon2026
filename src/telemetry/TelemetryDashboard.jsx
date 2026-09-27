@@ -1,25 +1,15 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
-import { loadOperationalData } from '../lib/dataAdapters/loadOperationalData.js'
-import {
-  loadRecommendationDecisions,
-  subscribeToPersistence,
-} from '../lib/persistence/persistence.js'
-import { isFirebaseConfigured, STORE_ID } from '../firebase.js'
-import {
-  ACTION_STATUS,
-  DISMISS_REASON,
-  DISMISS_REASON_ORDER,
-  OUTCOME_LABEL,
-  dismissReasonLabel,
-} from '../lib/operational/completionActions.js'
-import { formatShekel, formatDate } from '../lib/utils/format.js'
-import { buildTelemetry } from './telemetryModel.js'
+import { loadMeasurement } from '../lib/dataAdapters/loadMeasurement.js'
+import { formatDate, formatShekel } from '../lib/utils/format.js'
+import { viewMeasurement } from './telemetryModel.js'
 
-const pct = (rate) => `${Math.round((rate ?? 0) * 100)}%`
+// The team's measurement page (F13-S1, Phase 4 Task 4.5). It renders what the engine published
+// in public/data/measurement.json and computes nothing (ADR-023, ADR-001). The file is its own,
+// beside dashboard.json, so the edge gate keeps it from the owner (ADR-029 Decision 6).
 
-// The credibility target for wrong-data dismissals (PLAN.md §5, last row).
-const WRONG_DATA_TARGET = 0.1
+const pct = (share) => (share == null ? '—' : `${Math.round(share * 100)}%`)
+const n = (value) => value.toLocaleString('en-US')
 
 function Metric({ label, value, detail, tone = 'neutral' }) {
   return (
@@ -31,56 +21,137 @@ function Metric({ label, value, detail, tone = 'neutral' }) {
   )
 }
 
-function Bar({ rate }) {
+function Bar({ share }) {
   return (
     <div className="t-bar">
-      <div className="t-bar-fill" style={{ width: `${Math.round((rate ?? 0) * 100)}%` }} />
+      <div className="t-bar-fill" style={{ width: `${Math.round((share ?? 0) * 100)}%` }} />
     </div>
   )
 }
 
-export function TelemetryDashboard() {
-  const [operationalData, setOperationalData] = useState({ recommendations: [], meta: {} })
-  const [decisions, setDecisions] = useState(() => loadRecommendationDecisions())
-  const [status, setStatus] = useState('loading')
+function Measurement({ view }) {
+  const { totals } = view
+  return (
+    <>
+      <section className="t-grid">
+        <Metric label="Shown in this run" value={n(totals.shown)}
+          detail={`entries published ${formatDate(view.generatedAt)}`} tone="info" />
+        <Metric label="Decided" value={n(totals.decided)}
+          detail={`${totals.acted} acted on · ${totals.declined} dismissed · ${totals.deferred} deferred`} />
+        <Metric label="Acted on" value={n(totals.acted)}
+          detail={view.nothingDecided ? 'nothing decided yet' : `${pct(view.actedShare)} of decided`}
+          tone={totals.acted ? 'good' : 'neutral'} />
+      </section>
 
-  useEffect(() => {
-    let cancelled = false
-    loadOperationalData().then((data) => {
-      if (cancelled) return
-      setOperationalData(data)
-      setStatus('ready')
-    })
-    return () => {
-      cancelled = true
-    }
-  }, [])
+      {view.nothingDecided ? (
+        <p className="t-note">
+          No decisions recorded yet. When the owner acts on, dismisses or defers an entry, it is
+          counted here the next night.
+        </p>
+      ) : null}
 
-  // Refresh decisions whenever a background cloud sync updates the local mirror
-  // (another device, or offline writes reconciling on reconnect).
-  useEffect(() => {
-    const refresh = () => setDecisions(loadRecommendationDecisions())
-    const unsubscribe = subscribeToPersistence(refresh)
-    if (typeof window !== 'undefined') {
-      window.addEventListener('smartshelf:persistence-updated', refresh)
-      window.addEventListener('focus', refresh)
-    }
-    return () => {
-      unsubscribe()
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('smartshelf:persistence-updated', refresh)
-        window.removeEventListener('focus', refresh)
-      }
-    }
-  }, [])
+      <section className="t-panel">
+        <h2>Money recovered</h2>
+        <p className="t-panel-sub">
+          Only from entries the owner acted on, at the value the engine published when he decided.
+          One row per kind and certainty: they are never added together.
+        </p>
+        {view.money.length === 0 ? (
+          <p className="t-panel-sub">No acted-on decision carries money yet.</p>
+        ) : view.money.map((row) => (
+          <div className="t-money" key={`${row.kind}|${row.certainty}`} data-money={`${row.kind}|${row.certainty}`}>
+            <span>{row.kind === 'per_sale' ? 'per sale' : row.kind} · {row.certainty} · from {row.decisions} acted-on decision{row.decisions === 1 ? '' : 's'}</span>
+            <strong>{formatShekel(row.amount)}</strong>
+          </div>
+        ))}
+      </section>
 
-  const t = useMemo(
-    () => buildTelemetry(operationalData.recommendations ?? [], decisions),
-    [operationalData, decisions],
+      <section className="t-panel">
+        <h2>Which alert types earn their place</h2>
+        <p className="t-panel-sub">
+          What this run shows of each type, and what the owner decided about it. The share is of
+          his decisions only: a run&apos;s entries and his decisions are different sets.
+        </p>
+        <table className="t-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th className="t-num">Shown</th>
+              <th className="t-num">Acted on</th>
+              <th className="t-num">Dismissed</th>
+              <th className="t-num">Deferred</th>
+              <th className="t-num">Not in this run</th>
+              <th className="t-accept">Acted on, of decided</th>
+            </tr>
+          </thead>
+          <tbody>
+            {view.families.map((row) => (
+              <tr key={row.family} data-family={row.family}>
+                <td><span className="t-type">{row.family}</span></td>
+                <td className="t-num">{n(row.shown)}</td>
+                <td className="t-num">{row.acted}</td>
+                <td className="t-num">{row.declined}</td>
+                <td className="t-num">{row.deferred}</td>
+                <td className="t-num t-muted">{row.notInThisRun}</td>
+                <td className="t-accept">
+                  <div className="t-accept-cell">
+                    <Bar share={row.actedShare} />
+                    <span>{pct(row.actedShare)}</span>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+
+      <section className="t-panel">
+        <h2>Why alerts were dismissed</h2>
+        <p className="t-panel-sub">
+          A tool that is confidently wrong is worse than no tool, so “the data is wrong” is the
+          dismissal to watch.
+        </p>
+        <div className="t-reasons">
+          {view.reasons.map((r) => (
+            <div className="t-reason" key={r.reason}>
+              <div className="t-reason-count">{r.count}</div>
+              <div className="t-reason-label">{r.label}</div>
+              {r.reason === 'wrong_data' ? (
+                <div className="t-reason-rate">
+                  {view.wrongDataShare == null ? 'no dismissals yet' : `${pct(view.wrongDataShare)} of dismissals`}
+                </div>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <footer className="t-foot">
+        <p>
+          “Shown” is the run published {formatDate(view.generatedAt)}. Decisions are every one the
+          owner recorded
+          {view.window.first ? `, ${formatDate(view.window.first)} to ${formatDate(view.window.last)}` : ''},
+          as the engine read them {formatDate(view.window.pulled_at)}
+          {view.devices != null ? `, from ${view.devices} devices` : ''}. A decision whose entry
+          this run no longer shows is counted under “not in this run”, never dropped. ₪ figures are
+          per sale, deliberately not multiplied by volume: the stock counts are unreliable, so a
+          lot value would be a guess dressed up as a number.
+        </p>
+      </footer>
+    </>
   )
+}
 
-  const cloudLive = isFirebaseConfigured()
-  const generatedAt = operationalData.meta?.generatedAt
+export function TelemetryDashboard({ load = loadMeasurement }) {
+  const [result, setResult] = useState(null)
+  const reload = useCallback(() => {
+    let cancelled = false
+    load().then((next) => { if (!cancelled) setResult(next) })
+    return () => { cancelled = true }
+  }, [load])
+  useEffect(() => reload(), [reload])
+
+  const view = result?.status === 'ok' ? viewMeasurement(result.body) : null
 
   return (
     <div className="t-root">
@@ -88,190 +159,38 @@ export function TelemetryDashboard() {
 
       <header className="t-header">
         <div>
-          <p className="t-eyebrow">SmartShelf · Pilot telemetry</p>
+          <p className="t-eyebrow">SmartShelf · Pilot measurement</p>
           <h1>Did the alerts help?</h1>
           <p className="t-sub">
-            Internal view for the team. Every alert shown and every decision the manager made,
-            so we can answer acceptance and ₪ impact without opening a terminal.
+            Internal view for the team. What the engine&apos;s latest run shows, and every decision
+            the owner recorded, as the engine published them.
           </p>
         </div>
         <div className="t-source">
-          <span className={`t-dot ${cloudLive ? 't-dot-live' : 't-dot-local'}`} />
-          {cloudLive ? `Firestore · ${STORE_ID}` : 'localStorage (this device only)'}
-          <button className="t-reload" onClick={() => setDecisions(loadRecommendationDecisions())}>
-            Reload
-          </button>
+          {view?.generatedAt ? `Measured ${formatDate(view.generatedAt)}` : 'measurement.json'}
+          <button className="t-reload" onClick={reload}>Reload</button>
           {/* ADR-029 §3: team accounts land here after sign-in; this is the way to the owner's
               app, which they see read-only. */}
-          <a className="t-reload" href="/">Open the owner's app</a>
+          <a className="t-reload" href="/">Open the owner&apos;s app</a>
         </div>
       </header>
 
-      {status === 'loading' ? (
-        <p className="t-note">Loading the latest export…</p>
+      {result === null ? (
+        <p className="t-note">Loading the measurement…</p>
+      ) : result.status === 'missing' ? (
+        <p className="t-note">
+          The measurement has not been published yet. The nightly run writes it beside the
+          artefact.
+        </p>
+      ) : result.status !== 'ok' ? (
+        <p className="t-note">The measurement could not be loaded: {result.reason}.</p>
+      ) : view.state === 'unavailable' ? (
+        <p className="t-note">
+          The engine could not measure this run: {view.reason ?? 'no reason was published'}. No
+          number is shown in its place.
+        </p>
       ) : (
-        <>
-          <section className="t-grid">
-            <Metric
-              label="Alerts shown"
-              value={t.totalShown.toLocaleString()}
-              detail={`${t.totalMoneyShown.toLocaleString()} money · ${t.totalDataShown.toLocaleString()} data`}
-              tone="info"
-            />
-            <Metric
-              label="Acted on"
-              value={t.actedOn.toLocaleString()}
-              detail={`${t.totalDone} done · ${t.totalDismissed} dismissed · ${t.totalSnoozed} snoozed`}
-              tone={t.actedOn ? 'good' : 'neutral'}
-            />
-            <Metric
-              label="Acceptance rate"
-              value={pct(t.engagedAcceptanceRate)}
-              detail={`Done ÷ decided · ${pct(t.coverageRate)} of backlog touched · target > 30%`}
-              tone={t.engagedAcceptanceRate >= 0.3 ? 'good' : 'neutral'}
-            />
-            <Metric
-              label="₪ impact captured"
-              value={formatShekel(t.capturedImpactIls)}
-              detail="Per sale, on actions marked done"
-              tone={t.capturedImpactIls > 0 ? 'good' : 'neutral'}
-            />
-          </section>
-
-          {t.actedOn === 0 && t.totalSnoozed === 0 ? (
-            <p className="t-note">
-              No decisions recorded yet. Once the manager works the daily action list, acceptance
-              and ₪ impact populate here. Potential ₪ at stake across today&apos;s money alerts:{' '}
-              <strong>{formatShekel(t.potentialImpactIls)}</strong> per sale.
-            </p>
-          ) : null}
-
-          <section className="t-panel">
-            <h2>Which alert types earn their place</h2>
-            <p className="t-panel-sub">
-              Acceptance rate by type is how we decide what to keep. A type nobody acts on is a
-              type to drop.
-            </p>
-            <table className="t-table">
-              <thead>
-                <tr>
-                  <th>Type</th>
-                  <th className="t-num">Shown</th>
-                  <th className="t-num">Done</th>
-                  <th className="t-num">Dismissed</th>
-                  <th className="t-num">Snoozed</th>
-                  <th className="t-num">Ignored</th>
-                  <th className="t-accept">Accept. of decided</th>
-                  <th className="t-num">₪ captured</th>
-                </tr>
-              </thead>
-              <tbody>
-                {t.typeRows.map((row) => (
-                  <tr key={row.type}>
-                    <td>
-                      <span className="t-type">{row.label}</span>
-                      {row.isMoney ? <span className="t-tag t-tag-money">money</span> : (
-                        <span className="t-tag t-tag-data">data</span>
-                      )}
-                    </td>
-                    <td className="t-num">{row.shown.toLocaleString()}</td>
-                    <td className="t-num">{row.done}</td>
-                    <td className="t-num">{row.dismissed}</td>
-                    <td className="t-num">{row.snoozed}</td>
-                    <td className="t-num t-muted">{row.ignored.toLocaleString()}</td>
-                    <td className="t-accept">
-                      <div className="t-accept-cell">
-                        <Bar rate={row.engagedRate} />
-                        <span>{row.actedOn ? pct(row.engagedRate) : '—'}</span>
-                      </div>
-                    </td>
-                    <td className="t-num">
-                      {row.isMoney ? formatShekel(row.capturedImpactIls) : '—'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </section>
-
-          <section className="t-panel">
-            <h2>Why alerts were dismissed</h2>
-            <p className="t-panel-sub">
-              The single most important signal in the pilot. A tool that is confidently wrong is
-              worse than no tool, so “the data is wrong” dismissals are tracked against a{' '}
-              &lt; {pct(WRONG_DATA_TARGET)} target.
-            </p>
-            <div className="t-reasons">
-              <div className={`t-reason ${t.wrongDataRate > WRONG_DATA_TARGET ? 't-reason-alarm' : 't-reason-ok'}`}>
-                <div className="t-reason-count">{t.wrongDataDismissals}</div>
-                <div className="t-reason-label">{dismissReasonLabel(DISMISS_REASON.WRONG_DATA)}</div>
-                <div className="t-reason-rate">
-                  {t.totalDismissed ? `${pct(t.wrongDataRate)} of dismissals` : 'no dismissals yet'}
-                </div>
-              </div>
-              {DISMISS_REASON_ORDER.filter((r) => r !== DISMISS_REASON.WRONG_DATA).map((reason) => (
-                <div className="t-reason" key={reason}>
-                  <div className="t-reason-count">{t.reasonCounts[reason] ?? 0}</div>
-                  <div className="t-reason-label">{dismissReasonLabel(reason)}</div>
-                </div>
-              ))}
-              <div className="t-reason">
-                <div className="t-reason-count">{t.reasonUnknown}</div>
-                <div className="t-reason-label">Reason not recorded</div>
-              </div>
-            </div>
-          </section>
-
-          <section className="t-panel">
-            <h2>Recent decisions</h2>
-            {t.recentDecisions.length === 0 ? (
-              <p className="t-panel-sub">Nothing yet.</p>
-            ) : (
-              <table className="t-table">
-                <thead>
-                  <tr>
-                    <th>When</th>
-                    <th>Product</th>
-                    <th>Type</th>
-                    <th>Outcome</th>
-                    <th className="t-num">₪</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {t.recentDecisions.map((d) => (
-                    <tr key={d.id}>
-                      <td className="t-muted">{d.at ? formatDate(d.at) : '—'}</td>
-                      <td dir="auto">{d.productName ?? d.id}</td>
-                      <td className="t-muted">{d.type ?? '—'}</td>
-                      <td>
-                        <span className={`t-outcome t-outcome-${(d.status ?? '').toLowerCase()}`}>
-                          {OUTCOME_LABEL[d.status] ?? d.status ?? '—'}
-                        </span>
-                        {d.status === ACTION_STATUS.DISMISSED ? (
-                          <span className="t-muted"> · {dismissReasonLabel(d.reason)}</span>
-                        ) : null}
-                      </td>
-                      <td className="t-num">{d.impactIls != null ? formatShekel(d.impactIls) : '—'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </section>
-
-          <footer className="t-foot">
-            <p>
-              Acceptance rate is done ÷ decided (of the alerts the manager actually engaged with) —
-              we don&apos;t log per-alert impressions, so a true done ÷ shown would understate trust
-              against the whole {t.totalShown.toLocaleString()}-item backlog; coverage is shown
-              alongside it. ₪ figures are per sale, deliberately not multiplied by volume —
-              YomYom&apos;s stock counts are unreliable, so a lot value would be a guess dressed up
-              as a number. “Shown” is the current pipeline export
-              {generatedAt ? `, generated ${formatDate(generatedAt)}` : ''}. Capture a week-0
-              baseline before go-live, or no improvement can be attributed to us.
-            </p>
-          </footer>
-        </>
+        <Measurement view={view} />
       )}
     </div>
   )
@@ -286,9 +205,6 @@ const STYLES = `
 .t-header h1 { margin: 0 0 .4rem; font-size: 1.7rem; }
 .t-sub { margin: 0; color: #9fb0c6; max-width: 62ch; font-size: .92rem; line-height: 1.5; }
 .t-source { display: flex; align-items: center; gap: .5rem; font-size: .82rem; color: #9fb0c6; white-space: nowrap; }
-.t-dot { width: .6rem; height: .6rem; border-radius: 50%; display: inline-block; }
-.t-dot-live { background: #34d399; box-shadow: 0 0 0 3px rgba(52,211,153,.18); }
-.t-dot-local { background: #fbbf24; box-shadow: 0 0 0 3px rgba(251,191,36,.18); }
 .t-reload { margin-left: .5rem; background: #1c2635; color: #cdd7e6; border: 1px solid #33415a;
   border-radius: 7px; padding: .3rem .6rem; cursor: pointer; font-size: .8rem; }
 .t-reload:hover { background: #24324a; }
@@ -299,6 +215,8 @@ a.t-reload { display: inline-block; text-decoration: none; }
 .t-card-info { border-color: #2b4a6b; }
 .t-card-label { font-size: .78rem; color: #8ba0bb; margin-bottom: .4rem; }
 .t-card-value { font-size: 1.7rem; font-weight: 650; }
+.t-money { display: flex; justify-content: space-between; gap: 1rem; padding: .55rem 0; border-bottom: 1px solid #171f2b; font-size: .92rem; }
+.t-money strong { font-size: 1.15rem; font-variant-numeric: tabular-nums; }
 .t-card-detail { font-size: .76rem; color: #7f8ea8; margin-top: .3rem; }
 .t-panel { background: #10151f; border: 1px solid #1f2937; border-radius: 14px; padding: 1.25rem 1.35rem; margin-bottom: 1.35rem; }
 .t-panel h2 { margin: 0 0 .3rem; font-size: 1.12rem; }
@@ -310,24 +228,14 @@ a.t-reload { display: inline-block; text-decoration: none; }
 .t-num { text-align: right; font-variant-numeric: tabular-nums; }
 .t-muted { color: #6f7f97; }
 .t-type { font-weight: 550; }
-.t-tag { font-size: .64rem; text-transform: uppercase; letter-spacing: .05em; padding: .1rem .4rem;
-  border-radius: 5px; margin-left: .5rem; }
-.t-tag-money { background: rgba(52,211,153,.14); color: #6ee7b7; }
-.t-tag-data { background: rgba(148,163,184,.14); color: #b6c2d4; }
 .t-accept-cell { display: flex; align-items: center; gap: .55rem; min-width: 130px; }
 .t-bar { flex: 1; height: 7px; background: #1c2636; border-radius: 4px; overflow: hidden; }
 .t-bar-fill { height: 100%; background: linear-gradient(90deg, #38bdf8, #34d399); }
 .t-reasons { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .8rem; }
 .t-reason { background: #141b27; border: 1px solid #232f42; border-radius: 11px; padding: .9rem 1rem; }
-.t-reason-alarm { border-color: #7f1d1d; background: rgba(127,29,29,.18); }
-.t-reason-ok { border-color: #2f6b52; }
 .t-reason-count { font-size: 1.5rem; font-weight: 650; }
 .t-reason-label { font-size: .82rem; color: #b6c2d4; margin-top: .2rem; }
 .t-reason-rate { font-size: .74rem; color: #8ba0bb; margin-top: .25rem; }
-.t-outcome { padding: .12rem .5rem; border-radius: 6px; font-size: .76rem; }
-.t-outcome-done { background: rgba(52,211,153,.14); color: #6ee7b7; }
-.t-outcome-dismissed { background: rgba(248,113,113,.14); color: #fca5a5; }
-.t-outcome-snoozed { background: rgba(251,191,36,.14); color: #fcd34d; }
 .t-note { color: #9fb0c6; background: #10151f; border: 1px dashed #2b3a52; border-radius: 12px; padding: 1rem 1.15rem; font-size: .9rem; }
 .t-foot { color: #6f7f97; font-size: .78rem; line-height: 1.55; margin-top: 1.5rem; border-top: 1px solid #1f2937; padding-top: 1rem; }
 `
