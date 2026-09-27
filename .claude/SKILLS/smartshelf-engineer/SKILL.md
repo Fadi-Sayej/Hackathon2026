@@ -46,8 +46,8 @@ These are `CLAUDE.md` rules. They are here because each one cost this project re
   unit test and changed nothing, because each test supplied the input directly and never
   crossed the boundary where it was lost. `npm run check:signals` diffs real
   recommendations with the signal on and off. A green unit test is not evidence. (Rule 12.)
-- **Never sum a per-sale figure with a one-off figure.** `actionPriority.js` splits them
-  deliberately via `IMPACT_KIND`. Signals derived from stock quantities carry no shekel
+- **Never sum a per-sale figure with a one-off figure.** Every value carries its `kind`
+  (ADR-012), and nothing sums two kinds. Signals derived from stock quantities carry no shekel
   figure at all. When a number cannot be stated honestly, the UI shows **no number**, not
   zero. (Rule 8.)
 - **An empty export is a failure, not a result.** Do not reach for
@@ -56,7 +56,7 @@ These are `CLAUDE.md` rules. They are here because each one cost this project re
   committed frontend data with a 30-product demo set. (Rule 7.)
 - **Verify before you document.** Read the parquet or the JSON. Never quote a count from
   another markdown file. (Rule 11.)
-- **`data/**` is gitignored; `public/data/operational.json` is committed.** Read the diff
+- **`data/**` is gitignored; `public/data/*.json` is committed.** Read the diff
   before every commit. (Rule 6.)
 
 ## One task, one commit — before you start the next

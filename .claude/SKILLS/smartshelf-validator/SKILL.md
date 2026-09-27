@@ -57,7 +57,7 @@ that four times. (CLAUDE.md rule 12.)
 ## Usefulness questions
 
 - How many entries does this feature contribute to the daily surface today? Read the
-  artifact — `public/data/operational.json` or the parquet — never a markdown file.
+  artifact — `public/data/dashboard.json` or the parquet — never a markdown file.
 - Turn the signal off. What changes? If the answer is nothing, the feature is not
   delivered, whatever the tests say. `npm run check:signals` is the tool.
 - Does every figure it publishes obey rule 8 — per-sale and one-off never summed, no
@@ -75,9 +75,10 @@ that four times. (CLAUDE.md rule 12.)
   carries the pre-correction number. Verified on the deployed URL, 12 September."
 
   That example is real, and it is the shape of finding this role exists to produce: the
-  document was corrected and the artifact was not. Read
-  `public/data/operational.json` — `byType`, `byFamily`, `meta` and `recommendations[].type`
-  are the keys — never a markdown file.
+  document was corrected and the artifact was not. That artifact was the pre-V1
+  `operational.json`, deleted on 2026-09-27. Read `public/data/dashboard.json` —
+  `capabilities.<id>.entries`, `counts`, `status` and `generated_at` are the keys — never a
+  markdown file.
 - **Read the artifact, never another document.** CLAUDE.md rule 11 exists because counts
   in this repository drifted from 14,406 to 2,848 and from 2,183 to 3,035 between the
   markdown and the parquet. If you quote a number, say where you read it.

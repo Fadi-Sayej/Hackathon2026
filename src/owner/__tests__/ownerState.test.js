@@ -19,7 +19,7 @@ const entry = (over = {}) => ({
 })
 
 // The suite runs in the node environment (vitest.config.js): a test that needs storage
-// supplies it, the same stub completionActions.test.js uses.
+// supplies it.
 function createStorage({ failOnWrite = false } = {}) {
   const backing = new Map()
   return {

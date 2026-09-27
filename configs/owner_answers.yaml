@@ -7,7 +7,7 @@
 #   guess harder, the product asks him, and his answers land here.
 #
 #   This file is the durable store the pipeline reads on the next run. The browser
-#   writes answers through src/lib/persistence (localStorage, synced to Firestore
+#   writes answers through src/owner/ownerState.js (localStorage, synced to Firestore
 #   when configured); scripts/import_owner_answers.py folds them in here. It is
 #   plain YAML on purpose: he can read what he told it, and change his mind, without
 #   the app.

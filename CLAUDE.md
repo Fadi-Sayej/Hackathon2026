@@ -99,12 +99,10 @@ particular: no role quotes a figure it has not read from the artifact that produ
    synthesised from a monthly mean (rule 13). The whole story is in
    [`docs/reviews/nightly-2026-09-13-incident.md`](docs/reviews/nightly-2026-09-13-incident.md).
 
-   `operational.json` itself stays, frozen at its last good value, because its last reader,
-   `src/telemetry/TelemetryDashboard.jsx`, is still there. F13 (#83) replaces it, and the
-   file and `loadOperationalData.js` go then. Nothing regenerates the file: if it is ever
-   lost, restore it from git. ADR-009's one-shot outcome-id translation was never a reason to
-   keep it: it was never built (verified 2026-09-16), and the migration it would have
-   extended was itself removed on 2026-09-24.
+   `operational.json` stayed, frozen, while its last reader, the telemetry page, still read
+   it. F13 (#83) rebuilt that page on `public/data/measurement.json`, which the engine
+   writes beside the artefact, and the file and `loadOperationalData.js` went on 2026-09-27
+   (Phase 4 Task 4.5).
 
 6. **`data/**` is gitignored; `public/data/*.json` is committed.** A fresh clone has the
    artefacts and nothing to rebuild them from, so regenerating needs the POS import
@@ -129,9 +127,10 @@ particular: no role quotes a figure it has not read from the artifact that produ
    screens read `public/data/*.json`, which the engine writes (rule 5). If a page needs
    data the artefact does not carry, the answer is the engine, never a generated file.
 
-8. **Never sum a per-sale figure with a one-off figure.** `actionPriority.js` splits
-   them deliberately (`IMPACT_KIND`). Adding them once produced a meaningless
-   "₪106,164 per sale" headline. Related: signals derived from stock *quantities*
+8. **Never sum a per-sale figure with a one-off figure.** Every value carries its `kind`
+   (ADR-012), and nothing sums two kinds. Adding them once produced a meaningless
+   "₪106,164 per sale" headline, which the old telemetry page still showed until F13
+   replaced it on 2026-09-27. Related: signals derived from stock *quantities*
    carry no shekel figure at all, because the store manager told us the counts are
    unreliable in both directions. When a number cannot be stated honestly, the UI
    shows **no number**, not zero.

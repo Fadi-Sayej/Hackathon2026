@@ -38,6 +38,15 @@ def _trimmed_artefact() -> dict:
     return doc
 
 
+def _measurement(artefact: dict) -> dict:
+    """What the engine writes beside the artefact (F13-S1, ADR-023), for that same run."""
+    counts = {"shown": 3, "decided": 0, "acted": 0, "declined": 0, "deferred": 0, "not_in_this_run": 0}
+    return {"schema_version": 1, "generated_at": artefact["generated_at"], "run_id": artefact["run_id"],
+            "inputs_digest": artefact["inputs_digest"], "devices": None, "status": "available",
+            "unavailable_reason": None, "window": {"first": None, "last": None, "pulled_at": None},
+            "totals": counts, "by_family": {"price.inverted": counts}, "money": [], "declined_reasons": {}}
+
+
 def _trimmed_catalogue() -> dict:
     doc = json.loads((DATA / "catalogue.json").read_text(encoding="utf-8"))
     doc["products"] = doc["products"][:5]
@@ -50,10 +59,10 @@ def repo(tmp_path: Path) -> Path:
     """A committed, deployable data set: the three files the deploy serves."""
     data = tmp_path / "public" / "data"
     data.mkdir(parents=True)
-    (data / "dashboard.json").write_text(json.dumps(_trimmed_artefact()), encoding="utf-8")
+    artefact = _trimmed_artefact()
+    (data / "dashboard.json").write_text(json.dumps(artefact), encoding="utf-8")
     (data / "catalogue.json").write_text(json.dumps(_trimmed_catalogue()), encoding="utf-8")
-    (data / "operational.json").write_text(json.dumps({"recommendations": [{"id": "r1"}, {"id": "r2"}]}),
-                                           encoding="utf-8")
+    (data / "measurement.json").write_text(json.dumps(_measurement(artefact)), encoding="utf-8")
     _git(tmp_path, "init", "-q")
     _git(tmp_path, "add", "public/data")
     _git(tmp_path, "commit", "-qm", "data")
@@ -72,7 +81,7 @@ def _levels(findings, needle: str) -> set[str]:
 def test_a_committed_deployable_set_passes(repo):
     findings = check(repo, now=_generated_at(repo) + timedelta(hours=6))
     assert not [f for f in findings if f[0] == "BAD"], findings
-    for name in ("dashboard.json", "catalogue.json", "operational.json"):
+    for name in ("dashboard.json", "catalogue.json", "measurement.json"):
         assert "OK" in _levels(findings, name), (name, findings)
 
 
@@ -120,10 +129,37 @@ def test_an_artefact_older_than_two_nightlies_warns(repo):
     assert not [f for f in findings if f[0] == "BAD"], findings
 
 
-def test_the_telemetry_input_is_still_checked_until_f13(repo):
-    _git(repo, "rm", "-q", "public/data/operational.json")
-    _git(repo, "commit", "-qm", "lose the telemetry input")
-    assert "BAD" in _levels(check(repo, now=_generated_at(repo)), "operational.json")
+def test_a_missing_measurement_warns_and_does_not_block(repo):
+    """The team's page says "not published yet" until the nightly first writes it, so its
+    absence is worth a look and never a reason to refuse the owner's deploy."""
+    _git(repo, "rm", "-q", "public/data/measurement.json")
+    _git(repo, "commit", "-qm", "no measurement yet")
+    findings = check(repo, now=_generated_at(repo))
+    assert "WARN" in _levels(findings, "measurement.json"), findings
+    assert not [f for f in findings if f[0] == "BAD"], findings
+
+
+def test_a_measurement_the_engine_would_refuse_blocks_the_deploy(repo):
+    path = repo / "public/data/measurement.json"
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    doc["totals"]["shown"] = -1
+    path.write_text(json.dumps(doc), encoding="utf-8")
+    _git(repo, "commit", "-qam", "broken measurement")
+    assert "BAD" in _levels(check(repo, now=_generated_at(repo)), "measurement.json")
+
+
+def test_a_measurement_from_another_run_warns(repo):
+    path = repo / "public/data/measurement.json"
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    doc["inputs_digest"] = "another run"
+    path.write_text(json.dumps(doc), encoding="utf-8")
+    _git(repo, "commit", "-qam", "stale measurement")
+    assert "WARN" in _levels(check(repo, now=_generated_at(repo)), "measurement.json")
+
+
+def test_operational_json_is_no_longer_checked(repo):
+    """F13 (#83) replaced its one reader, and Task 4.5 deleted it."""
+    assert not _levels(check(repo, now=_generated_at(repo)), "operational.json")
 
 
 def _without(repo: Path, cap_id: str, generated_at: str) -> None:

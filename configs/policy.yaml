@@ -12,7 +12,7 @@ freshness_days: 14            # OQ-306 provisional: observations older than this
 # D-4 data-entry artefacts (SPEC-001 FR-010)
 artefact_min_price: 0.5
 artefact_cost_ratio: 2
-max_credible_gap_pct: 300     # legacy credibility.js guard, kept as a COUNTED exclusion (design §22.2)
+max_credible_gap_pct: 300     # the old credibility.js guard (deleted 2026-09-27), kept as a COUNTED exclusion (design §22.2)
 
 # SPEC-006
 surface:
