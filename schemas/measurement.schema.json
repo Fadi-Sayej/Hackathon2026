@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "smartshelf/measurement.schema.json",
+  "title": "SmartShelf pilot measurement v1",
+  "description": "F13-S1, ADR-023 (revised 2026-09-27), ADR-029 Decision 6. Published beside dashboard.json as its own file, so the edge gate can keep it from the owner. What the run showed and what the owner decided; money only from acted-on decisions' snapshots, per kind and certainty.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_at",
+    "run_id",
+    "inputs_digest",
+    "devices",
+    "status",
+    "unavailable_reason",
+    "window"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "inputs_digest": {
+      "type": "string",
+      "description": "The dashboard.json run this was computed with. If the two files disagree, a reader can tell."
+    },
+    "devices": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "ADR-021's device register, as dashboard.json publishes it."
+    },
+    "status": {
+      "enum": [
+        "available",
+        "unavailable"
+      ]
+    },
+    "unavailable_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "first",
+        "last",
+        "pulled_at"
+      ],
+      "properties": {
+        "first": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "last": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "pulled_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "totals": {
+      "$ref": "#/$defs/counts"
+    },
+    "by_family": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/counts"
+      }
+    },
+    "money": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "certainty",
+          "amount",
+          "decisions"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "certainty": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "decisions": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "declined_reasons": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 1
+      }
+    }
+  },
+  "if": {
+    "properties": {
+      "status": {
+        "const": "available"
+      }
+    }
+  },
+  "then": {
+    "required": [
+      "totals",
+      "by_family",
+      "money",
+      "declined_reasons"
+    ]
+  },
+  "else": {
+    "not": {
+      "anyOf": [
+        {
+          "required": [
+            "totals"
+          ]
+        },
+        {
+          "required": [
+            "by_family"
+          ]
+        },
+        {
+          "required": [
+            "money"
+          ]
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "shown",
+        "decided",
+        "acted",
+        "declined",
+        "deferred",
+        "not_in_this_run"
+      ],
+      "properties": {
+        "shown": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "decided": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "acted": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "declined": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "deferred": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "not_in_this_run": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

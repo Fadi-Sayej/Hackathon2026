@@ -261,6 +261,11 @@ jobs:
           if [ -f public/data/catalogue.json ]; then
             git add public/data/catalogue.json
           fi
+          # measurement.json likewise (F13-S1, ADR-023): its own file so the edge gate keeps
+          # it from the owner (ADR-029 §6), and it carries the same run's `inputs_digest`.
+          if [ -f public/data/measurement.json ]; then
+            git add public/data/measurement.json
+          fi
           if git diff --cached --quiet; then
             echo "Artefact unchanged."
             exit 0

@@ -460,6 +460,10 @@ def _digest(products, summary_rows, monthly, observations, matches, policy, owne
     # data disagree — which is precisely the failure this digest exists to detect, so it
     # would have detected nothing. `last_seen_at` moves every time anyone opens the app, so
     # hashing it would re-introduce that defect at a higher frequency.
+    # His decisions and revivals are inputs too (ADR-023, revised 2026-09-27): order_quantity
+    # reads his approvals, catalogue_lifecycle his revivals, and the measurement every decision.
     feed("owner", {"status": owner.status,
-                   "answers": _json.dumps(owner.answers, sort_keys=True, default=str)})
+                   "answers": _json.dumps(owner.answers, sort_keys=True, default=str),
+                   "outcomes": _json.dumps(owner.outcomes, sort_keys=True, default=str),
+                   "revivals": _json.dumps(owner.revivals, sort_keys=True, default=str)})
     return h.hexdigest()

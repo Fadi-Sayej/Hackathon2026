@@ -14,6 +14,7 @@ from src.engine.inputs import load_inputs
 from src.engine.model import CapabilityOutput
 from src.engine.policy import load_policy
 from src.engine.catalogue import build_catalogue, write_catalogue
+from src.engine.measurement import build_measurement, write_measurement
 from src.engine.publish import ARTEFACT_PATH, PublishRefused, build_artefact, validate_artefact, write_atomic
 from src.engine.registry import CAPABILITIES
 from src.owner_state.model import OwnerState
@@ -291,6 +292,11 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
                               extra_figures=extra_figures, generated_at=now.isoformat(),
                               run_id=uuid.uuid4().hex[:12],
                               inputs_digest=getattr(inputs, "inputs_digest", "") if inputs else "")
+    # F13-S1, ADR-023: the pilot measurement, published beside the artefact (ADR-029 §6).
+    measurement = build_measurement(outputs, inputs.owner if inputs else owner,
+                                    generated_at=artefact["generated_at"], run_id=artefact["run_id"],
+                                    inputs_digest=artefact["inputs_digest"],
+                                    devices=(artefact["vintages"].get("owner_state") or {}).get("devices"))
     # Completeness is asserted for a real run only: a test that injects two capabilities is
     # not a broken artefact, but a production run missing one is. Turns itself on in Phase 1.8
     # when DEFAULT_RUNNERS stops being empty — nobody has to remember to flip it.
@@ -325,10 +331,15 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
                 vintages=artefact["vintages"],
                 population=population,
             ), path=catalogue_path or (Path(artefact_path).parent / "catalogue.json")))
+            # The same rule as the catalogue: its own step, after the artefact, and a failure
+            # leaves the previous file in place, which `inputs_digest` lets a reader detect.
+            _step(steps, "measurement", lambda: write_measurement(
+                measurement, path=Path(artefact_path).parent / "measurement.json"))
     else:
         validate_artefact(artefact, require_complete_registry=complete)
     artefact["run"]["status"] = status
-    return {"status": status, "steps": steps, "artefact": artefact, "published": published}
+    return {"status": status, "steps": steps, "artefact": artefact, "published": published,
+            "measurement": measurement}
 
 
 def _no_inputs_vintages(owner: OwnerState) -> dict:
