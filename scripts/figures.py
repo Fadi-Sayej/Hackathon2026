@@ -38,6 +38,13 @@ from src.engine.run import run_engine  # noqa: E402
 # numbers do not reproduce.
 _CREDENTIAL_GATED = frozenset({"answer_storage_unavailable"})
 
+# Capabilities that register no figure at all (F8, Phase 5): their suggestions are advice,
+# not counts. §11.6 exits 1 when a registered figure is unavailable, and theirs being
+# unavailable loses none; they are unavailable on every machine without the model key and
+# the daily reports, so counting them made this command exit 1 everywhere.
+# tests/engine/test_figures_verdict.py checks this list against the committed artefact.
+_REGISTERS_NO_FIGURE = frozenset({"market_running_out", "market_boost", "order_quantity"})
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -69,12 +76,15 @@ def main() -> int:
     # reproduction failure. "This needs a credential you were not given" is not — and on a
     # machine without the service account the second is ALWAYS true, so exiting 1 for it
     # tells a reader the figures do not reproduce when 40 of 41 reproduce exactly.
-    blocked, gated = [], []
+    blocked, gated, no_figure = [], [], []
     for cap_id, cap in sorted((artefact.get("capabilities") or {}).items()):
         if cap.get("status") != "unavailable":
             continue
         reason = cap.get("unavailable_reason")
-        (gated if reason in _CREDENTIAL_GATED else blocked).append(f"{cap_id}: {reason}")
+        if cap_id in _REGISTERS_NO_FIGURE:
+            no_figure.append(f"{cap_id}: {reason}")
+        else:
+            (gated if reason in _CREDENTIAL_GATED else blocked).append(f"{cap_id}: {reason}")
 
     payload = {
         # What the run USED, not what was asked for. With no --population the CLI passes
@@ -91,6 +101,7 @@ def main() -> int:
         "missing": missing,
         "unavailable": blocked,
         "needs_credentials": gated,
+        "registers_no_figure": no_figure,
     }
 
     if args.json:
@@ -101,6 +112,8 @@ def main() -> int:
     for line in gated:
         print(f"NOTE  {line} — needs a credential this machine does not have; every other "
               f"figure is unaffected", file=sys.stderr)
+    for line in no_figure:
+        print(f"NOTE  {line} — registers no figure; every figure is unaffected", file=sys.stderr)
     if missing or blocked:
         for name in missing:
             print(f"FAIL  {name} has no value", file=sys.stderr)
@@ -150,6 +163,10 @@ def _print_human(payload: dict) -> None:
     if payload.get("needs_credentials"):
         print("\n  يحتاج صلاحية غير متوفرة على هذا الجهاز (بقية الأرقام غير متأثرة):")
         for line in payload["needs_credentials"]:
+            print(f"    {line}")
+    if payload.get("registers_no_figure"):
+        print("\n  غير متاح، ولا ينشر أي رقم مسجَّل (الأرقام كلها غير متأثرة):")
+        for line in payload["registers_no_figure"]:
             print(f"    {line}")
 
 
