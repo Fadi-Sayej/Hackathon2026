@@ -1,5 +1,8 @@
 # Questions for YomYom — pilot setup
 
+> **2026-09-27 (D-23):** the pilot with the YomYom store has ended. Kept as the record of
+> what was asked; nothing here is to be sent.
+
 **Owner:** Malik (task D-0) · **Send by:** immediately · **Handover:** 13/08/2026
 
 Everything here comes from actually reading their export (`all4shop_Mlai.csv`, 7,674 rows). The

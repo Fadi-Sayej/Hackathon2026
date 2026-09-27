@@ -6,7 +6,7 @@ Version: 1.0 (assembled 2026-09-08 from the approved `intent.md` §1, §8–§13
 Supersedes: docs/archive/pre-pivot/PRODUCT_REQUIREMENTS.md, docs/archive/pre-pivot/BUSINESS_CASE.md, docs/archive/pre-pivot/PILOT_PLAN.md
 Related: [Intent register (SPEC-000)](intent-register.md) · [Feature intents](../features/) · [System Design](../architecture/system-design.md)
 Owner: smartshelf-pm
-Updated: 2026-09-25 (F8's spec F8-S1 registered; D-21 and D-22 recorded)
+Updated: 2026-09-27 (D-23 recorded: the pilot with the YomYom store ended)
 ---
 
 # SmartShelf — وثيقة المنتج · Product Requirements
@@ -36,6 +36,8 @@ Updated: 2026-09-25 (F8's spec F8-S1 registered; D-21 and D-22 recorded)
 **مستخدم واحد:** مالك المتجر، على هاتفه، ~10 دقائق كل صباح. طاقمه يسجّل الاستلام والصلاحية
 فقط. لا متجر ثانٍ قبل أن يثبت متجر واحد القيمة (D-12). وحسابات المستخدمين دوران فقط، منذ 2026-09-25:
 المالك يرى تطبيقه، والفريق يرى كل شيء للقراءة فقط (D-22).
+*(2026-09-27: انتهت التجربة مع متجر YomYom. يُستكمل المشروع على البيانات التي بين أيدينا، بلا بيانات
+مختلَقة، إلى أن يأتي متجر جديد بمالك جديد — D-23.)*
 
 ## 3. Feature register
 
@@ -75,7 +77,7 @@ Updated: 2026-09-25 (F8's spec F8-S1 registered; D-21 and D-22 recorded)
 | 8 | "متى يصل كل مورّد فعلاً؟" | ❌ تُقاس بعد 3 تسليمات لكل مورّد | مهلة حقيقية بدل الافتراض | دقة توصيات V2 | **V3** |
 | 6 | "رتّب رفوفي لأربح أكثر" | ❌ — تحتاج صورة الرف + طلب V2 + قواعده | "ضع هذه الأصناف بهذه الواجهات" | +20–68% هامش لكل متر خطّي | **V4** |
 
-## 4. Settled decisions (D-1 … D-22)
+## 4. Settled decisions (D-1 … D-23)
 
 القرارات التي حسمتها طبقة النوايا. **لا تُعاد فتحها في أي طبقة أدنى.** النصّ الكامل في
 [سجلّ النوايا §3](intent-register.md#3-decisions-already-made-by-the-intent-layer).
@@ -118,6 +120,8 @@ Updated: 2026-09-25 (F8's spec F8-S1 registered; D-21 and D-22 recorded)
 | طاقمه يسجّل الاستلام والصلاحية | يومياً من 12/9 | دقيقة لكل تسليم |
 | صورة لكل رف + أبعاده + ساعة لقواعده | مرة واحدة، عند V4 | ~ساعة |
 
+> **2026-09-27 (D-23):** لا مالك متجر الآن. هذه الالتزامات تُطلب من مالك المتجر الجديد.
+
 ## 8. Decision criterion — the pilot's own go/no-go
 
 **ثلاثة أرقام تُحسم قبل كتابة سطر كود إضافي:**
@@ -127,6 +131,9 @@ Updated: 2026-09-25 (F8's spec F8-S1 registered; D-21 and D-22 recorded)
 3. **إيقاع البيانات:** يومي أم أسبوعي، ومن يرسله.
 
 **وبعد 30 يوماً، الجواب واحد من ثلاثة:** الرقم تحقّق → اشتراك ونكمل · لم يتحقّق لكن الاستخدام يومي → نراجع النوايا معه · لا استخدام → نتوقّف بشرف، وقد خسرنا شهراً لا سنة.
+
+> **2026-09-27 (D-23):** انتهت التجربة مع متجر YomYom ولم تُحسم الأرقام الثلاثة معه. تُطلب من
+> مالك المتجر الجديد، ولا يُفترض أيٌّ منها قبل ذلك.
 
 > This section is registered as feature **[F13](../features/F13-pilot-measurement/intent.md)**
 > (INT-MEAS). It is **not specified**, and the System Design removes the surface that
@@ -174,6 +181,8 @@ Updated: 2026-09-25 (F8's spec F8-S1 registered; D-21 and D-22 recorded)
 3. حين لا نستطيع ذكر رقم بصدق، تعرض الشاشة **لا رقم** — لا صفراً.
 
 ## 10. Open decisions
+
+> **2026-09-27 (D-23):** كل بند هنا يحتاج مالك المتجر ينتظر متجراً جديداً ومالكه.
 
 - الأرقام الثلاثة في §11.
 - ساعات العمل الأسبوعية المثبّتة (تُحدّث تواريخ §8 فوراً).

@@ -13,6 +13,11 @@ Updated: 2026-09-25
 
 # F8 — ماذا أطلب اليوم وبأي كمية؟ · Order Quantity
 
+> **Added 2026-09-27 (not part of the migrated content).** The pilot with the YomYom store
+> has ended (D-23). F8 is built (Phase 5) and publishes `order_quantity` unavailable, saying
+> that it waits for daily sales reports. It waits for another store to send those reports
+> and state its departments' order days and shelf lives. None of them is simulated meanwhile.
+
 > **Status: approved for specification.** The three product decisions named below were
 > taken on 2026-09-24, by the repository owner, as
 > [D-18 … D-20](../../product/intent-register.md#3-decisions-already-made-by-the-intent-layer),
