@@ -19,6 +19,8 @@ import { QuestionPanel } from './questions/QuestionPanel.jsx'
 import { DataPage } from './pages/DataPage.jsx'
 import { CapabilityPage } from './pages/CapabilityPage.jsx'
 import { PageAwaitingData } from './pages/PageAwaitingData.jsx'
+import { ReorderPage } from './pages/ReorderPage.jsx'
+import { ApprovedOrdersPage } from './pages/ApprovedOrdersPage.jsx'
 import { useI18n } from './lib/i18n/index.js'
 import { useAuth } from './auth/useAuth.js'
 import { TeamBanner } from './auth/SignInPage.jsx'
@@ -43,11 +45,11 @@ const CAPABILITY_PAGES = new Set([
 ])
 
 /** Pages that fetch `catalogue.json`. Everything else never pays for it. */
-const NEEDS_CATALOGUE = new Set(['products', 'prices', 'expiry'])
+const NEEDS_CATALOGUE = new Set(['products', 'prices', 'expiry', 'orders'])
 
 const AWAITING = {
-  recommendations: 'demand',
-  orders: 'demand',
+  // Reorder and Approved orders left this map in Phase 5 Task 5.13: F8 publishes what they
+  // show, and each page says what it waits for in the capability's own reason.
   'store-layout': 'demand',
   'shelf-plan': 'demand',
   // Reached only when `catalogue.json` cannot be read — the products branch below returns
@@ -248,6 +250,18 @@ export default function App() {
 
     if (CAPABILITY_PAGES.has(activePage)) {
       return <CapabilityPage artefact={artefact} capabilityId={activePage} />
+    }
+    if (activePage === 'recommendations') {
+      return <ReorderPage artefact={artefact} ownerState={ownerState} onOutcome={onOutcome} now={now}
+        readOnly={readOnly} />
+    }
+    if (activePage === 'orders') {
+      if (catalogue.status === 'loading' || catalogue.status === 'idle') {
+        return <p className="spine__loading">{t('spine.loading')}</p>
+      }
+      // Without the catalogue the lines still list, by barcode: his approvals are his, and a
+      // missing product name is no reason to hide them.
+      return <ApprovedOrdersPage ownerState={ownerState} catalogue={catalogue.catalogue} now={now} />
     }
     if (activePage === 'data-source') {
       return (

@@ -371,3 +371,199 @@
   cursor: pointer;
   min-height: 2.25rem;   /* the phone target this surface is held to elsewhere */
 }
+
+/* ── F8: Reorder and Approved orders (Phase 5 Task 5.13) ─────────────────────
+   As the repository owner approved them on 2026-09-27 (docs/reviews/F8-screens-mockups.md):
+   the entry card for each suggestion, the quantity as a teal pill, the model's boost in an
+   info wash, a department's missing fact in amber, and a table for approved orders. Every
+   value is a token from index.css. */
+
+.reorder,
+.orders {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.reorder__line {
+  margin: 0;
+  color: var(--ink-600);
+  line-height: 1.5;
+}
+
+.reorder__department,
+.orders__department {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reorder__department h2,
+.orders__department h2 {
+  margin: 8px 0 0;
+  font-size: 18px;
+  color: var(--ink-900);
+}
+
+.reorder__card {
+  gap: 10px;
+}
+
+.reorder__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.reorder__head .entry-card__name {
+  margin: 0;
+}
+
+.reorder__quantity {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--teal-050);
+  color: var(--teal-700);
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.reorder__quantity-input {
+  width: 6em;
+  min-height: 36px;
+  padding: 4px 8px;
+  border: 1px solid var(--ink-line-strong);
+  border-radius: var(--radius-md);
+  font: inherit;
+  background: var(--paper-100);
+}
+
+.reorder__boost {
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: var(--info-wash);
+  color: var(--ink-900);
+  line-height: 1.5;
+}
+
+.reorder__boost--not {
+  background: var(--paper-200);
+}
+
+.reorder__boost p {
+  margin: 0;
+}
+
+.reorder__boost .reorder__boost-reason {
+  margin-top: 4px;
+}
+
+/* The approved mockup draws these as rounded rectangles, not the Today card's pills. */
+.reorder__card .entry-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.reorder__card .entry-card__actions button {
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  font-size: inherit;
+  font-weight: 600;
+}
+
+/* The one decision that commits: filled, where the card's other buttons are outlined. */
+.entry-card__actions .reorder__approve,
+.orders .reorder__approve {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--teal-700);
+  border-radius: var(--radius-md);
+  background: var(--teal-700);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.entry-card__actions .reorder__approve:disabled,
+.orders .reorder__approve:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.reorder__needs {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--warn);
+  border-radius: var(--radius-lg);
+  background: var(--warn-wash);
+  color: var(--ink-900);
+}
+
+.reorder__needs-pill {
+  display: inline-block;
+  margin-inline-end: 8px;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--warn);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.reorder__counts {
+  margin: 0;
+  padding-inline-start: 18px;
+  color: var(--ink-600);
+  line-height: 1.5;
+}
+
+.reorder__waiting {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.4;
+  color: var(--ink-900);
+}
+
+.orders__table-wrap {
+  overflow-x: auto;
+}
+
+.orders__table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--paper-100);
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.orders__table th,
+.orders__table td {
+  text-align: start;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--ink-line);
+}
+
+.orders__table th {
+  font-size: 13px;
+  color: var(--ink-600);
+  font-weight: 600;
+}
+
+.orders__quantity {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.orders__changed {
+  display: block;
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--ink-600);
+}

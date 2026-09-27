@@ -152,3 +152,37 @@ describe('#139 — the store refuses a deferral with no date', () => {
     expect(loadOwnerState().outcomes.e2.status).toBe('acted')
   })
 })
+
+describe('an order suggestion\'s outcome (ADR-034 Decision 2, FR-161)', () => {
+  const suggestion = entry({ id: 'f1e2d3c4b5a69788', signal_family: 'order.suggestion', capability: 'order_quantity',
+    characterisation: 'order_suggestion', value: null,
+    evidence: { order_day: '2026-08-30', kind: 'net', quantity: 11 } })
+
+  it('carries the order day, net or gross, and the quantity suggested, and no ₪ field', async () => {
+    await recordOutcome(suggestion, { status: OUTCOME_STATUS.ACTED })
+    const { snapshot } = loadOwnerState().outcomes[suggestion.id]
+    expect(snapshot).toMatchObject({ signal_family: 'order.suggestion', order_day: '2026-08-30', kind: 'net',
+      suggested_quantity: 11 })
+    expect(snapshot).not.toHaveProperty('approved_quantity')
+    expect(snapshot).not.toHaveProperty('value')
+  })
+
+  it('records his own quantity beside the suggested one (SCN-143)', async () => {
+    await recordOutcome(suggestion, { status: OUTCOME_STATUS.ACTED, approvedQuantity: 20 })
+    const { snapshot } = loadOwnerState().outcomes[suggestion.id]
+    expect(snapshot.suggested_quantity).toBe(11)
+    expect(snapshot.approved_quantity).toBe(20)
+  })
+
+  it('never records a quantity that is not a positive whole number', async () => {
+    await recordOutcome(suggestion, { status: OUTCOME_STATUS.ACTED, approvedQuantity: -4 })
+    expect(loadOwnerState().outcomes[suggestion.id].snapshot).not.toHaveProperty('approved_quantity')
+  })
+
+  it('leaves every other family\'s snapshot as it was', async () => {
+    await recordOutcome(entry(), { status: OUTCOME_STATUS.ACTED, approvedQuantity: 20 })
+    const { snapshot } = loadOwnerState().outcomes[entry().id]
+    expect(snapshot).not.toHaveProperty('order_day')
+    expect(snapshot).not.toHaveProperty('approved_quantity')
+  })
+})

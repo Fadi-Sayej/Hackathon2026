@@ -16,12 +16,15 @@ const NOT_ADMITTED = new Set(['margin_below_cost'])
 // owner_questions is a panel of its own (D-8 caps it at three), not entries on this surface.
 const NOT_ENTRIES = new Set(['owner_questions'])
 
-// Phase 5 Task 5.0. F8's capabilities are published before the owner has approved how they
-// look, and every screen that lists capabilities would otherwise show them the night the
-// engine first does: an unavailable one as a line on Today and on Data, an available one as
-// entries. Until then they reach no screen at all, and nothing about them is counted.
-// Tasks 5.13 and 5.14 take them off this list, each once its mockup is approved (Task 5.12).
-export const NOT_YET_SHOWN = new Set(['order_quantity', 'market_running_out', 'market_boost'])
+// F8 never reaches Today (F8-S1 FR-160, OQ-901): its suggestions live on Reorder, and a line
+// saying "waiting for daily sales" every morning would be the day's first thing to read.
+export const NOT_ON_TODAY = new Set(['order_quantity', 'market_running_out', 'market_boost'])
+
+// Phase 5 Task 5.0: published before any screen for it existed, so kept off every screen.
+// Task 5.13 took `order_quantity` off (Reorder renders it whole, and Data names it). The market
+// signal and the boost stay: the owner approved them as facts ON the Reorder cards, not as
+// capabilities of their own, and approved no label that would name them on Data.
+export const NOT_YET_SHOWN = new Set(['market_running_out', 'market_boost'])
 
 const SETTLED = new Set(['acted', 'declined'])
 
@@ -46,7 +49,7 @@ export function compose(artefact, ownerState, { now } = {}) {
   const candidates = []
 
   for (const [id, capability] of Object.entries(artefact?.capabilities || {})) {
-    if (NOT_YET_SHOWN.has(id)) continue
+    if (NOT_ON_TODAY.has(id) || NOT_YET_SHOWN.has(id)) continue
     if (capability?.status === 'unavailable') {
       // AC-107. An unavailable capability is a finding in itself; rendering it as an empty
       // entry list would read as "nothing to act on", which is a different claim.
@@ -143,7 +146,7 @@ export function deferredEntries(artefact, ownerState, { now } = {}) {
   const outcomes = ownerState?.outcomes || {}
   const out = []
   for (const [id, capability] of Object.entries(artefact?.capabilities || {})) {
-    if (capability?.status === 'unavailable' || NOT_ENTRIES.has(id) || NOT_YET_SHOWN.has(id)) continue
+    if (capability?.status === 'unavailable' || NOT_ENTRIES.has(id) || NOT_ON_TODAY.has(id)) continue
     for (const entry of capability?.entries || []) {
       const outcome = outcomes[entry.id]
       if (outcome?.status !== 'deferred' || !isSettled(outcome, now)) continue

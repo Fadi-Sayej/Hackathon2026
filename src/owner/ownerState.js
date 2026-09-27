@@ -66,7 +66,7 @@ export function loadOwnerState() {
   return state
 }
 
-export async function recordOutcome(entry, { status, reason = null, deferredUntil = null } = {}) {
+export async function recordOutcome(entry, { status, reason = null, deferredUntil = null, approvedQuantity = null } = {}) {
   if (!entry?.id) throw new Error('recordOutcome: entry.id is required')
   // ADR-016. entry_id is a hash with no inverse, so an outcome written without the family
   // loses the only durable grouping key INT-MEAS has, for good.
@@ -112,6 +112,18 @@ export async function recordOutcome(entry, { status, reason = null, deferredUnti
           // exactly why adding it costs nothing now and is unrecoverable later.
           ...(entry.value
             ? { value: entry.value.amount, kind: entry.value.kind, certainty: entry.value.certainty }
+            : {}),
+          // ADR-034 Decision 2: an order suggestion's outcome carries the order day it is for,
+          // net or gross, the quantity suggested, and his own when he changed it (FR-161). No
+          // ₪ field (D-1). Approved orders lists these, and the engine reads `order_day` to
+          // say when a schedule change leaves an approval pointing at another day.
+          ...(entry.signal_family === 'order.suggestion'
+            ? {
+                order_day: entry.evidence?.order_day ?? null,
+                kind: entry.evidence?.kind ?? null,
+                suggested_quantity: entry.evidence?.quantity ?? null,
+                ...(Number.isInteger(approvedQuantity) && approvedQuantity > 0 ? { approved_quantity: approvedQuantity } : {}),
+              }
             : {}),
         },
       },
