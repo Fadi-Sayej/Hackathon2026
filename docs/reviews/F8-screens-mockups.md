@@ -1,11 +1,11 @@
 ---
 ID: F8-S1-MOCKUPS
 Title: F8 screens — mockups for the repository owner's approval
-Status: Ready for review — awaiting the repository owner's answer
+Status: Approved — by the repository owner, 2026-09-27
 Owner: smartshelf-engineer (Phase 5 Task 5.12)
 Parent: [Phase 5 plan](../implementation/phase-5-v2-order-quantity.md), Task 5.12
 Inputs: [docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (FR-154, FR-155, FR-158, FR-160 … FR-163), ADR-029, ADR-031, ADR-032, ADR-034, tests/fixtures/order_signals/build.py]
-Updated: 2026-09-26
+Updated: 2026-09-27 (approved)
 ---
 
 # F8 screens — mockups for approval
@@ -154,4 +154,12 @@ percentage is set left to right inside right-to-left text.
 
 ## His answer
 
-Not yet given. Task 5.13 does not start until it is, and it is recorded here with its date.
+**Approved, 2026-09-27.** He replied "approve" to all five points as proposed:
+
+1. the six screens, as drawn;
+2. all the new wording, in the three languages;
+3. the reason wording already in the dictionaries;
+4. the model's reason in Arabic (`configs/prompts/market_boost.v1.md` stays as it is);
+5. the Today panel's title, "Questions only you can answer".
+
+Tasks 5.13 and 5.14 build these screens and this wording, and nothing else.
