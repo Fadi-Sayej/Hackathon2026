@@ -523,9 +523,17 @@
   line-height: 1.5;
 }
 
-.reorder__waiting {
+/* The waiting reason is the page's heading, as approved (docs/reviews/F8-screens-mockups.md),
+   not the grey box .capability__unavailable draws on other pages; it keeps that class only
+   so the reason is found where every other capability's is. */
+.capability > h2.reorder__waiting {
   margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
   font-size: 20px;
+  font-weight: 700;
   line-height: 1.4;
   color: var(--ink-900);
 }
