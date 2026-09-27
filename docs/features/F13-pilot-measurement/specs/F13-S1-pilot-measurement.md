@@ -1,13 +1,13 @@
 ---
 ID: F13-S1
 Title: Pilot Measurement — the 30-day recovered-₪ surface
-Status: Blocked
+Status: Ready for review
 Owner: smartshelf-architect
-Version: 0.1 (2026-09-13)
+Version: 0.2 (2026-09-27)
 Parent: [F13 — Pilot Measurement](../intent.md)
 Related Intents: INT-MEAS
-Inputs: [docs/product/PRD.md §8, docs/features/F13-pilot-measurement/intent.md, F7-S1, F2-S1 (FR-023), F6-S1, ADR-009, ADR-016, ADR-021, docs/reviews/system-design-readiness.md ARCH-GATE-003, OQ-801]
-Updated: 2026-09-27 (§14 items 1 and 3 answered, as D-24)
+Inputs: [docs/product/PRD.md §8, docs/features/F13-pilot-measurement/intent.md, F7-S1, F2-S1 (FR-023), F6-S1, ADR-009, ADR-016, ADR-021, docs/reviews/system-design-readiness.md ARCH-GATE-003, OQ-801, D-23, D-24, ADR-023 (revised 2026-09-27)]
+Updated: 2026-09-27 (§14 items 1 and 3 answered, as D-24; then items 2, 4 and 5 closed for the build, §15 written, and Ready for review)
 ---
 
 # F13-S1 — Pilot Measurement
@@ -18,6 +18,9 @@ Updated: 2026-09-27 (§14 items 1 and 3 answered, as D-24)
 > of them a conversation and one of them OQ-801. Nothing here should be started until those
 > close, because the parts that are blocked decide what the parts that are not are counting
 > *towards*.
+>
+> **2026-09-27: closed for the build.** D-24 answers items 1 and 3; item 2 (OQ-801), item 4
+> and item 5 are answered in [§14](#14-blocked-on). The spec is `Ready for review`.
 
 > **Why this spec exists now, when SPEC-000 §4 said it should not.** That section declined
 > to specify INT-MEAS because it was *"already measured by an existing surface, so no new
@@ -47,7 +50,7 @@ the cadence; those are agreed with the owner and recorded, not built.
 
 | Intent | This spec |
 |---|---|
-| INT-MEAS — «رقم النجاح» after 30 days | FR-135 … FR-142, AC-130 … AC-135 |
+| INT-MEAS — «رقم النجاح» after 30 days | FR-135 … FR-142, AC-130 … AC-135, AC-162, AC-163 |
 | INT-PROV — every figure carries provenance | **F7-S1 governs this surface in full.** No requirement here relaxes it |
 | INT-STOCK — stock counts are unreliable in both directions | INV-066; D-1 and F2-S1 FR-023 forbid a money figure derived from stock quantities |
 
@@ -106,6 +109,10 @@ Phase 4 Task 4.2. Where the owner's outcomes are read from is open — §14 item
 > write-through built, `smartshelf.ownerState.v2` is per device: read on the team's screen it
 > measures the team. The requirement is corrected here; the source it needs is item 5.
 
+> **2026-09-27.** The source is the artefact's `measurement` block, which the engine computes
+> from the outcomes it pulls every run ([ADR-023](../../../architecture/decisions/ADR-023-the-engine-publishes-the-pilot-measurement.md),
+> §14 item 5). The surface reads `public/data/dashboard.json` and nothing else.
+
 **FR-136** — Entries MUST be joined to outcomes on `signal_family` and `entry_id`. A surface
 that joins on a capability id is wrong by ADR-009, which makes `signal_family` permanent and
 the capability id mutable.
@@ -126,6 +133,10 @@ last time: *"₪106,164 per sale"*.
 
 **FR-141** — Every figure MUST be rendered with its window, its vintages and the thresholds
 in force (F7-S1 FR-122/FR-123).
+
+> **2026-09-27.** No success threshold is in force (D-24), so nothing is compared with one.
+> The window is the span of the decisions recorded, first to last, with the time the engine
+> read them. "Shown" is the run the artefact publishes (ADR-023). Neither needs a data cadence.
 
 **FR-142** — Where an input is absent, the surface MUST read **unavailable**, with a reason,
 and MUST NOT substitute `0` (ARCH-DRIVER-002).
@@ -174,10 +185,10 @@ writing this is the live state: the engine's mirror pulls `answers: 0, outcomes:
 | Input | Source | Absent ⇒ |
 |---|---|---|
 | shown entries | `dashboard.json` `capabilities.*.entries` | unavailable |
-| outcomes | **the owner's** outcomes — written to `stores/{store}/ownerState/outcomes` since #94. Never the reading device's `smartshelf.ownerState.v2`. How the surface reads them is §14 item 5 | unavailable, with reason |
+| outcomes | **the owner's** outcomes — written to `stores/{store}/ownerState/outcomes` since #94. Never the reading device's `smartshelf.ownerState.v2`. The engine pulls them and publishes the measurement (ADR-023) | unavailable, with reason |
 | values, kinds | the entry's own published value | that component carries no money |
 | thresholds, vintages, window | `dashboard.json` | unavailable |
-| device count | `vintages.owner_state.devices` (ADR-021) | omitted, never `0` |
+| device count | `vintages.owner_state.devices` (ADR-021, published since #84) | omitted, never `0` |
 
 ---
 
@@ -189,6 +200,10 @@ figures. No clock is read except to render the window.
 **NFR-065** — The computation is pure and separately testable, with no React, no DOM and no
 storage access — the property the existing `telemetryModel.js` has and which must survive
 the rebuild.
+
+> **2026-09-27.** Since ADR-023 the computation is the engine's `src/engine/measurement.py`,
+> pure and tested without I/O. The browser's `telemetryModel.js` keeps the property for what
+> it still does: shaping the published block for display, with no aggregation.
 
 ---
 
@@ -218,6 +233,55 @@ item 1 is known, and 5 is answerable now.
 >
 > Items 2 (OQ-801) and 5 are still ours. The status stays `Blocked`.
 
-**When these close:** set `Status: Ready for review`, fill the threshold into
+> **2026-09-27, later: closed for the build.**
+> - **Item 2, OQ-801: there is no composite.** With no target (D-24), nothing needs one
+>   number. Money is stated only where an acted-on decision's snapshot carries it, per kind
+>   and certainty, and never summed across them (FR-138, FR-139, D-10). Everything else is a
+>   count per `signal_family` (FR-137, FR-140). So «مخزون مفسّر» and «كتالوج منظّف» are
+>   counts, as INV-066 requires, and a ₪ total over all three can never appear.
+> - **Item 4 is not needed for the build.** The window is the span of the decisions
+>   recorded (FR-141's note), which needs no cadence. The cadence still waits for another
+>   store (D-23, F8-S1 OQ-904) and matters when a store sends data.
+> - **Item 5: the engine publishes the measurement** ([ADR-023](../../../architecture/decisions/ADR-023-the-engine-publishes-the-pilot-measurement.md),
+>   revised 2026-09-27). The browser renders it.
+>
+> The status is `Ready for review`.
+
+~~**When these close:** set `Status: Ready for review`, fill the threshold into
 `configs/policy.yaml` as a declared policy line beside `owner_declared_ceiling_pct` rather
-than into code, and hand to `smartshelf-engineer` with #83.
+than into code, and hand to `smartshelf-engineer` with #83.~~ *(2026-09-27: done, except the
+threshold, which D-24 removes. The plan task is [Phase 4 Task 4.5](../../../implementation/phase-4-removal.md).)*
+
+---
+
+### 15. Acceptance Criteria
+
+**AC-130** — The measurement surface reads `public/data/dashboard.json` only: its
+`measurement` block and its vintages. It reads no owner state on the device and nothing from
+`public/data/operational.json`. *(FR-135)*
+
+**AC-131** — Decisions are joined to this run's entries on `entry_id` and counted by the
+snapshot's `signal_family`; no join or count uses a capability id. *(FR-136, ADR-009, ADR-016)*
+
+**AC-132** — The artefact states shown, decided, acted on, dismissed (`declined`), deferred and
+not in this run, per `signal_family` and in total, and the surface renders each. *(FR-137,
+SCN-128)*
+
+**AC-133** — Every money figure is the sum of the snapshot values of acted-on decisions, one
+row per kind and certainty. None is recomputed from an entry, and no row sums two kinds or two
+certainties. *(FR-138, FR-139, D-10)*
+
+**AC-134** — With the owner state unavailable, the measurement is `unavailable` with its
+reason and states no count, and the surface says so. With no decision recorded, the surface
+says nothing is recorded, and never that everything was dismissed. *(FR-142, INV-068, SCN-129,
+SCN-131)*
+
+**AC-135** — A decision whose entry this run does not publish is counted as not in this run,
+and still counted under its status. It is never dropped. *(SCN-130)*
+
+**AC-162** — A decision that carries no money is a count only. The surface states no ₪, no
+zero and no blank for it. *(FR-140, INV-066)*
+
+**AC-163** — The surface renders the window (first and last decision, and when they were
+read), the run it counted as shown, and the device count when published. It compares nothing
+with a target. *(FR-141, ADR-021, D-24)*
