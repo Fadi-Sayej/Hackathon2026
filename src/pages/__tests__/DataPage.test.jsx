@@ -5,6 +5,7 @@ import { cleanup, screen } from '@testing-library/react'
 
 import { renderWithI18n } from '../../test/renderWithI18n.jsx'
 import { DataPage } from '../DataPage.jsx'
+import { formatMoment } from '../../lib/i18n/formatMoment.js'
 
 afterEach(cleanup)
 
@@ -98,6 +99,15 @@ describe('capability statuses', () => {
   })
 })
 
+describe('when the owner\'s answers were read', () => {
+  it('shows the time in the reader\'s language, not the stored timestamp', () => {
+    renderWithI18n(<DataPage artefact={artefact()} />, { language: 'en' })
+    const el = document.querySelector('[data-field="owner_state"]')
+    expect(el.textContent).toContain(formatMoment('2026-09-12T11:00:00+00:00', 'en'))
+    expect(el.textContent).not.toContain('T11:00')
+  })
+})
+
 describe('ADR-021 — the device register on the data page', () => {
   const withDevices = (devices) => {
     const a = artefact()
@@ -112,7 +122,8 @@ describe('ADR-021 — the device register on the data page', () => {
     })} />)
     const el = document.querySelector('[data-field="owner_devices"]')
     expect(el.textContent).toContain('3')
-    expect(el.textContent).toContain('2026-09-13T07:41:55Z')   // the latest, not the first
+    expect(el.textContent).toContain(formatMoment('2026-09-13T07:41:55Z', 'ar'))   // the latest, not the first
+    expect(el.textContent).not.toContain('T07:41')
   })
 
   it('shows nothing rather than zero when nobody has registered', () => {

@@ -1,3 +1,4 @@
+import { formatMoment } from '../lib/i18n/formatMoment.js'
 import { unavailableReason } from '../lib/i18n/unavailableReason.js'
 import { useI18n } from '../lib/i18n/index.js'
 import { dirProps } from '../lib/utils/rtl.js'
@@ -25,7 +26,7 @@ function Field({ id, label, children, empty }) {
 }
 
 export function DataPage({ artefact, ownerState, onRestore, now, readOnly = false }) {
-  const { t } = useI18n()
+  const { t, language } = useI18n()
   if (!artefact) return null
 
   /**
@@ -116,7 +117,7 @@ export function DataPage({ artefact, ownerState, onRestore, now, readOnly = fals
             ? [
                 t(`data.ownerState.${vintages.owner_state.status}`),
                 vintages.owner_state.reason === 'from_mirror' ? t('data.ownerState.fromMirror') : null,
-                vintages.owner_state.pulled_at,
+                formatMoment(vintages.owner_state.pulled_at, language),
               ]
                 .filter(Boolean)
                 .join(' · ')
@@ -130,7 +131,7 @@ export function DataPage({ artefact, ownerState, onRestore, now, readOnly = fals
           {vintages.owner_state?.devices?.status === 'available'
             ? t('data.devices.counted', {
               n: vintages.owner_state.devices.count,
-              last: vintages.owner_state.devices.last_seen_at.at(-1) ?? '—',
+              last: formatMoment(vintages.owner_state.devices.last_seen_at.at(-1), language) ?? '—',
             })
             : null}
         </Field>
