@@ -7,7 +7,7 @@ import { cleanup, fireEvent, waitFor } from '@testing-library/react'
 
 import { renderWithI18n } from '../../test/renderWithI18n.jsx'
 import App from '../../App.jsx'
-import { compose } from '../compose.js'
+import { compose, NOT_YET_SHOWN } from '../compose.js'
 import { resetCacheForTests } from '../../owner/ownerState.js'
 import { ar } from '../../lib/i18n/dictionaries/ar.js'
 
@@ -96,6 +96,9 @@ describeIf('Checkpoint 2 — against the artefact the engine produced', () => {
     await openApp()
     for (const [id, capability] of Object.entries(artefact.capabilities)) {
       if (capability.status !== 'unavailable' || id === 'owner_questions') continue
+      // F8's capabilities are published before their screens exist (Phase 5 Task 5.0): no
+      // page renders them until Tasks 5.13 and 5.14 take them off NOT_YET_SHOWN.
+      if (NOT_YET_SHOWN.has(id)) continue
       await openPage(id)
       expect(document.querySelector('.capability__unavailable')).not.toBeNull()
       expect(document.querySelector('.capability__counts')).toBeNull()
@@ -141,6 +144,12 @@ describeIf('Checkpoint 2 — against the artefact the engine produced', () => {
     const ids = new Set(navIds())
     for (const id of Object.keys(artefact.capabilities)) {
       if (id === 'owner_questions') continue                  // its surface is the panel on Today
+      if (NOT_YET_SHOWN.has(id)) {
+        // Published by the engine since 2026-09-27, and deliberately without a page until the
+        // owner's approved screens are built (Task 5.0). Held to that, not merely skipped.
+        expect(ids.has(id), `${id} reached the nav before its screen was built`).toBe(false)
+        continue
+      }
       expect(ids.has(id), `${id} has no nav entry`).toBe(true)
       await openPage(id)
       expect(document.querySelector('.capability__missing')).toBeNull()
