@@ -37,6 +37,10 @@ const artefact = present ? JSON.parse(readFileSync(ARTEFACT, 'utf8')) : null
 const catalogue = existsSync(CATALOGUE) ? JSON.parse(readFileSync(CATALOGUE, 'utf8')) : null
 const NOW = Date.parse('2026-09-12T12:00:00Z')
 
+// A capability whose page is named for what the owner does there, not for the capability.
+const PAGE_OF = { order_quantity: 'recommendations' }
+const pageOf = (id) => PAGE_OF[id] ?? id
+
 function createStorage() {
   const backing = new Map()
   return {
@@ -99,7 +103,7 @@ describeIf('Checkpoint 2 — against the artefact the engine produced', () => {
       // F8's capabilities are published before their screens exist (Phase 5 Task 5.0): no
       // page renders them until Tasks 5.13 and 5.14 take them off NOT_YET_SHOWN.
       if (NOT_YET_SHOWN.has(id)) continue
-      await openPage(id)
+      await openPage(pageOf(id))
       expect(document.querySelector('.capability__unavailable')).not.toBeNull()
       expect(document.querySelector('.capability__counts')).toBeNull()
     }
@@ -150,8 +154,8 @@ describeIf('Checkpoint 2 — against the artefact the engine produced', () => {
         expect(ids.has(id), `${id} reached the nav before its screen was built`).toBe(false)
         continue
       }
-      expect(ids.has(id), `${id} has no nav entry`).toBe(true)
-      await openPage(id)
+      expect(ids.has(pageOf(id)), `${id} has no nav entry`).toBe(true)
+      await openPage(pageOf(id))
       expect(document.querySelector('.capability__missing')).toBeNull()
       expect(document.querySelector(`.page-body section.capability[data-capability="${id}"]`)).not.toBeNull()
     }

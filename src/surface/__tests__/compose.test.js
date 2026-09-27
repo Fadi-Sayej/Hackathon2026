@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { compose, deferredEntries, NOT_YET_SHOWN } from '../compose'
+import { compose, deferredEntries, NOT_ON_TODAY, NOT_YET_SHOWN } from '../compose'
 
 const NOW = 1_757_000_000_000
 
@@ -225,8 +225,11 @@ describe('Phase 5 Task 5.0 — the F8 capabilities reach no screen before their 
     market_boost: cap([valued(9, { capability: 'market_boost' })]),
   })
 
-  it('holds exactly the three F8 ids', () => {
-    expect([...NOT_YET_SHOWN].sort()).toEqual(['market_boost', 'market_running_out', 'order_quantity'])
+  it('keeps all three F8 ids off Today for good, and the two facts off every screen', () => {
+    // FR-160: suggestions live on Reorder. Task 5.13 took order_quantity off NOT_YET_SHOWN;
+    // the market signal and the boost are shown only as facts on its cards (approved 2026-09-27).
+    expect([...NOT_ON_TODAY].sort()).toEqual(['market_boost', 'market_running_out', 'order_quantity'])
+    expect([...NOT_YET_SHOWN].sort()).toEqual(['market_boost', 'market_running_out'])
   })
 
   it('composes an artefact carrying them exactly as one without them', () => {

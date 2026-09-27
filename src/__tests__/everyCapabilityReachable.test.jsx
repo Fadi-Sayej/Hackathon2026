@@ -37,10 +37,10 @@ import { NOT_YET_SHOWN } from '../surface/compose.js'
  * The capabilities are read from the artefact, not listed here, so one the engine adds
  * later is required to have a screen without anyone editing this file.
  *
- * The one exemption is `NOT_YET_SHOWN` (Phase 5 Task 5.0): F8's capabilities are published
- * before the owner has approved their screens, so for now they must reach NO screen, and
- * the last block below asserts exactly that. Tasks 5.13 and 5.14 take them off the list,
- * and from then on this test requires them to have one like every other.
+ * The one exemption is `NOT_YET_SHOWN` (Phase 5 Task 5.0): the market signal and the boost
+ * are shown only as facts on Reorder's cards, as the owner approved on 2026-09-27, so they must
+ * reach NO screen of their own, and the last block below asserts exactly that. `order_quantity`
+ * left the list in Task 5.13, and Reorder renders it whole.
  */
 
 function createStorage() {
@@ -99,21 +99,22 @@ describe('every capability the engine publishes has a screen', () => {
   })
 })
 
-describe('Phase 5 Task 5.0 — the F8 capabilities reach no screen before their mockups are approved', () => {
+describe('Phase 5 — the capabilities not yet shown reach no screen', () => {
   // Each state a capability can be published in, so each path to a screen is tried: an
   // unavailable one is a line on Today and on Data, an available one is entries and a line.
   const carrying = {
     ...fixture,
     capabilities: {
       ...fixture.capabilities,
-      order_quantity: { status: 'unavailable', unavailable_reason: 'no_daily_sales', counts: {}, thresholds: {}, entries: [] },
+      market_boost_unavailable_probe: undefined,
       market_running_out: {
         status: 'available', unavailable_reason: null, counts: { running_out: 1 }, thresholds: {},
         entries: [{ ...fixture.capabilities.hygiene.entries[0], id: 'f8-running-out', capability: 'market_running_out' }],
       },
-      market_boost: { status: 'available', unavailable_reason: null, counts: {}, thresholds: {}, entries: [] },
+      market_boost: { status: 'unavailable', unavailable_reason: 'no_boost_key', counts: {}, thresholds: {}, entries: [] },
     },
   }
+  delete carrying.capabilities.market_boost_unavailable_probe
 
   /** Every page's rendered body, by nav id. */
   async function pagesOf(artefact) {
@@ -149,5 +150,14 @@ describe('Phase 5 Task 5.0 — the F8 capabilities reach no screen before their 
     serve(carrying)
     const { reached } = await walkTheNav()
     expect([...NOT_YET_SHOWN].filter((id) => reached.has(id))).toEqual([])
+  })
+})
+
+describe('Phase 5 Task 5.13 — order_quantity has its screen', () => {
+  it('is reached whole on Reorder, even while it waits for daily sales', async () => {
+    serve({ ...fixture, capabilities: { ...fixture.capabilities,
+      order_quantity: { status: 'unavailable', unavailable_reason: 'no_daily_sales', counts: {}, thresholds: {}, entries: [] } } })
+    const { reached } = await walkTheNav()
+    expect(reached.get('order_quantity')).toBe('recommendations')
   })
 })

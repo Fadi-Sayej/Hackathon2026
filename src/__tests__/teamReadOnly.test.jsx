@@ -112,3 +112,33 @@ describe('the Data page for a team account', () => {
     expect(restore.disabled).toBe(true)
   })
 })
+
+describe('a team account on Reorder (Phase 5 Task 5.13, ADR-029)', () => {
+  it('sees the suggestions and can approve, change or dismiss none of them', async () => {
+    const artefact = artefactWithQuestion()
+    const suggestion = {
+      id: '0123456789abcdef', signal_family: 'order.suggestion', capability: 'order_quantity', barcode: '7290000000001',
+      product_name: 'מים', department: 'משקאות', action: 'place_order', characterisation: 'order_suggestion', value: null,
+      ordering_key: { name: 'units_in_window', value: 50 }, actionable: false, not_actionable_reason: null, attention: 'today',
+      evidence: { order_day: '2026-08-30', cycle: { first_day: '2026-08-30', last_day: '2026-09-05', days: 7 },
+        schedule: { form: 'weekdays', weekdays: ['sun'], stated_on: '2026-08-01' }, schedule_changed: false,
+        shelf_life: { days: 30, stated_on: '2026-08-01' }, capped: false, kind: 'gross', quantity: 14, expected_sales: 14,
+        boost: { applied: false, not_applied_because: 'market_not_running_out' },
+        count: { recorded_stock: 5, as_of: '2026-06-06', used: false, not_used_because: 'count_too_old', flags: [] } },
+    }
+    artefact.capabilities.order_quantity = { status: 'available', unavailable_reason: null, counts: {}, thresholds: {},
+      entries: [suggestion], departments: { 'משקאות': { reasons: {}, suggested: 1, covered_by_stock: 0 } } }
+    globalThis.fetch = async () => ({ ok: true, status: 200, json: async () => artefact })
+    asTeam(<App />)
+    await waitFor(() => expect(document.querySelector('.spine__loading')).toBeNull())
+    fireEvent.click(document.querySelector('.nav-item[data-nav="recommendations"]'))
+    const buttons = await waitFor(() => {
+      const found = [...document.querySelectorAll('[data-suggestion] button')]
+      expect(found).toHaveLength(3)
+      return found
+    })
+    expect(buttons.every((b) => b.disabled)).toBe(true)
+    fireEvent.click(buttons[0])
+    expect(Object.keys(loadOwnerState().outcomes)).toHaveLength(0)
+  })
+})
