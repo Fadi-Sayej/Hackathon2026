@@ -6,7 +6,7 @@ Version: 1.0 (assembled 2026-09-08 from the approved `intent.md` §1, §8–§13
 Supersedes: docs/archive/pre-pivot/PRODUCT_REQUIREMENTS.md, docs/archive/pre-pivot/BUSINESS_CASE.md, docs/archive/pre-pivot/PILOT_PLAN.md
 Related: [Intent register (SPEC-000)](intent-register.md) · [Feature intents](../features/) · [System Design](../architecture/system-design.md)
 Owner: smartshelf-pm
-Updated: 2026-09-27 (D-23 recorded: the pilot with the YomYom store ended)
+Updated: 2026-09-27 (D-23 recorded: the pilot with the YomYom store ended; §8: D-24)
 ---
 
 # SmartShelf — وثيقة المنتج · Product Requirements
@@ -77,7 +77,7 @@ Updated: 2026-09-27 (D-23 recorded: the pilot with the YomYom store ended)
 | 8 | "متى يصل كل مورّد فعلاً؟" | ❌ تُقاس بعد 3 تسليمات لكل مورّد | مهلة حقيقية بدل الافتراض | دقة توصيات V2 | **V3** |
 | 6 | "رتّب رفوفي لأربح أكثر" | ❌ — تحتاج صورة الرف + طلب V2 + قواعده | "ضع هذه الأصناف بهذه الواجهات" | +20–68% هامش لكل متر خطّي | **V4** |
 
-## 4. Settled decisions (D-1 … D-23)
+## 4. Settled decisions (D-1 … D-24)
 
 القرارات التي حسمتها طبقة النوايا. **لا تُعاد فتحها في أي طبقة أدنى.** النصّ الكامل في
 [سجلّ النوايا §3](intent-register.md#3-decisions-already-made-by-the-intent-layer).
@@ -134,6 +134,10 @@ Updated: 2026-09-27 (D-23 recorded: the pilot with the YomYom store ended)
 
 > **2026-09-27 (D-23):** انتهت التجربة مع متجر YomYom ولم تُحسم الأرقام الثلاثة معه. تُطلب من
 > مالك المتجر الجديد، ولا يُفترض أيٌّ منها قبل ذلك.
+
+> **2026-09-27 (D-24):** لا رقم نجاح: نقيس كم تحقّق من النجاح، بلا حدّ يجب بلوغه. سعر الاشتراك
+> يُناقَش لاحقاً. يبقى إيقاع البيانات بانتظار المتجر الجديد (D-23). وبلا رقم، متى يبدأ الاشتراك
+> لم يُحسم بعد.
 
 > This section is registered as feature **[F13](../features/F13-pilot-measurement/intent.md)**
 > (INT-MEAS). It is **not specified**, and the System Design removes the surface that
