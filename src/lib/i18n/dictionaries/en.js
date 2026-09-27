@@ -204,7 +204,7 @@ export const en = {
   'characterisation.inconsistent': "Numbers that do not add up",
   'capability.missing': "This capability is not present in this export.",
   'count.undetermined': "undetermined",
-  'questions.title': "Cost questions",
+  'questions.title': "Questions only you can answer",
   'questions.none': "No questions today — everything that would change a figure is known.",
   'questions.costOf': "What do you pay for {product}?",
   'questions.save': "Save",
@@ -524,4 +524,16 @@ export const en = {
   'orders.day': "Order day",
   'orders.changed': "you changed it from {n}",
   'orders.csv': "Download for your supplier (CSV)",
+
+  // F8 (Phase 5 Task 5.14): the disagreement question, as the repository owner approved it on
+  // 2026-09-27 (docs/reviews/F8-screens-mockups.md).
+  'questions.disagreement': "The stores near you have run out of {product}. Here you sold {units} in the last four weeks, in only {weeks} of them. Why doesn't it sell here?",
+  'questions.disagreementNoSales': "The stores near you have run out of {product}. It was delivered here, but the last four weeks of reports show no sale of it. Why doesn't it sell here?",
+  'questions.disagreementNoRow': "The stores near you have run out of {product}. Your sales reports have no row for it. Why?",
+  'questions.answer.shelf_place': "Its place on the shelf",
+  'questions.answer.price': "Its price",
+  'questions.answer.weak_market': "Few customers here want it",
+  'questions.answer.sells_elsewhere': "It sells, but not through these reports",
+  'questions.onceOnly': "Asked once. Your answer changes no quantity.",
+  'questions.later': "Not now",
 }

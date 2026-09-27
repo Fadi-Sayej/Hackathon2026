@@ -123,12 +123,12 @@ describe('recordOutcome', () => {
 
 describe('recordAnswer', () => {
   it('stores a cost answer the engine can read back', async () => {
-    await recordAnswer('7290000041445', { value: 4.5, status: ANSWER_STATUS.ANSWERED })
+    await recordAnswer('7290000041445', 'cost_price', { value: 4.5, status: ANSWER_STATUS.ANSWERED })
     expect(loadOwnerState().answers['7290000041445'].cost_price.value).toBe(4.5)
   })
 
   it('refuses a non-positive cost rather than storing a number nobody can use', async () => {
-    await expect(recordAnswer('7290000041445', { value: 0, status: ANSWER_STATUS.ANSWERED }))
+    await expect(recordAnswer('7290000041445', 'cost_price', { value: 0, status: ANSWER_STATUS.ANSWERED }))
       .rejects.toThrow(/value/)
   })
 })
@@ -184,5 +184,30 @@ describe('an order suggestion\'s outcome (ADR-034 Decision 2, FR-161)', () => {
     const { snapshot } = loadOwnerState().outcomes[entry().id]
     expect(snapshot).not.toHaveProperty('order_day')
     expect(snapshot).not.toHaveProperty('approved_quantity')
+  })
+})
+
+describe('answers are stored per fact (Phase 5 Task 5.14, ADR-034 Decision 3)', () => {
+  const B = '7290000041445'
+
+  it('a disagreement answer never erases a cost answer, and the reverse', async () => {
+    await recordAnswer(B, 'cost_price', { value: 4.5, status: ANSWER_STATUS.ANSWERED })
+    await recordAnswer(B, 'market_disagreement', { value: 'weak_market', status: ANSWER_STATUS.ANSWERED })
+    expect(loadOwnerState().answers[B]).toMatchObject({
+      cost_price: { value: 4.5, status: 'answered' },
+      market_disagreement: { value: 'weak_market', status: 'answered' },
+    })
+    await recordAnswer(B, 'cost_price', { value: 5.2, status: ANSWER_STATUS.ANSWERED })
+    expect(loadOwnerState().answers[B].market_disagreement.value).toBe('weak_market')
+    expect(loadOwnerState().answers[B].cost_price.value).toBe(5.2)
+  })
+
+  it('refuses a disagreement answer outside the four it offers', async () => {
+    await expect(recordAnswer(B, 'market_disagreement', { value: 'dunno', status: ANSWER_STATUS.ANSWERED }))
+      .rejects.toThrow(/market_disagreement/)
+  })
+
+  it('refuses a fact nobody asks', async () => {
+    await expect(recordAnswer(B, 'shelf_colour', { value: 'red' })).rejects.toThrow(/fact/)
   })
 })

@@ -205,7 +205,7 @@ export const he = {
   'characterisation.inconsistent': "מספרים שלא מסתדרים",
   'capability.missing': "היכולת הזו לא קיימת בייצוא הזה.",
   'count.undetermined': "לא נקבע",
-  'questions.title': "שאלות עלות",
+  'questions.title': "שאלות שרק אתה יכול לענות עליהן",
   'questions.none': "אין שאלות היום — כל מה שמשנה מספר ידוע.",
   'questions.costOf': "בכמה אתה קונה {product}?",
   'questions.save': "שמור",
@@ -523,4 +523,16 @@ export const he = {
   'orders.day': "יום הזמנה",
   'orders.changed': "שינית מ-{n}",
   'orders.csv': "הורדה לספק (CSV)",
+
+  // F8 (Phase 5 Task 5.14): the disagreement question, as the repository owner approved it on
+  // 2026-09-27 (docs/reviews/F8-screens-mockups.md).
+  'questions.disagreement': "בחנויות הסמוכות אליך נגמר {product}. אצלך נמכרו {units} בארבעת השבועות האחרונים, רק ב{weeks} מהם. למה הוא לא נמכר אצלך?",
+  'questions.disagreementNoSales': "בחנויות הסמוכות אליך נגמר {product}. אצלך הוא התקבל במלאי, אבל בדוחות של ארבעת השבועות האחרונים אין לו מכירה. למה הוא לא נמכר אצלך?",
+  'questions.disagreementNoRow': "בחנויות הסמוכות אליך נגמר {product}. בדוחות המכירות שלך אין לו שורה. למה?",
+  'questions.answer.shelf_place': "המקום שלו על המדף",
+  'questions.answer.price': "המחיר שלו",
+  'questions.answer.weak_market': "מעט לקוחות כאן רוצים אותו",
+  'questions.answer.sells_elsewhere': "הוא נמכר, אבל לא דרך הדוחות האלה",
+  'questions.onceOnly': "נשאל פעם אחת. התשובה שלך לא משנה שום כמות.",
+  'questions.later': "לא עכשיו",
 }

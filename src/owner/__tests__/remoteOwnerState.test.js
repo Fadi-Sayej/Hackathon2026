@@ -116,7 +116,7 @@ describe('recordOutcome and recordAnswer write through (§9.3, §9.4)', () => {
   it('recordAnswer reaches Firestore, keyed by barcode', async () => {
     const fake = createFakeFirestore()
     setRemoteLoaderForTests(fake.loader)
-    await recordAnswer('7290000041445', { value: 7.5, status: ANSWER_STATUS.ANSWERED })
+    await recordAnswer('7290000041445', 'cost_price', { value: 7.5, status: ANSWER_STATUS.ANSWERED })
     await settle()
     expect(fake.doc('answers')?.['7290000041445']?.cost_price).toMatchObject({ value: 7.5, status: 'answered' })
   })
@@ -229,7 +229,7 @@ describe('the device register rides this path (ADR-021)', () => {
     globalThis.localStorage = backing
     const fake = createFakeFirestore()
     setRemoteLoaderForTests(fake.loader)
-    await recordAnswer('7290000041445', { value: 7.5, status: ANSWER_STATUS.ANSWERED })
+    await recordAnswer('7290000041445', 'cost_price', { value: 7.5, status: ANSWER_STATUS.ANSWERED })
     await settle()
     expect(fake.doc('devices')).toBeUndefined()
     expect(fake.doc('answers')['7290000041445'].cost_price.value).toBe(7.5)
@@ -264,5 +264,38 @@ describe('ADR-029: only the owner writes owner state', () => {
     setRemoteLoaderForTests(fake.loader)
     expect(await writeThrough('outcomes', 'e1', { status: 'acted', at: 5 })).toEqual({ written: true })
     expect(fake.doc('outcomes')).toEqual({ e1: { status: 'acted', at: 5 } })
+  })
+})
+
+describe('answers reach Firestore per fact (Phase 5 Task 5.14)', () => {
+  it('a disagreement answer and a cost answer on one barcode both survive remotely', async () => {
+    const fake = createFakeFirestore()
+    setRemoteLoaderForTests(fake.loader)
+    await recordAnswer('7290000041445', 'cost_price', { value: 7.5, status: ANSWER_STATUS.ANSWERED })
+    await settle()
+    await recordAnswer('7290000041445', 'market_disagreement', { value: 'price', status: ANSWER_STATUS.ANSWERED })
+    await settle()
+    const remote = fake.doc('answers')['7290000041445']
+    expect(remote.cost_price).toMatchObject({ value: 7.5, status: 'answered' })
+    expect(remote.market_disagreement).toMatchObject({ value: 'price', status: 'answered' })
+  })
+
+  it('writes the barcode.fact field path, never the whole barcode record', async () => {
+    const fake = createFakeFirestore()
+    setRemoteLoaderForTests(fake.loader)
+    await recordAnswer('7290000041445', 'market_disagreement', { value: 'price', status: ANSWER_STATUS.ANSWERED })
+    await settle()
+    const write = fake.calls.find((c) => c.path.endsWith('/answers'))
+    expect(write.options.mergeFields.map(String)).toEqual(['7290000041445.market_disagreement'])
+  })
+
+  it('the once-per-session backfill sends each fact on its own path too', async () => {
+    const fake = createFakeFirestore()
+    setRemoteLoaderForTests(fake.loader)
+    resetPushForTests()
+    await pushAll({ answers: { b1: { cost_price: { value: 1, status: 'answered', at: 1 },
+      market_disagreement: { value: 'price', status: 'answered', at: 2 } } }, outcomes: {}, revivals: {} })
+    const write = fake.calls.find((c) => c.path.endsWith('/answers'))
+    expect(write.options.mergeFields.map(String).sort()).toEqual(['b1.cost_price', 'b1.market_disagreement'])
   })
 })

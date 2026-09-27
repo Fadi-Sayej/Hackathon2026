@@ -142,3 +142,21 @@ describe('a team account on Reorder (Phase 5 Task 5.13, ADR-029)', () => {
     expect(Object.keys(loadOwnerState().outcomes)).toHaveLength(0)
   })
 })
+
+describe('a team account and the disagreement question (Phase 5 Task 5.14, ADR-029)', () => {
+  it('sees it and can answer none of it', async () => {
+    const artefact = artefactWithQuestion()
+    artefact.capabilities.owner_questions.items.push({
+      question_id: 'd-7290000000003', barcode: '7290000000003', product_name: 'סודה', department: 'd',
+      fact: 'market_disagreement', expected_value: null, answers: ['shelf_place', 'price', 'weak_market', 'sells_elsewhere'],
+      why: { stores_out: 1, days_absent: [3], units_in_window: 7, weekly_units: [7, 0, 0, 0], report_days: 28, no_sales_row: false },
+    })
+    globalThis.fetch = async () => ({ ok: true, status: 200, json: async () => artefact })
+    asTeam(<App />)
+    const answer = await screen.findByRole('button', { name: en['questions.answer.price'] })
+    const buttons = [...answer.closest('[data-question-id]').querySelectorAll('button')]
+    expect(buttons.every((b) => b.disabled)).toBe(true)
+    fireEvent.click(answer)
+    expect(loadOwnerState().answers).toEqual({})
+  })
+})

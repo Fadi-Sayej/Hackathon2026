@@ -183,9 +183,9 @@ export default function App() {
 
   // The owner's answer to a cost question. It throws on an unusable value or a failed cache
   // write, and QuestionPanel keeps what he typed when it does (§9.3).
-  const onAnswer = useCallback(async (barcode, answer) => {
+  const onAnswer = useCallback(async (barcode, fact, answer) => {
     if (readOnly) return
-    await recordAnswer(barcode, answer)
+    await recordAnswer(barcode, fact, answer)
     refreshOwnerState()
   }, [readOnly, refreshOwnerState])
 

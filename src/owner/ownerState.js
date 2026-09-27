@@ -163,20 +163,41 @@ export async function clearOutcome(entryId) {
   return true
 }
 
-export async function recordAnswer(barcode, { value, status = ANSWER_STATUS.ANSWERED } = {}) {
+// The facts a question can ask, and for a disagreement the four answers it offers (F8-S1
+// FR-158). Permanent names, like every one in design §10.1: an answer is stored under its fact.
+export const ANSWER_FACTS = Object.freeze({ COST_PRICE: 'cost_price', MARKET_DISAGREEMENT: 'market_disagreement' })
+export const DISAGREEMENT_ANSWERS = Object.freeze(['shelf_place', 'price', 'weak_market', 'sells_elsewhere'])
+
+/**
+ * Record his answer to one question: `answers[barcode][fact]`, beside any answer he gave to
+ * another question about the same product (Phase 5 Task 5.14, ADR-034 Decision 3).
+ *
+ * It used to replace the barcode's whole record with `{ cost_price }`, which was harmless while
+ * cost was the only fact and would now erase a cost answer the moment he answered a
+ * disagreement. The remote write names the same `barcode.fact` path for the same reason.
+ */
+export async function recordAnswer(barcode, fact, { value, status = ANSWER_STATUS.ANSWERED } = {}) {
   if (!barcode) throw new Error('recordAnswer: barcode is required')
-  const num = Number(value)
-  if (status === ANSWER_STATUS.ANSWERED && (!Number.isFinite(num) || num <= 0)) {
-    // A cost of zero is not an answer; storing it would put a number in front of the owner
-    // that no one can act on (D-3).
-    throw new Error(`recordAnswer: value ${String(value)} is not a usable cost`)
+  if (!Object.values(ANSWER_FACTS).includes(fact)) {
+    throw new Error(`recordAnswer: fact ${String(fact)} is not one any question asks`)
+  }
+  let stored = value
+  if (fact === ANSWER_FACTS.COST_PRICE) {
+    stored = Number(value)
+    if (status === ANSWER_STATUS.ANSWERED && (!Number.isFinite(stored) || stored <= 0)) {
+      // A cost of zero is not an answer; storing it would put a number in front of the owner
+      // that no one can act on (D-3).
+      throw new Error(`recordAnswer: value ${String(value)} is not a usable cost`)
+    }
+  } else if (status === ANSWER_STATUS.ANSWERED && !DISAGREEMENT_ANSWERS.includes(value)) {
+    throw new Error(`recordAnswer: ${String(value)} is not one of the market_disagreement answers`)
   }
   const state = loadOwnerState()
-  const record = { cost_price: { value: num, at: Date.now(), status } }
+  const record = { value: stored, at: Date.now(), status }
   writeState({
     ...state,
-    answers: { ...state.answers, [barcode]: record },
+    answers: { ...state.answers, [barcode]: { ...(state.answers?.[barcode] || {}), [fact]: record } },
     meta: { ...state.meta, updated_at: Date.now() },
   })
-  void writeThrough('answers', barcode, record)
+  void writeThrough('answers', barcode, record, { field: fact })
 }

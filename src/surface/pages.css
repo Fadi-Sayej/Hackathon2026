@@ -567,3 +567,47 @@
   font-size: 12px;
   color: var(--ink-600);
 }
+
+/* ── F8: the disagreement question (Phase 5 Task 5.14) ──────────────────────
+   As approved on 2026-09-27: the question as plain text, the four answers stacked as outlined
+   rounded buttons, the once-only note small beneath them, and "Not now" last. Not the cost
+   question's green pill: nothing here is saved as a figure. */
+
+.question--disagreement .question__text {
+  margin: 0;
+  line-height: 1.55;
+  color: var(--ink-900);
+}
+
+.question--disagreement .question__answers {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.question--disagreement button {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--ink-line-strong);
+  border-radius: var(--radius-md);
+  background: var(--paper-100);
+  color: var(--ink-900);
+  font-weight: 600;
+}
+
+.question--disagreement button:hover {
+  background: var(--paper-300);
+  color: var(--ink-900);
+}
+
+.question--disagreement button[aria-pressed='true'] {
+  border-color: var(--teal-700);
+  background: var(--teal-050);
+  color: var(--teal-700);
+}
+
+.question--disagreement button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

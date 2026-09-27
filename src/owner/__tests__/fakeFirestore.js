@@ -3,8 +3,9 @@
  * the owner-state writer makes, so a test can assemble the documents the engine would read.
  *
  *  - setDoc(ref, data, { merge: true })          → deep merge (the real SDK's behaviour)
- *  - setDoc(ref, data, { mergeFields: [paths] })  → each named top-level field REPLACED
- *                                                   wholesale; every other field untouched
+ *  - setDoc(ref, data, { mergeFields: [paths] })  → each named field REPLACED wholesale, at its
+ *                                                   full path (a nested FieldPath replaces only
+ *                                                   that nested field); every other one untouched
  *
  * The distinction is load-bearing. A deep merge of `{ [id]: record }` keeps nested keys the new
  * record omits — a stale `deferred_until` survives an outcome changing to `acted` — so the
@@ -42,10 +43,18 @@ export function createFakeFirestore({ storeId = 'yomyom-kafr-qasim', configured 
       if (failWrites) throw new Error('permission-denied')
       const prev = docs.get(ref.path) || {}
       if (options.mergeFields) {
-        const next = { ...prev }
+        const next = structuredClone(prev)
         for (const field of options.mergeFields) {
-          const name = String(field)
-          if (Object.prototype.hasOwnProperty.call(data, name)) next[name] = data[name]
+          const segments = field.segments ?? [String(field)]
+          let source = data
+          for (const s of segments) source = isPlainObject(source) ? source[s] : undefined
+          if (source === undefined) continue
+          let target = next
+          for (const s of segments.slice(0, -1)) {
+            if (!isPlainObject(target[s])) target[s] = {}
+            target = target[s]
+          }
+          target[segments[segments.length - 1]] = structuredClone(source)
         }
         docs.set(ref.path, next)
       } else if (options.merge) {

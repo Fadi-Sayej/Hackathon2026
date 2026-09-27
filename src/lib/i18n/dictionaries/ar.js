@@ -210,7 +210,7 @@ export const ar = {
   'characterisation.inconsistent': "أرقام لا تتطابق",
   'capability.missing': "هذه القدرة غير موجودة في هذا التصدير.",
   'count.undetermined': "غير محدَّد",
-  'questions.title': "أسئلة التكلفة",
+  'questions.title': "أسئلة لا يجيب عنها غيرك",
   'questions.none': "لا أسئلة اليوم — كل ما يغيّر رقماً معروف.",
   'questions.costOf': "كم تشتري {product}؟",
   'questions.save': "حفظ",
@@ -528,4 +528,16 @@ export const ar = {
   'orders.day': "يوم الطلب",
   'orders.changed': "غيّرتها من {n}",
   'orders.csv': "تنزيل للمورّد (CSV)",
+
+  // F8 (Phase 5 Task 5.14): the disagreement question, as the repository owner approved it on
+  // 2026-09-27 (docs/reviews/F8-screens-mockups.md).
+  'questions.disagreement': "نفد {product} من المتاجر القريبة منك. عندك بيع منه {units} في الأسابيع الأربعة الأخيرة، في {weeks} منها فقط. لماذا لا يُباع عندك؟",
+  'questions.disagreementNoSales': "نفد {product} من المتاجر القريبة منك. وصلتك منه بضاعة، لكن تقارير الأسابيع الأربعة الأخيرة لا تُظهر أي بيع له. لماذا لا يُباع عندك؟",
+  'questions.disagreementNoRow': "نفد {product} من المتاجر القريبة منك. تقارير مبيعاتك لا تضم سطرًا له. لماذا؟",
+  'questions.answer.shelf_place': "مكانه على الرف",
+  'questions.answer.price': "سعره",
+  'questions.answer.weak_market': "قليلون هنا يريدونه",
+  'questions.answer.sells_elsewhere': "يُباع، لكن ليس عبر هذه التقارير",
+  'questions.onceOnly': "نسأل مرة واحدة. جوابك لا يغيّر أي كمية.",
+  'questions.later': "ليس الآن",
 }

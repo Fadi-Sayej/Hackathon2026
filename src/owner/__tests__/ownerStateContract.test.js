@@ -61,8 +61,11 @@ async function produceDocuments() {
   { status: OUTCOME_STATUS.DEFERRED, deferredUntil: FIXED + 7 * DAY })
   // a cost answer, and one on a barcode with leading zeros — keying on the wrong form of a
   // barcode is one of the four silent failures CLAUDE.md rule 12 records
-  await recordAnswer('7290000041445', { value: 9.9, status: ANSWER_STATUS.ANSWERED })
-  await recordAnswer('00729012345', { value: 4.5, status: ANSWER_STATUS.ANSWERED })
+  await recordAnswer('7290000041445', 'cost_price', { value: 9.9, status: ANSWER_STATUS.ANSWERED })
+  await recordAnswer('00729012345', 'cost_price', { value: 4.5, status: ANSWER_STATUS.ANSWERED })
+  // Phase 5 Task 5.14: a disagreement answered on a product that already has a cost answer.
+  // Both must reach the engine: the cost still prices it, and the answer retires the question.
+  await recordAnswer('7290000041445', 'market_disagreement', { value: 'weak_market', status: ANSWER_STATUS.ANSWERED })
 
   await settle()
   return fake.ownerStateDocs()

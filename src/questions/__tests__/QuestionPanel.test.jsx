@@ -64,7 +64,7 @@ describe('answering', () => {
     const onAnswer = render({ items: [item(1)] })
     await userEvent.type(screen.getByLabelText(/Product 1/i), '4.5')
     await userEvent.click(screen.getByRole('button', { name: /save|حفظ|שמור/i }))
-    expect(onAnswer).toHaveBeenCalledWith('bc1', { value: 4.5, status: 'answered' })
+    expect(onAnswer).toHaveBeenCalledWith('bc1', 'cost_price', { value: 4.5, status: 'answered' })
   })
 
   it('does not submit a non-numeric answer', async () => {
@@ -147,6 +147,74 @@ describe('an answer he has saved says so', () => {
     await userEvent.clear(input)
     await userEvent.type(input, '29')
     await userEvent.click(within(document.querySelector('[data-question-id="q1"]')).getByRole('button', { name: /save/i }))
-    expect(onAnswer).toHaveBeenCalledWith('bc1', { value: 29, status: 'answered' })
+    expect(onAnswer).toHaveBeenCalledWith('bc1', 'cost_price', { value: 29, status: 'answered' })
+  })
+})
+
+
+// ── Phase 5 Task 5.14: the disagreement question (FR-158, FR-159), as approved 2026-09-27 ──
+
+const disagreement = (i, why = {}) => ({
+  question_id: `d${i}`, barcode: `db${i}`, product_name: `סודה ${i}`, department: 'd', fact: 'market_disagreement',
+  why: { stores_out: 1, days_absent: [3], units_in_window: 7, weekly_units: [7, 0, 0, 0], report_days: 28,
+    no_sales_row: false, ...why },
+  answers: ['shelf_place', 'price', 'weak_market', 'sells_elsewhere'], expected_value: null,
+})
+
+const drawIn = (language, items, { onAnswer = vi.fn(), readOnly = false } = {}) => {
+  renderWithI18n(
+    <QuestionPanel artefact={{ schema_version: 2, capabilities: { owner_questions: cap({ items }) } }}
+      onAnswer={onAnswer} readOnly={readOnly} />, { language })
+  return onAnswer
+}
+
+describe('the disagreement question', () => {
+  it('states only what was observed, with the week count in words', () => {
+    drawIn('en', [disagreement(1)])
+    const text = document.querySelector('[data-question-id="d1"]').textContent
+    expect(text).toContain('The stores near you have run out of סודה 1.')
+    expect(text).toContain('Here you sold 7 in the last four weeks, in only one of them.')
+    expect(text).not.toMatch(/a lot|sells well|zero/i)
+  })
+
+  it('says his reports have no row for it, in a department they do not itemise', () => {
+    drawIn('he', [disagreement(1, { no_sales_row: true, units_in_window: null, weekly_units: null, report_days: null })])
+    expect(document.querySelector('[data-question-id="d1"]').textContent).toContain('בדוחות המכירות שלך אין לו שורה')
+  })
+
+  it('says it was delivered but did not sell, never that it sold zero', () => {
+    drawIn('ar', [disagreement(1, { units_in_window: 0, weekly_units: [0, 0, 0, 0] })])
+    expect(document.querySelector('[data-question-id="d1"]').textContent).toContain('وصلتك منه بضاعة')
+  })
+
+  it('offers the four answers, and records the one he picks under its own fact', async () => {
+    const onAnswer = drawIn('en', [disagreement(1)])
+    await userEvent.click(screen.getByRole('button', { name: en['questions.answer.weak_market'] }))
+    expect(onAnswer).toHaveBeenCalledWith('db1', 'market_disagreement', { value: 'weak_market', status: 'answered' })
+  })
+
+  it('"Not now" hides it here and records nothing, so the one ask is not spent', async () => {
+    const onAnswer = drawIn('en', [disagreement(1)])
+    await userEvent.click(screen.getByRole('button', { name: en['questions.later'] }))
+    expect(onAnswer).not.toHaveBeenCalled()
+    expect(document.querySelector('[data-question-id="d1"]')).toBeNull()
+  })
+
+  it('counts toward the same limit of three as the cost questions (D-8)', () => {
+    drawIn('en', [item(1), item(2), disagreement(1), disagreement(2)])
+    expect(document.querySelectorAll('[data-question-id]')).toHaveLength(3)
+  })
+
+  it('a team account cannot answer it', () => {
+    const onAnswer = drawIn('en', [disagreement(1)], { readOnly: true })
+    const buttons = [...document.querySelectorAll('[data-question-id="d1"] button')]
+    expect(buttons.length).toBe(5)
+    expect(buttons.every((b) => b.disabled)).toBe(true)
+    expect(onAnswer).not.toHaveBeenCalled()
+  })
+
+  it('the panel has the title he approved', () => {
+    drawIn('en', [disagreement(1)])
+    expect(screen.getByRole('heading', { name: 'Questions only you can answer' })).toBeTruthy()
   })
 })

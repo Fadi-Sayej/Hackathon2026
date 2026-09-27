@@ -5,6 +5,11 @@
         "value": 9.9,
         "at": 1789290000000,
         "status": "answered"
+      },
+      "market_disagreement": {
+        "value": "weak_market",
+        "at": 1789290000000,
+        "status": "answered"
       }
     },
     "00729012345": {
