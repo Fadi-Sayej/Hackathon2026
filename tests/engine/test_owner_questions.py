@@ -247,10 +247,13 @@ def test_no_why_claims_the_market_sells_a_lot_or_that_he_sold_nothing():
 
 
 def test_with_the_flag_off_the_items_are_unchanged_byte_for_byte():
-    """Task 5.14 turns it on. Until then the panel renders every question as a cost question,
-    so a disagreement published today would be asked as the wrong question."""
-    plain = run(_inputs())
+    """The flag is on since Task 5.14; off, it must still take the question out completely, so
+    turning it off again is a real way back."""
+    v1 = _inputs()
+    v1.policy = replace(v1.policy, order_publish_disagreement_questions=False)
+    plain = run(v1)
     off = _inputs()
+    off.policy = replace(off.policy, order_publish_disagreement_questions=False)
     off.sales_daily = _daily("live1", DAYS)
     off.running_out = _signal("live1", "live2")
     off.run_at = RUN_AT

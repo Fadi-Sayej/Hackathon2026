@@ -87,9 +87,9 @@ order:
   min_report_days: 21
   freshness_days: 7
   max_count_age_days: 7
-  # ADR-034. A disagreement is asked once and never again (D-20), and QuestionPanel renders
-  # every question as a cost question today. Off until Task 5.14 gives it its own panel.
-  publish_disagreement_questions: false
+  # ADR-034. A disagreement is asked once and never again (D-20). On since Task 5.14 gave it
+  # its own rendering in the Today panel, as the repository owner approved it on 2026-09-27.
+  publish_disagreement_questions: true
 
 # ADR-031, provisional until calibrated on the first month of per-day sales: a product is
 # running out at a store when it was listed on min_listed of the prior_days usable days and

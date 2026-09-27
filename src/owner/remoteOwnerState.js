@@ -100,12 +100,16 @@ function stampMeta(r, db, now) {
  * Write one record to its document. Returns `{ written }` and, when false, the `reason` —
  * never throws, because a failed send must not undo a decision the owner has already made.
  */
-export async function writeThrough(docName, key, record, { now = Date.now } = {}) {
+export async function writeThrough(docName, key, record, { now = Date.now, field = null } = {}) {
   try {
     const { r, db, reason } = await connect()
     if (reason) return { written: false, reason }
+    // With `field`, only `key.field` is replaced: an answer is one fact of a product's record,
+    // and the product's other answers must survive it (Phase 5 Task 5.14).
+    const data = field ? { [key]: { [field]: record } } : { [key]: record }
+    const path = field ? new r.FieldPath(key, field) : new r.FieldPath(key)
     await Promise.all([
-      r.setDoc(ref(r, db, docName), { [key]: record }, { mergeFields: [new r.FieldPath(key)] }),
+      r.setDoc(ref(r, db, docName), data, { mergeFields: [path] }),
       stampMeta(r, db, now),
       stampDevice(r, db, now),
     ].filter(Boolean))
@@ -133,7 +137,12 @@ export async function pushAll(state, { now = Date.now } = {}) {
       const map = state?.[name] || {}
       const keys = Object.keys(map)
       if (!keys.length) continue
-      writes.push(r.setDoc(ref(r, db, name), map, { mergeFields: keys.map((k) => new r.FieldPath(k)) }))
+      // Answers go fact by fact, so this device's copy never overwrites an answer another
+      // device gave to a different question about the same product.
+      const paths = name === 'answers'
+        ? keys.flatMap((k) => Object.keys(map[k] || {}).map((fact) => new r.FieldPath(k, fact)))
+        : keys.map((k) => new r.FieldPath(k))
+      writes.push(r.setDoc(ref(r, db, name), map, { mergeFields: paths }))
     }
     writes.push(stampMeta(r, db, now))
     // Unconditional — the loop above skips a document with no records, but the register

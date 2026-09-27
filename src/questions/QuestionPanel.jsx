@@ -22,13 +22,25 @@ export function QuestionPanel({ artefact, answers = {}, onAnswer, readOnly = fal
   // Questions he chose to change after saving. The engine drops an answered question only at
   // the next nightly run; until then the panel says it was saved (approved 2026-09-24).
   const [editing, setEditing] = useState({})
+  // "Not now" on a disagreement: hidden here, recorded nowhere. The question is asked once,
+  // ever (D-20), so putting it off must not be the thing that spends that one ask.
+  const [later, setLater] = useState({})
+
+  const answerDisagreement = useCallback(async (item, value) => {
+    try {
+      await onAnswer(item.barcode, 'market_disagreement', { value, status: 'answered' })
+      setError(null)
+    } catch (cause) {
+      setError(cause?.message || 'failed')
+    }
+  }, [onAnswer])
 
   const submit = useCallback(async (item) => {
     const value = Number(drafts[item.question_id])
     // Not a number is not an answer. Submitting it would store something nobody can use.
     if (!Number.isFinite(value) || value <= 0) return
     try {
-      await onAnswer(item.barcode, { value, status: 'answered' })
+      await onAnswer(item.barcode, 'cost_price', { value, status: 'answered' })
       setError(null)
       setDrafts((prev) => ({ ...prev, [item.question_id]: '' }))
       setEditing((prev) => ({ ...prev, [item.question_id]: false }))
@@ -53,7 +65,9 @@ export function QuestionPanel({ artefact, answers = {}, onAnswer, readOnly = fal
   }
 
   const limit = Number.isFinite(capability.limit) ? capability.limit : 3
-  const items = (capability.items || []).slice(0, limit)
+  // D-8: at most three on screen, whatever their kind. Disagreements come after every question
+  // with money (C-68), so they wait until the cost questions are answered.
+  const items = (capability.items || []).filter((item) => !later[item.question_id]).slice(0, limit)
 
   return (
     <section className="questions" {...dirProps()}>
@@ -65,6 +79,13 @@ export function QuestionPanel({ artefact, answers = {}, onAnswer, readOnly = fal
       ) : (
         <ul className="questions__list">
           {items.map((item) => {
+            if (item.fact === 'market_disagreement') {
+              return (
+                <Disagreement key={item.question_id} item={item} chosen={answers?.[item.barcode]?.market_disagreement?.value}
+                  readOnly={readOnly} onAnswer={(value) => answerDisagreement(item, value)}
+                  onLater={() => setLater((prev) => ({ ...prev, [item.question_id]: true }))} />
+              )
+            }
             // What he has already told us. The engine drops an answered question only at the
             // next nightly run; until then it says it was saved, rather than showing the same
             // empty field as if nothing happened (approved 2026-09-24).
@@ -120,5 +141,50 @@ export function QuestionPanel({ artefact, answers = {}, onAnswer, readOnly = fal
         </ul>
       )}
     </section>
+  )
+}
+
+// The week count in words, in each language's own form: "in only one of them".
+const WEEKS = {
+  en: ['', 'one', 'two', 'three'],
+  he: ['', 'אחד', 'שניים', 'שלושה'],
+  ar: ['', 'أسبوع واحد', 'أسبوعين', 'ثلاثة أسابيع'],
+}
+
+/**
+ * F8-S1 FR-158, as the repository owner approved it on 2026-09-27. It states only what was
+ * observed: that the stores near him ran out, and his own units over the window's report days,
+ * or that his sales evidence has no row for it. Never that the market sells a lot of it (§21),
+ * and never "zero sales": a product delivered and not sold says exactly that. His answer
+ * retires the question for good and changes no quantity (D-20); pressing another answer while
+ * it is still on screen revises it (FR-159).
+ */
+function Disagreement({ item, chosen, readOnly, onAnswer, onLater }) {
+  const { t, language } = useI18n()
+  const why = item.why || {}
+  const product = item.product_name || item.barcode
+  const weeks = (why.weekly_units || []).filter((units) => units > 0).length
+  const text = why.no_sales_row
+    ? t('questions.disagreementNoRow', { product })
+    : weeks === 0
+      ? t('questions.disagreementNoSales', { product })
+      : t('questions.disagreement', { product, units: String(Math.round((why.units_in_window ?? 0) * 10) / 10),
+        weeks: (WEEKS[language] || WEEKS.en)[weeks] ?? String(weeks) })
+  return (
+    <li data-question-id={item.question_id} className="question question--disagreement">
+      <p className="question__text">{text}</p>
+      <div className="question__answers">
+        {(item.answers || []).map((answer) => (
+          <button key={answer} type="button" disabled={readOnly} aria-pressed={chosen === answer}
+            onClick={() => !readOnly && onAnswer(answer)}>
+            {t(`questions.answer.${answer}`)}
+          </button>
+        ))}
+      </div>
+      <p className="question__why">{t('questions.onceOnly')}</p>
+      <div>
+        <button type="button" disabled={readOnly} onClick={() => !readOnly && onLater()}>{t('questions.later')}</button>
+      </div>
+    </li>
   )
 }

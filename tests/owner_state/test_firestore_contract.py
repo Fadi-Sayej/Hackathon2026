@@ -60,6 +60,17 @@ def test_a_browser_cost_answer_reaches_answered_cost():
     assert answered_cost(state, "7290000041445") == 9.9
 
 
+def test_a_disagreement_answer_beside_a_cost_answer_reaches_both_readers():
+    """Phase 5 Task 5.14. The browser now writes answers[barcode][fact], so one product can hold
+    a cost answer and a disagreement answer at once. Both must survive the seam: the cost still
+    prices the product, and the disagreement is retired for good (D-20)."""
+    from src.engine.owner_questions import DISAGREEMENT, _answered
+    state = _pulled()
+    assert answered_cost(state, "7290000041445") == 9.9
+    assert _answered(state, "7290000041445", DISAGREEMENT)
+    assert not _answered(state, "00729012345", DISAGREEMENT)
+
+
 def test_a_barcode_with_leading_zeros_is_found_in_either_form():
     """Keying on the wrong form of a barcode is one of rule 12's four silent failures. The
     browser writes '00729012345'; the engine normalises; both spellings must find it."""

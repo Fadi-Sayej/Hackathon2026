@@ -86,13 +86,13 @@ def test_policy_refuses_an_empty_unvalued_order(tmp_path):
 
 
 def test_policy_loads_the_order_quantity_values():
-    """OQ-906's provisional window, freshness and count age; the flag stays off until 5.14."""
+    """OQ-906's provisional window, freshness and count age; the flag is on since Task 5.14."""
     p = load_policy()
     assert p.order_window_days == 28
     assert p.order_min_report_days == 21
     assert p.order_freshness_days == 7
     assert p.order_max_count_age_days == 7
-    assert p.order_publish_disagreement_questions is False
+    assert p.order_publish_disagreement_questions is True
 
 
 def test_policy_loads_the_running_out_values():
@@ -162,7 +162,7 @@ def test_policy_publishes_the_f8_values_with_every_figure():
     t = load_policy().as_dict()
     assert t["order_quantity"] == {
         "window_days": 28, "min_report_days": 21, "freshness_days": 7,
-        "max_count_age_days": 7, "publish_disagreement_questions": False,
+        "max_count_age_days": 7, "publish_disagreement_questions": True,
     }
     assert t["market_running_out"] == {
         "prior_days": 14, "min_listed": 10, "min_absent": 2, "max_absent": 7,
