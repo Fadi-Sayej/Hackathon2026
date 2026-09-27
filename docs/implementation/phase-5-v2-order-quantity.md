@@ -687,6 +687,52 @@ These apply on top of the index's Global Constraints.
    Reorder page names it. Nothing is guessed.
 4. **The mockups are approved,** with the date recorded (Task 5.12).
 
+### Measured 2026-09-27: met
+
+Run on a clean worktree of `main` at `793e77b`, after `npm ci`. The POS import ran first,
+because a fresh clone has no silver tables (CLAUDE.md rule 6), as the nightly does.
+
+| Task | PR | Merged |
+|---|---|---|
+| 5.0 · 5.1 · 5.2 · 5.3 · 5.4 | #207 · #208 · #209 · #211 · #212 | 2026-09-26 |
+| 5.5 · 5.6 · 5.7 · 5.8 · 5.9 | #213 · #214 · #215 · #216 · #217 | 2026-09-27 |
+| 5.10 · 5.11 · 5.12 · 5.13 · 5.14 | #218 · #219 · #220 · #222 · #223 | 2026-09-27 |
+
+1. **Met.**
+   - `npm run lint`: clean.
+   - `npm test`: 573 passed, in 50 files.
+   - `npm run test:py`: 902 passed, 7 skipped.
+   - `npm run build` succeeded, and `npm run check:bundle` passed: the build output is
+     914 KB against the 915 KB ceiling, and `index.html` is 351 KB against the 500 KB
+     target.
+   - `npm run check:surface`: 8 passed.
+   - `npm run check:signals` printed `OK` for every line of its three probes.
+     - `check:v1`: every capability depends on exactly what it declares.
+     - `check:independence`: detection flags 355 with the reports, and is `unavailable`
+       (`no_sales_evidence`) without them. Hygiene holds 1,117 records either way.
+       Order quantity and the boost fail independently.
+     - `check:order-signals`: the baseline has 2 suggestions, 1 boosted and 1
+       disagreement. Withholding each input does what F8-S1 says: the report days,
+       the deliveries, the store facts, the market, the boost picks, and an answered
+       disagreement.
+2. **Met.** Task 5.0's commit (`da7ee02`) records 126 screenshots: every page, in he, ar
+   and en, on phone and desktop. Every Today and Data shot is byte-identical to `main`'s.
+   The only two that differ, of 126, are phone Prices shots. They are 11 to 13 px apart,
+   and `main`'s own two runs differ from each other by 11 to 15 px.
+3. **Met,** on the nightly's own artefact (`7c94768`, generated 2026-09-27 03:06 UTC):
+   - `order_quantity` is `unavailable`, with the reason `no_daily_sales`;
+   - `market_boost` is `unavailable`, with the reason `no_boost_key`;
+   - `market_running_out` is `available`.
+
+   `ReorderPage`, rendered on that file, shows the waiting reason and no suggestion in all
+   three languages. In English it reads "We are waiting for the daily sales reports: an
+   order quantity needs sales per day." This was a one-off render that was not committed;
+   `ReorderPage.test.jsx` holds the same assertion on a fixture.
+4. **Met.** `docs/reviews/F8-screens-mockups.md` records the owner's approval:
+   "Approved — by the repository owner, 2026-09-27".
+
+F8 is built and dormant. What turns it on is outside implementation, and listed below.
+
 ## Release conditions (outside implementation)
 
 > **2026-09-27 (D-23):** the pilot with the YomYom store has ended, and none of these was met
