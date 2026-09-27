@@ -7,7 +7,7 @@ Parent: [Intent Register (SPEC-000)](../product/intent-register.md)
 Related Specs: all F#-S# documents under `docs/features/`
 Owner: smartshelf-pm
 Inputs: [docs/product/intent-register.md, docs/features/F#-*/intent.md, docs/features/F#-*/specs/]
-Updated: 2026-09-27 (D-23: GAP-009 and GAP-011 now wait on another store's owner)
+Updated: 2026-09-27 (D-23: GAP-009 and GAP-011 now wait on another store's owner; OQ-801 after D-24)
 ---
 
 > **Migration note.** Moved verbatim from the pre-migration monolithic `specs.md`. It spans
@@ -548,7 +548,7 @@ price recommendation.
 | OQ-604 | When does a deferral lapse? | SPEC-006 |
 | OQ-605 | Does declining suppress an entry permanently? | SPEC-006 |
 | OQ-701 | Which figures must be reproducible — owner-facing, or all? | SPEC-007 |
-| OQ-801 | What may the 30-day recovered-₪ measurement contain, given that its "stock explained" component cannot be stated in money (D-1)? | INT-MEAS / SPEC-000 §4 |
+| OQ-801 | What may the 30-day recovered-₪ measurement contain, given that its "stock explained" component cannot be stated in money (D-1)? *(2026-09-27: D-24 sets no success number, so no number an owner names will settle this. Still open, for the pm and then the architect.)* | INT-MEAS / SPEC-000 §4 |
 | OQ-702 | When reproduction and a surface disagree, which is shown? | SPEC-007 |
 
 #### P2 — safely deferred

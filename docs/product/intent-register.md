@@ -6,7 +6,7 @@ Version: 0.1 (content unchanged from `specs.md` v1.1)
 Parent: [PRD](PRD.md)
 Related Specs: every F#-S# document under `docs/features/`
 Owner: smartshelf-pm
-Updated: 2026-09-27 (D-23 recorded: the pilot with the YomYom store ended)
+Updated: 2026-09-27 (D-23 recorded: the pilot with the YomYom store ended; D-24: F13 has no success number, and its price is for later)
 ---
 
 > **Migration note.** This is `SPEC-000` from the pre-migration monolithic `specs.md`,
@@ -106,7 +106,8 @@ These are settled. A specification may operationalize them; it may not reopen th
 | D-21 | **When the market (D-18) runs out of a product, how much its order rises is picked per product by a language model, once a night, and published with the suggestion as the model's estimate — never at request time.** It replaces D-19's one fixed amount; D-19's trigger and the rest of it stand. It needs a paid model account and a monthly spending cap. A pick is accepted only from 0% to 25%: one outside that range gives no rise at all, and the suggestion says the pick was rejected. The pick cannot be recomputed from the evidence, so it is recorded, with the model's reason, and the quantity is replayed from it | Decided by the repository owner 2026-09-25, in F8-S1's review, replacing D-19's fixed amount |
 | D-22 | **One store, two roles, and real sign-in.** Sign-in is by Google or by an email link. A *team* account sees everything: the owner's app and the telemetry page. It is read-only in the owner's app, so nothing a team member presses is saved as the owner's decision. An *owner* account sees his app and not the telemetry page. The team is two named people, and the owner's account is added before launch. Roles live on the accounts, never in the documents, and no one's email is recorded here. It supersedes D-12's "single-user" in part: it is still one store and one POS import, and multiple stores stay out of scope | Decided by the repository owner 2026-09-25 (confirmed to this session directly); built by ADR-029 |
 | D-20 | **When the market and his own sales disagree about a product, he is asked on screen, his answer is saved, and he is not asked about that product again.** Questions come at most three at a time (D-8). Letting an answer change future quantities automatically is left for later. This settles F8's case only; F9's decision (INT-005, §4) is not taken by it | GAP-008 decision 3; decided by the repository owner 2026-09-24 |
-| D-23 | **The pilot with the YomYom store ended on 2026-09-27. The project is finished on the data already held, and nothing is made up to stand in for what a store would send: no daily sales, store facts or owner answers are simulated. What needs a store owner waits for another store and its owner.** The data held, read from `public/data/dashboard.json` generated 2026-09-27: the POS inventory export as of 2026-06-06, the seven monthly sales reports (2026-01 … 2026-07), and the competitor snapshots the nightly collector keeps adding. No daily sales report and no store fact was ever received | Decided by the repository owner 2026-09-27, in his words: "we broke up with yomyom owner , but we will carry on finishing the project on the data we have until we get another market with new owner , no mock up" |
+| D-23 | **The pilot with the YomYom store ended on 2026-09-27. The project is finished on the data already held, and nothing is made up to stand in for what a store would send: no daily sales, store facts or owner answers are simulated. What needs a store owner waits for another store and its owner.** The data held, read from `public/data/dashboard.json` generated 2026-09-27: the POS inventory export as of 2026-06-06, the seven monthly sales reports (2026-01 … 2026-07), and the competitor snapshots the nightly collector keeps adding. No daily sales report and no store fact was ever received **D-24 supersedes it in part, the same day: F13 has no success number, so that does not wait. The rest of D-23 stands.** | Decided by the repository owner 2026-09-27, in his words: "we broke up with yomyom owner , but we will carry on finishing the project on the data we have until we get another market with new owner , no mock up" |
+| D-24 | **F13 has no success number, and its subscription price will be discussed later.** The pilot is not judged against a ₪ figure it must reach: the measurement shows how much success there is, and no target is set. This supersedes D-23 in one respect only: the success number no longer waits for another store's owner, because there is none. The price stays open, as D-23 left it, and with no number, when a subscription starts is not decided either. The data cadence still waits for another store (D-23). What the measurement may contain is still OQ-801 | Decided by the repository owner 2026-09-27, directly in the session that recorded it, in his words: "we don't really need a success number we just need to measure how much success there is no limit we need to get to, and for the subscription price you can avoid for now i don't think you need it fill it with 'will be discussed later'" |
 
 ---
 
@@ -152,6 +153,12 @@ obligations follow and are recorded rather than assumed:
   D-1 and SPEC-002 FR-023. What that component may contain instead — a count of products
   counted and closed, rather than an amount — is **OQ-801 (P1)**.
 
+On 2026-09-27 the repository owner answered two of PRD §8's three numbers as **D-24**: there is
+no success number, only a measure of how much success there is; and the subscription price
+will be discussed later. The third, the data cadence, waits for another store's owner (D-23),
+and is the same question as F8-S1 OQ-904. F13-S1 stays `Blocked` on it, on OQ-801 and on its
+§14 item 5.
+
 **INT-EXPL** (registered 2026-09-24) had three open decisions, and the owner took them the
 same day as **D-15 … D-17**. It explains F8's order suggestions. A language model writes the
 sentence once a night, under three conditions. There is no due date. It is still not
@@ -166,7 +173,7 @@ that waited on the store owner now waits on another store's owner, and nothing i
 meanwhile (D-3): F8's daily reports and department facts (F8-S1 OQ-903, OQ-904, OQ-908),
 F13's success number, price and data cadence (F13-S1 §14), GAP-009 and GAP-011, and D-22's
 owner account. F8 is built and publishes `order_quantity` unavailable, saying what it waits
-for.
+for. *(D-24, the same day: F13 has no success number, so that one no longer waits.)*
 
 These are tracked as open questions in SPEC-GAPS at P1/P2. They must be specified
 before their releases are designed, not before V1 is designed.

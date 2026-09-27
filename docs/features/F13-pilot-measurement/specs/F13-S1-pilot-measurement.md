@@ -7,7 +7,7 @@ Version: 0.1 (2026-09-13)
 Parent: [F13 — Pilot Measurement](../intent.md)
 Related Intents: INT-MEAS
 Inputs: [docs/product/PRD.md §8, docs/features/F13-pilot-measurement/intent.md, F7-S1, F2-S1 (FR-023), F6-S1, ADR-009, ADR-016, ADR-021, docs/reviews/system-design-readiness.md ARCH-GATE-003, OQ-801]
-Updated: 2026-09-13
+Updated: 2026-09-27 (§14 items 1 and 3 answered, as D-24)
 ---
 
 # F13-S1 — Pilot Measurement
@@ -207,6 +207,16 @@ merely what is written.
 
 Items 1, 3 and 4 are one conversation. Items 2 and 5 are ours; 2 is answerable as soon as
 item 1 is known, and 5 is answerable now.
+
+> **2026-09-27, by the repository owner.**
+> - **Item 1 → D-24: there is no success number.** The surface measures how much success
+>   there is and renders no target. The threshold that the line below would have put in
+>   `configs/policy.yaml` does not exist.
+> - **Item 3 → D-24: the price will be discussed later.**
+> - **Item 4 waits for another store's owner (D-23).** It is the same question as F8-S1
+>   OQ-904.
+>
+> Items 2 (OQ-801) and 5 are still ours. The status stays `Blocked`.
 
 **When these close:** set `Status: Ready for review`, fill the threshold into
 `configs/policy.yaml` as a declared policy line beside `owner_declared_ceiling_pct` rather

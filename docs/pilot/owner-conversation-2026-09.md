@@ -5,7 +5,7 @@ Status: Ready for review
 Owner: smartshelf-pm
 Parent: [PRD](../product/PRD.md)
 Inputs: [GAP-009, GAP-011, F13-S1 §14, F8-S1 (OQ-903, OQ-904), docs/reviews/system-design-readiness.md run 3, data/internal/silver_pos/*.parquet]
-Updated: 2026-09-27 (D-23: the pilot with the YomYom store ended; the questions stand for the next store's owner)
+Updated: 2026-09-27 (D-23: the pilot with the YomYom store ended; the questions stand for the next store's owner. D-24: #4 and #5 answered)
 ---
 
 # The owner conversation
@@ -132,6 +132,11 @@ more code is written.
 | 5 | **سعر الاشتراك** — agreed *today*, starting automatically if the number is met | ما هو سعر الاشتراك إذا تحقّق الرقم؟ | Not a build input. The intent is blunt about why it is asked now: a free trial with no agreed price measures politeness, not value |
 | 6 | **إيقاع البيانات** — daily or weekly, and who sends it | يومي أم أسبوعي، ومَن يرسله؟ | Sets the measurement window's granularity, which every figure must state |
 
+> **2026-09-27 (D-24): #4 and #5 are answered, by the repository owner, and are not to be
+> asked.** There is no success number, only a measure of how much success there is, and the
+> price will be discussed later. #6 still waits for the next store's owner, and is the same
+> question as #7.
+
 **A caveat to raise on #4 before he answers.** Of the three things his success number adds up
 — «أسعار مصحّحة + مخزون مفسّر + كتالوج منظّف» — **only corrected prices can honestly be
 stated in money.** Explained stock is derived from counts he himself calls unreliable, and we
@@ -162,8 +167,8 @@ till, F8 must not treat their absence as "sold nothing" (F8-S1 FR-156).
 1. Do the five zero-coverage departments sell through a different till? *(→ GAP-009, ADR-020)*
 2. Of the twenty products: which, if any, sold in the last seven months? *(→ GAP-009)*
 3. His markup ceiling, in his words, or "no policy". *(→ GAP-011, `owner_declared_ceiling_pct`)*
-4. The success ₪ number, and whether it is prices-only. *(→ F13-S1 §14, OQ-801)*
-5. The subscription price. *(→ PRD §8)*
+4. ~~The success ₪ number, and whether it is prices-only.~~ *Answered: none (D-24).*
+5. ~~The subscription price.~~ *Answered: discussed later (D-24).*
 6. Data cadence and who sends it. *(→ F13-S1 FR-141)*
 7. Whether the POS can export sales and deliveries per product per day, sent at least weekly. *(→ F8-S1 OQ-904)*
 8. Per department: when he orders it, and how long its products keep. *(→ F8-S1 OQ-903, OQ-908)*
