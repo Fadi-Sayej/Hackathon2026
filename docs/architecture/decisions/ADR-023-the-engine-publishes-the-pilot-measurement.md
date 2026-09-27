@@ -6,13 +6,19 @@ Owner: smartshelf-architect
 Date: 2026-09-13
 Parent: [System Design](../system-design.md) §19
 Related Specs: F13-S1 (§14 item 5), F6-S1, F7-S1
-Inputs: [ADR-001, ADR-004, ADR-005, ADR-016, docs/features/F13-pilot-measurement/specs/F13-S1-pilot-measurement.md, issue #94, issue #96]
-Updated: 2026-09-13
+Inputs: [ADR-001, ADR-004, ADR-005, ADR-016, ADR-021, D-23, D-24, docs/features/F13-pilot-measurement/specs/F13-S1-pilot-measurement.md, issue #94, issue #96, issue #83]
+Updated: 2026-09-27 (revised for D-23 and D-24: no target, and no reading of past artefacts; the block's shape stated)
 ---
 
 # ADR-023 — The engine publishes the pilot measurement; the browser renders it
 
 **Status:** Ready for review · **Recorded in:** [System Design](../system-design.md) §19
+
+> **Revised 2026-09-27.** Written on 2026-09-13 and never accepted. Two decisions since then
+> change what it has to carry. D-24: the measurement shows how much success there is and
+> renders no target. D-23: the pilot with the YomYom store has ended, and no store sends new
+> data. The decision below stands; [Revision](#revision-2026-09-27) says what it now publishes
+> and what it no longer needs.
 
 ## Context
 
@@ -75,6 +81,51 @@ starting before 2026-09-13. A 30-day *recovered ₪* can. If the pilot's 30 days
 ship, the rate is available; if anyone asks for a rate reaching back to the cut-over, the
 honest answer is "not measurable", not a smaller number (rule 13's distinction).
 
+## Revision (2026-09-27)
+
+**No history is read.** The 2026-09-13 text planned to count what was shown from past
+artefacts, read from git. It is dropped. "Shown" is what **this run** publishes: the entries
+in `capabilities.*.entries`, counted per `signal_family`. The engine still owns no state and
+reads no past output (ADR-004), and nothing depends on git history. With no store sending
+data (D-23), the runs differ only in their competitor half, so the history would add nothing
+the current run does not show.
+
+**No rate crosses two sets.** Decisions come from the whole outcome set, and "shown" from
+one run. So no figure divides one by the other. The only share published is within the
+decisions: acted on out of decided.
+
+**No target (D-24).** Nothing is compared with a success figure, and `configs/policy.yaml`
+gains no threshold.
+
+**The block.** The artefact gains one top-level key, `measurement`:
+
+| Field | Meaning |
+|---|---|
+| `status`, `unavailable_reason` | `unavailable` when the owner state is, with its reason (FR-142). Never zeros in its place |
+| `window` | `first` and `last`: the earliest and latest decision recorded, `null` when there is none; `pulled_at`: when the engine read them |
+| `totals` | `shown` (this run), `decided`, `acted`, `declined`, `deferred`, and `not_in_this_run`: decisions whose entry this run does not publish (SCN-130), counted, never dropped |
+| `by_family` | the same counts per `signal_family` (FR-136, FR-137) |
+| `money` | one row per `kind` and `certainty`: the sum of `snapshot.value` over **acted** decisions that carry one, with how many. Kinds are never summed together (FR-139), and confirmed and estimated are never summed together (D-10) |
+| `declined_reasons` | how many declined decisions gave each reason, and how many gave none |
+
+Money comes only from each decision's snapshot, which froze the value the engine published
+on the entry when he decided (ADR-016). Nothing is recomputed (FR-138). A decision with no
+money is a count and nothing else (FR-140, INV-066). Order suggestions carry none (D-1).
+
+**The digest reads the decisions.** `inputs_digest` feeds the owner's answers, and not his
+decisions or his revivals. Both are already read by what the engine publishes:
+`order_quantity` reads his approvals to detect a schedule change (ADR-034), and
+`catalogue_lifecycle` reads his revivals. So two runs over different owner state could
+publish different artefacts under one digest. The measurement adds a third reader, and the
+fix is the same for all three: the decisions and the revivals join the digest. The pull time
+and the device register still do not (ADR-021).
+
+**Not a registered figure.** The block carries its own window and pull time, and it lives in
+the artefact that `npm run figures` reproduces. It is not added to `figures{}`: its input
+needs a credential, and `figures.py` already separates "needs a credential" from "does not
+reproduce". Registering it would make every machine without the service account report a
+missing figure.
+
 ## Rejected options
 
 ### The browser reads Firestore and computes the measurement
@@ -87,6 +138,11 @@ Puts the owner's full decision history — including what he declined and why �
 committed to the repository on every run, to save an aggregation the engine is already placed
 to do. The artefact states figures, not a personal record.
 
+### Count "shown" from past artefacts in git (this ADR's 2026-09-13 text)
+It makes the engine depend on its own history, and a missed night becomes a permanent hole in
+the count. After D-23 it buys nothing: no store sends data, so the entries do not change from
+run to run except in their competitor half.
+
 ### Keep it out of the engine until the owner's numbers arrive
 F13-S1 is `Blocked` on those numbers, so this is tempting. But the transport question is
 independent of the threshold: what is measured may move with OQ-801; *where it is computed*
@@ -94,10 +150,8 @@ does not. Deciding it now is what lets the build start the day the numbers land.
 
 ## Consequences
 
-**We accept:** the artefact gains a measurement block, and its schema with it — so this lands
-**after Checkpoint 3 closes**, like every other artefact change queued tonight. The engine
-gains a reason to read its own past output, which is a new dependency and should be narrow:
-the shown-set only, never re-deriving figures from old artefacts.
+**We accept:** the artefact gains a measurement block, and its schema with it. (The 2026-09-13
+text also accepted reading past artefacts; the revision drops that.)
 
 **We gain:** one implementation of recovered ₪, in the language that owns every other figure,
 provenanced by F7-S1 like the rest, and available to any surface that reads the artefact
