@@ -14,6 +14,8 @@ REQUIRED_EVIDENCE = {
     "competitor_position": ("shelf_price", "reference", "premium_pct", "sources"),
     "catalogue_lifecycle": ("evidence_state", "window_id"),
     "margin_below_cost": ("shelf_price", "cost_price", "margin_pct"),
+    # F9-S1 FR-168: what the market was seen doing. No value, by design (FR-169).
+    "assortment_gap": ("stores_ran_out", "nights_ran_out", "last_ran_out", "window"),
 }
 
 

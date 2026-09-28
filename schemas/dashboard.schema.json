@@ -428,7 +428,8 @@
             "catalogue.idle",
             "catalogue.implausible_quantity",
             "margin.below_cost",
-            "order.suggestion"
+            "order.suggestion",
+            "assortment.market_ran_out"
           ]
         },
         "capability": {
@@ -460,7 +461,8 @@
             "decide_idle",
             "review_policy",
             "check_purchase_cost",
-            "place_order"
+            "place_order",
+            "try_product"
           ]
         },
         "characterisation": {
@@ -567,6 +569,40 @@
                     ]
                   }
                 }
+              }
+            }
+          }
+        },
+        {
+          "comment": "F9-S1 FR-168, FR-169 and INV-081 (Phase 6 Task 6.2): an assortment-gap entry publishes what the market was seen doing, and never a value. publish.py also refuses any money-named field at any depth.",
+          "if": {
+            "properties": {
+              "signal_family": {
+                "const": "assortment.market_ran_out"
+              }
+            },
+            "required": [
+              "signal_family"
+            ]
+          },
+          "then": {
+            "properties": {
+              "action": {
+                "const": "try_product"
+              },
+              "value": {
+                "type": "null"
+              },
+              "evidence": {
+                "type": "object",
+                "required": [
+                  "stores_ran_out",
+                  "nights_ran_out",
+                  "last_ran_out",
+                  "listed_at",
+                  "window",
+                  "market_name"
+                ]
               }
             }
           }

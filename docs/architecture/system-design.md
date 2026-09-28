@@ -1488,7 +1488,7 @@ it needs a store to send anything. The plan that builds it is
 | Requirement | Design element | Flow / contract | Verification |
 |---|---|---|---|
 | FR-165 … FR-167, INV-080, INV-082 | E `assortment_gap`: ADR-031's `running_out` replayed for each usable night of the last 14 days over D-18's market, less every barcode in his catalogue, less what no market store listed in the last `max_absent` usable days | ADR-031 (one rule, never a second); ADR-014 | AC-164, AC-169 |
-| FR-168 … FR-170, INV-081 | P entries with evidence and no value; `signal_family` and id from the barcode | ADR-009; FR-103 required evidence | AC-166 |
+| FR-168 … FR-170, INV-081 | P entries with evidence and no value; family `assortment.market_ran_out`, id `entry_id(family, barcode)`; the schema and `publish.py` refuse a value or a money-named field | ADR-009; FR-103 required evidence | AC-166 |
 | FR-171, FR-172, INV-083 | B `compose`: at most one unvalued place, the first, from `surface.unvalued_caps` in policy | FR-106; `unvalued_order` | AC-167, AC-171 |
 | FR-173, FR-177 | B the existing `acted` / `declined` / `deferred`; team accounts read-only | ADR-006; ADR-029 | AC-168 |
 | FR-174 | E unavailable on the market signal's input reason, or `market_signal_stale` by the same `is_stale` | ADR-014, ADR-031 Decision 5 | AC-165 |

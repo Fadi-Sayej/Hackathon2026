@@ -18,6 +18,7 @@ from src.internal_pos.pos_importer import read_pos_vintage
 from src.engine.stock_date import usable_stock_date
 from src.engine.store_facts import DEFAULT_PATH as STORE_FACTS_PATH, load_store_facts
 from src.market.presence import DELIVERY_CATALOG, load_presence
+from src.market.recent import recent_market
 from src.market.running_out import market_signal, market_store_ids
 from src.owner_state.model import OwnerState, answered_cost, device_register
 
@@ -46,6 +47,9 @@ class EngineInputs:
     owner: OwnerState
     policy: Policy
     run_at: datetime
+    # F9-S1 §5: ADR-031's rule replayed over the recent window (src/market/recent.py). None
+    # whenever `running_out` is None: the replay exists exactly when tonight's signal does.
+    market_recent: Optional[dict] = None
 
 
 def _rows(path: Path) -> Optional[list]:
@@ -322,7 +326,12 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
     # D-18's, the stores at or above the floor less the client, and only days up to the run
     # are read, so a run over an earlier date sees what that night saw.
     presence = load_presence(root=snapshots_root, source_id=DELIVERY_CATALOG)
-    running_out = market_signal(presence, market_store_ids(presence, stores, OUR_FORMAT), policy, run_at.date())
+    market_ids = market_store_ids(presence, stores, OUR_FORMAT)
+    running_out = market_signal(presence, market_ids, policy, run_at.date())
+    # F9-S1: the same rule, market and night, replayed over the recent window.
+    market_recent = (recent_market(presence, market_ids, policy, date.fromisoformat(running_out["on_day"]),
+                                   policy.assortment_gap_window_days)
+                     if running_out else None)
     # ADR-035: the picks sealed for the night the market evidence describes. Read, never asked
     # for here: asking is the live step's, and print mode must read exactly what it sealed.
     from src.engine.market_boost import read_picks      # local: market_boost imports this module
@@ -375,13 +384,14 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
     vintages["sales"] = {k: vintages["sales"][k]
                          for k in ("months", "first", "last", "full_annual_cycle", "reconcile_before")}
     digest = _digest(products, summary_rows, monthly, observations, matches, policy, owner,
-                     reconcile_before, sales_daily, store_facts, running_out, boost_picks)
+                     reconcile_before, sales_daily, store_facts, running_out, boost_picks, market_recent)
     return EngineInputs(products=products, inventory=inventory or None,
                         sales_monthly=monthly, sales_daily=sales_daily, sales_summary=summary, window=window,
                         observations=observations, matches=matches, stores=stores, withdrawn=None, idle=None, conflicting=conflicting,
                         store_facts=store_facts, running_out=running_out, boost_picks=boost_picks,
                         inputs_digest=digest,
-                        vintages=vintages, owner=owner, policy=policy, run_at=run_at)
+                        vintages=vintages, owner=owner, policy=policy, run_at=run_at,
+                        market_recent=market_recent)
 
 
 # When a row was imported is not what the row says. `sales_import` rewrites its tables on
@@ -405,7 +415,7 @@ def _content_only(row):
 def _digest(products, summary_rows, monthly, observations, matches, policy, owner,
             reconcile_before: Optional[str], sales_daily: Optional[list] = None,
             store_facts: Optional[dict] = None, running_out: Optional[dict] = None,
-            boost_picks: Optional[dict] = None) -> str:
+            boost_picks: Optional[dict] = None, market_recent: Optional[dict] = None) -> str:
     """A hex digest over the CONTENT the run read, not over the files it read them from.
 
     Content, because a parquet rewritten with identical rows is the same input and must
@@ -452,6 +462,9 @@ def _digest(products, summary_rows, monthly, observations, matches, policy, owne
     # ADR-035: a recorded pick is an input like a delivery catalogue, so the live run (which
     # reloads after sealing) and a reproduction digest the same picks.
     feed("boost_picks", boost_picks)
+    # F9-S1: the recent replay is read from the same snapshots, but it is what the finding is
+    # computed from, so a reproduction must digest the same one.
+    feed("market_recent", market_recent)
     feed("observations", observations)
     feed("matches", matches)
     feed("policy", policy.as_dict())

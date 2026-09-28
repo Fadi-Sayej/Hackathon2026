@@ -58,7 +58,7 @@ def test_the_artefact_carries_every_capability_with_its_extras_and_vintages(tmp_
     # registered with its runner in the same change.
     assert set(caps) == {"catalogue_lifecycle", "price_consistency", "reconciliation", "hygiene",
                          "competitor_position", "margin_below_cost", "owner_questions",
-                         "market_running_out", "market_boost", "order_quantity"}
+                         "market_running_out", "market_boost", "order_quantity", "assortment_gap"}
     assert all(c["status"] in ("available", "unavailable") for c in caps.values())
 
 

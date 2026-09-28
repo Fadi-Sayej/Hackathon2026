@@ -55,7 +55,9 @@ def test_every_exemption_is_required_by_something_and_names_a_real_probe():
 # check_order_signals.py describes what it withholds in the owner's terms. Each exempted input
 # is named here with the words that probe uses for it.
 _F8_WORDING = {"sales_daily": "report days", "running_out": "market snapshots",
-               "boost_picks": "boost picks", "store_facts": "store facts"}
+               "boost_picks": "boost picks", "store_facts": "store facts",
+               # F9-S1: the same snapshots, withheld in the same case (AC-165).
+               "market_recent": "F9's assortment gap goes unavailable"}
 
 
 def test_the_f8_probe_withholds_each_input_exempted_to_it():

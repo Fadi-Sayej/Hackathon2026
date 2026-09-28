@@ -9,7 +9,7 @@ fixture world, and the PUBLISHED artefact is read, never a capability's return v
 | the report days | order_quantity unavailable, with a monthly report right there to misuse |
 | the deliveries | no net suggestion: a count cannot be carried without them |
 | the store facts | no quantity at all |
-| the market snapshots | suggestions still publish, unadjusted, and no disagreement is raised |
+| the market snapshots | suggestions still publish, unadjusted, and no disagreement is raised; F9's assortment gap goes unavailable |
 | the boost picks | no boost, and zero calls to the model |
 | an answered disagreement | it is not raised again (D-20) |
 
@@ -78,6 +78,9 @@ def baseline_problems(art: dict) -> list:
         out.append("the baseline applies no boost, so withholding the picks proves nothing")
     if not _disagreements(art):
         out.append("the baseline raises no disagreement, so withholding the market proves nothing")
+    gap = _cap(art, "assortment_gap")
+    if gap["status"] != "available" or not gap["entries"]:
+        out.append("the baseline finds no assortment gap, so withholding the market proves nothing for F9")
     return out
 
 
@@ -108,6 +111,10 @@ def withheld_market_problems(art: dict) -> list:
         out.append("without the market snapshots a boost was still applied, from nothing")
     if _disagreements(art):
         out.append("without the market snapshots a disagreement was still raised (AC-142)")
+    gap = _cap(art, "assortment_gap")
+    if gap["status"] != "unavailable" or gap["entries"]:
+        out.append(f"without the market snapshots assortment_gap published {gap['status']} with "
+                   f"{len(gap['entries'])} findings: they came from no market (F9-S1 AC-165)")
     return out
 
 

@@ -63,6 +63,8 @@ PROBED_ELSEWHERE = {
     "sales_daily": "scripts/check_order_signals.py",
     "store_facts": "scripts/check_order_signals.py",
     "running_out": "scripts/check_order_signals.py",
+    # F9-S1: replayed from the same market snapshots as running_out, so withheld with them.
+    "market_recent": "scripts/check_order_signals.py",
     "boost_picks": "scripts/check_order_signals.py",
 }
 
