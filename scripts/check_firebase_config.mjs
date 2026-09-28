@@ -1,7 +1,7 @@
 /**
  * check_firebase_config.mjs — will B-2 actually switch on? (npm run check:firebase)
  *
- * Firestore activation fails *silently*: persistence.js falls back to localStorage
+ * Firestore activation fails *silently*: the owner state stays in localStorage
  * whenever `isFirebaseConfigured()` is false, so a typo'd or half-filled config
  * looks exactly like a working app — until you discover at the end of the pilot
  * that every decision lived on one laptop and the team saw nothing.

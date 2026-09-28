@@ -58,8 +58,8 @@ dist-ssr
 # Firebase configuration
 #
 # src/firebase.js was ignored from the first commit, back when it hardcoded the
-# project's web API key. It is now a required source module — persistence.js,
-# firestoreAdapter.js and the telemetry dashboard all import from it, and the
+# project's web API key. It is now a required source module — the sign-in session
+# (src/auth/session.js) and the owner-state writer import from it, and the
 # build fails with MISSING_EXPORT without it — and it reads every value from
 # VITE_FIREBASE_* instead of embedding anything. So it must be tracked.
 #

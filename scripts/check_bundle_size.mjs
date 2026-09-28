@@ -45,10 +45,14 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const CEILING_KB = 915         // measured 909 KB, 2026-09-27: F8's Reorder and Approved orders pages
-                               // and their approved wording in three languages (Phase 5 Task 5.13)
-                               // added 21 KB to main's 888, and index.html stayed at 346 KB, well
-                               // under the 500 KB target. Before that it was 900, over a measured
+const CEILING_KB = 900         // measured 894 KB, 2026-09-28, at Checkpoint 4: Phase 4 Task 4.5
+                               // rebuilt the telemetry page on measurement.json and deleted what
+                               // only the old one read (actionPriority, credibility, persistence,
+                               // completionActions). index.html is 352 KB. Before that it was 915,
+                               // over a measured 909 KB, 2026-09-27: F8's Reorder and Approved
+                               // orders pages and their approved wording in three languages
+                               // (Phase 5 Task 5.13) added 21 KB to main's 888, and index.html
+                               // stayed at 346 KB. Before that it was 900, over a measured
                                // 873 KB, 2026-09-24, once the strings and styles the
                                // removed pages left behind were deleted: 549 keys from each of
                                // the three dictionaries took 103 KB off index.html. It stood at
