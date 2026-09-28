@@ -20,6 +20,12 @@ const MONEY = new Set(['shelf_price', 'delivery_price', 'cost_price', 'differenc
 // spaces Arabic and Hebrew words apart.
 const SENTENCE = new Set(['format_note', 'reference', 'sources', 'fields', 'evidence_state', 'cost_source', 'reason'])
 const NOT_A_ROW = new Set(['question'])
+// What he found when he checked an idle product (F4 FR-070, approved 2026-09-28).
+const IDLE_ANSWERS = [
+  { id: 'still_stocked', outcome: { status: 'acted', reason: 'still_stocked' } },
+  { id: 'wrong_count', outcome: { status: 'declined', reason: 'wrong_data' } },
+  { id: 'no_longer_carried', outcome: { status: 'acted', reason: 'no_longer_carried' } },
+]
 // Isolated left to right (U+2066 … U+2069), or Arabic and Hebrew render 7% as "%7".
 const percent = (x) => `\u2066${Math.round(x * 10) / 10}%\u2069`
 
@@ -90,13 +96,23 @@ export function EntryCard({ entry, onOutcome, formatMoney, readOnly = false }) {
 
       <footer className="entry-card__actions">
         {/* readOnly: a team account's view (ADR-029 §5). Nothing it presses is the owner's. */}
-        <button type="button" data-outcome="acted" disabled={readOnly} onClick={() => onOutcome(entry, { status: 'acted' })}>
-          {t('outcome.acted')}
-        </button>
-        <button type="button" data-outcome="declined" disabled={readOnly}
-                onClick={() => onOutcome(entry, { status: 'declined', reason: 'not_worth_it' })}>
-          {t('outcome.declined')}
-        </button>
+        {entry.action === 'decide_idle' ? IDLE_ANSWERS.map(({ id, outcome }) => (
+          // F4 FR-070: an idle product is answered with what he found, each answer recorded
+          // apart, and none of them called the right one (FR-071).
+          <button key={id} type="button" data-outcome={id} disabled={readOnly} onClick={() => onOutcome(entry, outcome)}>
+            {t(`outcome.idle.${id}`)}
+          </button>
+        )) : (
+          <>
+            <button type="button" data-outcome="acted" disabled={readOnly} onClick={() => onOutcome(entry, { status: 'acted' })}>
+              {t('outcome.acted')}
+            </button>
+            <button type="button" data-outcome="declined" disabled={readOnly}
+                    onClick={() => onOutcome(entry, { status: 'declined', reason: 'not_worth_it' })}>
+              {t('outcome.declined')}
+            </button>
+          </>
+        )}
         <button type="button" data-outcome="deferred" disabled={readOnly} onClick={() => onOutcome(entry, { status: 'deferred' })}>
           {t('outcome.deferred')}
         </button>

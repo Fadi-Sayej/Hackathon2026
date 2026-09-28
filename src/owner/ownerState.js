@@ -27,6 +27,9 @@ export const OUTCOME_STATUS = Object.freeze({
 
 export const OUTCOME_REASONS = Object.freeze({
   WRONG_DATA: 'wrong_data', NOT_WORTH_IT: 'not_worth_it', ALREADY_HANDLED: 'already_handled',
+  // F4 FR-070 (approved 2026-09-28): what he found when he checked an idle product. Both are
+  // `acted`; the third answer, "the count is wrong", is `declined` with WRONG_DATA.
+  STILL_STOCKED: 'still_stocked', NO_LONGER_CARRIED: 'no_longer_carried',
 })
 
 export const ANSWER_STATUS = Object.freeze({ ANSWERED: 'answered', DEFERRED: 'deferred' })
