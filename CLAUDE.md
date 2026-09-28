@@ -13,7 +13,7 @@ PRD  →  Feature Intents  →  Feature Specs  →  System Design + ADRs  →  I
 |---|---|
 | PRD · settled decisions D-1 … D-25 | [`docs/product/PRD.md`](docs/product/PRD.md) · [`docs/product/intent-register.md`](docs/product/intent-register.md) |
 | Feature intents (F1 … F14) | [`docs/features/F#-*/intent.md`](docs/features/) |
-| Feature specs (F1-S1 … F8-S1, F13-S1) | [`docs/features/F#-*/specs/`](docs/features/) |
+| Feature specs (F1-S1 … F9-S1, F13-S1) | [`docs/features/F#-*/specs/`](docs/features/) |
 | Gaps, open questions, assumptions | [`docs/features/gaps-and-open-questions.md`](docs/features/gaps-and-open-questions.md) |
 | System Design | [`docs/architecture/system-design.md`](docs/architecture/system-design.md) |
 | ADR-001 … ADR-035 | [`docs/architecture/decisions/`](docs/architecture/decisions/) |
@@ -316,7 +316,7 @@ is `Approved`.
 |---|---|---|
 | `Approved` | Settled. Intents and specs use this. | Yes |
 | `Accepted` | Settled. **ADRs use this instead of `Approved`** — ADR-001 … ADR-035 all do. | Yes |
-| `Registered — not specified` | The intent is settled, and writing a spec is **deliberately forbidden** until a named decision is taken. F9 … F14 are in this state. | **No** — and not because it is unfinished. Point at the blocking `GAP-` id and stop. |
+| `Registered — not specified` | The intent is settled, and writing a spec is **deliberately forbidden** until a named decision is taken. F10 … F14 are in this state. | **No** — and not because it is unfinished. Point at the blocking `GAP-` id and stop. |
 | `Living` | Continuously updated by design; never "finished". The gaps register is one. | Yes, as a reference — never cite it as settled |
 | `Partial — <what is missing>` | Part written, part not. The implementation plan is here. | Only for the parts named as written |
 | `Proposal — <what must confirm it>` | Not yet product authority. | No |

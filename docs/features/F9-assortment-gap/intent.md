@@ -1,18 +1,20 @@
 ---
 ID: F9-INTENT
 Title: F9 — Assortment Gap
-Status: Registered — not specified
+Status: Approved — for specification, by the repository owner on 2026-09-28
 Release: V2
 Parent: [PRD](../../product/PRD.md)
 Intent IDs: INT-005
-Specs: none
+Specs: [F9-S1](specs/F9-S1-assortment-gap.md) (Approved 2026-09-28)
 ---
 
 # F9 — ماذا يبيع السوق ولا أبيعه أنا؟ · Assortment Gap
 
-> **Status: registered, deliberately NOT specified.** No `F#-S#` document exists for
-> this feature and none may be written until the product decisions named below are
-> taken. The reason is recorded in
+> **Specified since 2026-09-28** (see the dated note at the end): D-25 took the decision
+> below, and [F9-S1](specs/F9-S1-assortment-gap.md) is approved. What follows is the
+> original record. **Status then: registered, deliberately NOT specified.** No `F#-S#`
+> document existed for this feature and none could be written until the product decisions
+> named below were taken. The reason is recorded in
 > [SPEC-000 §4](../../product/intent-register.md#4-intents-deliberately-not-specified-in-this-phase),
 > and it is not scheduling: writing requirements now would mean inventing those answers.
 > Content moved verbatim from the pre-migration `intent.md` (§6); nothing added.
@@ -65,5 +67,5 @@ The blocking decision above was taken by the repository owner as **D-25**, from 
 
 The products he does stock are F8's (D-19, F8-S1 FR-158), so the "weak here" half of the
 sentence above is no longer F9's. The `WATCH_PRODUCT` tag and its 527 are gone with the
-recommender that produced them (GAP-008a). The status stays `Registered — not specified`
-until a spec is approved.
+recommender that produced them (GAP-008a). The repository owner asked for the spec the
+same day and approved it: [F9-S1](specs/F9-S1-assortment-gap.md).

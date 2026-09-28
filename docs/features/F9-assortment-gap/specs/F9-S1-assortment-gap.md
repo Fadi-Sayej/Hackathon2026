@@ -1,7 +1,7 @@
 ---
 ID: F9-S1
 Title: Assortment Gap — what the nearby market runs out of that he does not stock
-Status: Ready for review
+Status: Approved — by the repository owner, 2026-09-28
 Owner: smartshelf-architect
 Version: 0.1 (2026-09-28)
 Parent: [F9 — Assortment Gap](../intent.md)
@@ -12,10 +12,10 @@ Updated: 2026-09-28
 
 # F9-S1 — Assortment Gap
 
-> **Ready for review.** It builds D-25 and decides the three things D-25 left to it: the
-> window, the "does not stock" boundary, and where the entry sits among the ten. Each is
-> marked **(decided here)** so the review can find them. Nothing here may be built until the
-> repository owner approves it (HANDOVER rule 2).
+> **Approved by the repository owner on 2026-09-28.** It builds D-25. It decides the three
+> things D-25 left to it: the window, the "does not stock" boundary and where the entry sits
+> among the ten. It adds one that D-25 did not name: a finding must still be sold. Each of the
+> four is marked **(decided here)**, and his approval confirmed them.
 
 ---
 
@@ -69,7 +69,7 @@ daily surface; the owner's two answers.
 | **The market** | D-18's stores: the delivery-catalogue stores at or above the format floor, less the client (`market_store_ids`). Today Wolt Market, Rami Levy In The Neighborhood and Super Alonit Einat |
 | **Ran out, on a night** | ADR-031's rule, `running_out` in `src/market/running_out.py`, flags the product at one or more market stores for that night. The same rule, market and policy values as F8's `market_running_out` |
 | **Recent** **(decided here)** | The usable nights among the last 14 calendar days, ending on the run's night. That is ADR-031's own fortnight: the span its signal must cover (`SIGNAL_LOOKBACK_DAYS`) and the history that makes a listing "steady" (`prior_days: 14`) |
-| **Still sold** **(decided here)** | Listed at a market store on at least one of the last `max_absent` usable days (7 today). ADR-031 stops counting an absence after that because it is then more likely the store dropped the product. F9 does not point at what the market has stopped selling |
+| **Still sold** **(decided here)** | Listed at a market store on at least one of the last `max_absent` usable days (7 today), or running out tonight. ADR-031 stops counting an absence after `max_absent` days, because it is then more likely the store dropped the product. F9 does not point at what the market has stopped selling. *(Clarified 2026-09-28, before any code: "or running out tonight" was missing. A product absent for exactly `max_absent` days is running out tonight but listed on none of the last `max_absent` days, and INV-082 requires it. §9's 138 was measured with the clause.)* |
 | **Does not stock** **(decided here)** | Its barcode is not in his catalogue (`catalogue.json`). Every catalogued product is F8's, with or without sales rows (D-19). So F9 and F8 never speak about the same product |
 | **Finding** | A product that he does not stock, that ran out on at least one recent night, and that is still sold |
 
@@ -118,7 +118,7 @@ unvalued entries, so any place in that order would never show an F9 entry. Put f
 uncapped, F9's findings (138 that night) would displace reconciliation for months. One place
 shows a finding every day, and reconciliation keeps two of its three on such days.
 
-**FR-172** — Among F9's entries the order MUST be:
+**FR-172** — Among F9's entries the order MUST be the following. The engine publishes its entries in it, and the surface keeps it (F6-S1 FR-106a):
 1. more nights ran out first;
 2. then more stores ran out at;
 3. then the more recent `last_ran_out`;
