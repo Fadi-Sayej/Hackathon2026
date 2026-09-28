@@ -118,6 +118,13 @@ ADR-001 … ADR-035 are `Accepted`; ADR-023 was the last, on 2026-09-28. ADR-022
 | [System Design → Implementation readiness](reviews/system-design-readiness.md) | CONDITIONAL PASS (run 3, 2026-09-13) — 0 blockers, **1 MAJOR open** (ARCH-GATE-003). GATE-002 and GATE-004 closed against the built artefact |
 | [Documentation structure migration](reviews/documentation-structure-migration.md) | see report |
 | [F2 — stock reconciliation and hygiene](reviews/F2-validation.md) | conformance PASS (10/10) · fidelity PASS · usefulness 3 of 10 daily places; 2 findings |
+| [F3 — competitor price position](reviews/F3-validation.md) | 2026-09-28: conformance met in the artefact, AC-042 and AC-053 partial on screen · fidelity short: 1 breach where the intent measured 144 · usefulness: 0 daily places, the Prices page positions 873 products |
+| [F4 — catalogue lifecycle](reviews/F4-validation.md) | 2026-09-28: the engine conforms; AC-061/063/067/069 partial and AC-071b missing on screen · fidelity: a catalogue that cleans itself does not reach the owner (D-14) · usefulness: 0 daily places |
+| [F5 — owner knowledge capture](reviews/F5-validation.md) | 2026-09-28: conformance met · fidelity: 11 questions, led by the intent's two named products · usefulness: 3 on screen, 0 answers ever recorded |
+| [F6 — daily action surface](reviews/F6-validation.md) | 2026-09-28: conformance met except AC-110b and AC-110c (no card states its action) · usefulness: 10 of 10 places, F1 and F2 only |
+| [F7 — figure provenance](reviews/F7-validation.md) | 2026-09-28: 46 of 47 figures reproduce on the same data · AC-120 partial (no date on Today's cards) · AC-128 partial (six PRD §9 figures do not reproduce) |
+| [F8 — order quantity](reviews/F8-validation.md) | 2026-09-28: conformance met on fixtures, and on real data as designed (unavailable, `no_daily_sales`) · usefulness: 0 suggestions; its input never existed |
+| [F13 — pilot measurement](reviews/F13-validation.md) | 2026-09-28: conformance met in tests · Pass three pending the first `measurement.json` (2026-09-29) |
 | [Nav reachability 2026-09-21](reviews/nav-reachability-2026-09-21.md) | **OPEN** — `CapabilityPage` is unrouted, so FR-102/C-51/AC-110 are discharged by nothing and **1,638 of 3,380 published findings are reachable from no screen**. Wants an ADR on §20.1 versus the restore |
 | [Nightly incident 2026-09-13](reviews/nightly-2026-09-13-incident.md) | FIXED — the nightly published the owner's artefact and never committed it; all 6 findings closed |
 
