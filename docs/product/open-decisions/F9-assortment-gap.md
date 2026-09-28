@@ -1,17 +1,30 @@
 ---
 ID: F9-DECISIONS
 Title: F9 Assortment Gap — the two decisions that must be taken before a spec exists
-Status: Ready for review
+Status: Superseded
 Owner: smartshelf-pm
 Parent: [SPEC-GAPS · GAP-013](../../features/gaps-and-open-questions.md)
 Supersedes: —
-Superseded-by: — (on resolution, becomes the next free D-n in the intent register §3; D-25 today)
+Superseded-by: [intent register §3, D-25](../intent-register.md) — decided by the repository owner 2026-09-28
 Related Intents: INT-005, INT-004
 Inputs: [docs/features/F9-assortment-gap/intent.md, docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md, docs/product/intent-register.md (D-1, D-3, D-8, D-9, D-18, D-19, D-20, D-23), configs/store_types.yaml, public/data/catalogue.json, public/data/dashboard.json, data/internal/silver_pos/sales_summary.parquet, data/external/snapshots/ (delivery_catalog, 2026-08-13 … 2026-09-28)]
 Updated: 2026-09-28
 ---
 
 # F9 — the two decisions
+
+> **Decided 2026-09-28, by the repository owner** ("1b 2a"). Recorded as **D-25** in the
+> [intent register §3](../intent-register.md), which is the authority. This brief is kept as
+> the record of how it was reached.
+>
+> | Decision | Answer |
+> |---|---|
+> | 1 — which of the products he does not stock is a finding | **B, what the market ran out of**: at a market store on at least one recent night, by ADR-031's rule. 132 over the 45 nights held on 2026-09-28 |
+> | 2 — what he does with one | **A, an entry on the daily surface**: a place among his ten (D-9), where he records "I'll try it" or "Not for my store". No ₪ figure |
+>
+> Left to the spec, as this brief said: how many nights count as recent; which of his
+> catalogued but idle products count as not stocked; where the entry ranks among the ten.
+> Under D-23 no one can record an answer until a new store's owner signs in.
 
 F9's intent asks «ماذا يبيع السوق ولا أبيعه أنا؟» and stops at one blocking decision: what the
 owner is expected to *do* with a finding. This document turns that into questions the

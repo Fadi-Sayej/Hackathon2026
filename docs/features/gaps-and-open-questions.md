@@ -7,7 +7,7 @@ Parent: [Intent Register (SPEC-000)](../product/intent-register.md)
 Related Specs: all F#-S# documents under `docs/features/`
 Owner: smartshelf-pm
 Inputs: [docs/product/intent-register.md, docs/features/F#-*/intent.md, docs/features/F#-*/specs/]
-Updated: 2026-09-28 (GAP-013: F9's two decisions, posed in the F9 brief)
+Updated: 2026-09-28 (GAP-013 posed in the F9 brief, and resolved the same day as D-25)
 ---
 
 > **Migration note.** Moved verbatim from the pre-migration monolithic `specs.md`. It spans
@@ -502,7 +502,13 @@ the due date.
 
 ---
 
-#### GAP-013 — F9 cannot be specified until what counts as a finding, and what he does with one, are decided
+#### ~~GAP-013 — F9 cannot be specified until what counts as a finding, and what he does with one, are decided~~ — resolved 2026-09-28
+
+**Resolved** by the repository owner as **D-25**: a finding is a product he does not stock that
+the market (D-18) has run out of, and it is an entry on his daily surface where he records
+whether he will try it. Still open, for F9's spec: how many nights count as recent; which of
+his catalogued but idle products count as not stocked; where the entry ranks among the ten.
+The record of how it was decided follows.
 
 **Source:** F9's intent ("Blocking product decision") and SPEC-000 §4 (INT-005). Posed on
 2026-09-28.
