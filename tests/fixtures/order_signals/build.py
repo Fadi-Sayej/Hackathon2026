@@ -33,6 +33,9 @@ COUNTED = "2026-08-24"
 DEPT = "משקאות"
 WOLT = "65daeb8779ca7f0a9bf964f3"
 BOOSTED, STEADY, SLOW, UNSTOCKED = "7290001", "7290002", "7290003", "7290004"
+# F9-S1: a product the market sells and runs out of that is not in his catalogue at all, so
+# the probe's baseline shows an assortment-gap finding and withholding the market removes it.
+NOT_CARRIED = "7291000"
 HEADER = "תאור פריט,ברקוד/קוד,מכר,מחיר קניה,מחיר מכירה,עלות המכר (חנות),כניסות מלאי,מחיר קניה נטו,הנחה,קוד מחלקה,\n"
 PICK = '{"boost_pct": 10, "reason": "المحلات القريبة نفدت منها"}'
 
@@ -79,13 +82,14 @@ def _snapshots(root: Path) -> None:
     first = RUN_AT.date() - timedelta(days=29)
     for i in range(30):
         day = first + timedelta(days=i)
-        # Forty other listings: three products going at once is then 3 of 44 steady listings,
-        # a stockout's scatter. With twenty it was 3 of 24, 12.5%, and ADR-031's guard rightly
-        # read the day as a catalogue change and excluded it.
+        # Forty other listings: four products going at once is then 4 of 45 steady listings,
+        # a stockout's scatter under catalogue_change_pct. With twenty it was 3 of 24, 12.5%,
+        # and ADR-031's guard rightly read the day as a catalogue change and excluded it.
         rows = [{"barcode": f"7280{j:03d}", "store_id": WOLT, "is_online_available": True} for j in range(40)]
         rows.append({"barcode": STEADY, "store_id": WOLT, "is_online_available": True})
         if i < 27:
-            rows += [{"barcode": b, "store_id": WOLT, "is_online_available": True} for b in (BOOSTED, SLOW, UNSTOCKED)]
+            rows += [{"barcode": b, "store_id": WOLT, "is_online_available": True}
+                     for b in (BOOSTED, SLOW, UNSTOCKED, NOT_CARRIED)]
         folder = root / day.isoformat() / "delivery_catalog" / "01"
         folder.mkdir(parents=True, exist_ok=True)
         pl.DataFrame(rows).write_parquet(folder / "products_silver.parquet")

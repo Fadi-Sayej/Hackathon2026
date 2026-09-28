@@ -22,20 +22,26 @@ def _entry(barcode, kind="gross", applied=False):
             "evidence": {"kind": kind, "boost": {"applied": applied, "pct": 10 if applied else None}}}
 
 
-def _art(*, oq_status="available", oq_reason=None, entries=(), boost_status="available", disagreements=()):
+def _art(*, oq_status="available", oq_reason=None, entries=(), boost_status="available", disagreements=(),
+         gap_status="available", gap_entries=()):
     return {"capabilities": {
         "order_quantity": {"status": oq_status, "unavailable_reason": oq_reason, "entries": list(entries)},
+        # F9-S1: withheld with the market snapshots it is replayed from (AC-165).
+        "assortment_gap": {"status": gap_status, "entries": list(gap_entries)},
         "market_boost": {"status": boost_status},
         "owner_questions": {"items": [{"fact": "cost_price", "barcode": "c"}]
                             + [{"fact": "market_disagreement", "barcode": b} for b in disagreements]}}}
 
 
-GOOD = _art(entries=[_entry("a", "net", applied=True), _entry("b")], disagreements=["s"])
+GOOD = _art(entries=[_entry("a", "net", applied=True), _entry("b")], disagreements=["s"], gap_entries=[{"id": "g"}])
 
 
 def test_a_baseline_with_nothing_to_withhold_is_refused():
     assert probe.baseline_problems(GOOD) == []
-    assert len(probe.baseline_problems(_art())) == 4
+    assert len(probe.baseline_problems(_art())) == 5
+    # F9: a baseline with no assortment-gap finding proves nothing when the market is withheld.
+    no_gap = _art(entries=[_entry("a", "net", applied=True)], disagreements=["s"])
+    assert [m for m in probe.baseline_problems(no_gap) if "assortment gap" in m]
     assert probe.baseline_problems(_art(entries=[_entry("a", "gross", applied=True)], disagreements=["s"]))
 
 
@@ -58,10 +64,13 @@ def test_store_facts_withheld_must_leave_no_quantity():
 
 
 def test_market_withheld_must_leave_suggestions_unadjusted_and_no_question():
-    assert probe.withheld_market_problems(_art(entries=[_entry("a")])) == []
-    assert probe.withheld_market_problems(_art(entries=[]))                               # vanished
-    assert probe.withheld_market_problems(_art(entries=[_entry("a", applied=True)]))      # boosted from nothing
-    assert probe.withheld_market_problems(_art(entries=[_entry("a")], disagreements=["s"]))
+    assert probe.withheld_market_problems(_art(entries=[_entry("a")], gap_status="unavailable")) == []
+    # F9-S1 AC-165: findings with no market behind them.
+    assert probe.withheld_market_problems(_art(entries=[_entry("a")], gap_entries=[{"id": "g"}]))
+    assert probe.withheld_market_problems(_art(entries=[_entry("a")]))                    # still available
+    assert probe.withheld_market_problems(_art(entries=[], gap_status="unavailable"))     # vanished
+    assert probe.withheld_market_problems(_art(entries=[_entry("a", applied=True)], gap_status="unavailable"))
+    assert probe.withheld_market_problems(_art(entries=[_entry("a")], disagreements=["s"], gap_status="unavailable"))
 
 
 def test_picks_withheld_must_leave_no_boost_and_no_call():

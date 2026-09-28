@@ -5,7 +5,7 @@ Status: Ready for review — built on the repository owner's approval of F9-S1 (
 Owner: smartshelf-architect
 Parent: [Implementation plan](plan.md)
 Inputs: [docs/features/F9-assortment-gap/specs/F9-S1-assortment-gap.md (Approved 2026-09-28), D-25, ADR-009, ADR-014, ADR-031, docs/architecture/system-design.md §21, src/market/running_out.py, src/engine/registry.py, src/surface/compose.js]
-Updated: 2026-09-28
+Updated: 2026-09-28 (Tasks 6.1–6.4 built; 6.4's probe coverage landed inside 6.2, because the registry refuses an input no probe withholds; Task 6.5 waits for the card's approval)
 ---
 
 # Phase 6 — V2, F9 Assortment Gap
@@ -34,7 +34,7 @@ Tasks 6.1 … 6.4 therefore change nothing anyone sees.
 
 ### Task 6.1: The recent replay (FR-167, §5)
 
-**Files:** `src/market/assortment_gap.py`, `tests/market/test_assortment_gap.py`
+**Files:** `src/market/recent.py`, `tests/test_market_recent.py` *(named for what they hold, the market's recent running-out, beside `running_out.py` and `test_running_out.py`)*
 
 A pure function over a presence series, the market's store ids, the policy and the night.
 It runs `running_out` for each usable night of the last `window_days` calendar days, and
@@ -98,6 +98,19 @@ Mockups in the three languages go to the repository owner first. On his approval
 and the `action.*` string land, and `assortment_gap` leaves `NOT_YET_SHOWN`.
 
 **Done when:** AC-168 passes and the card is live.
+
+## Progress
+
+- **6.1 … 6.3 built on 2026-09-28**, in one PR:
+  - on the committed data a print run for 2026-09-28 publishes 138 findings, none catalogued;
+  - nothing visible changes, shown by the 126-screenshot harness.
+- **6.4 is done inside 6.2.** `check_v1_signals` refuses a required input that no probe
+  withholds, so the probe coverage had to land with the registration:
+  - `check_order_signals` now requires F9 to go unavailable without the market snapshots;
+  - its fixture world has a finding in the baseline;
+  - the catalogue case shows `market_running_out` untouched;
+  - the whole engine run takes 4.4 s locally, so the 2-minute budget holds.
+- **6.5 waits** for the repository owner to approve the card.
 
 ## Checkpoint 6
 

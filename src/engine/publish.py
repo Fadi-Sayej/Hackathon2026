@@ -111,6 +111,12 @@ def validate_artefact(artefact: dict, *, require_complete_registry: bool = False
             for e in cap["entries"]:
                 if e.get("value") is not None:
                     raise PublishRefused(f"value_policy none: {cap_id} entry {e['id']} carries a value (D-1)")
+        if cap_id == "assortment_gap":
+            # F9-S1 INV-081: the market's listing is evidence of demand, never of money.
+            for e in cap["entries"]:
+                fields = list(_money_fields(e.get("evidence") or {}))
+                if fields:
+                    raise PublishRefused(f"assortment_gap entry {e['id']} carries money-named fields {fields} (INV-081)")
         if cap_id == "order_quantity":
             declared = ((artefact.get("thresholds") or {}).get("market_boost") or {}).get("max_pct")
             max_pct = min(D21_MAX_BOOST_PCT, declared) if isinstance(declared, (int, float)) else D21_MAX_BOOST_PCT

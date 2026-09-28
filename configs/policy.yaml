@@ -20,7 +20,14 @@ surface:
   unvalued_places: 3          # OQ-602 provisional
   # OQ-601 provisional. Hygiene ranks last on purpose: 1,155 records of finite one-time
   # cleanup would otherwise hold the three reserved places for weeks (design §9.2).
-  unvalued_order: [reconciliation, competitor_position, catalogue_lifecycle, hygiene]
+  # F9-S1 FR-171: the assortment gap is first, and capped at one place below, so it shows a
+  # finding every day without displacing reconciliation's other two.
+  unvalued_order: [assortment_gap, reconciliation, competitor_position, catalogue_lifecycle, hygiene]
+  unvalued_caps: {assortment_gap: 1}
+  # F6-S1 FR-106a: capabilities whose published order the surface keeps (F9-S1 FR-172). The
+  # others are still ordered by entry id; changing that moves what Today shows, so it is its
+  # own decision.
+  engine_ordered: [assortment_gap]
 
 # SPEC-005 D-8
 question_limit: 3
@@ -115,3 +122,8 @@ boost:
   max_pct: 25
   request_ceiling: 200
   prompt: configs/prompts/market_boost.v1.md
+
+# F9-S1 §5, "recent": the usable nights among the last window_days calendar days. ADR-031's
+# own fortnight: the span its signal must cover, and the history that makes a listing steady.
+assortment_gap:
+  window_days: 14

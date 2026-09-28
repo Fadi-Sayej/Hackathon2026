@@ -38,6 +38,8 @@ SIGNAL_FAMILIES = (
     # F8 (V2, ADR-034). The variant is the order day, so a suggestion keeps its id every night
     # until that day and an approval holds for it (FR-163).
     "order.suggestion",
+    # F9 (V2, F9-S1 FR-170). No variant: the barcode alone, so an answer keeps applying.
+    "assortment.market_ran_out",
 )
 
 

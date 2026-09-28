@@ -37,7 +37,12 @@ def test_policy_loads_declared_constants():
     assert p.cost_floor_pct == 10
     assert p.surface_bound == 10
     assert p.surface_unvalued_places == 3
-    assert p.surface_unvalued_order == ("reconciliation", "competitor_position", "catalogue_lifecycle", "hygiene")
+    # F9-S1 FR-171: the assortment gap first, capped at one place, in its published order.
+    assert p.surface_unvalued_order == ("assortment_gap", "reconciliation", "competitor_position",
+                                        "catalogue_lifecycle", "hygiene")
+    assert p.surface_unvalued_caps == {"assortment_gap": 1}
+    assert p.surface_engine_ordered == ("assortment_gap",)
+    assert p.assortment_gap_window_days == 14
     assert p.question_limit == 3
     assert p.question_money_basis == "window_revenue_at_shelf_price"
     assert p.uncomparable_min_barcode_digits == 8
@@ -173,3 +178,38 @@ def test_policy_publishes_the_f8_values_with_every_figure():
         "model": "claude-sonnet-5", "max_pct": 25, "request_ceiling": 200,
         "prompt": "configs/prompts/market_boost.v1.md",
     }
+
+
+# ── F9-S1: the surface's cap and kept order, and F9's window ─────────────────
+
+@pytest.mark.parametrize("caps", [{"not_a_capability": 1}, {"assortment_gap": 0},
+                                  {"assortment_gap": 4}, {"assortment_gap": True}, {"assortment_gap": "1"}])
+def test_policy_refuses_a_cap_outside_the_order_or_the_places(tmp_path, caps):
+    raw = _committed()
+    raw["surface"]["unvalued_caps"] = caps
+    with pytest.raises(ValueError, match="unvalued_caps"):
+        load_policy(_write(tmp_path, raw))
+
+
+def test_policy_refuses_to_keep_the_order_of_a_capability_not_in_the_order(tmp_path):
+    raw = _committed()
+    raw["surface"]["engine_ordered"] = ["not_a_capability"]
+    with pytest.raises(ValueError, match="engine_ordered"):
+        load_policy(_write(tmp_path, raw))
+
+
+def test_policy_refuses_a_missing_or_empty_assortment_gap_window(tmp_path):
+    raw = _committed()
+    del raw["assortment_gap"]["window_days"]
+    with pytest.raises(ValueError):
+        load_policy(_write(tmp_path, raw))
+    raw = _committed()
+    raw["assortment_gap"]["window_days"] = 0
+    with pytest.raises(ValueError, match="window_days"):
+        load_policy(_write(tmp_path, raw))
+
+
+def test_the_surface_publishes_its_cap_and_kept_order():
+    surface = load_policy().as_dict()["surface"]
+    assert surface["unvalued_caps"] == {"assortment_gap": 1}
+    assert surface["engine_ordered"] == ["assortment_gap"]

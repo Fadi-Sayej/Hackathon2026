@@ -58,6 +58,12 @@ CAPABILITIES = {
     "order_quantity":      CapabilitySpec("order_quantity",      "F8-S1",    "none",     False, "units_in_window",
                                           ("products", "sales_daily", "store_facts"),
                                           published_from="2026-09-27"),
+    # F9 (V2). What the nearby market ran out of recently that he does not stock (D-25). It
+    # has no value and is admitted: F9-S1 FR-171 gives it one unvalued place, the first. His
+    # catalogue is the first input, because without it every market product looks unstocked.
+    "assortment_gap":      CapabilitySpec("assortment_gap",      "F9-S1",    "none",     True,  "nights_ran_out",
+                                          ("products", "running_out", "market_recent"),
+                                          published_from="2026-09-29"),
 }
 
 # The reason belongs to the missing input, not to the capability: catalogue_lifecycle with
@@ -73,6 +79,8 @@ INPUT_REASONS = {
     "matches": "no_competitor_data",
     # ADR-031 Decision 5: the market was not observed on enough of the last fortnight.
     "running_out": "market_signal_thin",
+    # F9-S1: the recent replay exists exactly when tonight's signal does, for the same reason.
+    "market_recent": "market_signal_thin",
     # ADR-035: no sealed picks for the day. A live run with a key always seals a manifest,
     # so the only live night without one is a night with no key.
     "boost_picks": "no_boost_key",

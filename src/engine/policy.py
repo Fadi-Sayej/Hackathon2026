@@ -32,6 +32,11 @@ class Policy:
     surface_bound: int
     surface_unvalued_places: int
     surface_unvalued_order: tuple
+    # F9-S1 FR-171: at most this many unvalued places for a capability, {id: n}. Unlisted: no cap.
+    surface_unvalued_caps: dict
+    # F6-S1 FR-106a, as F9-S1 FR-172 uses it: the capabilities whose published order the
+    # surface keeps. The others are still ordered by entry id, until that is changed on its own.
+    surface_engine_ordered: tuple
     question_limit: int
     question_money_basis: str
     question_yield_factor: float
@@ -62,6 +67,7 @@ class Policy:
     boost_max_pct: float
     boost_request_ceiling: int
     boost_prompt: str
+    assortment_gap_window_days: int     # F9-S1 §5 "recent"
 
     def as_dict(self) -> dict:
         """The artefact's `thresholds` block, grouped as design §11.4 defines it.
@@ -101,6 +107,8 @@ class Policy:
                 "bound": self.surface_bound,
                 "unvalued_places": self.surface_unvalued_places,
                 "unvalued_order": list(self.surface_unvalued_order),
+                "unvalued_caps": dict(self.surface_unvalued_caps),
+                "engine_ordered": list(self.surface_engine_ordered),
             },
             "artefact": {
                 "min_price": self.artefact_min_price,
@@ -128,6 +136,9 @@ class Policy:
                 "max_pct": self.boost_max_pct,
                 "request_ceiling": self.boost_request_ceiling,
                 "prompt": self.boost_prompt,
+            },
+            "assortment_gap": {
+                "window_days": self.assortment_gap_window_days,
             },
             "question_limit": self.question_limit,
             "published_population": self.published_population,
@@ -174,6 +185,8 @@ def load_policy(path: Path | str | None = None) -> Policy:
         surface_bound=int(surface.get("bound", 10)),
         surface_unvalued_places=int(surface.get("unvalued_places", 3)),
         surface_unvalued_order=tuple(surface.get("unvalued_order") or ()),
+        surface_unvalued_caps={str(k): v for k, v in (surface.get("unvalued_caps") or {}).items()},
+        surface_engine_ordered=tuple(surface.get("engine_ordered") or ()),
         question_limit=int(raw.get("question_limit", 3)),
         question_money_basis=str(raw.get("question_money_basis", "window_revenue_at_shelf_price")),
         question_yield_factor=float(raw.get("question_yield_factor", 1.0)),
@@ -205,6 +218,7 @@ def load_policy(path: Path | str | None = None) -> Policy:
         boost_max_pct=_required(raw, "boost", "max_pct", float),
         boost_request_ceiling=_required(raw, "boost", "request_ceiling", int),
         boost_prompt=_required(raw, "boost", "prompt", str),
+        assortment_gap_window_days=_required(raw, "assortment_gap", "window_days", int),
     )
     if policy.withdraw_with_stock:
         raise ValueError(
@@ -235,4 +249,15 @@ def load_policy(path: Path | str | None = None) -> Policy:
             "surface.unvalued_order must list every unvalued capability in precedence order: "
             "it decides which unvalued work reaches the three reserved places (OQ-601, design §9.2)."
         )
+    for cap_id, n in policy.surface_unvalued_caps.items():
+        if cap_id not in policy.surface_unvalued_order:
+            raise ValueError(f"surface.unvalued_caps names {cap_id!r}, which is not in surface.unvalued_order")
+        if isinstance(n, bool) or not isinstance(n, int) or not 1 <= n <= policy.surface_unvalued_places:
+            raise ValueError(f"surface.unvalued_caps.{cap_id} must be a whole number from 1 to "
+                             f"surface.unvalued_places ({policy.surface_unvalued_places}), not {n!r}")
+    for cap_id in policy.surface_engine_ordered:
+        if cap_id not in policy.surface_unvalued_order:
+            raise ValueError(f"surface.engine_ordered names {cap_id!r}, which is not in surface.unvalued_order")
+    if policy.assortment_gap_window_days < 1:
+        raise ValueError("assortment_gap.window_days must be at least 1")
     return policy

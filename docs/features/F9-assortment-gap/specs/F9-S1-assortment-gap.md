@@ -102,9 +102,14 @@ requires before the entry is actionable (FR-103, `REQUIRED_EVIDENCE`).
 **FR-169** — An entry MUST carry no value: no ₪ amount, no price, no quantity. The capability's
 value policy is `none` (D-25, D-1, D-3).
 
-**FR-170** — The entry's `signal_family` MUST be `assortment_gap`, and its id MUST derive from
-the barcode alone (ADR-009). An answer recorded against a product then keeps applying on
-later nights.
+**FR-170** — The entry's `signal_family` MUST be `assortment.market_ran_out`, and its id MUST
+derive from the barcode alone (ADR-009), through `entry_id(signal_family, barcode)` with no
+variant. An answer recorded against a product then keeps applying on later nights.
+
+*(Corrected 2026-09-28, in Task 6.2, before any code merged. This said the family was
+`assortment_gap`, the capability's id. Families are `<area>.<kind>` identities enumerated in
+`SIGNAL_FAMILIES` and the artefact schema, and entry ids are `entry_id`'s hash (design §11).
+Nothing the owner sees changes.)*
 
 **FR-171 — Placement (decided here).** `assortment_gap` MUST take at most **one** of the
 daily surface's unvalued places (FR-106). When it has an actionable entry, it MUST take the

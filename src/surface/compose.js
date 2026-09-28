@@ -24,7 +24,10 @@ export const NOT_ON_TODAY = new Set(['order_quantity', 'market_running_out', 'ma
 // Task 5.13 took `order_quantity` off (Reorder renders it whole, and Data names it). The market
 // signal and the boost stay: the owner approved them as facts ON the Reorder cards, not as
 // capabilities of their own, and approved no label that would name them on Data.
-export const NOT_YET_SHOWN = new Set(['market_running_out', 'market_boost'])
+//
+// Phase 6: `assortment_gap` (F9-S1 FR-175) is published from its first night and stays here
+// until the repository owner approves its card (Task 6.5).
+export const NOT_YET_SHOWN = new Set(['market_running_out', 'market_boost', 'assortment_gap'])
 
 const SETTLED = new Set(['acted', 'declined'])
 
@@ -43,10 +46,16 @@ export function compose(artefact, ownerState, { now } = {}) {
   const bound = Number.isFinite(surface.bound) ? surface.bound : 10
   const unvaluedPlaces = Number.isFinite(surface.unvalued_places) ? surface.unvalued_places : 3
   const unvaluedOrder = Array.isArray(surface.unvalued_order) ? surface.unvalued_order : []
+  // F9-S1 FR-171: at most this many unvalued places for a capability. Unlisted: no cap.
+  const unvaluedCaps = surface.unvalued_caps && typeof surface.unvalued_caps === 'object' ? surface.unvalued_caps : {}
+  // F6-S1 FR-106a, as F9-S1 FR-172 uses it: these capabilities are shown in the order the
+  // engine published them. Every other capability is still ordered by id, as before.
+  const engineOrdered = new Set(Array.isArray(surface.engine_ordered) ? surface.engine_ordered : [])
   const outcomes = ownerState?.outcomes || {}
 
   const unavailable = []
   const candidates = []
+  const published = new Map()        // entry -> its position in its capability's list
 
   for (const [id, capability] of Object.entries(artefact?.capabilities || {})) {
     if (NOT_ON_TODAY.has(id) || NOT_YET_SHOWN.has(id)) continue
@@ -57,8 +66,9 @@ export function compose(artefact, ownerState, { now } = {}) {
       continue
     }
     if (NOT_ADMITTED.has(id) || NOT_ENTRIES.has(id)) continue
-    for (const entry of capability?.entries || []) {
+    for (const [position, entry] of (capability?.entries || []).entries()) {
       if (isSettled(outcomes[entry.id], now)) continue
+      published.set(entry, position)
       candidates.push(entry)
     }
   }
@@ -92,8 +102,18 @@ export function compose(artefact, ownerState, { now } = {}) {
     const i = unvaluedOrder.indexOf(e.capability)
     return i === -1 ? unvaluedOrder.length : i
   }
+  const within = (a, b) => (a.capability === b.capability && engineOrdered.has(a.capability)
+    ? published.get(a) - published.get(b)
+    : String(a.id).localeCompare(String(b.id)))
+  const taken = {}
   const orderedUnvalued = unvalued
-    .sort((a, b) => rank(a) - rank(b) || String(a.id).localeCompare(String(b.id)))
+    .sort((a, b) => rank(a) - rank(b) || within(a, b))
+    .filter((e) => {
+      const cap = unvaluedCaps[e.capability]
+      if (!Number.isFinite(cap)) return true
+      taken[e.capability] = (taken[e.capability] || 0) + 1
+      return taken[e.capability] <= cap
+    })
     .slice(0, unvaluedPlaces)
 
   // FR-106: unvalued entries are ALLOCATED places, never ranked against valued ones. Without

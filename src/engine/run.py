@@ -34,9 +34,9 @@ MATCHES_PATH = MATCHING_ROOT / "product_matches.parquet"
 
 # Filled by Phase 1: capability id -> callable(inputs) -> CapabilityOutput
 def _runners() -> dict:
-    from src.engine import (catalogue_lifecycle, competitor_position, margin_below_cost, market_boost,
-                            market_running_out, order_quantity, owner_questions, price_consistency,
-                            reconciliation)
+    from src.engine import (assortment_gap, catalogue_lifecycle, competitor_position, margin_below_cost,
+                            market_boost, market_running_out, order_quantity, owner_questions,
+                            price_consistency, reconciliation)
     return {"catalogue_lifecycle": catalogue_lifecycle.run, "price_consistency": price_consistency.run,
             "reconciliation": reconciliation.run, "hygiene": reconciliation.run_hygiene,
             "competitor_position": competitor_position.run,
@@ -44,7 +44,7 @@ def _runners() -> dict:
             # Registered in the same change as its registry entry: a real run whose artefact
             # lacks a registered id is refused (publish.require_complete_registry).
             "market_running_out": market_running_out.run, "market_boost": market_boost.run,
-            "order_quantity": order_quantity.run}
+            "order_quantity": order_quantity.run, "assortment_gap": assortment_gap.run}
 
 
 DEFAULT_RUNNERS: dict = {}          # populated lazily by run_engine
