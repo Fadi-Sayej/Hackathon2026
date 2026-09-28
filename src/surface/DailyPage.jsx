@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { unavailableReason } from '../lib/i18n/unavailableReason.js'
 import { useI18n } from '../lib/i18n/index.js'
 import { formatCurrency } from '../components/shared/formatters.js'
+import { formatDay } from '../lib/i18n/formatMoment.js'
 import { compose } from './compose.js'
 import { settleOutcome } from './deferral.js'
 import { EntryCard } from './EntryCard.jsx'
@@ -24,8 +25,10 @@ import { EntryCard } from './EntryCard.jsx'
  * passed in the app's state, not because a component happened to re-render.
  */
 export function DailyPage({ artefact, ownerState, onOutcome, onUndoOutcome, now, readOnly = false }) {
-  const { t } = useI18n()
+  const { t, language } = useI18n()
   const [error, setError] = useState(null)
+  // F7 AC-120: the figures on these cards rest on the stock file, and it has a date.
+  const asOf = formatDay(artefact?.vintages?.pos?.as_of, language)
   // The last entry settled on this screen, so it can be taken back.
   //
   // "Later" is the reason this exists. It sends no date, and an outcome with no
@@ -99,6 +102,8 @@ export function DailyPage({ artefact, ownerState, onOutcome, onUndoOutcome, now,
           ))}
         </ul>
       ) : null}
+
+      {entries.length > 0 && asOf ? <p className="daily__as-of">{t('daily.asOf', { date: asOf })}</p> : null}
 
       {entries.length > 0 ? (
         <ol className="daily__entries">

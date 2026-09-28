@@ -45,7 +45,11 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const CEILING_KB = 900         // measured 894 KB, 2026-09-28, at Checkpoint 4: Phase 4 Task 4.5
+const CEILING_KB = 905         // measured 903 KB, 2026-09-28: the card batch (#235) put 60 strings in
+                               // three languages on the owner's screens (each card's action, the
+                               // evidence and threshold labels) and index.html went 352 → 361 KB,
+                               // under its 500 KB target. Before that it was 900, over a
+                               // measured 894 KB, 2026-09-28, at Checkpoint 4: Phase 4 Task 4.5
                                // rebuilt the telemetry page on measurement.json and deleted what
                                // only the old one read (actionPriority, credibility, persistence,
                                // completionActions). index.html is 352 KB. Before that it was 915,

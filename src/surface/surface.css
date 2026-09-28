@@ -31,6 +31,13 @@
   gap: 16px;
 }
 
+/* The date of the stock file the cards rest on (F7 AC-120): stated once, quietly. */
+.daily__as-of {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--ink-400);
+}
+
 /* The markers were the "1." and "2." floating in the margin of the live page. The order
    is meaningful — FR-106 ranks these — but it is carried by position, not by a glyph. */
 .daily__entries {
@@ -107,6 +114,15 @@
   color: var(--ink-600);
 }
 
+/* What to do (F6 AC-110c): the one line on the card that is an instruction, so it reads first
+   after the product and in the ink the product's name uses. */
+.entry-card__action {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ink-900);
+}
+
 /* The money line. Two spans that ran together without this — the live page read
    "₪16.00per sale" — so the gap is the fix, not decoration. */
 .entry-card__value {
@@ -170,6 +186,12 @@
   font-size: 0.875rem;
   color: var(--ink-900);
   overflow-wrap: anywhere;
+}
+
+/* A value that is a sentence, not a figure (the 2026-09-28 card batch). */
+.entry-card__evidence dd[data-text] {
+  font-family: inherit;
+  line-height: 1.5;
 }
 
 /* ── the three answers ───────────────────────────────────────────────────── */
