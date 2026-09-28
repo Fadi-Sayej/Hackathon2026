@@ -1,10 +1,15 @@
 # ci.yml — tests run before a merge, for the first time (design.md ADR-013).
 name: ci
 
+# A change that touches only documents runs nothing (2026-09-29): the account's Actions minutes
+# were at 2,704 of 3,000 with three days left, and no test reads docs/, CLAUDE.md or .claude/
+# (checked with git grep). A change that touches anything else still runs everything.
 on:
   push:
     branches: [main]
+    paths-ignore: ['docs/**', 'CLAUDE.md', '.claude/**']
   pull_request:
+    paths-ignore: ['docs/**', 'CLAUDE.md', '.claude/**']
 
 concurrency:
   group: ci-${{ github.ref }}
