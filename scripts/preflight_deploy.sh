@@ -43,9 +43,10 @@ fi
 
 # ---------------------------------------------------------------- 2. data
 head_ "2. Data the deployed app reads"
-# dashboard.json and catalogue.json are what the owner's app reads; operational.json is the
-# telemetry page's frozen input until F13 (#83). Until 2026-09-24 this section checked only
-# operational.json, which no owner page has read since the cut-over. The checks, and why
+# dashboard.json and catalogue.json are what the owner's app reads; measurement.json is the
+# team's measurement page (F13-S1). Until 2026-09-24 this section checked only
+# operational.json, which no owner page had read since the cut-over, and which went on
+# 2026-09-27. The checks, and why
 # each exists, are in scripts/check_deploy_data.py (tests/test_check_deploy_data.py).
 DATA_OUT=$(python3 scripts/check_deploy_data.py 2>&1); DATA_RC=$?
 while IFS= read -r line; do

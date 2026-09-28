@@ -72,3 +72,29 @@ def test_adr_020_the_whole_population_hands_nothing_off(tmp_path, monkeypatch):
     assert art["population"] == "whole"
     assert art["capabilities"]["owner_questions"]["suppressed"]["withdrawn"] == 0
     assert art["capabilities"]["price_consistency"]["thresholds"]["ceiling_population_excludes_withdrawn"] is False
+
+
+
+def test_the_measurement_is_its_own_file_beside_the_artefact(tmp_path, monkeypatch):
+    """F13-S1, ADR-023 (revised 2026-09-27), ADR-029 Decision 6: it is published beside
+    dashboard.json and never inside it, because the edge gate can keep a file from the owner
+    but not a field inside a file his app downloads. "Shown" is every entry this run publishes."""
+    import json
+    inputs = _stub_inputs(monkeypatch)
+    inputs.owner = OwnerState.from_dict({"status": "available", "pulled_at": "t", "outcomes": {
+        "gone": {"status": "acted", "at": 1790000000000,
+                 "snapshot": {"signal_family": "price.inverted", "value": 2.5, "kind": "per_sale",
+                              "certainty": "confirmed"}}}})
+    result = run_mod.run_engine(mode="publish", artefact_path=tmp_path / "d.json",
+                                now=datetime(2026, 9, 8, tzinfo=timezone.utc))
+    art = result["artefact"]
+    assert "measurement" not in art
+    m = json.loads((tmp_path / "measurement.json").read_text(encoding="utf-8"))
+    assert m == result["measurement"]
+    assert m["inputs_digest"] == art["inputs_digest"] and m["run_id"] == art["run_id"]
+    shown = sum(len(c.get("entries") or []) for c in art["capabilities"].values())
+    assert m["status"] == "available"
+    assert m["totals"]["shown"] == shown
+    assert m["totals"]["decided"] == 1 and m["totals"]["not_in_this_run"] == 1
+    assert m["money"] == [{"kind": "per_sale", "certainty": "confirmed", "amount": 2.5, "decisions": 1}]
+    assert next(s for s in result["steps"] if s["step"] == "measurement")["status"] == "ok"

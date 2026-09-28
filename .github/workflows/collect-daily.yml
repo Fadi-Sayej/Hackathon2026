@@ -132,11 +132,9 @@ jobs:
       # green export is rule 10. So the legacy chain stops running instead of being
       # propped up.
       #
-      # public/data/operational.json therefore freezes at its last good value, which is
-      # the correct state for a rollback target (§20.2): after the cut-over no V1 page
-      # imports loadOperationalData — only src/telemetry/ does — so nothing the owner
-      # opens reads it. Phase 4 deleted the chain on 2026-09-24; the file stays until
-      # F13 (#83) replaces the telemetry page that reads it.
+      # public/data/operational.json therefore froze at its last good value. Phase 4 deleted
+      # the chain on 2026-09-24, and the file went on 2026-09-27, when F13 (#83) rebuilt its
+      # last reader, the telemetry page, on measurement.json (Phase 4 Task 4.5).
       #
       # sources.json is gone. It was deleted on 2026-09-13 (ADR-005), and the three
       # code paths that kept rewriting it stopped; its writers disagreed about
@@ -260,6 +258,11 @@ jobs:
           # to know that.
           if [ -f public/data/catalogue.json ]; then
             git add public/data/catalogue.json
+          fi
+          # measurement.json likewise (F13-S1, ADR-023): its own file so the edge gate keeps
+          # it from the owner (ADR-029 §6), and it carries the same run's `inputs_digest`.
+          if [ -f public/data/measurement.json ]; then
+            git add public/data/measurement.json
           fi
           if git diff --cached --quiet; then
             echo "Artefact unchanged."

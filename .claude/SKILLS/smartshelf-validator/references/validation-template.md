@@ -63,8 +63,8 @@ Read from the artifacts. Name the artifact for every number.
 
 | Question | Answer | Read from |
 |---|---|---|
-| Entries this feature contributes to the daily surface today |  | `public/data/operational.json` → `byType.<TYPE>` / `recommendations[].type`; or the source `*.parquet` |
-| `meta.generatedAt` of the artifact you read |  | `public/data/operational.json` |
+| Entries this feature contributes to the daily surface today |  | `public/data/dashboard.json` → `capabilities.<id>.entries` / `counts`; or the source `*.parquet` |
+| `generated_at` of the artifact you read |  | `public/data/dashboard.json` |
 | Does that count match what the approved intent and spec say it should be? | yes / no — <both numbers> |  |
 | What changes when the signal is turned off |  | `npm run check:signals` output |
 | Every figure obeys rule 8 (kinds not summed · no shekel figure on a quantity signal · no number rather than zero) | yes / no |  |

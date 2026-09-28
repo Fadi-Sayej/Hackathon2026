@@ -12,8 +12,11 @@ loadDashboard.js) and public/data/catalogue.json (Products). Each is checked thr
   - it passes the validation the engine itself applies before publishing:
     validate_artefact() with the complete registry (ADR-014), and validate_catalogue().
 
-public/data/operational.json is checked too, as the telemetry page's frozen input until
-F13 (#83). Nothing regenerates it since the legacy chain went on 2026-09-24.
+public/data/measurement.json is checked too, as the team's measurement page's input (F13-S1,
+ADR-023). It is published beside the artefact, so it must pass its schema and come from the
+same run. Its absence only warns: the page says "not published yet", and the owner's deploy
+does not depend on it. It replaced operational.json, the telemetry page's frozen input, which
+Phase 4 Task 4.5 deleted.
 
 Until 2026-09-24 the preflight checked only operational.json, which no owner page has read
 since the 2026-09-12 cut-over. So a deploy with dashboard.json missing, uncommitted or
@@ -36,6 +39,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.engine.catalogue import validate_catalogue  # noqa: E402
+from src.engine.measurement import validate_measurement  # noqa: E402
 from src.engine.publish import PublishRefused, validate_artefact  # noqa: E402
 from src.engine.registry import CAPABILITIES  # noqa: E402
 
@@ -43,7 +47,7 @@ Finding = Tuple[str, str]
 
 DASHBOARD = "public/data/dashboard.json"
 CATALOGUE = "public/data/catalogue.json"
-OPERATIONAL = "public/data/operational.json"
+MEASUREMENT = "public/data/measurement.json"
 
 # The nightly commits the artefact every day. Older than this means at least one nightly
 # did not: worth a look before deploying, not a reason to refuse.
@@ -142,21 +146,27 @@ def _check_catalogue(root: Path) -> List[Finding]:
     return findings + [("OK", f"{CATALOGUE} passes the engine's validation: {len(products):,} products")]
 
 
-def _check_operational(root: Path) -> List[Finding]:
-    findings, doc = _load(root, OPERATIONAL, "nothing regenerates it since 2026-09-24; restore it: "
-                                             "git checkout -- public/data/operational.json")
+def _check_measurement(root: Path) -> List[Finding]:
+    if not (root / MEASUREMENT).exists():
+        return [("WARN", f"{MEASUREMENT} is missing — the team's measurement page will say it is not "
+                         "published yet. The nightly writes it beside the artefact")]
+    findings, doc = _load(root, MEASUREMENT, "the nightly writes it beside the artefact")
     if doc is None:
         return findings
-    count = len(doc.get("recommendations") or []) if isinstance(doc, dict) else 0
-    if count == 0:
-        return findings + [("BAD", f"{OPERATIONAL} is committed but EMPTY — the telemetry page, "
-                                   "its one reader until F13 (#83), will show nothing")]
-    return findings + [("OK", f"{OPERATIONAL} committed, {count:,} recommendations "
-                              "(the telemetry page's frozen input until F13, #83)")]
+    try:
+        validate_measurement(doc)
+    except Exception as err:            # jsonschema.ValidationError, or a doc that is not an object
+        return findings + [("BAD", f"{MEASUREMENT} would be refused by the engine: {getattr(err, 'message', err)}")]
+    artefact = root / DASHBOARD
+    digest = json.loads(artefact.read_text(encoding="utf-8")).get("inputs_digest") if artefact.exists() else None
+    if digest is not None and doc.get("inputs_digest") != digest:
+        return findings + [("WARN", f"{MEASUREMENT} comes from another run than {DASHBOARD} "
+                                    "(inputs_digest differs); the measurement step failed on a later night")]
+    return findings + [("OK", f"{MEASUREMENT} passes the engine's validation and comes from the same run")]
 
 
 def check(root: Path, now: datetime) -> List[Finding]:
-    return _check_dashboard(root, now) + _check_catalogue(root) + _check_operational(root)
+    return _check_dashboard(root, now) + _check_catalogue(root) + _check_measurement(root)
 
 
 def main() -> int:

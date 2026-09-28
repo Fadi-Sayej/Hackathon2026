@@ -1,11 +1,10 @@
 /**
  * firebase.js — browser Firebase client for the pilot (B-2).
  *
- * Consumed by `firestoreAdapter.js`, `persistence.js` and the telemetry dashboard.
+ * Consumed by `auth/session.js` and `owner/firestoreOwnerStateWriter.js`.
  * Everything here is lazy and fails soft: if the `VITE_FIREBASE_*` values are not
- * set, `isFirebaseConfigured()` returns false, nothing is ever initialised, and
- * `persistence.js` silently stays on localStorage. That is the state today —
- * activation is a console/env task, not a code change.
+ * set, `isFirebaseConfigured()` returns false, nothing is ever initialised, and the
+ * owner state stays in this device's localStorage.
  *
  * Config comes from env, never from a literal in this file. An earlier version
  * hardcoded the project's web API key here. Firebase web keys are not secrets
@@ -58,8 +57,8 @@ export const STORE_ID = readEnv('VITE_STORE_ID') || 'yomyom-kafr-qasim'
 const REQUIRED_KEYS = ['apiKey', 'projectId', 'appId']
 
 /**
- * Is the browser Firebase config present? The single switch `persistence.js`
- * reads to choose between the Firestore adapter and plain localStorage.
+ * Is the browser Firebase config present? The owner-state writer checks it before
+ * touching Firestore.
  */
 export function isFirebaseConfigured() {
   return REQUIRED_KEYS.every((key) => firebaseConfig[key] !== '')
@@ -79,7 +78,7 @@ function getFirebaseApp() {
 /**
  * Lazily created Firestore handle. Throws when unconfigured rather than
  * returning a broken client — callers are expected to check
- * `isFirebaseConfigured()` first, which `firestoreAdapter` does.
+ * `isFirebaseConfigured()` first, as the owner-state writer does.
  */
 export function getDb() {
   if (!isFirebaseConfigured()) {
@@ -98,7 +97,7 @@ export function getDb() {
   } catch {
     // Private browsing and some embedded webviews refuse IndexedDB. Falling back
     // to an in-memory client is strictly better than failing to load the app:
-    // the localStorage mirror underneath firestoreAdapter still holds the data.
+    // the owner state's localStorage copy still holds the data.
     dbInstance = initializeFirestore(getFirebaseApp(), {})
   }
   return dbInstance
@@ -111,8 +110,8 @@ let authPromise = null
  * `request.auth != null`, so every read/write must wait on this.
  *
  * Resolves (rather than rejects) on failure so a sign-in problem degrades to
- * "local only" instead of taking the page down; `firestoreAdapter` reports the
- * sync error and keeps serving from the localStorage mirror.
+ * "local only" instead of taking the page down; the owner state keeps serving
+ * from its localStorage copy.
  */
 export function ensureAnonymousAuth() {
   if (authPromise) return authPromise

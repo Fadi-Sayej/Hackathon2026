@@ -527,3 +527,29 @@ def test_a_changed_daily_report_changes_the_digest(tmp_path):
     assert same_a.inputs_digest == same_b.inputs_digest
     assert same_a.inputs_digest != changed.inputs_digest
     assert none.inputs_digest != same_a.inputs_digest
+
+
+def _owner_common(tmp_path):
+    row = {"barcode": "0012", "product_name": "מים", "category": "c", "selling_price": 4.0,
+           "wolt_price": 5.0, "cost_price": 1.0}
+    return dict(run_at=datetime(2026, 9, 8, tzinfo=timezone.utc), silver_dir=_dup_silver(tmp_path, [row]),
+                signals_dir=tmp_path / "n", matches_path=tmp_path / "n.parquet", policy=load_policy())
+
+
+def test_a_changed_owner_decision_changes_the_digest(tmp_path):
+    """ADR-023 (revised 2026-09-27). order_quantity reads his approvals and the measurement
+    reads every decision, so two runs over different decisions must not share a digest."""
+    common = _owner_common(tmp_path)
+    none = OwnerState.from_dict({"status": "available", "pulled_at": "t"})
+    one = OwnerState.from_dict({"status": "available", "pulled_at": "t", "outcomes": {
+        "e1": {"status": "acted", "at": 1, "snapshot": {"signal_family": "price.inverted"}}}})
+    assert load_inputs(owner=none, **common).inputs_digest != load_inputs(owner=one, **common).inputs_digest
+
+
+def test_a_changed_revival_changes_the_digest(tmp_path):
+    """catalogue_lifecycle reads his revivals (revival_active), so they are an input too."""
+    common = _owner_common(tmp_path)
+    none = OwnerState.from_dict({"status": "available", "pulled_at": "t"})
+    one = OwnerState.from_dict({"status": "available", "pulled_at": "t",
+                                "revivals": {"0012": {"window_id": "w", "at": 1}}})
+    assert load_inputs(owner=none, **common).inputs_digest != load_inputs(owner=one, **common).inputs_digest
