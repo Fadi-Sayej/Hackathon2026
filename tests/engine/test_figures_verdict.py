@@ -84,3 +84,81 @@ def test_the_list_agrees_with_what_the_committed_artefact_publishes():
         if cap.get("status") != "available":
             continue
         assert (cap_id in figures._REGISTERS_NO_FIGURE) == (cap_id not in published), cap_id
+
+
+# ── "The same data" (AC-127) ─────────────────────────────────────────────────
+#
+# The market half is rebuilt on each machine from the committed snapshots, so a laptop's can
+# be older than the artefact it is compared with. Then every figure that reads it differs and
+# nothing says why: 15 of 47 on 2026-09-28, until the market half was rebuilt from the same
+# day's snapshot (F7 validation record). A NOTE, never a FAIL: the engine is not wrong, the
+# comparison is, so the exit code is what it would have been without it.
+
+COMPETITOR_FIGURE = {"value": 5, "unit": "products", "inputs": ["pos", "competitor"], "thresholds": {}}
+
+
+def _run_dated(monkeypatch, capsys, tmp_path, *, ours, committed, capabilities=None, committed_text=None):
+    artefact = {"figures": {"price_consistency.inverted": FIGURE,
+                            "competitor_position.matched": COMPETITOR_FIGURE,
+                            "provenance.competitor_snapshot_age_days": {**FIGURE, "inputs": ["competitor"]}},
+                "capabilities": capabilities or {"price_consistency": {"status": "available"}},
+                "vintages": {"competitor": {"snapshot_date": ours}}}
+    path = tmp_path / "dashboard.json"
+    path.write_text(committed_text if committed_text is not None else
+                    json.dumps({"vintages": {"competitor": {"snapshot_date": committed}}}), encoding="utf-8")
+    monkeypatch.setattr(figures, "COMMITTED_ARTEFACT", path)
+    monkeypatch.setattr(figures, "run_engine", lambda **_: {"artefact": artefact})
+    monkeypatch.setattr(sys, "argv", ["figures.py", "--json"])
+    code = figures.main()
+    out, err = capsys.readouterr()
+    return code, json.loads(out), err
+
+
+def test_the_same_market_snapshot_says_nothing(monkeypatch, capsys, tmp_path):
+    code, payload, err = _run_dated(monkeypatch, capsys, tmp_path, ours="2026-09-28", committed="2026-09-28")
+    assert code == 0
+    assert "market snapshot" not in err
+    assert payload["market_snapshot"] == {"this_run": "2026-09-28", "committed": "2026-09-28"}
+
+
+def test_an_older_local_market_half_is_named_with_the_figures_it_moves(monkeypatch, capsys, tmp_path):
+    code, payload, err = _run_dated(monkeypatch, capsys, tmp_path, ours="2026-09-27", committed="2026-09-28")
+    assert code == 0, "a NOTE must not change the exit code"
+    note = next(line for line in err.splitlines() if "market snapshot" in line)
+    assert note.startswith("NOTE")
+    assert "2026-09-27" in note and "2026-09-28" in note
+    # Exactly the figures that read the market: the POS-only one is not named.
+    assert "competitor_position.matched" in note
+    assert "provenance.competitor_snapshot_age_days" in note
+    assert "price_consistency.inverted" not in note
+    # How to get the same data, and the one way not to.
+    assert "scripts/rehydrate_silver.py" in note
+    assert "scripts/build_competitor_product_signals.py" in note
+    assert "scripts/build_product_matches.py" in note
+    assert "--skip-market" in note and "market-context.json" in note
+    assert payload["market_snapshot"] == {"this_run": "2026-09-27", "committed": "2026-09-28"}
+
+
+def test_no_local_market_half_at_all_is_named_too(monkeypatch, capsys, tmp_path):
+    _, _, err = _run_dated(monkeypatch, capsys, tmp_path, ours=None, committed="2026-09-28")
+    assert any("market snapshot" in line and "none" in line for line in err.splitlines())
+
+
+def test_the_note_does_not_turn_a_failure_into_a_pass(monkeypatch, capsys, tmp_path):
+    code, _, err = _run_dated(monkeypatch, capsys, tmp_path, ours="2026-09-27", committed="2026-09-28",
+                              capabilities={"reconciliation": _unavailable("no_sales_evidence")})
+    assert code == 1
+    assert "FAIL  reconciliation: no_sales_evidence" in err
+    assert any(line.startswith("NOTE") and "market snapshot" in line for line in err.splitlines())
+
+
+def test_an_unreadable_committed_artefact_says_the_comparison_is_unknown(monkeypatch, capsys, tmp_path):
+    code, payload, err = _run_dated(monkeypatch, capsys, tmp_path, ours="2026-09-28", committed=None,
+                                    committed_text="{not json")
+    assert code == 0
+    assert any(line.startswith("NOTE") and "unknown" in line for line in err.splitlines())
+    assert payload["market_snapshot"] == {"this_run": "2026-09-28", "committed": None}
+
+
+def test_the_default_comparison_is_the_committed_artefact():
+    assert figures.COMMITTED_ARTEFACT == ROOT / "public" / "data" / "dashboard.json"

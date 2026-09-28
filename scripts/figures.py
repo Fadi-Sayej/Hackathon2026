@@ -45,6 +45,17 @@ _CREDENTIAL_GATED = frozenset({"answer_storage_unavailable"})
 # tests/engine/test_figures_verdict.py checks this list against the committed artefact.
 _REGISTERS_NO_FIGURE = frozenset({"market_running_out", "market_boost", "order_quantity"})
 
+# AC-127 is "on the same data". The market half is rebuilt on each machine from the committed
+# snapshots, so a laptop's can be older than the artefact it is compared with, and then every
+# figure that reads it differs with nothing said: 15 of 47 on 2026-09-28, until the market
+# half was rebuilt from the same day's snapshot (F7 validation record). A NOTE, never a FAIL:
+# the engine is not wrong, the comparison is, so the exit code is what it would have been.
+COMMITTED_ARTEFACT = ROOT / "public" / "data" / "dashboard.json"
+# The market half without the rest of the market chain: `figures` without --skip-market would
+# also call Open-Meteo and rewrite the committed public/data/market-context.json.
+_REBUILD_MARKET = ("python3 scripts/rehydrate_silver.py && python3 scripts/build_competitor_product_signals.py"
+                   " && python3 scripts/build_product_matches.py")
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -86,6 +97,13 @@ def main() -> int:
         else:
             (gated if reason in _CREDENTIAL_GATED else blocked).append(f"{cap_id}: {reason}")
 
+    this_run = _competitor_snapshot(artefact)
+    try:
+        committed = _competitor_snapshot(json.loads(Path(COMMITTED_ARTEFACT).read_text(encoding="utf-8")))
+        readable = True
+    except (OSError, ValueError):
+        committed, readable = None, False
+
     payload = {
         # What the run USED, not what was asked for. With no --population the CLI passes
         # None and run_engine resolves it from policy, so reporting args.population here
@@ -102,6 +120,7 @@ def main() -> int:
         "unavailable": blocked,
         "needs_credentials": gated,
         "registers_no_figure": no_figure,
+        "market_snapshot": {"this_run": this_run, "committed": committed},
     }
 
     if args.json:
@@ -114,6 +133,9 @@ def main() -> int:
               f"figure is unaffected", file=sys.stderr)
     for line in no_figure:
         print(f"NOTE  {line} — registers no figure; every figure is unaffected", file=sys.stderr)
+    market_note = _market_note(figures, this_run, committed, readable)
+    if market_note:
+        print(f"NOTE  {market_note}", file=sys.stderr)
     if missing or blocked:
         for name in missing:
             print(f"FAIL  {name} has no value", file=sys.stderr)
@@ -121,6 +143,25 @@ def main() -> int:
             print(f"FAIL  {line}", file=sys.stderr)
         return 1
     return 0
+
+
+def _competitor_snapshot(artefact: dict):
+    return ((artefact.get("vintages") or {}).get("competitor") or {}).get("snapshot_date")
+
+
+def _market_note(figures: dict, this_run, committed, readable: bool):
+    """None when this run read the published market snapshot; otherwise what differs and why."""
+    if not readable:
+        return (f"could not read {COMMITTED_ARTEFACT}, so whether this run's market snapshot is the "
+                f"published one is unknown")
+    if this_run == committed:
+        return None
+    reading = sorted(name for name, f in figures.items() if "competitor" in (f.get("inputs") or []))
+    return (f"this run's market snapshot is {this_run or 'none'} and the committed artefact's is "
+            f"{committed or 'none'}, so the {len(reading)} figures that read it can differ from the "
+            f"published ones: {', '.join(reading)}. To compare on the same data, rebuild the market "
+            f"half from the committed snapshots: {_REBUILD_MARKET}. Not by running figures without "
+            f"--skip-market, which also rewrites public/data/market-context.json")
 
 
 def _carries_nothing(figure: dict) -> bool:
