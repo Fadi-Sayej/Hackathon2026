@@ -53,3 +53,17 @@ Specs: none
 - Sibling of F8 — the other face of the same market-movement signal.
 - The 527 products carrying `WATCH_PRODUCT` today are this feature's raw material; the tag
   leaves V1 with the System Design's §5.3.
+
+## Added 2026-09-28 (not part of the migrated content)
+
+The blocking decision above was taken by the repository owner as **D-25**, from the
+[F9 brief](../../product/open-decisions/F9-assortment-gap.md):
+- **A finding** is a product he does not stock that the market (D-18) has run out of,
+  by ADR-031's rule.
+- **It is an entry on his daily surface**, where he records "I'll try it" or "Not for my
+  store".
+
+The products he does stock are F8's (D-19, F8-S1 FR-158), so the "weak here" half of the
+sentence above is no longer F9's. The `WATCH_PRODUCT` tag and its 527 are gone with the
+recommender that produced them (GAP-008a). The status stays `Registered — not specified`
+until a spec is approved.

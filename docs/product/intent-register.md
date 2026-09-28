@@ -6,7 +6,7 @@ Version: 0.1 (content unchanged from `specs.md` v1.1)
 Parent: [PRD](PRD.md)
 Related Specs: every F#-S# document under `docs/features/`
 Owner: smartshelf-pm
-Updated: 2026-09-27 (D-23 recorded: the pilot with the YomYom store ended; D-24: F13 has no success number, and its price is for later)
+Updated: 2026-09-28 (D-25 recorded: F9's two decisions)
 ---
 
 > **Migration note.** This is `SPEC-000` from the pre-migration monolithic `specs.md`,
@@ -108,6 +108,7 @@ These are settled. A specification may operationalize them; it may not reopen th
 | D-20 | **When the market and his own sales disagree about a product, he is asked on screen, his answer is saved, and he is not asked about that product again.** Questions come at most three at a time (D-8). Letting an answer change future quantities automatically is left for later. This settles F8's case only; F9's decision (INT-005, §4) is not taken by it | GAP-008 decision 3; decided by the repository owner 2026-09-24 |
 | D-23 | **The pilot with the YomYom store ended on 2026-09-27. The project is finished on the data already held, and nothing is made up to stand in for what a store would send: no daily sales, store facts or owner answers are simulated. What needs a store owner waits for another store and its owner.** The data held, read from `public/data/dashboard.json` generated 2026-09-27: the POS inventory export as of 2026-06-06, the seven monthly sales reports (2026-01 … 2026-07), and the competitor snapshots the nightly collector keeps adding. No daily sales report and no store fact was ever received **D-24 supersedes it in part, the same day: F13 has no success number, so that does not wait. The rest of D-23 stands.** | Decided by the repository owner 2026-09-27, in his words: "we broke up with yomyom owner , but we will carry on finishing the project on the data we have until we get another market with new owner , no mock up" |
 | D-24 | **F13 has no success number, and its subscription price will be discussed later.** The pilot is not judged against a ₪ figure it must reach: the measurement shows how much success there is, and no target is set. This supersedes D-23 in one respect only: the success number no longer waits for another store's owner, because there is none. The price stays open, as D-23 left it, and with no number, when a subscription starts is not decided either. The data cadence still waits for another store (D-23). What the measurement may contain is still OQ-801 | Decided by the repository owner 2026-09-27, directly in the session that recorded it, in his words: "we don't really need a success number we just need to measure how much success there is no limit we need to get to, and for the subscription price you can avoid for now i don't think you need it fill it with 'will be discussed later'" |
+| D-25 | **F9 points out the products he does not stock that the market (D-18) has run out of, and each one is an entry on his daily surface where he records whether he will try it.** A finding is a product the market lists and he does not stock that ran out at a market store on at least one recent night, by ADR-031's rule, the one F8 uses. On 2026-09-28 that was 132 over the 45 nights held, of the 995 products the market lists that are not in his catalogue. Each takes a place among his ten (D-9), where he records "I'll try it" or "Not for my store". It carries no ₪ figure, because he has no sales of the product to size it with (D-1, D-3). Until a new store's owner signs in (D-23), no one can record an answer: the team's accounts are read-only (D-22). Left to the spec: how many nights count as recent, which of his catalogued but idle products count as not stocked, and where the entry ranks among the ten | GAP-013, both decisions as they were put to him in the F9 brief: 1 "B — What the market ran out of … 132 over the 45 nights held", 2 "A — An entry on the daily surface … where he records 'I'll try it' or 'Not for my store'"; decided by the repository owner 2026-09-28 ("1b 2a") |
 
 ---
 
@@ -131,9 +132,14 @@ rather than surfacing them:
   out" signal D-19 needs does not exist yet for the nearby stores (GAP-008e). The brief that
   posed the questions is kept, `Superseded`, as the record:
   [F8 brief](open-decisions/F8-ordering.md).
-- **INT-005** depends on what the owner is expected to *do* with a "strong in the
+- **INT-005** depended on what the owner is expected to *do* with a "strong in the
   market, weak here" finding. `intent.md` §6 phrases it as a conversation opener, which
-  is not yet a decision the system can record.
+  is not yet a decision the system can record. The repository owner took it on 2026-09-28
+  as **D-25**: a finding is a product he does not stock that the market (D-18) has run out
+  of, and it is an entry on his daily surface, where he records whether he will try it.
+  Products he stocks are F8's (D-19, F8-S1 FR-158). The brief that posed the questions is
+  kept, `Superseded`, as the record:
+  [F9 brief](open-decisions/F9-assortment-gap.md). Its spec is not yet written.
 - **INT-007** depends on shelf-life data that does not exist until store staff have
   recorded receipts for 30 days.
 - **INT-008** depends on three deliveries per supplier being observed; the intent notes
