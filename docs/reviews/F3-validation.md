@@ -104,7 +104,7 @@ name the reference it measured against, or be re-measured on what the collector 
 
 | Question | Answer | Read from |
 |---|---|---|
-| Entries on the daily surface today | **0.** The 6 entries are `review` (1 breach, 5 purchase-cost), so `compose` admits none. The surface's 10 are F1 (7) and F2 (3) | `compose()` over `public/data/dashboard.json`, `now` 2026-09-28 08:00Z |
+| Entries on the daily surface today | **0.** Entries without money share three reserved places, handed out in the order `reconciliation` → `competitor_position` → `catalogue_lifecycle` → `hygiene` (`thresholds.surface`, `compose.js`); reconciliation's 355 fill all three every day until the owner settles them. F3's 6 reach it only after those. The surface's 10 are F1 (7) and F2 (3). (`attention` plays no part in admission: with F1's and F2's entries removed, `compose` admits 3 of F3's) | `compose()` over `public/data/dashboard.json`, `now` 2026-09-28 08:00Z |
 | `generated_at` | 2026-09-28T03:10:39Z, run `ok` | `public/data/dashboard.json` |
 | On its own pages | Prices: 396 dearer · 477 same or cheaper · 1,805 no comparison. Findings: 1 breach, 5 purchase-cost | `capabilities.competitor_position.comparison`, `.entries` |
 | Matches the intent? | **no** — 1 breach against 144 (97 after the gate) | as Pass two |
@@ -121,7 +121,7 @@ calls `context`, and the gas station the intent was built around matches five pr
 honest about everything it computes, and it computes almost nothing to act on.
 
 A latent defect found on the way: `EntryCard.jsx` renders every evidence value with `String()`.
-A competitor finding that reached the morning screen (a premium over 100%) would print its
+A competitor finding that reached the morning screen (once reconciliation's 355 are settled) would print its
 `sources` and `reference` as `[object Object]`, under labels the Arabic and Hebrew dictionaries
 leave in English (`evidence.sources` "sources", `evidence.reference` "reference",
 `evidence.premium_pct` "premium pct", `evidence.policy_pct` "policy pct", `attention_pct`,
