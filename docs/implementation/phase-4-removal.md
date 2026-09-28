@@ -705,8 +705,8 @@ a quarter has passed".
 
 ### Task 4.5: The measurement surface (F13-S1, #83), and the rest of Task 4.2
 
-> **Added 2026-09-27.** F13-S1 is `Ready for review` with its §14 closed for the build
-> (D-24, ADR-023 revised). This task is what Task 4.2 and Checkpoint 4 have waited on: once the
+> **Added 2026-09-27.** F13-S1 has its §14 closed for the build (D-24, ADR-023 revised), and
+> the repository owner approved it, with ADR-023, on 2026-09-28 (#230). This task is what Task 4.2 and Checkpoint 4 have waited on: once the
 > telemetry surface reads the artefact, `operational.json` and everything only it fed can go.
 > It runs in three pieces, in order, because the page needs the block and the deletions need
 > the page.

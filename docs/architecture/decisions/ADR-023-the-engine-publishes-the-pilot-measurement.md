@@ -1,18 +1,18 @@
 ---
 ID: ADR-023
 Title: The engine publishes the pilot measurement; the browser renders it
-Status: Ready for review
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-09-13
 Parent: [System Design](../system-design.md) §19
 Related Specs: F13-S1 (§14 item 5), F6-S1, F7-S1
 Inputs: [ADR-001, ADR-004, ADR-005, ADR-016, ADR-021, ADR-024, ADR-029, D-23, D-24, docs/features/F13-pilot-measurement/specs/F13-S1-pilot-measurement.md, issue #94, issue #96, issue #83]
-Updated: 2026-09-27 (revised for D-23 and D-24: no target, and no reading of past artefacts; the file's shape stated)
+Updated: 2026-09-28 (accepted by the repository owner on PR #230, as revised on 2026-09-27)
 ---
 
 # ADR-023 — The engine publishes the pilot measurement; the browser renders it
 
-**Status:** Ready for review · **Recorded in:** [System Design](../system-design.md) §19
+**Status:** Accepted (2026-09-28, by the repository owner, on PR #230) · **Recorded in:** [System Design](../system-design.md) §19
 
 > **Revised 2026-09-27.** Written on 2026-09-13 and never accepted. Two decisions since then
 > change what it has to carry. D-24: the measurement shows how much success there is and

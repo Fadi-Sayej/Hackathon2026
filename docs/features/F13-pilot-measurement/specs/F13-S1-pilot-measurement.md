@@ -1,13 +1,13 @@
 ---
 ID: F13-S1
 Title: Pilot Measurement — the 30-day recovered-₪ surface
-Status: Ready for review
+Status: Approved — by the repository owner, 2026-09-28 (PR #230)
 Owner: smartshelf-architect
 Version: 0.2 (2026-09-27)
 Parent: [F13 — Pilot Measurement](../intent.md)
 Related Intents: INT-MEAS
 Inputs: [docs/product/PRD.md §8, docs/features/F13-pilot-measurement/intent.md, F7-S1, F2-S1 (FR-023), F6-S1, ADR-009, ADR-016, ADR-021, docs/reviews/system-design-readiness.md ARCH-GATE-003, OQ-801, D-23, D-24, ADR-023 (revised 2026-09-27)]
-Updated: 2026-09-27 (§14 items 1 and 3 answered, as D-24; then items 2, 4 and 5 closed for the build, §15 written, and Ready for review)
+Updated: 2026-09-28 (approved by the repository owner; the day before, §14 closed for the build and §15 written)
 ---
 
 # F13-S1 — Pilot Measurement
@@ -20,7 +20,8 @@ Updated: 2026-09-27 (§14 items 1 and 3 answered, as D-24; then items 2, 4 and 5
 > *towards*.
 >
 > **2026-09-27: closed for the build.** D-24 answers items 1 and 3; item 2 (OQ-801), item 4
-> and item 5 are answered in [§14](#14-blocked-on). The spec is `Ready for review`.
+> and item 5 are answered in [§14](#14-blocked-on). The repository owner approved the spec on
+> 2026-09-28 (PR #230).
 
 > **Why this spec exists now, when SPEC-000 §4 said it should not.** That section declined
 > to specify INT-MEAS because it was *"already measured by an existing surface, so no new

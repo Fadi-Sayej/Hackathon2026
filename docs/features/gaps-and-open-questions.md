@@ -548,7 +548,7 @@ price recommendation.
 | OQ-604 | When does a deferral lapse? | SPEC-006 |
 | OQ-605 | Does declining suppress an entry permanently? | SPEC-006 |
 | OQ-701 | Which figures must be reproducible — owner-facing, or all? | SPEC-007 |
-| OQ-801 | What may the 30-day recovered-₪ measurement contain, given that its "stock explained" component cannot be stated in money (D-1)? *(2026-09-27: D-24 sets no success number, so no number an owner names will settle this. Still open, for the pm and then the architect.)* *(2026-09-27, later: answered in F13-S1 §14 item 2, `Ready for review`: no composite. Money only where an acted-on decision carries it, per kind and certainty; every other component a count. Closes when the owner approves F13-S1.)* | INT-MEAS / SPEC-000 §4 |
+| ~~OQ-801~~ | What may the 30-day recovered-₪ measurement contain, given that its "stock explained" component cannot be stated in money (D-1)? *(2026-09-27: D-24 sets no success number, so no number an owner names will settle this. Still open, for the pm and then the architect.)* *(2026-09-27, later: answered in F13-S1 §14 item 2, `Ready for review`: no composite. Money only where an acted-on decision carries it, per kind and certainty; every other component a count. Closed 2026-09-28: the repository owner approved F13-S1.)* | INT-MEAS / SPEC-000 §4 |
 | OQ-702 | When reproduction and a surface disagree, which is shown? | SPEC-007 |
 
 #### P2 — safely deferred

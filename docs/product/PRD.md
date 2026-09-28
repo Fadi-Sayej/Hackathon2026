@@ -143,6 +143,10 @@ Updated: 2026-09-27 (D-23 recorded: the pilot with the YomYom store ended; §8: 
 > (INT-MEAS). It is **not specified**, and the System Design removes the surface that
 > SPEC-000 §4 assumed would measure it — see ARCH-GATE-003 in the
 > [readiness gate](../reviews/system-design-readiness.md).
+>
+> **2026-09-28:** F13 is specified as [F13-S1](../features/F13-pilot-measurement/specs/F13-S1-pilot-measurement.md),
+> approved by the repository owner, with no success number (D-24). The engine publishes the
+> measurement and the team's page renders it (ADR-023).
 
 ## 9. Figures, and where they come from
 

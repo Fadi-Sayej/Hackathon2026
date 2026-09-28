@@ -1214,7 +1214,7 @@ own, so their rows say so rather than grade it after the fact.
 | [ADR-013](decisions/ADR-013-tests-run-before-merge.md) | Tests run before merge | Easy |
 | [ADR-021](decisions/ADR-021-the-artefact-states-how-many-devices-wrote-owner-state.md) | The artefact states how many devices have written owner state, and when | Not stated |
 | [ADR-022](decisions/ADR-022-a-barcode-less-row-is-identified-by-its-name.md) | A barcode-less row is identified by its name, under ADR-019's rule | Not stated |
-| [ADR-023](decisions/ADR-023-the-engine-publishes-the-pilot-measurement.md) | The engine publishes the pilot measurement; the browser renders it — **`Ready for review`** | Not stated |
+| [ADR-023](decisions/ADR-023-the-engine-publishes-the-pilot-measurement.md) | The engine publishes the pilot measurement; the browser renders it | Not stated |
 | [ADR-024](decisions/ADR-024-the-catalogue-is-published-beside-the-artefact.md) | The product catalogue is published beside the artefact, not inside it | Not stated |
 | [ADR-025](decisions/ADR-025-the-comparison-behind-the-finding-is-published.md) | The comparison behind a competitor finding is published, not only the finding | Not stated |
 | [ADR-026](decisions/ADR-026-reconciliation-publishes-the-span-it-reconciled.md) | The reconcile window is cut once per run, at the run's own stock date, and reconciliation publishes that cut | Easy |
