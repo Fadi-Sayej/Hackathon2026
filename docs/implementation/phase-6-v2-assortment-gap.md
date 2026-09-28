@@ -110,7 +110,8 @@ and the `action.*` string land, and `assortment_gap` leaves `NOT_YET_SHOWN`.
   - its fixture world has a finding in the baseline;
   - the catalogue case shows `market_running_out` untouched;
   - the whole engine run takes 4.4 s locally, so the 2-minute budget holds.
-- **6.5 waits** for the repository owner to approve the card.
+- **6.5 built on 2026-09-29**, after the repository owner approved the mockups
+  (`docs/reviews/f9-card-2026-09-29.md`). F9 is on Today and on the Assortment page.
 
 ## Checkpoint 6
 
