@@ -436,8 +436,15 @@ The build emits a second entry, `telemetry.html`, from the same `vite build` (mu
 `vite.config.js`). It is served at **`/telemetry.html`** on the same deployment, behind the same
 sign-in gate, to team accounts only (ADR-029). Vercel serves the built file directly (the filesystem is checked before the SPA
 rewrite), so no `vercel.json` rewrite change is needed. It is the internal read-only pilot
-dashboard (alerts shown vs acted-on, acceptance by type, ₪ impact). It reads decisions from
-Firestore when `VITE_FIREBASE_*` is set, otherwise from that device's localStorage.
+measurement (F13-S1): what the engine's latest run shows, and what the owner decided. It reads
+`public/data/measurement.json`, which the nightly engine writes beside `dashboard.json`, and
+computes nothing (ADR-023). The edge gate answers 403 to the owner for that file (ADR-029 §6).
+Until the first nightly after 2026-09-28 writes it, the page says it is not published yet.
+
+> **Rebuilt 2026-09-28 (#231).** The three breaks below are fixed: the page reads the
+> engine's measurement, keyed by `signal_family` and entry id, over the owner's decisions as
+> the engine pulls them from Firestore. `operational.json` and the pre-V1 store are deleted.
+> What follows is the record of why it was rebuilt.
 
 > **It has measured nothing since the cut-over (verified 2026-09-13).** Three independent
 > breaks, each of which alone is enough:

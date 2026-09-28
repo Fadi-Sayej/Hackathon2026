@@ -141,10 +141,9 @@ what gates it.
   not `operational.json`.
 - [Phase 3 — Reproduction & gates](implementation/phase-3-reproduction.md) — `figures.py` as
   the engine's print mode, content addressing, the V1 signal probes, the nightly workflow.
-- [Phase 4 — Removal](implementation/phase-4-removal.md) — **not started, deliberately.**
-  Deletes the old demo/V2/planogram/LLM/MCP chain and `operational.json` once Checkpoint 3
-  is green (two consecutive clean scheduled nightlies — one so far) and three open
-  questions (P4-OQ-1 … P4-OQ-3) are answered.
+- [Phase 4 — Removal](implementation/phase-4-removal.md) — **done; Checkpoint 4 closed
+  2026-09-28.** Deleted the old demo/V2/planogram/LLM/MCP chain, and, once F13 rebuilt the
+  telemetry page on `measurement.json` (Task 4.5), `operational.json`.
 
 ## Operations (not product authority)
 

@@ -7,7 +7,7 @@ Version: 1.0 (2026-09-12)
 Parent: [Implementation Plan](plan.md)
 Related Specs: F6-S1, F7-S1
 Inputs: [docs/architecture/system-design.md §20.1, §20.2, §22, docs/reviews/checkpoint-3-reproduction.md]
-Updated: 2026-09-27 (Task 4.5 added: the measurement surface, F13-S1)
+Updated: 2026-09-28 (Task 4.5 done, #231; Checkpoint 4 closed)
 ---
 
 # Phase 4 — Removal
@@ -620,6 +620,10 @@ reachable afterwards.
 > that file was retired on 2026-09-13, unnoticed, because CI never runs it.
 >
 > **Still open:** `operational.json` and `loadOperationalData.js`, until F13 (#83).
+>
+> **Done 2026-09-28 (#231):** both deleted with Task 4.5, once the telemetry page read
+> `measurement.json` instead. No caller remained (`git grep` over src, scripts, e2e, the
+> middleware and the Vite config).
 
 **Files:**
 - Modify: `.github/workflows/collect-daily.yml` — drop the `refresh_pipeline.py` step
@@ -631,10 +635,10 @@ reachable afterwards.
 in production for **at least one release** (§20.2), and `dashboard.json` is committed
 nightly by Task 3.4. Until both are true this task does not start.
 
-- [ ] **Step 1:** confirm no `loadOperationalData` caller remains (Task 2.7 removed the
+- [x] **Step 1:** confirm no `loadOperationalData` caller remains (Task 2.7 removed the
       last one; verify rather than assume)
 - [x] **Step 2:** confirm the nightly has committed `dashboard.json` on consecutive days
-- [ ] **Step 3:** delete, run everything, lower the ceiling
+- [x] **Step 3:** delete, run everything, lower the ceiling
 - [x] **Step 4:** `check:signals` loses its reorder probes with the engine; `check:signals:v1`
       becomes `check:signals`
 
@@ -740,25 +744,44 @@ a quarter has passed".
 - Until the nightly first publishes it, there is no file. The page then says the
   measurement has not been published yet, and shows no number (FR-142).
 
-- [ ] **Step 1:** The block, test first. AC-131 … AC-135 and AC-162 on the engine. Commit.
-- [ ] **Step 2:** The page, test first. AC-130, AC-132, AC-134, AC-162 and AC-163 on the
+- [x] **Step 1:** The block, test first. AC-131 … AC-135 and AC-162 on the engine. Commit.
+- [x] **Step 2:** The page, test first. AC-130, AC-132, AC-134, AC-162 and AC-163 on the
   page. Screenshots before and after, in the page's language, for the owner's approval.
   Commit.
-- [ ] **Step 3:** The deletions, with `git grep` showing no importer left. Commit.
-- [ ] **Step 4:** Checkpoint 4 (Task 4.4).
+- [x] **Step 3:** The deletions, with `git grep` showing no importer left. Commit.
+- [x] **Step 4:** Checkpoint 4 (Task 4.4). *(Steps 1–3 merged as #231 on 2026-09-28; the file
+  is a separate file, `measurement.json`, as ADR-029 §6 requires, not the block this task's
+  first text named.)*
 
 ---
 
 ### Task 4.4: Checkpoint 4
 
-- [ ] `npm run check:bundle` — **`index.html` under 500 KB** (the owner's entry; see the
+- [x] `npm run check:bundle` — **`index.html` under 500 KB** (the owner's entry; see the
       2026-09-13 answer under Task 4.1), and `CEILING_KB` — the ratchet on total build
       output — lowered to the new measured size
-- [ ] `npm run lint`, `npx vitest run`, `npm run test:py`, `npm run build` all green
-- [ ] `npm run check:surface`, `check:signals`, `check:independence` green
-- [ ] `git grep` finds no reference to anything removed, in code **or** in docs outside
+- [x] `npm run lint`, `npx vitest run`, `npm run test:py`, `npm run build` all green
+- [x] `npm run check:surface`, `check:signals`, `check:independence` green
+- [x] `git grep` finds no reference to anything removed, in code **or** in docs outside
       `docs/archive/`
-- [ ] `v1-attic` resolves on the remote and builds
+- [x] `v1-attic` resolves on the remote and builds
+
+> **Closed 2026-09-28**, on `phase4/checkpoint-4-close` over `9ee163c` (main after #231).
+> Task 4.5 removed the last blocker: the telemetry page reads `measurement.json`, and
+> `operational.json` and `loadOperationalData.js` are gone.
+>
+> | Check | Result |
+> |---|---|
+> | `check:bundle` | `index.html` **352 KB**, under the 500 KB target; total **894 KB**. `CEILING_KB` lowered 915 → 900 |
+> | lint, vitest, `test:py`, build | green: vitest 525/525, pytest 925 passed |
+> | `check:surface`, `check:signals` (which runs `check:independence` and `check:order-signals`) | green: surface 8/8, signals 12 OK |
+> | `git grep` for anything removed | swept by the same narrower reading as 2026-09-24: live references to the deleted files were rewritten (CLAUDE.md rules 5 and 8, two role skills, the preflight, the nightly's comments, `.gitignore`, `check_firebase_config.mjs`, System Design §15 and §20.1, deployment.md), and dated history left as history |
+> | `v1-attic`, `v1-attic-2026-09-24` | both resolve on the remote (`bf1d47a`, `959a572`) and build |
+>
+> **Left as before:** `.ai-codex/lib.md`, the export index nothing regenerates, still lists
+> removed modules (named for its owner on 2026-09-24). The middleware still refuses
+> `/data/operational.json` to the owner, which costs nothing and would still hold if the
+> file were restored from git.
 
 > **Where it stands, 2026-09-24.** Not closable yet. Task 4.2 keeps `operational.json` and
 > `loadOperationalData.js` until F13 (#83) rebuilds the telemetry surface, and Task 4.3

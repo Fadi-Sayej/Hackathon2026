@@ -1,10 +1,10 @@
 ---
 ID: PLAN
 Title: SmartShelf V1 Implementation Plan
-Status: Partial — Phases 0, 1, 2 and 3 built (Task 2.7's cut-over done 2026-09-12, once ADR-020 removed D-14 as a blocker); Phase 4 in progress: Tasks 4.0 and 4.1 done (4.1 re-scoped by ADR-028, less §20.1's scripts row), Task 4.2 done except `operational.json` and its loader, which wait on F13 (#83), Task 4.3 done, Checkpoint 4 open; Phase 5 (V2, F8) built 2026-09-27 (Tasks 5.0–5.14, Checkpoint 5 met), and unavailable on real data until another store sends daily reports (D-23)
+Status: Partial — Phases 0, 1, 2 and 3 built (Task 2.7's cut-over done 2026-09-12, once ADR-020 removed D-14 as a blocker); Phase 4 done: Tasks 4.0 … 4.3 and 4.5 done (4.1 re-scoped by ADR-028, less §20.1's scripts row; 4.5 rebuilt the measurement surface, F13-S1, which let 4.2 finish), Checkpoint 4 closed 2026-09-28; Phase 5 (V2, F8) built 2026-09-27 (Tasks 5.0–5.14, Checkpoint 5 met), and unavailable on real data until another store sends daily reports (D-23)
 Owner: smartshelf-architect
 Inputs: [docs/architecture/system-design.md, docs/features/F1-*/specs … F8-*/specs, docs/architecture/decisions/]
-Updated: 2026-09-27 (Phase 5 built; D-23: the pilot with the YomYom store ended)
+Updated: 2026-09-28 (Phase 4 done: Task 4.5 and Checkpoint 4)
 Version: 1.1 (written 2026-09-08 against System Design v1.0; refreshed the same day against v1.1)
 Parent: [System Design](../architecture/system-design.md)
 Related Specs: F1-S1 … F7-S1 for Phases 0–4; F8-S1 for Phase 5 (see the System Design's §21 traceability matrix)
