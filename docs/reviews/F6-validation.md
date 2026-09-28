@@ -129,7 +129,7 @@ most-tested screen in the product answers "what is wrong" ten times and "what do
 
 | Item | Owning role | Why it matters |
 |---|---|---|
-| Render each entry's action on its card, in the owner's words, with `action.*` keys in three languages | smartshelf-engineer; screen change, owner approves the wording | AC-110c partial; the North Star's "sees what to do" |
+| ~~Render each entry's action on its card, in the owner's words, with `action.*` keys in three languages~~ **Done 2026-09-28, #235** (approved by the owner; see `docs/reviews/card-wording-2026-09-28.md`) | smartshelf-engineer; screen change, owner approves the wording | AC-110c partial; the North Star's "sees what to do" |
 | Decide whether the card must name the producing capability or the characterisation suffices | smartshelf-architect | AC-110b partial |
 | Say in F6's intent how F1–F5 share ten places, and whether reconciliation holding all three reserved places for about four months (355 entries, three a day) is intended | smartshelf-pm, then smartshelf-architect | F3, F4 and hygiene cannot reach the surface |
-| Translate the twelve English `evidence.*` labels in `ar.js` and `he.js` | smartshelf-engineer; owner approves | AC-112 latent |
+| ~~Translate the twelve English `evidence.*` labels in `ar.js` and `he.js`~~ **Done 2026-09-28, #235** (approved by the owner; see `docs/reviews/card-wording-2026-09-28.md`) | smartshelf-engineer; owner approves | AC-112 latent |
