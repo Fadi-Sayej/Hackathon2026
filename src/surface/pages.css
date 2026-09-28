@@ -634,9 +634,19 @@
   line-height: 1.5;
 }
 
-/* How a calculated reference was made, under its price (approved 2026-09-28). */
+/* When the price was seen: a date, so it never breaks across two lines (AC-112), however wide
+   the other columns grow. */
+.data-table td.price-seen {
+  white-space: nowrap;
+}
+
+/* How a calculated reference was made, under its price (approved 2026-09-28). It wraps inside
+   its cell: the table's number cells never wrap, and a note that could not would widen the
+   column until the next one broke its date across two lines. */
 .price-ref-note {
   display: block;
+  white-space: normal;
+  max-inline-size: 14ch;
   font-family: var(--font-body, inherit);
   font-size: 0.75rem;
   font-weight: 400;

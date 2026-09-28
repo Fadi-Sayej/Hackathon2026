@@ -245,7 +245,7 @@ export function PriceGapPage({ artefact, catalogue, now, onOpenFinding }) {
                       )
                       : <td>{whyText(row.uncompared_reason, t)}</td>}
                     <td className="numeric">{row.stores ?? '—'}</td>
-                    <td>{seenLabel(row.observed_at, now, t)}</td>
+                    <td className="price-seen">{seenLabel(row.observed_at, now, t)}</td>
                   </tr>
                 )
               })}
