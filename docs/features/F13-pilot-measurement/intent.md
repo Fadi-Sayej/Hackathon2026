@@ -1,11 +1,12 @@
 ---
 ID: F13-INTENT
 Title: F13 — Pilot Measurement (30-day recovered ₪)
-Status: Registered — not specified
+Status: Approved — specified as F13-S1, which the repository owner approved on 2026-09-28
 Release: V1 (the pilot's own decision criterion)
 Parent: [PRD](../../product/PRD.md)
 Intent IDs: INT-MEAS
-Specs: none
+Specs: [F13-S1](specs/F13-S1-pilot-measurement.md) (Approved 2026-09-28)
+Updated: 2026-09-28
 ---
 
 # F13 — رقم النجاح · Pilot Measurement

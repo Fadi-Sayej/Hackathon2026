@@ -7,7 +7,7 @@ Version: 1.0 (2026-09-12)
 Parent: [Implementation Plan](plan.md)
 Related Specs: F6-S1, F7-S1
 Inputs: [docs/architecture/system-design.md §20.1, §20.2, §22, docs/reviews/checkpoint-3-reproduction.md]
-Updated: 2026-09-24
+Updated: 2026-09-27 (Task 4.5 added: the measurement surface, F13-S1)
 ---
 
 # Phase 4 — Removal
@@ -700,6 +700,52 @@ a quarter has passed".
 > the three pre-V1 keys stay where they are: a test asserts they are left unchanged, and
 > another that they are not read. The migration is at `v1-attic-2026-09-24` if it is ever
 > wanted back.
+
+---
+
+### Task 4.5: The measurement surface (F13-S1, #83), and the rest of Task 4.2
+
+> **Added 2026-09-27.** F13-S1 has its §14 closed for the build (D-24, ADR-023 revised), and
+> the repository owner approved it, with ADR-023, on 2026-09-28 (#230). This task is what Task 4.2 and Checkpoint 4 have waited on: once the
+> telemetry surface reads the artefact, `operational.json` and everything only it fed can go.
+> It runs in three pieces, in order, because the page needs the block and the deletions need
+> the page.
+
+**Files:**
+- **The block** (engine):
+  - Create: `src/engine/measurement.py`, `schemas/measurement.schema.json`,
+    `tests/engine/test_measurement.py`
+  - Modify: `src/engine/run.py` (its own step after the artefact, writing
+    `public/data/measurement.json` beside it, ADR-029 Decision 6)
+  - Modify: `.github/workflows/collect-daily.yml`: commit `measurement.json` with the artefact
+  - Modify: `src/engine/inputs.py`: the digest feeds the owner's decisions and revivals
+    (ADR-023's digest paragraph)
+  - Test: `tests/engine/test_inputs.py`, `tests/engine/test_run_capabilities.py`
+- **The page** (browser; a screen, so its before-and-after screenshots go to the repository
+  owner before it merges):
+  - Modify: `src/telemetry/TelemetryDashboard.jsx` (reads `/data/measurement.json`; renders it)
+  - Modify: `src/telemetry/telemetryModel.js` (shapes the file for display; aggregates nothing)
+  - Test: `src/telemetry/__tests__/telemetryModel.test.js` (rewritten: it asserts the pre-V1
+    vocabulary today), `src/telemetry/__tests__/TelemetryDashboard.test.jsx`
+- **The deletions** (Task 4.2's remainder), each checked to have no importer left:
+  - `public/data/operational.json`, `src/lib/dataAdapters/loadOperationalData.js`, and
+    `scripts/check_deploy_data.py`'s check on it (it moves to `measurement.json`)
+  - `src/lib/persistence/` (the pre-V1 decision store) and its tests
+  - `src/lib/operational/completionActions.js` and its tests
+  - `src/lib/analytics/actionPriority.js`, `credibility.js` and their tests
+  - CLAUDE.md rules 5 and 8, which name `operational.json` and `actionPriority.js`
+
+**Interfaces:**
+- The file is ADR-023's table. The page renders it and computes nothing (ADR-001).
+- Until the nightly first publishes it, there is no file. The page then says the
+  measurement has not been published yet, and shows no number (FR-142).
+
+- [ ] **Step 1:** The block, test first. AC-131 … AC-135 and AC-162 on the engine. Commit.
+- [ ] **Step 2:** The page, test first. AC-130, AC-132, AC-134, AC-162 and AC-163 on the
+  page. Screenshots before and after, in the page's language, for the owner's approval.
+  Commit.
+- [ ] **Step 3:** The deletions, with `git grep` showing no importer left. Commit.
+- [ ] **Step 4:** Checkpoint 4 (Task 4.4).
 
 ---
 

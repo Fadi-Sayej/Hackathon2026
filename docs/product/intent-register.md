@@ -143,7 +143,8 @@ rather than surfacing them:
   **not** reopen D-13: when INT-006 is specified, the sensor and fixed-camera approach
   remains excluded permanently, not merely postponed.
 
-**INT-MEAS** is not specified here for a different reason: `intent.md` §11.1 states it is
+**INT-MEAS** *(2026-09-28: now specified as F13-S1, approved by the repository owner, with no
+success number, D-24; what follows is the record of why it was not.)* It was not specified here for a different reason: `intent.md` §11.1 states it is
 already measured by an existing surface, so no new capability is being designed. Two
 obligations follow and are recorded rather than assumed:
 

@@ -92,7 +92,7 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 | [ADR-020](architecture/decisions/ADR-020-the-published-population-is-a-policy-not-a-constant.md) | The published population is a policy setting, not a constant |
 | [ADR-021](architecture/decisions/ADR-021-the-artefact-states-how-many-devices-wrote-owner-state.md) | The artefact states how many devices have written owner state, and when |
 | [ADR-022](architecture/decisions/ADR-022-a-barcode-less-row-is-identified-by-its-name.md) | A barcode-less row is identified by its name, under ADR-019's rule; amends one sentence of ADR-019 |
-| [ADR-023](architecture/decisions/ADR-023-the-engine-publishes-the-pilot-measurement.md) | The engine publishes the pilot measurement; the browser renders it — **`Ready for review`** |
+| [ADR-023](architecture/decisions/ADR-023-the-engine-publishes-the-pilot-measurement.md) | The engine publishes the pilot measurement; the browser renders it — accepted 2026-09-28 |
 | [ADR-024](architecture/decisions/ADR-024-the-catalogue-is-published-beside-the-artefact.md) | The product catalogue is published beside the artefact, not inside it — accepted 2026-09-17 |
 | [ADR-025](architecture/decisions/ADR-025-the-comparison-behind-the-finding-is-published.md) | The comparison behind a competitor finding is published, not only the finding — accepted 2026-09-22 |
 | [ADR-026](architecture/decisions/ADR-026-reconciliation-publishes-the-span-it-reconciled.md) | The reconcile window is cut once per run, at the run's own stock date, and reconciliation publishes that cut — accepted 2026-09-23 |
@@ -106,7 +106,7 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 | [ADR-034](architecture/decisions/ADR-034-a-suggestion-is-identified-by-product-and-order-day.md) | A suggestion is identified by product and order day; a disagreement is a question keyed by product — accepted 2026-09-26 |
 | [ADR-035](architecture/decisions/ADR-035-a-models-answer-is-collected-data.md) | A model's answer is collected data, sealed as a daily snapshot — accepted 2026-09-26 |
 
-ADR-001 … ADR-022 and ADR-024 … ADR-035 are `Accepted`. ADR-023 is `Ready for review`. ADR-022 amends a sentence of ADR-019 and was accepted on 2026-09-13, after the defect it fixes was verified end to end: `entry_id` falls back to `product_name`, and `compose.js` skips any entry whose id carries a settled outcome, so two barcode-less rows sharing a name settled together on the owner's screen. ADR-020 was accepted on 2026-09-13 **conditional on GAP-009**:
+ADR-001 … ADR-035 are `Accepted`; ADR-023 was the last, on 2026-09-28. ADR-022 amends a sentence of ADR-019 and was accepted on 2026-09-13, after the defect it fixes was verified end to end: `entry_id` falls back to `product_name`, and `compose.js` skips any entry whose id carries a settled outcome, so two barcode-less rows sharing a name settled together on the owner's screen. ADR-020 was accepted on 2026-09-13 **conditional on GAP-009**:
 `published_population: whole` is the right value while that question is open, and becomes
 `living` when it closes.
 
