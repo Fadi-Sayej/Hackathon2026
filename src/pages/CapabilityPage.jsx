@@ -1,4 +1,5 @@
 import { unavailableReason } from '../lib/i18n/unavailableReason.js'
+import { formatWindowId } from '../lib/i18n/formatPeriod.js'
 import { useI18n } from '../lib/i18n/index.js'
 import { dirProps } from '../lib/utils/rtl.js'
 
@@ -14,8 +15,15 @@ import { dirProps } from '../lib/utils/rtl.js'
  * produces it, so it is browse-only until SPEC-008 exists (SPEC-GAP-A).
  */
 export function CapabilityPage({ artefact, capabilityId }) {
-  const { t } = useI18n()
+  const { t, language } = useI18n()
   const capability = artefact?.capabilities?.[capabilityId]
+  // A threshold in words: yes or no, and a method's name as what it means (F6 AC-112).
+  const thresholdText = (value) => {
+    if (Array.isArray(value)) return String(value.length)
+    if (typeof value === 'boolean') return t(value ? 'common.yes' : 'common.no')
+    if (typeof value === 'string') return t(`threshold.value.${value}`)
+    return String(value)
+  }
 
   if (!capability) {
     // An absent capability is not an empty one. Rendering nothing would read as "no
@@ -28,7 +36,9 @@ export function CapabilityPage({ artefact, capabilityId }) {
     )
   }
 
-  const { status, unavailable_reason: reason, counts, thresholds, entries } = capability
+  const { status, unavailable_reason: reason, counts, thresholds, entries, notes, window } = capability
+  // F4 AC-067: a dead count on a short window is stated with that window and its seasonal limit.
+  const seasonal = (notes || []).includes('seasonal_misclassification_possible') && window?.window_id
 
   return (
     <section className="capability" data-capability={capabilityId} {...dirProps()}>
@@ -40,6 +50,12 @@ export function CapabilityPage({ artefact, capabilityId }) {
         <p className="capability__unavailable">{unavailableReason(t, reason)}</p>
       ) : (
         <>
+          {seasonal ? (
+            <p className="capability__note">
+              {t('capability.note.seasonal', { period: formatWindowId(window.window_id, t, language) })}
+            </p>
+          ) : null}
+
           <dl className="capability__counts">
             {Object.entries(counts || {}).map(([name, value]) => (
               <div key={name}>
@@ -57,7 +73,7 @@ export function CapabilityPage({ artefact, capabilityId }) {
               {Object.entries(thresholds).map(([name, value]) => (
                 <div key={name}>
                   <dt>{t(`threshold.${name}`)}</dt>
-                  <dd>{Array.isArray(value) ? value.length : String(value)}</dd>
+                  <dd data-text={typeof value === 'string' ? '' : undefined}>{thresholdText(value)}</dd>
                 </div>
               ))}
             </dl>

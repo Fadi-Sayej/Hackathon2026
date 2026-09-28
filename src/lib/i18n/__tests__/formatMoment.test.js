@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatMoment } from '../formatMoment.js'
+import { formatDay, formatMoment } from '../formatMoment.js'
 
 // The Data page printed the engine's timestamps as they are stored,
 // `2026-09-27T03:06:42.142275+00:00`, which a phone breaks mid-string. Approved on
@@ -28,5 +28,21 @@ describe('formatMoment — a timestamp the owner can read', () => {
 
   it.each([[null], [undefined], [''], ['not a date']])('returns null for %j, so the page shows "none"', (value) => {
     expect(formatMoment(value, 'en', IL)).toBeNull()
+  })
+})
+
+
+// F7 AC-120 (2026-09-28): Today states the date of the stock file its figures rest on. A date,
+// not a moment: the export is dated by day, so no time and no time zone shift it.
+describe('formatDay — a date the owner can read', () => {
+  it('in each language, with the month named', () => {
+    expect(formatDay('2026-06-06', 'en')).toBe('6 June 2026')
+    expect(formatDay('2026-06-06', 'ar')).toBe('6 يونيو 2026')
+    expect(formatDay('2026-06-06', 'he')).toBe('6 ביוני 2026')
+  })
+
+  it('is nothing for something that is not a date', () => {
+    expect(formatDay(null, 'en')).toBeNull()
+    expect(formatDay('not a date', 'en')).toBeNull()
   })
 })

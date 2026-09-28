@@ -17,3 +17,16 @@ export function formatMoment(value, language, timeZone) {
     day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone,
   }).format(date)
 }
+
+/**
+ * A date as the owner reads it: `6 June 2026`. For values dated by day, such as the stock
+ * file's `as_of` (F7 AC-120): no time, and read in UTC so no time zone moves it a day.
+ */
+export function formatDay(value, language) {
+  if (!value) return null
+  const date = new Date(`${String(value).slice(0, 10)}T00:00:00Z`)
+  if (Number.isNaN(date.getTime())) return null
+  return new Intl.DateTimeFormat(LOCALE[language] || LOCALE.en, {
+    day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC',
+  }).format(date)
+}

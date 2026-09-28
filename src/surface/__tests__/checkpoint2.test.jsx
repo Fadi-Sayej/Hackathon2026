@@ -136,7 +136,10 @@ describeIf('Checkpoint 2 — against the artefact the engine produced', () => {
     expect(ids.length).toBeGreaterThan(0)
     for (const id of ids) {
       await openPage(id)
-      const leaked = [...document.body.textContent.matchAll(/\b([a-z][a-z_]*\.[a-z][a-zA-Z_.]+)\b/g)]
+      // Not `\b` before the key: a value is rendered right before the next label, so
+      // `18threshold.ceiling_source` has no word boundary at the `t` and hid two raw keys on
+      // the price page until 2026-09-28. A key is any dotted identifier not preceded by a letter.
+      const leaked = [...document.body.textContent.matchAll(/(?<![A-Za-z_.])([a-z][a-z_]*\.[a-z][a-zA-Z_.]+)/g)]
         .map((m) => m[1])
         .filter((candidate) => candidate in ar === false && /^(daily|entry|value|outcome|questions|data|spine|capability|count|threshold|unavailable|characterisation|evidence|prices|awaiting|page)\./.test(candidate))
       expect(leaked, `unresolved keys on ${id}`).toEqual([])

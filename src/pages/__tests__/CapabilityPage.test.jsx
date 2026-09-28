@@ -53,4 +53,33 @@ describe('thresholds travel with the counts', () => {
     expect(document.querySelector('.capability__thresholds')).not.toBeNull()
     expect(screen.getByText('18')).toBeTruthy()
   })
+
+  // F4 AC-067 and F6 AC-112 (2026-09-28 validations): the dead count stated with its window
+  // and its seasonal limit; thresholds in words, not `false` or a method's code name.
+  it('states the seasonal limit beside a short window\'s dead count', () => {
+    const catalogue = { status: 'available', unavailable_reason: null, counts: { withdrawable: 3903 }, entries: [],
+      thresholds: { withdraw_with_stock: false }, notes: ['provisional_window', 'seasonal_misclassification_possible'],
+      window: { window_id: '2026-01..2026-07' } }
+    renderWithI18n(<CapabilityPage artefact={{ schema_version: 2, thresholds: {}, capabilities: { catalogue_lifecycle: catalogue } }}
+      capabilityId="catalogue_lifecycle" />, { language: 'en' })
+    const note = document.querySelector('.capability__note')
+    expect(note.textContent).toContain('January')
+    expect(note.textContent).toContain('July 2026')
+    expect(document.body.textContent).not.toMatch(/\bfalse\b|\btrue\b/)
+  })
+
+  it('says nothing about seasons when the window is a full year', () => {
+    const catalogue = { status: 'available', unavailable_reason: null, counts: {}, entries: [], notes: [],
+      window: { window_id: '2025-08..2026-07' } }
+    renderWithI18n(<CapabilityPage artefact={{ schema_version: 2, thresholds: {}, capabilities: { catalogue_lifecycle: catalogue } }}
+      capabilityId="catalogue_lifecycle" />, { language: 'en' })
+    expect(document.querySelector('.capability__note')).toBeNull()
+  })
+
+  it('names how the ceiling was found in words, not as the engine\'s code', () => {
+    renderWithI18n(<CapabilityPage artefact={artefact({ status: 'available', unavailable_reason: null, counts: {}, entries: [],
+      thresholds: { ceiling_method: 'densest_density_collapse', ceiling_source: 'derived' } })} capabilityId="price_consistency" />,
+      { language: 'en' })
+    expect(document.body.textContent).not.toMatch(/densest_density_collapse|\bderived\b/)
+  })
 })
