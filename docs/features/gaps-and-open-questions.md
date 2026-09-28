@@ -7,7 +7,7 @@ Parent: [Intent Register (SPEC-000)](../product/intent-register.md)
 Related Specs: all F#-S# documents under `docs/features/`
 Owner: smartshelf-pm
 Inputs: [docs/product/intent-register.md, docs/features/F#-*/intent.md, docs/features/F#-*/specs/]
-Updated: 2026-09-27 (D-23: GAP-009 and GAP-011 now wait on another store's owner; OQ-801 after D-24)
+Updated: 2026-09-28 (GAP-013: F9's two decisions, posed in the F9 brief)
 ---
 
 > **Migration note.** Moved verbatim from the pre-migration monolithic `specs.md`. It spans
@@ -499,6 +499,33 @@ Take the three decisions in the
 first, who writes the sentence, and when the promise is due. They are recorded as the next
 free D-n, and F14 is then specified. **Owner:** the repository owner, and the client for
 the due date.
+
+---
+
+#### GAP-013 — F9 cannot be specified until what counts as a finding, and what he does with one, are decided
+
+**Source:** F9's intent ("Blocking product decision") and SPEC-000 §4 (INT-005). Posed on
+2026-09-28.
+
+**Problem:**
+The intent says what F9 looks for, products the market sells around him, and phrases the
+result as the start of a conversation. That is not a decision the system can record. Since
+then F8-S1 (approved 2026-09-25) has taken the half of the intent's example that concerns
+products he stocks (D-19, FR-158), and hands F9 the products he does not stock (F8-S1 §3).
+Which of those count as a finding, and what he does with one, are undecided.
+
+**Why it matters:**
+On 2026-09-28 the market (D-18) listed 995 products that are not in his catalogue, and ran out
+of 132 of them on at least one of the 45 nights held (measured in the brief below). The two
+answers decide the spec, whether owner state needs a new record type, and whether anything is
+usable before a new store's owner exists (D-23).
+
+**Recommended resolution:**
+Take the two decisions in the [F9 brief](../product/open-decisions/F9-assortment-gap.md). They
+are recorded as the next free D-n, and F9 is specified when the repository owner asks for it.
+**Owner:** the repository owner.
+
+---
 
 ### Part 2 — Open Questions by Priority
 
