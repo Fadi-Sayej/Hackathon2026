@@ -109,7 +109,7 @@ in AC-127, and on a laptop nothing warns you that yours is a day old.
 
 | Item | Owning role | Why it matters |
 |---|---|---|
-| State the POS date on the cards that rest on it, now that it is 114 days old and will not change (D-23) | smartshelf-architect, then smartshelf-engineer; screen change, owner approves | AC-120 partial |
+| ~~State the POS date on the cards that rest on it, now that it is 114 days old and will not change (D-23)~~ **Done 2026-09-28, #235** (approved by the owner; see `docs/reviews/card-wording-2026-09-28.md`) | smartshelf-architect, then smartshelf-engineer; screen change, owner approves | AC-120 partial |
 | Remove from PRD §9 (and F7's intent table) the figures that no longer reproduce, or replace them with the command | smartshelf-pm | AC-128 partial |
 | PRD §9 and F7's intent say the nightly regenerates `operational.json`, deleted on 2026-09-28 | smartshelf-pm | A present-tense claim about a deleted file; the Checkpoint 4 sweep missed it |
 | ~~Make `figures.py` say when the local market half is older than the artefact it is compared with~~ **Done 2026-09-28, #234 (`8f71e28`)**: a NOTE names the figures that read the market and how to rebuild; the exit code is unchanged | smartshelf-engineer | AC-127 depends on "same data" and nothing checks it |
