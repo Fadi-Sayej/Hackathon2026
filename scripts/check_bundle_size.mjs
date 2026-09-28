@@ -45,7 +45,10 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const CEILING_KB = 905         // measured 903 KB, 2026-09-28: the card batch (#235) put 60 strings in
+const CEILING_KB = 910         // measured 906 KB in CI (905 locally), 2026-09-28: idle products'
+                               // three answers and the Prices page's reference note (#243), five
+                               // strings in three languages; index.html 363 KB. Before that it was
+                               // 905, over a measured 903 KB, 2026-09-28: the card batch (#235) put 60 strings in
                                // three languages on the owner's screens (each card's action, the
                                // evidence and threshold labels) and index.html went 352 → 361 KB,
                                // under its 500 KB target. Before that it was 900, over a
