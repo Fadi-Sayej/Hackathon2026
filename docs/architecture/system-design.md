@@ -875,7 +875,7 @@ ship unlabelled (INV-052/INV-063).
 ```
 OwnerState (Firestore: stores/{storeId}/ownerState/{doc}; mirror: data/owner/owner_state.json)
   answers:   { [barcode]: { cost_price: { value, at, status: answered | deferred, reason?: unknown } } }
-  outcomes:  { [entry_id]: { status: acted | declined | deferred, reason?: wrong_data | not_worth_it | already_handled,
+  outcomes:  { [entry_id]: { status: acted | declined | deferred, reason?: wrong_data | not_worth_it | already_handled | still_stocked | no_longer_carried,
                              deferred_until?, at, snapshot: { signal_family, capability, barcode,
                                                               value?, kind?, certainty?, characterisation } } }
   revivals:  { [barcode]: { at, window_id } }

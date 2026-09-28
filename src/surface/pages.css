@@ -633,3 +633,12 @@
   font-family: inherit;
   line-height: 1.5;
 }
+
+/* How a calculated reference was made, under its price (approved 2026-09-28). */
+.price-ref-note {
+  display: block;
+  font-family: var(--font-body, inherit);
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--ink-400);
+}

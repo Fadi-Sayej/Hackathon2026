@@ -107,7 +107,7 @@ describe('recordOutcome', () => {
     for (const reason of Object.values(OUTCOME_REASONS)) {
       await recordOutcome(entry(), { status: OUTCOME_STATUS.DECLINED, reason })
     }
-    expect(loadOwnerState().outcomes['a1b2c3d4e5f60718'].reason).toBe('already_handled')
+    expect(loadOwnerState().outcomes['a1b2c3d4e5f60718'].reason).toBe(Object.values(OUTCOME_REASONS).at(-1))
   })
 
   it('leaves the outcome unrecorded when the cache write fails, and says so', async () => {

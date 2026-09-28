@@ -38,6 +38,22 @@ const ISOLATE = (text) => `⁦${text}⁩`
  * a ratio and multiplies it by 100, so a product 0.5% dearer would read "+50%". Whole
  * numbers from 10 up, one decimal below, two only when one would round a real gap to zero.
  */
+/**
+ * How a reference no shop actually charges was made (approved 2026-09-28): a supermarket price
+ * plus the measured allowance, or the average of two prices. A price from one shop like his
+ * needs no note.
+ */
+function ReferenceNote({ reference, t }) {
+  if (reference?.kind === 'supermarket_plus_allowance' && Number.isFinite(reference.allowance_pct)) {
+    const pct = `\u2066${Math.round(reference.allowance_pct * 10) / 10}%\u2069`
+    return <small className="price-ref-note">{t('prices.referenceKind.supermarket_plus_allowance', { pct })}</small>
+  }
+  if (reference?.kind === 'midpoint') {
+    return <small className="price-ref-note">{t('prices.referenceKind.midpoint')}</small>
+  }
+  return null
+}
+
 function formatPremium(pct) {
   let decimals = Math.abs(pct) >= 10 ? 0 : 1
   if (pct !== 0 && Number(pct.toFixed(decimals)) === 0) decimals = 2
@@ -221,7 +237,12 @@ export function PriceGapPage({ artefact, catalogue, now, onOpenFinding }) {
                     ) : null}
                     <td className="numeric">{formatShekel(row.shelf_price)}</td>
                     {compared
-                      ? <td className="numeric">{formatShekel(row.reference?.value)}</td>
+                      ? (
+                        <td className="numeric">
+                          {formatShekel(row.reference?.value)}
+                          <ReferenceNote reference={row.reference} t={t} />
+                        </td>
+                      )
                       : <td>{whyText(row.uncompared_reason, t)}</td>}
                     <td className="numeric">{row.stores ?? '—'}</td>
                     <td>{seenLabel(row.observed_at, now, t)}</td>
@@ -261,6 +282,7 @@ export function PriceGapPage({ artefact, catalogue, now, onOpenFinding }) {
                       yours: formatShekel(row.shelf_price),
                       reference: formatShekel(row.reference?.value),
                     })}</span>
+                    <ReferenceNote reference={row.reference} t={t} />
                   </p>
                 ) : (
                   <p className="price-card__figures">

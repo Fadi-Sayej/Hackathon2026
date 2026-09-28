@@ -275,3 +275,35 @@ describe('the Prices page, over the artefact the nightly actually published', ()
     expect(published.filter((r) => !names.has(r.barcode))).toEqual([])
   })
 })
+
+// Approved by the repository owner on 2026-09-28 ("yes to all"): a reference no shop actually
+// charges says how it was made, so he is not measured against a price he could not find.
+describe('a calculated reference says how it was made', () => {
+  const withKind = (barcode, kind) => ({
+    barcode, shelf_price: 10, stores: 3, observed_at: '2026-09-27', premium_pct: 12.5, uncompared_reason: null,
+    reference: { value: 8.89, kind, same_format: kind === 'supermarket_plus_allowance' ? null : 9.9,
+      supermarket: kind === 'same_format_only' ? null : 7.9, allowance_pct: kind === 'supermarket_plus_allowance' ? 7.0779 : null },
+  })
+  const draw = () => renderPage({ artefact: fixture({ comparison: [
+    withKind('7290000000011', 'supermarket_plus_allowance'),
+    withKind('7290000000028', 'midpoint'),
+    withKind('7290000000035', 'same_format_only'),
+  ] }) })
+  const card = (barcode) => document.querySelector(`.price-card[data-barcode="${barcode}"]`)
+
+  it('a supermarket price plus the allowance says so, with the allowance', () => {
+    draw()
+    expect(card('7290000000011').textContent).toMatch(/supermarket \+ \u2066?7\.1%/)
+  })
+
+  it('an average of two prices says so', () => {
+    draw()
+    expect(card('7290000000028').textContent).toContain('average of a supermarket and a shop like yours')
+  })
+
+  it('a real shop\'s price needs no note', () => {
+    draw()
+    expect(card('7290000000035').querySelector('.price-ref-note')).toBeNull()
+  })
+})
+
