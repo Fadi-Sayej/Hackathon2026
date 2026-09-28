@@ -1,7 +1,7 @@
 ---
 ID: CARD-WORDING-2026-09-28
 Title: What the owner's cards and pages say — wording and rendering, for approval
-Status: Ready for review — needs the repository owner's approval before it merges (front-end rule)
+Status: Approved — by the repository owner, 2026-09-28 ("approve", on the wording and screenshots below)
 Owner: smartshelf-engineer
 Parent: [F6-S1](../features/F6-daily-action-surface/specs/F6-S1-daily-action-surface.md)
 Inputs: [docs/reviews/F3-validation.md, F4-validation.md, F6-validation.md, F7-validation.md, public/data/dashboard.json (2026-09-28)]
@@ -12,7 +12,7 @@ Updated: 2026-09-28
 
 Fixes the screen findings of the 2026-09-28 validations. Nothing here changes what is chosen for
 the owner or any number; it changes how each card and page says it. **The wording below is
-mine, in all three languages, and is what needs approving.**
+mine, in all three languages; the repository owner approved it on 2026-09-28.**
 
 ## What changes
 
