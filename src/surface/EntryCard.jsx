@@ -18,7 +18,9 @@ const MONEY = new Set(['shelf_price', 'delivery_price', 'cost_price', 'differenc
 // The card's own line already asks this (characterisation), so it is not repeated as a row.
 // Values rendered as a sentence, set in the text face: the monospace face is for figures, and
 // spaces Arabic and Hebrew words apart.
-const SENTENCE = new Set(['format_note', 'reference', 'sources', 'fields', 'evidence_state', 'cost_source', 'reason'])
+const SENTENCE = new Set(['format_note', 'reference', 'sources', 'fields', 'evidence_state', 'cost_source', 'reason',
+  // F9: store names, "n of the last 14 days", a date in words, and "none of them".
+  'stores_ran_out', 'nights_ran_out', 'last_ran_out', 'listed_at'])
 const NOT_A_ROW = new Set(['question'])
 // What he found when he checked an idle product (F4 FR-070, approved 2026-09-28).
 const IDLE_ANSWERS = [
@@ -26,6 +28,16 @@ const IDLE_ANSWERS = [
   { id: 'wrong_count', outcome: { status: 'declined', reason: 'wrong_data' } },
   { id: 'no_longer_carried', outcome: { status: 'acted', reason: 'no_longer_carried' } },
 ]
+// Rows a capability's card folds into another or already shows. F9 (F9-S1 FR-175): the window is
+// said inside the nights row, and the market's name is the card's own heading.
+const FOLDED = { assortment_gap: new Set(['window', 'market_name']) }
+// F9-S1 FR-173: F9's two answers, in its own words. "Not for my store" is a decline with no
+// reason: it is his judgement of his customers, not a verdict that the finding was wrong.
+const ANSWERS = {
+  assortment_gap: { acted: 'outcome.assortment_gap.acted', declined: 'outcome.assortment_gap.declined', declineReason: null },
+}
+const DEFAULT_ANSWERS = { acted: 'outcome.acted', declined: 'outcome.declined', declineReason: 'not_worth_it' }
+const LOCALE = { ar: 'ar-u-nu-latn', he: 'he-IL', en: 'en-GB' }
 // Isolated left to right (U+2066 … U+2069), or Arabic and Hebrew render 7% as "%7".
 const percent = (x) => `\u2066${Math.round(x * 10) / 10}%\u2069`
 
@@ -42,6 +54,17 @@ export function EntryCard({ entry, onOutcome, formatMoney, readOnly = false }) {
     if (key === 'window_id') return formatWindowId(raw, t, language)
     if (key === 'format_note') return t('evidence.format_note.text')
     if (key === 'sources' && Array.isArray(raw)) return t('evidence.sourcesCount', { n: raw.length })
+    // F9-S1 FR-175: stores by name, how often of the recent days, and the last day, as a date.
+    if (key === 'stores_ran_out' || key === 'listed_at') {
+      return raw.length ? raw.join(t('common.listSeparator')) : t(`evidence.${key}.none`)
+    }
+    if (key === 'nights_ran_out') {
+      return t('evidence.nights_ran_out.value', { n: raw, days: entry.evidence?.window?.days ?? '' })
+    }
+    if (key === 'last_ran_out') {
+      return new Intl.DateTimeFormat(LOCALE[language] || LOCALE.en, { day: 'numeric', month: 'long', timeZone: 'UTC' })
+        .format(new Date(`${raw}T00:00:00Z`))
+    }
     if (key === 'fields' && raw && typeof raw === 'object') {
       return Object.keys(raw).map((field) => t(`evidence.${field}`)).join(t('common.listSeparator'))
     }
@@ -62,7 +85,10 @@ export function EntryCard({ entry, onOutcome, formatMoney, readOnly = false }) {
   }
   // A value the engine does not have is left out, never printed as "null" (D-3): the card shows
   // absence by absence, as it does for the value above.
-  const rows = Object.entries(entry.evidence || {}).filter(([key, raw]) => raw != null && !NOT_A_ROW.has(key))
+  const folded = FOLDED[entry.capability]
+  const rows = Object.entries(entry.evidence || {})
+    .filter(([key, raw]) => raw != null && !NOT_A_ROW.has(key) && !folded?.has(key))
+  const answers = ANSWERS[entry.capability] || DEFAULT_ANSWERS
 
   return (
     <article className="entry-card" data-capability={entry.capability} data-entry-id={entry.id} {...dirProps()}>
@@ -105,11 +131,11 @@ export function EntryCard({ entry, onOutcome, formatMoney, readOnly = false }) {
         )) : (
           <>
             <button type="button" data-outcome="acted" disabled={readOnly} onClick={() => onOutcome(entry, { status: 'acted' })}>
-              {t('outcome.acted')}
+              {t(answers.acted)}
             </button>
             <button type="button" data-outcome="declined" disabled={readOnly}
-                    onClick={() => onOutcome(entry, { status: 'declined', reason: 'not_worth_it' })}>
-              {t('outcome.declined')}
+                    onClick={() => onOutcome(entry, { status: 'declined', reason: answers.declineReason })}>
+              {t(answers.declined)}
             </button>
           </>
         )}

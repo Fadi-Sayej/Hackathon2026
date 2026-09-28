@@ -163,3 +163,15 @@ def test_it_publishes_its_window_and_thresholds_and_counts():
     assert out["thresholds"]["window_days"] == 14
     assert out["thresholds"]["max_absent"] == 7
     assert out["counts"] == {"findings": 4, "stores": 2, "usable_nights": 13}
+
+
+def test_the_stores_are_named_as_the_store_config_names_them():
+    """FR-175: the card says which stores ran out of it, by name. An id the config does not
+    know is published as it is, never dropped."""
+    wolt, rami = "65daeb8779ca7f0a9bf964f3", "6315c7a3f00f9e43ec812476"
+    named = recent(**{"7290008": {"nights": [TONIGHT], "stores": [rami, wolt, "unknown"]}})
+    named["listed_tonight"]["7290008"] = [wolt]
+    entry = next(e for e in _run(market_recent=named)["entries"] if e["barcode"] == "7290008")
+    assert entry["evidence"]["stores_ran_out"] == ["Rami Levy In The Neighborhood", "Wolt Market | Lev Haaretz", "unknown"]
+    assert entry["evidence"]["listed_at"] == ["Wolt Market | Lev Haaretz"]
+

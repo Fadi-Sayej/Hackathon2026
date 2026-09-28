@@ -989,6 +989,109 @@
         "answered": 0,
         "no_effect": 0
       }
+    },
+    "assortment_gap": {
+      "id": "assortment_gap",
+      "spec": "F9-S1",
+      "requires": [
+        "products",
+        "running_out",
+        "market_recent"
+      ],
+      "status": "available",
+      "unavailable_reason": null,
+      "window": null,
+      "thresholds": {
+        "window_days": 14,
+        "max_absent": 7,
+        "min_absent": 2,
+        "prior_days": 14,
+        "min_listed": 10
+      },
+      "counts": {
+        "findings": 2,
+        "stores": 3,
+        "usable_nights": 13
+      },
+      "entries": [
+        {
+          "id": "f900000000000001",
+          "signal_family": "assortment.market_ran_out",
+          "capability": "assortment_gap",
+          "barcode": "7290100000011",
+          "product_name": "שוקולד לבן 200 גרם",
+          "department": null,
+          "action": "try_product",
+          "characterisation": "market_ran_out",
+          "evidence": {
+            "stores_ran_out": [
+              "Wolt Market | Lev Haaretz",
+              "Rami Levy In The Neighborhood"
+            ],
+            "nights_ran_out": 10,
+            "last_ran_out": "2026-09-27",
+            "listed_at": [
+              "Rami Levy In The Neighborhood"
+            ],
+            "window": {
+              "first": "2026-09-15",
+              "last": "2026-09-28",
+              "days": 14,
+              "usable_nights": 13
+            },
+            "market_name": "שוקולד לבן 200 גרם"
+          },
+          "value": null,
+          "ordering_key": {
+            "name": "nights_ran_out",
+            "value": 10
+          },
+          "actionable": true,
+          "not_actionable_reason": null,
+          "attention": "today"
+        },
+        {
+          "id": "f900000000000002",
+          "signal_family": "assortment.market_ran_out",
+          "capability": "assortment_gap",
+          "barcode": "7290100000028",
+          "product_name": "סוכריות טופי",
+          "department": null,
+          "action": "try_product",
+          "characterisation": "market_ran_out",
+          "evidence": {
+            "stores_ran_out": [
+              "Super Alonit Einat (Wolt)"
+            ],
+            "nights_ran_out": 8,
+            "last_ran_out": "2026-09-28",
+            "listed_at": [],
+            "window": {
+              "first": "2026-09-15",
+              "last": "2026-09-28",
+              "days": 14,
+              "usable_nights": 13
+            },
+            "market_name": "סוכריות טופי"
+          },
+          "value": null,
+          "ordering_key": {
+            "name": "nights_ran_out",
+            "value": 8
+          },
+          "actionable": true,
+          "not_actionable_reason": null,
+          "attention": "today"
+        }
+      ],
+      "notes": [],
+      "on_day": "2026-09-28",
+      "recent_window": {
+        "first": "2026-09-15",
+        "last": "2026-09-28",
+        "days": 14,
+        "usable_nights": 13
+      }
     }
   },
   "figures": {
