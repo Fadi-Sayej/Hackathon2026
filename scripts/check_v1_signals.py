@@ -36,20 +36,68 @@ from src.engine.registry import CAPABILITIES  # noqa: E402
 
 # How to withhold each input AT SOURCE. Nothing here reaches into EngineInputs: the point is
 # to cross inputs.py and run.py, which is where four signals in this repository were lost.
-WITHHOLDING = {
+SILVER_FILES = {
     "products": ["yomyom_products.parquet"],
     "inventory": ["yomyom_inventory.parquet"],
     "sales_summary": ["sales_summary.parquet", "sales_monthly.parquet"],
     "window": ["sales_summary.parquet", "sales_monthly.parquet"],
 }
+# The market half is not in silver. run_engine reads observations from `signals_dir` and
+# matches from `matches_path` (run.py), so each is withheld by pointing that argument at
+# nothing: an empty signals directory has no signal file to read, and a matches path that does
+# not exist is a missing table. Until 2026-09-28 neither was withheld, so competitor_position's
+# two market inputs went unprobed (F3 validation record, "boundary probe" row).
+MARKET_SOURCES = {
+    "observations": "signals_dir",
+    "matches": "matches_path",
+}
+WITHHELD = sorted(SILVER_FILES.keys() | MARKET_SOURCES.keys())
+
+# Inputs a registered capability requires that THIS probe does not withhold, each with the
+# probe that withholds it instead. An input that is required and on neither list is unprobed,
+# and the probe refuses to pass (unprobed_inputs, tests/test_check_v1_signals.py).
+PROBED_ELSEWHERE = {
+    # F8 (ADR-030 … ADR-035). Real data has no daily report and no store facts, so on it these
+    # capabilities are unavailable at baseline and withholding here would prove nothing.
+    # check_order_signals.py withholds each over the fixture world it builds.
+    "sales_daily": "scripts/check_order_signals.py",
+    "store_facts": "scripts/check_order_signals.py",
+    "running_out": "scripts/check_order_signals.py",
+    "boost_picks": "scripts/check_order_signals.py",
+}
 
 failures: list[str] = []
 
 
-def _run(silver: Path) -> dict:
-    result = run_mod.run_engine(mode="print", skip_market=True, silver_dir=silver,
+def unprobed_inputs(withheld=None, elsewhere=None) -> list:
+    """Required inputs that no probe withholds. Empty, or rule 12 can pass unexamined."""
+    withheld = set(WITHHELD if withheld is None else withheld)
+    elsewhere = set(PROBED_ELSEWHERE if elsewhere is None else elsewhere)
+    required = {key for cap in CAPABILITIES.values() for key in cap.requires}
+    return sorted(required - withheld - elsewhere)
+
+
+def withheld_sources(input_name: str, source_silver: Path, workdir: Path) -> dict:
+    """run_engine's keyword arguments for a run with `input_name` withheld at source."""
+    workdir.mkdir(parents=True, exist_ok=True)
+    silver = workdir / "silver"
+    shutil.copytree(source_silver, silver)
+    for name in SILVER_FILES.get(input_name, []):
+        (silver / name).unlink(missing_ok=True)
+    sources = {"silver_dir": silver}
+    if MARKET_SOURCES.get(input_name) == "signals_dir":
+        empty = workdir / "signals"
+        empty.mkdir()
+        sources["signals_dir"] = empty
+    elif MARKET_SOURCES.get(input_name) == "matches_path":
+        sources["matches_path"] = workdir / "product_matches.parquet"
+    return sources
+
+
+def _run(silver_dir: Path, **sources) -> dict:
+    result = run_mod.run_engine(mode="print", skip_market=True, silver_dir=silver_dir,
                                 sales_dir=ROOT / "does-not-exist",
-                                now=datetime.now(timezone.utc))
+                                now=datetime.now(timezone.utc), **sources)
     return result["artefact"]["capabilities"]
 
 
@@ -57,6 +105,12 @@ def main() -> int:
     source = run_mod.SILVER_DIR
     if not (source / "yomyom_products.parquet").exists():
         print(f"FAIL  no silver tables under {source}: import the POS export first", file=sys.stderr)
+        return 1
+
+    unprobed = unprobed_inputs()
+    if unprobed:
+        print(f"FAIL  required but withheld by no probe: {', '.join(unprobed)} — add each to "
+              f"SILVER_FILES, MARKET_SOURCES or PROBED_ELSEWHERE", file=sys.stderr)
         return 1
 
     with tempfile.TemporaryDirectory() as tmp:
@@ -67,16 +121,13 @@ def main() -> int:
         available = sorted(cid for cid, c in whole.items() if c["status"] == "available")
         print(f"baseline: {len(available)} of {len(whole)} capabilities available")
 
-        for input_name, files in sorted(WITHHOLDING.items()):
+        for input_name in WITHHELD:
             dependants = sorted(cid for cid, cap in CAPABILITIES.items() if input_name in cap.requires)
             if not dependants:
                 continue
-            withheld_dir = Path(tmp) / f"without_{input_name}"
-            shutil.copytree(source, withheld_dir)
-            for name in files:
-                (withheld_dir / name).unlink(missing_ok=True)
-            withheld = _run(withheld_dir)
+            withheld = _run(**withheld_sources(input_name, source, Path(tmp) / f"without_{input_name}"))
 
+            silent = [cid for cid in dependants if whole[cid]["status"] != "available"]
             for cid in dependants:
                 if whole[cid]["status"] != "available":
                     continue                      # it was not speaking to begin with
@@ -96,7 +147,12 @@ def main() -> int:
                         f"{withheld[cid]['status']} ({withheld[cid]['unavailable_reason']}) "
                         f"without it — an undeclared dependency")
 
-            print(f"withholding {input_name:14} → {', '.join(dependants)} unavailable, others unaffected")
+            proven = [cid for cid in dependants if cid not in silent]
+            # Named, not folded in: a dependant unavailable at baseline proves nothing about
+            # this input, and the line must not read as though it did.
+            note = f" (not available at baseline, so unproven: {', '.join(silent)})" if silent else ""
+            print(f"withholding {input_name:14} → {', '.join(proven) or 'nothing'} unavailable, "
+                  f"others unaffected{note}")
 
         # The stock-count date is not a declared input, so the loop above cannot reach
         # it: it is a rule-level unavailability, derived from vintages.pos.as_of rather
