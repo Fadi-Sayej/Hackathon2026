@@ -115,5 +115,5 @@ devices opened the app, and not one of eleven questions, each two minutes, was a
 | Item | Owning role | Why it matters |
 |---|---|---|
 | Record, for the next store, that F5's value depends on the owner answering, and measure it (F13 now counts decisions, not answers) | smartshelf-pm | Zero answers in the pilot; F13's measurement does not show questions at all |
-| A test that withdraws an answered product and keeps its answer (AC-090) | smartshelf-engineer | Met by construction only |
+| ~~A test that withdraws an answered product and keeps its answer (AC-090)~~ **Done 2026-09-28, #234 (`d36c0d4`)**: `tests/engine/test_answer_survives_withdrawal.py` | smartshelf-engineer | Met by construction only |
 | #168 and the F8 question entered F5's panel through an issue and F8-S1; F5-S1 does not mention a second fact | smartshelf-architect | F5-S1 §3 describes cost questions only |
