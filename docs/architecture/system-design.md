@@ -1478,6 +1478,23 @@ Each row names the ADR that answers it. The plan that built them is
 | FR-158, FR-159, INV-075 | E the disagreement question in the owner-question population, ordered by ADR-027; O answers | ADR-003, ADR-027, ADR-031 (the trigger), ADR-034 (the question id) | AC-150, AC-151, AC-155, AC-158 |
 | FR-160 … FR-163, INV-069, INV-077, INV-078 | U the Reorder and Approved orders entries leave their awaiting shells (ADR-028 §1); O outcomes keyed on product and order day (ADR-003, ADR-009, ADR-016) | ADR-034 | AC-136, AC-152, AC-153, AC-154 |
 
+### F9-S1 — Assortment gap (V2: approved 2026-09-28, being built)
+
+F9-S1 (`Approved`, 2026-09-28) builds D-25 on data already held (D-23). It adds one engine
+capability over inputs F8 already reads, and one policy line on the daily surface. Nothing in
+it needs a store to send anything. The plan that builds it is
+[`phase-6-v2-assortment-gap.md`](../implementation/phase-6-v2-assortment-gap.md).
+
+| Requirement | Design element | Flow / contract | Verification |
+|---|---|---|---|
+| FR-165 … FR-167, INV-080, INV-082 | E `assortment_gap`: ADR-031's `running_out` replayed for each usable night of the last 14 days over D-18's market, less every barcode in his catalogue, less what no market store listed in the last `max_absent` usable days | ADR-031 (one rule, never a second); ADR-014 | AC-164, AC-169 |
+| FR-168 … FR-170, INV-081 | P entries with evidence and no value; `signal_family` and id from the barcode | ADR-009; FR-103 required evidence | AC-166 |
+| FR-171, FR-172, INV-083 | B `compose`: at most one unvalued place, the first, from `surface.unvalued_caps` in policy | FR-106; `unvalued_order` | AC-167, AC-171 |
+| FR-173, FR-177 | B the existing `acted` / `declined` / `deferred`; team accounts read-only | ADR-006; ADR-029 | AC-168 |
+| FR-174 | E unavailable on the market signal's input reason, or `market_signal_stale` by the same `is_stale` | ADR-014, ADR-031 Decision 5 | AC-165 |
+| FR-175 | B `NOT_YET_SHOWN` until the card is approved | Phase 5 Task 5.0's precedent | AC-170 |
+| FR-176, NFR-070, NFR-071 | R print mode over the committed snapshots | ADR-002, ADR-005 | AC-164; Checkpoint 3's budget |
+
 ### Cross-cutting decisions
 
 | Decision | Design element |

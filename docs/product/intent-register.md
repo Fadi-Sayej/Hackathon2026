@@ -6,7 +6,7 @@ Version: 0.1 (content unchanged from `specs.md` v1.1)
 Parent: [PRD](PRD.md)
 Related Specs: every F#-S# document under `docs/features/`
 Owner: smartshelf-pm
-Updated: 2026-09-28 (D-25 recorded: F9's two decisions)
+Updated: 2026-09-28 (D-25 recorded: F9's two decisions; INT-005 specified and approved as F9-S1)
 ---
 
 > **Migration note.** This is `SPEC-000` from the pre-migration monolithic `specs.md`,
@@ -40,7 +40,7 @@ owner.
 | **INT-002B** | "Where is my stock disappearing?" — **data hygiene**, deliberately carrying no money figure | V1 | SPEC-002 |
 | **INT-003** | "Are my prices reasonable against my neighbours?" | V1 | SPEC-003 |
 | **INT-004** | "What do I order today, and how much?" | V2 | F8-S1 |
-| **INT-005** | "What does the market sell that I don't?" | V2 | Not specified — see §4 |
+| **INT-005** | "What does the market sell that I don't?" | V2 | F9-S1 (Approved 2026-09-28) |
 | **INT-006** | "Arrange my shelves so I earn more" | V4 | Not specified — see §4 |
 | **INT-007** | "How much do I order so it does not spoil?" | V2 | Not specified — see §4 |
 | **INT-008** | "When does each supplier actually deliver?" | V3 | Not specified — see §4 |
@@ -114,9 +114,9 @@ These are settled. A specification may operationalize them; it may not reopen th
 
 ### 4. Intents deliberately not specified in this phase
 
-**INT-005, INT-007, INT-008 (V2/V3) and INT-006 (V4)** are not given specifications here.
-INT-004 now is (F8-S1, 2026-09-25); its entry below keeps the record of how its decisions
-were taken.
+**INT-007, INT-008 (V2/V3) and INT-006 (V4)** are not given specifications here.
+INT-004 and INT-005 now are (F8-S1, 2026-09-25; F9-S1, 2026-09-28); their entries below keep
+the record of how their decisions were taken.
 
 The reason is not scheduling. Each rests on a product decision that the intent layer
 has explicitly left open, and writing requirements now would mean inventing those answers
@@ -139,7 +139,8 @@ rather than surfacing them:
   of, and it is an entry on his daily surface, where he records whether he will try it.
   Products he stocks are F8's (D-19, F8-S1 FR-158). The brief that posed the questions is
   kept, `Superseded`, as the record:
-  [F9 brief](open-decisions/F9-assortment-gap.md). Its spec is not yet written.
+  [F9 brief](open-decisions/F9-assortment-gap.md). He asked for its spec the same day:
+  [F9-S1](../features/F9-assortment-gap/specs/F9-S1-assortment-gap.md), which he approved.
 - **INT-007** depends on shelf-life data that does not exist until store staff have
   recorded receipts for 30 days.
 - **INT-008** depends on three deliveries per supplier being observed; the intent notes

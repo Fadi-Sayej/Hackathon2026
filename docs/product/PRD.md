@@ -54,7 +54,7 @@ Updated: 2026-09-28 (D-25 recorded: F9's two decisions)
 | [F6](../features/F6-daily-action-surface/intent.md) | INT-NS | الشاشة الواحدة كل صباح — لا أكثر من 10 إجراءات | [F6-S1](../features/F6-daily-action-surface/specs/F6-S1-daily-action-surface.md) | **V1** |
 | [F7](../features/F7-figure-provenance/intent.md) | INT-PROV | كل رقم يُعاد حسابه بأمر واحد | [F7-S1](../features/F7-figure-provenance/specs/F7-S1-figure-provenance.md) | **V1** |
 | [F8](../features/F8-order-quantity/intent.md) | INT-004 | «ماذا أطلب اليوم وبأي كمية؟» | [F8-S1](../features/F8-order-quantity/specs/F8-S1-order-quantity.md) | V2 · حُسمت قراراته — D-18 … D-20 |
-| [F9](../features/F9-assortment-gap/intent.md) | INT-005 | «ماذا يبيع السوق ولا أبيعه أنا؟» | — | V2 · حُسم قراره — D-25 |
+| [F9](../features/F9-assortment-gap/intent.md) | INT-005 | «ماذا يبيع السوق ولا أبيعه أنا؟» | [F9-S1](../features/F9-assortment-gap/specs/F9-S1-assortment-gap.md) | V2 · حُسم قراره — D-25 |
 | [F10](../features/F10-expiry-bounded-ordering/intent.md) | INT-007 | «كم أطلب حتى لا يتلف؟» | — | V2 |
 | [F11](../features/F11-supplier-lead-times/intent.md) | INT-008 | «متى يصل كل مورّد فعلاً؟» | — | V3 |
 | [F12](../features/F12-planogram/intent.md) | INT-006 | «رتّب رفوفي لأربح أكثر» | — | V4 |
