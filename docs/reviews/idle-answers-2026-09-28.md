@@ -1,7 +1,7 @@
 ---
 ID: IDLE-ANSWERS-2026-09-28
 Title: Idle stock's three answers, and how a calculated reference was made — for approval
-Status: Ready for review — the repository owner approved both changes on 2026-09-28 ("yes to all"); the wording below is what remains to approve
+Status: Approved — by the repository owner: both changes on 2026-09-28 ("yes to all"), the wording and screenshots on 2026-09-29 ("approved"); merged as #243
 Owner: smartshelf-engineer
 Parent: [F4-S1](../features/F4-catalogue-lifecycle/specs/F4-S1-catalogue-lifecycle.md), [F3-S1](../features/F3-competitor-price-position/specs/F3-S1-competitor-price-position.md)
 Inputs: [docs/reviews/F3-validation.md, docs/reviews/F4-validation.md, public/data/dashboard.json (2026-09-28)]
