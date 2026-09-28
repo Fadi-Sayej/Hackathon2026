@@ -34,7 +34,7 @@ Tasks 6.1 … 6.4 therefore change nothing anyone sees.
 
 ### Task 6.1: The recent replay (FR-167, §5)
 
-**Files:** `src/market/assortment_gap.py`, `tests/market/test_assortment_gap.py`
+**Files:** `src/market/recent.py`, `tests/test_market_recent.py` *(named for what they hold, the market's recent running-out, beside `running_out.py` and `test_running_out.py`)*
 
 A pure function over a presence series, the market's store ids, the policy and the night.
 It runs `running_out` for each usable night of the last `window_days` calendar days, and
