@@ -127,7 +127,7 @@ beside the "withdrawable 3,903" it qualifies.
 
 - AC-063b over real data: there is no 12-month evidence to extend into.
 - The catalogue page on the deployed URL: it needs a sign-in; the component and the artefact were read.
-- No owner decision on an F4 entry exists (0 decisions in the owner-state mirror), so no outcome was exercised.
+- Whether the owner decided on an F4 entry: first published by F13's `measurement.json` on 2026-09-29 (the committed owner-state mirror of 2026-09-12 holds none).
 
 ## Open items
 

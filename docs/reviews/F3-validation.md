@@ -135,8 +135,8 @@ reaches it today, so nobody has seen it.
   count.
 - The Prices page on the deployed URL: it needs a sign-in; the tests and the artefact were read
   instead.
-- No owner acted on an F3 entry (the owner-state mirror read locally holds 0 decisions), so no
-  outcome path was exercised.
+- Whether the owner acted on an F3 entry: his decisions are first published by F13's
+  `measurement.json` on 2026-09-29 (the committed owner-state mirror of 2026-09-12 holds none).
 
 ## Open items
 
