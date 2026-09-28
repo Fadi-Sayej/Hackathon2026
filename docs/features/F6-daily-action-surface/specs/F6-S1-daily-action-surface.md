@@ -393,6 +393,11 @@ required evidence is unavailable is absent from the surface rather than shown wi
 **AC-110b** — Every entry names the capability that produced it, so a confirmed loss is
 distinguishable from a question. *(FR-107, SCN-108)*
 
+> **2026-09-28, the repository owner:** the card's characterisation line («خسارة مؤكدة»,
+> «أرقام لا تتطابق», …) satisfies this. It already separates a confirmed loss from a
+> question, which is the criterion's purpose; no card also names its capability.
+> (F6 validation, AC-110b.)
+
 **AC-110c** — Every entry states an action the owner can physically perform, and carries
 on the surface itself the evidence its producing specification requires. *(FR-109,
 FR-110, NFR-051)*
