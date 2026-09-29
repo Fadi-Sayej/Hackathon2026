@@ -5,7 +5,7 @@ Status: Ready for review — built on the repository owner's approval of F9-S1 (
 Owner: smartshelf-architect
 Parent: [Implementation plan](plan.md)
 Inputs: [docs/features/F9-assortment-gap/specs/F9-S1-assortment-gap.md (Approved 2026-09-28), D-25, ADR-009, ADR-014, ADR-031, docs/architecture/system-design.md §21, src/market/running_out.py, src/engine/registry.py, src/surface/compose.js]
-Updated: 2026-09-28 (Tasks 6.1–6.4 built; 6.4's probe coverage landed inside 6.2, because the registry refuses an input no probe withholds; Task 6.5 waits for the card's approval)
+Updated: 2026-09-29 (Checkpoint 6 met: built, on real data, and on screen since the card's approval)
 ---
 
 # Phase 6 — V2, F9 Assortment Gap
@@ -114,6 +114,15 @@ and the `action.*` string land, and `assortment_gap` leaves `NOT_YET_SHOWN`.
   (`docs/reviews/f9-card-2026-09-29.md`). F9 is on Today and on the Assortment page.
 
 ## Checkpoint 6
+
+> **Met on 2026-09-29.**
+> - Tasks 6.1 … 6.5 are merged (#242, #245), and #245 is deployed to production.
+> - The nightly of 2026-09-29 published `assortment_gap` available on real data, with 142
+>   findings.
+> - Both probes passed in that run: `check_v1_signals` (withholding the catalogue takes F9
+>   down alone) and `check_order_signals` (withholding the market takes it down).
+> - Before the card, nothing visible had changed (re-verified on #242). The card and the
+>   Assortment page went live on the repository owner's approval.
 
 - Tasks 6.1 … 6.4 are merged.
 - The nightly publishes `assortment_gap` available on real data.
