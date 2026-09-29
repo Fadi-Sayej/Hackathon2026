@@ -244,6 +244,357 @@ stores:
       which is the correct answer to a question we cannot answer. Guessing
       `urban_minimarket` here would be the exact failure this file exists to stop.
 
+  # -- AM-PM, from the Dor Alon price file (source `alonit`) -------------------
+  # Keys are the price file's own branch numbers. Decided on 2026-09-29 by the repository
+  # owner: an AM-PM shop is a neighbourhood minimarket (Dor Alon's urban convenience chain).
+  # Until then every store in that file was unclassified, so none could set the reference
+  # a price is judged against (unknown scores 0.2, under min_affinity), and F3 judged 835
+  # products. With these 57 it judges 2,036 (the engine in print mode on 2026-09-29 data).
+  # The file's other 100 stores are Alonit branches of mixed formats (forecourt shops,
+  # kibbutz minimarkets, kiosks). The chain has no one format, so they stay unclassified.
+  "401":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "AM-PMדרך השלום"
+    chain: "AM-PM"
+  "402":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "AM-PMקרית ביאליק"
+    chain: "AM-PM"
+  "403":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "AM-PM המושבה הגרמנית"
+    chain: "AM-PM"
+  "404":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "AM-PMאח\"י אילת חיפה"
+    chain: "AM-PM"
+  "501":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm בן יהודה 30"
+    chain: "AM-PM"
+  "503":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm ארלוזרוב"
+    chain: "AM-PM"
+  "504":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm נורדאו"
+    chain: "AM-PM"
+  "505":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pmאלנבי"
+    chain: "AM-PM"
+  "506":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm קינג גורג"
+    chain: "AM-PM"
+  "507":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm 24 שנקין"
+    chain: "AM-PM"
+  "508":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm  אבן גבירול"
+    chain: "AM-PM"
+  "509":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm זמנהוף"
+    chain: "AM-PM"
+  "510":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm לינקולן"
+    chain: "AM-PM"
+  "511":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm  הרצל"
+    chain: "AM-PM"
+  "512":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm  כל-בו שלום"
+    chain: "AM-PM"
+  "513":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm פרנקל"
+    chain: "AM-PM"
+  "514":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm גורדון"
+    chain: "AM-PM"
+  "517":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm זבוטינסקי ר\"ג"
+    chain: "AM-PM"
+  "518":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm זבוטינסקי ת\"א"
+    chain: "AM-PM"
+  "519":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm נחלת יצחק"
+    chain: "AM-PM"
+  "524":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm בן יהודה 61"
+    chain: "AM-PM"
+  "529":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm בן גוריון"
+    chain: "AM-PM"
+  "531":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pmכצנלסון גבעתיים"
+    chain: "AM-PM"
+  "533":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm י.ל פרץ"
+    chain: "AM-PM"
+  "534":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm בוגרשוב"
+    chain: "AM-PM"
+  "535":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm שנקין59"
+    chain: "AM-PM"
+  "536":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pmזבוטינסקי 44"
+    chain: "AM-PM"
+  "537":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm סוקולוב הרצליה"
+    chain: "AM-PM"
+  "540":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm טברסקי"
+    chain: "AM-PM"
+  "542":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm שד יהודית"
+    chain: "AM-PM"
+  "544":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm ברודצקי"
+    chain: "AM-PM"
+  "545":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm הנשיא הרצליה"
+    chain: "AM-PM"
+  "548":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm נווה מונסון"
+    chain: "AM-PM"
+  "549":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm הוד השרון"
+    chain: "AM-PM"
+  "551":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm הדר נס ציונה"
+    chain: "AM-PM"
+  "554":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm ווינשל"
+    chain: "AM-PM"
+  "558":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm המלכות"
+    chain: "AM-PM"
+  "560":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "AMPMיהודה הלוי"
+    chain: "AM-PM"
+  "563":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm החשמונאים"
+    chain: "AM-PM"
+  "564":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm אבא הלל"
+    chain: "AM-PM"
+  "566":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm קהילת סלוניקי"
+    chain: "AM-PM"
+  "568":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pmאלנבי 69"
+    chain: "AM-PM"
+  "570":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "AMPMהרצל 61"
+    chain: "AM-PM"
+  "571":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pmבן גוריון בת ים"
+    chain: "AM-PM"
+  "576":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "AMPM ארלוזורוב 52"
+    chain: "AM-PM"
+  "577":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "AMPM אלנבי 56"
+    chain: "AM-PM"
+  "578":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "AMPM הקסטל"
+    chain: "AM-PM"
+  "579":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "AM-PM הקוממיות 16"
+    chain: "AM-PM"
+  "580":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "AM-PM דניה"
+    chain: "AM-PM"
+  "581":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "Am-pm-העצמאות"
+    chain: "AM-PM"
+  "583":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "AM-PM קריית אונו"
+    chain: "AM-PM"
+  "591":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "מוריה חיפה AM-PM"
+    chain: "AM-PM"
+  "594":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "AMPM חדרה"
+    chain: "AM-PM"
+  "595":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "AM-PMזבוטינסקי בת ים"
+    chain: "AM-PM"
+  "596":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "AM-PM אילנות חיפה"
+    chain: "AM-PM"
+  "597":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "AM-PM נרקיסים"
+    chain: "AM-PM"
+  "599":
+    store_type: urban_minimarket
+    verified: manual
+    basis: chain_format
+    name: "AM-PM טירת הכרמל"
+    chain: "AM-PM"
+
 # ── Inference guard ──────────────────────────────────────────────────────────
 # A price file with fewer than this many distinct SKUs is a partial scrape, not a
 # catalog. Inferring a format from it would classify a Shufersal branch (27 SKUs

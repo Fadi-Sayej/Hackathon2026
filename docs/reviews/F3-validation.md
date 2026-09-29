@@ -5,7 +5,7 @@ Status: Ready for review
 Owner: smartshelf-validator
 Parent: [F3-S1](../features/F3-competitor-price-position/specs/F3-S1-competitor-price-position.md)
 Inputs: [docs/features/F3-competitor-price-position/specs/F3-S1-competitor-price-position.md, docs/features/F3-competitor-price-position/intent.md, docs/operations/deployment.md, public/data/dashboard.json (2026-09-28), src/engine/competitor_position.py, src/pages/PriceGapPage.jsx, src/pages/CapabilityPage.jsx, src/surface/EntryCard.jsx, src/lib/i18n/dictionaries/, scripts/check_v1_signals.py, GitHub deployment records (Production)]
-Updated: 2026-09-28
+Updated: 2026-09-29
 ---
 
 # Validation F3 — Competitor Price Position
@@ -141,8 +141,8 @@ reaches it today, so nobody has seen it.
 
 | Item | Owning role | Why it matters |
 |---|---|---|
-| Reconcile the intent's 144/97/~15 with the engine's 1/1/0: which reference did the intent measure against, and is the Alonit station matched? | smartshelf-pm, then smartshelf-architect | F3's SUCCESS cannot be counted against numbers the engine does not reproduce |
-| C-21 ("a store below the floor may not drive a recommendation") against FR-044a (a supermarket price plus the allowance): which binds? | smartshelf-architect | The only breach is driven by `context` stores alone |
+| Reconcile the intent's 144/97/~15 with the engine's 1/1/0: which reference did the intent measure against, and is the Alonit station matched? **Partly answered 2026-09-29 (`d0fea13`)**: none of the 157 stores in the national Dor Alon price file had a store type, so none could set a reference. The repository owner decided that the 57 AM-PM shops among them are neighbourhood minimarkets (`configs/store_types.yaml`). On the 2026-09-29 data in print mode, F3 then evaluates 2,036 products (was 835) and finds 13 breaches, 2 at the attention level (was 2 and 0). 13 is still not 144; which reference the intent measured against remains open | smartshelf-pm, then smartshelf-architect | F3's SUCCESS cannot be counted against numbers the engine does not reproduce |
+| C-21 ("a store below the floor may not drive a recommendation") against FR-044a (a supermarket price plus the allowance): which binds? **Narrowed 2026-09-29 (`d0fea13`)**: 11 of the 13 breaches now have a same-format price in their reference; 2 still rest on `context` stores alone (`supermarket_plus_allowance`) | smartshelf-architect | The only breach is driven by `context` stores alone |
 | ~~Add `observations` and `matches` to `check_v1_signals.py`'s withholding list~~ **Done 2026-09-28, #234 (`a651353`)**: both withheld, and `tests/test_check_v1_signals.py` refuses a required input no probe withholds | smartshelf-engineer | Rule 12: F3's market inputs are declared but never probed |
 | ~~Show the reference's kind (and the allowance) and the sources' formats on screen, or record that FR-042 and FR-044a are met by the artefact alone~~ **Done 2026-09-29, #243**: the Prices page notes "supermarket + 7.1%" or "average of a supermarket and a shop like yours"; the sources' formats stay in the artefact | smartshelf-architect (decision), then smartshelf-engineer; a screen change needs the owner's approval | AC-042 and AC-053 are partial on screen |
 | ~~`EntryCard.jsx` prints objects as `[object Object]`; seven `evidence.*` labels are English in `ar.js` and `he.js`~~ **Done 2026-09-28, #235** (approved by the owner; see `docs/reviews/card-wording-2026-09-28.md`) | smartshelf-engineer; the owner approves the wording | Latent until a competitor finding reaches the morning screen |
