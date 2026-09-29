@@ -49,6 +49,9 @@ export function compose(artefact, ownerState, { now } = {}) {
   // F6-S1 FR-106a: these capabilities are shown in the order the engine published them (F9's,
   // and reconciliation's biggest gap first). A capability policy does not list is ordered by id.
   const engineOrdered = new Set(Array.isArray(surface.engine_ordered) ? surface.engine_ordered : [])
+  // D-26: these kinds take turns. Their order shifts by one each day, counted from the date the
+  // artefact was generated (the nightly), so every device shows the same Today.
+  const rotating = Array.isArray(surface.rotate) ? surface.rotate : []
   const outcomes = ownerState?.outcomes || {}
 
   const unavailable = []
@@ -96,23 +99,36 @@ export function compose(artefact, ownerState, { now } = {}) {
 
   // The reserved places go to capabilities in the declared order; hygiene ranks last on
   // purpose, or a thousand records of finite cleanup would hold them for weeks (§9.2).
+  const day = Math.floor(Date.parse(artefact?.generated_at ?? '') / 86_400_000)
+  const shift = rotating.length && Number.isFinite(day) ? day % rotating.length : 0
+  const order = [
+    ...unvaluedOrder.filter((id) => !rotating.includes(id)),
+    ...rotating.slice(shift), ...rotating.slice(0, shift),
+  ]
   const rank = (e) => {
-    const i = unvaluedOrder.indexOf(e.capability)
-    return i === -1 ? unvaluedOrder.length : i
+    const i = order.indexOf(e.capability)
+    return i === -1 ? order.length : i
   }
   const within = (a, b) => (a.capability === b.capability && engineOrdered.has(a.capability)
     ? published.get(a) - published.get(b)
     : String(a.id).localeCompare(String(b.id)))
-  const taken = {}
-  const orderedUnvalued = unvalued
-    .sort((a, b) => rank(a) - rank(b) || within(a, b))
-    .filter((e) => {
-      const cap = unvaluedCaps[e.capability]
-      if (!Number.isFinite(cap)) return true
-      taken[e.capability] = (taken[e.capability] || 0) + 1
-      return taken[e.capability] <= cap
-    })
-    .slice(0, unvaluedPlaces)
+  // D-26: one place per kind per round, in `order`, until the places run out. A kind gets a
+  // second place only when every other kind has had one or has nothing left; a capped kind
+  // stops at its cap (F9-S1 FR-171).
+  const queues = new Map()
+  for (const e of unvalued.sort((a, b) => rank(a) - rank(b) || within(a, b))) {
+    if (!queues.has(e.capability)) queues.set(e.capability, [])
+    queues.get(e.capability).push(e)
+  }
+  for (const [id, queue] of queues) {
+    if (Number.isFinite(unvaluedCaps[id])) queue.splice(unvaluedCaps[id])
+  }
+  const orderedUnvalued = []
+  while (orderedUnvalued.length < unvaluedPlaces && [...queues.values()].some((q) => q.length)) {
+    for (const queue of queues.values()) {
+      if (queue.length && orderedUnvalued.length < unvaluedPlaces) orderedUnvalued.push(queue.shift())
+    }
+  }
 
   // FR-106: unvalued entries are ALLOCATED places, never ranked against valued ones. Without
   // the reservation the pilot's 53 confirmed losses fill all ten every day and hygiene,

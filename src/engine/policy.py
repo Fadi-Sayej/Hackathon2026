@@ -37,6 +37,8 @@ class Policy:
     # F6-S1 FR-106a, as F9-S1 FR-172 uses it: the capabilities whose published order the
     # surface keeps. The others are still ordered by entry id, until that is changed on its own.
     surface_engine_ordered: tuple
+    # D-26: the kinds of work that take turns for the unvalued places, one shift a day.
+    surface_rotate: tuple
     question_limit: int
     question_money_basis: str
     question_yield_factor: float
@@ -109,6 +111,7 @@ class Policy:
                 "unvalued_order": list(self.surface_unvalued_order),
                 "unvalued_caps": dict(self.surface_unvalued_caps),
                 "engine_ordered": list(self.surface_engine_ordered),
+                "rotate": list(self.surface_rotate),
             },
             "artefact": {
                 "min_price": self.artefact_min_price,
@@ -187,6 +190,7 @@ def load_policy(path: Path | str | None = None) -> Policy:
         surface_unvalued_order=tuple(surface.get("unvalued_order") or ()),
         surface_unvalued_caps={str(k): v for k, v in (surface.get("unvalued_caps") or {}).items()},
         surface_engine_ordered=tuple(surface.get("engine_ordered") or ()),
+        surface_rotate=tuple(surface.get("rotate") or ()),
         question_limit=int(raw.get("question_limit", 3)),
         question_money_basis=str(raw.get("question_money_basis", "window_revenue_at_shelf_price")),
         question_yield_factor=float(raw.get("question_yield_factor", 1.0)),
@@ -258,6 +262,11 @@ def load_policy(path: Path | str | None = None) -> Policy:
     for cap_id in policy.surface_engine_ordered:
         if cap_id not in policy.surface_unvalued_order:
             raise ValueError(f"surface.engine_ordered names {cap_id!r}, which is not in surface.unvalued_order")
+    if len(set(policy.surface_rotate)) != len(policy.surface_rotate):
+        raise ValueError("surface.rotate repeats a capability")
+    for cap_id in policy.surface_rotate:
+        if cap_id not in policy.surface_unvalued_order:
+            raise ValueError(f"surface.rotate names {cap_id!r}, which is not in surface.unvalued_order")
     if policy.assortment_gap_window_days < 1:
         raise ValueError("assortment_gap.window_days must be at least 1")
     return policy

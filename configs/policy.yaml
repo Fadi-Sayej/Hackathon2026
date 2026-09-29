@@ -24,11 +24,14 @@ surface:
   # finding every day without displacing reconciliation's other two.
   unvalued_order: [assortment_gap, reconciliation, competitor_position, catalogue_lifecycle, hygiene]
   unvalued_caps: {assortment_gap: 1}
-  # F6-S1 FR-106a: capabilities whose published order the surface keeps. F9's (F9-S1 FR-172),
-  # and reconciliation's biggest gap ratio first (F2-S1 FR-024), which the repository owner
-  # chose on 2026-09-29 ("the biggest first"): before, Today took its two by entry id. The
-  # others are still ordered by entry id, and changing that is a decision of its own.
-  engine_ordered: [assortment_gap, reconciliation]
+  # F6-S1 FR-106a: every unvalued capability keeps the order the engine published, its own
+  # stated key: F9's (F9-S1 FR-172), the biggest gap ratio first (F2-S1 FR-024, "the biggest
+  # first", the repository owner 2026-09-29), the highest premium, the one quantity question
+  # and then the highest unit cost (F4-S1 FR-069), and hygiene's own order.
+  engine_ordered: [assortment_gap, reconciliation, competitor_position, catalogue_lifecycle, hygiene]
+  # D-26: the places left after F9's take turns. One place per kind per round, and the order of
+  # these kinds shifts by one each day of the nightly's date, so each is on Today two days in four.
+  rotate: [reconciliation, competitor_position, catalogue_lifecycle, hygiene]
 
 # SPEC-005 D-8
 question_limit: 3
