@@ -131,6 +131,6 @@ everything F1–F6 put in front of him.
 | Item | Owning role | Why it matters |
 |---|---|---|
 | ~~Re-run Pass three on the 2026-09-29 nightly's `measurement.json`, and record the pilot's decision counts~~ **Done 2026-09-29** (above) | smartshelf-validator | The feature's first real output, and the pilot's answer |
-| F13's intent body still says "deliberately NOT specified" and lists ARCH-GATE-003 as open | smartshelf-pm | Both stopped being true on 2026-09-28 |
-| Put OQ-801's answer (no composite; money only where a decision carries it) into F13's intent for the next store | smartshelf-pm | The intent still asks for one ₪ figure over three components, which D-1 forbids |
+| ~~F13's intent body still says "deliberately NOT specified" and lists ARCH-GATE-003 as open~~ **Noted 2026-09-29** in the intent | smartshelf-pm | Both stopped being true on 2026-09-28 |
+| ~~Put OQ-801's answer (no composite; money only where a decision carries it) into F13's intent for the next store~~ **Noted 2026-09-29** in the intent | smartshelf-pm | The intent still asks for one ₪ figure over three components, which D-1 forbids |
 | The implementation-readiness gate (and docs/README) still list ARCH-GATE-003 (no measurement surface) as the one open MAJOR | smartshelf-architect | F13-S1 and ADR-023 answer it; the gate should record that, or say what is still missing |

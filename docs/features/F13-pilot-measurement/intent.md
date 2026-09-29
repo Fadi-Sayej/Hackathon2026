@@ -20,6 +20,12 @@ Updated: 2026-09-28
 > and the subscription price will be discussed later. Only the data cadence still waits for
 > another store's owner.
 
+> **Added 2026-09-29 (not part of the migrated content).** The status banner below is out of
+> date. F13 is specified (F13-S1, approved 2026-09-28) and built (#231), which answers
+> ARCH-GATE-003. OQ-801 is answered: no composite figure; money is stated only where an
+> acted-on decision carries it, and everything else is a count. Its first measurement
+> (2026-09-29) records one decision in the whole pilot: a "Later" on 2026-09-17.
+
 > **Status: registered, deliberately NOT specified — for a different reason from F9–F12.**
 > [SPEC-000 §4](../../product/intent-register.md#4-intents-deliberately-not-specified-in-this-phase)
 > declines to specify it because `intent.md` §11.1 states it is *already measured by an
