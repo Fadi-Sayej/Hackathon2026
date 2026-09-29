@@ -26,8 +26,6 @@ import { LANGUAGES } from '../index.js'
 const FIGURES_ALLOWED = {
   'awaiting.demand.why':
     '24.3% catalogue coverage is a property of the seven monthly reports (rule 13), fixed for as long as they are the reports',
-  'awaiting.decision.why':
-    'the 5,848-of-7,463 measurement is GAP-009 itself — a stated finding with a date, not a nightly count',
   'awaiting.expiry.why':
     'the date capture began is a date',
   'awaiting.expiry.what':

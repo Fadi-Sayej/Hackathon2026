@@ -55,15 +55,22 @@ def _neg_iso(day: str) -> tuple:
     return (-y, -m, -d)
 
 
-def _entry(barcode: str, flag: dict, recent: dict) -> Entry:
+def _store_name(stores, store_id: str) -> str:
+    """FR-175: the card names the store. The config's name, or the id when it has none."""
+    record = stores.store(store_id) if stores else None
+    return (record.name if record and record.name else store_id)
+
+
+def _entry(barcode: str, flag: dict, recent: dict, stores) -> Entry:
     name = recent["names"].get(barcode)
     return Entry(
         # FR-170, ADR-009: the id derives from the barcode alone, so an answer keeps applying.
         id=entry_id(FAMILY, barcode), signal_family=FAMILY, capability=CAP, barcode=barcode,
         product_name=name, department=None, action="try_product", characterisation="market_ran_out",
-        evidence={"stores_ran_out": list(flag["stores"]), "nights_ran_out": len(flag["nights"]),
+        evidence={"stores_ran_out": [_store_name(stores, s) for s in flag["stores"]],
+                  "nights_ran_out": len(flag["nights"]),
                   "last_ran_out": max(flag["nights"]),
-                  "listed_at": list(recent["listed_tonight"].get(barcode, [])),
+                  "listed_at": [_store_name(stores, s) for s in recent["listed_tonight"].get(barcode, [])],
                   "window": dict(recent["window"]), "market_name": name},
         value=None,
         ordering_key={"name": "nights_ran_out", "value": len(flag["nights"])},
@@ -80,7 +87,7 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
         out.extras = {"on_day": inputs.running_out["on_day"]}
         return out
     recent = inputs.market_recent
-    entries = [_entry(b, f, recent) for b, f in _findings(inputs)]
+    entries = [_entry(b, f, recent, inputs.stores) for b, f in _findings(inputs)]
     return CapabilityOutput(
         id=CAP, spec=SPEC, status="available", thresholds=_thresholds(inputs.policy),
         counts={"findings": len(entries), "stores": len(inputs.running_out["stores"]),

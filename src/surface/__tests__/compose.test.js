@@ -229,7 +229,7 @@ describe('Phase 5 Task 5.0 — the F8 capabilities reach no screen before their 
     // FR-160: suggestions live on Reorder. Task 5.13 took order_quantity off NOT_YET_SHOWN;
     // the market signal and the boost are shown only as facts on its cards (approved 2026-09-27).
     expect([...NOT_ON_TODAY].sort()).toEqual(['market_boost', 'market_running_out', 'order_quantity'])
-    expect([...NOT_YET_SHOWN].sort()).toEqual(['assortment_gap', 'market_boost', 'market_running_out'])
+    expect([...NOT_YET_SHOWN].sort()).toEqual(['market_boost', 'market_running_out'])
   })
 
   it('composes an artefact carrying them exactly as one without them', () => {
@@ -259,9 +259,9 @@ describe('Phase 5 Task 5.0 — the F8 capabilities reach no screen before their 
 
 // ── Phase 6 Task 6.3: F9-S1 FR-171, FR-172 (F6-S1 FR-106a), FR-175 ───────────────────────────
 //
-// F9 stays in NOT_YET_SHOWN until the repository owner approves its card, so the two surface
-// mechanisms it needs are pinned here on a stand-in capability, through the same published
-// policy lines. Task 6.5 adds the test with assortment_gap itself when it leaves the list.
+// The two surface mechanisms are pinned here on a stand-in capability, through the same
+// published policy lines, so they hold for any capability policy names. AC-167 below pins
+// them with assortment_gap itself.
 
 const recon = (n) => Array.from({ length: n }, (_, i) => entry({ id: `r${i}`, capability: 'reconciliation' }))
 const stand = (ids) => ids.map((id) => entry({ id, capability: 'competitor_position' }))
@@ -316,24 +316,28 @@ describe('FR-172 / F6-S1 FR-106a — the surface keeps the published order where
   })
 })
 
-describe('FR-175 — F9 reaches no screen before its card is approved (AC-170)', () => {
-  const f9 = () => ({
-    assortment_gap: cap([entry({ capability: 'assortment_gap', signal_family: 'assortment.market_ran_out' })]),
-  })
+describe('AC-167 — F9 on Today: one place, the first, in the engine\'s order', () => {
+  // The policy lines exactly as configs/policy.yaml publishes them (pinned there by test_policy).
+  const F9_POLICY = { surface: { ...THRESHOLDS.surface,
+    unvalued_order: ['assortment_gap', ...THRESHOLDS.surface.unvalued_order],
+    unvalued_caps: { assortment_gap: 1 }, engine_ordered: ['assortment_gap'] } }
+  const gaps = (ids) => ids.map((id) => entry({ id, capability: 'assortment_gap', signal_family: 'assortment.market_ran_out' }))
 
-  it('composes an artefact carrying it exactly as one without it', () => {
-    const base = { price_consistency: cap([valued(5)]), reconciliation: cap(recon(4)) }
-    const policy = { surface: { ...THRESHOLDS.surface, unvalued_order: ['assortment_gap', ...THRESHOLDS.surface.unvalued_order],
-      unvalued_caps: { assortment_gap: 1 }, engine_ordered: ['assortment_gap'] } }
-    const without = compose(artefact(base, policy), state(), { now: NOW })
-    const carrying = compose(artefact({ ...base, ...f9() }, policy), state(), { now: NOW })
-    expect(carrying).toEqual(without)
-  })
-
-  it('does not name it when unavailable', () => {
-    const out = compose(artefact({ assortment_gap: cap([], { status: 'unavailable', unavailable_reason: 'market_signal_stale' }) }),
+  it('shows exactly one F9 entry, first, and reconciliation keeps the other two places', () => {
+    const out = compose(artefact({ assortment_gap: cap(gaps(['g9', 'g1', 'g5'])), reconciliation: cap(recon(355)) }, F9_POLICY),
       state(), { now: NOW })
-    expect(out).toEqual({ entries: [], unavailable: [], nothingToDo: true })
+    expect(out.entries.map((e) => e.capability)).toEqual(['assortment_gap', 'reconciliation', 'reconciliation'])
+    expect(out.entries[0].id).toBe('g9')                    // the engine's first, not the smallest id
+  })
+
+  it('lets reconciliation have all three on a day with no F9 finding', () => {
+    const out = compose(artefact({ assortment_gap: cap([]), reconciliation: cap(recon(355)) }, F9_POLICY), state(), { now: NOW })
+    expect(out.entries.map((e) => e.capability)).toEqual(['reconciliation', 'reconciliation', 'reconciliation'])
+  })
+
+  it('names it on Today when unavailable, like any capability (AC-107)', () => {
+    const out = compose(artefact({ assortment_gap: cap([], { status: 'unavailable', unavailable_reason: 'market_signal_stale' }) }, F9_POLICY),
+      state(), { now: NOW })
+    expect(out.unavailable).toEqual([{ id: 'assortment_gap', reason: 'market_signal_stale' }])
   })
 })
-

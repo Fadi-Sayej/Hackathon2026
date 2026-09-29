@@ -24,10 +24,8 @@ export const NOT_ON_TODAY = new Set(['order_quantity', 'market_running_out', 'ma
 // Task 5.13 took `order_quantity` off (Reorder renders it whole, and Data names it). The market
 // signal and the boost stay: the owner approved them as facts ON the Reorder cards, not as
 // capabilities of their own, and approved no label that would name them on Data.
-//
-// Phase 6: `assortment_gap` (F9-S1 FR-175) is published from its first night and stays here
-// until the repository owner approves its card (Task 6.5).
-export const NOT_YET_SHOWN = new Set(['market_running_out', 'market_boost', 'assortment_gap'])
+// Phase 6 Task 6.5 took `assortment_gap` off, once the repository owner approved its card.
+export const NOT_YET_SHOWN = new Set(['market_running_out', 'market_boost'])
 
 const SETTLED = new Set(['acted', 'declined'])
 

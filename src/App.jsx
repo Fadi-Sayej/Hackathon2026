@@ -60,17 +60,13 @@ const AWAITING = {
   // `priceLeaderProducts` and the HIGH-urgency `recommendations` it filters are all
   // velocity-derived. Demand is the honest blocker and it is the one that does not arrive.
   dashboard: 'demand',
-  // Not 'catalogue'. A catalogue would let these two RENDER, and that is the trap: both
-  // would then look finished while resting on nothing anyone decided.
-  //   assortment  F9 is `Registered — not specified`, and the protocol forbids writing the
-  //               spec until a named decision is taken. GAP-009 is the blocker, and it is
-  //               measured: the gap rule would key on absence from the sales reports, which
-  //               covers 5,848 of 7,463 products because the reports reach 24.3% of the
-  //               catalogue (rule 13). Lighting it would answer a question nobody settled.
+  // Not 'catalogue'. A catalogue would let this RENDER, and that is the trap: it would then
+  // look finished while resting on nothing anyone decided.
+  //   (assortment left this map in Phase 6 Task 6.5: D-25 settled F9, and F9-S1 keys on the
+  //   market running out and on his catalogue, never on absence from the sales reports.)
   //   report      the LLM layer is REMOVE in design §20.1 — no document says what the report
   //               should claim or how it would be checked, and D-12 forbids a runtime server
   //               for one store. It is withdrawn, not postponed, and says so.
-  assortment: 'decision',
   report: 'withdrawn',
   expiry: 'expiry',
 }
@@ -250,6 +246,10 @@ export default function App() {
 
     if (CAPABILITY_PAGES.has(activePage)) {
       return <CapabilityPage artefact={artefact} capabilityId={activePage} />
+    }
+    // F9 (F6-S1 FR-102): the whole set, on the nav item it always had.
+    if (activePage === 'assortment') {
+      return <CapabilityPage artefact={artefact} capabilityId="assortment_gap" />
     }
     if (activePage === 'recommendations') {
       return <ReorderPage artefact={artefact} ownerState={ownerState} onOutcome={onOutcome} now={now}
