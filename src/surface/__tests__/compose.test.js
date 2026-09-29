@@ -289,11 +289,11 @@ describe('FR-171 — a capped capability takes at most its cap, first in the ord
     expect(out.entries.filter((e) => e.value === null)).toHaveLength(1)
   })
 
-  it('changes nothing when no cap is published', () => {
+  it('without a cap, still gives each kind one place per round (D-26)', () => {
     const caps = { competitor_position: cap(stand(['c1', 'c2', 'c3'])), reconciliation: cap(recon(5)) }
     const uncapped = { surface: { ...WITH_CAP.surface, unvalued_caps: undefined } }
     const out = compose(artefact(caps, uncapped), state(), { now: NOW })
-    expect(out.entries.map((e) => e.capability)).toEqual(['competitor_position', 'competitor_position', 'competitor_position'])
+    expect(out.entries.map((e) => e.capability)).toEqual(['competitor_position', 'reconciliation', 'competitor_position'])
   })
 })
 
@@ -368,3 +368,67 @@ describe('F2-S1 FR-024 on Today — reconciliation, biggest gap first (the owner
     expect(out.entries[0].id).toBe('m-yogurt')
   })
 })
+
+describe('D-26 — the places without ₪ take turns', () => {
+  // The policy lines as configs/policy.yaml publishes them (pinned there by test_policy).
+  const KINDS = ['reconciliation', 'competitor_position', 'catalogue_lifecycle', 'hygiene']
+  const POLICY = { surface: { bound: 10, unvalued_places: 3, unvalued_order: ['assortment_gap', ...KINDS],
+    unvalued_caps: { assortment_gap: 1 }, engine_ordered: ['assortment_gap', ...KINDS], rotate: KINDS } }
+  const many = (capability, n) => Array.from({ length: n }, (_, i) => entry({ id: `${capability}-${i}`, capability }))
+  const all = () => ({
+    assortment_gap: cap(many('assortment_gap', 3)), reconciliation: cap(many('reconciliation', 355)),
+    competitor_position: cap(many('competitor_position', 7)), catalogue_lifecycle: cap(many('catalogue_lifecycle', 50)),
+    hygiene: cap(many('hygiene', 50)),
+  })
+  // The rotation follows the date the artefact was generated (the nightly), not the device's clock.
+  const onDay = (caps, day) => ({ ...artefact(caps, POLICY), generated_at: `${day}T03:52:33+00:00` })
+  const kinds = (out) => out.entries.map((e) => e.capability)
+  const days = ['2026-09-29', '2026-09-30', '2026-10-01', '2026-10-02']
+
+  it('keeps F9 first every day, and gives two other kinds one place each', () => {
+    for (const day of days) {
+      const k = kinds(compose(onDay(all(), day), state(), { now: NOW }))
+      expect(k[0], day).toBe('assortment_gap')
+      expect(new Set(k.slice(1)).size, day).toBe(2)
+    }
+  })
+
+  it('puts every kind on Today twice in four days', () => {
+    const seen = Object.fromEntries(KINDS.map((k) => [k, 0]))
+    for (const day of days) for (const k of kinds(compose(onDay(all(), day), state(), { now: NOW })).slice(1)) seen[k] += 1
+    expect(seen).toEqual({ reconciliation: 2, competitor_position: 2, catalogue_lifecycle: 2, hygiene: 2 })
+  })
+
+  it('moves the pair along by one kind a day', () => {
+    const pairs = days.map((day) => kinds(compose(onDay(all(), day), state(), { now: NOW })).slice(1))
+    for (let i = 1; i < pairs.length; i += 1) expect(pairs[i][0], days[i]).toBe(pairs[i - 1][1])
+  })
+
+  it('is the same on every device: it reads the artefact\'s date, not the clock', () => {
+    const a = compose(onDay(all(), '2026-09-30'), state(), { now: NOW })
+    const b = compose(onDay(all(), '2026-09-30'), state(), { now: NOW + 5 * 86_400_000 })
+    expect(kinds(a)).toEqual(kinds(b))
+  })
+
+  it('shows each kind\'s most important entry, in the order the engine published', () => {
+    for (const day of days) {
+      for (const e of compose(onDay(all(), day), state(), { now: NOW }).entries) expect(e.id.endsWith('-0'), e.id).toBe(true)
+    }
+  })
+
+  it('passes a kind with nothing to do to the next one', () => {
+    const caps = { ...all(), competitor_position: cap([]) }
+    for (const day of days) {
+      const k = kinds(compose(onDay(caps, day), state(), { now: NOW }))
+      expect(k, day).toHaveLength(3)
+      expect(k, day).not.toContain('competitor_position')
+      expect(new Set(k.slice(1)).size, day).toBe(2)
+    }
+  })
+
+  it('gives a kind a second place only when no other kind has work', () => {
+    const caps = { assortment_gap: cap(many('assortment_gap', 3)), reconciliation: cap(many('reconciliation', 355)) }
+    expect(kinds(compose(onDay(caps, '2026-09-29'), state(), { now: NOW }))).toEqual(['assortment_gap', 'reconciliation', 'reconciliation'])
+  })
+})
+
