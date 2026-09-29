@@ -24,9 +24,10 @@ market is never collected (`skip_market=True`): a probe must not call Open-Meteo
 market-context.json. The disagreement question is published only while its policy flag is
 on, and the flag is off until Task 5.14, so the probe turns it on for its own runs.
 
-Blocking starts on its own. Until the committed artefact shows order_quantity available on
-real data, a failure is printed as a warning and the exit is 0: before then nothing the owner
-sees depends on F8. From that night on, a failure exits 1 and holds the artefact back.
+Blocking starts on its own. Until the committed artefact shows one of the capabilities it
+covers (order_quantity, market_boost, assortment_gap) available on real data, a failure is
+printed as a warning and the exit is 0: before then nothing the owner sees depends on them.
+From that night on, a failure exits 1 and holds the artefact back.
 """
 from __future__ import annotations
 
@@ -230,13 +231,24 @@ def probe(tmp: Path) -> tuple:
     return problems, done
 
 
+# The capabilities this probe covers whose publication on real data comes from F8 or F9.
+# owner_questions is not one: F5's cost questions keep it available with no F8 input at all.
+PROBED = ("order_quantity", "market_boost", "assortment_gap")
+
+
 def blocking() -> bool:
-    """From the first night the committed artefact carries a real order_quantity, on."""
+    """From the first night the committed artefact carries any of them on real data, on.
+
+    It used to wait for order_quantity alone, which needs daily reports. After D-23 none is
+    coming, while F9's assortment gap has been available on real data since the 2026-09-29
+    nightly: the probe would have warned forever about a capability the owner can see.
+    """
     try:
         art = json.loads(ARTEFACT.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return False
-    return ((art.get("capabilities") or {}).get("order_quantity") or {}).get("status") == "available"
+    caps = art.get("capabilities") or {}
+    return any((caps.get(cap_id) or {}).get("status") == "available" for cap_id in PROBED)
 
 
 def main() -> int:
@@ -250,7 +262,7 @@ def main() -> int:
     for line in problems:
         print(f"{'FAIL' if block else '::warning::F8 probe'}  {line}")
     if not block:
-        print("order_quantity is not yet available on real data, so this warns rather than blocks")
+        print(f"none of {', '.join(PROBED)} is available on real data yet, so this warns rather than blocks")
         return 0
     return 1
 
