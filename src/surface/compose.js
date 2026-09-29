@@ -46,8 +46,8 @@ export function compose(artefact, ownerState, { now } = {}) {
   const unvaluedOrder = Array.isArray(surface.unvalued_order) ? surface.unvalued_order : []
   // F9-S1 FR-171: at most this many unvalued places for a capability. Unlisted: no cap.
   const unvaluedCaps = surface.unvalued_caps && typeof surface.unvalued_caps === 'object' ? surface.unvalued_caps : {}
-  // F6-S1 FR-106a, as F9-S1 FR-172 uses it: these capabilities are shown in the order the
-  // engine published them. Every other capability is still ordered by id, as before.
+  // F6-S1 FR-106a: these capabilities are shown in the order the engine published them (F9's,
+  // and reconciliation's biggest gap first). A capability policy does not list is ordered by id.
   const engineOrdered = new Set(Array.isArray(surface.engine_ordered) ? surface.engine_ordered : [])
   const outcomes = ownerState?.outcomes || {}
 
