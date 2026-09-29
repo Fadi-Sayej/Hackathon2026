@@ -5,7 +5,7 @@ Status: Approved — by the repository owner, 2026-09-28 ("approve", on the word
 Owner: smartshelf-engineer
 Parent: [F6-S1](../features/F6-daily-action-surface/specs/F6-S1-daily-action-surface.md)
 Inputs: [docs/reviews/F3-validation.md, F4-validation.md, F6-validation.md, F7-validation.md, public/data/dashboard.json (2026-09-28)]
-Updated: 2026-09-28
+Updated: 2026-09-29 (the thresholds question decided: keep them)
 ---
 
 # What the owner's cards and pages say
@@ -147,3 +147,5 @@ the higher-ranked ones set aside, because today only F1 and F2 reach Today's ten
   from.
 - **Whether the owner should see the technical thresholds at all** (the ceiling's bands, the
   entry-error ratios). This batch translates them; it does not decide to keep them.
+  **Decided 2026-09-29 by the repository owner: keep them.** They say why something was
+  flagged, and hiding them would be a screen change for no gain; the translations stand.

@@ -133,7 +133,7 @@ beside the "withdrawable 3,903" it qualifies.
 
 | Item | Owning role | Why it matters |
 |---|---|---|
-| Say what the owner gets from F4 while D-14 holds: nothing, the idle list only, or the withdrawn list labelled provisional | smartshelf-pm | The intent promises automatic cleaning; D-14 forbids showing it; nothing says what stands in between |
+| ~~Say what the owner gets from F4 while D-14 holds: nothing, the idle list only, or the withdrawn list labelled provisional~~ **Decided 2026-09-29 by the repository owner: the idle list only**, which is what the screens already show. Dated note in F4's intent | smartshelf-pm | The intent promises automatic cleaning; D-14 forbids showing it; nothing says what stands in between |
 | ~~Show the window and the seasonal statement wherever the dead count is shown~~ **Done 2026-09-28, #235** (approved by the owner; see `docs/reviews/card-wording-2026-09-28.md`) | smartshelf-engineer; screen change, owner approves | AC-067 partial |
 | ~~Offer idle stock FR-070's three outcomes instead of the generic three~~ **Done 2026-09-29, #243** (approved by the owner): on the shelf, not selling · the count is wrong · we don't sell it anymore | smartshelf-architect (outcome vocabulary), then smartshelf-engineer; owner approves | AC-071b missing |
 | ~~Ask the implausible quantity as a question on screen, and stop the raw `is_this_quantity_right` reaching a card~~ **Done 2026-09-28, #235** (approved by the owner; see `docs/reviews/card-wording-2026-09-28.md`) | smartshelf-engineer; owner approves the wording | AC-069 partial |

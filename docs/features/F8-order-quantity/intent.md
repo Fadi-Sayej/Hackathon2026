@@ -8,7 +8,7 @@ Parent: [PRD](../../product/PRD.md)
 Intent IDs: INT-004
 Specs: [F8-S1](specs/F8-S1-order-quantity.md) (Approved 2026-09-25)
 Inputs: [docs/product/intent-register.md (D-18 … D-20), docs/product/open-decisions/F8-ordering.md, docs/features/gaps-and-open-questions.md (GAP-008)]
-Updated: 2026-09-25
+Updated: 2026-09-29 (dated note: the running-out signal gets no screen of its own)
 ---
 
 # F8 — ماذا أطلب اليوم وبأي كمية؟ · Order Quantity
@@ -17,6 +17,12 @@ Updated: 2026-09-25
 > has ended (D-23). F8 is built (Phase 5) and publishes `order_quantity` unavailable, saying
 > that it waits for daily sales reports. It waits for another store to send those reports
 > and state its departments' order days and shelf lives. None of them is simulated meanwhile.
+
+> **Added 2026-09-29 (not part of the migrated content).** The market's running-out signal
+> (`market_running_out`: 91 products in the 2026-09-29 artefact, from 3 nearby stores) gets no
+> screen of its own while F8 is dormant; it stays a fact the Reorder page uses. Decided by the
+> repository owner on 2026-09-29: with no store owner to act on it, a new screen is not worth
+> building now. The engine keeps publishing it.
 
 > **Status: approved for specification.** The three product decisions named below were
 > taken on 2026-09-24, by the repository owner, as

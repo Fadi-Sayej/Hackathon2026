@@ -6,6 +6,9 @@ Release: V1
 Parent: [PRD](../../product/PRD.md)
 Intent IDs: INT-009
 Specs: [F4-S1](specs/F4-S1-catalogue-lifecycle.md)
+Owner: smartshelf-pm
+Inputs: [docs/product/PRD.md, docs/product/intent-register.md]
+Updated: 2026-09-29 (dated note: what the owner gets from F4 while D-14 holds)
 ---
 
 # F4 — نظّف كتالوجي من الأصناف الميتة · Catalogue Lifecycle
@@ -13,6 +16,14 @@ Specs: [F4-S1](specs/F4-S1-catalogue-lifecycle.md)
 > **Migration note.** Content moved verbatim from the pre-migration monolithic
 > `intent.md` (§4 + §4ب). Nothing was added, removed or reworded. Section numbering from
 > the original is kept in the headings so existing citations still resolve.
+
+> **Added 2026-09-29 (not part of the migrated content).** While D-14 holds, the owner gets
+> the idle list only: products that have stock and are not selling. The products the engine
+> would withdraw automatically are not shown to the owner; withdrawal stays engine-only
+> (AC-061, AC-063). Decided by the repository owner on
+> 2026-09-29 from three options put to him: nothing, the idle list only, or the withdrawn
+> list labelled provisional. It is what the screens already did, so nothing changes. After
+> D-23 no store owner can close GAP-009, so this holds until another store's owner does.
 
 ## Problem
 
