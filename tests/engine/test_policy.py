@@ -41,7 +41,8 @@ def test_policy_loads_declared_constants():
     assert p.surface_unvalued_order == ("assortment_gap", "reconciliation", "competitor_position",
                                         "catalogue_lifecycle", "hygiene")
     assert p.surface_unvalued_caps == {"assortment_gap": 1}
-    assert p.surface_engine_ordered == ("assortment_gap",)
+    # F2-S1 FR-024 on Today: reconciliation biggest gap first, the owner's choice on 2026-09-29.
+    assert p.surface_engine_ordered == ("assortment_gap", "reconciliation")
     assert p.assortment_gap_window_days == 14
     assert p.question_limit == 3
     assert p.question_money_basis == "window_revenue_at_shelf_price"
@@ -212,4 +213,4 @@ def test_policy_refuses_a_missing_or_empty_assortment_gap_window(tmp_path):
 def test_the_surface_publishes_its_cap_and_kept_order():
     surface = load_policy().as_dict()["surface"]
     assert surface["unvalued_caps"] == {"assortment_gap": 1}
-    assert surface["engine_ordered"] == ["assortment_gap"]
+    assert surface["engine_ordered"] == ["assortment_gap", "reconciliation"]

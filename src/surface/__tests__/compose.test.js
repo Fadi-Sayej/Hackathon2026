@@ -341,3 +341,30 @@ describe('AC-167 — F9 on Today: one place, the first, in the engine\'s order',
     expect(out.unavailable).toEqual([{ id: 'assortment_gap', reason: 'market_signal_stale' }])
   })
 })
+
+describe('F2-S1 FR-024 on Today — reconciliation, biggest gap first (the owner, 2026-09-29)', () => {
+  // The policy lines as configs/policy.yaml publishes them (pinned there by test_policy).
+  const POLICY = { surface: { ...THRESHOLDS.surface,
+    unvalued_order: ['assortment_gap', ...THRESHOLDS.surface.unvalued_order],
+    unvalued_caps: { assortment_gap: 1 }, engine_ordered: ['assortment_gap', 'reconciliation'] } }
+  // Published by the engine in gap-ratio order, with ids that sort the other way round.
+  const byGap = [['z-melon', 6.39], ['m-yogurt', 4.38], ['c-strawberry', 2.25], ['a-bamba', 0.47]]
+    .map(([id, ratio]) => entry({ id, capability: 'reconciliation', ordering_key: { name: 'gap_ratio', value: ratio } }))
+
+  it('shows the biggest gaps, not the smallest ids', () => {
+    const out = compose(artefact({ reconciliation: cap(byGap) }, POLICY), state(), { now: NOW })
+    expect(out.entries.map((e) => e.id)).toEqual(['z-melon', 'm-yogurt', 'c-strawberry'])
+  })
+
+  it('keeps the F9 place first and gives reconciliation its two biggest', () => {
+    const f9 = cap([entry({ id: 'g1', capability: 'assortment_gap', signal_family: 'assortment.market_ran_out' })])
+    const out = compose(artefact({ assortment_gap: f9, reconciliation: cap(byGap) }, POLICY), state(), { now: NOW })
+    expect(out.entries.map((e) => e.id)).toEqual(['g1', 'z-melon', 'm-yogurt'])
+  })
+
+  it('moves to the next biggest once one is answered', () => {
+    const out = compose(artefact({ reconciliation: cap(byGap) }, POLICY),
+      state({ 'z-melon': { status: 'acted', at: NOW - 1 } }), { now: NOW })
+    expect(out.entries[0].id).toBe('m-yogurt')
+  })
+})

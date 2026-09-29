@@ -24,10 +24,11 @@ surface:
   # finding every day without displacing reconciliation's other two.
   unvalued_order: [assortment_gap, reconciliation, competitor_position, catalogue_lifecycle, hygiene]
   unvalued_caps: {assortment_gap: 1}
-  # F6-S1 FR-106a: capabilities whose published order the surface keeps (F9-S1 FR-172). The
-  # others are still ordered by entry id; changing that moves what Today shows, so it is its
-  # own decision.
-  engine_ordered: [assortment_gap]
+  # F6-S1 FR-106a: capabilities whose published order the surface keeps. F9's (F9-S1 FR-172),
+  # and reconciliation's biggest gap ratio first (F2-S1 FR-024), which the repository owner
+  # chose on 2026-09-29 ("the biggest first"): before, Today took its two by entry id. The
+  # others are still ordered by entry id, and changing that is a decision of its own.
+  engine_ordered: [assortment_gap, reconciliation]
 
 # SPEC-005 D-8
 question_limit: 3
