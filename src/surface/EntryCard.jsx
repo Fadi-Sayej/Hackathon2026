@@ -20,7 +20,7 @@ const MONEY = new Set(['shelf_price', 'delivery_price', 'cost_price', 'differenc
 // spaces Arabic and Hebrew words apart.
 const SENTENCE = new Set(['format_note', 'reference', 'sources', 'fields', 'evidence_state', 'cost_source', 'reason',
   // F9: store names, "n of the last 14 days", a date in words, and "none of them".
-  'stores_ran_out', 'nights_ran_out', 'last_ran_out', 'listed_at'])
+  'stores_ran_out', 'nights_ran_out', 'last_ran_out', 'listed_at', 'market_prices'])
 const NOT_A_ROW = new Set(['question'])
 // What he found when he checked an idle product (F4 FR-070, approved 2026-09-28).
 const IDLE_ANSWERS = [
@@ -34,7 +34,9 @@ const FOLDED = { assortment_gap: new Set(['window', 'market_name']) }
 // F9-S1 FR-173: F9's two answers, in its own words. "Not for my store" is a decline with no
 // reason: it is his judgement of his customers, not a verdict that the finding was wrong.
 const ANSWERS = {
-  assortment_gap: { acted: 'outcome.assortment_gap.acted', declined: 'outcome.assortment_gap.declined', declineReason: null },
+  assortment_gap: { acted: 'outcome.assortment_gap.acted', declined: 'outcome.assortment_gap.declined', declineReason: null,
+    // D-27: he already sells it, in another size or pack. Kept apart from "Not for my store".
+    extra: [{ id: 'already_sold', label: 'outcome.assortment_gap.already_sold', outcome: { status: 'declined', reason: 'already_handled' } }] },
 }
 const DEFAULT_ANSWERS = { acted: 'outcome.acted', declined: 'outcome.declined', declineReason: 'not_worth_it' }
 const LOCALE = { ar: 'ar-u-nu-latn', he: 'he-IL', en: 'en-GB' }
@@ -49,6 +51,8 @@ export function EntryCard({ entry, onOutcome, formatMoney, readOnly = false }) {
   // a price in shekels, a share with its sign, a code as the sentence it stands for. An object
   // or a list is never printed as it is: `[object Object]` was waiting for the first competitor
   // card to reach this surface.
+  const dayText = (iso) => new Intl.DateTimeFormat(LOCALE[language] || LOCALE.en, { day: 'numeric', month: 'long', timeZone: 'UTC' })
+    .format(new Date(`${iso}T00:00:00Z`))
   const evidenceText = (key, raw) => {
     if (typeof raw === 'boolean') return t(raw ? 'common.yes' : 'common.no')
     if (key === 'window_id') return formatWindowId(raw, t, language)
@@ -61,9 +65,21 @@ export function EntryCard({ entry, onOutcome, formatMoney, readOnly = false }) {
     if (key === 'nights_ran_out') {
       return t('evidence.nights_ran_out.value', { n: raw, days: entry.evidence?.window?.days ?? '' })
     }
-    if (key === 'last_ran_out') {
-      return new Intl.DateTimeFormat(LOCALE[language] || LOCALE.en, { day: 'numeric', month: 'long', timeZone: 'UTC' })
-        .format(new Date(`${raw}T00:00:00Z`))
+    if (key === 'last_ran_out') return dayText(raw)
+    // D-27: what each nearby store lists it at on the delivery app, the sale price when there is
+    // one, and the day, because a price seen a fortnight ago is not today's.
+    if (key === 'market_prices') {
+      // One store to a line: two stores' prices, sale prices, names and dates in one sentence
+      // read as a run-on, and worse in Hebrew and Arabic, where the store names are Latin.
+      return raw.map((q) => (
+        <span key={q.store} className="entry-card__line">
+          {t(q.sale_price ? 'evidence.market_prices.sale' : 'evidence.market_prices.item', {
+            // The store name is isolated (U+2068 … U+2069): a Latin name in a Hebrew or Arabic
+            // line would otherwise pull the comma and the date after it into its own run.
+            price: formatMoney(q.price), sale: q.sale_price ? formatMoney(q.sale_price) : '', store: `\u2068${q.store}\u2069`, date: dayText(q.on),
+          })}
+        </span>
+      ))
     }
     if (key === 'fields' && raw && typeof raw === 'object') {
       return Object.keys(raw).map((field) => t(`evidence.${field}`)).join(t('common.listSeparator'))
@@ -87,7 +103,8 @@ export function EntryCard({ entry, onOutcome, formatMoney, readOnly = false }) {
   // absence by absence, as it does for the value above.
   const folded = FOLDED[entry.capability]
   const rows = Object.entries(entry.evidence || {})
-    .filter(([key, raw]) => raw != null && !NOT_A_ROW.has(key) && !folded?.has(key))
+    .filter(([key, raw]) => raw != null && !NOT_A_ROW.has(key) && !folded?.has(key)
+      && !(key === 'market_prices' && Array.isArray(raw) && raw.length === 0))
   const answers = ANSWERS[entry.capability] || DEFAULT_ANSWERS
 
   return (
@@ -113,7 +130,7 @@ export function EntryCard({ entry, onOutcome, formatMoney, readOnly = false }) {
 
       <dl className="entry-card__evidence">
         {rows.map(([key, raw]) => (
-          <div key={key}>
+          <div key={key} data-row={key}>
             <dt>{t(`evidence.${key}`)}</dt>
             <dd data-text={SENTENCE.has(key) ? '' : undefined}>{evidenceText(key, raw)}</dd>
           </div>
@@ -137,6 +154,11 @@ export function EntryCard({ entry, onOutcome, formatMoney, readOnly = false }) {
                     onClick={() => onOutcome(entry, { status: 'declined', reason: answers.declineReason })}>
               {t(answers.declined)}
             </button>
+            {(answers.extra || []).map(({ id, label, outcome }) => (
+              <button key={id} type="button" data-outcome={id} disabled={readOnly} onClick={() => onOutcome(entry, outcome)}>
+                {t(label)}
+              </button>
+            ))}
           </>
         )}
         <button type="button" data-outcome="deferred" disabled={readOnly} onClick={() => onOutcome(entry, { status: 'deferred' })}>

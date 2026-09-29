@@ -10,8 +10,9 @@ A finding (F9-S1 §5) is a product that:
   usable days, or running out tonight. Past `max_absent` days the store has more likely
   dropped it, and F9 does not point at what the market stopped selling.
 
-It carries no value of any kind (FR-169, INV-081): we never see what a competitor sells,
-only what it lists, so the entry states nights and stores and nothing else. Entries are
+It carries no value (FR-169, INV-081): we never see what a competitor sells, only what it
+lists, so the entry states nights and stores. Its one ₪ figure is D-27's: what each nearby store
+lists it at on the delivery app, as evidence, never as money at stake. Entries are
 published in FR-172's order, which the surface keeps (policy `surface.engine_ordered`).
 """
 from __future__ import annotations
@@ -71,7 +72,11 @@ def _entry(barcode: str, flag: dict, recent: dict, stores) -> Entry:
                   "nights_ran_out": len(flag["nights"]),
                   "last_ran_out": max(flag["nights"]),
                   "listed_at": [_store_name(stores, s) for s in recent["listed_tonight"].get(barcode, [])],
-                  "window": dict(recent["window"]), "market_name": name},
+                  "window": dict(recent["window"]), "market_name": name,
+                  # D-27: cheapest first; a store the snapshot has no price for is left out.
+                  "market_prices": sorted(
+                      ({"store": _store_name(stores, s), **q} for s, q in (recent.get("prices") or {}).get(barcode, {}).items()),
+                      key=lambda q: (q["price"], q["store"]))},
         value=None,
         ordering_key={"name": "nights_ran_out", "value": len(flag["nights"])},
     )

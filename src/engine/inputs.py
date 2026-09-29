@@ -18,6 +18,7 @@ from src.internal_pos.pos_importer import read_pos_vintage
 from src.engine.stock_date import usable_stock_date
 from src.engine.store_facts import DEFAULT_PATH as STORE_FACTS_PATH, load_store_facts
 from src.market.presence import DELIVERY_CATALOG, load_presence
+from src.market.listed_prices import snapshot_price_reader
 from src.market.recent import recent_market
 from src.market.running_out import market_signal, market_store_ids
 from src.owner_state.model import OwnerState, answered_cost, device_register
@@ -330,7 +331,8 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
     running_out = market_signal(presence, market_ids, policy, run_at.date())
     # F9-S1: the same rule, market and night, replayed over the recent window.
     market_recent = (recent_market(presence, market_ids, policy, date.fromisoformat(running_out["on_day"]),
-                                   policy.assortment_gap_window_days)
+                                   policy.assortment_gap_window_days,
+                                   price_of=snapshot_price_reader(snapshots_root))   # D-27
                      if running_out else None)
     # ADR-035: the picks sealed for the night the market evidence describes. Read, never asked
     # for here: asking is the live step's, and print mode must read exactly what it sealed.

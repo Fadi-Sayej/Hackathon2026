@@ -175,6 +175,18 @@
   min-width: 0;
 }
 
+/* D-27: the market's prices take the card's full width, one store to a line. */
+.entry-card__evidence > div[data-row="market_prices"] {
+  grid-column: 1 / -1;
+}
+
+.entry-card__line {
+  display: block;
+  /* The card is dir="auto" and a Hebrew product name makes it right to left even in English.
+     Each line takes its direction from its own words, as the evidence cells do. */
+  unicode-bidi: plaintext;
+}
+
 .entry-card__evidence dt {
   font-size: 0.75rem;
   color: var(--ink-400);
