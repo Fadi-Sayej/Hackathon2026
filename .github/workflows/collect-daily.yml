@@ -219,8 +219,9 @@ jobs:
       - name: Does F8 depend on exactly what it should?
         # F8-S1 §20, Phase 5 Task 5.11. Withholds each of F8's inputs over a built fixture
         # world and reads the published artefact. It warns, exiting 0, until the committed
-        # artefact first carries an available order_quantity on real data, and blocks from
-        # that night on, without anyone having to remember to switch it.
+        # artefact first carries order_quantity, market_boost or assortment_gap available on
+        # real data, and blocks from that night on, without anyone having to remember to
+        # switch it. F9's assortment gap did so in the 2026-09-29 artefact, so it blocks.
         run: python3 scripts/check_order_signals.py
 
       - name: Commit the owner's artefact

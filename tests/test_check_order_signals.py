@@ -100,11 +100,30 @@ def test_the_probe_passes_over_its_world_and_reaches_the_engine(tmp_path):
     assert done[0].startswith("baseline:") and "0 suggestions" not in done[0]
 
 
-def test_it_blocks_only_once_the_real_artefact_carries_the_quantity(tmp_path, monkeypatch):
+def test_it_blocks_once_the_real_artefact_carries_the_quantity(tmp_path, monkeypatch):
     art = tmp_path / "dashboard.json"
     monkeypatch.setattr(probe, "ARTEFACT", art)
     assert probe.blocking() is False                                    # no artefact
     art.write_text(json.dumps({"capabilities": {"order_quantity": {"status": "unavailable"}}}))
     assert probe.blocking() is False                                    # today: no_daily_sales
     art.write_text(json.dumps({"capabilities": {"order_quantity": {"status": "available"}}}))
+    assert probe.blocking() is True
+
+
+def test_it_blocks_once_any_capability_it_probes_is_live(tmp_path, monkeypatch):
+    """F9's assortment gap is live on real data with no daily report at all (since the 2026-09-29
+    nightly), and the probe covers it, as it covers the boost. Waiting for order_quantity alone
+    would warn forever: after D-23 no daily report is coming."""
+    art = tmp_path / "dashboard.json"
+    monkeypatch.setattr(probe, "ARTEFACT", art)
+
+    def publish(**status):
+        art.write_text(json.dumps({"capabilities": {k: {"status": v} for k, v in status.items()}}))
+
+    publish(order_quantity="unavailable", market_boost="unavailable", assortment_gap="unavailable",
+            owner_questions="available")
+    assert probe.blocking() is False            # F5's questions are live, but not because of F8
+    publish(order_quantity="unavailable", market_boost="unavailable", assortment_gap="available")
+    assert probe.blocking() is True             # today, 2026-09-29
+    publish(order_quantity="unavailable", market_boost="available", assortment_gap="unavailable")
     assert probe.blocking() is True

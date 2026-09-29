@@ -180,8 +180,11 @@ particular: no role quotes a figure it has not read from the artifact that produ
     deliveries, the store facts, the market snapshots, the boost picks, an
     answered disagreement) over a fixture world built by
     `tests/fixtures/order_signals/build.py`, because real data has no daily
-    reports yet. It warns until the committed artefact first shows
-    `order_quantity` available on real data, and blocks from then on.
+    reports yet. It warns until the committed artefact first shows one of the
+    capabilities it covers (`order_quantity`, `market_boost`, `assortment_gap`)
+    available on real data, and blocks from then on. F9's assortment gap made it
+    blocking on 2026-09-29; waiting for `order_quantity` alone would have meant
+    waiting for daily reports that D-23 says are not coming.
 
     The pre-V1 probe over the reorder ranking, `check:signals:legacy`
     (`check_signals_live.mjs`), was retired on 2026-09-24 (Phase 4 Task 4.2, #77)
