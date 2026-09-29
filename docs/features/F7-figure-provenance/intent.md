@@ -34,6 +34,11 @@ Specs: [F7-S1](specs/F7-S1-figure-provenance.md)
 > **شغّله صباح الاجتماع.** وإن شكّك المالك في رقم، افتح اللابتوب وشغّله أمامه — رقم
 > يُحسب أمام صاحبه ينهي النقاش، ورقم منقول عن ورقة يبدأ نقاشاً لا تكسبه.
 
+> **Added 2026-09-29 (not part of the migrated content).** `operational.json` was deleted on
+> 2026-09-28; the nightly now writes `dashboard.json` and `measurement.json`. Of the figures in
+> the table below, only **68** and **18%** reproduce today. 6,260 · 4,932 · 136 · 371 · 1,970 ·
+> −11% no longer match what the engine computes (F7 validation, AC-128). Run `npm run figures`.
+
 | الرقم | مصدره | ملاحظة |
 |---|---|---|
 | **6,260** صنفاً لها سعر رف وWolt | عمود `WOLT` في تصدير الجرد | **بيانات المتجر نفسه**، لا بيانات منافس |

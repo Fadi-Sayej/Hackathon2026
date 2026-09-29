@@ -74,7 +74,7 @@ Nothing.
 **PROBLEM (without a bound the screen becomes a fire hose and nothing gets done): is the owner
 measurably less stuck?** The bound holds: 3,309 candidates (3,094 products) become 10. Whether anything got done
 is not yet measurable: the owner's decisions are first published by F13's `measurement.json` on
-2026-09-29. (The committed owner-state mirror of 2026-09-12 holds none; four devices had
+2026-09-29. *(Measured 2026-09-29: the first `measurement.json` (published 2026-09-29, `generated_at 03:52Z`) records **one** decision in the whole pilot: a deferral ("Later") on one `price.inverted` entry, on 2026-09-17. Nothing acted on, nothing dismissed, no money recovered; four devices had opened the app, the last on 2026-09-24.)* (The committed owner-state mirror of 2026-09-12 holds none; four devices had
 written owner state by 2026-09-24.)
 
 **SUCCESS — the North Star, count it.** "The manager opens one screen each morning and sees what

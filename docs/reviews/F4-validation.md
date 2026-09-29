@@ -127,7 +127,7 @@ beside the "withdrawable 3,903" it qualifies.
 
 - AC-063b over real data: there is no 12-month evidence to extend into.
 - The catalogue page on the deployed URL: it needs a sign-in; the component and the artefact were read.
-- Whether the owner decided on an F4 entry: first published by F13's `measurement.json` on 2026-09-29 (the committed owner-state mirror of 2026-09-12 holds none).
+- Whether the owner decided on an F4 entry: **no** (2026-09-29: the first `measurement.json` (published 2026-09-29, `generated_at 03:52Z`) records **one** decision in the whole pilot: a deferral ("Later") on one `price.inverted` entry, on 2026-09-17. Nothing acted on, nothing dismissed, no money recovered; four devices had opened the app, the last on 2026-09-24).
 
 ## Open items
 
@@ -135,7 +135,7 @@ beside the "withdrawable 3,903" it qualifies.
 |---|---|---|
 | Say what the owner gets from F4 while D-14 holds: nothing, the idle list only, or the withdrawn list labelled provisional | smartshelf-pm | The intent promises automatic cleaning; D-14 forbids showing it; nothing says what stands in between |
 | ~~Show the window and the seasonal statement wherever the dead count is shown~~ **Done 2026-09-28, #235** (approved by the owner; see `docs/reviews/card-wording-2026-09-28.md`) | smartshelf-engineer; screen change, owner approves | AC-067 partial |
-| Offer idle stock FR-070's three outcomes instead of the generic three | smartshelf-architect (outcome vocabulary), then smartshelf-engineer; owner approves | AC-071b missing |
+| ~~Offer idle stock FR-070's three outcomes instead of the generic three~~ **Done 2026-09-29, #243** (approved by the owner): on the shelf, not selling · the count is wrong · we don't sell it anymore | smartshelf-architect (outcome vocabulary), then smartshelf-engineer; owner approves | AC-071b missing |
 | ~~Ask the implausible quantity as a question on screen, and stop the raw `is_this_quantity_right` reaching a card~~ **Done 2026-09-28, #235** (approved by the owner; see `docs/reviews/card-wording-2026-09-28.md`) | smartshelf-engineer; owner approves the wording | AC-069 partial |
 | A withdrawn list, a revival action and the CSV (FR-065, FR-067, FR-075) — once D-14 allows | smartshelf-architect, then smartshelf-engineer | AC-061 and AC-063 are engine-only |
 | ~~Twelve `evidence.*` labels are English in `ar.js` and `he.js`: `attention_pct`, `cost_floor_pct`, `cost_source`, `evidence_state`, `format_note`, `margin_pct`, `policy_pct`, `premium_pct`, `question`, `reference`, `sources`, `unit_cost` (F3's record names the seven its evidence uses)~~ **Done 2026-09-28, #235** (approved by the owner; see `docs/reviews/card-wording-2026-09-28.md`) | smartshelf-engineer; the owner approves the wording | F4's evidence uses four of them |
