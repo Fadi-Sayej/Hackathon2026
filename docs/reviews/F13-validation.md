@@ -5,7 +5,7 @@ Status: Ready for review
 Owner: smartshelf-validator
 Parent: [F13-S1](../features/F13-pilot-measurement/specs/F13-S1-pilot-measurement.md)
 Inputs: [docs/features/F13-pilot-measurement/specs/F13-S1-pilot-measurement.md, docs/features/F13-pilot-measurement/intent.md, docs/architecture/decisions/ADR-023-the-engine-publishes-the-pilot-measurement.md, docs/architecture/decisions/ADR-029-two-roles-sign-in-and-the-gate-enforces-them.md, src/engine/measurement.py, schemas/measurement.schema.json, src/telemetry/, src/lib/dataAdapters/loadMeasurement.js, tests/engine/test_measurement.py, src/telemetry/__tests__/, src/__tests__/middlewareSignIn.test.js, GitHub deployment records (Production)]
-Updated: 2026-09-28
+Updated: 2026-09-29
 ---
 
 # Validation F13 — Pilot Measurement
@@ -133,4 +133,4 @@ everything F1–F6 put in front of him.
 | ~~Re-run Pass three on the 2026-09-29 nightly's `measurement.json`, and record the pilot's decision counts~~ **Done 2026-09-29** (above) | smartshelf-validator | The feature's first real output, and the pilot's answer |
 | ~~F13's intent body still says "deliberately NOT specified" and lists ARCH-GATE-003 as open~~ **Noted 2026-09-29** in the intent | smartshelf-pm | Both stopped being true on 2026-09-28 |
 | ~~Put OQ-801's answer (no composite; money only where a decision carries it) into F13's intent for the next store~~ **Noted 2026-09-29** in the intent | smartshelf-pm | The intent still asks for one ₪ figure over three components, which D-1 forbids |
-| The implementation-readiness gate (and docs/README) still list ARCH-GATE-003 (no measurement surface) as the one open MAJOR | smartshelf-architect | F13-S1 and ADR-023 answer it; the gate should record that, or say what is still missing |
+| ~~The implementation-readiness gate (and docs/README) still list ARCH-GATE-003 (no measurement surface) as the one open MAJOR~~ **Done 2026-09-29, #253**: the gate has a dated addendum closing it, and the README row and the plan say so | smartshelf-architect | F13-S1 and ADR-023 answer it; the gate should record that, or say what is still missing |
