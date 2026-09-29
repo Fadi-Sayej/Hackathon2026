@@ -53,10 +53,10 @@ _REGISTERS_NO_FIGURE = frozenset({"market_running_out", "market_boost", "order_q
 # half was rebuilt from the same day's snapshot (F7 validation record). A NOTE, never a FAIL:
 # the engine is not wrong, the comparison is, so the exit code is what it would have been.
 COMMITTED_ARTEFACT = ROOT / "public" / "data" / "dashboard.json"
-# The market half without the rest of the market chain: `figures` without --skip-market would
-# also call Open-Meteo and rewrite the committed public/data/market-context.json.
-_REBUILD_MARKET = ("python3 scripts/rehydrate_silver.py && python3 scripts/build_competitor_product_signals.py"
-                   " && python3 scripts/build_product_matches.py")
+# The market half is rebuilt by this command itself, without --skip-market: print mode runs
+# rehydrate, signals and matching, and since 2026-09-29 not market_context, so it rewrites no
+# committed file (run._PUBLISH_ONLY).
+_REBUILD_MARKET = "npm run figures (without --skip-market)"
 
 # The same data needs the same engine too. On 2026-09-29 a fresh clone reproduced 33 of 47
 # figures on the very market snapshot the artefact used: #250 had reclassified 57 shops in
@@ -226,8 +226,7 @@ def _market_note(figures: dict, this_run, committed, readable: bool):
     return (f"this run's market snapshot is {this_run or 'none'} and the committed artefact's is "
             f"{committed or 'none'}, so the {len(reading)} figures that read it can differ from the "
             f"published ones: {', '.join(reading)}. To compare on the same data, rebuild the market "
-            f"half from the committed snapshots: {_REBUILD_MARKET}. Not by running figures without "
-            f"--skip-market, which also rewrites public/data/market-context.json")
+            f"half from the committed snapshots: {_REBUILD_MARKET}")
 
 
 def _carries_nothing(figure: dict) -> bool:
