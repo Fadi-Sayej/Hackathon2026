@@ -1478,9 +1478,11 @@ Each row names the ADR that answers it. The plan that built them is
 | FR-158, FR-159, INV-075 | E the disagreement question in the owner-question population, ordered by ADR-027; O answers | ADR-003, ADR-027, ADR-031 (the trigger), ADR-034 (the question id) | AC-150, AC-151, AC-155, AC-158 |
 | FR-160 … FR-163, INV-069, INV-077, INV-078 | U the Reorder and Approved orders entries leave their awaiting shells (ADR-028 §1); O outcomes keyed on product and order day (ADR-003, ADR-009, ADR-016) | ADR-034 | AC-136, AC-152, AC-153, AC-154 |
 
-### F9-S1 — Assortment gap (V2: approved 2026-09-28, being built)
+### F9-S1 — Assortment gap (V2: built 2026-09-29, on screen)
 
-F9-S1 (`Approved`, 2026-09-28) builds D-25 on data already held (D-23). It adds one engine
+F9-S1 (`Approved`, 2026-09-28) builds D-25 on data already held (D-23). **Built as Phase 6
+(#242, #245); Checkpoint 6 met on 2026-09-29**, when the nightly published 142 findings on real
+data. It adds one engine
 capability over inputs F8 already reads, and one policy line on the daily surface. Nothing in
 it needs a store to send anything. The plan that builds it is
 [`phase-6-v2-assortment-gap.md`](../implementation/phase-6-v2-assortment-gap.md).
