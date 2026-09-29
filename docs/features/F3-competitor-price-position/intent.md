@@ -8,7 +8,7 @@ Parent: [PRD](../../product/PRD.md)
 Intent IDs: INT-003
 Specs: [F3-S1](specs/F3-S1-competitor-price-position.md)
 Inputs: [docs/product/PRD.md, docs/product/intent-register.md, ADR-008, ADR-028]
-Updated: 2026-09-25 (dated note: storeFormat.js deleted; the engine labels context)
+Updated: 2026-09-29 (dated note: the 1,970 / 144 / 97 table rests on the deleted Kaggle-era files)
 ---
 
 # F3 — هل أسعاري معقولة مقابل الجيران؟ · Competitor Price Position
@@ -111,6 +111,20 @@ Updated: 2026-09-25 (dated note: storeFormat.js deleted; the engine labels conte
 والـ97 الباقية معروضة على مستويين: ما يتجاوز 100% يدخل شاشة الصباح، والباقي في صفحة
 الأسعار للمراجعة على مهل. **السياسة +60% محفوظة كاملة؛ المستويان يقرّران متى يزاحم
 التنبيه مهامَ اليوم، لا ما إذا كان مخالفاً.**
+
+> **Added 2026-09-29 (not part of the migrated content).** Nothing can reproduce the table
+> above now, and that is not an engine fault. Its 1,970 / 144 / 97 were measured against the
+> Kaggle-era price files for Alonit Kafr Qasim, Rami Levy Petah Tikva and Shufersal Deal Petah
+> Tikva (`scripts/classify_store_types.py` maps `kaggle_dor_alon`, `kaggle_rami_levy` and
+> `kaggle_shufersal` to those three stores). Their importer was deleted on 2026-09-24
+> (`0a88154`), and none of the three is among the stores the engine compares against today.
+> The method survives: `balanced_reference` builds the reference as point 2 above says (the
+> cheapest supermarket and the cheapest shop of the store's own format, averaged; the
+> supermarket plus the measured allowance when no such shop sells it; that shop's price alone
+> when no supermarket does). On the 2026-09-29 data, with the AM-PM shops classified
+> (`9ff20bb`), the engine finds 13 products over the policy after the cost gate (the table's
+> 97), 2 of them over 100% (its ~15). `npm run figures` gives the current count; this table
+> is history.
 
 ## Not In Scope
 
