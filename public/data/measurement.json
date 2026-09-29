@@ -1,0 +1,140 @@
+{
+ "by_family": {
+  "assortment.market_ran_out": {
+   "acted": 0,
+   "decided": 0,
+   "declined": 0,
+   "deferred": 0,
+   "not_in_this_run": 0,
+   "shown": 142
+  },
+  "catalogue.idle": {
+   "acted": 0,
+   "decided": 0,
+   "declined": 0,
+   "deferred": 0,
+   "not_in_this_run": 0,
+   "shown": 1631
+  },
+  "catalogue.implausible_quantity": {
+   "acted": 0,
+   "decided": 0,
+   "declined": 0,
+   "deferred": 0,
+   "not_in_this_run": 0,
+   "shown": 1
+  },
+  "competitor.policy_breach": {
+   "acted": 0,
+   "decided": 0,
+   "declined": 0,
+   "deferred": 0,
+   "not_in_this_run": 0,
+   "shown": 2
+  },
+  "competitor.purchase_cost": {
+   "acted": 0,
+   "decided": 0,
+   "declined": 0,
+   "deferred": 0,
+   "not_in_this_run": 0,
+   "shown": 5
+  },
+  "hygiene.absent_price": {
+   "acted": 0,
+   "decided": 0,
+   "declined": 0,
+   "deferred": 0,
+   "not_in_this_run": 0,
+   "shown": 223
+  },
+  "hygiene.conflicting_duplicate": {
+   "acted": 0,
+   "decided": 0,
+   "declined": 0,
+   "deferred": 0,
+   "not_in_this_run": 0,
+   "shown": 68
+  },
+  "hygiene.negative_stock": {
+   "acted": 0,
+   "decided": 0,
+   "declined": 0,
+   "deferred": 0,
+   "not_in_this_run": 0,
+   "shown": 578
+  },
+  "hygiene.no_identifier": {
+   "acted": 0,
+   "decided": 0,
+   "declined": 0,
+   "deferred": 0,
+   "not_in_this_run": 0,
+   "shown": 248
+  },
+  "margin.below_cost": {
+   "acted": 0,
+   "decided": 0,
+   "declined": 0,
+   "deferred": 0,
+   "not_in_this_run": 0,
+   "shown": 71
+  },
+  "price.above_ceiling": {
+   "acted": 0,
+   "decided": 0,
+   "declined": 0,
+   "deferred": 0,
+   "not_in_this_run": 0,
+   "shown": 131
+  },
+  "price.inverted": {
+   "acted": 0,
+   "decided": 1,
+   "declined": 0,
+   "deferred": 1,
+   "not_in_this_run": 0,
+   "shown": 68
+  },
+  "recon.impossible_opening": {
+   "acted": 0,
+   "decided": 0,
+   "declined": 0,
+   "deferred": 0,
+   "not_in_this_run": 0,
+   "shown": 355
+  }
+ },
+ "declined_reasons": {},
+ "devices": {
+  "count": 4,
+  "last_seen_at": [
+   "2026-09-16T11:05:30.158000Z",
+   "2026-09-17T09:57:57.248000Z",
+   "2026-09-22T10:30:41.119000Z",
+   "2026-09-24T10:03:00.328000Z"
+  ],
+  "reason": null,
+  "status": "available"
+ },
+ "generated_at": "2026-09-29T03:52:33.210581+00:00",
+ "inputs_digest": "d89cd826bda54e8ea453d4cb0f38126952ae8327a49ca45b0df34059a5512dd4",
+ "money": [],
+ "run_id": "fd2e72230faa",
+ "schema_version": 1,
+ "status": "available",
+ "totals": {
+  "acted": 0,
+  "decided": 1,
+  "declined": 0,
+  "deferred": 1,
+  "not_in_this_run": 0,
+  "shown": 3523
+ },
+ "unavailable_reason": null,
+ "window": {
+  "first": "2026-09-17T09:47:26Z",
+  "last": "2026-09-17T09:47:26Z",
+  "pulled_at": "2026-09-29T03:52:34.825738+00:00"
+ }
+}
