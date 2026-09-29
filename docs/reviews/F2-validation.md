@@ -5,7 +5,7 @@ Status: Ready for review
 Owner: smartshelf-validator
 Parent: [F2-S1](../features/F2-stock-truth/specs/F2-S1-stock-reconciliation-and-hygiene.md)
 Inputs: [docs/features/F2-stock-truth/specs/F2-S1-stock-reconciliation-and-hygiene.md, docs/features/F2-stock-truth/intent.md, docs/operations/deployment.md, public/data/dashboard.json (2026-09-24), src/engine/reconciliation.py, src/engine/inputs.py, src/surface/compose.js, src/surface/EntryCard.jsx, src/lib/i18n/dictionaries/, GitHub deployment records (Production)]
-Updated: 2026-09-24
+Updated: 2026-09-29 (open items: V2, V4, V5 and V7 closed; V6 waits under D-23)
 ---
 
 # Validation F2 — Stock Reconciliation and Data Hygiene
@@ -179,8 +179,8 @@ morning when the owner's screen is a day old, because nothing looks at the last 
 
 | Item | Owning role | Why it matters |
 |---|---|---|
-| F2-V4: a surface for FR-026's statement | smartshelf-architect; wording by the owner | The intent's governing sentence never reaches the owner |
-| F2-V5 / #167: nightly deploys are blocked | the repository owner (Vercel), then smartshelf-platform | The owner sees data only as fresh as the last human merge |
-| F2-V6: a fresh POS export | the repository owner, with the store | All 355 findings describe June |
-| F2-V7: one English label, and a raw period id | smartshelf-engineer, after the owner approves the wording | Language on the owner's screen |
-| F2-V2: hygiene has no daily place | smartshelf-architect and smartshelf-pm | Still undecided out loud |
+| ~~F2-V4: a surface for FR-026's statement~~ **Done 2026-09-24, #179 (`52b5f85`)**, wording approved by the repository owner: the reconciliation page says the loss is known only after a count, in the three languages (`reconciliationCardWording.test.jsx`) | smartshelf-architect; wording by the owner | The intent's governing sentence never reaches the owner |
+| ~~F2-V5 / #167: nightly deploys are blocked~~ **Done**: #167 closed on 2026-09-27; the nightly artefacts of 2026-09-28 (`dbcb2f2`) and 2026-09-29 (`b215b0c`) each have their own production deployment (GitHub deployment records, read 2026-09-29) | the repository owner (Vercel), then smartshelf-platform | The owner sees data only as fresh as the last human merge |
+| F2-V6: a fresh POS export. **Waits for another store (D-23, 2026-09-27)**: the export will stay dated 2026-06-06 | the repository owner, with the store | All 355 findings describe June |
+| ~~F2-V7: one English label, and a raw period id~~ **Done 2026-09-24, #179 (`52b5f85`)**: "חודשים בבדיקה", and the period as month names (`formatPeriod.test.js`, `reconciliationCardWording.test.jsx`) | smartshelf-engineer, after the owner approves the wording | Language on the owner's screen |
+| ~~F2-V2: hygiene has no daily place~~ **Decided 2026-09-29, D-26 (#254)**: the places without a ₪ figure take turns, and record fixes are on Today two days in four | smartshelf-architect and smartshelf-pm | Still undecided out loud |
