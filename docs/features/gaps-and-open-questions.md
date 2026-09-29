@@ -7,7 +7,7 @@ Parent: [Intent Register (SPEC-000)](../product/intent-register.md)
 Related Specs: all F#-S# documents under `docs/features/`
 Owner: smartshelf-pm
 Inputs: [docs/product/intent-register.md, docs/features/F#-*/intent.md, docs/features/F#-*/specs/]
-Updated: 2026-09-28 (GAP-013 posed in the F9 brief, and resolved the same day as D-25)
+Updated: 2026-09-29 (OQ-602: its question of order answered by D-26)
 ---
 
 > **Migration note.** Moved verbatim from the pre-migration monolithic `specs.md`. It spans
@@ -549,7 +549,7 @@ produces a monetary figure:
 | ID | Now |
 |---|---|
 | ~~OQ-601~~ | **Moot.** With no standing amount in V1 there is one monetary kind, and FR-104 alone orders it |
-| ~~OQ-602~~ | **P1.** The principle is settled (FR-106: unvalued work gets a stated allocation, not a rank); only the number of places is open |
+| ~~OQ-602~~ | **P1.** The principle is settled (FR-106: unvalued work gets a stated allocation, not a rank); only the number of places is open. *(2026-09-29: the order among them is D-26: F9 keeps its place, the other kinds take turns, each in its own stated order. The number, three, stays provisional.)* |
 | ~~OQ-201~~ | **P1.** Period alignment governed the magnitude, which is no longer stated. Detection does not depend on it |
 | ~~OQ-401~~ | **Resolved.** Withdrawal is re-evaluated on every ingestion and its strength follows the evidence window; a full annual cycle triggers re-examination of earlier withdrawals. Narrowed to OQ-407 (P1) |
 | ~~OQ-406~~ | **Resolved.** The window follows available evidence. Narrowed to OQ-408 (P2) |

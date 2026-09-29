@@ -40,7 +40,7 @@ Anything without a traceable id does not belong in this repository.
 When two documents disagree, the one **higher** in this list wins. It is reproduced from
 [`docs/README.md`](../docs/README.md), which is the canonical copy.
 
-1. PRD, and the settled decisions `D-1 … D-25` in the intent register §3
+1. PRD, and the settled decisions `D-1 … D-26` in the intent register §3
 2. Feature intents
 3. Approved feature specs
 4. System Design

@@ -445,6 +445,11 @@ allocation; it does not fix the number. Design can proceed on the allocation mec
 while the number is decided from observation of the owner. SPEC-002 supplies gap ratio
 as its own ordering key (FR-024); other unvalued capabilities need one under FR-106a.
 
+> **2026-09-29:** the order among the unvalued places is **D-26**. F9 keeps one place (F9-S1
+> FR-171), the other kinds take turns one place each, rotating with the nightly's date, and each
+> kind keeps its own stated order (FR-106a), which `surface.engine_ordered` publishes. The number
+> of places, three, remains provisional.
+
 **OQ-603 (P1) — May staff act on entries, or only the owner?**
 Counting stock is plausibly a staff task; changing a price is plausibly not. Affects
 FR-112 and what outcomes mean.
