@@ -96,6 +96,24 @@ and still lists ARCH-GATE-003 as open; both stopped being true on 2026-09-28.
 
 ---
 
+## Pass three, re-run 2026-09-29
+
+Read from `public/data/measurement.json` at `b215b0c`, `generated_at 2026-09-29T03:52:33Z`, `status: available`,
+the owner state pulled from Firestore at 03:52:34Z.
+
+| Question | Answer | Read from |
+|---|---|---|
+| Shown in this run | 3,523 entries | `totals.shown` |
+| Decided over the whole pilot | **1** | `totals.decided` |
+| Acted on / dismissed / deferred | **0 / 0 / 1** | `totals` |
+| Which | one `price.inverted` entry, deferred on 2026-09-17 09:47Z | `by_family`, `window` |
+| Money recovered | none: no acted-on decision carries money | `money: []` |
+| Devices that wrote owner state | 4, last seen 2026-09-24 | `devices` |
+
+**This is the pilot's answer to its own question.** The intent's third outcome after 30 days is "no use,
+stop honourably, having lost a month and not a year". The owner opened the app on four devices and
+recorded one "Later". F13 measured it, as it was built to; the pilot had already ended (D-23).
+
 ## What surprised me
 
 F13 is the only feature whose most important output does not exist yet, and the one output the
@@ -112,7 +130,7 @@ everything F1–F6 put in front of him.
 
 | Item | Owning role | Why it matters |
 |---|---|---|
-| Re-run Pass three on the 2026-09-29 nightly's `measurement.json`, and record the pilot's decision counts | smartshelf-validator | The feature's first real output, and the pilot's answer |
+| ~~Re-run Pass three on the 2026-09-29 nightly's `measurement.json`, and record the pilot's decision counts~~ **Done 2026-09-29** (above) | smartshelf-validator | The feature's first real output, and the pilot's answer |
 | F13's intent body still says "deliberately NOT specified" and lists ARCH-GATE-003 as open | smartshelf-pm | Both stopped being true on 2026-09-28 |
 | Put OQ-801's answer (no composite; money only where a decision carries it) into F13's intent for the next store | smartshelf-pm | The intent still asks for one ₪ figure over three components, which D-1 forbids |
 | The implementation-readiness gate (and docs/README) still list ARCH-GATE-003 (no measurement surface) as the one open MAJOR | smartshelf-architect | F13-S1 and ADR-023 answer it; the gate should record that, or say what is still missing |
