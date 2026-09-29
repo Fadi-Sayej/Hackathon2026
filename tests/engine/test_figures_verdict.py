@@ -162,3 +162,151 @@ def test_an_unreadable_committed_artefact_says_the_comparison_is_unknown(monkeyp
 
 def test_the_default_comparison_is_the_committed_artefact():
     assert figures.COMMITTED_ARTEFACT == ROOT / "public" / "data" / "dashboard.json"
+
+
+# ── "The same data" includes the same engine (AC-127) ────────────────────────
+#
+# 2026-09-29: a fresh clone reproduced 33 of 47 figures, on the same market snapshot as the
+# committed artefact. #250 had reclassified 57 shops in configs/store_types.yaml after the
+# night's run, so every competitor figure moved. With the artefact's own configs and engine
+# put back, the same clone reproduced 46 of 47 (the 47th is the owner state's source, as ever).
+# Nothing said so: the market-snapshot NOTE above compares dates, and the dates matched.
+
+import subprocess  # noqa: E402
+
+GIT_ENV = {"GIT_CONFIG_GLOBAL": "/dev/null", "GIT_CONFIG_NOSYSTEM": "1",
+           "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@example.com",
+           "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@example.com"}
+
+
+def _git(repo, *args):
+    import os
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")} | GIT_ENV
+    return subprocess.run(["git", "-C", str(repo), *args], env=env, capture_output=True, text=True,
+                          check=True).stdout.strip()
+
+
+def _write(repo, path, text):
+    p = repo / path
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(text, encoding="utf-8")
+
+
+def _repo(tmp_path):
+    """An engine commit, then the nightly's artefact commit on top of it."""
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _git(repo, "init", "-q")
+    _write(repo, "configs/store_types.yaml", "a: 1\n")
+    _write(repo, "src/engine/competitor_position.py", "X = 1\n")
+    _write(repo, "src/pages/PriceGapPage.jsx", "export default 1\n")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-q", "-m", "engine")
+    _write(repo, "public/data/dashboard.json", "{}")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-q", "-m", "engine: artefact for the day")
+    return repo
+
+
+def _since(repo):
+    return figures.engine_changes_since_artefact(root=repo, artefact=repo / "public" / "data" / "dashboard.json")
+
+
+def test_nothing_changed_since_the_artefact_was_built(tmp_path):
+    repo = _repo(tmp_path)
+    state = _since(repo)
+    assert state["state"] == "same" and state["changed"] == []
+    assert state["built_from"] == _git(repo, "rev-parse", "--short", "HEAD~1")
+
+
+def test_a_config_committed_after_the_artefact_is_named(tmp_path):
+    repo = _repo(tmp_path)
+    _write(repo, "configs/store_types.yaml", "a: 2\n")
+    _git(repo, "commit", "-q", "-am", "config: reclassify")
+    assert _since(repo)["state"] == "changed"
+    assert _since(repo)["changed"] == ["configs/store_types.yaml"]
+
+
+def test_an_uncommitted_engine_change_is_named_too(tmp_path):
+    repo = _repo(tmp_path)
+    _write(repo, "src/engine/competitor_position.py", "X = 2\n")
+    assert _since(repo)["changed"] == ["src/engine/competitor_position.py"]
+
+
+def test_a_screen_change_is_not_an_engine_change(tmp_path):
+    """The browser computes no figure, so a page edit cannot make one differ."""
+    repo = _repo(tmp_path)
+    _write(repo, "src/pages/PriceGapPage.jsx", "export default 2\n")
+    _git(repo, "commit", "-q", "-am", "ui")
+    assert _since(repo)["state"] == "same"
+
+
+def test_a_probe_or_this_command_is_not_an_engine_change(tmp_path):
+    repo = _repo(tmp_path)
+    _write(repo, "scripts/check_order_signals.py", "probe\n")
+    _write(repo, "scripts/figures.py", "cmd\n")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-q", "-m", "probe")
+    assert _since(repo)["state"] == "same"
+    _write(repo, "scripts/rehydrate_silver.py", "run.py imports this\n")
+    assert _since(repo)["state"] == "same", "untracked, so not yet in any diff"
+    _git(repo, "add", ".")
+    assert _since(repo)["changed"] == ["scripts/rehydrate_silver.py"]
+
+
+def test_a_shallow_clone_cannot_tell_and_says_so(tmp_path):
+    repo = _repo(tmp_path)
+    _write(repo, "configs/store_types.yaml", "a: 2\n")
+    _git(repo, "commit", "-q", "-am", "config")
+    shallow = tmp_path / "shallow"
+    subprocess.run(["git", "clone", "-q", "--depth", "1", f"file://{repo}", str(shallow)], check=True,
+                   capture_output=True)
+    state = _since(shallow)
+    assert state["state"] == "unknown" and "shallow" in state["reason"]
+
+
+def test_a_locally_rewritten_artefact_is_not_the_published_one(tmp_path):
+    """`npm run data:refresh` writes public/data/dashboard.json; comparing with that compares a
+    run with itself."""
+    repo = _repo(tmp_path)
+    _write(repo, "public/data/dashboard.json", '{"local": true}')
+    state = _since(repo)
+    assert state["state"] == "unknown" and "uncommitted" in state["reason"]
+
+
+def test_outside_a_repository_it_cannot_tell(tmp_path):
+    (tmp_path / "public" / "data").mkdir(parents=True)
+    (tmp_path / "public" / "data" / "dashboard.json").write_text("{}")
+    state = figures.engine_changes_since_artefact(root=tmp_path, artefact=tmp_path / "public/data/dashboard.json")
+    assert state["state"] == "unknown"
+
+
+def _run_with_engine_state(monkeypatch, capsys, tmp_path, engine_state, capabilities=None):
+    monkeypatch.setattr(figures, "engine_changes_since_artefact", lambda **_: engine_state)
+    return _run_dated(monkeypatch, capsys, tmp_path, ours="2026-09-29", committed="2026-09-29",
+                      capabilities=capabilities)
+
+
+def test_a_changed_engine_is_a_note_naming_the_files_and_the_commit(monkeypatch, capsys, tmp_path):
+    code, payload, err = _run_with_engine_state(monkeypatch, capsys, tmp_path, {
+        "state": "changed", "built_from": "b215b0c", "changed": ["configs/store_types.yaml"], "reason": None})
+    assert code == 0, "a NOTE must not change the exit code"
+    note = next(line for line in err.splitlines() if "b215b0c" in line)
+    assert note.startswith("NOTE") and "configs/store_types.yaml" in note
+    assert "git checkout b215b0c" in note
+    assert payload["engine_since_artefact"]["state"] == "changed"
+
+
+def test_an_unchanged_engine_says_nothing(monkeypatch, capsys, tmp_path):
+    _, payload, err = _run_with_engine_state(monkeypatch, capsys, tmp_path, {
+        "state": "same", "built_from": "b215b0c", "changed": [], "reason": None})
+    assert "b215b0c" not in err
+    assert payload["engine_since_artefact"]["state"] == "same"
+
+
+def test_an_unknown_engine_state_is_a_note_with_its_reason(monkeypatch, capsys, tmp_path):
+    code, _, err = _run_with_engine_state(monkeypatch, capsys, tmp_path, {
+        "state": "unknown", "built_from": None, "changed": [], "reason": "a shallow clone"},
+        capabilities={"reconciliation": _unavailable("no_sales_evidence")})
+    assert code == 1, "and it does not turn a failure into a pass"
+    assert any(line.startswith("NOTE") and "a shallow clone" in line for line in err.splitlines())
