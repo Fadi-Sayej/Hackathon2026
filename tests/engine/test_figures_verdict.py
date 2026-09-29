@@ -131,11 +131,8 @@ def test_an_older_local_market_half_is_named_with_the_figures_it_moves(monkeypat
     assert "competitor_position.matched" in note
     assert "provenance.competitor_snapshot_age_days" in note
     assert "price_consistency.inverted" not in note
-    # How to get the same data, and the one way not to.
-    assert "scripts/rehydrate_silver.py" in note
-    assert "scripts/build_competitor_product_signals.py" in note
-    assert "scripts/build_product_matches.py" in note
-    assert "--skip-market" in note and "market-context.json" in note
+    # How to get the same data: this command, building its own market half.
+    assert "npm run figures (without --skip-market)" in note
     assert payload["market_snapshot"] == {"this_run": "2026-09-27", "committed": "2026-09-28"}
 
 

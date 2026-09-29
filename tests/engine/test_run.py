@@ -125,6 +125,39 @@ def test_skip_market_skips_the_market_context_too():
         "market_context", "rehydrate_silver", "competitor_signals", "product_matching"]
 
 
+def _chain_that_records(monkeypatch, ran):
+    steps = [(name, (lambda name=name: ran.append(name)))
+             for name in ("market_context", "rehydrate_silver", "competitor_signals", "product_matching")]
+    monkeypatch.setattr(run_mod, "_market_chain", lambda skip: [] if skip else steps)
+
+
+def test_print_mode_rebuilds_the_market_half_without_rewriting_market_context(tmp_path, monkeypatch):
+    """Reproduction changes no committed file, and spends no time on a file no figure reads.
+
+    Measured on a fresh clone on 2026-09-29: `npm run figures`, which a clone must run without
+    --skip-market to build its market half, took 133 s against NFR-060's two minutes. 69 s of
+    that was market_context calling Open-Meteo to rewrite the committed
+    public/data/market-context.json, which nothing in the engine or the browser reads. The
+    three steps that build the market half the figures do read still run."""
+    _isolate(monkeypatch, tmp_path)
+    ran = []
+    _chain_that_records(monkeypatch, ran)
+    result = run_mod.run_engine(mode="print", capability_runners={},
+                                now=datetime(2026, 9, 29, tzinfo=timezone.utc))
+    assert ran == ["rehydrate_silver", "competitor_signals", "product_matching"]
+    assert "market_context" not in [s["step"] for s in result["steps"]]
+
+
+def test_the_nightly_still_publishes_market_context(tmp_path, monkeypatch):
+    """ADR-028 keeps the file published, and collect-daily.yml commits it: publish mode runs it."""
+    _isolate(monkeypatch, tmp_path)
+    ran = []
+    _chain_that_records(monkeypatch, ran)
+    run_mod.run_engine(mode="publish", artefact_path=tmp_path / "d.json", capability_runners={},
+                       now=datetime(2026, 9, 29, tzinfo=timezone.utc))
+    assert ran == ["market_context", "rehydrate_silver", "competitor_signals", "product_matching"]
+
+
 # ── Phase 5 Task 5.2: the daily sales reports in the run (ADR-030 §3, §4) ───────────────
 
 import pytest

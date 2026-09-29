@@ -150,6 +150,15 @@ def _market_chain(skip: bool) -> list:
             ("product_matching", run_product_matching)]
 
 
+# Market steps whose only product is a committed file nothing reads, so a print-mode run skips
+# them. A fresh clone must run `npm run figures` without --skip-market to build the market half
+# its figures read; on 2026-09-29 that took 133 s against NFR-060's two minutes, 69 s of it
+# market_context calling Open-Meteo to rewrite public/data/market-context.json, which no
+# figure, capability or page reads. Reproduction changes no committed file. The nightly
+# publishes, so it still refreshes the file ADR-028 keeps.
+_PUBLISH_ONLY = frozenset({"market_context"})
+
+
 def _step(steps: list, name: str, fn: Callable, verdict: Optional[Callable] = None):
     """`verdict` lets a step that succeeded still report that it did nothing.
 
@@ -219,6 +228,8 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
     daily_age = _daily_age(daily, now)
     daily_stale = daily_age is not None and daily_age > policy.order_freshness_days
     for name, fn in _market_chain(skip_market):
+        if name in _PUBLISH_ONLY and mode != "publish":
+            continue
         _step(steps, name, fn)
 
     # Named only when the caller named them, so a test that redirects neither reads the
