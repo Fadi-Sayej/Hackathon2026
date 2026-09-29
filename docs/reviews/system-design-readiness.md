@@ -1216,6 +1216,26 @@ delete was taken on 09-13 (P4-OQ-3).
 **Verdict unchanged: CONDITIONAL PASS.** Zero blockers, **one** MAJOR open (ARCH-GATE-003),
 down from three.
 
+> **Addendum, 2026-09-29 — ARCH-GATE-003 closed against the built artefact.** Run 3's text
+> above stays as written. What the finding asked for now exists:
+>
+> - **A spec:** [F13-S1](../features/F13-pilot-measurement/specs/F13-S1-pilot-measurement.md),
+>   `Approved` by the repository owner on 2026-09-28 (PR #230), with
+>   [ADR-023](../architecture/decisions/ADR-023-the-engine-publishes-the-pilot-measurement.md)
+>   `Accepted` the same day.
+> - **A working instrument:** the engine writes `public/data/measurement.json` every night
+>   (#231, `9ee163c`). The 2026-09-29 file (`generated_at 2026-09-29T03:52:33Z`) is
+>   `status: available`: 4 devices, 3,523 entries shown in that run, and over the whole
+>   pilot 1 decision and 0 acted on. The telemetry page reads it and nothing else; `operational.json` was deleted.
+>   Production is `3b44c60` (GitHub deployment `6735901166`, `success`), which contains
+>   `9ee163c`.
+> - **The release condition:** the "30-day go/no-go number" was settled by **D-24**. F13 has
+>   no success number. It measures how much success there is and sets no figure to reach.
+>
+> The validation is in [F13-validation.md](F13-validation.md), with Pass three re-run on the
+> nightly's file. **Zero MAJOR findings remain open.** The two peer-review points below are
+> judgement calls, not findings, and are unchanged by this addendum.
+
 ### Two things the peer review raised that neither run resolved
 
 Recorded here rather than fixed, because both are judgement calls the team should take

@@ -119,8 +119,11 @@ Copied verbatim from `docs/architecture/system-design.md`; every task's requirem
   **Settled by [ADR-016](../architecture/decisions/ADR-016-outcome-snapshot-carries-the-signal-family.md)**
   on 2026-09-12: the snapshot carries `signal_family`, the System Design §9.3 and §10.3 are
   edited, and Phase 2 Task 2.1 refuses an outcome without it.
-- **ARCH-GATE-003 (INT-MEAS)** — the pilot's own 30-day go/no-go number (PRD §8) has no V1
+- ~~**ARCH-GATE-003 (INT-MEAS)** — the pilot's own 30-day go/no-go number (PRD §8) has no V1
   delivery: the design removes the telemetry surface that SPEC-000 §4 relied on and builds
   nothing in its place. Either F13 is specified before V1 ships, or the team states on 12/9
   that the number will not compute itself. Carried here from the readiness gate §18 action
-  11, which the System Design has not yet recorded in its own §23 release conditions.
+  11, which the System Design has not yet recorded in its own §23 release conditions.~~
+  **Closed 2026-09-29:** F13 is specified (F13-S1, approved 2026-09-28) and built (Task 4.5,
+  #231); the nightly publishes `public/data/measurement.json`. D-24 settled that there is no
+  success number. See the readiness gate's addendum of the same date.

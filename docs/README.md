@@ -115,7 +115,7 @@ ADR-001 … ADR-035 are `Accepted`; ADR-023 was the last, on 2026-09-28. ADR-022
 | Gate | Verdict |
 |---|---|
 | [Intent → Spec conformance](reviews/intent-spec-conformance.md) | CONDITIONAL PASS (run 2) |
-| [System Design → Implementation readiness](reviews/system-design-readiness.md) | CONDITIONAL PASS (run 3, 2026-09-13) — 0 blockers, **1 MAJOR open** (ARCH-GATE-003). GATE-002 and GATE-004 closed against the built artefact |
+| [System Design → Implementation readiness](reviews/system-design-readiness.md) | CONDITIONAL PASS (run 3, 2026-09-13) — 0 blockers, 0 MAJOR open. GATE-002 and GATE-004 closed against the built artefact; ARCH-GATE-003 closed on 2026-09-29 by F13 and D-24 (addendum) |
 | [Documentation structure migration](reviews/documentation-structure-migration.md) | see report |
 | [F2 — stock reconciliation and hygiene](reviews/F2-validation.md) | conformance PASS (10/10) · fidelity PASS · usefulness 3 of 10 daily places; 2 findings |
 | [F3 — competitor price position](reviews/F3-validation.md) | 2026-09-28: conformance met in the artefact, AC-042 and AC-053 partial on screen · fidelity short: 1 breach where the intent measured 144 · usefulness: 0 daily places, the Prices page positions 873 products |
