@@ -3,10 +3,13 @@ ID: F3-S1
 Title: Competitor Price Position
 Status: Approved — passed the Intent → Spec conformance gate (run 2, CONDITIONAL PASS)
 Version: 1.1
+Owner: smartshelf-architect
 Parent: [F3 — Competitor Price Position](../intent.md)
 Related Intents: INT-003
+Inputs: [docs/product/PRD.md, docs/features/F3-competitor-price-position/intent.md]
 Legacy ID: SPEC-003 (in the pre-migration monolithic `specs.md` v1.1)
 Answered by: [System Design](../../../architecture/system-design.md) §21
+Updated: 2026-09-29 (dated note under C-21: read with OQ-301, confirmed by the repository owner)
 ---
 
 > **Identifier note.** The requirement identifiers inside this document (`FR-…`, `INV-…`,
@@ -351,6 +354,14 @@ a recommendation. The bound itself is **OQ-306**.
   is sourced from one. This constraint is binding and is the source of GAP-001.
 - **C-21** — Existing protected behavior: a store below the comparability floor is
   context only and may not drive a recommendation.
+
+  > **Added 2026-09-29.** C-21 is read with OQ-301's resolution (§17), which its wording
+  > predates. A store below the floor still never drives a signal alone or as a bare price.
+  > Its price may drive as the supermarket half of the balanced reference, raised by the
+  > measured allowance where no same-format price is held (FR-044a). The repository owner
+  > confirmed this on 2026-09-29. Two of the 13 breaches on the 2026-09-29 data (with
+  > the AM-PM shops classified) rest on such a reference alone, and they stay, labelled on the
+  > Prices page as a supermarket price plus the allowance.
 - **C-22** — Store classifications carry a provenance distinction between first-hand
   knowledge of a branch and desk knowledge of a chain; a manually decided
   classification is final and MUST NOT be overwritten by inference.
