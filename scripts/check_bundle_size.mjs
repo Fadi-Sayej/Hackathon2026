@@ -45,7 +45,11 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const CEILING_KB = 910         // measured 906 KB in CI (905 locally), 2026-09-28: idle products'
+const CEILING_KB = 913         // measured 910 KB on a fresh local build, 2026-09-29 (CI reads about 1 KB
+                               // higher): D-27 puts the market's listed prices and a third answer on F9's
+                               // card, 5 strings in three languages and the per-store price lines.
+                               // index.html is 368 KB, under its 500 KB target. Before that it was 910,
+                               // measured 906 KB in CI (905 locally), 2026-09-28: idle products'
                                // three answers and the Prices page's reference note (#243), five
                                // strings in three languages; index.html 363 KB. Before that it was
                                // 905, over a measured 903 KB, 2026-09-28: the card batch (#235) put 60 strings in

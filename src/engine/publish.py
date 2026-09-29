@@ -31,6 +31,18 @@ def _money_fields(obj, path=""):
             yield from _money_fields(value, f"{path}[{i}]")
 
 
+# D-27 (F9-S1 INV-081 as amended): an assortment-gap entry's one ₪ figure is what each nearby
+# store lists it at, `market_prices[*].price` and `.sale_price`. Any other money-named field, at
+# any depth, is refused as INV-069 refuses them on an order suggestion.
+_LISTED_PRICE = re.compile(r"^market_prices(\[\d+\](\.(price|sale_price))?)?$")
+
+
+def check_assortment_gap_entry(entry: dict) -> None:
+    fields = [f for f in _money_fields(entry.get("evidence") or {}) if not _LISTED_PRICE.match(f)]
+    if fields:
+        raise PublishRefused(f"assortment_gap entry {entry['id']} carries money-named fields {fields} (INV-081)")
+
+
 def _check_order_suggestion(entry: dict, max_pct: float) -> None:
     fields = list(_money_fields(entry.get("evidence") or {}))
     if fields:
@@ -112,11 +124,8 @@ def validate_artefact(artefact: dict, *, require_complete_registry: bool = False
                 if e.get("value") is not None:
                     raise PublishRefused(f"value_policy none: {cap_id} entry {e['id']} carries a value (D-1)")
         if cap_id == "assortment_gap":
-            # F9-S1 INV-081: the market's listing is evidence of demand, never of money.
             for e in cap["entries"]:
-                fields = list(_money_fields(e.get("evidence") or {}))
-                if fields:
-                    raise PublishRefused(f"assortment_gap entry {e['id']} carries money-named fields {fields} (INV-081)")
+                check_assortment_gap_entry(e)
         if cap_id == "order_quantity":
             declared = ((artefact.get("thresholds") or {}).get("market_boost") or {}).get("max_pct")
             max_pct = min(D21_MAX_BOOST_PCT, declared) if isinstance(declared, (int, float)) else D21_MAX_BOOST_PCT

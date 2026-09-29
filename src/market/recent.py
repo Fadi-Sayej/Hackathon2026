@@ -12,6 +12,10 @@ from one it has dropped (F9-S1 §5 "still sold"):
 - `listed_tonight`: orderable on the last night.
 "Orderable" is ADR-031's reading: a listed item marked not orderable counts as absent.
 
+D-27 adds the price each market store last listed the product at, read through `price_of`
+(the delivery app's listed price, from the same day's snapshot). A price the snapshot does not
+carry is left out, never written as zero.
+
 Only products flagged in the window are carried, and everything is plain data (ISO dates,
 sorted lists), because the result is an engine input: it is hashed into the digest and
 replayed by print mode.
@@ -19,7 +23,7 @@ replayed by print mode.
 from __future__ import annotations
 
 from datetime import date, timedelta
-from typing import Dict, Iterable, List, Set
+from typing import Callable, Dict, Iterable, List, Optional, Set
 
 from src.market.presence import PresenceSeries
 from src.market.running_out import running_out
@@ -35,7 +39,7 @@ def _orderable(series: PresenceSeries, day: date, market: Set[str]) -> Dict[str,
 
 
 def recent_market(series: PresenceSeries, market_store_ids: Iterable[str], policy, on_day: date,
-                  window_days: int) -> dict:
+                  window_days: int, price_of: Optional[Callable[[date, str, str], Optional[dict]]] = None) -> dict:
     """The market's recent running-out, as of the night `on_day` (F9-S1 §5)."""
     market = set(market_store_ids)
     days = sorted(d for d in series.days if d <= on_day)
@@ -60,6 +64,21 @@ def recent_market(series: PresenceSeries, market_store_ids: Iterable[str], polic
     def lists(d: Dict[str, Set[str]]) -> Dict[str, List[str]]:
         return {b: sorted(v) for b, v in sorted(d.items())}
 
+    # D-27: each market store's price on the last day it listed the product as orderable.
+    prices: Dict[str, Dict[str, dict]] = {}
+    if price_of is not None and flagged:
+        last_listed: Dict[tuple, date] = {}
+        for day in days:
+            for barcode, stores in _orderable(series, day, market).items():
+                if barcode in flagged:
+                    for store in stores:
+                        last_listed[(barcode, store)] = day
+        for (barcode, store), day in sorted(last_listed.items()):
+            quote = price_of(day, barcode, store)
+            if quote and quote.get("price") is not None:
+                prices.setdefault(barcode, {})[store] = {"price": quote["price"], "sale_price": quote.get("sale_price"),
+                                                         "on": day.isoformat()}
+
     return {
         "on_day": on_day.isoformat(),
         "window": {"first": first.isoformat(), "last": on_day.isoformat(), "days": window_days,
@@ -68,4 +87,5 @@ def recent_market(series: PresenceSeries, market_store_ids: Iterable[str], polic
         "listed_recent": lists(listed_recent),
         "listed_tonight": lists({b: s for b, s in tonight.items() if b in flagged}),
         "names": {b: series.product_names[b] for b in sorted(flagged) if b in series.product_names},
+        "prices": prices,
     }

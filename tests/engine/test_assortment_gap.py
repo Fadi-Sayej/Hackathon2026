@@ -108,9 +108,11 @@ def test_an_entry_carries_its_evidence_and_no_value():
     assert ev["market_name"] == "ביסלי גריל" and entry["product_name"] == "ביסלי גריל"
     for key in REQUIRED_EVIDENCE["assortment_gap"]:
         assert ev[key] is not None
-    text = json.dumps(entry["evidence"])
+    # D-27: the one ₪ figure is what the market lists it at, under market_prices. Nothing else
+    # in the evidence may name money, and the entry still has no value.
+    rest = {k: v for k, v in entry["evidence"].items() if k != "market_prices"}
     for word in ("price", "amount", "₪", "cost"):
-        assert word not in text
+        assert word not in json.dumps(rest)
 
 
 def test_the_identity_is_the_barcode_alone():
@@ -174,4 +176,34 @@ def test_the_stores_are_named_as_the_store_config_names_them():
     entry = next(e for e in _run(market_recent=named)["entries"] if e["barcode"] == "7290008")
     assert entry["evidence"]["stores_ran_out"] == ["Rami Levy In The Neighborhood", "Wolt Market | Lev Haaretz", "unknown"]
     assert entry["evidence"]["listed_at"] == ["Wolt Market | Lev Haaretz"]
+
+
+def test_it_states_what_each_nearby_store_lists_it_at_by_name():
+    """D-27, F9-S1 FR-168: the delivery app's listed price per store, cheapest first, with the
+    day it was listed. A store with no price in the snapshot is simply not in the list."""
+    wolt, rami = "65daeb8779ca7f0a9bf964f3", "6315c7a3f00f9e43ec812476"
+    mr = recent(**{"7290008": {"nights": [TONIGHT], "stores": [wolt, rami]}})
+    mr["listed_recent"]["7290008"] = [rami]
+    mr["prices"] = {"7290008": {wolt: {"price": 12.9, "sale_price": None, "on": "2026-09-26"},
+                                rami: {"price": 11.5, "sale_price": 9.9, "on": TONIGHT}}}
+    entry = next(e for e in _run(market_recent=mr)["entries"] if e["barcode"] == "7290008")
+    assert entry["evidence"]["market_prices"] == [
+        {"store": "Rami Levy In The Neighborhood", "price": 11.5, "sale_price": 9.9, "on": TONIGHT},
+        {"store": "Wolt Market | Lev Haaretz", "price": 12.9, "sale_price": None, "on": "2026-09-26"},
+    ]
+    assert entry["value"] is None
+    other = next(e for e in _run(market_recent=mr)["entries"] if e["barcode"] == "7290001")
+    assert other["evidence"]["market_prices"] == []
+
+
+def test_publish_accepts_the_listed_price_and_refuses_any_other_money_field():
+    from src.engine.publish import PublishRefused, check_assortment_gap_entry
+    import pytest
+    ok = {"id": "e", "evidence": {"stores_ran_out": ["w"], "market_prices": [{"store": "w", "price": 9.9, "sale_price": None, "on": TONIGHT}]}}
+    check_assortment_gap_entry(ok)
+    for bad in ({"id": "e", "evidence": {"unit_cost": 3.1}},
+                {"id": "e", "evidence": {"market_prices": [{"store": "w", "price": 9.9, "margin": 2}]}},
+                {"id": "e", "evidence": {"stores_ran_out": [{"amount": 5}]}}):
+        with pytest.raises(PublishRefused):
+            check_assortment_gap_entry(bad)
 

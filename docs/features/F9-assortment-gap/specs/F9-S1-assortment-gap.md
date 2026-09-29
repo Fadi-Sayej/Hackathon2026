@@ -3,11 +3,11 @@ ID: F9-S1
 Title: Assortment Gap — what the nearby market runs out of that he does not stock
 Status: Approved — by the repository owner, 2026-09-28
 Owner: smartshelf-architect
-Version: 0.1 (2026-09-28)
+Version: 0.2 (2026-09-29, D-27: a third answer, and the market's listed price)
 Parent: [F9 — Assortment Gap](../intent.md)
 Related Intents: INT-005
 Inputs: [docs/features/F9-assortment-gap/intent.md, docs/product/intent-register.md (D-1, D-3, D-9, D-18, D-22, D-23, D-25), docs/product/open-decisions/F9-assortment-gap.md (Superseded; the record of D-25), F6-S1 (FR-103, FR-106, AC-107, OQ-601, OQ-602, OQ-605), F7-S1, F8-S1 (§3, FR-158), ADR-009, ADR-014, ADR-029, ADR-031, configs/policy.yaml, src/market/running_out.py, src/surface/compose.js, public/data/catalogue.json and dashboard.json (2026-09-28), data/external/snapshots/*/delivery_catalog (2026-08-13 … 2026-09-28)]
-Updated: 2026-09-28
+Updated: 2026-09-29 (D-27 amends FR-168, FR-169, FR-173, FR-175 and INV-081; OQ-1001 and OQ-1002 answered)
 ---
 
 # F9-S1 — Assortment Gap
@@ -94,13 +94,18 @@ fact twice, and F8 and F9 could then disagree about the same night.
   when it is running out tonight;
 - `window` — the first and last day of the window, and how many of its days were usable;
 - `market_name` — the product's name as the market lists it. He has no name of his own
-  for a product he does not stock.
+  for a product he does not stock;
+- `market_prices` *(D-27)* — for each market store, the delivery app's listed price, its sale
+  price when there is one, and the day it was listed, cheapest first. A store the snapshot has
+  no price for is left out, never given zero.
 
 `stores_ran_out`, `nights_ran_out`, `last_ran_out` and `window` are the evidence the surface
 requires before the entry is actionable (FR-103, `REQUIRED_EVIDENCE`).
 
-**FR-169** — An entry MUST carry no value: no ₪ amount, no price, no quantity. The capability's
-value policy is `none` (D-25, D-1, D-3).
+**FR-169** — An entry MUST carry no value: no ₪ amount at stake, no quantity. The capability's
+value policy is `none` (D-25, D-1, D-3). *(Amended by D-27: its one ₪ figure is the market's
+listed price in `market_prices`, stated as evidence of what the market charges, never summed or
+used as a value.)*
 
 **FR-170** — The entry's `signal_family` MUST be `assortment.market_ran_out`, and its id MUST
 derive from the barcode alone (ADR-009), through `entry_id(signal_family, barcode)` with no
@@ -133,6 +138,8 @@ shows a finding every day, and reconciliation keeps two of its three on such day
 no new status is added:
 - "I'll try it" is `acted`;
 - "Not for my store" is `declined`, with no reason;
+- "I already sell it" is `declined` with reason `already_handled` *(D-27)*: another size or
+  pack of something he sells, kept apart from "Not for my store";
 - the surface's "Later" is `deferred`, as on every entry.
 
 How long a declined entry stays settled is F6-S1's rule (OQ-605), not F9's. The labels are
@@ -149,7 +156,9 @@ The card states:
 - the product's market name;
 - which stores ran out of it, and on how many of the recent nights;
 - whether a market store lists it tonight;
-- "I'll try it", "Not for my store" and "Later", in the three languages.
+- what each store lists it at on the delivery app, with any sale price and the day *(D-27)*;
+- "I'll try it", "Not for my store", "I already sell it" *(D-27)* and "Later", in the three
+  languages.
 
 The card shows no other number.
 
@@ -165,7 +174,8 @@ published and shown.
 
 **INV-080** — A product whose barcode is in his catalogue is never an `assortment_gap` entry.
 
-**INV-081** — No `assortment_gap` entry carries a value, a price or a quantity.
+**INV-081** — No `assortment_gap` entry carries a value or a quantity. Its only money-named
+evidence is `market_prices[*].price` and `.sale_price` (D-27), and `publish.py` refuses any other.
 
 **INV-082** — On the run's night, a product that `market_running_out` lists and that is not
 in his catalogue is an `assortment_gap` entry with that night as `last_ran_out`. Every entry
@@ -276,8 +286,8 @@ each key in turn.
 
 | ID | Question | Priority |
 |---|---|---|
-| OQ-1001 | A multipack of a product he sells in another size is a finding (OQ-303). Should there be a third answer, "I already sell it"? D-25 names two, so adding one is the repository owner's decision | P2 |
-| OQ-1002 | Should the card show the market's price? D-25 says the entry carries no ₪ figure. A listed price is evidence rather than money at stake, but it is still a ₪ figure on the card, so it is left out until he says otherwise | P2 |
+| ~~OQ-1001~~ | A multipack of a product he sells in another size is a finding (OQ-303). Should there be a third answer, "I already sell it"? **Answered 2026-09-29: yes (D-27), FR-173** | — |
+| ~~OQ-1002~~ | Should the card show the market's price? **Answered 2026-09-29: yes, the delivery app's listed price per store with the day (D-27), FR-168** | — |
 | OQ-1003 | After "I'll try it", nothing checks that he did. SCN-157 is the only trace: the barcode enters his catalogue. Whether F13 should count that is F13's question | P2 |
 
 ### 14. Non-Goals

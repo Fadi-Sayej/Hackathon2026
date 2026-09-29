@@ -28,6 +28,10 @@ const GAP = {
     last_ran_out: '2026-09-27', listed_at: [],
     window: { first: '2026-09-15', last: '2026-09-28', days: 14, usable_nights: 13 },
     market_name: 'ביסלי ברביקיו 5×55 גרם',
+    market_prices: [
+      { store: 'Rami Levy In The Neighborhood', price: 42.9, sale_price: 34.9, on: '2026-09-22' },
+      { store: 'Super Alonit Einat (Wolt)', price: 46.9, sale_price: null, on: '2026-09-14' },
+    ],
   },
 }
 
@@ -71,7 +75,7 @@ describe('F9 card — what it says (FR-175)', () => {
   it('sets its sentences in the text face, not the figures face that spaces Hebrew and Arabic apart', () => {
     draw('he')
     const dds = [...card('g1').querySelectorAll('.entry-card__evidence dd')]
-    expect(dds.length).toBe(4)
+    expect(dds.length).toBe(5)
     expect(dds.every((dd) => dd.hasAttribute('data-text'))).toBe(true)
   })
 
@@ -88,7 +92,10 @@ describe('F9 card — what it says (FR-175)', () => {
       expect(text).not.toMatch(/\[object Object\]|\bnull\b|undefined/)
       expect(text).not.toMatch(/stores_ran_out|nights_ran_out|last_ran_out|listed_at|market_name|usable_nights/)
       expect(text).not.toContain('2026-09-27')
-      expect(text).not.toMatch(/₪/)
+      expect(text).not.toContain('2026-09-22')
+      // D-27: the only ₪ on the card is what the market lists it at, in its own row.
+      const rows = [...card('g1').querySelectorAll('.entry-card__evidence > div')]
+      for (const row of rows) if (!row.textContent.includes('Rami Levy')) expect(row.textContent).not.toMatch(/₪/)
       expect(text.split('ביסלי ברביקיו').length - 1).toBe(1)          // the header only
     })
   }
@@ -96,16 +103,25 @@ describe('F9 card — what it says (FR-175)', () => {
   it('has every word it uses in all three languages', () => {
     const keys = ['characterisation.market_ran_out', 'action.try_product', 'evidence.stores_ran_out',
       'evidence.nights_ran_out', 'evidence.nights_ran_out.value', 'evidence.last_ran_out', 'evidence.listed_at',
-      'evidence.listed_at.none', 'outcome.assortment_gap.acted', 'outcome.assortment_gap.declined', 'capability.assortment_gap']
+      'evidence.listed_at.none', 'outcome.assortment_gap.acted', 'outcome.assortment_gap.declined', 'capability.assortment_gap',
+      'evidence.market_prices', 'evidence.market_prices.item', 'evidence.market_prices.sale', 'outcome.assortment_gap.already_sold']
     for (const key of keys) for (const dict of [en, ar, he]) expect(dict[key], key).toBeTruthy()
   })
 })
 
 describe('F9 card — the two answers (FR-173, FR-177)', () => {
-  it('offers "I\'ll try it", "Not for my store" and "Later"', () => {
+  it('offers "I\'ll try it", "Not for my store", "I already sell it" and "Later" (D-27)', () => {
     draw('en')
     const labels = [...card('g1').querySelectorAll('.entry-card__actions button')].map((b) => b.textContent)
-    expect(labels).toEqual([en['outcome.assortment_gap.acted'], en['outcome.assortment_gap.declined'], en['outcome.deferred']])
+    expect(labels).toEqual([en['outcome.assortment_gap.acted'], en['outcome.assortment_gap.declined'],
+      en['outcome.assortment_gap.already_sold'], en['outcome.deferred']])
+  })
+
+  it('records "I already sell it" as a decline for a reason of its own (D-27)', () => {
+    const onOutcome = vi.fn()
+    draw('en', [GAP], { onOutcome })
+    fireEvent.click(card('g1').querySelector('[data-outcome="already_sold"]'))
+    expect(onOutcome.mock.calls[0][1]).toEqual({ status: 'declined', reason: 'already_handled' })
   })
 
   it('records "I\'ll try it" as acted and "Not for my store" as declined with no reason', () => {
@@ -130,3 +146,24 @@ describe('F9 card — the two answers (FR-173, FR-177)', () => {
     expect([...card('g1').querySelectorAll('.entry-card__actions button')].every((b) => b.disabled)).toBe(true)
   })
 })
+
+describe('F9 card — what the market lists it at (D-27)', () => {
+  it('states each store\'s delivery-app price, the sale price when there is one, and the day', () => {
+    draw('en')
+    const text = card('g1').textContent
+    expect(text).toContain(en['evidence.market_prices'])
+    expect(text).toContain('₪42.90'); expect(text).toContain('₪34.90'); expect(text).toContain('₪46.90')
+    expect(text).toContain('22 September'); expect(text).toContain('14 September')
+    const lines = [...card('g1').querySelectorAll('[data-row="market_prices"] .entry-card__line')].map((l) => l.textContent)
+    expect(lines).toHaveLength(2)                               // one store to a line
+    expect(lines[0]).toContain('Rami Levy'); expect(lines[1]).toContain('Super Alonit')
+  })
+
+  it('shows no price row at all when the snapshot had none, never a zero', () => {
+    draw('en', [{ ...GAP, evidence: { ...GAP.evidence, market_prices: [] } }])
+    const text = card('g1').textContent
+    expect(text).not.toContain(en['evidence.market_prices'])
+    expect(text).not.toMatch(/₪/)
+  })
+})
+

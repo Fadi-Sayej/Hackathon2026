@@ -150,3 +150,32 @@ def test_the_result_is_plain_data_and_deterministic():
     first, second = recent(s), recent(s)
     assert json.dumps(first, sort_keys=True) == json.dumps(second, sort_keys=True)
     json.dumps(first)                         # no dates, no sets
+
+
+# ── D-27: the price each market store last listed it at (F9-S1 FR-168, amended) ───────────────
+
+def test_each_store_s_price_is_from_the_last_day_it_listed_the_product():
+    # Wolt lists "a" until three days ago; Rami still lists it tonight.
+    s = build({(W, "a"): present_then_absent(3), (R, "a"): "1" * 30})
+    asked = []
+    def price_of(day, barcode, store):
+        asked.append((day, barcode, store))
+        return {"price": 10.0 + (1 if store == R else 0), "sale_price": None}
+    out = recent_market(s, [W, R], POLICY, s.days[-1], 14, price_of=price_of)
+    assert out["prices"]["a"] == {
+        R: {"price": 11.0, "sale_price": None, "on": s.days[-1].isoformat()},
+        W: {"price": 10.0, "sale_price": None, "on": s.days[-4].isoformat()},
+    }
+    assert set(b for (_d, b, _s) in asked) == {"a"}             # only flagged products are priced
+
+
+def test_a_price_the_snapshot_does_not_carry_is_left_out_never_zero():
+    s = build({(W, "a"): present_then_absent(3)})
+    out = recent_market(s, [W], POLICY, s.days[-1], 14, price_of=lambda day, b, store: None)
+    assert out["prices"] == {}
+
+
+def test_without_a_price_reader_there_are_no_prices():
+    s = build({(W, "a"): present_then_absent(3)})
+    assert recent_market(s, [W], POLICY, s.days[-1], 14)["prices"] == {}
+
