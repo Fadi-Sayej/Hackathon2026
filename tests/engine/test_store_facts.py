@@ -160,8 +160,8 @@ def _silver_with(tmp_path, departments):
             for i, d in enumerate(sorted(departments))]
     inv = [{"barcode": r["barcode"], "product_name": r["product_name"], "current_stock": 1.0,
             "_source_file": "inv.csv", "_as_of": "2026-08-02"} for r in prod]
-    pq.write_table(pa.Table.from_pylist(prod), silver / "yomyom_products.parquet")
-    pq.write_table(pa.Table.from_pylist(inv), silver / "yomyom_inventory.parquet")
+    pq.write_table(pa.Table.from_pylist(prod), silver / "products.parquet")
+    pq.write_table(pa.Table.from_pylist(inv), silver / "inventory.parquet")
     return silver
 
 

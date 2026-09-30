@@ -33,8 +33,8 @@ def _silver(tmp_path: Path) -> Path:
              "cost_price": c, "_source_file": "inv.csv", "_as_of": AS_OF} for b, n, s, c, _ in rows]
     inv = [{"barcode": b, "product_name": n, "current_stock": k, "_source_file": "inv.csv", "_as_of": AS_OF}
            for b, n, _, _, k in rows]
-    pq.write_table(pa.Table.from_pylist(prod), silver / "yomyom_products.parquet")
-    pq.write_table(pa.Table.from_pylist(inv), silver / "yomyom_inventory.parquet")
+    pq.write_table(pa.Table.from_pylist(prod), silver / "products.parquet")
+    pq.write_table(pa.Table.from_pylist(inv), silver / "inventory.parquet")
     monthly = [{"barcode": LIVE, "month": m, "product_name": "חי", "units": 5.0, "receipts": 5.0, "revenue": 50.0,
                 "cost_price": 4.0, "selling_price": 10.0, "_imported_at": "t", "_source_file": "s.csv"}
                for m in ("2026-01", "2026-02")]

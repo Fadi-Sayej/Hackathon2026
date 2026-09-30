@@ -20,12 +20,12 @@ def _silver(tmp_path):
             {"barcode": None, "product_name": "אייס", "category": "c", "selling_price": 1.0, "wolt_price": 2.0,
              "cost_price": 0.5, "_source_file": "inv.csv", "_as_of": "2026-08-02"}]
     # product_name is part of the join key (a null barcode has no other), and the real
-    # yomyom_inventory.parquet carries it — configs/pos_schema_mapping.yaml, inventory.columns.
+    # inventory.parquet carries it — configs/pos_schema_mapping.yaml, inventory.columns.
     inv = [{"barcode": "0012", "product_name": "מים", "current_stock": -5.0, "_source_file": "inv.csv", "_as_of": "2026-08-02"},
            {"barcode": None, "product_name": "אייס", "current_stock": 3.0, "_source_file": "inv.csv", "_as_of": "2026-08-02"}]
-    pq.write_table(pa.Table.from_pylist(prod), silver / "yomyom_products.parquet")
-    pq.write_table(pa.Table.from_pylist(inv), silver / "yomyom_inventory.parquet")
-    pq.write_table(pa.Table.from_pylist(prod), silver / "yomyom_margins.parquet")
+    pq.write_table(pa.Table.from_pylist(prod), silver / "products.parquet")
+    pq.write_table(pa.Table.from_pylist(inv), silver / "inventory.parquet")
+    pq.write_table(pa.Table.from_pylist(prod), silver / "margins.parquet")
     return silver
 
 
@@ -145,9 +145,9 @@ def _dup_silver(tmp_path, rows):
     prod = [{**base, **r} for r in rows]
     inv = [{"barcode": r.get("barcode"), "product_name": r.get("product_name"),
             "current_stock": 1.0, **base} for r in rows]
-    pq.write_table(pa.Table.from_pylist(prod), silver / "yomyom_products.parquet")
-    pq.write_table(pa.Table.from_pylist(inv), silver / "yomyom_inventory.parquet")
-    pq.write_table(pa.Table.from_pylist(prod), silver / "yomyom_margins.parquet")
+    pq.write_table(pa.Table.from_pylist(prod), silver / "products.parquet")
+    pq.write_table(pa.Table.from_pylist(inv), silver / "inventory.parquet")
+    pq.write_table(pa.Table.from_pylist(prod), silver / "margins.parquet")
     return silver
 
 
@@ -319,9 +319,9 @@ def test_identical_rows_from_different_export_days_are_the_same_input(tmp_path):
     import pyarrow as pa_, pyarrow.parquet as pq_
     a = _dup_silver(tmp_path / "a", [row])                 # counted 2026-08-02
     b = _dup_silver(tmp_path / "b", [row])
-    inv = pq_.read_table(b / "yomyom_inventory.parquet").to_pylist()
+    inv = pq_.read_table(b / "inventory.parquet").to_pylist()
     pq_.write_table(pa_.Table.from_pylist([{**r, "_as_of": "2026-08-20"} for r in inv]),
-                    b / "yomyom_inventory.parquet")
+                    b / "inventory.parquet")
     assert _load(b, tmp_path).vintages["pos"]["as_of"] == "2026-08-20", "the day must really differ"
     assert _load(a, tmp_path).inputs_digest == _load(b, tmp_path).inputs_digest
 
@@ -345,9 +345,9 @@ def _rows_silver(tmp_path, rows):
     prod = [{**base, **{k: v for k, v in r.items() if k != "current_stock"}} for r in rows]
     inv = [{"barcode": r.get("barcode"), "product_name": r.get("product_name"),
             "current_stock": r["current_stock"], **base} for r in rows]
-    pq.write_table(pa.Table.from_pylist(prod), silver / "yomyom_products.parquet")
-    pq.write_table(pa.Table.from_pylist(inv), silver / "yomyom_inventory.parquet")
-    pq.write_table(pa.Table.from_pylist(prod), silver / "yomyom_margins.parquet")
+    pq.write_table(pa.Table.from_pylist(prod), silver / "products.parquet")
+    pq.write_table(pa.Table.from_pylist(inv), silver / "inventory.parquet")
+    pq.write_table(pa.Table.from_pylist(prod), silver / "margins.parquet")
     return silver
 
 

@@ -58,6 +58,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from src.common.paths import SILVER_POS_ROOT, SNAPSHOTS_ROOT
+from src.common.store import PRODUCTS_TABLE
 
 # Two snapshots closer together than this are the same export imported twice, not a
 # real interval. Dividing a delta by a two-hour gap produces a wild daily rate.
@@ -369,7 +370,7 @@ def apply_to_sales_table(
     survive all the way to the UI or the whole thing becomes dishonest.
     """
     sales_path = sales_path or (SILVER_POS_ROOT / "yomyom_sales.parquet")
-    products_path = products_path or (SILVER_POS_ROOT / "yomyom_products.parquet")
+    products_path = products_path or (SILVER_POS_ROOT / PRODUCTS_TABLE)
 
     if not sales_path.exists():
         raise FileNotFoundError("sales table not found: %s" % sales_path)

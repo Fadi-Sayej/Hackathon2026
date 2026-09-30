@@ -384,9 +384,9 @@ def _load_with(tmp_path, as_of, as_of_source):
     prod = [{**base, **row}]
     inv = [{"barcode": row["barcode"], "product_name": row["product_name"],
             "current_stock": 1.0, **base}]
-    pq.write_table(pa.Table.from_pylist(prod), silver / "yomyom_products.parquet")
-    pq.write_table(pa.Table.from_pylist(inv), silver / "yomyom_inventory.parquet")
-    pq.write_table(pa.Table.from_pylist(prod), silver / "yomyom_margins.parquet")
+    pq.write_table(pa.Table.from_pylist(prod), silver / "products.parquet")
+    pq.write_table(pa.Table.from_pylist(inv), silver / "inventory.parquet")
+    pq.write_table(pa.Table.from_pylist(prod), silver / "margins.parquet")
     return load_inputs(policy=load_policy(), owner=OwnerState.unavailable("no_credentials"),
                        run_at=datetime(2026, 9, 8, tzinfo=timezone.utc), silver_dir=silver,
                        signals_dir=tmp_path / "n", matches_path=tmp_path / "n.parquet")
@@ -450,11 +450,11 @@ def _pos_silver(silver, as_of, *, stock, source="declared_sidecar"):
     base = {"_source_file": "inv.csv", "_as_of": as_of, "_as_of_source": source}
     row = {"barcode": "0012", "product_name": "מים", "category": "c",
            "selling_price": 4.0, "wolt_price": 5.0, "cost_price": 1.0}
-    pq.write_table(pa.Table.from_pylist([{**base, **row}]), silver / "yomyom_products.parquet")
-    pq.write_table(pa.Table.from_pylist([{**base, **row}]), silver / "yomyom_margins.parquet")
+    pq.write_table(pa.Table.from_pylist([{**base, **row}]), silver / "products.parquet")
+    pq.write_table(pa.Table.from_pylist([{**base, **row}]), silver / "margins.parquet")
     pq.write_table(pa.Table.from_pylist([{"barcode": "0012", "product_name": "מים",
                                           "current_stock": stock, **base}]),
-                   silver / "yomyom_inventory.parquet")
+                   silver / "inventory.parquet")
     return silver
 
 

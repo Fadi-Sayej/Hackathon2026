@@ -32,7 +32,7 @@ import { dirProps } from '../lib/utils/rtl.js'
  *                24.3% of the catalogue (rule 13), and deriving a daily rate from a monthly
  *                mean is exactly what Task 0.6 deleted `yomyom_sales.parquet` for.
  *   `catalogue`  a per-product list in the artefact. The data exists — 7,674 rows in
- *                `yomyom_products.parquet` with name, category, supplier and prices — but
+ *                `products.parquet` with name, category, supplier and prices — but
  *                `dashboard.json` publishes per-signal findings, not a catalogue. This one
  *                is engineering, not missing data.
  *   `expiry`     shelf-life dates. The engine publishes no expiry capability; capture began

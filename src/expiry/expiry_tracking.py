@@ -11,6 +11,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from src.common.paths import EXPIRY_SCANS_CSV, PROJECT_ROOT, SIGNALS_ROOT, SILVER_POS_ROOT
+from src.common.store import INVENTORY_TABLE, PRODUCTS_TABLE
 
 
 EXPIRY_SIGNALS_DIR = SIGNALS_ROOT / "expiry"
@@ -148,8 +149,8 @@ def _read_parquet_rows(path: Path) -> list[dict[str, Any]]:
 
 
 def _pos_indexes() -> tuple[dict[str, dict[str, Any]], dict[str, dict[str, Any]]]:
-    products = _read_parquet_rows(SILVER_POS_ROOT / "yomyom_products.parquet")
-    inventory = _read_parquet_rows(SILVER_POS_ROOT / "yomyom_inventory.parquet")
+    products = _read_parquet_rows(SILVER_POS_ROOT / PRODUCTS_TABLE)
+    inventory = _read_parquet_rows(SILVER_POS_ROOT / INVENTORY_TABLE)
 
     product_by_barcode: dict[str, dict[str, Any]] = {}
     inventory_by_barcode: dict[str, dict[str, Any]] = {}

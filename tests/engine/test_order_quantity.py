@@ -310,8 +310,8 @@ def test_a_print_mode_rerun_reproduces_every_quantity_and_fact(tmp_path, monkeyp
             for b, n in (("7290001", "מים"), ("7290002", "קולה"))]
     inv = [{"barcode": r["barcode"], "product_name": r["product_name"], "current_stock": 9.0,
             "_source_file": "inv.csv", "_as_of": "2026-10-26", "_as_of_source": "declared"} for r in prod]
-    pq.write_table(pa.Table.from_pylist(prod), silver / "yomyom_products.parquet")
-    pq.write_table(pa.Table.from_pylist(inv), silver / "yomyom_inventory.parquet")
+    pq.write_table(pa.Table.from_pylist(prod), silver / "products.parquet")
+    pq.write_table(pa.Table.from_pylist(inv), silver / "inventory.parquet")
     reports = tmp_path / "daily"; reports.mkdir()
     header = "תאור פריט,ברקוד/קוד,מכר,מחיר קניה,מחיר מכירה,עלות המכר (חנות),כניסות מלאי,מחיר קניה נטו,הנחה,קוד מחלקה,\n"
     for i, d in enumerate(DAYS):

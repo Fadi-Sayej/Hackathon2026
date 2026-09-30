@@ -33,6 +33,7 @@ from src.context.islamic import get_islamic_context
 from src.context.competitor_stockouts import stockout_barcodes
 from src.context.owner_answers import load_owner_answers
 from src.context.shelf_life import load_shelf_life
+from src.common.store import get_store
 from src.context.weather import get_weather
 
 OUTPUT_PATH = PROJECT_ROOT / "public" / "data" / "market-context.json"
@@ -49,11 +50,11 @@ def _competitor_stockouts() -> Dict[str, Any]:
     try:
         import pyarrow.parquet as pq
 
-        from src.common.paths import SILVER_POS_ROOT
+        from src.common.store import SILVER_PRODUCTS
         from src.context.competitor_stockouts import stockout_barcodes
 
         rows = pq.read_table(
-            SILVER_POS_ROOT / "yomyom_products.parquet", columns=["barcode"]
+            SILVER_PRODUCTS, columns=["barcode"]
         ).to_pylist()
         mine = {str(r["barcode"]).strip() for r in rows if r.get("barcode")}
         result = stockout_barcodes(limit_to=mine)
@@ -86,7 +87,8 @@ def build_market_context(
     """Assemble the context. Never raises: each source already degrades to nulls."""
     day = day or date.today()
 
-    weather = get_weather()
+    location = get_store().location           # ADR-036: the store's own, never a default town
+    weather = get_weather(location.lat, location.lon)
     hebrew = get_hebrew_context(day)
     islamic = get_islamic_context(day, use_api=use_islamic_api)
 

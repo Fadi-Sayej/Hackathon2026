@@ -1,7 +1,7 @@
 """
-product_matching.py — YomYom internal product ↔ competitor signal matcher.
+product_matching.py — the store's own products ↔ competitor signal matcher.
 
-Matching passes (in priority order, first hit wins per YomYom product)
+Matching passes (in priority order, first hit wins per product of the store)
 ----------------------------------------------------------------------
   1. barcode_exact
        confidence = 1.0
@@ -22,20 +22,10 @@ Matching passes (in priority order, first hit wins per YomYom product)
        manual_review   iff 0.75 <= score < 0.85
        ignored         iff score < 0.75
 
-Language note
--------------
-The fake YomYom POS file uses English product names while the Alonit price-
-file corpus is ~100% Hebrew.  Fuzzy scores across languages will be very low
-(<0.5 for most pairs), so the manual review queue will be empty and match
-rates will be near 0% with this fake dataset.  All counts, methods and
-confidence levels are correct; they simply reflect the language mismatch.
-When the real YomYom POS file arrives (Hebrew names, real GTINs) the same
-pipeline will produce high-confidence barcode and name matches.
-
 Inputs
 ------
-  Prefer:  data/internal/silver_pos/yomyom_products.parquet
-  Fallback: data/internal/raw_pos/yomyom/sample_yomyom_pos.csv
+  data/internal/silver_pos/products.parquet (the POS importer's table; nothing else, and
+  never a sample file: there is no demo data, CLAUDE.md rule 7)
 
   Prefer:  data/signals/competitor_product_signals/**/*.parquet
   Fallback: data/external/silver/alonit_prices/**/*.parquet
@@ -77,9 +67,10 @@ except ImportError:
     logger.warning("rapidfuzz not installed — fuzzy matching disabled.  pip install rapidfuzz")
 
 from src.common.paths import (
-    INTERNAL_ROOT, SIGNALS_ROOT, EXTERNAL_SILVER_ROOT,
+    SIGNALS_ROOT, EXTERNAL_SILVER_ROOT,
     MATCHING_ROOT, QUALITY_ROOT,
 )
+from src.common.store import SILVER_PRODUCTS
 from src.engine.model import norm_barcode
 
 
@@ -103,8 +94,7 @@ _REVIEW_MAX = {
 }
 
 # Paths
-YOMYOM_PRODUCTS_PARQUET = INTERNAL_ROOT / "silver_pos" / "yomyom_products.parquet"
-YOMYOM_POS_CSV          = INTERNAL_ROOT / "raw_pos" / "yomyom" / "sample_yomyom_pos.csv"
+PRODUCTS_PARQUET        = SILVER_PRODUCTS
 COMPETITOR_SIGNALS_DIR  = SIGNALS_ROOT  / "competitor_product_signals"
 MATCHES_PATH            = MATCHING_ROOT / "product_matches.parquet"
 REVIEW_PATH             = MATCHING_ROOT / "manual_review_queue.parquet"
@@ -179,19 +169,13 @@ def _match_id(internal_id: str, external_key: str, method: str) -> str:
 
 # ── Loaders ────────────────────────────────────────────────────────────────────
 
-def load_internal_products() -> pl.DataFrame:
-    """Load YomYom internal products (parquet preferred, CSV fallback)."""
-    if YOMYOM_PRODUCTS_PARQUET.exists():
-        logger.info("Loading internal products from {}", YOMYOM_PRODUCTS_PARQUET)
-        return pl.read_parquet(YOMYOM_PRODUCTS_PARQUET)
-    if YOMYOM_POS_CSV.exists():
-        logger.info("Loading internal products from {}", YOMYOM_POS_CSV)
-        return pl.read_csv(YOMYOM_POS_CSV)
-    raise FileNotFoundError(
-        f"No internal product source found.  Expected:\n"
-        f"  {YOMYOM_PRODUCTS_PARQUET}\n"
-        f"  {YOMYOM_POS_CSV}"
-    )
+def load_internal_products(path: Optional[Path] = None) -> pl.DataFrame:
+    """Load the store's own products from the POS importer's table. There is no fallback."""
+    path = path or PRODUCTS_PARQUET
+    if not path.exists():
+        raise FileNotFoundError(f"No products table at {path}: import the store's POS export first.")
+    logger.info("Loading internal products from {}", path)
+    return pl.read_parquet(path)
 
 
 def load_competitor_signals() -> pl.DataFrame:

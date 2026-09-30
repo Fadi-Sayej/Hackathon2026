@@ -49,8 +49,8 @@ def _silver(silver: Path) -> None:
              "cost_price": 1.0, **base} for b, n in names.items()]
     inv = [{"barcode": b, "product_name": n, "current_stock": 12.0, **base} for b, n in names.items()]
     silver.mkdir(parents=True, exist_ok=True)
-    pq.write_table(pa.Table.from_pylist(prod), silver / "yomyom_products.parquet")
-    pq.write_table(pa.Table.from_pylist(inv), silver / "yomyom_inventory.parquet")
+    pq.write_table(pa.Table.from_pylist(prod), silver / "products.parquet")
+    pq.write_table(pa.Table.from_pylist(inv), silver / "inventory.parquet")
 
 
 def _daily(folder: Path) -> None:

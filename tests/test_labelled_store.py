@@ -26,7 +26,7 @@ if str(ROOT) not in sys.path:
 import polars as pl  # noqa: E402
 
 from src.market.labelled_store import (  # noqa: E402
-    _venue_matches,
+    _is_our_venue,
     load_pos_stock,
     normalise_barcode,
     validate,
@@ -37,7 +37,7 @@ def write_inventory(tmp_path, rows, imported_at="2026-06-06T15:32:59+00:00"):
     pl.DataFrame([
         {"barcode": b, "current_stock": q, "_imported_at": imported_at}
         for b, q in rows
-    ]).write_parquet(tmp_path / "yomyom_inventory.parquet")
+    ]).write_parquet(tmp_path / "inventory.parquet")
     return tmp_path
 
 
@@ -77,22 +77,32 @@ def test_the_import_date_travels_with_the_stock(tmp_path):
 # Identifying our own venue
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize("name", ["Yom Yom", "YomYom", "yom yom", "YOM YOM", "Yom Yom | Kafr Qasim"])
-def test_our_venue_is_recognised_however_it_is_written(name):
-    assert _venue_matches(name) is True
+# ADR-036: our venue is the store's own entry in configs/store_types.yaml (`role: client`),
+# matched by the delivery platform's venue id. It used to be matched by the name "Yom Yom",
+# which would have made every other store's copy validate against a venue it does not own.
+OURS = {"68e64a15ddc7ae17b6279458"}
 
 
-@pytest.mark.parametrize("name", [
-    "Super Alonit | Kibbutz Einat",
-    "Victory | Rosh Ha'ayin Park Afek",
-    "Shufersal | Rosh Ha’ayin",
+@pytest.mark.parametrize("store_id", ["68e64a15ddc7ae17b6279458", " 68e64a15ddc7ae17b6279458 "])
+def test_our_venue_is_recognised_by_its_id(store_id):
+    assert _is_our_venue(store_id, OURS) is True
+
+
+@pytest.mark.parametrize("store_id", [
+    "689d9d1ea1357c9968d6850f",   # Super Alonit | Kibbutz Einat
+    "65af9c58e895c470fe3eb763",   # Victory | Rosh Ha'ayin Park Afek
     "",
     None,
 ])
-def test_other_venues_are_not_mistaken_for_ours(name):
+def test_other_venues_are_not_mistaken_for_ours(store_id):
     """A competitor counted as our store would validate inference against stock
     we do not own — a number that is wrong and looks fine."""
-    assert _venue_matches(name) is False
+    assert _is_our_venue(store_id, OURS) is False
+
+
+def test_a_venue_named_like_ours_is_not_ours_without_its_id():
+    """Another store's copy may sit next to a venue called anything at all."""
+    assert _is_our_venue("somebody-elses-id", OURS) is False
 
 
 # ---------------------------------------------------------------------------
