@@ -40,6 +40,12 @@ def test_a_daily_report_is_taken_by_a_plain_add(tmp_path):
     assert DAILY in _added(tmp_path, [DAILY])
 
 
+def test_another_stores_daily_report_is_taken_too(tmp_path):
+    """ADR-036: a new store's copy commits its reports under its own folder, not YomYom's."""
+    other = "data/internal/raw_pos/store-b/sales_daily/דוח מכירות יום 2026-10-01.csv"
+    assert other in _added(tmp_path, [other])
+
+
 def test_everything_else_under_raw_pos_stays_ignored(tmp_path):
     added = _added(tmp_path, [DAILY, *STILL_IGNORED])
     assert [p for p in STILL_IGNORED if p in added] == []

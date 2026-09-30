@@ -155,3 +155,47 @@ def firebase_project_for_owner_state(env: Mapping[str, str], path: Optional[Path
             raise StoreSettingsError(f"{key} is {configured!r}, but configs/store.yaml's "
                                      f"`firebase.project_id` is {project!r}. One copy, one project (D-28).")
     return project
+
+
+# ── The store-data manifest (ADR-036 §3) ────────────────────────────────────────────────────
+# Every path that holds a store's data or its owner's statements, from the repository root.
+# A new store's copy starts without the first group and with an empty template of the second
+# (scripts/new_store_copy.py writes them); `--update` never touches either. Everything else is
+# code, which every copy shares. The store's own POS export and its sidecar are added from the
+# settings (store_data_paths).
+STARTS_WITHOUT = (
+    "data/internal/**",            # the POS snapshots, the monthly and daily reports, silver
+    "data/owner/**",               # the owner-state mirror: the owner's decisions and answers
+    "data/external/snapshots/**",  # the market around another store's location
+    "public/data/*.json",          # the published artefacts, built from that store's data
+    "docs/pilot/**",               # that store's handover, conversations and questions
+    "configs/measured_weights.yaml",   # measured from that store's sales (analyse_sales_movement)
+    "samples/**",
+)
+KEPT_IN_EVERY_COPY = ("docs/pilot/next-store.md",)
+STARTS_EMPTY = (
+    "configs/store.yaml",
+    "configs/store_facts.yaml",
+    "configs/owner_answers.yaml",
+    "configs/store_policy.yaml",
+    "configs/delivery_targets.yaml",
+    "configs/store_types.yaml",    # its scale and affinity kept; its stores emptied
+    "firestore.rules",             # the pinned store id
+    ".firebaserc",                 # the project the rules deploy to
+    ".env.example",                # the Firebase project and store id a developer starts from
+)
+
+
+def store_data_paths(store: StoreSettings) -> tuple:
+    """The store's own export and its declared date, as repository paths."""
+    export = store.pos_export.relative_to(PROJECT_ROOT).as_posix()
+    return export, export.rsplit(".", 1)[0] + ".vintage.json"
+
+
+def is_store_data(rel: str, store: StoreSettings) -> bool:
+    """True for a path a new copy must not inherit, whether it starts without it or empty."""
+    from fnmatch import fnmatch
+    if rel in KEPT_IN_EVERY_COPY:
+        return False
+    return (rel in store_data_paths(store) or rel in STARTS_EMPTY
+            or any(fnmatch(rel, pattern) for pattern in STARTS_WITHOUT))

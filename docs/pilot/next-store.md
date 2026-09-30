@@ -13,7 +13,8 @@ Updated: 2026-09-30 (the importers' new names, ADR-036)
 The pilot with YomYom ended on 2026-09-27 (D-23). The product was finished on the data it
 had, and nothing was simulated to stand in for what a store sends. This page lists what
 that data lacked, so the next store can be asked for it on day one. Each row names what
-it unlocks and where it goes.
+it unlocks and where it goes. How to set the store's copy up, step by step, is
+[`docs/operations/new-store.md`](../operations/new-store.md); `npm run check:store` checks each row.
 
 Nothing on this list may be simulated while it is missing (D-23).
 

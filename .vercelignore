@@ -20,7 +20,9 @@
 *.webm
 *.mp4
 *.mov
-/yomyom-inventory.csv
+# The store's POS export sits at the root (configs/store.yaml's pos.export); no root CSV
+# is ever part of the site, whichever store it belongs to (ADR-036).
+/*.csv
 /docs
 /tests
 /e2e

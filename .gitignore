@@ -17,11 +17,12 @@ data/external/bronze/
 data/external/silver/
 # ADR-030: everything under raw_pos/ stays out except the daily sales reports, which are
 # committed by a plain `git add` (a forgotten -f in a weekly batch would be a missing day).
-# Git cannot re-include a path under an ignored directory, hence the four steps.
+# Git cannot re-include a path under an ignored directory, hence the four steps. Any store's
+# folder, not one store's (ADR-036): raw_pos/<store>/sales_daily/.
 data/internal/raw_pos/*
-!data/internal/raw_pos/yomyom/
-data/internal/raw_pos/yomyom/*
-!data/internal/raw_pos/yomyom/sales_daily/
+!data/internal/raw_pos/*/
+data/internal/raw_pos/*/*
+!data/internal/raw_pos/*/sales_daily/
 data/internal/silver_pos/
 data/internal/expiry/
 data/internal/snapshots/
