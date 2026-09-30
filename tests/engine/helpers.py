@@ -67,3 +67,17 @@ def make_inputs(**kw):
                   "owner_state": {"pulled_at": owner.pulled_at, "status": owner.status,
                                   "devices": device_register(owner)}},
         owner=owner, policy=kw.get("policy") or load_policy(), run_at=kw.get("run_at") or RUN_AT)
+
+
+# Where a test that is not about the market points load_inputs' snapshots. By default it
+# replays the repository's committed delivery catalogues for F8's running-out signal and F9's
+# recent market: about 2.4 s a call (measured 2026-09-30), and a result that moves with every
+# nightly. This path does not exist, so the series is empty and both inputs are None.
+NO_SNAPSHOTS = Path(__file__).resolve().parent / "no-market-snapshots-here"
+
+
+def load_inputs_without_market(**kw):
+    """load_inputs with no market snapshots, unless the test names some."""
+    from src.engine.inputs import load_inputs
+    kw.setdefault("snapshots_root", NO_SNAPSHOTS)
+    return load_inputs(**kw)

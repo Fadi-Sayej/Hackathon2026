@@ -153,6 +153,16 @@ def test_a_usable_day_is_not_refused(snapshots):
     assert ds.why_unusable("2026-08-12", "price_transparency") is None
 
 
+def test_a_usable_day_is_read_from_the_same_root_as_its_manifest(snapshots):
+    """usable_days() called load_presence() without a root, so it read the repository's own
+    snapshots while why_unusable() read the manifest under the redirected root. The test above
+    passed only because 2026-08-12 is a usable day in the committed history, and it took about
+    30 s to read all of it. Days that exist nowhere in the repository settle which root is read."""
+    for day in ("2031-01-01", "2031-01-02", "2031-01-03"):
+        write_day(snapshots, day, [("729001", str(400 + i), 5.0, "x") for i in range(20)])
+    assert ds.why_unusable("2031-01-02", "price_transparency") is None
+
+
 def test_barcodes_are_normalised_the_same_way_as_the_presence_series(snapshots):
     """A leading zero on one day and not the next would read as a product
     disappearing and an identical one appearing, on every single day."""

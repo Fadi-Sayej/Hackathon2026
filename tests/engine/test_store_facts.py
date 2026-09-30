@@ -166,7 +166,7 @@ def _silver_with(tmp_path, departments):
 
 
 def _inputs(tmp_path, facts_path, silver=None):
-    from src.engine.inputs import load_inputs
+    from helpers import load_inputs_without_market as load_inputs
     from src.engine.policy import load_policy
     from src.owner_state.model import OwnerState
     return load_inputs(policy=load_policy(), owner=OwnerState.unavailable("x"),
@@ -213,7 +213,7 @@ def test_the_run_names_every_rejected_entry_in_its_steps(tmp_path, monkeypatch):
     result = run_mod.run_engine(mode="print", capability_runners={}, now=datetime(2026, 10, 2, tzinfo=timezone.utc),
                                 silver_dir=_silver_with(tmp_path, DEPARTMENTS), signals_dir=tmp_path / "nosig",
                                 matches_path=tmp_path / "nomatch.parquet", daily_sales_dir=tmp_path / "nodaily",
-                                store_facts_path=path)
+                                store_facts_path=path, snapshots_root=tmp_path / "nosnap")
     step = next(s for s in result["steps"] if s["step"] == "store_facts")
     assert step["status"] == "degraded" and "ירקות" in step["error"] and "מאפים" not in step["error"]
     assert result["status"] == "ok"
@@ -225,6 +225,6 @@ def test_the_run_reads_the_committed_file_by_default_and_rejects_nothing(tmp_pat
     result = run_mod.run_engine(mode="print", capability_runners={}, now=datetime(2026, 10, 2, tzinfo=timezone.utc),
                                 silver_dir=_silver_with(tmp_path, DEPARTMENTS), signals_dir=tmp_path / "nosig",
                                 matches_path=tmp_path / "nomatch.parquet", daily_sales_dir=tmp_path / "nodaily",
-                                sales_dir=tmp_path / "nosales")
+                                sales_dir=tmp_path / "nosales", snapshots_root=tmp_path / "nosnap")
     step = next(s for s in result["steps"] if s["step"] == "store_facts")
     assert step == {**step, "status": "ok", "error": None}

@@ -7,7 +7,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from src.engine.inputs import load_inputs
+# Not about the market: without it every call replays the committed snapshots (helpers.py).
+from helpers import load_inputs_without_market as load_inputs  # noqa: E402
 from src.engine.policy import load_policy
 from src.owner_state.model import OwnerState
 
