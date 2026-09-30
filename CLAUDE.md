@@ -11,12 +11,12 @@ PRD  →  Feature Intents  →  Feature Specs  →  System Design + ADRs  →  I
 
 | Layer | Canonical location |
 |---|---|
-| PRD · settled decisions D-1 … D-27 | [`docs/product/PRD.md`](docs/product/PRD.md) · [`docs/product/intent-register.md`](docs/product/intent-register.md) |
+| PRD · settled decisions D-1 … D-28 | [`docs/product/PRD.md`](docs/product/PRD.md) · [`docs/product/intent-register.md`](docs/product/intent-register.md) |
 | Feature intents (F1 … F14) | [`docs/features/F#-*/intent.md`](docs/features/) |
 | Feature specs (F1-S1 … F9-S1, F13-S1) | [`docs/features/F#-*/specs/`](docs/features/) |
 | Gaps, open questions, assumptions | [`docs/features/gaps-and-open-questions.md`](docs/features/gaps-and-open-questions.md) |
 | System Design | [`docs/architecture/system-design.md`](docs/architecture/system-design.md) |
-| ADR-001 … ADR-035 | [`docs/architecture/decisions/`](docs/architecture/decisions/) |
+| ADR-001 … ADR-036 | [`docs/architecture/decisions/`](docs/architecture/decisions/) |
 | Quality gates | [`docs/reviews/`](docs/reviews/) |
 | Implementation plan | [`docs/implementation/plan.md`](docs/implementation/plan.md) |
 | Deploy / run / data durability | [`docs/operations/`](docs/operations/) |
@@ -277,7 +277,7 @@ Anything without a traceable id does not belong in this repository.
 When two documents disagree, the one **higher** in this list wins. It is reproduced from
 [`docs/README.md`](../docs/README.md), which is the canonical copy.
 
-1. PRD, and the settled decisions `D-1 … D-27` in the intent register §3
+1. PRD, and the settled decisions `D-1 … D-28` in the intent register §3
 2. Feature intents
 3. Approved feature specs
 4. System Design
