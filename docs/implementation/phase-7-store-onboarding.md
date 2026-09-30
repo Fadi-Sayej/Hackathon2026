@@ -1,10 +1,10 @@
 ---
 ID: PLAN-PHASE-7
 Title: Phase 7 — A new store without code changes (ADR-036)
-Status: Ready for review
+Status: Approved — by the repository owner, 2026-09-30 ("approved"), with ADR-036
 Owner: smartshelf-architect
 Parent: [Implementation plan](plan.md)
-Inputs: [D-28, ADR-036 (Ready for review), docs/pilot/next-store.md, src/engine/inputs.py, src/engine/run.py, src/common/paths.py, src/context/weather.py, src/internal_pos/, scripts/import_yomyom_pos.py, scripts/import_yomyom_sales.py, src/matching/product_matching.py, configs/delivery_targets.yaml, configs/store_types.yaml, firestore.rules, scripts/check_firebase_config.mjs, .github/workflows/collect-daily.yml, index.html]
+Inputs: [D-28, ADR-036 (Accepted 2026-09-30), docs/pilot/next-store.md, src/engine/inputs.py, src/engine/run.py, src/common/paths.py, src/context/weather.py, src/internal_pos/, scripts/import_yomyom_pos.py, scripts/import_yomyom_sales.py, src/matching/product_matching.py, configs/delivery_targets.yaml, configs/store_types.yaml, firestore.rules, scripts/check_firebase_config.mjs, .github/workflows/collect-daily.yml, index.html]
 Updated: 2026-09-30
 ---
 

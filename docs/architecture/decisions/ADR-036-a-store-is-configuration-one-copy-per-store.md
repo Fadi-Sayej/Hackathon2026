@@ -1,7 +1,7 @@
 ---
 ID: ADR-036
 Title: A store is configuration, and each store runs its own copy with only its own data
-Status: Ready for review
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-09-30
 Parent: [System Design](../system-design.md) §19
@@ -12,7 +12,7 @@ Updated: 2026-09-30
 
 # ADR-036 — A store is configuration, and each store runs its own copy with only its own data
 
-**Status:** Ready for review · **Recorded in:** [System Design](../system-design.md) §19 once accepted
+**Status:** Accepted (2026-09-30, by the repository owner: "approved") · **Recorded in:** [System Design](../system-design.md) §19
 
 ## Context
 
