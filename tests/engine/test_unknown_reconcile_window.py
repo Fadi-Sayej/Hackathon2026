@@ -82,7 +82,7 @@ def _load_after_import(tmp_path, sales, as_of, *, source="declared_sidecar", sto
     boundary ADR-026 moved the cut across."""
     from datetime import datetime, timezone
     import src.engine.run as run_mod
-    from src.engine.inputs import load_inputs
+    from helpers import load_inputs_without_market as load_inputs
     from src.engine.policy import load_policy
     from src.owner_state.model import OwnerState
 
@@ -215,8 +215,12 @@ def test_a_first_run_with_no_silver_reports_no_pos_data_not_an_unknown_date(tmp_
     """
     import src.engine.run as run_mod
 
+    # The market half is redirected too: left to its defaults, this read the repository's
+    # competitor signals, matches and snapshots, 13 s for a test about an empty silver layer.
     result = run_mod.run_engine(mode="print", skip_market=True, silver_dir=tmp_path,
-                                sales_dir=tmp_path / "no-reports")
+                                sales_dir=tmp_path / "no-reports", signals_dir=tmp_path / "no-signals",
+                                matches_path=tmp_path / "no-matches.parquet",
+                                snapshots_root=tmp_path / "no-snapshots")
     recon = result["artefact"]["capabilities"]["reconciliation"]
 
     assert recon["status"] == "unavailable"
@@ -368,7 +372,7 @@ def _load_with(tmp_path, as_of, as_of_source):
     `_as_of` and writes no `_as_of_source`, and the source is the axis these tests vary, so
     this builds its own rather than widening a helper another file owns."""
     from datetime import datetime, timezone
-    from src.engine.inputs import load_inputs
+    from helpers import load_inputs_without_market as load_inputs
     from src.engine.policy import load_policy
     from src.owner_state.model import OwnerState
 
@@ -469,6 +473,7 @@ def _engine(silver, sales_dir):
     return run_mod.run_engine(mode="print", skip_market=True, silver_dir=silver,
                               sales_dir=sales_dir, signals_dir=silver.parent / "no-signals",
                               matches_path=silver.parent / "no-matches.parquet",
+                              snapshots_root=silver.parent / "no-snapshots",
                               now=datetime(2026, 9, 23, tzinfo=timezone.utc))["artefact"]
 
 
@@ -649,7 +654,7 @@ def test_adr_026_absent_monthly_rows_are_unknown_not_zero(tmp_path):
     boundary has nothing to cut, so the figures are None, not 0."""
     from datetime import datetime, timezone
     import src.engine.run as run_mod
-    from src.engine.inputs import load_inputs
+    from helpers import load_inputs_without_market as load_inputs
     from src.engine.policy import load_policy
     from src.owner_state.model import OwnerState
 

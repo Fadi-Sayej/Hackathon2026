@@ -10,6 +10,8 @@ import src.engine.run as run_mod
 from src.engine.model import CapabilityOutput
 from src.owner_state.model import OwnerState
 
+from helpers import load_inputs_without_market  # noqa: E402
+
 
 def _isolate(monkeypatch, tmp_path):
     monkeypatch.setattr(run_mod, "_pull_owner_state", lambda: OwnerState.unavailable("no_credentials"))
@@ -25,6 +27,8 @@ def _isolate(monkeypatch, tmp_path):
     monkeypatch.setattr(run_mod, "MATCHES_PATH", tmp_path / "matches.parquet")
     # …and the daily reports (Task 5.2), so no test reads the repository's own.
     monkeypatch.setattr(run_mod, "DAILY_SALES_DIR", tmp_path / "sales_daily")
+    # …and the market snapshots F8 and F9 replay, for the same reason: 2.4 s a run.
+    monkeypatch.setattr(run_mod, "load_inputs", load_inputs_without_market)
 
 
 def test_empty_capability_set_publishes_a_valid_artefact(tmp_path, monkeypatch):

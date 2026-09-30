@@ -48,16 +48,21 @@ from src.market.presence import (
 Pair = Tuple[str, str]
 
 
-def usable_days(source_id: str) -> list[str]:
+def usable_days(source_id: str, root: Optional[Path] = None) -> list[str]:
     """Days this source can be read from, in order. Uses the same rules as the
-    presence series, so a diff can never be built on a day the analysis rejects."""
-    series = load_presence(source_id=source_id)
+    presence series, so a diff can never be built on a day the analysis rejects.
+
+    The root is passed on. load_presence() used to be called without one, so it read the
+    repository's snapshots whatever root the caller had meant, while why_unusable() read the
+    manifest under that root: two roots for one question."""
+    series = load_presence(root=root or EXTERNAL_SNAPSHOTS_ROOT, source_id=source_id)
     return [d.isoformat() for d in series.days]
 
 
-def why_unusable(day: str, source_id: str) -> Optional[str]:
+def why_unusable(day: str, source_id: str, root: Optional[Path] = None) -> Optional[str]:
     """None when the day is usable, otherwise the reason it is not."""
-    day_dir = EXTERNAL_SNAPSHOTS_ROOT / day
+    root = root or EXTERNAL_SNAPSHOTS_ROOT
+    day_dir = root / day
     if not day_dir.exists():
         return "no snapshot folder for that date"
     manifest_path = day_dir / "_manifest.json"
@@ -72,14 +77,15 @@ def why_unusable(day: str, source_id: str) -> Optional[str]:
         return f"manifest records no {source_id} for that day"
     if entry.get("status") not in USABLE_STATUSES:
         return f"{source_id} status is {entry.get('status')!r}"
-    if day not in usable_days(source_id):
+    if day not in usable_days(source_id, root):
         # Covers the short-run case, which the manifest may still call `ok` if
         # it was written before the coverage check existed.
         return "excluded from the series (short run or no listings)"
     return None
 
 
-def read_day(day: str, source_id: str) -> Tuple[Set[Pair], Dict[Pair, float], Dict[str, str]]:
+def read_day(day: str, source_id: str,
+             root: Optional[Path] = None) -> Tuple[Set[Pair], Dict[Pair, float], Dict[str, str]]:
     """(listings, prices, names) for one day.
 
     Prices are read here rather than in presence.py, which is deliberately
@@ -90,7 +96,7 @@ def read_day(day: str, source_id: str) -> Tuple[Set[Pair], Dict[Pair, float], Di
     prices: Dict[Pair, float] = {}
     names: Dict[str, str] = {}
 
-    source_dir = EXTERNAL_SNAPSHOTS_ROOT / day / source_id
+    source_dir = (root or EXTERNAL_SNAPSHOTS_ROOT) / day / source_id
     if not source_dir.exists():
         return listings, prices, names
 
@@ -128,9 +134,10 @@ def read_day(day: str, source_id: str) -> Tuple[Set[Pair], Dict[Pair, float], Di
     return listings, prices, names
 
 
-def diff(day_from: str, day_to: str, source_id: str, price_epsilon: float = 0.005) -> dict:
-    before, prices_before, names_before = read_day(day_from, source_id)
-    after, prices_after, names_after = read_day(day_to, source_id)
+def diff(day_from: str, day_to: str, source_id: str, price_epsilon: float = 0.005,
+         root: Optional[Path] = None) -> dict:
+    before, prices_before, names_before = read_day(day_from, source_id, root)
+    after, prices_after, names_after = read_day(day_to, source_id, root)
     names = {**names_before, **names_after}
 
     appeared = sorted(after - before)
