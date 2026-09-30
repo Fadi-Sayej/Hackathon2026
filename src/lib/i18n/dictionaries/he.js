@@ -293,6 +293,7 @@ export const he = {
   'characterisation.idle': "תקוע",
   'characterisation.implausible_quantity': "האם הכמות הזאת נכונה?",
   'characterisation.policy_breach_review': "מחוץ למדיניות — לבדיקה",
+  'characterisation.policy_breach_attention': "מחוץ למדיניות — דחוף",
   'characterisation.purchase_cost': "עלות הרכישה גבוהה",
   'characterisation.thin_margin': "מרווח דק",
   'count.above': "מעל המדיניות",

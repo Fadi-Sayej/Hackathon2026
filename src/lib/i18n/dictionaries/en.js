@@ -294,6 +294,7 @@ export const en = {
   'characterisation.idle': "Idle",
   'characterisation.implausible_quantity': "Is this quantity right?",
   'characterisation.policy_breach_review': "Outside your policy — review",
+  'characterisation.policy_breach_attention': "Outside your policy — urgent",
   'characterisation.purchase_cost': "Your purchase cost is high",
   'characterisation.thin_margin': "Thin margin",
   'count.above': "Above your policy",

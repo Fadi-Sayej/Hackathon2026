@@ -298,6 +298,7 @@ export const ar = {
   'characterisation.idle': "راكد",
   'characterisation.implausible_quantity': "هل هذه الكمية صحيحة؟",
   'characterisation.policy_breach_review': "خارج سياستك — راجعه",
+  'characterisation.policy_breach_attention': "خارج سياستك — عاجل",
   'characterisation.purchase_cost': "تكلفة شرائك مرتفعة",
   'characterisation.thin_margin': "هامش ضئيل",
   'count.above': "فوق سياستك",
