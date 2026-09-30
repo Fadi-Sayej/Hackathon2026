@@ -67,7 +67,7 @@ _REBUILD_MARKET = "npm run figures (without --skip-market)"
 # market chain), and the two imports a fresh clone runs first. The browser computes no figure,
 # and neither do the probes or this command.
 _ENGINE_PATHS = ("configs", ":(glob)src/**/*.py", "scripts/rehydrate_silver.py",
-                 "scripts/import_yomyom_pos.py", "scripts/import_yomyom_sales.py")
+                 "scripts/import_pos.py", "scripts/import_sales.py")
 
 
 def main() -> int:

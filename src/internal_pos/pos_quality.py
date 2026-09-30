@@ -35,7 +35,7 @@ def build_quality_report(
         return round(missing / len(normalized_rows), 4)
 
     return {
-        "pipeline": "yomyom_pos_import",
+        "pipeline": "pos_import",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "status": status,
         "source_file": str(input_path),
@@ -68,7 +68,7 @@ def build_quality_report(
 def write_quality_report(report: dict[str, Any], report_root: Path) -> Path:
     report_root.mkdir(parents=True, exist_ok=True)
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    path = report_root / f"yomyom_pos_quality_{ts}.json"
+    path = report_root / f"pos_quality_{ts}.json"
     path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     return path
 

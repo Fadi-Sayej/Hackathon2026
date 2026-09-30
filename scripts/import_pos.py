@@ -1,3 +1,8 @@
+"""import_pos.py — the store's POS inventory export → silver tables.
+
+The export is configs/store.yaml's `pos.export` (ADR-036). `--input` imports another file,
+for inspecting one; the nightly never passes it.
+"""
 from __future__ import annotations
 
 import argparse
@@ -9,16 +14,20 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from src.common.store import get_store
 from src.internal_pos.pos_importer import CONFIG_PATH, import_pos_file
 
 
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Import a YomYom POS CSV into silver parquet outputs.")
-    parser.add_argument("--input", required=True, type=Path, help="Path to the POS CSV file.")
+def parse_args(argv=None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Import the store's POS export into silver parquet outputs.")
+    parser.add_argument("--input", default=None, type=Path,
+                        help="The POS CSV file (default: configs/store.yaml's pos.export).")
     parser.add_argument("--config", default=CONFIG_PATH, type=Path, help="Schema mapping YAML.")
     parser.add_argument("--imported-at", default=None, help="Optional ISO timestamp override.")
     parser.add_argument("--as-of", default=None, help="YYYY-MM-DD the export was taken (default: file mtime)")
-    return parser.parse_args()
+    args = parser.parse_args(argv)
+    args.input = args.input or get_store().pos_export
+    return args
 
 
 def main() -> int:

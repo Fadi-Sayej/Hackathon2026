@@ -1,4 +1,4 @@
-"""import_yomyom_sales.py — monthly sales reports → silver evidence tables.
+"""import_sales.py — the store's monthly sales reports → silver evidence tables.
 
 Thin wrapper over src/internal_pos/sales_importer.py so CI keeps its script name.
 The old per-product velocity table (units_sold_7d synthesised from a monthly mean)
@@ -14,9 +14,10 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from src.common.store import get_store  # noqa: E402
 from src.internal_pos.sales_importer import import_sales  # noqa: E402
 
-DEFAULT_DIR = ROOT / "data" / "internal" / "raw_pos" / "yomyom" / "sales"
+DEFAULT_DIR = get_store().sales_monthly_dir          # ADR-036: the store's settings
 
 
 def main() -> int:

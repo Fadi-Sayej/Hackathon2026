@@ -1,10 +1,12 @@
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { siteTitlePlugin } from './scripts/store_settings.mjs'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  // ADR-036: the tab title is the store's, from configs/store.yaml.
+  plugins: [react(), siteTitlePlugin()],
   build: {
     // Two entry points: the store app (index.html) and the internal pilot
     // telemetry dashboard (telemetry.html, nagham.md B-3). Both are static and

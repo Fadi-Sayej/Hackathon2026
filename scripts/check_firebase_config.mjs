@@ -15,6 +15,7 @@
 
 import { existsSync, readFileSync } from 'node:fs'
 import process from 'node:process'
+import { readStoreSettings } from './store_settings.mjs'
 
 const REQUIRED = {
   VITE_FIREBASE_API_KEY: {
@@ -35,8 +36,10 @@ const OPTIONAL = {
   VITE_FIREBASE_AUTH_DOMAIN: 'used by anonymous sign-in; usually <projectId>.firebaseapp.com',
   VITE_FIREBASE_STORAGE_BUCKET: 'not needed for Firestore',
   VITE_FIREBASE_MESSAGING_SENDER_ID: 'not needed for Firestore',
-  VITE_STORE_ID: 'Firestore path root; MUST match firestore.rules',
 }
+
+// ADR-036: which store this copy serves is configs/store.yaml's `id`, never a default.
+const STORE = readStoreSettings()
 
 const argIndex = process.argv.indexOf('--env')
 const envPath = argIndex > -1 ? process.argv[argIndex + 1] : '.env'
@@ -96,20 +99,45 @@ for (const [key, note] of Object.entries(OPTIONAL)) {
   console.log(value ? `${green('✓')} ${key}` : `${yellow('·')} ${key} — not set (${note})`)
 }
 
-// The rules file pins a store id; a mismatch means every write is denied and the
-// app looks broken in a way that has nothing to do with the config being "valid".
+// The store id (ADR-036). The rules must pin configs/store.yaml's `id`, and the env being
+// checked must carry it: that is Production's. Preview's is `preview-sandbox` on purpose
+// (deployment.md), so run this against Production's values, not Preview's. There is no
+// fallback: an unset VITE_STORE_ID means the browser writes nothing remotely at all.
+if (missing < Object.keys(REQUIRED).length) {
+  const configured = env.VITE_STORE_ID || ''
+  if (!configured) {
+    console.log(`\n${red('✗')} VITE_STORE_ID — missing. It must be configs/store.yaml's id, "${STORE.id}".`)
+    invalid += 1
+  } else if (configured !== STORE.id) {
+    console.log(`\n${red('✗')} STORE ID MISMATCH: VITE_STORE_ID is "${configured}", but configs/store.yaml's id is "${STORE.id}".`)
+    console.log('    This copy serves one store (D-28). Production must use its id.')
+    invalid += 1
+  } else {
+    console.log(`\n${green('✓')} VITE_STORE_ID is configs/store.yaml's id ("${STORE.id}")`)
+  }
+}
+// The Firebase project is the copy's own (ADR-036 §1): the web config and the rules-deploy
+// default must both be configs/store.yaml's `firebase.project_id`.
+if (env.VITE_FIREBASE_PROJECT_ID && env.VITE_FIREBASE_PROJECT_ID !== STORE.firebaseProjectId) {
+  console.log(`${red('✗')} PROJECT MISMATCH: VITE_FIREBASE_PROJECT_ID is "${env.VITE_FIREBASE_PROJECT_ID}", but configs/store.yaml's firebase.project_id is "${STORE.firebaseProjectId}".`)
+  invalid += 1
+}
+if (existsSync('.firebaserc')) {
+  const deployTo = JSON.parse(readFileSync('.firebaserc', 'utf8'))?.projects?.default
+  if (deployTo !== STORE.firebaseProjectId) {
+    console.log(`${red('✗')} .firebaserc deploys the rules to "${deployTo}", but configs/store.yaml's firebase.project_id is "${STORE.firebaseProjectId}".`)
+    invalid += 1
+  }
+}
 if (existsSync('firestore.rules')) {
   const rules = readFileSync('firestore.rules', 'utf8')
   const pinned = rules.match(/match \/stores\/([a-z0-9-]+)\//)
-  const configured = env.VITE_STORE_ID || 'yomyom-kafr-qasim'
-  if (pinned && pinned[1] !== configured) {
-    console.log(
-      `\n${red('✗')} STORE ID MISMATCH: firestore.rules pins "${pinned[1]}" but VITE_STORE_ID is "${configured}".`,
-    )
-    console.log('    Every read and write would be denied. Make them identical.')
+  if (pinned && pinned[1] !== STORE.id) {
+    console.log(`${red('✗')} STORE ID MISMATCH: firestore.rules pins "${pinned[1]}", but configs/store.yaml's id is "${STORE.id}".`)
+    console.log('    Every read and write would be denied. Make them identical, then deploy the rules.')
     invalid += 1
   } else if (pinned) {
-    console.log(`\n${green('✓')} store id matches firestore.rules ("${pinned[1]}")`)
+    console.log(`${green('✓')} firestore.rules pins the same store ("${pinned[1]}")`)
   }
 }
 
@@ -133,5 +161,5 @@ console.log('     Without it every request is unauthenticated and the rules deny
 console.log('  2. Deploy the rules:  firebase deploy --only firestore:rules')
 console.log('     Without it the default rules deny everything.\n')
 console.log('Then set the SAME values in Vercel (Production AND Preview), redeploy, and')
-console.log('confirm on /telemetry.html that the footer reads "Firestore · ' + (env.VITE_STORE_ID || 'yomyom-kafr-qasim') + '"')
+console.log('confirm on /telemetry.html that the footer reads "Firestore · ' + STORE.id + '"')
 console.log('rather than "localStorage (this device only)".\n')

@@ -108,14 +108,15 @@ jobs:
       # `unavailable` instead.
       - name: Rebuild silver POS from the committed exports
         # data/internal/ is gitignored, so a runner starts with no POS tables at all.
-        # Both source files ARE committed; this importer turns yomyom-inventory.csv into
-        # the products/inventory/margins parquet the engine's capabilities read.
+        # The store's export IS committed, at configs/store.yaml's `pos.export` (ADR-036);
+        # this importer turns it into the products/inventory/margins parquet the engine's
+        # capabilities read.
         #
-        # import_yomyom_sales.py is NOT called here any more: run_engine()'s own
-        # sales_import step writes sales_monthly.parquet and sales_summary.parquet from
-        # the same seven CSVs, which ARE committed under data/internal/raw_pos/yomyom/sales/
-        # despite the data/** ignore. Calling it first was simply the same import twice.
-        run: python3 scripts/import_yomyom_pos.py --input yomyom-inventory.csv
+        # import_sales.py is NOT called here: run_engine()'s own sales_import step writes
+        # sales_monthly.parquet and sales_summary.parquet from the monthly reports, which
+        # ARE committed at `sales.monthly_dir` despite the data/** ignore. Calling it first
+        # was simply the same import twice.
+        run: python3 scripts/import_pos.py
 
       # ── Why refresh_pipeline.py stopped running here (2026-09-13) ────────────
       #
@@ -151,9 +152,9 @@ jobs:
         # and the gate that followed exited 1, so this step never ran and the owner's
         # artefact was never rebuilt — for a failure in a chain it does not use.
         env:
+          # The store id and the Firebase project are configs/store.yaml's (ADR-036), read by
+          # the engine itself; nothing here names a store. Only the credential is a secret.
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
-          FIREBASE_PROJECT_ID: hackathon26-a6ebd
-          VITE_STORE_ID: yomyom-kafr-qasim
           # ADR-032: the boost's model key, the repository owner's secret. Under the engine's own
           # name, not ANTHROPIC_API_KEY, so a developer's personal key is never spent by a local
           # data:refresh. Unset, the engine asks nothing, says no_boost_key, and the next step

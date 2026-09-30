@@ -106,7 +106,7 @@ particular: no role quotes a figure it has not read from the artifact that produ
 
 6. **`data/**` is gitignored; `public/data/*.json` is committed.** A fresh clone has the
    artefacts and nothing to rebuild them from, so regenerating needs the POS import
-   first — `scripts/import_yomyom_pos.py --input yomyom-inventory.csv`, then
+   first — `scripts/import_pos.py` (it reads the export `configs/store.yaml` names), then
    `npm run data:refresh`. Checkpoint 3 measured that path end to end. Under
    `data/internal/`, three things are committed all the same: the POS snapshots
    (`snapshots/`), the seven monthly sales reports (`raw_pos/yomyom/sales/`, force-added in

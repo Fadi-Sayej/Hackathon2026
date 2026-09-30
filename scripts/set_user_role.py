@@ -20,8 +20,8 @@ refresh, within the hour. `--revoke` also stops the person's sessions renewing, 
 access ends within the hour: a token already issued stays valid until it expires.
 
 Credentials are the same as the nightly's owner-state pull: FIREBASE_SERVICE_ACCOUNT_JSON (the
-key file's contents) or FIREBASE_SERVICE_ACCOUNT_PATH, plus FIREBASE_PROJECT_ID (default
-hackathon26-a6ebd).
+key file's contents) or FIREBASE_SERVICE_ACCOUNT_PATH. The project is configs/store.yaml's
+`firebase.project_id` (ADR-036); a FIREBASE_PROJECT_ID naming another one stops the script.
 """
 from __future__ import annotations
 
@@ -51,7 +51,8 @@ def _real_auth():
     else:
         raise SystemExit("no service account: set FIREBASE_SERVICE_ACCOUNT_JSON or FIREBASE_SERVICE_ACCOUNT_PATH")
     if not firebase_admin._apps:
-        firebase_admin.initialize_app(cred, {"projectId": os.environ.get("FIREBASE_PROJECT_ID", "hackathon26-a6ebd")})
+        from src.common.store import firebase_project_for_owner_state  # ADR-036: the copy's own project
+        firebase_admin.initialize_app(cred, {"projectId": firebase_project_for_owner_state(os.environ)})
     return auth
 
 

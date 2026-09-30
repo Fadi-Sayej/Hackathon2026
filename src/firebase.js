@@ -48,9 +48,11 @@ const firebaseConfig = {
 
 /**
  * Firestore path root: stores/{STORE_ID}/... — see firestore.rules.
- * One store for the pilot; the default keeps paths stable if the env is unset.
+ * The deployment's own VITE_STORE_ID, with no default (ADR-036): Production's is the store's
+ * id in configs/store.yaml, and Preview's is `preview-sandbox` on purpose. Unset, nothing is
+ * written remotely and the owner state stays on this device.
  */
-export const STORE_ID = readEnv('VITE_STORE_ID') || 'yomyom-kafr-qasim'
+export const STORE_ID = readEnv('VITE_STORE_ID')
 
 // The three values without which nothing can connect. storageBucket / senderId
 // are not required for Firestore + anonymous auth, so they are not gated on.
@@ -61,7 +63,7 @@ const REQUIRED_KEYS = ['apiKey', 'projectId', 'appId']
  * touching Firestore.
  */
 export function isFirebaseConfigured() {
-  return REQUIRED_KEYS.every((key) => firebaseConfig[key] !== '')
+  return STORE_ID !== '' && REQUIRED_KEYS.every((key) => firebaseConfig[key] !== '')
 }
 
 let appInstance = null

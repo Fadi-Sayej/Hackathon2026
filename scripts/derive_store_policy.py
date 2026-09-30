@@ -54,7 +54,7 @@ def load_sales() -> pl.DataFrame:
     if not path.exists():
         raise SystemExit(
             f"{path} not found.\n"
-            "Run scripts/import_yomyom_pos.py then scripts/import_yomyom_sales.py first."
+            "Run scripts/import_pos.py then scripts/import_sales.py first."
         )
     df = pl.read_parquet(path)
     col = "total_units_all_months" if "total_units_all_months" in df.columns else "units_sold_30d"

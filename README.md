@@ -40,28 +40,29 @@ python scripts/build_competitor_product_signals.py --run-at 2025-05-25T10:00:00+
 
 Output: `data/signals/competitor_product_signals/competitor_product_signals_<ts>.parquet`
 
-### YomYom POS Readiness
+### POS readiness
+
+Which store this copy serves, and where its files are, is `configs/store.yaml` (ADR-036).
 
 ```bash
-# Inspect an incoming YomYom POS CSV before import
-python scripts/inspect_yomyom_pos_file.py --input <path-to-pos.csv>
+# Inspect a POS CSV before importing it (a new store's first export especially)
+python scripts/inspect_pos_file.py --input <path-to-pos.csv>
 
-# Import a YomYom POS CSV into internal silver tables
-python scripts/import_yomyom_pos.py --input <path-to-pos.csv>
+# Import the store's POS export (configs/store.yaml's pos.export) into silver tables
+python scripts/import_pos.py
 
 # One command after every new POS export or scrape: the engine rebuilds silver
 # from the committed snapshots, runs its own market chain and sales import, and
 # publishes public/data/dashboard.json and catalogue.json (CLAUDE.md rule 5)
 npm run data:refresh
-npm run data:refresh -- --input data/internal/raw_pos/yomyom/all4shop_Mlai.csv
 ```
 
 Import outputs:
 
-- `data/internal/silver_pos/yomyom_products.parquet`
-- `data/internal/silver_pos/yomyom_inventory.parquet`
-- `data/internal/silver_pos/yomyom_margins.parquet`
-- `reports/quality/yomyom_pos_quality_<timestamp>.json`
+- `data/internal/silver_pos/products.parquet`
+- `data/internal/silver_pos/inventory.parquet`
+- `data/internal/silver_pos/margins.parquet`
+- `reports/quality/pos_quality_<timestamp>.json`
 
 ### Expiry Tracking at Receiving
 
@@ -140,17 +141,15 @@ configs/
 scripts/
   init_storage.py             ← one-time folder bootstrap
   smoke_test_storage.py       ← end-to-end storage smoke test
-  generate_fake_yomyom_pos.py ← generate realistic fake POS CSV (seed=42, reproducible)
-  import_yomyom_pos.py        ← CLI: import a POS CSV into silver Parquet + signals
+  import_pos.py               ← CLI: import the store's POS export into silver Parquet
 data/
   internal/
     silver_pos/
-      yomyom_products.parquet   ← master product catalog (barcode, name, category, price…)
-      yomyom_sales.parquet      ← sales data (units_sold_7d/30d, revenue)
-      yomyom_inventory.parquet  ← stock levels + last purchase date
-      yomyom_margins.parquet    ← margin analysis (selling, cost, profit, margin_pct)
+      products.parquet    ← master product catalog (barcode, name, category, price…)
+      inventory.parquet   ← stock levels + last purchase date
+      margins.parquet     ← margin analysis (selling, cost, profit, margin_pct)
 reports/quality/
-    yomyom_pos_<timestamp>.json ← per-run quality report
+    pos_quality_<timestamp>.json ← per-run quality report
 ```
 
 ### Quick start (Python backend)
@@ -165,16 +164,12 @@ python scripts/init_storage.py
 # 3. Verify the storage layer end-to-end
 python scripts/smoke_test_storage.py
 
-# 4. (Re-)generate the fake YomYom POS CSV
-python scripts/generate_fake_yomyom_pos.py
-
-# 5. Import the POS CSV → silver Parquet + signals
-python scripts/import_yomyom_pos.py \
-    --input data/internal/raw_pos/yomyom/sample_yomyom_pos.csv
+# 4. Import the store's committed POS export → silver Parquet. There is no demo data and
+#    nothing generates any (CLAUDE.md rule 7): the export is configs/store.yaml's pos.export.
+python scripts/import_pos.py
 
 # with a custom config or fixed timestamp:
-python scripts/import_yomyom_pos.py \
-    --input       data/internal/raw_pos/yomyom/sample_yomyom_pos.csv \
+python scripts/import_pos.py \
     --config      configs/pos_schema_mapping.yaml \
     --imported-at 2025-05-25T08:00:00+00:00
 ```

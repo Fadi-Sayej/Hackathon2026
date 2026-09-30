@@ -43,7 +43,7 @@ no longer fragments the history — whoever runs an import commits the snapshot,
 continuous series. Add this to the daily flow after a POS import:
 
 ```bash
-python3 scripts/import_yomyom_pos.py --input yomyom-inventory.csv   # writes a new snapshot
+python3 scripts/import_pos.py            # the export configs/store.yaml names; writes a new snapshot
 git add data/internal/snapshots
 git commit -m "data: POS snapshot <date>"
 git push
