@@ -5,7 +5,7 @@ Status: Approved — by the repository owner, 2026-09-30 ("approved"), with ADR-
 Owner: smartshelf-architect
 Parent: [Implementation plan](plan.md)
 Inputs: [D-28, ADR-036 (Accepted 2026-09-30), docs/pilot/next-store.md, src/engine/inputs.py, src/engine/run.py, src/common/paths.py, src/context/weather.py, src/internal_pos/, scripts/import_yomyom_pos.py, scripts/import_yomyom_sales.py, src/matching/product_matching.py, configs/delivery_targets.yaml, configs/store_types.yaml, firestore.rules, scripts/check_firebase_config.mjs, .github/workflows/collect-daily.yml, index.html]
-Updated: 2026-09-30
+Updated: 2026-10-01 (Tasks 7.1–7.6 built; one pull request)
 ---
 
 # Phase 7 — A new store without code changes
@@ -104,28 +104,38 @@ writes only its review file. Its tests run offline on the captured response.
 **Done when:**
 - A copy made into a temporary directory holds no manifest data, and no manifest path holds
   YomYom's id or name.
-- On that copy, `npm run build` and the suites pass, and `check:store` lists what a store must
-  supply.
+- On that copy, with its settings filled, `npm run build` passes and `check:store` lists what a
+  store must supply.
 - `--update` carries a code change across and leaves every manifest path untouched.
+
+> **Refined 2026-10-01, while building.** "The suites pass on the copy" is dropped. Many tests
+> read the committed store data (the artefact, the snapshots, the export), which a clean copy
+> does not have. A copy does not change code: code is tested here, and `--update` carries it
+> across. So a copy leaves out `ci.yml`, and its nightly, with the probes in it, runs as it
+> does here. The ignore rules move from YomYom's folder to any store's
+> (`raw_pos/*/sales_daily/`, and `/*.csv` for Vercel), or a new store's daily reports would
+> never be committed.
 
 ### Task 7.6: The fake data goes (ADR-036 §6)
 
 **Files:** `scripts/generate_fake_yomyom_pos.py` (deleted), `README.md`,
-`src/matching/product_matching.py` (the sample-CSV fallback).
+`src/matching/product_matching.py` (the sample-CSV fallback), and `samples/sample_expiry_scans.csv`
+(deleted 2026-10-01: invented expiry scans that nothing read).
 
 **Done when:** `git grep` finds no reference to either, and the suites pass.
 
 ## Pull requests
 
-1. Tasks 7.6, 7.1 and 7.2: the settings, with the identical-artefact proof.
-2. Tasks 7.3 and 7.4: the finder and the check.
-3. Task 7.5: the copy and the guide, proven on a real copy.
+One pull request for the phase, instead of three, to spend Actions minutes once: its commits
+are the six tasks, each tested locally first.
 
 ## Checkpoint 7
 
 - YomYom's artefact is unchanged by the phase (the proof in PR 1 and PR 2).
 - A clean copy is made, builds, passes the suites, and `check:store` on it lists exactly what
   `docs/pilot/next-store.md` says a store must send.
-- No hard-coded store id, name, path, format or coordinate remains in `src/` or `scripts/`
-  (`git grep` for YomYom's id, name, coordinates and file names finds only this copy's settings,
-  its manifest data and the documents).
+- No hard-coded store id, name, path, format or coordinate remains in the code a copy runs:
+  the engine, the importers, the nightly, the build, the Firebase checks and the setup tools.
+  Research scripts written against the pilot's data (the Alonit discovery, velocity,
+  baselines) say so in their docstrings, and comments that record the pilot's history keep
+  its name.

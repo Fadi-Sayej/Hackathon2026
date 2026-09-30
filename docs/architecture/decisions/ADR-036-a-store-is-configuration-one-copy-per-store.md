@@ -106,6 +106,18 @@ applying the manifest. `--update <dir>` later brings a copy's code up to date an
 touches a manifest path. Both refuse to run if the result would contain the source store's
 `id` or `name` under a manifest path.
 
+> **Clarified 2026-10-01, in Task 7.5.** The manifest as built, in `src/common/store.py`,
+> differs from the table in three ways:
+> - `configs/measured_weights.yaml` is left out rather than emptied. It is generated from the
+>   store's sales by `analyse_sales_movement.py`, and nothing in the engine reads it.
+> - `firestore.rules`, `.firebaserc` and `.env.example` start as templates, because they
+>   pin this copy's store id and Firebase project.
+> - `samples/**` is left out.
+>
+> A copy also leaves out `.github/workflows/ci.yml`. Many tests read committed store data a
+> clean copy does not have, and a copy changes no code: code is tested here before `--update`
+> carries it. The ignore rules follow any store's folder, not YomYom's.
+
 ### 4. Nearby venues are found, then confirmed by a person
 
 `scripts/find_nearby_venues.py` takes the store's location and radius. It asks the delivery
