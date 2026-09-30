@@ -96,6 +96,8 @@ def load_store(path: Optional[Path] = None) -> StoreSettings:
                                  "(ADR-036); docs/operations/new-store.md says how to fill it.") from None
     if not isinstance(raw, Mapping):
         raise StoreSettingsError(f"{path}: not a mapping of settings.")
+    for dotted in REQUIRED_KEYS:                   # the first missing key, in the file's own order
+        _get(raw, dotted, path)
     fmt = _text(raw, "format", path)
     known = _formats()
     if fmt not in known:
