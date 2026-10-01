@@ -38,6 +38,14 @@ describe('check:firebase and the store id', () => {
     expect(code).toBe(0)
   })
 
+  it('says to enable Google and email-link sign-in and give roles, never anonymous sign-in', () => {
+    // Anonymous sign-in was disabled on 2026-09-26 (ADR-029); its instructions went on 2026-10-01.
+    const { out } = run([...KEYS, `VITE_STORE_ID=${id}`])
+    expect(out).toContain('Google')
+    expect(out).toContain('set_user_role.py')
+    expect(out).not.toMatch(/anonymous/i)
+  })
+
   it('fails when VITE_STORE_ID names another store', () => {
     const { code, out } = run([...KEYS, 'VITE_STORE_ID=another-store'])
     expect(out).toContain('configs/store.yaml')
