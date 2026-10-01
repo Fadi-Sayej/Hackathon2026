@@ -14,7 +14,7 @@ from src.internal_pos.pos_normalizer import inspect_pos_file
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Inspect a YomYom POS CSV before import.")
+    parser = argparse.ArgumentParser(description="Inspect a POS CSV before importing it (a new store's export first).")
     parser.add_argument("--input", required=True, type=Path, help="Path to the POS CSV file.")
     parser.add_argument("--config", default=CONFIG_PATH, type=Path, help="Schema mapping YAML.")
     return parser.parse_args()

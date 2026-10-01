@@ -31,6 +31,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.common.paths import EXTERNAL_SNAPSHOTS_ROOT, SILVER_POS_ROOT
+from src.common.store import INVENTORY_TABLE
 from src.market.baseline import Score, score_membership_rule
 
 # Venues that can be scored at all: those declaring `price_file_store_id` in
@@ -93,7 +94,7 @@ def measure_n1() -> dict:
     has no true negatives by construction. That is the point: it is the rule a
     system falls into by default when it treats a catalogue as a shelf.
     """
-    inv = pd.read_parquet(SILVER_POS_ROOT / "yomyom_inventory.parquet",
+    inv = pd.read_parquet(SILVER_POS_ROOT / INVENTORY_TABLE,
                           columns=["barcode", "product_name", "current_stock"])
     stock = pd.to_numeric(inv["current_stock"], errors="coerce")
     inv = inv.assign(stock=stock).dropna(subset=["stock"])

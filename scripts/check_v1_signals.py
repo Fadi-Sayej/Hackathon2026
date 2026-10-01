@@ -33,12 +33,13 @@ sys.path.insert(0, str(ROOT))
 
 import src.engine.run as run_mod  # noqa: E402
 from src.engine.registry import CAPABILITIES  # noqa: E402
+from src.common.store import INVENTORY_TABLE, PRODUCTS_TABLE
 
 # How to withhold each input AT SOURCE. Nothing here reaches into EngineInputs: the point is
 # to cross inputs.py and run.py, which is where four signals in this repository were lost.
 SILVER_FILES = {
-    "products": ["yomyom_products.parquet"],
-    "inventory": ["yomyom_inventory.parquet"],
+    "products": [PRODUCTS_TABLE],
+    "inventory": [INVENTORY_TABLE],
     "sales_summary": ["sales_summary.parquet", "sales_monthly.parquet"],
     "window": ["sales_summary.parquet", "sales_monthly.parquet"],
 }
@@ -105,7 +106,7 @@ def _run(silver_dir: Path, **sources) -> dict:
 
 def main() -> int:
     source = run_mod.SILVER_DIR
-    if not (source / "yomyom_products.parquet").exists():
+    if not (source / PRODUCTS_TABLE).exists():
         print(f"FAIL  no silver tables under {source}: import the POS export first", file=sys.stderr)
         return 1
 
@@ -164,11 +165,11 @@ def main() -> int:
         # notice if it stopped working. Withheld at source like everything else here.
         undated_dir = Path(tmp) / "without_as_of"
         shutil.copytree(source, undated_dir)
-        inventory = undated_dir / "yomyom_inventory.parquet"
+        inventory = undated_dir / INVENTORY_TABLE
         table = pq.read_table(inventory)
         dated = [c for c in table.schema.names if c in ("_as_of", "_as_of_source")]
         if not dated:
-            failures.append("yomyom_inventory.parquet carries no _as_of, so this probe "
+            failures.append(f"{INVENTORY_TABLE} carries no _as_of, so this probe "
                             "proves nothing — re-import the POS export")
         else:
             pq.write_table(table.select([c for c in table.schema.names if c not in dated]),

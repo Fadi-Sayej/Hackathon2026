@@ -29,6 +29,7 @@ if str(ROOT) not in sys.path:
 import pyarrow.parquet as pq
 
 from src.common.paths import SILVER_POS_ROOT
+from src.common.store import INVENTORY_TABLE, PRODUCTS_TABLE
 from src.snapshots.velocity import list_usable_snapshots
 
 # A drop larger than this versus the previous import means a broken export, not a
@@ -58,8 +59,8 @@ def _previous_row_count() -> int | None:
 
 
 def run_checks(baseline: int | None = None) -> dict:
-    products = _rows(SILVER_POS_ROOT / "yomyom_products.parquet")
-    inventory = _rows(SILVER_POS_ROOT / "yomyom_inventory.parquet")
+    products = _rows(SILVER_POS_ROOT / PRODUCTS_TABLE)
+    inventory = _rows(SILVER_POS_ROOT / INVENTORY_TABLE)
 
     total = len(products)
 

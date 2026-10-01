@@ -23,10 +23,10 @@ sys.path.insert(0, str(ROOT / "tests" / "engine"))
 # So they skip rather than fail. A test that cannot run in an environment should say so;
 # failing there tells you about the environment, not the code, and teaches everyone to
 # ignore a red suite.  The nightly has the data and runs them.
-_PILOT_DATA = ROOT / "data" / "internal" / "silver_pos" / "yomyom_products.parquet"
+_PILOT_DATA = ROOT / "data" / "internal" / "silver_pos" / "products.parquet"
 pytestmark = pytest.mark.skipif(
     not _PILOT_DATA.exists(),
-    reason="no pilot data in this checkout: run scripts/import_yomyom_pos.py --input yomyom-inventory.csv",
+    reason="no pilot data in this checkout: run scripts/import_pos.py",
 )
 
 

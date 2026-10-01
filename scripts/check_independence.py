@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 import src.engine.run as run_mod
+from src.common.store import PRODUCTS_TABLE
 
 
 def _fail(message: str) -> None:
@@ -38,9 +39,9 @@ def _total(capability: dict) -> int:
 
 
 def main() -> None:
-    if not (run_mod.SILVER_DIR / "yomyom_products.parquet").exists():
+    if not (run_mod.SILVER_DIR / PRODUCTS_TABLE).exists():
         _fail(f"no silver tables under {run_mod.SILVER_DIR}: import the POS export first "
-              f"(python3 scripts/import_yomyom_pos.py --input <csv>)")
+              f"(python3 scripts/import_pos.py)")
 
     with tempfile.TemporaryDirectory() as tmp:
         whole_silver = Path(tmp) / "silver_whole"

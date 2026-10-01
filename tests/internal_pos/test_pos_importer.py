@@ -21,7 +21,7 @@ def test_import_preserves_negative_stock_and_records_vintage(tmp_path, monkeypat
     monkeypatch.setattr(imp, "SNAPSHOTS_DIR", tmp_path / "snapshots")
     result = imp.import_pos_file(csv, as_of="2026-08-02")
     assert result["status"] == "ok"
-    inv = pq.read_table(silver / "yomyom_inventory.parquet").to_pylist()[0]
+    inv = pq.read_table(silver / "inventory.parquet").to_pylist()[0]
     assert inv["current_stock"] == -5
     assert inv["_as_of"] == "2026-08-02"
     assert not (silver / "yomyom_sales.parquet").exists()
@@ -51,7 +51,7 @@ def test_the_import_archives_the_silver_it_wrote_into_the_snapshots_it_was_given
 
     archived = sorted(p for p in snapshots.iterdir() if p.is_dir()) if snapshots.exists() else []
     assert len(archived) == 1, "the import did not archive into the snapshots directory it was given"
-    wrote = [r["barcode"] for r in pq.read_table(silver / "yomyom_products.parquet").to_pylist()]
+    wrote = [r["barcode"] for r in pq.read_table(silver / "products.parquet").to_pylist()]
     kept = [r["barcode"] for r in pq.read_table(archived[0] / "products.parquet").to_pylist()]
     assert len(wrote) == 1 and kept == wrote
 
@@ -86,7 +86,7 @@ def _inventory_lacking(silver: Path, *columns: str) -> None:
     for column in columns:
         present.pop(column, None)
     silver.mkdir(parents=True, exist_ok=True)
-    pq.write_table(pa.table(present), silver / "yomyom_inventory.parquet")
+    pq.write_table(pa.table(present), silver / "inventory.parquet")
 
 
 def test_a_parquet_written_before_as_of_still_loads(tmp_path):
@@ -133,7 +133,7 @@ def test_the_shape_a_zero_row_import_actually_writes(tmp_path):
     silver.mkdir(parents=True)
     pq.write_table(
         pa.table({"_empty": pa.array([], type=pa.bool_())}),
-        silver / "yomyom_inventory.parquet",
+        silver / "inventory.parquet",
     )
     assert imp.read_pos_vintage(silver).get("as_of") is None
 

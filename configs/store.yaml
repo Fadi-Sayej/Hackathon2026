@@ -1,0 +1,47 @@
+# configs/store.yaml — which store this copy of SmartShelf serves (ADR-036, D-28).
+#
+# Each store runs its own copy, with only its own data. Everything store-specific the code needs
+# is read from here, through src/common/store.py. Nothing is defaulted: a missing key stops the
+# run and names the key, because a copy that forgot one would otherwise run on another store's
+# identity. A new store's copy starts with this file empty (the store-data manifest, ADR-036 §3),
+# and docs/operations/new-store.md says how to fill it.
+#
+# Paths are from the repository root.
+
+# The store's id everywhere: the Firestore root (firestore.rules pins it) and the owner state's.
+id: yomyom-kafr-qasim
+
+# The store's name, as the team and the setup guide use it.
+name: YomYom
+
+# The browser tab's title. The only place the app names a store.
+site_title: "SmartShelf AI — YomYom pilot"
+
+# Where the store is: the weather context, and where the nearby-venue finder looks from.
+location:
+  lat: 32.1091501
+  lon: 34.9624392
+
+# The store's format, one of configs/store_types.yaml's scale. It decides which nearby stores
+# are the store's market (D-18) and how comparable each competitor's price is (ADR-008). The
+# store's own entries there carry `role: client`.
+format: gas_convenience
+
+# The committed inventory export (the POS importer reads it; configs/pos_schema_mapping.yaml
+# maps its columns).
+pos:
+  export: yomyom-inventory.csv
+
+# Where the store's sales reports are committed: one file per month, and one per day (ADR-030).
+sales:
+  monthly_dir: data/internal/raw_pos/yomyom/sales
+  daily_dir: data/internal/raw_pos/yomyom/sales_daily
+
+# How far the nearby-venue finder looks, in kilometres.
+market:
+  radius_km: 5
+
+# The copy's own Firebase project: its owner state and its accounts (ADR-003, ADR-029). Not a
+# secret. The service account that reads it is, and lives in the nightly's secrets only.
+firebase:
+  project_id: hackathon26-a6ebd

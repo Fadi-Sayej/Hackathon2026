@@ -27,7 +27,7 @@ and measuring it yields the two numbers Step 3 needs:
 
 ⚠️ THE GROUND TRUTH IS STALE, AND THAT IS NOT HIDEABLE
 ------------------------------------------------------
-`yomyom_inventory.parquet` was imported on 2026-06-06. Every stock figure is that
+The inventory table was imported on 2026-06-06. Every stock figure is that
 day's. Comparing it against today's orderability measures a 68-day-old shelf, so
 the per-product result is only as good as "did this product's situation change".
 `staleness_days` travels with every result for that reason, and the caller is
@@ -46,13 +46,13 @@ from typing import Dict, List, Optional, Set
 import polars as pl
 
 from src.common.paths import EXTERNAL_SNAPSHOTS_ROOT, SILVER_POS_ROOT
+from src.common.store import INVENTORY_TABLE
 from src.market.baseline import Score, score_membership_rule, wilson_interval
 from src.market.presence import DELIVERY_CATALOG, USABLE_STATUSES
 
-# The Wolt display name of our own venue. Matched case-insensitively on a
-# normalised form so a punctuation change upstream does not silently empty the
-# universe — an empty universe would report a perfect score over nothing.
-OUR_VENUE_NAMES = ("yom yom", "yomyom")
+# Our own venue is the store's own entry in configs/store_types.yaml (`role: client`), matched
+# by the delivery platform's venue id (ADR-036). It used to be matched by the display name
+# "Yom Yom", which ties every copy to one store and breaks on a rename upstream.
 
 
 def normalise_barcode(value) -> str:
@@ -65,9 +65,13 @@ def normalise_barcode(value) -> str:
     return str(value or "").strip().lstrip("0")
 
 
-def _venue_matches(store_name) -> bool:
-    flat = "".join(c.lower() for c in str(store_name or "") if c.isalnum() or c.isspace())
-    return any(name in flat for name in OUR_VENUE_NAMES)
+def _is_our_venue(store_id, ours: Set[str]) -> bool:
+    return bool(store_id) and str(store_id).strip() in ours
+
+
+def _our_venue_ids() -> Set[str]:
+    from src.common.store_types import get_store_types
+    return set(get_store_types().client_store_ids())
 
 
 @dataclass
@@ -132,6 +136,7 @@ def load_our_orderability(root: Optional[Path] = None) -> Dict[str, Set[str]]:
     out: Dict[str, Set[str]] = {}
     if not root.exists():
         return out
+    ours = _our_venue_ids()
 
     for day_dir in sorted(p for p in root.iterdir() if p.is_dir()):
         manifest = day_dir / "_manifest.json"
@@ -153,10 +158,10 @@ def load_our_orderability(root: Optional[Path] = None) -> Dict[str, Set[str]]:
                 frame = pl.read_parquet(path)
             except Exception:
                 continue
-            if "barcode" not in frame.columns or "store_name" not in frame.columns:
+            if "barcode" not in frame.columns or "store_id" not in frame.columns:
                 continue
-            for row in frame.select(["barcode", "store_name"]).iter_rows(named=True):
-                if not _venue_matches(row.get("store_name")):
+            for row in frame.select(["barcode", "store_id"]).iter_rows(named=True):
+                if not _is_our_venue(row.get("store_id"), ours):
                     continue
                 barcode = normalise_barcode(row.get("barcode"))
                 if barcode:
@@ -169,7 +174,7 @@ def load_our_orderability(root: Optional[Path] = None) -> Dict[str, Set[str]]:
 def load_pos_stock(silver_root: Optional[Path] = None):
     """({barcode -> in stock?}, imported_at) from the POS inventory snapshot."""
     silver_root = silver_root or SILVER_POS_ROOT
-    frame = pl.read_parquet(silver_root / "yomyom_inventory.parquet")
+    frame = pl.read_parquet(silver_root / INVENTORY_TABLE)
 
     imported_at = None
     if "_imported_at" in frame.columns and frame.height:

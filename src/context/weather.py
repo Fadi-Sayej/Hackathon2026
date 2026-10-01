@@ -15,11 +15,9 @@ from typing import Any, Dict, Optional
 
 BASE_URL = "https://api.open-meteo.com/v1/forecast"
 
-# Kafr Qasim — the pilot store. The JS default was 31.95/35.93, which is ~100km
-# away near Jerusalem; weather-driven demand for THIS shop was being read off the
-# wrong town.
-DEFAULT_LAT = 32.114
-DEFAULT_LON = 34.976
+# No default location. The JS default was 31.95/35.93, ~100 km from the pilot store, and a
+# Python default near that store would read every other copy's weather off the wrong town.
+# The caller passes the store's location from configs/store.yaml (ADR-036).
 
 
 def classify(temperature_c: Optional[float], precipitation: Optional[float]) -> str:
@@ -38,8 +36,8 @@ def classify(temperature_c: Optional[float], precipitation: Optional[float]) -> 
 
 
 def get_weather(
-    lat: float = DEFAULT_LAT,
-    lon: float = DEFAULT_LON,
+    lat: float,
+    lon: float,
     *,
     timeout: float = 15.0,
 ) -> Dict[str, Any]:

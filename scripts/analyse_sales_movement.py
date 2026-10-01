@@ -28,6 +28,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.common.paths import SILVER_POS_ROOT
+from src.common.store import PRODUCTS_TABLE, get_store
 from src.market.sales_movement import (
     department_shares,
     estimate_effect,
@@ -37,7 +38,7 @@ from src.market.sales_movement import (
     product_velocity,
 )
 
-SALES_DIR = ROOT / "data" / "internal" / "raw_pos" / "yomyom" / "sales"
+SALES_DIR = get_store().sales_monthly_dir     # ADR-036: the store's settings
 CALENDARS = ROOT / "configs" / "calendars.yaml"
 OUT_WEIGHTS = ROOT / "configs" / "measured_weights.yaml"
 
@@ -52,7 +53,7 @@ def main() -> int:
     parser.add_argument("--out", default=str(OUT_WEIGHTS))
     args = parser.parse_args()
 
-    departments = load_departments(SILVER_POS_ROOT / "yomyom_products.parquet")
+    departments = load_departments(SILVER_POS_ROOT / PRODUCTS_TABLE)
     panel = load_panel(SALES_DIR, departments)
     if panel.empty:
         print("No sales reports found in %s" % SALES_DIR)

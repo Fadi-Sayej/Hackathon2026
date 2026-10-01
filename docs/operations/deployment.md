@@ -363,7 +363,7 @@ human committed one by hand.
 To refresh by hand for a release:
 
 ```bash
-python3 scripts/import_yomyom_pos.py --input yomyom-inventory.csv   # POS CSV → silver parquet
+python3 scripts/import_pos.py                                       # POS export → silver parquet
 npm run data:refresh                                                # → public/data/dashboard.json
 git add public/data/dashboard.json public/data/market-context.json
 git commit -m "data: refresh the engine artefact"

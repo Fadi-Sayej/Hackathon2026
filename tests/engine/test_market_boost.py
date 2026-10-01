@@ -281,8 +281,8 @@ def _world(tmp_path):
              "wolt_price": 0.0, "cost_price": 1.0, "_source_file": "inv.csv", "_as_of": "2026-10-01"}]
     inv = [{"barcode": "7290999", "product_name": "מים", "current_stock": 5.0,
             "_source_file": "inv.csv", "_as_of": "2026-10-01"}]
-    pq.write_table(pa.Table.from_pylist(prod), silver / "yomyom_products.parquet")
-    pq.write_table(pa.Table.from_pylist(inv), silver / "yomyom_inventory.parquet")
+    pq.write_table(pa.Table.from_pylist(prod), silver / "products.parquet")
+    pq.write_table(pa.Table.from_pylist(inv), silver / "inventory.parquet")
     reports = tmp_path / "daily"; reports.mkdir()
     header = "תאור פריט,ברקוד/קוד,מכר,מחיר קניה,מחיר מכירה,עלות המכר (חנות),כניסות מלאי,מחיר קניה נטו,הנחה,קוד מחלקה,\n"
     for d in DAYS:

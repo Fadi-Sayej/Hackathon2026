@@ -1,0 +1,6323 @@
+{
+ "_captured": {
+  "url": "https://consumer-api.wolt.com/v1/pages/retail?lat=32.1091501&lon=34.9624392",
+  "on": "2026-09-30T20:55Z",
+  "note": "Trimmed from the live response: every venue kept, only the fields the finder reads. Nothing invented (ADR-036 §4)."
+ },
+ "city": "petah-tikva",
+ "sections": [
+  {
+   "name": "category-list",
+   "items": []
+  },
+  {
+   "name": "retail-delivering-venues",
+   "items": [
+    {
+     "venue": {
+      "id": "66c43207a4092f6957523873",
+      "name": "Yellow Mini Market | Siona",
+      "slug": "yellow-natan",
+      "location": [
+       34.904279,
+       32.116256
+      ],
+      "address": "Natan Shiphris Street, Petah Tikva, Israel",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "66a641c6d5f6f079bc0ba975",
+      "name": "SNAX | Rosh HaAyin",
+      "slug": "snax-rosh-haain",
+      "location": [
+       34.9781251,
+       32.0861123
+      ],
+      "address": "זהרה אלפסיה 3 ראש העין ",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6995b679d0c786272f3aa5fc",
+      "name": "City Market | Hertzel",
+      "slug": "city-market-hertzel",
+      "location": [
+       34.8874168,
+       32.0855865
+      ],
+      "address": "הרצל 39",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "67a8876ceb70f14c1384d7ae",
+      "name": "Shusha Smoke Market | Petah Tikva",
+      "slug": "shusha-smoke-market-petah-tikva",
+      "location": [
+       34.877833,
+       32.087453
+      ],
+      "address": "יצחק שדה 34 פתח תקווה",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a37f473adf668df42e64108",
+      "name": "Glida Stock | Em HaMoshavot",
+      "slug": "glida-stock-em-hamoshavot",
+      "location": [
+       34.87560348,
+       32.09823905
+      ],
+      "address": "אבשלום גיסין 37",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69aebf3f98b8914a896a6e16",
+      "name": "Beauty Shop | Warehouse",
+      "slug": "beauty-shop-warehouse",
+      "location": [
+       35.0683401,
+       32.8008455
+      ],
+      "address": "התעשייה 51, קרית אתא, Israel",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "690c7e8d5cf9c4fb65ebf96f",
+      "name": "Cellfi | Warehouse",
+      "slug": "cellfi-warehouse",
+      "location": [
+       34.8063288,
+       32.0833681
+      ],
+      "address": "ז'בוטינסקי 22, Ramat Gan, Israel",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "693ac912df11de73d644a553",
+      "name": "TLV Stock  | Warehouse",
+      "slug": "stock-online-warehouse",
+      "location": [
+       34.8099228,
+       32.0847326
+      ],
+      "address": "ז'בוטינסקי 48, רמת גן, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6950eaae70509f48428bd331",
+      "name": "Techno Home | Warehouse",
+      "slug": "techno-home-warehouse",
+      "location": [
+       34.8251048,
+       32.0702496
+      ],
+      "address": "דרך נגבה 20, Ramat Gan, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "693aca6ae199602405d37d66",
+      "name": "Yoyo digital | Warehouse",
+      "slug": "yoyo-digital-warehouse",
+      "location": [
+       34.7867933,
+       32.0846336
+      ],
+      "address": "תש\"ח 2, Tel Aviv-Yafo, Israel",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69882f8af4751d93c6c85a29",
+      "name": "Hashmal Neto | Warehouse",
+      "slug": "hashmal-neto-warehouse",
+      "location": [
+       34.783129,
+       32.0750516
+      ],
+      "address": "דובנוב 7 תל אביב",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a2f9bf70b4bb7c602d17f08",
+      "name": "Multi Store | Warehouse",
+      "slug": "multi-store-warehouse",
+      "location": [
+       34.5565047,
+       31.6694788
+      ],
+      "address": "שילה 2, אשקלון",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6918ece748d166c199c22e2e",
+      "name": "Or Sport | Warehouse",
+      "slug": "or-sport-warehouse",
+      "location": [
+       34.8529316,
+       32.0874693
+      ],
+      "address": "Magshimim Street 20, Petah Tikva, Israel",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "696dfd0595183e380bc3ce7d",
+      "name": "Brurya | Warehouse",
+      "slug": "brurya-warehouse",
+      "location": [
+       34.7749342,
+       32.0751211
+      ],
+      "address": "A דיזנגוף סנטר תל אביב, קומה 2 בניין",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "693e82608b5959f1f6070d12",
+      "name": "Phone Play | Warehouse",
+      "slug": "phone-play-warehouse",
+      "location": [
+       34.815393,
+       31.8631176
+      ],
+      "address": "Bussy Saint Georges St 15, Kiryat Ekron",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6950fac970509f48428bd333",
+      "name": "Itechstore | Warehouse",
+      "slug": "itechstore-warehouse",
+      "location": [
+       34.8973103,
+       32.0278413
+      ],
+      "address": "שבזי 24, יהוד מונוסון, Israel",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "68b58f6a5a8ba2008a8c149a",
+      "name": "Dreame | Warehouse",
+      "slug": "dreame-warehouse",
+      "location": [
+       34.7850363,
+       32.0617938
+      ],
+      "address": "המסגר 18 תל אביב",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "699c0f43eac4c912d5e0d434",
+      "name": "Xiaomi | Warehouse",
+      "slug": "xiaomi-warehouse",
+      "location": [
+       34.964767,
+       31.887884
+      ],
+      "address": "האופה 8 מודיעין",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "696cdc1752549bc34136cbd4",
+      "name": "Mashtela Online | Warehouse",
+      "slug": "mashtela-online-warehouse",
+      "location": [
+       34.8394747,
+       32.1808747
+      ],
+      "address": "יבנה/כנפי נשרים, הרצליה",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "691a37f20ff708b96b8e21c7",
+      "name": "Lingerie Brands | Warehouse",
+      "slug": "lingerie-brands-warehouse",
+      "location": [
+       34.7684474,
+       31.9920966
+      ],
+      "address": "דוד סחרוב 8, Rishon LeZion, Israel",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "692365b9917e642f1c58add8",
+      "name": "HomeIn | Warehouse",
+      "slug": "homein-warehouse",
+      "location": [
+       34.9879027,
+       31.7657378
+      ],
+      "address": "סלע 10, בית שמש, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a2fa1acbfd935b2577052e6",
+      "name": "Yanshuf Market | Warehouse",
+      "slug": "yanshuf-market-warehouse",
+      "location": [
+       34.947614,
+       32.138591
+      ],
+      "address": "מושב חגור, 4587000, HaSharon",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69412cc20ba7c41428f84669",
+      "name": "Peled Import Export | Warehouse",
+      "slug": "peled-import-export-warehouse",
+      "location": [
+       34.8375426,
+       32.133286
+      ],
+      "address": "ששת הימים ",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69791962edc80cf3431bb584",
+      "name": "Gadget Mall | Warehouse",
+      "slug": "gadget-mall-warehouse",
+      "location": [
+       34.7713714,
+       32.0399265
+      ],
+      "address": "דרך בן צבי 84, Tel Aviv-Yafo, Israel",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a0af8d7ca464a5a5422e5d0",
+      "name": "Baby Boss & Benbat Israel | Warehouse",
+      "slug": "baby-boss-warehouse",
+      "location": [
+       34.8513532,
+       32.0343771
+      ],
+      "address": "הפלדה 9, Or Yehuda, Israel",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "692c41797b978d24de9513a4",
+      "name": "Player1 | Warehouse",
+      "slug": "player1-werehouse",
+      "location": [
+       34.7817206,
+       32.0712307
+      ],
+      "address": "Ibe Gabirol 1 Street, Tel Aviv-Yafo, Israel",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "692d5b3f07e5fc4caffe126c",
+      "name": "XI Mobility | Warehouse",
+      "slug": "xi-mobility-warehouse",
+      "location": [
+       34.7850363,
+       32.0617938
+      ],
+      "address": "המסגר 18, Tel Aviv-Yafo, Israel",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6975cbd92de04de4985d38a4",
+      "name": "Smart Home Plus | Warehouse",
+      "slug": "stock-electric-all-sizes-test-menu",
+      "location": [
+       34.796376,
+       32.0879848
+      ],
+      "address": "ניסים אלוני 3, תל אביב",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6950efe2aa6485f6a413b13b",
+      "name": "FreeDio | Warehouse",
+      "slug": "freedio-warehouse",
+      "location": [
+       34.8005292,
+       32.0537263
+      ],
+      "address": "דרך משה דיין 52, Tel Aviv-Yafo, Israel",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "699c01210113044d248618e8",
+      "name": "Hani's Place | Warehouse",
+      "slug": "hanis-place-warehouse",
+      "location": [
+       34.7776611,
+       32.0593355
+      ],
+      "address": "הגדוד העברי 29, Tel Aviv-Yafo, Israel",
+      "product_line": "pet_supply",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "691983640ece52842c05591e",
+      "name": "Play On | Warehouse",
+      "slug": "play-on-warehouse",
+      "location": [
+       34.880753,
+       32.105333
+      ],
+      "address": "יוני נתניהו 4, אור יהודה",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69e47d6fc45c33d19c2e1f9e",
+      "name": "Bobo Decor | Warehouse",
+      "slug": "bobo-warehouse",
+      "location": [
+       34.7646649,
+       32.0179138
+      ],
+      "address": "אילת 36, חולון",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69257c604ac1abf7ca1674cb",
+      "name": "ToyLand | Warehouse",
+      "slug": "toyland-warehouse",
+      "location": [
+       34.925187,
+       32.172221
+      ],
+      "address": "התעש 4 כפר סבא",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "68bebf5021fc2e341ec44e8f",
+      "name": "Rozenfeld | Warehouse",
+      "slug": "rozenfeld-warehouse",
+      "location": [
+       34.8921515,
+       32.1067014
+      ],
+      "address": "גליס 32",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6857f116a3db8e56693a99d5",
+      "name": "Home & More | Warehouse",
+      "slug": "home-more-beer-tuvia",
+      "location": [
+       34.7860508,
+       32.0664443
+      ],
+      "address": "המלאכה 8",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "691dd63e5314d7fb0dc12381",
+      "name": "Start Home | Warehouse",
+      "slug": "smart-home-warehouse",
+      "location": [
+       35.0453441,
+       32.1127401
+      ],
+      "address": "השקמה 11, עץ אפרים ",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a40a38777cdfe455f0eeebe",
+      "name": "Bonny & Bunny | Warehouse",
+      "slug": "bonny-bunny-warehouse",
+      "location": [
+       34.7688505,
+       32.0515438
+      ],
+      "address": "דרך קיבוץ גלויות 34, תל אביב-יפו",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a40aa83e4b1a84ec7056a18",
+      "name": "Cherie | Warehouse",
+      "slug": "cherie-warehouse",
+      "location": [
+       34.8922204,
+       32.0610853
+      ],
+      "address": "האילנות 29, כפר מעש",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "691ad0036a7ac956cf6c6d8f",
+      "name": "Medics Care | Warehouse",
+      "slug": "medics-care-warehouse",
+      "location": [
+       34.8602872,
+       32.0910533
+      ],
+      "address": "BSR City Totseret Haaretz 1, Petah Tikva",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69236ea5e2c2046c4c30121c",
+      "name": "Luli Babys Style | Warehouse",
+      "slug": "luli-babys-style-warehouse",
+      "location": [
+       34.9689157,
+       32.480089
+      ],
+      "address": "הגפן 43, אחיטוב",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69aeba95e104be52144af1cb",
+      "name": "Noa Kirel Beauty | Warehouse",
+      "slug": "noa-kirel-beauty-warehouse",
+      "location": [
+       35.0140211,
+       32.3309304
+      ],
+      "address": "גלבוע 32, בת חפר, Israel",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69495966b865353f5ec2129c",
+      "name": "Tagor Center | Warehouse",
+      "slug": "tagor-center-warehouse",
+      "location": [
+       34.7974665,
+       32.1172216
+      ],
+      "address": "טאגור 38 תל אביב",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69007a369855699872d4fbf0",
+      "name": "Hadeal Hayomi | Warehouse",
+      "slug": "hadeal-hayomi-warehouse",
+      "location": [
+       34.9975139,
+       32.8097959
+      ],
+      "address": "שדרות ירושלים 3",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6979cc54325084dafe97f39b",
+      "name": "Homax | Warehouse",
+      "slug": "homax-warehouse",
+      "location": [
+       34.8554464,
+       32.0841053
+      ],
+      "address": "הערבה 1, גבעת שמואל, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a01e3f738776b639af7d0c8",
+      "name": "KfitzKfotz | Warehouse",
+      "slug": "kfitz-kfotz",
+      "location": [
+       34.969067,
+       32.257854
+      ],
+      "address": "הכרם 96 עזריאל",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a0b00100645eac3f01e98fb",
+      "name": "Gadgetline | Warehouse",
+      "slug": "gadgetline-a-new-dimension-of-gifts-warehouse",
+      "location": [
+       34.7897231,
+       32.0596818
+      ],
+      "address": "שדרות המעפילים 36, 6109301, Tel Aviv",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "692589fa981e48511f249b2b",
+      "name": "Newpan | Warehouse",
+      "slug": "newpan",
+      "location": [
+       34.771333,
+       31.986664
+      ],
+      "address": "רוז'נסקי מרדכי 14 ראשון לציון",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "699c1073392be56354761f0f",
+      "name": "Midea | Warehouse",
+      "slug": "midea-warehouse",
+      "location": [
+       34.964767,
+       31.887884
+      ],
+      "address": "האופה 8 מודיעין",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "697917b3b11a633c52f632ed",
+      "name": "Home Set | Warehouse",
+      "slug": "home-set-warehouse",
+      "location": [
+       34.7630811,
+       31.9929256
+      ],
+      "address": "אליהו איתן 26, Rishon LeZion, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a2fa0dc731818dfb15169d1",
+      "name": "Vos Natural Cosmetics | Warehouse",
+      "slug": "vos-natural-cosmetics-wearhouse",
+      "location": [
+       34.7792345,
+       32.0897207
+      ],
+      "address": "בזל 34, Tel Aviv",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a3277642f186aab1312622e",
+      "name": "Pro Body | Warehouse",
+      "slug": "pro-body-warehouse",
+      "location": [
+       34.7747622,
+       32.0581216
+      ],
+      "address": "מטלון 66 תל אביב",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69bbdf89f983a53e6f136f03",
+      "name": "Britax & BabySafe Israel | Warehouse",
+      "slug": "restex",
+      "location": [
+       34.98197462775525,
+       32.486657746857134
+      ],
+      "address": "אזור תעשייה יצחקי, משמרות",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a0b022c3389424c85090b18",
+      "name": "BoxStore | Warehouse",
+      "slug": "boxstyle-warehouse",
+      "location": [
+       34.8258306,
+       32.0898704
+      ],
+      "address": "רבי עקיבא 18, בני ברק, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a745ca533c2b6b8a9a7737d",
+      "name": "Matnia | Warehouse",
+      "slug": "matnia",
+      "location": [
+       34.8125236,
+       32.0872236
+      ],
+      "address": "ז׳בוטינסקי 75 רמת גן",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69e08f7e1e42eba588d42c3b",
+      "name": "Laster Design | Warehouse",
+      "slug": "laster-design-warehouse",
+      "location": [
+       34.7741248,
+       32.066722
+      ],
+      "address": "מזא\"ה 22, Tel Aviv-Yafo",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a154a207e9a5de5396cf1b6",
+      "name": "Baby Fun | Warehouse",
+      "slug": "byyby-p-n",
+      "location": [
+       34.8938002,
+       32.1470725
+      ],
+      "address": "יונה וולך 4",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69f308973259fa885c5cf782",
+      "name": "Electro Slil | Warehouse",
+      "slug": "electri-slil-warehouse",
+      "location": [
+       35.214031,
+       31.752761
+      ],
+      "address": "General Pierre Koenig 37 Street, Jerusalem",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a44d103620a0f596cd5fed4",
+      "name": "Olam Harefua | Warehouse",
+      "slug": "wlm-hrpw-h",
+      "location": [
+       34.7668981,
+       31.9928736
+      ],
+      "address": "דוד סחרוב 4 ",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69d22c4beb05a74d832cbb20",
+      "name": "Todo | Warehouse",
+      "slug": "todo-warehouse",
+      "location": [
+       35.2879424,
+       32.6072446
+      ],
+      "address": "שדרות ארלוזורוב 28, עפולה, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a40fe8e8ea4109737cd513a",
+      "name": "Rocking Chair | Warehouse",
+      "slug": "ks-ndndh",
+      "location": [
+       34.7703387,
+       32.0413002
+      ],
+      "address": "תל גיבורים 5 ",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a1fee337f9aa094f2eef650",
+      "name": "Yazamco 3D | Warehouse",
+      "slug": "yzmqw-tlt-mymd",
+      "location": [
+       34.8485451,
+       32.0934563
+      ],
+      "address": "אפעל 5 פתח תקווה",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "691f107f374160278db7793c",
+      "name": "Bag Store | Warehouse",
+      "slug": "bag-store-warehouse",
+      "location": [
+       34.8838788,
+       32.149961
+      ],
+      "address": "אזור תעשיה כוכב יאיר אינתר מותגים",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "693e9d56a30dc87105c6a34e",
+      "name": "PlaySmart | Warehouse",
+      "slug": "playsmart-warehouse",
+      "location": [
+       34.7913393,
+       31.9001774
+      ],
+      "address": "דרך גד פינשטיין 13, רחובות, Israel",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a7847f967ba72467c2921ad",
+      "name": "Benda Magnetics | Warehouse",
+      "slug": "benda-magnetics-warehouse",
+      "location": [
+       34.9477286,
+       32.4818848
+      ],
+      "address": "האשל 38, פארק תעשיות קיסריה",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a3d172eeff1ae07ae2b0036",
+      "name": "Israel Market | Warehouse",
+      "slug": "israel-market-warehouse",
+      "location": [
+       34.622257,
+       31.657504
+      ],
+      "address": "בראשית 150, Mash'en",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6978f4ded52feb512339e2d3",
+      "name": "The Little Prince | Warehouse",
+      "slug": "the-little-prince-warehouse",
+      "location": [
+       34.7384621,
+       31.9016748
+      ],
+      "address": "נחל פולג 1, יבנה, Israel",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "695e614f5d72df8b1543a404",
+      "name": "Dna Comfort | Warehouse",
+      "slug": "dna-comfort-warehouse",
+      "location": [
+       34.767451,
+       31.602956
+      ],
+      "address": "התאנה 4 ",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "696cd94b1b4894921e2264a5",
+      "name": "Anisfeld | Warehouse",
+      "slug": "anisfeld-warehouse",
+      "location": [
+       34.921046,
+       32.275611
+      ],
+      "address": "HaOfe St 2, Kadima Zoran, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69791cc1edc80cf3431bb587",
+      "name": "Grandtech | Warehouse",
+      "slug": "grandtech-warehouse",
+      "location": [
+       34.8497791,
+       32.1534594
+      ],
+      "address": "רבי עקיבא 50, הרצליה, Israel",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69c55b636c751d49451190fd",
+      "name": "Colder Ventilation And Heating Solutions | Warehouse",
+      "slug": "colder-ventilation-and-heating-solutions-warehouse",
+      "location": [
+       35.46733239,
+       32.78637704
+      ],
+      "address": "שוהם 5 פארק תעשיות, קדמת גליל",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69d21e06eb05a74d832cbb1d",
+      "name": "Karl Louis | Warehouse",
+      "slug": "karl-louis-warehouse",
+      "location": [
+       35.0635307,
+       32.8110727
+      ],
+      "address": "המסגר 23, חיפה, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69f30bef6c98f9c4d3798da9",
+      "name": "Top Drop | Warehouse",
+      "slug": "splendo-warehouse",
+      "location": [
+       34.9339849,
+       32.5222793
+      ],
+      "address": "השעורה 23, חדרה",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "69fc430230c6e2f534b820c5",
+      "name": "Woody | Warehouse",
+      "slug": "woody",
+      "location": [
+       34.8589773,
+       32.3507277
+      ],
+      "address": "אלישמע הנרקיס 5",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a0afa4f3389424c85090a1d",
+      "name": "Plego | Warehouse",
+      "slug": "plego-warehouse",
+      "location": [
+       34.7811178,
+       32.0783351
+      ],
+      "address": "שלמה אבן גבירול 59, Tel Aviv-Yafo",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a1c39ec3aead48433a63ab1",
+      "name": "Grill Master | Warehouse",
+      "slug": "grill-master-new",
+      "location": [
+       34.8436103,
+       32.1363659
+      ],
+      "address": "טרומפלדור 10, רמת השרון",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a58e3d99f08180468760f98",
+      "name": "Comodo Bedsheets | Warehouse",
+      "slug": "comodo-bedshits-warehouse",
+      "location": [
+       34.8297599,
+       32.0823069
+      ],
+      "address": "מרדכי אנילביץ' 6, בני ברק",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "695fbb0029ddb82989a03b29",
+      "name": "RRG | Warehouse",
+      "slug": "rrg-warehouse",
+      "location": [
+       34.7947711,
+       32.0258182
+      ],
+      "address": "המכתש 6, חולון, Israel",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "693e9eea61c3fb4fa31a5665",
+      "name": "Green Toys | Warehouse",
+      "slug": "green-toys-warehouse",
+      "location": [
+       35.4938254,
+       32.9680096
+      ],
+      "address": "ירושלים 75 צפת",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6481888c93decb8fa0980fde",
+      "name": "HaContainer | All Sizes",
+      "slug": "hacontainer-self-delivery",
+      "location": [
+       34.8265043,
+       32.111385
+      ],
+      "address": "מטודלה בנימין 30, תל אביב",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "69791a9e325084dafe97f270",
+      "name": "Boom Bam Tamburia | Warehouse",
+      "slug": "boom-bam-tamburia-warehouse",
+      "location": [
+       34.7646649,
+       32.0179138
+      ],
+      "address": "אילת 36, חולון, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69e49981ec1d5f43c217f245",
+      "name": "Bradex | Warehouse",
+      "slug": "bradex-warehouse",
+      "location": [
+       35.0409597,
+       32.7897321
+      ],
+      "address": "יוחנן סנדלר 18, חיפה",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69e5f2c0c45c33d19c2e2150",
+      "name": "Titanium Suitcases | Warehouse",
+      "slug": "titanium-suitcases-warehouse",
+      "location": [
+       34.7732192,
+       32.0605226
+      ],
+      "address": "דרך יפו 56, Tel Aviv-Yafo",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69aec0c3e104be52144af1dc",
+      "name": "Linenz | Warehouse",
+      "slug": "linenz-warehouse",
+      "location": [
+       34.602305,
+       31.556197
+      ],
+      "address": "קיבוץ אור הנר, Or HaNer, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69e5eaaac45c33d19c2e2144",
+      "name": "TimBer Design | Warehouse",
+      "slug": "timber-design-warehouse",
+      "location": [
+       34.655314,
+       31.804381
+      ],
+      "address": "נחלה, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69244456374160278db7871b",
+      "name": "Lamer | Warehouse",
+      "slug": "lamer-warehouse",
+      "location": [
+       34.7634189,
+       32.060865
+      ],
+      "address": "כל ישראל חברים 4 תל אביב",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69020063d900a20a8c2b0e8c",
+      "name": "Baby Stav | Warehouse",
+      "slug": "baby-stav-warehouse",
+      "location": [
+       34.8545994,
+       32.3281821
+      ],
+      "address": "קראוזה 1 נתניה",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6918e991e60a59693ac789ea",
+      "name": "Hilis | Warehouse",
+      "slug": "hilis-warehouse",
+      "location": [
+       34.90764887211847,
+       32.17447939365347
+      ],
+      "address": "נחשון 13 כפר סבא",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6926cf40e0c4157374993686",
+      "name": "Mommy Hugs | Warehouse",
+      "slug": "mommy-hugs-warehouse",
+      "location": [
+       34.7033743,
+       31.79836989999999
+      ],
+      "address": "עופרה 44/2 גן יבנה",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6935c6d7dc113b071fca5bac",
+      "name": "Camel Mountain | Warehouse",
+      "slug": "camel-mountain-warehouse",
+      "location": [
+       34.8112615,
+       31.9767285
+      ],
+      "address": "שמוטקין 19 ראשון לציון",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "693acea2b1cbc8bbb31f8e85",
+      "name": "Splendid | Warehouse",
+      "slug": "splendid-warehouse",
+      "location": [
+       34.850162,
+       32.0961576
+      ],
+      "address": "עמל 39, פתח תקווה, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "693e9b718d84fac3939e450b",
+      "name": "Winstore | Warehouse",
+      "slug": "winstore-warehouse",
+      "location": [
+       34.99437,
+       31.74736
+      ],
+      "address": "הר טוב 8, בית שמש, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "634e569b5cc604e025744cb2",
+      "name": "Pizuhei Mishel | Petah Tikva",
+      "slug": "pizuhei-mishel-petah-tikva",
+      "location": [
+       34.882034,
+       32.089658
+      ],
+      "address": "ברון הירש 8",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "695fbe74ea8cb6cc42b45131",
+      "name": "Bait Vagan | Warehouse",
+      "slug": "bait-vagan-warehouse",
+      "location": [
+       34.8390533,
+       31.8546172
+      ],
+      "address": "שדרות רוטשילד 50, מזכרת בתיה, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "692d6929611763e63006ca0f",
+      "name": "B.Decor | Warehouse",
+      "slug": "bdecor-warehouse",
+      "location": [
+       34.8094982,
+       31.860503
+      ],
+      "address": "המלך חסן השני 12, קריית עקרון, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "692b3c1a55afa7ec1f9bdea1",
+      "name": "Sportsale | Warehouse",
+      "slug": "sportsale-warehouse",
+      "location": [
+       34.8098241,
+       32.0789328
+      ],
+      "address": "בורוכוב 54, גבעתיים, Israel",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "693acbaa9aff9ebcc3a9ad98",
+      "name": "DECOROZ | Warehouse",
+      "slug": "decoroz-warehouse",
+      "location": [
+       34.66064097512958,
+       31.811037490033698
+      ],
+      "address": "האורגים 11, אשדוד",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "690b40220cdcf18b76fed37d",
+      "name": "Burman | Warehouse",
+      "slug": "borman-warehouse",
+      "location": [
+       35.0573764,
+       32.8224645
+      ],
+      "address": "האיצטדיון 21 חיפה",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "692b3aa8fbadffb5365178d7",
+      "name": "Eden David Group | Warehouse",
+      "slug": "eden-david-group-warehouse",
+      "location": [
+       34.8350518,
+       32.0010871
+      ],
+      "address": "הרימון 15, פדיה, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "693561dde988612ad9268941",
+      "name": "KEISAR | Warehouse",
+      "slug": "keisar-warehouse",
+      "location": [
+       34.8554537,
+       32.0929291
+      ],
+      "address": "זבוטינסקי 110",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6935945b9acfff5f14b2a5c4",
+      "name": "iRobot | Warehouse",
+      "slug": "irobot-warehouse",
+      "location": [
+       34.968918,
+       32.1173916
+      ],
+      "address": "לב בארץ 2 כפר קאסם",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "693ad02f0ffe5920fadf50ed",
+      "name": "Dil Hadilim | Warehouse",
+      "slug": "dil-hadilim-warehouse",
+      "location": [
+       34.8143517,
+       32.1598035
+      ],
+      "address": "נתיבות 3, הרצליה, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "693e7d7461c3fb4fa31a565d",
+      "name": "Ulike | Warehouse",
+      "slug": "ulike-warehouse",
+      "location": [
+       34.8953259,
+       32.1060057
+      ],
+      "address": "יחיאל דרזנר9",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "693e8f0b8b5959f1f6070d19",
+      "name": "Computer On-line | Warehouse",
+      "slug": "computer-on-line-warehouse",
+      "location": [
+       35.0113001,
+       31.8962749
+      ],
+      "address": "עמק החולה 76, מודיעין מכבים רעות, Israel",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6951062d66bd8777d9ec3989",
+      "name": "De Kas Paris | Warehouse",
+      "slug": "de-kas-paris-warehouse",
+      "location": [
+       34.7750645,
+       32.0948193
+      ],
+      "address": "ירמיהו 16, תל אביב יפו",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "698342dfd91bc23ca90b96bd",
+      "name": "Bissell | Warehouse",
+      "slug": "bissell-warehouse",
+      "location": [
+       34.964767,
+       31.887884
+      ],
+      "address": "האופה 8 מודיעין",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "699c10fb392be56354761f12",
+      "name": "Anker | Warehouse",
+      "slug": "anker-warehouse",
+      "location": [
+       34.964767,
+       31.887884
+      ],
+      "address": "האופה 8 מודיעין",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69d23794651b0c9240af9766",
+      "name": "Nutricook | Warehouse",
+      "slug": "nutricook-warehouse",
+      "location": [
+       34.964767,
+       31.887884
+      ],
+      "address": "האופה 8 מודיעין, 8973212",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a573da81f0e061662b7d4a0",
+      "name": "HB Dead Sea Cosmetics | Warehouse",
+      "slug": "hb-dead-sea-cosmetics",
+      "location": [
+       34.8577427,
+       32.094594
+      ],
+      "address": "אריה שנקר 16 ",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6981d9a35a199b63060af854",
+      "name": "Numii | Warehouse",
+      "slug": "numii-warehouse",
+      "location": [
+       34.8141032,
+       32.0552241
+      ],
+      "address": "גולני 23 רמת גן",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a4fa1e93856cdca2cc976df",
+      "name": "Tera Market | Warehouse",
+      "slug": "tera-market",
+      "location": [
+       34.7749342,
+       32.0751211
+      ],
+      "address": "דיזינגוף 50 - דיזנגוף סנטר, קומה מינוס 4 בחניון של הקניון.",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "69e4961dc726d11bb0b36b85",
+      "name": "Brightcom | Warehouse",
+      "slug": "brightcom-warehouse",
+      "location": [
+       34.841903,
+       32.249196
+      ],
+      "address": "קיבוץ יקום, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a02cfbd4c99e8b85ac606de",
+      "name": "OIG | Warehouse",
+      "slug": "oig-1",
+      "location": [
+       34.964534,
+       31.886403
+      ],
+      "address": "הגנן 8 ",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a1c263ca409693176459e9c",
+      "name": "Tineco | Warehouse",
+      "slug": "tineco-warehouse",
+      "location": [
+       34.964534,
+       31.886403
+      ],
+      "address": "הגנן 8, Modi'in-Maccabim-Re'ut",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a0aad02a84130f6ad2e44a9",
+      "name": "Baby Tech | Warehouse",
+      "slug": "byyby-tq",
+      "location": [
+       34.78406,
+       31.8883662
+      ],
+      "address": "קלמן גבריאלוב 41 רחובות",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "6a4e1f29352255615def14c5",
+      "name": "Champion Sport | Warehouse",
+      "slug": "z-mpywn-spwrt",
+      "location": [
+       35.5397929,
+       32.7891593
+      ],
+      "address": "העצמאות 5 ",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "5ee9c20a78addcfef8ab7386",
+      "name": "Yellow Market | Petah Tikva Stadium",
+      "slug": "yellow-market-petah-tikva-stadium",
+      "location": [
+       34.875336,
+       32.09825
+      ],
+      "address": "אבשלום גיסין 37",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": true,
+      "delivers": true
+     }
+    },
+    {
+     "venue": {
+      "id": "66b1ce8373d28b639a3e5b1b",
+      "name": "Mifgash Psagot",
+      "slug": "mifgash-psagot",
+      "location": [
+       34.96641687,
+       32.08447457
+      ],
+      "address": "הרב שבזי 180 ראש העין",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6576d161608e6c09be0c0e54",
+      "name": "King Store | Rosh Haayin",
+      "slug": "king-store-rosh-haayin",
+      "location": [
+       34.949539,
+       32.111672
+      ],
+      "address": "קינג סטור כפר קאסם",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "65af9c58e895c470fe3eb763",
+      "name": "Victory | Rosh Ha'ayin Park Afek",
+      "slug": "victory-rosh-haayin-park-afek",
+      "location": [
+       34.964299,
+       32.108179
+      ],
+      "address": "רחוב העמל 2 פארק התעשייה אפק, ראש העין",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68c2de8051891121641ccf69",
+      "name": "Roladin | KQ",
+      "slug": "roldin-kfar-kasem",
+      "location": [
+       34.9694886,
+       32.1170691
+      ],
+      "address": "א- סולטאני 5, כפר קאסם",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6846c439813000ebeb979157",
+      "name": "Bingo",
+      "slug": "bingo1",
+      "location": [
+       34.9604446,
+       32.1016407
+      ],
+      "address": "דרך הציונות 18, ראש העין",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6857bdd1d05bf179c1a60d6c",
+      "name": "Biscotti | Rosh HaAyin",
+      "slug": "biscotti-rosh-haayin",
+      "location": [
+       34.97848245,
+       32.08622761
+      ],
+      "address": "זהרה אלפסיה 1, ראש העין",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6475f16879b711f39a180292",
+      "name": "Shufersal | Rosh Ha’ayin",
+      "slug": "shufersal-rosh-haayin",
+      "location": [
+       34.96668784,
+       32.08459558
+      ],
+      "address": "שבזי 187 ראש העין",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6316fc4136acdb09593966cc",
+      "name": "Bazaar Hamashkaot | Rosh Ha'ayin",
+      "slug": "bazar-hamashkaot-rosh-haain",
+      "location": [
+       34.979389,
+       32.085586
+      ],
+      "address": "ניסים אלוני 2, ראש העין",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6315c7a3f00f9e43ec812476",
+      "name": "Rami Levy In The Neighborhood | Rosh Haayin",
+      "slug": "rami-levy-in-the-neighborhood-rosh-haayin",
+      "location": [
+       34.941845,
+       32.0983791
+      ],
+      "address": "הרב שלום שבזי 12, ראש העין, Israel",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6396cf39430c8e99b3e7a0ed",
+      "name": "The Secret Flower",
+      "slug": "haperach-hasodi",
+      "location": [
+       34.8818009,
+       32.0895211
+      ],
+      "address": "הברון הירש 14, פתח תקווה",
+      "product_line": "florist",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68e628a2728dcf78ae3d5eab",
+      "name": "Boutique Zohour",
+      "slug": "boutique-zohour-kfar-qasem",
+      "location": [
+       34.96103509,
+       32.11675479
+      ],
+      "address": " 4X96+2QC אבן רושד 3 כפר קאסם",
+      "product_line": "florist",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "689d9d1ea1357c9968d6850f",
+      "name": "Super Alonit | Kibbutz Einat",
+      "slug": "super-alonit-kibbutz-einat",
+      "location": [
+       34.9436097,
+       32.0892045
+      ],
+      "address": "סופר אלונית קיבוץ עינת",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "618cfda6a5519f6e439c45be",
+      "name": "123 Alcohol & Wine | Kiryat Ono",
+      "slug": "123-alcohol-kiryat-ono",
+      "location": [
+       34.8595791,
+       32.0536366
+      ],
+      "address": "רחוב הגפן 1 קרית אונו",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "67bf6c20d4736546b9a521b8",
+      "name": "Carrefour | Rosh Haayin",
+      "slug": "carrefour-rosh-haayin",
+      "location": [
+       34.942344,
+       32.1050615
+      ],
+      "address": "Yehoshu'a Bin Nun St 77, Rosh Haayin",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a39494fe5c602f1bfd78822",
+      "name": "Super Haviv | Rosh HaAyin",
+      "slug": "super-haviv-rosh-haayin",
+      "location": [
+       34.97206194,
+       32.0844027
+      ],
+      "address": "הרב שלום שבזי 203, ראש העין, Israel",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68cfe279c834c7e6cc2cd521",
+      "name": "Kliyat Alarbe | KQ",
+      "slug": "kliyat-alarbe",
+      "location": [
+       34.9737969,
+       32.1114875
+      ],
+      "address": "4X6F+HGV כפר קאסם, עומר אבן אלחטאב",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "5f043097a9039910de1a7f0a",
+      "name": "Haofeh Mi'Baghdad Ariel | Petah Tikva",
+      "slug": "haofeh-mibaghdad-petah-tikva",
+      "location": [
+       34.892805,
+       32.106185
+      ],
+      "address": "בן ציון גליס 30 ",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "630cc41a69eb0aff948a1d53",
+      "name": "Boutique Central | Rosh Ha'ayin",
+      "slug": "boutique-central-rosh-haain",
+      "location": [
+       34.967076,
+       32.084829
+      ],
+      "address": "Ha-Rav Shalom Shabazi St 187 Rosh Haayin",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a2ea53615abbb39baa92edd",
+      "name": "Alcohol Ba'ir | Em HaMoshavot",
+      "slug": "alcohol-bair-sharonim",
+      "location": [
+       34.87559681,
+       32.09821229
+      ],
+      "address": "אבשלום גיסין 37",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "659177114f37886c54c76f35",
+      "name": "Matok Ba'mitzpe",
+      "slug": "matok-bamitzpe",
+      "location": [
+       34.9587155,
+       32.0872122
+      ],
+      "address": "שילה 99 ראש העין",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "65a3b442e27022401bd9060b",
+      "name": "Jungle | Rosh Ha'ayin",
+      "slug": "jungle-rosh-haayin",
+      "location": [
+       34.9557806,
+       32.1079831
+      ],
+      "address": "אזור תעשייה לב הארץ, הזית, ראש העין, ישראל",
+      "product_line": "pet_supply",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "655e0143519f95aa12f38394",
+      "name": "Noy Hasade | Rosh Ha'ayin | Kosher",
+      "slug": "noy-hasade-rosh-haayin",
+      "location": [
+       34.9781764,
+       32.0813268
+      ],
+      "address": "הרב שלום שבזי 229, Rosh Haayin, Israel",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "649411bd60dd391059d771b7",
+      "name": "Roses Flowers | Petah Tikva",
+      "slug": "roses-flowers-petach-tikva",
+      "location": [
+       34.88642712,
+       32.08950041
+      ],
+      "address": "חיים עוזר 7",
+      "product_line": "florist",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "63071c62471681bd2b40886a",
+      "name": "La Fleur Boutique Flowers | Rosh Ha’ayin",
+      "slug": "la-fleur-boutique-rosh-haayin",
+      "location": [
+       34.973499,
+       32.093397
+      ],
+      "address": "בזק 1 ראש העין",
+      "product_line": "florist",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "679225c3bc0c147f6d9b4f1b",
+      "name": "Ari׳s Drinks | Rosh Haayin",
+      "slug": "aris-drinks-rosh-haayin",
+      "location": [
+       34.938818,
+       32.107633
+      ],
+      "address": "היצירה 11 ראש העין",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "66f4e87bc0cdae730c61c313",
+      "name": "Sweetime | Rosh HaAyin",
+      "slug": "sweetime-rosh-haain",
+      "location": [
+       34.978215,
+       32.086466
+      ],
+      "address": "שייקה אופיר 3",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "5f0db89c865db0c6d24bba56",
+      "name": "Kiortosh | Petah Tikva | Kosher",
+      "slug": "kiortosh",
+      "location": [
+       34.886947,
+       32.107518
+      ],
+      "address": "Ben Tsiyon Galis St 57",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6731b063dadf22029594bfe4",
+      "name": "ZooEretZoo | Rosh Ha'ayin",
+      "slug": "zooeretzoo-rosh-haayin",
+      "location": [
+       34.963563,
+       32.084659
+      ],
+      "address": "שבזי 172 ראש העין",
+      "product_line": "pet_supply",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "650c17402dee1631d359a65d",
+      "name": "Irit Flowers | Petah Tikva",
+      "slug": "irit-flowers-petach-tikva",
+      "location": [
+       34.886229,
+       32.094528
+      ],
+      "address": "זאב אורלוב 74 ",
+      "product_line": "florist",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "69f1c2f83812d7aa0ec4bcc8",
+      "name": "Bana Mashkaot | Rosh Haayin",
+      "slug": "bana-mashkaot-rosh-haayin",
+      "location": [
+       34.941854,
+       32.098432
+      ],
+      "address": "הרב שלום שבזי 12, Rosh Haayin",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "657ae2f6a6da8f2e19f9d1f0",
+      "name": "Good Pharm | Gissin",
+      "slug": "good-pharm-petah-tikva",
+      "location": [
+       34.88258,
+       32.0979
+      ],
+      "address": "Avshalom Gissin Street 15, Petah Tikva, Israel",
+      "product_line": "pharmacy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "693aa8722af8e54c260e7326",
+      "name": "Olam Haprachim Shel Shirel",
+      "slug": "olam-hafrachim-shel-shirel",
+      "location": [
+       34.8824486,
+       32.0898856
+      ],
+      "address": "הברון הירש 3 פתח תקווה ",
+      "product_line": "florist",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "630df96f13f64937a90965a9",
+      "name": "Meitav Habesarim | Rosh Ha’ayin",
+      "slug": "meitav-habesarim-rosh-haayin",
+      "location": [
+       34.967031,
+       32.08463
+      ],
+      "address": "הרב שלום שבזי 187 ראש העין",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6534f32dff883c98baea8e1a",
+      "name": "Be Pharm | Segula 💊",
+      "slug": "be-pharm-segula",
+      "location": [
+       34.895548,
+       32.100925
+      ],
+      "address": "HaRav Pinto Mas'ud Asher Street 20, Petah Tikva, Israel",
+      "product_line": "pharmacy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "697b69d3a7fea848d9e70b34",
+      "name": "Prachim Beclick | Kiryat Ono",
+      "slug": "123-flowers-kiryat-ono",
+      "location": [
+       34.85975826,
+       32.05368831
+      ],
+      "address": "רחוב הגפן 1, קרית אונו, Israel",
+      "product_line": "florist",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6671a23e343f49792e1c7770",
+      "name": "SMOK SHOP",
+      "slug": "star-bangs",
+      "location": [
+       34.88250846703778,
+       32.08865367677494
+      ],
+      "address": "סלור 4, פתח תקווה",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "608fccf544c7cd4223d6da89",
+      "name": "BeerZ | Petah Tikva",
+      "slug": "beerz-petah-tikva",
+      "location": [
+       34.8853811,
+       32.0930708
+      ],
+      "address": "Frumkin St 15 Petah Tikva",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68ca9a4fc5ba53403b28acc4",
+      "name": "Laline | Rosh Ha'ayin",
+      "slug": "laline-rosh-haayin",
+      "location": [
+       34.9798775,
+       32.0860825
+      ],
+      "address": "יגאל אלון 22 ראש העין",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "666ee24562b9200b531a277e",
+      "name": "Pizuhei Hamama | Rosh Haayin",
+      "slug": "pizuhei-hamama-rosh-haayin",
+      "location": [
+       34.978553818743904,
+       32.08093876115191
+      ],
+      "address": "שבזי 231 ראש העין",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "678f433a06aa8371f376b8f3",
+      "name": "Iraqi Butchery | Rosh Ha'ayin",
+      "slug": "iraqi-butchery-kfar-saba",
+      "location": [
+       34.9557196,
+       32.10777
+      ],
+      "address": "הזית 6 ראש העין",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6399a2922093cdb95e0b8783",
+      "name": "Mitukit Flowers",
+      "slug": "mitokit",
+      "location": [
+       34.891948,
+       32.061036
+      ],
+      "address": "האילנות 29, כפר מעש",
+      "product_line": "florist",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "63fdd3a1a1a4c5f6aa31441d",
+      "name": "Tiv Ta'am | Petah Tikva",
+      "slug": "tiv-taam-petah-tikva",
+      "location": [
+       34.881226,
+       32.089325
+      ],
+      "address": "רחוב רוטשילד 57 פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68d9310dc6c82d20d31686c7",
+      "name": "Super Tal | Bar Kochva",
+      "slug": "super-tal-bar-kochva-petah-tikva",
+      "location": [
+       34.8859951,
+       32.091542
+      ],
+      "address": "בר כוכבא 16, פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "60129e061e8be07f2de8bc23",
+      "name": "Prihat Hasachlav",
+      "slug": "prihat-hasahlav",
+      "location": [
+       34.855879,
+       32.072555
+      ],
+      "address": "This is a virtual venue",
+      "product_line": "florist",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "67b4558b4d772261e9b0df12",
+      "name": "ACE | Petach Tikva",
+      "slug": "ace-petach-tikva",
+      "location": [
+       34.89383919,
+       32.10094465
+      ],
+      "address": "הרב פינטו מסעוד אשר 20 פתח תקווה",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "668ad6c4cc92cb5c80347f96",
+      "name": "Maor Balloons",
+      "slug": "maor-balloons",
+      "location": [
+       34.902698,
+       32.079234
+      ],
+      "address": "אליעזר פרידמן 9 פתח תקווה",
+      "product_line": "florist",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "69b1f412dded409647968224",
+      "name": "Bread Station | Rosh Ha'ayin",
+      "slug": "bread-station-rosh-haayin",
+      "location": [
+       34.973875,
+       32.0926901
+      ],
+      "address": "קניון לב, אפק מבצע בזק 1, ראש העין",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "62f3906012ac6e030a79d96e",
+      "name": "Home Game | Kiryat ono",
+      "slug": "home-game-kiryat-ono",
+      "location": [
+       34.864414,
+       32.069397
+      ],
+      "address": "הדובדבן 7, קריית אונו",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "65ca03662f16f62679f5c729",
+      "name": "Icon King Smoke",
+      "slug": "icon-king-smoke",
+      "location": [
+       34.8849707,
+       32.0900536
+      ],
+      "address": "יהודה לייב פינסקר 2 פתח תקווה",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "64ad8c2044f3186b5700460b",
+      "name": "SAY FLOWERS",
+      "slug": "ba-li-baloon",
+      "location": [
+       34.885597,
+       32.090502
+      ],
+      "address": "בר כוכבא 1 פתח תקווה",
+      "product_line": "florist",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "614e31b1d3bfea6acf2f3826",
+      "name": "Wine In The City | Petah Tikva",
+      "slug": "yayin-bair-herzliya",
+      "location": [
+       34.8855076,
+       32.0936469
+      ],
+      "address": "בר כוכבא פינת תל חי 19 פתח תקווה",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a7301e10f666aeab7b31d84",
+      "name": "Keshet Teamim | Petah Tikva",
+      "slug": "keshet-teamim-petah-tikva",
+      "location": [
+       34.89427849,
+       32.10106464
+      ],
+      "address": "הרב פינטו מסעוד אשר 19, פתח תקווה, Israel",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6703c89595536c2cf6e08f08",
+      "name": "Anipet | Yehud",
+      "slug": "anipet-yehud",
+      "location": [
+       34.899905,
+       32.026025
+      ],
+      "address": "Altalef St 4, Yehud-Monosson, Israel",
+      "product_line": "pet_supply",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "61efd5c2d05d049293858635",
+      "name": "Toys R' Us | Petah Tikva",
+      "slug": "toys-r-us-petach-tikva",
+      "location": [
+       34.865194,
+       32.092795
+      ],
+      "address": "Zeev Jabotinsky Street 72, פ'ת",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "62933ecf84695012f44f13ee",
+      "name": "Nestle Ice Cream | Kiryat Ono",
+      "slug": "nestle-ice-cream-kiryat-ono",
+      "location": [
+       34.8595791,
+       32.0536366
+      ],
+      "address": "רחוב הגפן 1 קרית אונו",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "5f84347c30dea6aa28e14eac",
+      "name": "Shemesh Fruits | Kosher",
+      "slug": "shemesh-fruits",
+      "location": [
+       34.8888225596682,
+       32.09262954952878
+      ],
+      "address": "שטמפפר 59, פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "66af84a5efb60b61a1cd2758",
+      "name": "Dealcosmetics | Petach Tikva",
+      "slug": "dealcosmetics-petach-tikva",
+      "location": [
+       34.870897,
+       32.074162
+      ],
+      "address": "העצמאות 63, פתח תקווה",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "67bda8625a20822c56960205",
+      "name": "Home & More | Petah Tikva",
+      "slug": "home-more-petah-tikva",
+      "location": [
+       34.891955,
+       32.061037
+      ],
+      "address": "האילנות 29, Kfar Ma'as, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a5f75c065e64ed934c5d343",
+      "name": "Urban Pet | Rosh Haayin",
+      "slug": "urban-pet-rosh-haayin",
+      "location": [
+       34.939885,
+       32.105824
+      ],
+      "address": "המרץ 11 ראש העין",
+      "product_line": "pet_supply",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68aa16d856578f789bce0ee7",
+      "name": "Partycool | Petah Tikva",
+      "slug": "partycool-petah-tikva",
+      "location": [
+       34.881157,
+       32.0980922
+      ],
+      "address": "אבשלום גיסין 10, פתח תקווה",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "65ca500f2f16f62679f5c7d1",
+      "name": "Smoking & Drink",
+      "slug": "smoking-drink",
+      "location": [
+       34.864186,
+       32.056235
+      ],
+      "address": "הכלנית 17 קריית אונו",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "65f06e9547092a5052da2703",
+      "name": "Tamburia Ba'ir | Petah Tikva",
+      "slug": "tamburia-bair-petah-tikva",
+      "location": [
+       34.870998,
+       32.074069
+      ],
+      "address": "העצמאות 63 פתח תקווה",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "69710062bba025e47badd1da",
+      "name": "Magnolia | Petah Tikva",
+      "slug": "magnolia-petah-tikva",
+      "location": [
+       34.9025999,
+       32.0794457
+      ],
+      "address": "אלעזר פרידמן 9 פתח תקווה",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "652e5b64546532424d0f6674",
+      "name": "Mashkaot Haturki | Petah Tikva",
+      "slug": "mashkaot-haturki-petah-tikva",
+      "location": [
+       34.8816998,
+       32.0909683
+      ],
+      "address": "David Meir Guttman, 7",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a3282b8a50f80b35fb0c7a1",
+      "name": "Hamakolet | Kfar Sirkin",
+      "slug": "hamakolet-kfar-sirkin",
+      "location": [
+       34.92461699,
+       32.07668415
+      ],
+      "address": "הבנים 12 כפר סירקין",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "631d8897b4f1097ac0df6c76",
+      "name": "Sabon | Petah Tikva",
+      "slug": "sabon-petach-tikva",
+      "location": [
+       34.8655205,
+       32.0930217
+      ],
+      "address": "זאב ז'בוטינסקי 72, פתח תקווה",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "63b595e5412d6b6a9fcdd84c",
+      "name": "Beyad Rehava",
+      "slug": "beyad-rehava",
+      "location": [
+       34.952645,
+       32.0880017
+      ],
+      "address": "הרב שלום שבזי 129 ראש העין",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6728d110606f8b3678fd7fd8",
+      "name": "Yasmin Gallery",
+      "slug": "yasmin-gallery",
+      "location": [
+       34.8822393,
+       32.0978653
+      ],
+      "address": "אבשלום גיסין 15",
+      "product_line": "florist",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "690871a9cdb5d22c5f69958d",
+      "name": "Park Hatza'atzu'im | Rosh Ha'ain",
+      "slug": "park-hatzaatzuim-rosh-haain",
+      "location": [
+       34.979831,
+       32.085473
+      ],
+      "address": "ניסים אלוני 4 ראש העין",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "659a8bd798d56e0475c3e756",
+      "name": "Maafe Neeman | Rosh HaAyin",
+      "slug": "maafe-neeman-rosh-haain",
+      "location": [
+       34.942165,
+       32.104856
+      ],
+      "address": "שלום מנצורה 1 ראש העין",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "692b32ab55afa7ec1f9bde84",
+      "name": "Traklin Hashmal | Big Yehud",
+      "slug": "traklin-hashmal-big-yehud",
+      "location": [
+       34.90096820000001,
+       32.0260333
+      ],
+      "address": "BIG ביג יהוד, אלטלף 4, Yehud-Monosson, Israel ",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "69440364d97269e65c08711a",
+      "name": "Mashtela Avney Kesem",
+      "slug": "mishtelet-avney-kesem",
+      "location": [
+       34.90290117795689,
+       32.117649358153486
+      ],
+      "address": "הירקונים 67",
+      "product_line": "florist",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a414d5ae4b1a84ec7056c09",
+      "name": "Adonit Hatavlinim | Rosh Ha'ayin",
+      "slug": "adonit-hatavlinim-rosh-ha-ayin",
+      "location": [
+       34.9773161,
+       32.0816345
+      ],
+      "address": "הרב שלום שבזי 225, ראש העין",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "677d4fee6e13206b45de845c",
+      "name": "Artisan Bread | Rosh Hayin",
+      "slug": "artisan-bread-rosh-hayin",
+      "location": [
+       34.9662319,
+       32.0928504
+      ],
+      "address": "משה דיין 4, Rosh Haayin, Israel ",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "624a9dc44780a4df52562a66",
+      "name": "SACARA | Petah Tikva",
+      "slug": "sacara-petah-tikva",
+      "location": [
+       34.9025999,
+       32.0794457
+      ],
+      "address": "אלעזר פרידמן 9, פתח תקווה",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "67345ce95ca7d02a2756f934",
+      "name": "Hayevuan Wine & Alcohol | Kiryat Ono",
+      "slug": "hayevuan-kiryat-ono",
+      "location": [
+       34.864779,
+       32.035971
+      ],
+      "address": "השדרה האקדמית 2 קרית אונו",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "69b1949ac52d04d41d3d16bf",
+      "name": "Home Center | Petah Tikva Yachin Center",
+      "slug": "home-center-petah-tikva-yachin-center",
+      "location": [
+       34.8600023,
+       32.0879003
+      ],
+      "address": "Shacham St 17, Petah Tikva",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68244e3c7474fc95ea8e0a17",
+      "name": "My Tamburia | Ganey Tikva",
+      "slug": "my-tamburia-ganey-tikva",
+      "location": [
+       34.87570789,
+       32.06533281
+      ],
+      "address": "דרך ההדרים 7, פתח תקווה",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "69305efa3bc34b7870484c42",
+      "name": "Hagan Shel Nitai | Rosh Ha'ayin",
+      "slug": "hagan-shel-nitai-rosh-haayin",
+      "location": [
+       34.97335793,
+       32.09349986
+      ],
+      "address": "מבצע בזק 1, ראש העין",
+      "product_line": "florist",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68e6414a70158c69399e9e5f",
+      "name": "Delta | Em Hamoshavot",
+      "slug": "delta-em-hamoshavot",
+      "location": [
+       34.8807369,
+       32.0981741
+      ],
+      "address": "מרכז רום - אם המושבות - פתח תקווה, Ya'el Rom Street 8, Petah Tikva, Israel",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "66a0df51d0a1af429c46ac06",
+      "name": "Mashkaot Mendelson | Petah Tikva",
+      "slug": "mashkaot-mendelson-petah-tikva",
+      "location": [
+       34.8838262,
+       32.0894319
+      ],
+      "address": "סלור 19, פתח תקווה",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "675ed3782e1c8211dd0250a0",
+      "name": "Perach Lee | Or Yehuda",
+      "slug": "perach-lee-or-yehuda",
+      "location": [
+       34.8568,
+       32.030966
+      ],
+      "address": "חיים בר לב 10 אור יהודה",
+      "product_line": "florist",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "66682503d9a87f3b4d50911e",
+      "name": "Lugasi Bakery | Petah Tikva",
+      "slug": "lugasi-bakery-petah-tikva",
+      "location": [
+       34.882442,
+       32.087952
+      ],
+      "address": "מונטיפיורי 13, Petah Tikva, Israel",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "64aa9a1a36283918da2d392f",
+      "name": "Feldman Ice Cream | Petah Tikva",
+      "slug": "feldman-ice-cream-petah-tikva",
+      "location": [
+       34.8956129,
+       32.103577
+      ],
+      "address": "בן ציון גליס 14, פתח תקווה, Israel",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "67d455c39a0da37373458e53",
+      "name": "Tsomet Sfarim | Petah Tikva",
+      "slug": "tsomet-sfarim-petach-tikva",
+      "location": [
+       34.865923,
+       32.093272
+      ],
+      "address": "ז‘בוטינסקי 72, פתח תקווה",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "65f7107bf440b57b8b019c07",
+      "name": "YOLO | Ganei Tikva",
+      "slug": "yolo-kiryat-ono",
+      "location": [
+       34.875352,
+       32.065441
+      ],
+      "address": "צים אורבן גני תקווה",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "682b808e825693be8b1dc5cf",
+      "name": "Jiggeria Cocktails | Kiryat Ono",
+      "slug": "jiggeria-cocktails-kiryat-ono",
+      "location": [
+       34.8595791,
+       32.0536366
+      ],
+      "address": "This is a virtual venue",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "671e364131bd842ce8712f2d",
+      "name": "Pet Max | Petah Tikva",
+      "slug": "pet-max-petah-tikva",
+      "location": [
+       34.8699868,
+       32.0742854
+      ],
+      "address": "העצמאות 65 פתח תקווה",
+      "product_line": "pet_supply",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "66c5d590a384dc16050de346",
+      "name": "Olam Hasear",
+      "slug": "olam-hasear",
+      "location": [
+       34.8876163,
+       32.0915374
+      ],
+      "address": "שטמפפר יהושע 43 פתח תקווה",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "66c32ff8776a400b1531837c",
+      "name": "Ve-ahavta | Petah Tikva",
+      "slug": "ve-ahavta-petah-tikva",
+      "location": [
+       34.8655205,
+       32.0930217
+      ],
+      "address": " זאב ז׳בוטינסקי 72  פתח תקווה",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "674343217c561f6c9fb0b92e",
+      "name": "FOX Home | Rosh Ha'ayin",
+      "slug": "fox-home-rosh-haayin",
+      "location": [
+       34.9797862,
+       32.0861211
+      ],
+      "address": "יגאל אלון 22, ראש העין, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6973d304aedf4497e8c4f1f7",
+      "name": "Pets Market | Kfar Ma'as",
+      "slug": "pets-market-kfar-maas",
+      "location": [
+       34.8922204,
+       32.0610853
+      ],
+      "address": "האילנות 29, כפר מעש, Israel",
+      "product_line": "pet_supply",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "66012f2e611d8a38084a6e26",
+      "name": "Chili Baby",
+      "slug": "chili-baby",
+      "location": [
+       34.885642,
+       32.086457
+      ],
+      "address": "מוהליבר 16 פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "641b018dcb8d6d4738aeef68",
+      "name": "Babka Bakery | Petach Tikva",
+      "slug": "babka-bakery-petah-tikva",
+      "location": [
+       34.88923168,
+       32.10847111
+      ],
+      "address": "הרכבת 4, פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "682e128b068bb1c1ddb347dd",
+      "name": "Anime Market | Petah Tikva",
+      "slug": "anime-market-petah-tikva",
+      "location": [
+       34.8872247,
+       32.0865486
+      ],
+      "address": "חיים עוזר 32, פתח תקווה",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "65db3b5663fef109c01d3e2c",
+      "name": "Almog Pet",
+      "slug": "almog-pet",
+      "location": [
+       34.88862481,
+       32.03183455
+      ],
+      "address": "סעדיה חתוכה 38 יהוד",
+      "product_line": "pet_supply",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a155db205cd3d5f5ee2a84c",
+      "name": "Kzir Hitim Bakery | Petah Tikva",
+      "slug": "kzir-hitim-bakery-petah-tikva",
+      "location": [
+       34.88533204951321,
+       32.091389099998736
+      ],
+      "address": "בר כוכבא 11, פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "636a1600af660dd2a8334c47",
+      "name": "Mimi Vaza Flowers | Petah Tikva",
+      "slug": "vaza-givatayim",
+      "location": [
+       34.8680892,
+       32.0969053
+      ],
+      "address": "בזל 16 פתח תקווה",
+      "product_line": "florist",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "678655dff868aa72944bcb96",
+      "name": "Minene | Rosh Haayin",
+      "slug": "minene-rosh-haayin",
+      "location": [
+       34.9797862,
+       32.0861211
+      ],
+      "address": "יגאל אלון 22 ראש העין",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68871fbdd6e5c752a48d4850",
+      "name": "L.E.N PC | LEN Computers",
+      "slug": "len-pc-len-computers",
+      "location": [
+       34.9658883,
+       32.1087238
+      ],
+      "address": "העמל 5, בית 35, ראש העין",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "697b0e0ee217f20ffe6f93a0",
+      "name": "Bait VeGan BaShdera",
+      "slug": "bait-vegan-bashdera",
+      "location": [
+       34.859043567939466,
+       32.04076000230056
+      ],
+      "address": "שדרות יצחק שמיר 3, אור יהודה",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "63106da174cdfe828ec30601",
+      "name": "Shuk Bair | Rosh Ha'ayin",
+      "slug": "shuk-bair-rosh-haain",
+      "location": [
+       34.95263914,
+       32.08792718
+      ],
+      "address": "הרב שלום שבזי 129 ראש העין",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "676c2ef6380a333b40a8f9fe",
+      "name": "Alma flowers | Ganey Tikva",
+      "slug": "alma-flowers-ganey-tikva",
+      "location": [
+       34.868965,
+       32.0572
+      ],
+      "address": "הגליל 78, גני תקווה, Israel",
+      "product_line": "florist",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "673c58ad2ea69833a0f0d937",
+      "name": "Meshek Basar | Petah Tikva",
+      "slug": "meshek-basar-petah-tikva",
+      "location": [
+       34.882884,
+       32.097577
+      ],
+      "address": " אבשלום גיסין 17 פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "654b6ab49c5ee774fdec52a0",
+      "name": "Bustan | Rosh Ha'ayin",
+      "slug": "bustan-rosh-haayin",
+      "location": [
+       34.97958,
+       32.085526
+      ],
+      "address": "ניסים אלוני 2 ראש העין",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "63eba1e9161d5afd5f04135c",
+      "name": "Hashmal Neto | Petah Tikva",
+      "slug": "hashmal-neto-petah-tikva",
+      "location": [
+       34.860677,
+       32.087354
+      ],
+      "address": "שחם 17, פתח תקווה",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "699bfda3392be56354761ece",
+      "name": "Graphos | Givat Shmuel",
+      "slug": "graphos-givat-shmuel",
+      "location": [
+       34.8545377,
+       32.0754703
+      ],
+      "address": "יוני נתניהו 35, גבעת שמואל",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68f0e6f9e2a4c788ff7c3f73",
+      "name": "Oh My Pet | Petah Tikva",
+      "slug": "oh-my-pet-petah-tikva",
+      "location": [
+       34.8824699,
+       32.0876352
+      ],
+      "address": "מונטיפיורי 20 פתח תקווה",
+      "product_line": "pet_supply",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "69e5ef9efccb4903183aeb6e",
+      "name": "Emily Style",
+      "slug": "emily-style",
+      "location": [
+       34.8839778,
+       32.0885136
+      ],
+      "address": "חובבי ציון 20, Petah Tikva",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6310a3de766fe1ab37a56038",
+      "name": "Dagei Hamoshava | Petah Tikva",
+      "slug": "dagei-hamoshava",
+      "location": [
+       34.8817354,
+       32.1040521
+      ],
+      "address": "רפאל איתן 5, פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "67cfcd76fe68d3729288d481",
+      "name": "Verde | Yehud Monosson",
+      "slug": "verde-yahud-monosson",
+      "location": [
+       34.878146,
+       32.030407
+      ],
+      "address": "דרך משה דיין 3 יהוד מונוסון",
+      "product_line": "florist",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "67879d879a902d3fe3597397",
+      "name": "Office Depot | Kiryat Ono",
+      "slug": "office-depot-kiryat-ono",
+      "location": [
+       34.862612,
+       32.055526
+      ],
+      "address": "שלמה המלך 37, קריית אונו, Israel",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "681f8293379f648e801e8e86",
+      "name": "Shefa Fruits & Vegetables | Kosher",
+      "slug": "mehadrin-fruits-vegetables",
+      "location": [
+       34.8863891,
+       32.0846534
+      ],
+      "address": "חפץ חיים 6 , פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a0b13f4cc879df33b46adc1",
+      "name": "Olam Hachayot Shel Saba | Kafr Qasim",
+      "slug": "olam-hachayot-shel-saba-kafr-qasim",
+      "location": [
+       34.9755108,
+       32.116779
+      ],
+      "address": "E-Sultani St 45, כפר קאסם",
+      "product_line": "pet_supply",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "69c2a790f873d52171e9b20b",
+      "name": "Shuk Haikar | Petah Tikva",
+      "slug": "shuk-haikar-petah-tikva",
+      "location": [
+       34.8784726,
+       32.0860587
+      ],
+      "address": "פתח תקווה, פיקא 27",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "690b528b028e66d2e498edc1",
+      "name": "Red Star | Petah Tikva",
+      "slug": "red-star-petah-tikva",
+      "location": [
+       34.8707081,
+       32.0744382
+      ],
+      "address": "קניון הכיכר, העצמאות 63, פתח תקווה",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "64a2bd449b3e895ef2145068",
+      "name": "SOHO | Rosh Ha'Ayin",
+      "slug": "soho-rosh-haayin",
+      "location": [
+       34.95181071,
+       32.10927019
+      ],
+      "address": "הדקלים 10, ראש העין",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6978f8d7325084dafe97f238",
+      "name": "Alnajah Library",
+      "slug": "alnajah-library",
+      "location": [
+       34.97657151453373,
+       32.11118885746535
+      ],
+      "address": "עומר בן אל ח'טאב, כפר קאסם, Israel",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68bf1c0a43f4788b58d9d1fb",
+      "name": "Four Twenty | Petah Tikva",
+      "slug": "four-twenty-petah-tikva",
+      "location": [
+       34.8811573,
+       32.0892131
+      ],
+      "address": "רוטשילד 57 פתח תקווה",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "67e565724ec74a698e340cdd",
+      "name": "Body Shop | Petach Tikva",
+      "slug": "body-shop-petach-tikva",
+      "location": [
+       34.9025999,
+       32.0794457
+      ],
+      "address": "אלעזר פרידמן 9, פתח תקווה",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6852b942f3d70e634d680609",
+      "name": "Had Peami | Petah Tikva",
+      "slug": "had-peami-petah-tikva",
+      "location": [
+       34.8824528,
+       32.0896046
+      ],
+      "address": "ברון הירש 14, פתח תקווה",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68b8a62fe604c9e36742cf3b",
+      "name": "Umtza Bamoshava | Butchery",
+      "slug": "umtza-bamoshava",
+      "location": [
+       34.8821695,
+       32.103258
+      ],
+      "address": "רפאל איתן 5 פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "69ee0455f1b299f782223b22",
+      "name": "Cook and Bake | Givat Shmuel",
+      "slug": "cook-and-bake-givat-shmuel",
+      "location": [
+       34.854764,
+       32.0777258
+      ],
+      "address": "יוני נתניהו 27 גבעת שמואל - מתחם עופר הגבעה",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "652529bd1b60d8f5af3517e3",
+      "name": "Nespresso | Kiryat Ono",
+      "slug": "nespresso-kiryat-ono",
+      "location": [
+       34.8595791,
+       32.0536366
+      ],
+      "address": "רחוב הגפן 1, קרית אונו",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "689474c3fc983d2d54c32e7f",
+      "name": "Shuk Bashchuna | Petah Tikva",
+      "slug": "shuk-bashkona-petah-tikva",
+      "location": [
+       34.8998117,
+       32.0817064
+      ],
+      "address": "עין גנים 96 פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "5ee86c6d3ae2dc24d550ec6e",
+      "name": "Hinnawi Wine & More | Petah Tikva",
+      "slug": "hinnawi-wine-more-petach-tikva",
+      "location": [
+       34.8756373,
+       32.0982689
+      ],
+      "address": "גיסין 37",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6620f58fe3bf5e7e999a87d0",
+      "name": "Shefa Taamim | Petah Tikva",
+      "slug": "shefa-taamim-petah-tikva",
+      "location": [
+       34.8855916,
+       32.0940788
+      ],
+      "address": "בר כוכבא 50, Petah Tikva, Israel",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "64985e5e60dd391059d77464",
+      "name": "M.A Pri Gal | Kosher",
+      "slug": "ma-pri-gal",
+      "location": [
+       34.8835631,
+       32.0898019
+      ],
+      "address": "הברון הירש 26",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a0b23d0361a2976359a13f6",
+      "name": "Alcoholi | Kiryat Ono",
+      "slug": "alcoholy-kiryat-ono",
+      "location": [
+       34.8632142,
+       32.054596
+      ],
+      "address": "שלמה המלך 38, Kiryat Ono, Israel",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68e77c89da6f69f7e8011e19",
+      "name": "Mobi Cell | Petach Tikva",
+      "slug": "mobi-cell-petach-tikva",
+      "location": [
+       34.8661266,
+       32.092592
+      ],
+      "address": "זבוטינסקי 58",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6799f687488723434e1873ae",
+      "name": "Mashbir Beauty | Petach Tikva",
+      "slug": "mashbir-v-day-pop-up-petach-tikva",
+      "location": [
+       34.8655205,
+       32.0930217
+      ],
+      "address": "רחוב זאב ז'בוטינסקי 72, Petah Tikva, Israel",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "66c46553ca15873495dbabc6",
+      "name": "Mizra Deli | Petah Tikva",
+      "slug": "mizra-deli-petah-tikva",
+      "location": [
+       34.8811573,
+       32.0892131
+      ],
+      "address": "רחוב רוטשילד 57 פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68e283e6323894caddbc96ee",
+      "name": "Spirala | KQ",
+      "slug": "spirala-kfar-kasem",
+      "location": [
+       34.96407156,
+       32.11326401
+      ],
+      "address": "עבדל קארים קאסם, Kfar Qasim, 4881000, Israel",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "62e11d0b5b39306f1bd5767c",
+      "name": "Jacobi | Petah Tikva",
+      "slug": "jacobi-petah-tiqva",
+      "location": [
+       34.847356,
+       32.096995
+      ],
+      "address": "אפעל 31 פתח תקווה",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "65f95c8a5e141749d703ce20",
+      "name": "Pireus Dagim",
+      "slug": "pireus-dagim",
+      "location": [
+       34.9108092,
+       32.0760321
+      ],
+      "address": "צלח שלום 30, מרכז מסחרי עמישב, פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "66702d786219381d984b8792",
+      "name": "Mister Phone | Tel Hashomer",
+      "slug": "mister-phone-tel-hashomer",
+      "location": [
+       34.841609,
+       32.046221
+      ],
+      "address": "מרכז רפואי שיבא, תל השומר – עיר הבריאות של ישראל, Derech Sheba, Ramat Gan, Israel",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "655f36928bab7064d8f383ef",
+      "name": "Mashbir | Petah Tikva",
+      "slug": "mashbir-petach-tikva",
+      "location": [
+       34.865682,
+       32.094148
+      ],
+      "address": "רחוב זאב ז'בוטינסקי 72, Petah Tikva, Israel",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a3d18ea7e086bd01026e9c0",
+      "name": "Samuel Fish Factory | Rosh HaAyin",
+      "slug": "samuel-fish-factory-rosh-haayin",
+      "location": [
+       34.9777031,
+       32.0815875
+      ],
+      "address": "3XJH+J3P ראש העין",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "62a04c564eabcabd7e274938",
+      "name": "Mobile Point | Kiryat Ono",
+      "slug": "mobile-point-kiryat-ono",
+      "location": [
+       34.86338,
+       32.06771
+      ],
+      "address": "דרך רפאל איתן 1 קריית אונו",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "699ebaf5454b9353d1f5df69",
+      "name": "Intima | Petah Tikva",
+      "slug": "intima-big-mall",
+      "location": [
+       34.8655205,
+       32.0930217
+      ],
+      "address": "זבוטינסקי 72, פתח תקווה",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "628b5350c6dd50ad661cfde1",
+      "name": "Boaron Butcher Shop | Petah Tikva",
+      "slug": "boaron-butcher-shop-petah-tikva",
+      "location": [
+       34.8824774,
+       32.0898145
+      ],
+      "address": "ברון הירש 16, פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "64a56463f0f3dc3f63ce778e",
+      "name": "Naaman Vardinon | Petah Tikva",
+      "slug": "naaman-vardinon-petah-tikva",
+      "location": [
+       34.8531613,
+       32.0874062
+      ],
+      "address": "מגשימים 20, פתח תקווה",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "66e94ca7ad6a806be3de6b9c",
+      "name": "Hakole Bair | Rosh Hayin",
+      "slug": "hakole-bair-rosh-hayin",
+      "location": [
+       34.9662319,
+       32.0928504
+      ],
+      "address": "Moshe Dayan 4 ראש העין",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "69772f4541d0b5ccd2acbb99",
+      "name": "Patish Ve Masmer | Petah Tikva",
+      "slug": "patish-ve-masmer-or-yehuda",
+      "location": [
+       34.8837096,
+       32.0893299
+      ],
+      "address": "סלור 23, 4936325, Petah Tikva, ISR",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "693146ef98a49c5980064c10",
+      "name": "Meshek Biton | Rinatya",
+      "slug": "meshek-biton-rinatya",
+      "location": [
+       34.931839871660515,
+       32.04368364111461
+      ],
+      "address": "דרך הרימונים 34, רינתיה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6419cb8ffe3d26477802bad0",
+      "name": "Soltam | Petah Tikva",
+      "slug": "soltam-petach-tikva",
+      "location": [
+       34.9025999,
+       32.0794457
+      ],
+      "address": "Elazar Fridman St 9, Petah Tikva, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "676c34ffb3a8e451df441554",
+      "name": "Alodie Groom",
+      "slug": "alodie-groom",
+      "location": [
+       34.8651405,
+       32.1012223
+      ],
+      "address": "גרניט 10 פתח תקווה",
+      "product_line": "pet_supply",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "63342ee49fc92d23ad857fb5",
+      "name": "Tamboria Plus | Kiryat Ono",
+      "slug": "tamboria-plus-kiryat-ono",
+      "location": [
+       34.858561,
+       32.053788
+      ],
+      "address": "Shlomo ha-Melekh St 2, Kiryat Ono",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "64c22fd5a23a05727683af4d",
+      "name": "Mira Florist | Ganei Tikva",
+      "slug": "mira-florist-ganei-tikva",
+      "location": [
+       34.87573958,
+       32.06537495
+      ],
+      "address": "דרך ההדרים 7 גני תקווה",
+      "product_line": "florist",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "655f3c2eb1d10d280fc59f6d",
+      "name": "WeShoes | Kiryat Ono",
+      "slug": "weshoes-kiryat-ono",
+      "location": [
+       34.862905,
+       32.055575
+      ],
+      "address": "Shlomo ha-Melekh St 37, Kiryat Ono",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "65f1aa60a20acc1be95ae5e6",
+      "name": "Animal Zoo | Petah Tikva",
+      "slug": "animal-zoo",
+      "location": [
+       34.884349,
+       32.090836
+      ],
+      "address": "פינסקר 23",
+      "product_line": "pet_supply",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a8196c88965ce4f23c2c9cc",
+      "name": "LIOR PASHA | Or Yehuda",
+      "slug": "lior-pasha-or-yehuda",
+      "location": [
+       34.8416812,
+       32.0307288
+      ],
+      "address": "סמטת כנרת 59, אור יהודה",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6640a12dd2794b51e5772ea7",
+      "name": "Doricoh",
+      "slug": "doricoh",
+      "location": [
+       34.8635429,
+       32.098615
+      ],
+      "address": "אימבר 14",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a3ced69022da5b0e90d2e7f",
+      "name": "Steimatzky |  Lev Ha'aretz",
+      "slug": "steimatzky-lev-haaretz",
+      "location": [
+       34.94960915,
+       32.10896047
+      ],
+      "address": "שדרות הדקלים 1, א.ת לב הארץ כפר קאסם",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "69517b246e4d6e6117a36530",
+      "name": "Pet Carnival",
+      "slug": "oded-dalal-pet",
+      "location": [
+       34.8649493,
+       32.0624145
+      ],
+      "address": "אבן עזרא 9 קרית אונו, Israel",
+      "product_line": "pet_supply",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "646337fbc229362553d97e5f",
+      "name": "Yarkan Hair",
+      "slug": "yarkan-hair",
+      "location": [
+       34.898029,
+       32.099019
+      ],
+      "address": "יונה גרין 9, פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6464d119c0ce0c6415eb3f3b",
+      "name": "Lachmanina | Petah Tikva",
+      "slug": "lahmanina-petach-tikva",
+      "location": [
+       34.881502,
+       32.098679
+      ],
+      "address": "רום יעל 8, פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6550e269273b1e00dca7efd4",
+      "name": "Rubin Shefa Basar Veoff",
+      "slug": "rubin-shefa-basar-veoff",
+      "location": [
+       34.882681,
+       32.089967
+      ],
+      "address": "ברון הירש 9 פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "5f7f1aaa9c4a29729cc6d20d",
+      "name": "Derech Hayayin | Savyon",
+      "slug": "wine-route-savyon",
+      "location": [
+       34.866807,
+       32.034013
+      ],
+      "address": "מרכז מסחרי צומת סביון, 461, Savyon",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a60a20dbb92baae56dea8bd",
+      "name": "Oligarch Perfume",
+      "slug": "oligarch-perfume",
+      "location": [
+       34.884069,
+       32.0858179
+      ],
+      "address": "ההסתדרות 4 פתח תקווה ",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "687f44c066bc3fff89f11b94",
+      "name": "ArTik plus",
+      "slug": "artik-plus",
+      "location": [
+       34.8998117,
+       32.0817064
+      ],
+      "address": "עין גנים 96 פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "69f3053fac08b24b18ca9f1d",
+      "name": "Animal Express | Ganei Tikva",
+      "slug": "animal-express-ganei-tikva",
+      "location": [
+       34.8822603,
+       32.0561677
+      ],
+      "address": "ההדרים 7, Ganei Tikva",
+      "product_line": "pet_supply",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a3bd22f3fd380f63148e8d2",
+      "name": "Golf Kids | Em Hamoshavot",
+      "slug": "golf-kids-em-hamoshavot",
+      "location": [
+       34.8756808,
+       32.0995721
+      ],
+      "address": "ראשון לציון 1, פתח תקווה, Israel",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "675ed87842fa5d78b9612176",
+      "name": "Shvil Hayain | Or Yehuda",
+      "slug": "shvil-hayain-or-yehuda",
+      "location": [
+       34.86276273,
+       32.02267606
+      ],
+      "address": "היצירה 12 אור יהודה",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6792387726640a74a5c1f086",
+      "name": "NEXTECH | Petach Tikva",
+      "slug": "nextech-petach-tikva",
+      "location": [
+       34.8754729,
+       32.0801635
+      ],
+      "address": "לוחמי הגיטו 30 פתח תקווה",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "65e84d5c22d9c4601583cc74",
+      "name": "‫Wine Man | יין ואלכוהול",
+      "slug": "wine-man",
+      "location": [
+       34.901227,
+       32.026016
+      ],
+      "address": "אלטלף 4, יהוד, Israel",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "65df24b0220b01038977a7b2",
+      "name": "Yain Bashuk | Ganei Tikva",
+      "slug": "yain-bashuk-ganei-tikva",
+      "location": [
+       34.87572859,
+       32.06535988
+      ],
+      "address": "דרך ההדרים 7 גני תקווה",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "69ef5711685693124fd474bd",
+      "name": "Hamama Bair | Petah Tikva",
+      "slug": "hamama-petah-tikva",
+      "location": [
+       34.8838428,
+       32.0978892
+      ],
+      "address": "אבשלום גיסין 7 ",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68cff313055a1feade55e779",
+      "name": "Royal Asado Butcher | KQ",
+      "slug": "royal-asado-butcher",
+      "location": [
+       34.9695469,
+       32.1160625
+      ],
+      "address": " 4X89+CRF אלשאפעי, כפר קאסם",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68e766b3ae84d80c70678936",
+      "name": "Merkaz Habsar Abu Wahed ||",
+      "slug": "merkaz-habsar-abu-wahed-baqa",
+      "location": [
+       34.9639289,
+       32.1155595
+      ],
+      "address": "עבד אל כרים קאסם, כפר קאסם, 4881000",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "66ec1f421a003f25bd62fd46",
+      "name": "Doron Min Hateva | Nehalim | Kosher",
+      "slug": "doron-min-hateva-nehalim",
+      "location": [
+       34.91260087,
+       32.06075716
+      ],
+      "address": "חרמון 19 נחלים",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a2ec404bfd935b2577052ab",
+      "name": "Bat-El Nuts & Spices | Petah Tikva",
+      "slug": "bt-l-tblynym-wpyzwhym",
+      "location": [
+       34.8872972,
+       32.0854353
+      ],
+      "address": "הרצל 37 פתח תקווה ",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "66aa6cafff364367ef0b5b61",
+      "name": "BeerBazaar | Kiryat Ono",
+      "slug": "beer-bazar-kiryat-ono",
+      "location": [
+       34.8595791,
+       32.0536366
+      ],
+      "address": "הגפן 1, קרית אונו",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "67dfb507eb7e424b02996c4b",
+      "name": "Cellular Nekuda",
+      "slug": "cellular-nekuda",
+      "location": [
+       34.859531,
+       32.0349249
+      ],
+      "address": "כרמל 3 אור יהודה",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6863f94efbbb9da061cf884a",
+      "name": "Arcosteel Kitchen | Ganei Tikva",
+      "slug": "arcosteel-kitchen-ganei-tikva",
+      "location": [
+       34.87510633,
+       32.06522405
+      ],
+      "address": "דרך ההדרים 7 גני תקווה",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6978f7a9b2a11a47d859dd8d",
+      "name": "Mobile Style | Kiryat Ono",
+      "slug": "mobile-style-kiryat-ono",
+      "location": [
+       34.8638919,
+       32.0548391
+      ],
+      "address": "שלמה המלך 40, Kiryat Ono, Israel",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6846ca6dd4e266dd3865dd2f",
+      "name": "The Sixth Sense",
+      "slug": "the-sixth-sense",
+      "location": [
+       34.91097753,
+       32.06406403
+      ],
+      "address": "דן 25 נחלים ",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "62c3e20e6ae9ad99a5402a1b",
+      "name": "Tari Bari | Petah tikva",
+      "slug": "tari-bari",
+      "location": [
+       34.88207865,
+       32.10374094
+      ],
+      "address": "Refa'el Eitan St 5",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "660abe510d1d91c82b867115",
+      "name": "M·A·C Cosmetics | Petah Tikva",
+      "slug": "mac-petah-tikva",
+      "location": [
+       34.8655205,
+       32.0930217
+      ],
+      "address": "זבוטינסקי 72, Petah Tikva, Israel",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "689a371f294b927922e646d7",
+      "name": "Shilav | Rosh HaAyin",
+      "slug": "shilav-rosh-haayin",
+      "location": [
+       34.97826502,
+       32.08651569
+      ],
+      "address": "שייקה אופיר 3, ראש העין",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68e2827f9003d867adddef9f",
+      "name": "Talk & Go | KQ",
+      "slug": "talk-go-kfar-kasem",
+      "location": [
+       34.9697215,
+       32.1170267
+      ],
+      "address": "E-Sultani St 9, Kfar Qasim, Israel",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6694e3e763758b5cce84b55e",
+      "name": "Medics Care",
+      "slug": "medics-care",
+      "location": [
+       34.8595631,
+       32.0901734
+      ],
+      "address": "תוצרת הארץ 1 פתח תקווה",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "659fbf6a2ff46d6c2f72a9ae",
+      "name": "Optica Halperin | Petah Tikva",
+      "slug": "optica-halperin-haifa",
+      "location": [
+       34.8877815,
+       32.0855073
+      ],
+      "address": "חיים עוזר 33, פתח תקווה",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "660159dceaae4c73a83f2fee",
+      "name": "417 | Petach Tikva",
+      "slug": "minus-417",
+      "location": [
+       34.8628273,
+       32.1002159
+      ],
+      "address": "אהרון ברט 12",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68f89a5a2469416d6b12521b",
+      "name": "FLOW | Ganei Tikvah",
+      "slug": "flow-ganei-tikvah",
+      "location": [
+       34.8756912,
+       32.0647022
+      ],
+      "address": "צים אורבן גני תקווה, Ganei Tikva, Israel",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "62a1bae83c446334cf7702d6",
+      "name": "Havaianas | Petah Tikva",
+      "slug": "havaianas-petach-tikva",
+      "location": [
+       34.866089,
+       32.093254
+      ],
+      "address": "זאב ז׳בוטינסקי 72 פתח תקווה",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "69aea8d0c587ab2a5e283ad4",
+      "name": "Golf & Co | Petach Tikva",
+      "slug": "golf-co-petach-tikva",
+      "location": [
+       34.8655205,
+       32.0930217
+      ],
+      "address": "ז׳בונטיסקי 72, פתח תקווה",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "681205ec7e3ae8609f55ae10",
+      "name": "Montefiore Hardware Store",
+      "slug": "montefiore-hardware-store",
+      "location": [
+       34.8606314,
+       32.0625351
+      ],
+      "address": "מונטיפיורי 20 קרית אונו",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "69afe365e910fb9e4c5d217a",
+      "name": "Imobile Israel",
+      "slug": "imobile-israel",
+      "location": [
+       34.8859937,
+       32.0280328
+      ],
+      "address": "דרך העצמאות 16, Yehud-Monosson, Israel",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "695fb34ede2781a1b379e63a",
+      "name": "PlayOn",
+      "slug": "playon",
+      "location": [
+       34.8587045,
+       32.0223575
+      ],
+      "address": "יוני נתניהו 4, אור יהודה, Israel",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68512e7b3b868ef67e041662",
+      "name": "Terminal phone",
+      "slug": "terminal-phone",
+      "location": [
+       34.8636642,
+       32.0225395
+      ],
+      "address": "מעלה המגדל 9 אור יהודה",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68d3bc43399bf2dc7a2c8af2",
+      "name": "Sea World | KQ",
+      "slug": "dage-olam-h-yam",
+      "location": [
+       34.968398,
+       32.1165633
+      ],
+      "address": "4X89+28J  עלי בן אבו טאלב 5 כפר קאסם ",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a56037d5bc1f8d63bbc41a8",
+      "name": "Be Sembol | בי סמבול",
+      "slug": "be-sembol",
+      "location": [
+       34.853306,
+       32.0967471
+      ],
+      "address": "החרש 6",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a993043e7f03ce30e3de1eb",
+      "name": "NOODY | Petah Tikva",
+      "slug": "noodyskin-petah-tikva",
+      "location": [
+       34.853306,
+       32.0967471
+      ],
+      "address": "החרש 6, פתח תקווה, Israel",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "631480ca6741954d25cf2611",
+      "name": "Victory | Rosh Ha'ayin Shabazi",
+      "slug": "victory-rosh-haayin",
+      "location": [
+       34.94284862,
+       32.09655699
+      ],
+      "address": "שבזי 26,ראש העין",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6509d8844f952952973baa3b",
+      "name": "Wine In The City | Savyon",
+      "slug": "yayin-bair-savion",
+      "location": [
+       34.876115,
+       32.049541
+      ],
+      "address": "השקמה 1 סביון",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "631ef6b77ef4e81f63ef45b0",
+      "name": "Be Pharm | Sirkin 💊",
+      "slug": "be-pharm-petah-tikva",
+      "location": [
+       34.902647,
+       32.079107
+      ],
+      "address": "אלעזר פרידמן 9",
+      "product_line": "pharmacy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "65560e83e2f4040cab6c2ac9",
+      "name": "Shufersal | Petah Tikva Sokolov",
+      "slug": "shufersal-petah-tikva-sokolov",
+      "location": [
+       34.8932413,
+       32.0912873
+      ],
+      "address": "סוקולוב 27, פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6509744a2c54e10b344766d1",
+      "name": "Bonny & Bunny | Petah Tikva",
+      "slug": "oneg-petach-tikva",
+      "location": [
+       34.891946,
+       32.061036
+      ],
+      "address": "האילנות 29, כפר מעש",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "675b152bbdbae759ac910097",
+      "name": "Roladin | Rosh Ha'ayin",
+      "slug": "roladin-rosh-haain",
+      "location": [
+       34.9797862,
+       32.0861211
+      ],
+      "address": "יגאל אלון 22 ראש העין",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6270fe643013e99858d416fb",
+      "name": "Rami Levy In The Neighborhood | Petah Tikva Stampfer",
+      "slug": "rami-levy-in-the-neighborhood-petah-tikva",
+      "location": [
+       34.8872136,
+       32.0912329
+      ],
+      "address": "שטמפפר 37, פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "67c962509b2ad33475d433d6",
+      "name": "Mimi Vaza Flowers | Kiryat Ono",
+      "slug": "mimi-vaza-flowers-kiryat-ono",
+      "location": [
+       34.857491,
+       32.055856
+      ],
+      "address": "המייסדים 3, Kiryat Ono, Israel",
+      "product_line": "florist",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "65198987f06b3b00acf34f5e",
+      "name": "Noy Hasade | Petah Tikva | Kosher",
+      "slug": "noy-hasade",
+      "location": [
+       34.904349,
+       32.114007
+      ],
+      "address": "הירקונים 58, פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a0c32bd35faf192591d3cdb",
+      "name": "Shufersal | Rachel Hameshoreret",
+      "slug": "shufersal-rachel-hameshoreret",
+      "location": [
+       34.8954631,
+       32.0841187
+      ],
+      "address": "רחל המשוררת 29, פתח תקווה, Israel",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "66a8e0c6f0c1fe2f807d5ecc",
+      "name": "SNAX | Ganei Tikva",
+      "slug": "snax-ganei-tikva",
+      "location": [
+       34.875709,
+       32.065599
+      ],
+      "address": "דרך הים 14 גני תקווה",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6534f32d31656221a46dda1d",
+      "name": "Be Pharm | Em Hamoshavot 💊",
+      "slug": "be-pharm-em-hamoshavot",
+      "location": [
+       34.87598,
+       32.099693
+      ],
+      "address": "Rishon LeTsiyon St 1, Petah Tikva, Israel",
+      "product_line": "pharmacy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "65ba820122e64678ab5e913a",
+      "name": "Alma Flowers | Givat Shmuel",
+      "slug": "alma-flowers",
+      "location": [
+       34.854534,
+       32.080648
+      ],
+      "address": "הנשיא 73 גבעת שמואל",
+      "product_line": "florist",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "63fde0908ee2cdd903a89d3f",
+      "name": "Shufersal | Petah Tikva",
+      "slug": "shufersal-petah-tikva",
+      "location": [
+       34.8871711,
+       32.0804406
+      ],
+      "address": "קרן קימת לישראל 35 פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6888e37b47abce16078e4e57",
+      "name": "Super Tal | Em HaMoshavot",
+      "slug": "super-tal-em-hamoshavot",
+      "location": [
+       34.8822393,
+       32.0978653
+      ],
+      "address": "Avshalom Gissin St 15, Petah Tikva",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6367b6642a94fea49c48fbc4",
+      "name": "Rami Levy In The Neighborhood | Petah Tikva Rothschild",
+      "slug": "rami-levy-in-the-neighborhood-petah-tikva-rothschild",
+      "location": [
+       34.885444,
+       32.076099
+      ],
+      "address": "Rothschild St 182, Petah Tikva, Israel",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "5f3b74813dedb7412db60622",
+      "name": "Be Pharm | Givat Shmuel 💊",
+      "slug": "be-pharm-givat-shmuel",
+      "location": [
+       34.854902,
+       32.07766
+      ],
+      "address": "יוני נתניהו 29 גבעת שמואל",
+      "product_line": "pharmacy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "69303ce6b9b9b9166472a459",
+      "name": "Alcohol Ba'ir | Shoham",
+      "slug": "alcohol-bair-shoham",
+      "location": [
+       34.96100021,
+       32.00639757
+      ],
+      "address": "רימון 1, שוהם",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "66ddb953413f01612e134545",
+      "name": "Shufersal | Rom Center",
+      "slug": "shufersal-rom-center",
+      "location": [
+       34.881512,
+       32.098534
+      ],
+      "address": "יעל רום 8 פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "66a8e88af0c1fe2f807d5eda",
+      "name": "SNAX | Shoham",
+      "slug": "snax-shoham",
+      "location": [
+       34.94685,
+       31.9990278
+      ],
+      "address": "עמק אילון 30 שהם",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "661f731f6fb9763922e71ef9",
+      "name": "ZooEretZoo | Petah Tikva",
+      "slug": "zooeretzoo-petah-tikva",
+      "location": [
+       34.895782,
+       32.102303
+      ],
+      "address": "בן ציון גליס 9 ",
+      "product_line": "pet_supply",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6888e34b7b1c8446899e10f7",
+      "name": "Alcohol Ba'ir | Neve Oz",
+      "slug": "alcohol-bair-petah-tikva",
+      "location": [
+       34.8618635,
+       32.0892003
+      ],
+      "address": "דרך יצחק רבין 4 פתח תקווה",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "657597d706e63b0041fabb07",
+      "name": "Good Pharm | Rothschild Petach Tikva",
+      "slug": "good-pharm-rothschild",
+      "location": [
+       34.8811573,
+       32.0892131
+      ],
+      "address": "רוטשילד 57 פתח תקווה",
+      "product_line": "pharmacy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "66af42dd23d28521bcd8c4b4",
+      "name": "Anipet | Kiryat Ono",
+      "slug": "anipet-kiryat-ono",
+      "location": [
+       34.863776,
+       32.055659
+      ],
+      "address": "שלמה המלך 37, קרית אונו",
+      "product_line": "pet_supply",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "5f86fff504af240ee1626ae0",
+      "name": "Be Pharm | Savyonim",
+      "slug": "be-pharm-savyonim",
+      "location": [
+       34.878081,
+       32.030152
+      ],
+      "address": "Derech Moshe Dayan 3 Yehud",
+      "product_line": "pharmacy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "634697c3b893950cb547a556",
+      "name": "Steimatzky | Kiryat Ono Mall",
+      "slug": "steimatzky-petah-tikva",
+      "location": [
+       34.8633719,
+       32.0555788
+      ],
+      "address": "שלמה המלך 37 קרית אונו",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "695f7e9f567baa51d501364c",
+      "name": "Alcohol Ba'ir | Kiryat Ono",
+      "slug": "alcohol-bair-kityat-ono",
+      "location": [
+       34.8616116,
+       32.0637877
+      ],
+      "address": "דרך לוי אשכול 23 קרית אונו",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a3bbdda74dd8ca07905218b",
+      "name": "Steimatzky | Rom Center Em Hamoshavot",
+      "slug": "steimatzky-rom-center-em-hamoshavot",
+      "location": [
+       34.8814443,
+       32.0981726
+      ],
+      "address": "הסושיה פתח תקווה, מרכז רום, יעל רום 8",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "696344fc6d3f199abec27c46",
+      "name": "Bana Mashkaot | Petah Tikva",
+      "slug": "bana-mashkaot-petah-tikva",
+      "location": [
+       34.8957784,
+       32.10102
+      ],
+      "address": "הרב פינטו מסעוד אשר 20 פתח תקווה",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a5e0e6d9daa4cf25f11354a",
+      "name": "Super Tal | Katz",
+      "slug": "super-tal-katz",
+      "location": [
+       34.8869433,
+       32.0743512
+      ],
+      "address": "רחוב כץ 47, פתח תקווה, Israel",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a0b06e57d6aafd5ccdcf8e8",
+      "name": "Shufersal | Kakal Petah Tikva",
+      "slug": "shufersal-kakal-petah-tikva",
+      "location": [
+       34.88172835,
+       32.07867036
+      ],
+      "address": "קק\"ל 2 פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a7320b26871ecdfd22d99a8",
+      "name": "Super Tal | Hovevei Tsiyon",
+      "slug": "super-tal-rothschild",
+      "location": [
+       34.881836,
+       32.0873784
+      ],
+      "address": "רוטשילד 73, פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "69d2c8fc4efaee9dbda0ccfe",
+      "name": "Carrefour | Bar Kochva",
+      "slug": "carrefour-bar-kochva",
+      "location": [
+       34.8856478,
+       32.096693
+      ],
+      "address": "בר כוכבא 63, פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "64b51e9549f46768a1a2107a",
+      "name": "Bread Station | Petah Tikva | Kosher",
+      "slug": "bread-station-petah-tikva",
+      "location": [
+       34.882822,
+       32.097885
+      ],
+      "address": "אבשלום גיסין 15",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "672b664dca528956dfd8a958",
+      "name": "Carrefour | Hafetz Haim",
+      "slug": "carrefour-hafetz-haim",
+      "location": [
+       34.8867423,
+       32.0851386
+      ],
+      "address": "הרצל 28, פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68f0e150e2a4c788ff7c3f6a",
+      "name": "Partycool | Shoham",
+      "slug": "partycool-shoham",
+      "location": [
+       34.9467177,
+       32.0054845
+      ],
+      "address": "שדרות עמק איילון 161 שוהם",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6863db0fc3a5e154a6f2b5e2",
+      "name": "Itechstore",
+      "slug": "itechstore",
+      "location": [
+       34.8973103,
+       32.0278413
+      ],
+      "address": "שבזי 24 יהוד מונסון",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68223097c02ba7c7f6d5df01",
+      "name": "Boutique Central | Petah TIkva",
+      "slug": "boutique-central-petah-tikva",
+      "location": [
+       34.87602701,
+       32.09967392
+      ],
+      "address": "ראשון לציון 1, פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "686e22122d48427e0edaffd3",
+      "name": "Alcohol Ba'ir | Savyon",
+      "slug": "alcohol-bair-savyon",
+      "location": [
+       34.86662535,
+       32.03344335
+      ],
+      "address": "תחנת דלק פז מחוז המרכז, סביון",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "67bda0d5eb063308b2b5efdc",
+      "name": "Good Pharm | Shlomo Hamelech",
+      "slug": "good-pharm-kiryat-ono",
+      "location": [
+       34.8633719,
+       32.0555788
+      ],
+      "address": "שלמה המלך 37, Kiryat Ono, Israel",
+      "product_line": "pharmacy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a15cdcc0b9a970d4fe15245",
+      "name": "Be Pharm | Belinson",
+      "slug": "be-pharm-belinson",
+      "location": [
+       34.8673292,
+       32.0903359
+      ],
+      "address": "מרכז רפואי רבין (בילינסון והשרון), Jabotinsky Street, פתח תקווה, Israel",
+      "product_line": "pharmacy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68ca9dcfc5ba53403b28acc9",
+      "name": "Laline | Yehud",
+      "slug": "laline-yehud",
+      "location": [
+       34.9010009,
+       32.0262441
+      ],
+      "address": "אלטלף 4 יהוד מונסון",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "681f90136b98cfcc8767ab9b",
+      "name": "Shilav | Kikar Ha'ir",
+      "slug": "shilav-kikar-hair",
+      "location": [
+       34.8878353,
+       32.0881094
+      ],
+      "address": "שפיגל זוסיה 3, פתח תקווה",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "668fe0163263291e0ff39245",
+      "name": "Mashbir | Kiryat Ono",
+      "slug": "mashbir-kiryat-ono",
+      "location": [
+       34.8633719,
+       32.0555788
+      ],
+      "address": "שלמה המלך 37, קריית אונו, Israel",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6964b91e4d94d330a3e6480a",
+      "name": "SACARA | Shiba Mall",
+      "slug": "sacara-shiba-mall",
+      "location": [
+       34.8417344,
+       32.0459625
+      ],
+      "address": "2RWR+9MQ רמת גן",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "696c9cd3e171fbbeeccdefa1",
+      "name": "Mashkaot Haturki | Shoham",
+      "slug": "mashkaot-haturki-shoham",
+      "location": [
+       34.9511782,
+       32.0065004
+      ],
+      "address": "שוהם מרקט, רחוב דקל 30, שוהם",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "628a0cc587901c115c4e89df",
+      "name": "Shilav | Petah Tikva",
+      "slug": "shilav-petah-tikva",
+      "location": [
+       34.862582,
+       32.091117
+      ],
+      "address": "דרך יצחק רבין 1 פתח תקווה",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "65d35f71f0c0d500959eeb62",
+      "name": "Good Pharm | Yehud",
+      "slug": "good-pharm-yahud",
+      "location": [
+       34.887824,
+       32.032645
+      ],
+      "address": "מקלב 8 יהוד",
+      "product_line": "pharmacy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6863a32a3787f8c210745d4d",
+      "name": "Animal Zoo | Kiryat Ono",
+      "slug": "animal-zoo-kiryat-ono",
+      "location": [
+       34.8648233,
+       32.0537354
+      ],
+      "address": "דרך לוי אשכול 121 קרית אונו",
+      "product_line": "pet_supply",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "61b0cceddf264b49b8f42125",
+      "name": "Hakole | Petah Tikva | Kosher",
+      "slug": "hakole-petach-tikva",
+      "location": [
+       34.8821753,
+       32.0862912
+      ],
+      "address": "רוטשילד 79 פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68f0db8ac32bddc87f783405",
+      "name": "Rozenfeld",
+      "slug": "rozenfeld",
+      "location": [
+       34.8921515,
+       32.1067014
+      ],
+      "address": "גליס 32 פתח תקווה",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "69f0661c36ded3901a8b6315",
+      "name": "Ciber Mobile",
+      "slug": "ciber-mobile",
+      "location": [
+       34.8922204,
+       32.0610853
+      ],
+      "address": "האילנות 29, כפר מעש",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68342be0819a91773d146ad8",
+      "name": "CHERIE | Kfar Ma'as",
+      "slug": "mitukit-maarazei-boutique-kfar-maas",
+      "location": [
+       34.8922204,
+       32.0610853
+      ],
+      "address": "האילנות 29, כפר מעש",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "657ae16b3e69e08e831401a1",
+      "name": "Good Pharm | Ramat Efal",
+      "slug": "good-pharm-ramat-efal",
+      "location": [
+       34.8392879,
+       32.0510227
+      ],
+      "address": "דרך שיבא 12 רמת גן",
+      "product_line": "pharmacy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "69f1ac1ac7254d23eabd926a",
+      "name": "Bana Mashkaot | Or Yehuda",
+      "slug": "bana-mashkaot-or-yehuda",
+      "location": [
+       34.84997108,
+       32.0330772
+      ],
+      "address": "ההגנה 15, אור יהודה",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6a3ced60022da5b0e90d2e7d",
+      "name": "Steimatzky | Rosh Haayin",
+      "slug": "steimatzky-rosh-haayin",
+      "location": [
+       34.9798775,
+       32.0860825
+      ],
+      "address": "יגאל אלון 22, ראש העין, Israel",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "665ded5c91076526b38d6baa",
+      "name": "Bustan | Em HaMoshavot",
+      "slug": "bustan-avital",
+      "location": [
+       34.882109,
+       32.103898
+      ],
+      "address": "רפאל איתן 5 פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68ad84a4b746181ed5687a3a",
+      "name": "Minene | Petach Tikva",
+      "slug": "minene-petach-tikva",
+      "location": [
+       34.8655205,
+       32.0930217
+      ],
+      "address": "ז׳בוטינסקי 72 פתח תקווה",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "648189c510ede5cafc61aace",
+      "name": "Shilav | Kiryat Ono",
+      "slug": "shilav-kiryat-ono",
+      "location": [
+       34.863799,
+       32.055676
+      ],
+      "address": "שלמה המלך 37, קריית אונו",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "69faed2d404c46bb6a960f54",
+      "name": "Hashmal Neto | Or Yehuda",
+      "slug": "hashmal-neto-or-yehuda",
+      "location": [
+       34.858504,
+       32.035012
+      ],
+      "address": "כרמל 7, אור יהודה",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6644be9b0c091825f625ffb9",
+      "name": "Mashkaot Haturki | Ramat Efal",
+      "slug": "mashkaot-haturki-ramat-efal",
+      "location": [
+       34.8389252,
+       32.0511215
+      ],
+      "address": "דרך שיבא 10 רמת גן",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "679243024200444ade3a6b34",
+      "name": "ZooEretZoo | Ramat Efal",
+      "slug": "zooereteoo-ramat-gan",
+      "location": [
+       34.83940317,
+       32.05110468
+      ],
+      "address": "דרך שיבא 14, רמת גן",
+      "product_line": "pet_supply",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6534f32d31656221a46dda1e",
+      "name": "Be Pharm | Kfar Ganim",
+      "slug": "be-pharm-kfar-ganim",
+      "location": [
+       34.870647,
+       32.074271
+      ],
+      "address": "העצמאות 63, פתח תקווה, Israel",
+      "product_line": "pharmacy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "696cf18b52549bc34136cbe3",
+      "name": "Splendid",
+      "slug": "splendid",
+      "location": [
+       34.8489308,
+       32.0966858
+      ],
+      "address": "עמל 37, Petah Tikva, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68455123c0d3d4a46ed2de2a",
+      "name": "Soltam | Givat Shmuel",
+      "slug": "soltam-givat-shmuel",
+      "location": [
+       34.8546023,
+       32.0761704
+      ],
+      "address": "יוני נתניהו 21 גבעת שמאול",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "652fbef3131493ed792bcc5b",
+      "name": "Mashkaot Haturki | Givat Shmuel",
+      "slug": "mashkaot-haturki-givat-shmuel",
+      "location": [
+       34.855569,
+       32.08391
+      ],
+      "address": "הערבה 1, גבעת שמואל",
+      "product_line": "alcohol",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6453937bfe41f0b923753cdc",
+      "name": "Be Pharm | Shoham",
+      "slug": "be-pharm-shoham",
+      "location": [
+       34.951508,
+       32.006166
+      ],
+      "address": "הדקל 30 שוהם",
+      "product_line": "pharmacy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68ad89cdc408f502c9597d75",
+      "name": "Minene | Kiryat Ono",
+      "slug": "minene-kiryat-ono",
+      "location": [
+       34.8632788,
+       32.0555687
+      ],
+      "address": "שלמה המלך 37 קרית אונו",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "6602c51d18933e53460b4d7e",
+      "name": "Tamburia Ba'ir | Kiryat Ono",
+      "slug": "tamburia-bair-kiryat-ono",
+      "location": [
+       34.863829,
+       32.055089
+      ],
+      "address": "שלמה המלך 37, קרית אונו, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "62c544ee862c9977d10d0f59",
+      "name": "Minene | Ganei Tikva",
+      "slug": "minene-ganei-tikva",
+      "location": [
+       34.875344,
+       32.06552
+      ],
+      "address": "דרך הים 14גני תקווה",
+      "product_line": "toys_games_and_kids",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "67aa17e61948322fd1b21c79",
+      "name": "FOX Home | Yehud",
+      "slug": "fox-home-yahud",
+      "location": [
+       34.90058138,
+       32.02591915
+      ],
+      "address": "BIG ביג יהוד, Altalef Street, Yehud-Monosson, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "67237ea7d8033e3e5f896d99",
+      "name": "FOX Home | Petah Tikva",
+      "slug": "fox-home-grand-mall",
+      "location": [
+       34.865894,
+       32.093983
+      ],
+      "address": "Mota Gur St 4",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68754241306197cffa1472ca",
+      "name": "ACE | Yehud",
+      "slug": "ace-yehud",
+      "location": [
+       34.9005493,
+       32.02587629
+      ],
+      "address": "אלטלף 4 יהוד",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "69b917f5b16753d4e5fb043a",
+      "name": "Golf & Co | Kiryat Ono",
+      "slug": "golf-co-kiryat-ono",
+      "location": [
+       34.863739,
+       32.05529
+      ],
+      "address": "ירושלים 35, קרית אונו, Israel",
+      "product_line": "home_and_diy",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "674340df45c37732b8961b6a",
+      "name": "Optica Halperin | Givat Shmuel",
+      "slug": "optica-halperin-givat-shmuel",
+      "location": [
+       34.854743,
+       32.07567
+      ],
+      "address": "יוני נתניהו 23, Giv'at Shmuel, Israel",
+      "product_line": "health_and_beauty",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "687f6d0c4df25e04d74f605a",
+      "name": "Mobi Cell | Giv'at Shmuel",
+      "slug": "mobi-cell-givat-shmuel",
+      "location": [
+       34.8547425,
+       32.077168
+      ],
+      "address": "יוני נתניהו 29 גבעת שמואל",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68eccec934282704ee75caf7",
+      "name": "Mobi Cell | Yehud",
+      "slug": "mobi-cell-yehud",
+      "location": [
+       34.9010009,
+       32.0262441
+      ],
+      "address": "אלטלף 4 יהוד מונסון",
+      "product_line": "electronics",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "65daeb8779ca7f0a9bf964f3",
+      "name": "Wolt Market | Lev Haaretz",
+      "slug": "wolt-market-lev-haaretz",
+      "location": [
+       34.956182,
+       32.107996
+      ],
+      "address": "הזית 10, כפר קסאם",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "67bd8aa28e7d411df8b1dba0",
+      "name": "7 Express | Petah Tikva",
+      "slug": "seven-express-petah-tikva",
+      "location": [
+       34.8808774,
+       32.0982145
+      ],
+      "address": "Ya'el Rom St 8, Petah Tikva",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "63159c22c694428ffa60d911",
+      "name": "Deli Top | Rosh Ha’ayin",
+      "slug": "deli-top-rosh-haayin",
+      "location": [
+       34.967253,
+       32.084735
+      ],
+      "address": "הרב שלום שבזי 187 ראש העין",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68d26242ce3f9efa75cb280d",
+      "name": "Maafiat Shofan | KQ",
+      "slug": "maafeat-shofan",
+      "location": [
+       34.9768906,
+       32.1195375
+      ],
+      "address": "4X9G+RQ6 כפר קאסם אלחרם",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "68d3b43f90319d73510abbc7",
+      "name": "Alzaem Bakery | KQ",
+      "slug": "alzaem-bakery",
+      "location": [
+       34.97506369,
+       32.11133341
+      ],
+      "address": "4X6G+G2V כפר קאסם, עומר בן אלחטאב ",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "692420b5917e642f1c58af02",
+      "name": "COCO CHERIE | Warehouse",
+      "slug": "coco-cherie-warehouse",
+      "location": [
+       34.8821817,
+       32.10338
+      ],
+      "address": "רפאל איתן 3",
+      "product_line": "general_merchandise",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    },
+    {
+     "venue": {
+      "id": "659a8df30c00204d93f9262f",
+      "name": "Maafe Neeman | Sgula Petah Tikva",
+      "slug": "maafe-neeman-sgula-petah-tikva",
+      "location": [
+       34.894756,
+       32.101863
+      ],
+      "address": "חיים סוטין 2 פתח תקווה",
+      "product_line": "grocery",
+      "franchise": "",
+      "online": false,
+      "delivers": false
+     }
+    }
+   ]
+  }
+ ]
+}

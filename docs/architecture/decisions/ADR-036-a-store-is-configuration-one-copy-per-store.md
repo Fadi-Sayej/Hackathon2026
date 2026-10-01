@@ -60,16 +60,33 @@ It states what makes a copy one store's:
 | `site_title` | The browser tab's title, set into `index.html` at build (today "SmartShelf AI — YomYom pilot", the only place the app names a store) |
 | `location` | `lat` and `lon`; used for the weather context and for finding nearby venues |
 | `format` | One of `store_types.yaml`'s formats. Replaces `OUR_FORMAT` |
-| `client_store_ids` | The store's own entries in `store_types.yaml` (its catalogue and its delivery venue), never a competitor |
 | `pos.export` | Path of the committed inventory export (today `yomyom-inventory.csv`) |
 | `sales.monthly_dir`, `sales.daily_dir` | Where its monthly and daily reports are committed (ADR-030) |
 | `market.radius_km` | How far the nearby-venue finder looks (§4) |
+| `firebase.project_id` | The copy's own Firebase project (§1), added 2026-09-30 |
 
 One loader, `src/common/store.py`, reads and validates it. Every store-specific reader goes
 through it: the engine, the importers, the weather context, the build (the tab title), the
 nightly (which sets `VITE_STORE_ID` from it), and `check_firebase_config` (which compares
 `firestore.rules`' pinned root with it). A missing or invalid key stops the run with the
 key's name; nothing is defaulted to YomYom's value.
+
+> **Clarified 2026-09-30, in Task 7.1–7.2, before any code merged.** Three details changed
+> while building:
+> - **`client_store_ids` is not a key.** The store's own entries are already marked
+>   `role: client` in `configs/store_types.yaml`, and the engine reads them there
+>   (`client_store_ids()`). Listing them in the settings too would decide one fact twice.
+> - **`firebase.project_id` is a key.** Each copy has its own Firebase project (§1), and the
+>   nightly, the engine's owner-state pull and `set_user_role.py` all named this copy's
+>   project in code. An environment naming a different project stops the run, as a
+>   different `VITE_STORE_ID` does.
+> - **The web build keeps its deployment's `VITE_STORE_ID`, and takes only the tab title
+>   from the settings.** Preview's `VITE_STORE_ID` is `preview-sandbox` on purpose
+>   (deployment.md), so that a preview of any branch cannot write the owner's state. Setting
+>   the id from the settings at build would have undone that. `check:firebase` checks that
+>   Production's id, `firestore.rules`' pinned root, `VITE_FIREBASE_PROJECT_ID` and
+>   `.firebaserc` all match the settings. Unset, the browser writes nothing remotely; it no
+>   longer falls back to YomYom's id.
 
 The derived tables stop carrying a store's name. They become `silver_pos/products.parquet`
 and `silver_pos/inventory.parquet`, because one copy holds one store.
@@ -88,6 +105,18 @@ or with an empty template:
 applying the manifest. `--update <dir>` later brings a copy's code up to date and never
 touches a manifest path. Both refuse to run if the result would contain the source store's
 `id` or `name` under a manifest path.
+
+> **Clarified 2026-10-01, in Task 7.5.** The manifest as built, in `src/common/store.py`,
+> differs from the table in three ways:
+> - `configs/measured_weights.yaml` is left out rather than emptied. It is generated from the
+>   store's sales by `analyse_sales_movement.py`, and nothing in the engine reads it.
+> - `firestore.rules`, `.firebaserc` and `.env.example` start as templates, because they
+>   pin this copy's store id and Firebase project.
+> - `samples/**` is left out.
+>
+> A copy also leaves out `.github/workflows/ci.yml`. Many tests read committed store data a
+> clean copy does not have, and a copy changes no code: code is tested here before `--update`
+> carries it. The ignore rules follow any store's folder, not YomYom's.
 
 ### 4. Nearby venues are found, then confirmed by a person
 

@@ -1,4 +1,4 @@
-# YomYom market-intelligence — Python backend dependencies
+# SmartShelf — Python backend dependencies
 # Install with: pip install -r requirements.txt
 
 # Data serialisation

@@ -299,7 +299,7 @@ validation:
 # The importer adds _imported_at and _source_file to every table automatically.
 silver_tables:
   products:
-    filename: yomyom_products.parquet
+    filename: products.parquet   # src/common/store.py PRODUCTS_TABLE
     columns:
       - barcode
       - product_name
@@ -311,7 +311,7 @@ silver_tables:
       - cost_price
 
   inventory:
-    filename: yomyom_inventory.parquet
+    filename: inventory.parquet  # src/common/store.py INVENTORY_TABLE
     columns:
       - barcode
       - product_name
@@ -320,7 +320,7 @@ silver_tables:
       - last_purchase_date
 
   margins:
-    filename: yomyom_margins.parquet
+    filename: margins.parquet
     columns:
       - barcode
       - product_name

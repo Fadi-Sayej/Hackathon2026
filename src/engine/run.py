@@ -12,6 +12,7 @@ from typing import Callable, Optional
 from src.common.paths import EXTERNAL_SNAPSHOTS_ROOT, SILVER_POS_ROOT
 from src.engine.inputs import load_inputs
 from src.engine.model import CapabilityOutput
+from src.common.store import firebase_project_for_owner_state, get_store, store_id_for_owner_state
 from src.engine.policy import load_policy
 from src.engine.catalogue import build_catalogue, write_catalogue
 from src.engine.measurement import build_measurement, write_measurement
@@ -21,9 +22,10 @@ from src.owner_state.model import OwnerState
 from src.owner_state.pull import MIRROR_PATH, pull, read_mirror, write_mirror
 
 SILVER_DIR = SILVER_POS_ROOT
-SALES_DIR = Path(__file__).resolve().parents[2] / "data" / "internal" / "raw_pos" / "yomyom" / "sales"
-# ADR-030: the same report, one file per day, committed beside the monthly ones.
-DAILY_SALES_DIR = SALES_DIR.parent / "sales_daily"
+# ADR-036: where the store's reports are committed is the store's settings, not code. ADR-030: the
+# same report, one file per day, beside the monthly ones.
+SALES_DIR = get_store().sales_monthly_dir
+DAILY_SALES_DIR = get_store().sales_daily_dir
 # The market half, named here for the same reason the two above are: a caller must be
 # able to run the whole engine over a copy of the data with an input withheld. Without
 # them, a run that isolates silver still reads production signals and matches — which is
@@ -51,8 +53,8 @@ DEFAULT_RUNNERS: dict = {}          # populated lazily by run_engine
 
 
 def _pull_owner_state() -> OwnerState:
-    project = os.environ.get("FIREBASE_PROJECT_ID") or os.environ.get("VITE_FIREBASE_PROJECT_ID") or ""
-    store = os.environ.get("VITE_STORE_ID", "yomyom-kafr-qasim")
+    project = firebase_project_for_owner_state(os.environ)   # ADR-036: the settings' project
+    store = store_id_for_owner_state(os.environ)        # ADR-036: the settings' id; a different env stops the run
     cred_json = os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON") or None
     cred_path = os.environ.get("FIREBASE_SERVICE_ACCOUNT_PATH") or None
     if not (cred_json or cred_path):

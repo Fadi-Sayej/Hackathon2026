@@ -11,6 +11,8 @@ from typing import Optional
 import pyarrow.parquet as pq
 
 from src.common.paths import EXTERNAL_SNAPSHOTS_ROOT, MATCHING_ROOT, SIGNALS_ROOT, SILVER_POS_ROOT
+from src.common.store import INVENTORY_TABLE, PRODUCTS_TABLE
+from src.common.store import get_store
 from src.common.store_types import StoreTypeConfig, load_store_types
 from src.engine.model import EvidenceWindow, norm_barcode
 from src.engine.policy import Policy
@@ -23,7 +25,10 @@ from src.market.recent import recent_market
 from src.market.running_out import market_signal, market_store_ids
 from src.owner_state.model import OwnerState, answered_cost, device_register
 
-OUR_FORMAT = "gas_convenience"
+def our_format() -> str:
+    """The store's own format, from configs/store.yaml (ADR-036). It decides D-18's market and
+    how comparable each competitor's price is (ADR-008)."""
+    return get_store().format
 
 
 @dataclass
@@ -278,10 +283,10 @@ def _competitor_vintage(observations: Optional[list]) -> dict:
     }
 
 
-def _shape_observations(signals, stores: StoreTypeConfig) -> Optional[list]:
+def _shape_observations(signals, stores: StoreTypeConfig, our_fmt: str) -> Optional[list]:
     if signals is None:
         return None
-    excluded = set(stores.excluded_stores(OUR_FORMAT)) | set(stores.client_store_ids())
+    excluded = set(stores.excluded_stores(our_fmt)) | set(stores.client_store_ids())
     out = []
     for s in signals:
         store_id = str(s.get("competitor_store_id") or "")
@@ -293,7 +298,7 @@ def _shape_observations(signals, stores: StoreTypeConfig) -> Optional[list]:
         fmt = stores.store_type(store_id)
         out.append({"barcode": norm_barcode(s.get("barcode")), "price": price, "store_id": store_id,
                     "store_name": s.get("competitor_store_name"), "store_format": fmt,
-                    "affinity": stores.affinity(OUR_FORMAT, fmt), "observed_at": s.get("observed_at"),
+                    "affinity": stores.affinity(our_fmt, fmt), "observed_at": s.get("observed_at"),
                     "source_type": "delivery" if _pos(s.get("delivery_catalog_price")) else "price_file"})
     return sorted(out, key=lambda o: (o["barcode"], o["store_id"], o["price"]))
 
@@ -305,8 +310,8 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
                 store_facts_path: Path = STORE_FACTS_PATH,
                 snapshots_root: Path = EXTERNAL_SNAPSHOTS_ROOT) -> EngineInputs:
     stores = stores or load_store_types()
-    products_raw = _rows(silver_dir / "yomyom_products.parquet")
-    inventory = _rows(silver_dir / "yomyom_inventory.parquet")
+    products_raw = _rows(silver_dir / PRODUCTS_TABLE)
+    inventory = _rows(silver_dir / INVENTORY_TABLE)
     products, conflicting = (_shape_products(products_raw, inventory, owner)
                             if products_raw else (None, None))
     # ADR-033. Checked against the departments the catalogue actually prints, so a stated
@@ -321,13 +326,13 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
     window = _window_from_summary(monthly, policy) if monthly else None
     latest_signal = sorted(signals_dir.glob("*.parquet")) if signals_dir.exists() else []
     signals = _rows(latest_signal[-1]) if latest_signal else None
-    observations = _shape_observations(signals, stores)
+    observations = _shape_observations(signals, stores, our_format())
     # ADR-031. Read from the committed delivery-catalogue snapshots, not from silver: the
     # rule needs every day's listings, and silver holds only the latest. The market is
     # D-18's, the stores at or above the floor less the client, and only days up to the run
     # are read, so a run over an earlier date sees what that night saw.
     presence = load_presence(root=snapshots_root, source_id=DELIVERY_CATALOG)
-    market_ids = market_store_ids(presence, stores, OUR_FORMAT)
+    market_ids = market_store_ids(presence, stores, our_format())
     running_out = market_signal(presence, market_ids, policy, run_at.date())
     # F9-S1: the same rule, market and night, replayed over the recent window.
     market_recent = (recent_market(presence, market_ids, policy, date.fromisoformat(running_out["on_day"]),

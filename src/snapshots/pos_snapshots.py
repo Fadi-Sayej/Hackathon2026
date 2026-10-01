@@ -28,6 +28,7 @@ from typing import Any
 import pyarrow.parquet as pq
 
 from src.common.paths import PROJECT_ROOT, SILVER_POS_ROOT, SNAPSHOTS_ROOT
+from src.common.store import INVENTORY_TABLE, PRODUCTS_TABLE
 
 SNAPSHOT_REPORTS_DIR = PROJECT_ROOT / "reports" / "snapshots"
 
@@ -68,11 +69,11 @@ def _current_import_id(silver_dir: Path | None = None) -> str | None:
     """Import identity of the LIVE silver tables.
 
     Deliberately not snapshot_import_id(): inside a snapshot the files are named
-    products/inventory.parquet, but in the silver root they are yomyom_*.parquet,
-    so that helper finds nothing and returns None — which silently disabled the
+    products/inventory.parquet, and in the silver root they were yomyom_*.parquet until
+    ADR-036 renamed them, so that helper found nothing and returned None — which silently disabled the
     duplicate check and let another full copy be archived every run.
     """
-    for name in ("yomyom_products.parquet", "yomyom_inventory.parquet"):
+    for name in (PRODUCTS_TABLE, INVENTORY_TABLE):
         path = (silver_dir or SILVER_POS_ROOT) / name
         if not path.exists():
             continue
@@ -111,8 +112,8 @@ def archive_current_silver(imported_at: str | None = None, force: bool = False, 
     """
     silver_dir = silver_dir or SILVER_POS_ROOT
     snapshots_root = snapshots_root or SNAPSHOTS_ROOT
-    products = silver_dir / "yomyom_products.parquet"
-    inventory = silver_dir / "yomyom_inventory.parquet"
+    products = silver_dir / PRODUCTS_TABLE
+    inventory = silver_dir / INVENTORY_TABLE
     if not products.exists():
         return None
 

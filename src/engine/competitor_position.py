@@ -11,7 +11,7 @@ import statistics
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from src.engine.inputs import OUR_FORMAT, EngineInputs
+from src.engine.inputs import EngineInputs
 from src.engine.model import CapabilityOutput, Entry, Figure, entry_id
 from src.engine.registry import derive_status
 

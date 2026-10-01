@@ -12,6 +12,7 @@ import pyarrow.parquet as pq
 
 from src.internal_pos.pos_normalizer import inspect_pos_file, load_schema_config, load_raw_rows, normalize_rows
 from src.internal_pos.pos_quality import build_quality_report, classify_source_file, write_quality_report
+from src.common.store import INVENTORY_TABLE
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -262,7 +263,7 @@ def import_pos_file(
 
 
 def read_pos_vintage(silver_dir: Path = SILVER_POS_DIR) -> dict[str, Any] | None:
-    path = silver_dir / "yomyom_inventory.parquet"
+    path = silver_dir / INVENTORY_TABLE
     if not path.exists():
         return None
     columns = set(pq.read_schema(path).names)

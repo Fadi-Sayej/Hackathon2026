@@ -4,8 +4,7 @@ build_product_matches.py
 CLI entry point for the YomYom product-matching pipeline.
 
 Reads:
-  data/internal/silver_pos/yomyom_products.parquet   (preferred)
-  data/internal/raw_pos/yomyom/sample_yomyom_pos.csv (fallback)
+  data/internal/silver_pos/products.parquet
 
   data/signals/competitor_product_signals/**/*.parquet  (preferred)
   data/external/silver/alonit_prices/**/*.parquet       (fallback)
