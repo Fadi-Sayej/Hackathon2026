@@ -26,8 +26,13 @@
 /docs
 /tests
 /e2e
-/scripts
-/configs
+# The build reads the store's tab title through these two files (ADR-036, vite.config.js);
+# everything else in both folders stays off Vercel. A folder rule would hide them, so the
+# children are ignored and the two let back in.
+/scripts/*
+!/scripts/store_settings.mjs
+/configs/*
+!/configs/store.yaml
 /schemas
 *.docx
 *.pdf
