@@ -84,7 +84,7 @@ Copied verbatim from `docs/architecture/system-design.md`; every task's requirem
 
 ## Prerequisites that are not code (do before Phase 0, Task 0.13 checks them)
 
-1. Firebase: six `VITE_FIREBASE_*` values in `.env` and in Vercel; Anonymous sign-in enabled; `firestore.rules` deployed; `npm run check:firebase-live` exits 0.
+1. Firebase: six `VITE_FIREBASE_*` values in `.env` and in Vercel; Anonymous sign-in enabled; `firestore.rules` deployed; `npm run check:firebase-live` exits 0. *(As of 2026-09-12. Since ADR-029 sign-in is by Google or email link with a role per account; anonymous sign-in was disabled on 2026-09-26 and `check:firebase-live` removed on 2026-10-01.)*
 2. GitHub secret `FIREBASE_SERVICE_ACCOUNT_JSON` for a **read-only** service account (`roles/datastore.viewer`).
 3. **Vercel: the PR preview check fails with "Deployment was blocked" for PRs opened by
    collaborators.** Still open — a console setting on the project, not anything in this

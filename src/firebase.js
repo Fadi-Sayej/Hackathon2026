@@ -15,7 +15,8 @@
  * Activation, in order:
  *   1. Firebase console → Project settings → your web app → copy the config
  *      into `VITE_FIREBASE_*` (see .env.example).
- *   2. Authentication → Sign-in method → Anonymous → Enable.
+ *   2. Authentication → Sign-in method → Google, and Email link (ADR-029). Each account
+ *      is given its role with `scripts/set_user_role.py`; the rules accept nothing else.
  *   3. `firebase deploy --only firestore:rules`
  */
 
@@ -25,7 +26,7 @@ import {
   persistentLocalCache,
   persistentMultipleTabManager,
 } from 'firebase/firestore'
-import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth'
+import { getAuth } from 'firebase/auth'
 import { authMode } from './auth/mode.js'
 
 // import.meta.env is a plain object at build time; guard so this module can also
@@ -55,7 +56,7 @@ const firebaseConfig = {
 export const STORE_ID = readEnv('VITE_STORE_ID')
 
 // The three values without which nothing can connect. storageBucket / senderId
-// are not required for Firestore + anonymous auth, so they are not gated on.
+// are not required for Firestore or sign-in, so they are not gated on.
 const REQUIRED_KEYS = ['apiKey', 'projectId', 'appId']
 
 /**
@@ -105,68 +106,17 @@ export function getDb() {
   return dbInstance
 }
 
-let authPromise = null
-
-/**
- * Resolve once an anonymous session exists. Firestore rules require
- * `request.auth != null`, so every read/write must wait on this.
- *
- * Resolves (rather than rejects) on failure so a sign-in problem degrades to
- * "local only" instead of taking the page down; the owner state keeps serving
- * from its localStorage copy.
- */
-export function ensureAnonymousAuth() {
-  if (authPromise) return authPromise
-
-  authPromise = new Promise((resolve) => {
-    if (!isFirebaseConfigured()) {
-      resolve(null)
-      return
-    }
-    try {
-      const auth = getAuth(getFirebaseApp())
-      if (auth.currentUser) {
-        resolve(auth.currentUser)
-        return
-      }
-      const unsubscribe = onAuthStateChanged(auth, (user) => {
-        if (user) {
-          unsubscribe()
-          resolve(user)
-        }
-      })
-      signInAnonymously(auth).catch((error) => {
-        unsubscribe()
-        if (typeof console !== 'undefined') {
-          console.warn(
-            'SmartShelf: anonymous sign-in failed; staying on local storage. ' +
-              'Enable Anonymous sign-in in the Firebase console.',
-            error,
-          )
-        }
-        resolve(null)
-      })
-    } catch (error) {
-      if (typeof console !== 'undefined') {
-        console.warn('SmartShelf: Firebase auth unavailable; staying on local storage.', error)
-      }
-      resolve(null)
-    }
-  })
-
-  return authPromise
-}
-
 /**
  * The signed-in user, for Firestore reads and writes, under the build's access model.
  *
- * `basic` (before ADR-029's switch-over): anonymous sign-in, exactly as before.
- * `firebase`: the account the person signed in with (Google or email link). It never falls
- * back to an anonymous session, which the role rules would refuse anyway. Resolves null
+ * `firebase`: the account the person signed in with (Google or email link). Resolves null
  * when nobody is signed in.
+ * `basic` (local development and the tests, no sign-in): null, always. There is no account,
+ * so owner state stays in this browser. Anonymous sign-in, which this used to attempt, was
+ * disabled on 2026-09-26, and the role rules refuse an account without a role anyway.
  */
 export async function ensureAuthForMode() {
-  if (authMode() !== 'firebase') return ensureAnonymousAuth()
+  if (authMode() !== 'firebase') return null
   if (!isFirebaseConfigured()) return null
   try {
     const auth = getAuth(getFirebaseApp())

@@ -15,7 +15,6 @@
     "discover:alonit-network": "node scripts/discover-alonit-network.mjs",
     "collect:delivery-venue": "python3 scripts/run_delivery_venue_connector.py",
     "collect:alonit-signals": "python3 scripts/run_alonit_signal_pipeline.py",
-    "check:firebase-live": "node scripts/check_firebase_live.mjs",
     "check:firebase": "node scripts/check_firebase_config.mjs",
     "check:store": "python3 scripts/check_store.py",
     "preflight": "bash scripts/preflight_deploy.sh",

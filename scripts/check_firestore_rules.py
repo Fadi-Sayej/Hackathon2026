@@ -22,9 +22,9 @@ say so.
 
 What it does NOT overlap with
 -----------------------------
-`npm run check:firebase-live` writes, reads and deletes a probe document against the PILOT
-store. That exercises the **allow** branch for `yomyom-kafr-qasim` and says nothing about
-whether any other store is denied. The isolation rests on the **deny** branch, which no
+`npm run check:firebase-live` (removed 2026-10-01) wrote, read and deleted a probe document
+against the PILOT store. That exercised the **allow** branch for `yomyom-kafr-qasim` and said
+nothing about whether any other store is denied. The isolation rests on the **deny** branch, which no
 live probe here covers.
 
 This reads the deployed ruleset text instead, which settles both branches at once: if the
@@ -34,7 +34,8 @@ Deliberately read-only. It touches no document and creates no anonymous user —
 `firebaserules.googleapis.com` for the released ruleset and diffs the text. That matters:
 the alternative on the table was a client `getDoc` against `stores/preview-sandbox/...`,
 which settles the same question but connects as a new anonymous user against the
-production project.
+production project. (Anonymous sign-in was disabled on 2026-09-26, and `check_firebase_live.mjs`,
+which signed in that way, was removed on 2026-10-01.)
 
 Usage:
   FIREBASE_SERVICE_ACCOUNT_PATH=./secrets/firebase-service-account.json \\

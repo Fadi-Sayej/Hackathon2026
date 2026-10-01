@@ -55,7 +55,7 @@ describe('writeThrough', () => {
     expect(fake.calls).toHaveLength(0)
   })
 
-  it('is a no-op, and says so, when anonymous sign-in fails', async () => {
+  it('is a no-op, and says so, when no account is signed in', async () => {
     const fake = createFakeFirestore({ user: null })
     setRemoteLoaderForTests(fake.loader)
     expect(await writeThrough('outcomes', 'e1', { status: 'acted', at: 1 })).toEqual({ written: false, reason: 'no_auth' })

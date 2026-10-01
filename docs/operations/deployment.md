@@ -210,7 +210,7 @@ Firestore, which is real and unrelated. Tracked as **#97**, deliberately not cha
 night Checkpoint 3's first gate run happens: the ruleset is byte-identical, so the check
 cannot fire for drift, and editing the nightly on gate night buys nothing.
 
-**`npm run check:firebase-live` does not settle this**, and should not be read as though it
+**`npm run check:firebase-live` does not settle this** (it was removed on 2026-10-01: it signed in anonymously, which is disabled since 2026-09-26), and should not be read as though it
 does. It writes, reads and deletes a probe document against the **pilot** store, so it
 exercises the *allow* branch for `yomyom-kafr-qasim` and says nothing about whether any
 other store is denied. The isolation rests on the *deny* branch.

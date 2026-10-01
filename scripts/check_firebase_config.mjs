@@ -33,7 +33,7 @@ const REQUIRED = {
 }
 
 const OPTIONAL = {
-  VITE_FIREBASE_AUTH_DOMAIN: 'used by anonymous sign-in; usually <projectId>.firebaseapp.com',
+  VITE_FIREBASE_AUTH_DOMAIN: 'used by sign-in (Google, email link); usually <projectId>.firebaseapp.com',
   VITE_FIREBASE_STORAGE_BUCKET: 'not needed for Firestore',
   VITE_FIREBASE_MESSAGING_SENDER_ID: 'not needed for Firestore',
 }
@@ -156,8 +156,9 @@ if (missing || invalid) {
 }
 
 console.log(green(bold('Config is valid.')) + ' Two console steps remain — neither is code:\n')
-console.log('  1. Firebase console → Authentication → Sign-in method → Anonymous → Enable')
-console.log('     Without it every request is unauthenticated and the rules deny it.')
+console.log('  1. Firebase console → Authentication → Sign-in method → Google, and Email link (ADR-029),')
+console.log('     then give each account its role: python3 scripts/set_user_role.py <email> owner|team.')
+console.log('     The rules refuse any account without a role.')
 console.log('  2. Deploy the rules:  firebase deploy --only firestore:rules')
 console.log('     Without it the default rules deny everything.\n')
 console.log('Then set the SAME values in Vercel (Production AND Preview), redeploy, and')
