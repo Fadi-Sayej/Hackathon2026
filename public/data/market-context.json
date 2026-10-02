@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-01T03:38:49.342113+00:00",
-  "date": "2026-10-01",
+  "generatedAt": "2026-10-02T03:39:08.418705+00:00",
+  "date": "2026-10-02",
   "status": "ok",
   "sources": {
     "weather": "open-meteo",
@@ -9,28 +9,28 @@
     "islamic": "computed_hijri"
   },
   "weather": {
-    "temperatureC": 18.7,
+    "temperatureC": 18.5,
     "precipitation": 0.0,
-    "windSpeed": 6.0,
-    "weatherCode": 2,
+    "windSpeed": 5.2,
+    "weatherCode": 1,
     "label": "mild",
-    "observedAt": "2026-10-01T06:30",
-    "lat": 32.114,
-    "lon": 34.976,
+    "observedAt": "2026-10-02T06:30",
+    "lat": 32.1091501,
+    "lon": 34.9624392,
     "source": "open-meteo"
   },
   "hebrew": {
-    "date": "2026-10-01",
+    "date": "2026-10-02",
     "holidays": [
       {
-        "title": "Sukkot VI (CH’’M)",
-        "hebrew": "סוכות ו׳ (חוה״מ)",
+        "title": "Sukkot VII (Hoshana Raba)",
+        "hebrew": "סוכות ז׳ (הושענא רבה)",
         "category": "holiday"
       }
     ],
     "isErevChag": false,
     "isFastDay": false,
-    "isShabbatEve": false,
+    "isShabbatEve": true,
     "chametz": null,
     "pesachStart": "2027-04-22",
     "windows": {
@@ -41,11 +41,11 @@
     "source": "hebcal"
   },
   "islamic": {
-    "date": "2026-10-01",
+    "date": "2026-10-02",
     "hijri": {
       "year": 1448,
       "month": 4,
-      "day": 18
+      "day": 19
     },
     "isRamadan": false,
     "ramadanDay": null,
@@ -53,8 +53,8 @@
     "isEidAlFitr": false,
     "isEidAlAdha": false,
     "ramadanStart": "2027-02-08",
-    "daysToRamadan": 130,
-    "daysToEidAlFitr": 160,
+    "daysToRamadan": 129,
+    "daysToEidAlFitr": 159,
     "phase": null,
     "windows": {
       "ramadan_build_up_days": 21,
@@ -64,9 +64,21 @@
     },
     "source": "computed_hijri"
   },
-  "demandSignals": {},
-  "demandBasis": {},
-  "activeReasons": [],
+  "demandSignals": {
+    "מוצרי מכולת": 1.1,
+    "מוצרי מקרר": 1.1
+  },
+  "demandBasis": {
+    "מוצרי מכולת": [
+      "shabbat_eve"
+    ],
+    "מוצרי מקרר": [
+      "shabbat_eve"
+    ]
+  },
+  "activeReasons": [
+    "shabbat_eve"
+  ],
   "shelfLife": {
     "categories": {
       "מחלקת -barista": 2,
@@ -2447,7 +2459,7 @@
       "9780201321029",
       "9800800056"
     ],
-    "days": 52,
+    "days": 53,
     "status": "ok",
     "lift": 1.15
   }
