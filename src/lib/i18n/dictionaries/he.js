@@ -577,6 +577,13 @@ export const he = {
   'orders.day': "יום הזמנה",
   'orders.changed': "שינית מ-{n}",
   'orders.csv': "הורדה לספק (CSV)",
+  // D-29: the order pages' example, while they wait for daily reports.
+  'example.open': "לראות איך הדף ייראה",
+  'example.close': "סגירת הדוגמה",
+  'example.label': "דוגמה",
+  'example.banner': "דוגמה: חנות לבדיקה, לא הנתונים שלך. כאן אי אפשר לאשר, לשמור או לשלוח דבר.",
+  'example.loading': "טוען את הדוגמה…",
+  'example.unavailable': "לא ניתן היה לטעון את הדוגמה.",
 
   // F8 (Phase 5 Task 5.14): the disagreement question, as the repository owner approved it on
   // 2026-09-27 (docs/reviews/F8-screens-mockups.md).

@@ -45,7 +45,11 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const CEILING_KB = 913         // measured 910 KB on a fresh local build, 2026-09-29 (CI reads about 1 KB
+const CEILING_KB = 916         // measured 912 KB on a fresh local build, 2026-10-03 (CI reads about 1 KB
+                               // higher): D-29's preview on Reorder and Approved orders, a component
+                               // and six strings in three languages; the example itself is fetched,
+                               // not bundled. index.html is 371 KB. Before that it was 913,
+                               // measured 910 KB on a fresh local build, 2026-09-29 (CI reads about 1 KB
                                // higher): D-27 puts the market's listed prices and a third answer on F9's
                                // card, 5 strings in three languages and the per-store price lines.
                                // index.html is 368 KB, under its 500 KB target. Before that it was 910,
