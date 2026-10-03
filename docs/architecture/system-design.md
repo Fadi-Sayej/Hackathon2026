@@ -1227,6 +1227,7 @@ own, so their rows say so rather than grade it after the fact.
 | [ADR-033](decisions/ADR-033-store-facts-are-a-committed-file.md) | The store facts are a committed file the team records from the owner; owner state never holds them | Easy |
 | [ADR-034](decisions/ADR-034-a-suggestion-is-identified-by-product-and-order-day.md) | An order suggestion is identified by its product and order day; a disagreement is a question keyed by its product | Easy before first use |
 | [ADR-035](decisions/ADR-035-a-models-answer-is-collected-data.md) | A model's answer is collected data: sealed as a daily snapshot, and reproduction reads it like any other | Easy |
+| [ADR-036](decisions/ADR-036-a-store-is-configuration-one-copy-per-store.md) | A store is configuration, and each store runs its own copy with only its own data (D-28) | Easy |
 
 ---
 

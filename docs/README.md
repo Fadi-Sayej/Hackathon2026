@@ -53,7 +53,7 @@ globally unique across the specification layer and were **not** renumbered by th
 | F6 — Daily Action Surface | [intent](features/F6-daily-action-surface/intent.md) | [F6-S1](features/F6-daily-action-surface/specs/F6-S1-daily-action-surface.md) | V1 |
 | F7 — Figure Provenance | [intent](features/F7-figure-provenance/intent.md) | [F7-S1](features/F7-figure-provenance/specs/F7-S1-figure-provenance.md) | V1 |
 | F8 — Order Quantity | [intent](features/F8-order-quantity/intent.md) | [F8-S1](features/F8-order-quantity/specs/F8-S1-order-quantity.md) | V2 |
-| F9 — Assortment Gap | [intent](features/F9-assortment-gap/intent.md) | *not specified* | V2 |
+| F9 — Assortment Gap | [intent](features/F9-assortment-gap/intent.md) | [F9-S1](features/F9-assortment-gap/specs/F9-S1-assortment-gap.md) | V2 |
 | F10 — Expiry-Bounded Ordering | [intent](features/F10-expiry-bounded-ordering/intent.md) | *not specified* | V2 |
 | F11 — Supplier Lead Times | [intent](features/F11-supplier-lead-times/intent.md) | *not specified* | V3 |
 | F12 — Planogram | [intent](features/F12-planogram/intent.md) | *not specified* | V4 |
