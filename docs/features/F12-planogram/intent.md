@@ -1,7 +1,7 @@
 ---
 ID: F12-INTENT
 Title: F12 — Planogram
-Status: Registered — not specified
+Status: Approved — for specification, by the repository owner on 2026-10-03 (D-30)
 Release: V4
 Parent: [PRD](../../product/PRD.md)
 Intent IDs: INT-006
@@ -52,14 +52,20 @@ F8, and the owner's own arrangement rules.
 ## Added 2026-10-03 (not part of the migrated content)
 
 The repository owner unlocked this feature for specification as **D-30**, answering "should F12
-be unlocked for specification now, with the plan waiting for sales the way F8 does?":
-- **The owner's inputs** (shelf photographs, shelf measurements, his arrangement rules) can be
-  entered as soon as a store exists.
-- **The plan waits for the store's daily sales reports**, and says so. It is never shown empty
-  or invented, the way F8's order pages wait (D-23).
+be unlocked for specification now, with the plan waiting for sales the way F8 does?" with
+"unlock":
+- **The plan waits for the store's daily sales reports**, and says why, the way F8's order
+  pages wait. It is never shown empty or invented (D-23).
+- **The owner's own inputs** (shelf photographs, shelf measurements, his arrangement rules)
+  would not wait for sales, as the option was put to him.
 - **D-13 stands:** no fixed cameras or sensors.
 
-Not decided by D-30, and left to the spec or to the owner: a marked example while the plan
-waits (as D-29 allows the order pages), and whether a first version reads shelves from
-photographs or takes them by hand. The PRD's one-day shelf-photograph trial was never run.
-The status stays `Registered — not specified` until a spec is approved.
+Not decided by D-30:
+- building it, which follows his approval of the spec and its mockups;
+- a marked example while the plan waits, which needs a decision of its own because D-29
+  confines examples to the order pages;
+- whether a first version reads shelves from photographs or takes them by hand, for the spec
+  to propose and the owner to approve. The PRD's one-day shelf-photograph trial was never run.
+
+The status above records his approval for specification, as F8's did (ca47a35). The banner at
+the top describes the state before D-30, and is kept as the record.
