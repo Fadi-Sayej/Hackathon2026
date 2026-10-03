@@ -53,15 +53,21 @@ owner (ADR-003, ADR-029). Reorder's approvals reuse that model (ADR-034).
    It has no ₪ field (D-1) and no name (D-22). `arranged_on` is the day his device's calendar
    shows when he presses, and it is the boundary of the measurement. `recordOutcome` gains a
    `shelf.plan` branch, as it gained an `order.suggestion` one (ADR-034).
-5. **The date is written once.** For every other family, a second `recordOutcome` on the same
-   entry rewrites `at`. On an acted `shelf.plan` entry, it changes nothing. `clearOutcome`
-   (his undo) removes the arrangement, and its measurement with it.
-6. **Nothing else maps onto it.** `declined` and `deferred` are not offered on a plan.
-7. **The engine reads arrangements** from the pulled owner state, as it reads every outcome
+5. **The date is written once, on the device that records it.** For every other family, a
+   second `recordOutcome` on the same entry rewrites `at`. On an acted `shelf.plan` entry, it
+   changes nothing. `clearOutcome` (his undo) removes the arrangement, and its measurement with
+   it.
+6. **Every device shows the published arrangement.** The browser does not read owner state
+   back (System Design §11.5; `remoteOwnerState.js`), so a device knows only its own presses.
+   Shelf plan therefore shows each fixture's latest arrangement from `shelf_measurement`'s
+   published output, and a device's own record only until the nightly has read it. While a
+   fixture's measurement is running, the button warns that arranging it again ends it.
+7. **Nothing else maps onto it.** `declined` and `deferred` are not offered on a plan.
+8. **The engine reads arrangements** from the pulled owner state, as it reads every outcome
    (ADR-003). Only `acted` outcomes of `shelf.plan` are used, by `shelf_measurement` (F12-S1
    FR-208). An outcome whose entry is no longer published is still read: its snapshot carries
    everything the measurement needs, so no past artefact is read.
-8. **The seam is tested.** `ownerStateContract.test.js` records one `shelf.plan` outcome through
+9. **The seam is tested.** `ownerStateContract.test.js` records one `shelf.plan` outcome through
    the real `recordOutcome`. The engine's reader and F12-S1's probe read that fixture, so both
    are tested against the shape the browser writes.
 
@@ -75,6 +81,13 @@ already holds: who acted, on what, and when. ADR-034 reused outcomes for the sam
 §11.3 reads `barcode` as a product's, and the id's construction normalises it as one. Fixture
 "01" and fixture "1" would share an entry, and every reader of `barcode` would have to know that
 some barcodes are fixtures.
+
+### Enforce "written once" in `firestore.rules`
+Outcomes are fields of one document, keyed by entry id, and the rules language cannot loop over
+a write's changed keys to check which family each belongs to. Enforcing it there would need one
+document per arrangement, which is the new kind of record rejected above. Decision 6 makes the
+published arrangement the one every device shows instead, and F12-S1 ASM-082 states the case
+that remains.
 
 ### Keep the latest press's time, as other outcomes do
 The date is the boundary between the two windows. A second press a week later would move a week
@@ -95,7 +108,10 @@ the effect being measured.
 - the plan publishes one entry per fixture per night, which the capability's entries were not
   otherwise needed for;
 - the entry contract gains a case with no product and one action value;
-- `recordOutcome` gains a family-specific branch, and one family whose date is written once.
+- `recordOutcome` gains a family-specific branch, and one family whose date is written once;
+- until the browser reads owner state back, an undo on one device can be reversed by another
+  that also pressed, because `pushAll` re-sends a device's records on every load (F12-S1
+  ASM-082).
 
 **We gain:** no new storage, rules or pull code, and arrangements fall under the existing role
 rule: the team cannot write them (ADR-029).
