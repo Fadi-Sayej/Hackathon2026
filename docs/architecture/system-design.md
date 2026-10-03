@@ -1228,6 +1228,7 @@ own, so their rows say so rather than grade it after the fact.
 | [ADR-034](decisions/ADR-034-a-suggestion-is-identified-by-product-and-order-day.md) | An order suggestion is identified by its product and order day; a disagreement is a question keyed by its product | Easy before first use |
 | [ADR-035](decisions/ADR-035-a-models-answer-is-collected-data.md) | A model's answer is collected data: sealed as a daily snapshot, and reproduction reads it like any other | Easy |
 | [ADR-036](decisions/ADR-036-a-store-is-configuration-one-copy-per-store.md) | A store is configuration, and each store runs its own copy with only its own data (D-28) | Easy |
+| [ADR-037](decisions/ADR-037-shelf-layout-is-a-committed-file.md) | The shelf layout, facing widths and arrangement rules are a committed file the team records from the owner (F12-S1). **Ready for review** | Easy: a later ADR can move widths to photographs if the vision trial succeeds |
 
 ---
 
@@ -1497,6 +1498,23 @@ it needs a store to send anything. The plan that builds it is
 | FR-174 | E unavailable on the market signal's input reason, or `market_signal_stale` by the same `is_stale` | ADR-014, ADR-031 Decision 5 | AC-165 |
 | FR-175 | B `NOT_YET_SHOWN` until the card is approved | Phase 5 Task 5.0's precedent | AC-170 |
 | FR-176, NFR-070, NFR-071 | R print mode over the committed snapshots | ADR-002, ADR-005 | AC-164; Checkpoint 3's budget |
+
+### F12-S1 — Planogram (V4: specified, Ready for review; not built)
+
+F12-S1 builds D-30, which unlocked F12 for specification on 2026-10-03 with the plan waiting for
+daily sales the way F8 does. It adds two engine capabilities, `layout_facts`, which needs no
+sales, and `shelf_plan`, which waits for them (ADR-014), and one committed file of layout facts (ADR-037). Nothing is built
+until the owner approves the spec and its mockups.
+
+| Requirement | Design element | Flow / contract | Verification |
+|---|---|---|---|
+| FR-178 … FR-180, INV-084, INV-086 | I the layout file, validated at load and never repaired; rejected entries named in the run's steps; store data under ADR-036's manifest | ADR-037, after ADR-033; ADR-036 | AC-175, AC-183, AC-184, AC-188 |
+| FR-181, INV-085 | E demand by F8's own evidence functions over F8's window; unknown where the evidence does not itemise | F8-S1 FR-143 … FR-146, FR-156; ADR-011; ADR-030 | AC-179, AC-186 |
+| FR-190, FR-191, FR-196 … FR-199 | E `layout_facts` (requires `products`, `store_layout`): the facts with dates, what is missing, and the catalogue products not planned with their reasons; available without sales | ADR-014 | AC-172, AC-173, AC-176, AC-184, AC-186 |
+| FR-182 … FR-189, INV-087, INV-088, INV-090, INV-091 | E `shelf_plan`: first facings packed shelf by shelf, known earnings first; an over-full fixture planned not at all; extra facings only where every size is known, greedy with a provisional elasticity; P the plan with its conditions and no money total | ADR-005, ADR-012 | AC-174 … AC-178, AC-180, AC-181 |
+| FR-193 | E `shelf_plan` requires `products`, `store_layout`, `sales_daily`; rule-level `layout_all_rejected`, `no_evidence_window`, `stale_daily_sales` | ADR-014; ADR-030 §4 | AC-172, AC-173, AC-185 |
+| FR-192, FR-194, FR-195, INV-089 | U Store layout and Shelf plan leave their awaiting shells; `value_policy: none`, not admitted; read-only for every role | ADR-028 §1; ADR-029; ADR-012 | AC-173, AC-182, AC-187 |
+| NFR-072, NFR-073 | R print mode; no step growing with market history | ADR-002 | Checkpoint of its phase |
 
 ### Cross-cutting decisions
 
