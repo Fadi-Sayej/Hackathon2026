@@ -3,12 +3,12 @@ ID: F12-S1
 Title: Planogram — a dated shelf plan from his own sales, waiting for them until they arrive
 Status: Ready for review
 Owner: smartshelf-architect
-Version: 0.4 (2026-10-03: OQ-1201, OQ-1202, OQ-1203 and OQ-1205 answered; D-31; OQ-1206 raised)
+Version: 0.5 (2026-10-04: OQ-1206 answered; the arrangement record and the before-and-after measurement; §23)
 Parent: [F12 — Planogram](../intent.md)
 Related Intents: INT-006
-Inputs: [docs/features/F12-planogram/intent.md (Approved for specification, D-30), docs/product/PRD.md (§5 V4, §6 #7), docs/product/intent-register.md (D-1, D-3, D-13, D-14, D-22, D-23, D-28, D-29, D-30, D-31), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (§5 "He stocks", FR-143 … FR-146, FR-156), ADR-001, ADR-002, ADR-005, ADR-007, ADR-011, ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-033, ADR-036, ADR-037, CLAUDE.md]
+Inputs: [docs/features/F12-planogram/intent.md (Approved for specification, D-30), docs/product/PRD.md (§5 V4, §6 #7), docs/product/intent-register.md (D-1, D-3, D-13, D-14, D-22, D-23, D-28, D-29, D-30, D-31), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (§5 "He stocks", FR-143 … FR-146, FR-156), ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-011, ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-033, ADR-036, ADR-037, ADR-038, CLAUDE.md]
 Answered by: [System Design](../../../architecture/system-design.md) §21 (F12-S1)
-Updated: 2026-10-03 (the owner's answers; D-31 brings the marked example into scope)
+Updated: 2026-10-04 (OQ-1206: the scientific basis, and measuring the plan in his store)
 ---
 
 # F12-S1 — Planogram
@@ -18,11 +18,11 @@ Updated: 2026-10-03 (the owner's answers; D-31 brings the marked example into sc
 > **(decided here)** for the owner's approval, or asked in §17.
 
 > **Identifier note.** Every `FR-`, `INV-`, `NFR-`, `AC-`, `SCN-`, `C-`, `ASM-` and `OQ-` id
-> below is new and globally unique: FR-178 … FR-200, INV-084 … INV-091, NFR-072 … NFR-075,
-> AC-172 … AC-189, SCN-159 … SCN-168, C-73 … C-75, ASM-073 … ASM-074, OQ-1201 … OQ-1206.
+> below is new and globally unique: FR-178 … FR-207, INV-084 … INV-094, NFR-072 … NFR-076,
+> AC-172 … AC-195, SCN-159 … SCN-172, C-73 … C-75, ASM-073 … ASM-077, OQ-1201 … OQ-1207.
 
-Implements intent F12. Bound by ADR-001, ADR-002, ADR-005, ADR-007, ADR-011, ADR-012, ADR-014,
-ADR-028, ADR-029, ADR-030, ADR-033, ADR-036 and ADR-037, and settled decisions D-1, D-3, D-13,
+Implements intent F12. Bound by ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-011, ADR-012,
+ADR-014, ADR-028, ADR-029, ADR-030, ADR-033, ADR-036, ADR-037 and ADR-038, and settled decisions D-1, D-3, D-13,
 D-14, D-23, D-29, D-30 and D-31.
 
 ## 1. Purpose
@@ -35,8 +35,11 @@ The plan is a **dated plan with its conditions**, not a finished feature (intent
 commitment; PRD §6 #7). It names the sales window it rests on, the date of every measurement and
 rule, and every product it did not place and why.
 
-It never claims a gain. The intent's "+20–68% margin per linear metre" is a figure from
-elsewhere, and this store has no before-and-after to measure one (§21).
+Its rules come from shelf-space research (§23), and its numbers start as research averages.
+When he arranges a fixture to the plan and records it, the product measures what changed
+against fixtures he did not touch. Measured on enough products, his store's own response
+replaces the research average (FR-201 … FR-207). Until then it claims no gain. The intent's
+"+20–68% margin per linear metre" is a figure from elsewhere (§21).
 
 ## 2. Intent Traceability
 
@@ -54,13 +57,16 @@ Behavioural scope, not a file list. The implementation plan declares the files.
   (ADR-037):
   - each fixture's shelves and their usable lengths;
   - the departments it holds, whether it is chilled, and which shelf is at eye level;
-  - each stocked product's facing width;
+  - each stocked product's facing width, and its current facings, both read from his shelf
+    photographs;
   - the owner's arrangement rules.
 - Two engine capabilities, because they fail on different days (ADR-014):
   - **`layout_facts`** publishes the recorded facts and what is missing, and needs no sales;
   - **`shelf_plan`** publishes the plan, and waits for daily sales.
 - Two pages that already exist as waiting shells (ADR-028 §1), filled from the artefact:
   **Store layout** from `layout_facts`, and **Shelf plan** from `shelf_plan`.
+- His "I've arranged this shelf" record, and the before-and-after measurement it starts
+  (FR-201 … FR-207; OQ-1206, answered).
 - A clearly marked example on Shelf plan while it waits, as on Reorder (D-31, FR-200). What the
   example is built from is proposed by its plan for his approval.
 - The boundary probe for the new inputs (§20).
@@ -73,7 +79,10 @@ Behavioural scope, not a file list. The implementation plan declares the files.
   Possible later, and only by hand-held photographs (D-13).
 - **The order of products from left to right within a shelf.** The plan gives each product a
   shelf and a number of facings **(decided here)**.
-- **Any money projection.** See INV-087 and §21.
+- **Any money projection, and any money measurement.** The measurement is in units sold (FR-207;
+  INV-087, INV-093).
+- **Products affecting each other's sales** (cross-space elasticities, which Corstjens and Doyle
+  model). The plan treats each product's space on its own (§23).
 - **Planning products he does not stock** (F8-S1 §5). Those in his catalogue are listed, not
   planned (FR-198). Products outside his catalogue are F9's.
 
@@ -85,6 +94,7 @@ Behavioural scope, not a file list. The implementation plan declares the files.
 | The team | Measures shelves and facing widths; records them and his rules in the layout file (ADR-037); commits | When something is measured or stated |
 | The nightly engine | Computes `layout_facts` and `shelf_plan` | Nightly (ADR-007) |
 | The owner | Opens Store layout or Shelf plan | Any time |
+| The owner | Presses "I've arranged this shelf" on a fixture's plan, after he rearranges it | When he does |
 | A team account | Opens either page | Any time; read-only (ADR-029) |
 
 ## 5. Domain Terms
@@ -102,6 +112,10 @@ Behavioural scope, not a file list. The implementation plan declares the files.
 | Demand | The daily mean that F8's evidence functions give for the product over F8's window. The same functions compute it, so it is never a second derivation (INV-085). It is unknown where the evidence does not itemise the department (ADR-011). |
 | Earnings per centimetre | Margin per sale × demand ÷ facing width. Defined only where all three are known. |
 | Margin per sale | Shelf price less unit cost, for one unit. A unit figure, not a quantity (D-1). |
+| Space elasticity | How a product's sales respond to its shelf space: sales scale as space to this power. With 0.17, doubling the space multiplies sales by 2^0.17, about 1.125 (§23). |
+| Arrangement | His record that he rearranged one fixture to one dated plan (FR-201, ADR-038). |
+| Before and after windows | The report days before and after an arrangement, each held to F8's window rules (FR-202). |
+| Comparison products | Planned products on fixtures with no arrangement inside either window (FR-203). |
 
 ## 6. Functional Requirements
 
@@ -202,7 +216,8 @@ zero (the evidence itemises its department and records no sale) has a known earn
 zero, keeps its first facing, and gets no more.
 
 **FR-192** — Both capabilities are `value_policy: none`, and neither is admitted to the daily
-surface **(decided here)**. The plan is a page he opens, not one of Today's places. Margin per sale
+surface **(decided here)**. `shelf_plan` publishes each fixture's plan as one entry of the family
+`shelf.plan`, whose variant is the plan's date (ADR-038). The plan is a page he opens, not one of Today's places. Margin per sale
 may appear in a placed product's evidence as a unit price figure, never as a value or a total
 (INV-087).
 
@@ -233,8 +248,63 @@ example of itself, as Reorder does (D-31, after D-29):
 - the engine, the published artefacts, the owner state and the pilot measurement never read
   it.
 
-**FR-195** — Neither page has a control that changes anything. A team account sees them the same
-(ADR-029).
+**FR-195** — Neither page has a control that changes anything, except FR-201's record on Shelf
+plan. A team account sees both the same and cannot use that control (ADR-029).
+
+#### Measuring what the plan did
+
+**FR-201** — On each fixture's plan, the owner can record "I've arranged this shelf". It records
+the existing `acted` outcome on that fixture's plan entry, with the facings he followed and the
+time (ADR-003, ADR-038). A later press, for a later plan, is a new record. A team account cannot
+write it (ADR-029), and the marked example's control is disabled (D-31).
+
+**FR-202** — An arrangement is measured over two windows of report days, each held to F8's
+window rules (F8-S1 FR-144):
+- **before:** the window ending the day before the arrangement;
+- **after:** the window of the same length starting the day after it.
+
+The window's length and its minimum report days are F8's policy values, and are provisional
+(OQ-1207). Until the after window is complete, the measurement says how many report days
+remain.
+
+**FR-203** — Each arranged product's change is measured net of what happened in the rest of his
+store, by difference in differences **(decided here)**:
+- its daily mean after ÷ before;
+- divided by the median of the same ratio over the comparison products.
+
+Seasons, holidays and store-wide swings move the comparison products too, which is why they
+are the yardstick. With no comparison product there is no measurement, and the reason is "no
+unchanged fixture to compare with".
+
+**FR-204** — A product is left out of the measurement, and named, when its shelf price changed
+between the windows, or it had no sale in either window **(decided here)**.
+
+**FR-205** — His store's own space elasticity is estimated across the arranged products whose
+facings changed: the slope of the logarithm of FR-203's net change against the logarithm of
+after ÷ before facings **(decided here)**. The before facings are the ones the team counted from
+his shelf photographs and recorded in the layout file (ADR-037). The after facings are the ones
+he recorded following (FR-201). A product without a counted before figure is named and left out
+of the estimate, though not out of FR-203's net change. It is published with its interval and the number of
+products behind it, and with one of three verdicts (CLAUDE.md rule 13):
+- **measured**, when the interval excludes zero;
+- **measured and not significant**, when the interval includes zero;
+- **not measurable**, with fewer products than the policy minimum, or no comparison.
+
+The interval's level and the minimum number of products are policy values, and are
+provisional (OQ-1207).
+
+**FR-206** — The plan uses the research elasticity, 0.17 (Eisend 2014; §23), until his store's
+own value is "measured". From then on it uses his, and the plan says which it used. A store value
+that is "measured and not significant" or "not measurable" never replaces the research value
+**(decided here)**.
+
+**FR-207** — The measurement is published per arranged fixture:
+- the arrangement's date and the two windows;
+- per product, the daily mean before and after and its net change (FR-203), or why it was left
+  out;
+- the store elasticity, with its interval, product count and verdict (FR-205).
+
+It is in units sold, never in ₪ **(decided here)**.
 
 **FR-196** — `layout_facts` is unavailable (`no_store_layout`) when the layout file is absent, and
 (`layout_all_rejected`) when every fixture in it was rejected. Store layout then says the
@@ -280,12 +350,25 @@ in the window", "count zero or below", "stock unknown", or the fixture being ove
 stopped by a rule. *Violated if* a fixture's published products and its departments' catalogue
 products differ.
 
-**INV-089** — Nothing on either page can be changed, approved or sent (FR-195). *Violated if* a
-click on either page writes owner state.
+**INV-089** — Nothing on either page can be changed, approved or sent, except FR-201's record,
+which writes that record and nothing else (FR-195). *Violated if* a click on either page writes
+any other owner state, or a team account writes an arrangement.
 
 **INV-090** — A product whose earnings per centimetre is unknown never takes a place in the
 earnings order (FR-183). *Violated if* such a product is packed before one whose earnings are
 known.
+
+**INV-092** — A measurement never compares a window that fails F8's window rules, and is never
+published without comparison products. *Violated if* a net change is published for an
+arrangement with an incomplete window or no comparison.
+
+**INV-093** — A measured change is never extended to the whole store, to other fixtures, to money
+or to the future. *Violated if* a published figure scales a fixture's measured change beyond its
+own products and windows.
+
+**INV-094** — The plan uses his store's elasticity only when its verdict is "measured" (FR-206).
+*Violated if* the plan cites a store value whose verdict is "measured and not significant" or
+"not measurable".
 
 **INV-091** — Extra facings are never given on a fixture with a product of unknown size (FR-186).
 *Violated if* a fixture with "no width" or "too wide" shows a product with more than one facing.
@@ -326,6 +409,19 @@ not known.
 
 **SCN-167** — Given a layout file with one malformed fixture, when the nightly runs, then that
 fixture is named in the run's steps and the others are planned.
+
+**SCN-169** — Given an owner on a fixture's plan, when he presses "I've arranged this shelf",
+then one arrangement record is written with the fixture, the plan's date and the time. A team
+account pressing it writes nothing.
+
+**SCN-170** — Given an arrangement 10 report days ago, when the nightly runs, then the fixture's
+measurement says how many report days its after window still needs, and publishes no change.
+
+**SCN-171** — Given every fixture arranged inside the windows, when the measurement is due, then
+no net change is published, and the reason is "no unchanged fixture to compare with".
+
+**SCN-172** — Given enough arranged products for a store elasticity whose verdict is "measured",
+when the nightly runs, then the plan uses the store's value instead of 0.17 and says so.
 
 **SCN-168** — Given a department the evidence does not itemise, when the plan is made, then its
 stocked products (latest count above zero) each get one facing, and the plan says their demand is
@@ -386,6 +482,9 @@ committed inputs (ADR-002).
 **NFR-074** — The two pages render on a phone without horizontal scrolling, in Hebrew, Arabic and
 English (the existing e2e invariants).
 
+**NFR-076** — The measurement reads only the daily reports, the plan's history and owner state. Its
+time grows with the arrangements he records, not with the collected market history.
+
 **NFR-075** — A store's layout file is store data. Updating a copy from the product never
 overwrites it, and `check:store` reports whether it is present (ADR-036, ADR-037).
 
@@ -434,8 +533,27 @@ margin is a unit figure in evidence, unsummed. *(FR-192, INV-087)*
 **AC-181** — The published plan carries its window dates, every fact's date, and the per-fixture
 counts of FR-189. *(FR-189)*
 
-**AC-182** — Neither page writes owner state, and a team account sees both read-only.
-*(FR-195, INV-089)*
+**AC-182** — Neither page writes owner state except FR-201's arrangement record, and a team
+account writes nothing. *(FR-195, INV-089)*
+
+**AC-190** — Pressing "I've arranged this shelf" writes exactly one record with the fixture, the
+plan's date and the time. A team account cannot write it. *(FR-201, INV-089)*
+
+**AC-191** — No net change is published until both windows meet F8's window rules, and none
+without comparison products. *(FR-202, FR-203, INV-092)*
+
+**AC-192** — On a fixture-world test with known sales, the net change equals after ÷ before,
+divided by the comparison products' median ratio. *(FR-203)*
+
+**AC-193** — A product whose price changed between the windows, or that had no sale in either,
+is named and left out. *(FR-204)*
+
+**AC-194** — The store elasticity is published with its interval, count and verdict. The plan
+switches to it only when the verdict is "measured", and names the value it used. *(FR-205,
+FR-206, INV-094)*
+
+**AC-195** — Every published measurement is in units, for its own fixture's products and
+windows, never in ₪ and never extended beyond them. *(FR-207, INV-093)*
 
 **AC-183** — No input other than the layout file and the existing artefact inputs reaches either
 capability. *(INV-084; D-13)*
@@ -465,6 +583,18 @@ example. No engine step, published artefact, owner state or pilot measurement re
 **ASM-073** — A product's facing width does not change between packs of the same barcode.
 *Falsified if* he sells one barcode in two pack sizes.
 
+**ASM-075** — A day a product sold nothing in the after window is a day of no demand, not a day it
+was out of stock. *Falsified if* stock-outs are common on arranged fixtures: they would make a
+plan look worse than it was, and nothing here detects them.
+
+**ASM-076** — Nothing else changed on an arranged fixture between the windows, such as a
+promotion or a supplier display, beyond what FR-204 removes. *Falsified if* he ran a promotion
+there. The comparison products absorb store-wide changes, not changes on one fixture.
+
+**ASM-077** — When he records an arrangement, the fixture matches the plan he followed. *Falsified
+if* he arranges part of it. The after facings would then be wrong, and nothing here checks them:
+the photograph check is out of scope (§3).
+
 **ASM-074** — One measured usable length per shelf is enough. A shelf with dividers or uneven
 depth is measured as the length that can hold products. *Falsified if* a fixture's products need
 depth or height to fit.
@@ -484,8 +614,10 @@ approval.
 will look, like Reorder does? That would be a new decision, D-31." **Answered 2026-10-03:
 "yes", recorded as D-31 (FR-200).**
 
-**OQ-1204** — What are the provisional space-elasticity factor and facings cap (FR-185)? · owner:
-the repository owner, on the architect's proposal · blocks: FR-185's numbers, not its rule.
+**OQ-1204** — What are the provisional space-elasticity factor and facings cap (FR-185)? The
+architect proposes 0.17 for the factor, the meta-analysis mean (§23). The cap has no research
+figure behind it and is still to be proposed. · owner: the repository owner · blocks: FR-185's
+numbers, not its rule.
 
 **~~OQ-1205~~** — "Are my design choices right?" **Answered 2026-10-03: "yes".** The choices
 marked **(decided here)** are:
@@ -502,18 +634,26 @@ marked **(decided here)** are:
 - rejecting a split department's unassigned products (FR-199).
 
 
-**OQ-1206** — In his words: "the planogram is real science, how our product actually know what to
-tell the owner to put where to give him the best sellings". The plan's rules (FR-183 … FR-185)
-and its provisional elasticity (OQ-1204) need their scientific basis stated, and §21 says the
-plan is not a proven optimum. · owner: the repository owner, on the architect's proposal ·
-blocks: approval of this spec.
+**~~OQ-1206~~** — In his words: "the planogram is real science, how our product actually know what
+to tell the owner to put where to give him the best sellings". **Answered 2026-10-04, in two
+parts:**
+- **§23 states the basis** of each rule, with its source.
+- **He answered "yes"** to "Should I add the button and the before-and-after measurement to the
+  spec?" FR-201 … FR-207 measure the plan in his own store. Once his own elasticity is
+  measured, it replaces the research value.
+
+**OQ-1207** — What are the measurement's provisional values? They are the window's length and
+minimum report days (F8's), the interval's level, and the minimum number of products for a
+store elasticity. · owner: the repository owner, on the architect's proposal · blocks: the
+numbers in FR-202 and FR-205, not their rules.
 
 ## 18. Non-Goals
 
 - A plan built from monthly reports, or from assumed demand, to show something now.
 - A floor plan of the store. Store layout lists fixtures; it does not draw the floor.
 - Promotions, end caps or seasonal moves.
-- Any measured gain from following the plan.
+- A measured gain in money, or one claimed for the whole store (FR-207, INV-093).
+- How products affect each other's sales (cross-space elasticities).
 
 ## 19. Traceability Matrix
 
@@ -528,12 +668,18 @@ blocks: approval of this spec.
 | INT-006 | FR-189 | SCN-161 | AC-181 |
 | INT-006 | FR-192, FR-195 | SCN-160 | AC-182, AC-187 |
 | INT-006 | FR-200 | SCN-160 | AC-189 |
+| INT-006 | FR-201 | SCN-169 | AC-190 |
+| INT-006 | FR-202, FR-203, FR-204 | SCN-170, SCN-171 | AC-191, AC-192, AC-193 |
+| INT-006 | FR-205, FR-206, FR-207 | SCN-172 | AC-194, AC-195 |
 | Protected behavior | INV-084 | — | AC-183 |
 | Protected behavior | INV-085 | — | AC-179 |
 | Protected behavior | INV-086, INV-088, INV-090, INV-091 | SCN-162, SCN-163, SCN-165 | AC-175, AC-176, AC-177 |
 | Protected behavior | INV-087 | — | AC-180 |
 | Protected behavior | INV-089 | — | AC-182 |
 | Protected behavior | NFR-075 | — | AC-188 |
+| Protected behavior | INV-092 | SCN-170, SCN-171 | AC-191 |
+| Protected behavior | INV-093 | — | AC-195 |
+| Protected behavior | INV-094 | SCN-172 | AC-194 |
 
 ---
 
@@ -542,19 +688,42 @@ blocks: approval of this spec.
 | Probe | What it would catch | Where it runs |
 |---|---|---|
 | `npm run check:order-signals` (exists), extended over its fixture world, which carries daily reports. The extension withholds the daily reports, the layout file and one product's width. | `shelf_plan` published without daily sales or a layout; `layout_facts` failing without sales; a product placed without a width | `collect-daily.yml` |
+| The same probe, given arrangement records over the fixture world's daily reports. It withholds the records, and separately leaves every fixture arranged. | A measurement made without an arrangement; a net change published with no comparison products (INV-092) | `collect-daily.yml` |
 | `scripts/check_v1_signals.py`'s `PROBED_ELSEWHERE` guard (exists) | Once the `store_layout` input is in either capability's `requires`, `tests/test_check_v1_signals.py` fails until it is listed. Listing it also needs the probe's own word for it in that test | CI |
 
 ## 21. Claim Limits
 
 | Claim | Verdict | Why |
 |---|---|---|
-| "Following the plan raises margin per metre by 20–68%" | not measurable | No before-and-after for this store, and the figure is from elsewhere (intent). |
+| "Following the plan raises margin per metre by 20–68%" | not measurable | The figure is from elsewhere (intent), and the measurement is per fixture and in units (FR-207). |
+| "Arranging this fixture raised its sales by X%" | measured, or measured and not significant (FR-205); not measurable until both windows exist | Only for that fixture's products and windows, against the comparison products (INV-093). |
+| "Space elasticity in this store is 0.17" | not measurable until FR-205 measures it | 0.17 is the research average (§23), used until his own is measured (FR-206). |
 | "This product sells X a day", from the monthly reports | not measurable | Monthly rows have no days (rule 13). Only F8's daily window is used. |
 | "The plan is optimal" | not measurable | The allocation is greedy with a provisional elasticity (OQ-1204). It is a defensible ranking, not a proven optimum. |
 
 ## 22. Unmapped PRD Acceptance Lines
 
-None. FR-178 … FR-199 cover the PRD's V4 row: shelf photographs, rules, and generating the plan.
+None. FR-178 … FR-207 cover the PRD's V4 row: shelf photographs, rules, and generating the plan.
 - Photographs enter only as the team's source for the recorded facts (§3).
 - Facing widths are an input the PRD row does not name. They come from his shelf photographs
   (FR-180, OQ-1201).
+
+---
+
+## 23. Scientific Basis
+
+OQ-1206, in his words: "the planogram is real science". For each rule the plan applies: where it
+comes from, and whether it is measured in his store or assumed. The figures were checked against
+the papers' published abstracts and the literature that cites them, on 2026-10-04.
+
+| Rule | Source | What the source found | How F12 uses it | In his store |
+|---|---|---|---|---|
+| Space goes by profit per unit of space, not by sales share (FR-185) | Corstjens and Doyle, "A Model for Optimizing Retail Space Allocations", *Management Science* 27(7), 1981, 822–833 | Allocating by profit, with each product's response to space, beats rules of thumb such as sales share. Their model also includes cross-space elasticities and inventory costs | Margin per sale × demand ÷ facing width, per centimetre. Cross-elasticities and inventory costs are left out (§3) | Margin and demand are his own (F8; his prices and costs) |
+| More space sells more, with diminishing returns (FR-185) | Curhan, "The Relationship between Shelf Space and Unit Sales in Supermarkets", *Journal of Marketing Research* 9(4), 1972, 406–412 | About 500 items had their shelf space changed, with sales watched 5 weeks before and 12 weeks after. The average space elasticity was 0.212 | Each further facing counts for less, by a space elasticity | Assumed until FR-205 measures it |
+| The elasticity to start from (FR-206, OQ-1204) | Eisend, "Shelf space elasticity: A meta-analysis", *Journal of Retailing* 90(2), 2014, 168–181 | Across 1,268 estimates, the average was 0.17 | 0.17 until his own is "measured". At 0.17, doubling a product's space multiplies its sales by about 1.125 | Replaced by his own once measured (FR-206) |
+| Shelf position matters more than extra facings (FR-183) | Drèze, Hoch and Purk, "Shelf management and space elasticity", *Journal of Retailing* 70(4), 1994, 301–326 | In field experiments in stores, location moved sales a lot. Facings moved them much less, once a product had the minimum it needed not to run out. Fitting shelf sets to each store's own sales gained about 4% | The eye-level shelf goes first to the highest earners. Every planned product gets one facing first | Not measured separately. The measurement captures facings and position together, per fixture |
+| Measure before and after, against unchanged products (FR-202, FR-203) | Curhan's design, above; difference in differences generally | Change the space, and compare sales before and after | His arrangement starts the clock. Fixtures he did not touch are the yardstick | Measured (FR-205) |
+
+**What this does not make the plan.** It is not optimal (§21): the packing is greedy, and the
+elasticity starts as an average from other stores. It is not a forecast either: the measurement
+says what happened on his arranged fixtures, in units, and nothing beyond them (INV-093).

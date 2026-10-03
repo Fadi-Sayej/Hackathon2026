@@ -7,7 +7,7 @@ Date: 2026-10-03
 Parent: [System Design](../system-design.md) §19
 Related Specs: F12-S1 (FR-178 … FR-180, FR-190, FR-199, NFR-075, C-74, OQ-1201, OQ-1202)
 Inputs: [docs/features/F12-planogram/specs/F12-S1-planogram.md, D-13, D-22, D-30, ADR-029, ADR-033, ADR-036]
-Updated: 2026-10-03 (OQ-1201 answered: widths from photographs)
+Updated: 2026-10-04 (current facings, for F12-S1's measurement)
 ---
 
 # ADR-037 — The shelf layout is a committed file the team records; owner state never holds them
@@ -19,7 +19,8 @@ Updated: 2026-10-03 (OQ-1201 answered: widths from photographs)
 F12-S1 needs three kinds of fact that only the store can give, and needs them before its daily
 sales arrive (D-30):
 - each fixture's shelves, usable lengths, departments, chilled or not, and eye-level shelf;
-- each stocked product's facing width;
+- each stocked product's facing width, and the facings it has today (the measurement's "before",
+  F12-S1 FR-205), both read from his shelf photographs;
 - the owner's arrangement rules.
 
 ADR-033 settled where the store's other stated facts live (order schedules and shelf lives): a
