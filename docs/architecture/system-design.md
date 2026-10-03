@@ -1514,6 +1514,7 @@ until the owner approves the spec and its mockups.
 | FR-182 … FR-189, INV-087, INV-088, INV-090, INV-091 | E `shelf_plan`: first facings packed shelf by shelf, known earnings first; an over-full fixture planned not at all; extra facings only where every size is known, greedy with a provisional elasticity; P the plan with its conditions and no money total | ADR-005, ADR-012 | AC-174 … AC-178, AC-180, AC-181 |
 | FR-193 | E `shelf_plan` requires `products`, `store_layout`, `sales_daily`; rule-level `layout_all_rejected`, `no_evidence_window`, `stale_daily_sales` | ADR-014; ADR-030 §4 | AC-172, AC-173, AC-185 |
 | FR-192, FR-194, FR-195, INV-089 | U Store layout and Shelf plan leave their awaiting shells; `value_policy: none`, not admitted; read-only for every role | ADR-028 §1; ADR-029; ADR-012 | AC-173, AC-182, AC-187 |
+| FR-200 | U the marked example on Shelf plan while it waits for a sales reason; nothing reads it | D-31, after D-29 | AC-189 |
 | NFR-072, NFR-073 | R print mode; no step growing with market history | ADR-002 | Checkpoint of its phase |
 
 ### Cross-cutting decisions
