@@ -46,6 +46,29 @@ describe('sign in', () => {
     renderWithI18n(<SignInPage status="signedOut" error {...handlers()} />, { language: 'en' })
     expect(screen.getByRole('alert').textContent).toBe(en['auth.error'])
   })
+
+  it('says why, when Firebase says why', () => {
+    renderWithI18n(<SignInPage status="signedOut" error="auth/popup-blocked" {...handlers()} />, { language: 'en' })
+    expect(screen.getByRole('alert').textContent).toBe(en['auth.error.popup'])
+  })
+
+  it('on an address sign-in does not accept, links to the one it does', () => {
+    renderWithI18n(<SignInPage status="signedOut" error="auth/unauthorized-domain" siteAddress="shop.example.app"
+      {...handlers()} />, { language: 'en' })
+    const link = screen.getByRole('link', { name: 'shop.example.app' })
+    expect(link.getAttribute('href')).toBe('https://shop.example.app/')
+    expect(screen.getByRole('alert').textContent).toContain('shop.example.app')
+  })
+
+  it('on such an address, with no known address to send to, still says why', () => {
+    renderWithI18n(<SignInPage status="signedOut" error="auth/unauthorized-domain" {...handlers()} />, { language: 'en' })
+    expect(screen.getByRole('alert').textContent).toBe(en['auth.error.addressUnknown'])
+  })
+
+  it('says who can open it, under the card', () => {
+    renderWithI18n(<SignInPage status="signedOut" {...handlers()} />, { language: 'en' })
+    expect(screen.getByText(en['auth.signin.note'])).toBeTruthy()
+  })
 })
 
 describe('after the link is sent', () => {

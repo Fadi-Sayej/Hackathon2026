@@ -59,3 +59,81 @@
   opacity: 0.45;
   cursor: not-allowed;
 }
+
+/* The welcome around the sign-in card (2026-10-03). The brand side is the sidebar's own warm
+   night, so the app the owner opens afterwards looks like the screen they signed in on. */
+.signin {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(300px, 440px) 1fr;
+  background: var(--color-surface);
+}
+.signin__brand {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding: 32px;
+  color: var(--paper-300);
+  background-color: var(--night);
+  background-image: linear-gradient(180deg, var(--night-2) 0%, var(--night) 100%);
+}
+.signin__pitch { margin-top: 24px; }
+.signin__headline {
+  margin: 0 0 20px;
+  font-family: var(--font-heading);
+  font-size: 30px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: var(--paper-100);
+}
+.signin__points {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.signin__points li {
+  position: relative;
+  padding-inline-start: 22px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.78);
+}
+.signin__points li::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0.55em;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--teal-600);
+  box-shadow: 0 0 0 3px rgba(15, 107, 99, 0.25);
+}
+.signin__lang { margin-top: auto; }
+.signin__main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+}
+.signin__main .auth-card { width: 100%; margin: 0; }
+.auth-card .auth-card__google { font-weight: 600; }
+.auth-card p.auth-card__note {
+  margin: 16px 0 0;
+  font-size: 13px;
+  color: var(--ink-400);
+  text-align: center;
+}
+.auth-card p.auth-card__error a { color: inherit; font-weight: 600; white-space: nowrap; }
+
+/* A phone: the brand above, the card below, the language switch last. */
+@media (max-width: 900px) {
+  .signin { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  .signin__brand { gap: 20px; padding: 20px 16px 24px; }
+  .signin__pitch { margin-top: 0; }
+  .signin__headline { font-size: 22px; margin-bottom: 12px; }
+  .signin__points { gap: 6px; font-size: 14px; }
+  .signin__lang { margin-top: 0; }
+  .signin__main { align-items: flex-start; padding: 20px 16px 32px; }
+}

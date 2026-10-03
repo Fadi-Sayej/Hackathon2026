@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { AppShell } from '../components/layout/AppShell.jsx'
 import { authMode } from './mode.js'
 import { setCurrentRole } from './current.js'
 import { landingFor } from './landing.js'
+import { SignInLayout } from './SignInLayout.jsx'
 import { SignInPage } from './SignInPage.jsx'
 import { AuthContext } from './useAuth.js'
 
 /**
  * Renders the app only for an account with a role. Until then it renders the approved
- * sign-in screens inside the bare shell. In `basic` mode it renders the app untouched and
+ * sign-in screens on the welcome screen (SignInLayout). In `basic` mode it renders the app untouched and
  * loads nothing: the Firebase SDK stays off the page.
  */
 export function AuthGate({ children }) {
@@ -37,9 +37,9 @@ function SignedIn({ children }) {
             if (live) setState({ status: 'needEmail' })
           } else {
             justSignedIn.current = true
-            try { await s.finishEmailLink(email) } catch {
+            try { await s.finishEmailLink(email) } catch (error) {
               justSignedIn.current = false
-              if (live) setState({ status: 'signedOut', error: true })
+              if (live) setState({ status: 'signedOut', error: error?.code || true })
             }
           }
         }
@@ -76,27 +76,28 @@ function SignedIn({ children }) {
       justSignedIn.current = false
       // Closing Google's window is a choice, not a failure.
       if (error?.code === 'auth/popup-closed-by-user' || error?.code === 'auth/cancelled-popup-request') return
-      onFail()
+      // Firebase's code says why, and the page says it in words (signInErrors.js).
+      onFail(error?.code || true)
     }
   }, [])
 
   const onGoogle = useCallback(() => attempt(
     () => session.current.signInWithGoogle(),
-    () => setState({ status: 'signedOut', error: true }),
+    (error) => setState({ status: 'signedOut', error }),
   ), [attempt])
 
   const onSendLink = useCallback(async (email) => {
     try {
       await session.current.sendEmailLink(email)
       setState({ status: 'linkSent', email })
-    } catch {
-      setState({ status: 'signedOut', error: true })
+    } catch (error) {
+      setState({ status: 'signedOut', error: error?.code || true })
     }
   }, [])
 
   const onFinish = useCallback((email) => attempt(
     () => session.current.finishEmailLink(email),
-    () => setState({ status: 'needEmail', error: true }),
+    (error) => setState({ status: 'needEmail', error }),
   ), [attempt])
 
   const signOut = useCallback(async () => {
@@ -112,17 +113,17 @@ function SignedIn({ children }) {
   }
 
   return (
-    <AppShell bare activePage="daily">
+    <SignInLayout>
       <SignInPage
         status={state.status}
         email={state.email}
-        error={Boolean(state.error)}
+        error={state.error || false}
         onGoogle={onGoogle}
         onSendLink={onSendLink}
         onFinish={onFinish}
         onUseDifferentEmail={() => setState({ status: 'signedOut' })}
         onSignOut={signOut}
       />
-    </AppShell>
+    </SignInLayout>
   )
 }

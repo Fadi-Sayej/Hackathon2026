@@ -512,7 +512,7 @@ export const he = {
 
   // ── Sign-in and the team's read-only view (ADR-029; wording approved 2026-09-25) ──
   'auth.signin.title': "כניסה",
-  'auth.signin.lead': "כדי להיכנס ל-SmartShelf, התחברו עם חשבון Google או עם האימייל שלכם.",
+  'auth.signin.lead': "היכנסו עם חשבון Google, או שנשלח לכם קישור כניסה באימייל.",
   'auth.signin.google': "המשך עם Google",
   'auth.signin.or': "או",
   'auth.signin.email': "אימייל",
@@ -526,6 +526,18 @@ export const he = {
   'auth.team.banner': "תצוגת צוות — לקריאה בלבד. שום דבר שתלחצו כאן לא נשמר.",
   'auth.team.toTelemetry': "פתיחת דף מדידת הפיילוט",
   'auth.error': "הכניסה נכשלה. נסו שוב.",
+  'auth.signin.note': "רק חשבונות שהצוות הוסיף יכולים לפתוח את SmartShelf.",
+  'auth.welcome.headline': "היום של החנות שלכם, במסך אחד.",
+  'auth.welcome.today': "מה דורש אתכם היום",
+  'auth.welcome.prices': "המחירים שלכם מול החנויות הסמוכות",
+  'auth.welcome.orders': "מה להזמין, ובאיזו כמות",
+  'auth.error.address': "הכניסה עובדת רק בכתובת {address}.",
+  'auth.error.addressUnknown': "הכניסה לא עובדת בכתובת הזו. פתחו את SmartShelf בכתובת הרגילה שלו.",
+  'auth.error.popup': "הדפדפן חסם את החלון של Google. אפשרו חלונות קופצים לאתר הזה, או השתמשו בקישור באימייל.",
+  'auth.error.link': "קישור הכניסה הזה פג או שכבר נעשה בו שימוש. שלחו לעצמכם קישור חדש.",
+  'auth.error.email': "זו לא נראית כמו כתובת אימייל.",
+  'auth.error.offline': "אין חיבור לאינטרנט. נסו שוב כשתהיו מחוברים.",
+  'auth.error.tooMany': "יותר מדי ניסיונות. חכו דקה ונסו שוב.",
 
   // F8 (Phase 5 Task 5.13): Reorder and Approved orders, as the repository owner approved
   // them on 2026-09-27 (docs/reviews/F8-screens-mockups.md).

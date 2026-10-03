@@ -513,7 +513,7 @@ export const en = {
 
   // ── Sign-in and the team's read-only view (ADR-029; wording approved 2026-09-25) ──
   'auth.signin.title': "Sign in",
-  'auth.signin.lead': "To open SmartShelf, sign in with your Google account or your email.",
+  'auth.signin.lead': "Use your Google account, or we'll email you a sign-in link.",
   'auth.signin.google': "Continue with Google",
   'auth.signin.or': "or",
   'auth.signin.email': "Email",
@@ -527,6 +527,18 @@ export const en = {
   'auth.team.banner': "Team view — read only. Nothing you press here is saved.",
   'auth.team.toTelemetry': "Open the telemetry page",
   'auth.error': "Sign-in didn't work. Try again.",
+  'auth.signin.note': "Only accounts the team has added can open SmartShelf.",
+  'auth.welcome.headline': "Your shop's day, on one screen.",
+  'auth.welcome.today': "What needs you today",
+  'auth.welcome.prices': "Your prices against the shops nearby",
+  'auth.welcome.orders': "What to order, and how much",
+  'auth.error.address': "Sign-in only works at {address}.",
+  'auth.error.addressUnknown': "Sign-in doesn't work at this address. Open SmartShelf at its usual address.",
+  'auth.error.popup': "Your browser blocked Google's window. Allow pop-ups for this site, or use the email link.",
+  'auth.error.link': "This sign-in link has expired or was already used. Send yourself a new one.",
+  'auth.error.email': "That doesn't look like an email address.",
+  'auth.error.offline': "There's no internet connection. Try again when you're online.",
+  'auth.error.tooMany': "Too many tries. Wait a minute, then try again.",
 
   // F8 (Phase 5 Task 5.13): Reorder and Approved orders, as the repository owner approved
   // them on 2026-09-27 (docs/reviews/F8-screens-mockups.md).

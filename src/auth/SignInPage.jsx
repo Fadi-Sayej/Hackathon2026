@@ -2,7 +2,12 @@ import { useState } from 'react'
 
 import { Button } from '../components/shared/Button.jsx'
 import { useI18n } from '../lib/i18n/index.js'
+import { errorKey } from './signInErrors.js'
 import './auth.css'
+
+// The address sign-in works at, from the deployment (vite.config.js: Vercel's production
+// domain). Empty on a laptop, where the page then says why without a link.
+const SITE_ADDRESS = (import.meta.env.VITE_SITE_ADDRESS || '').trim()
 
 /** An email inside Arabic or Hebrew text, isolated so it reads left to right. */
 const isolate = (email) => `⁨${email ?? ''}⁩`
@@ -19,13 +24,31 @@ function GoogleMark() {
 }
 
 /**
+ * Why sign-in failed, in the words Firebase's code allows (signInErrors.js). On an address
+ * Firebase does not accept, it links to the one it does.
+ */
+function ErrorLine({ code, siteAddress }) {
+  const { t } = useI18n()
+  const key = errorKey(code)
+  if (key === 'auth.error.address' && siteAddress) {
+    const [before, after] = t('auth.error.address').split('{address}')
+    return (
+      <p role="alert" className="auth-card__error">
+        {before}<a href={`https://${siteAddress}/`} dir="ltr">{siteAddress}</a>{after}
+      </p>
+    )
+  }
+  return <p role="alert" className="auth-card__error">{t(key === 'auth.error.address' ? 'auth.error.addressUnknown' : key)}</p>
+}
+
+/**
  * The sign-in screens (ADR-029 §5), as the repository owner approved them on 2026-09-25:
  * sign in with Google or an email link; the link-sent confirmation; an account that has no
  * role. `needEmail` is the email link opened on a device that did not ask for it: the same
  * card with only the address, to finish rather than to send another link.
  */
 export function SignInPage({
-  status, email = null, error = false,
+  status, email = null, error = false, siteAddress = SITE_ADDRESS,
   onGoogle, onSendLink, onFinish, onUseDifferentEmail, onSignOut,
 }) {
   const { t } = useI18n()
@@ -70,10 +93,10 @@ export function SignInPage({
     <section className="auth-card">
       <h1>{t('auth.signin.title')}</h1>
       {finishing ? null : <p>{t('auth.signin.lead')}</p>}
-      {error ? <p role="alert" className="auth-card__error">{t('auth.error')}</p> : null}
+      {error ? <ErrorLine code={error} siteAddress={siteAddress} /> : null}
       {finishing ? null : (
         <>
-          <Button tone="ghost" className="auth-card__full" onClick={onGoogle}>
+          <Button tone="primary" className="auth-card__full auth-card__google" onClick={onGoogle}>
             <GoogleMark />
             <span>{t('auth.signin.google')}</span>
           </Button>
@@ -92,10 +115,11 @@ export function SignInPage({
           value={typed}
           onChange={(event) => setTyped(event.target.value)}
         />
-        <Button tone="primary" type="submit" className="auth-card__full">
+        <Button tone={finishing ? 'primary' : 'ghost'} type="submit" className="auth-card__full">
           {finishing ? t('auth.signin.title') : t('auth.signin.sendLink')}
         </Button>
       </form>
+      {finishing ? null : <p className="auth-card__note">{t('auth.signin.note')}</p>}
     </section>
   )
 }

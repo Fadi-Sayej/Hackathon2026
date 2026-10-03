@@ -517,7 +517,7 @@ export const ar = {
 
   // ── Sign-in and the team's read-only view (ADR-029; wording approved 2026-09-25) ──
   'auth.signin.title': "تسجيل الدخول",
-  'auth.signin.lead': "للدخول إلى SmartShelf، استخدم حساب Google أو بريدك الإلكتروني.",
+  'auth.signin.lead': "ادخل بحساب Google، أو نرسل لك رابط دخول على بريدك الإلكتروني.",
   'auth.signin.google': "المتابعة باستخدام Google",
   'auth.signin.or': "أو",
   'auth.signin.email': "البريد الإلكتروني",
@@ -531,6 +531,18 @@ export const ar = {
   'auth.team.banner': "عرض الفريق — للقراءة فقط. لا يُحفظ شيء تضغطه هنا.",
   'auth.team.toTelemetry': "فتح صفحة قياس التجربة",
   'auth.error': "تعذّر تسجيل الدخول. حاول مرة أخرى.",
+  'auth.signin.note': "لا يفتح SmartShelf إلا الحسابات التي أضافها الفريق.",
+  'auth.welcome.headline': "يوم متجرك على شاشة واحدة.",
+  'auth.welcome.today': "ما يحتاجك اليوم",
+  'auth.welcome.prices': "أسعارك مقارنة بالمتاجر القريبة",
+  'auth.welcome.orders': "ماذا تطلب، وبأي كمية",
+  'auth.error.address': "لا يعمل تسجيل الدخول إلا على العنوان {address}.",
+  'auth.error.addressUnknown': "لا يعمل تسجيل الدخول على هذا العنوان. افتح SmartShelf على عنوانه المعتاد.",
+  'auth.error.popup': "منع متصفحك نافذة Google. اسمح بالنوافذ المنبثقة لهذا الموقع، أو استخدم رابط البريد.",
+  'auth.error.link': "انتهت صلاحية رابط الدخول هذا أو استُخدم من قبل. أرسل لنفسك رابطًا جديدًا.",
+  'auth.error.email': "لا يبدو هذا عنوان بريد إلكتروني.",
+  'auth.error.offline': "لا يوجد اتصال بالإنترنت. حاول مرة أخرى عند الاتصال.",
+  'auth.error.tooMany': "محاولات كثيرة. انتظر دقيقة ثم حاول مرة أخرى.",
 
   // F8 (Phase 5 Task 5.13): Reorder and Approved orders, as the repository owner approved
   // them on 2026-09-27 (docs/reviews/F8-screens-mockups.md).
