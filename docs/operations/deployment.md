@@ -88,7 +88,9 @@ Set these in Vercel before any preview or production deployment:
 > account had its role:
 > - Preview and Production carry the variables below.
 > - `firestore.rules` is the role ruleset, and is deployed.
-> - Google and email-link sign-in are enabled, and anonymous sign-in is disabled.
+> - Google and email-link sign-in are enabled, and anonymous sign-in is disabled. Email and
+>   password were added on 2026-10-03 (#273). They need Authentication → Sign-in method →
+>   Email/Password's first switch on.
 > - The same day, on the same decision, step 7 was done without waiting the day: the Basic
 >   Auth variables and code are gone, and `middleware.ts` no longer reads `AUTH_MODE`.
 > - The steps below are kept as the record.
