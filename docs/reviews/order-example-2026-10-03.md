@@ -1,7 +1,7 @@
 ---
 ID: D29-ORDER-EXAMPLE-REVIEW
 Title: The order pages' example — screens for the repository owner's approval
-Status: Ready for review
+Status: Approved — by the repository owner, 2026-10-03 ("approve")
 Owner: smartshelf-engineer
 Parent: [D-29](../product/intent-register.md#3-decisions-already-made-by-the-intent-layer)
 Inputs: [D-29, docs/reviews/F8-screens-mockups.md, scripts/build_order_example.py, public/examples/order-example.json, src/pages/OrderExample.jsx, src/pages/ReorderPage.jsx, src/pages/ApprovedOrdersPage.jsx]
@@ -9,6 +9,9 @@ Updated: 2026-10-03
 ---
 
 # The order pages' example — screens for approval
+
+> **Approved by the repository owner on 2026-10-03** ("approve"), after viewing the build locally
+> with sign-in off. Merged as #271 (`13c508f`) and live in production the same morning.
 
 D-29 (2026-10-03): while Reorder and Approved orders wait for daily sales reports, each may
 show an example of itself, inside a clearly marked preview. Front-end work waits for the
