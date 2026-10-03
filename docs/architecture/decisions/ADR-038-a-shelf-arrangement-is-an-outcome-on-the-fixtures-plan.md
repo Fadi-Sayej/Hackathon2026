@@ -83,11 +83,17 @@ already holds: who acted, on what, and when. ADR-034 reused outcomes for the sam
 some barcodes are fixtures.
 
 ### Enforce "written once" in `firestore.rules`
-Outcomes are fields of one document, keyed by entry id, and the rules language cannot loop over
-a write's changed keys to check which family each belongs to. Enforcing it there would need one
-document per arrangement, which is the new kind of record rejected above. Decision 6 makes the
-published arrangement the one every device shows instead, and F12-S1 ASM-082 states the case
-that remains.
+Outcomes are fields of one document, keyed by entry id. The rules cannot tell which family a
+changed key belongs to, so enforcing it on that document would also freeze every other outcome.
+Arrangements could move to a map document of their own, where an update passes only when no
+existing key changes: adding or deleting one passes, rewriting one fails. It would cost:
+- a new owner-state document, in the browser's record documents and in the engine's pull;
+- an undo that deletes the field rather than writing a null;
+- a `pushAll` that writes that document key by key, so one refused key does not block the rest.
+
+That is the new kind of record rejected above, for one case. Decision 6 makes the published
+arrangement the one every device shows instead, and F12-S1 ASM-082 states the case that
+remains.
 
 ### Keep the latest press's time, as other outcomes do
 The date is the boundary between the two windows. A second press a week later would move a week

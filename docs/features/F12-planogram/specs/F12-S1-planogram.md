@@ -354,7 +354,8 @@ together, by one Poisson regression **(decided here)**:
 The coefficient on the logarithm of facings is the elasticity. Separating it from the other two
 terms keeps an eye-level move, and the tidying any rearrangement brings, from being counted as
 the effect of space (§23). The eye-level term is dropped when no arranged product changed eye
-level, and the estimate says so.
+level, and the estimate says so. That is decided once, on the full sample, so every bootstrap draw
+estimates the same model.
 
 The before facings and shelf are the later-dated of two records, provided it is dated no later
 than the arrangement:
@@ -367,7 +368,8 @@ facings are unknown or zero is named, and left out of the estimate, though not o
 Its interval comes from a bootstrap that resamples whole fixtures, each with all its products and
 arrangements. Products on one fixture share whatever happened there, so an interval that treats
 them as independent would be too narrow. In a draw, an arrangement left with no comparison
-product drops out of that draw. A draw left with no arrangement is drawn again. The estimate is published with the number of
+product drops out of that draw. A draw left with no arrangement, or with no variation in after ÷
+before facings, is drawn again. The estimate is published with the number of
 arrangements and products behind it, and one verdict (CLAUDE.md rule 13):
 - **measured**, when the interval excludes zero;
 - **measured and not significant**, when it includes zero;
