@@ -15,7 +15,7 @@ PRD                     what the product is, for whom, and what is out of scope
 
 ## Authority hierarchy
 
-1. [**PRD**](product/PRD.md) — and the settled decisions D-1 … D-28 in the [intent register](product/intent-register.md) §3
+1. [**PRD**](product/PRD.md) — and the settled decisions D-1 … D-29 in the [intent register](product/intent-register.md) §3
 2. [**Feature Intents**](features/) — `features/F#-*/intent.md`
 3. [**Approved Feature Specs**](features/) — `features/F#-*/specs/F#-S#-*.md`
 4. [**System Design**](architecture/system-design.md) — the single authoritative architecture
@@ -34,7 +34,7 @@ carries a banner saying so.
 |---|---|
 | [PRD](product/PRD.md) | Problem · user · feature register (F1–F14) · releases · not-in-scope · owner commitments · decision criterion · figures · open decisions |
 | [Release phases](product/release-phases.md) | Three customer-facing delivery phases with dates · **proposes a change to PRD §5's dates, does not take it** |
-| [Intent register (SPEC-000)](product/intent-register.md) | INT-id ↔ spec map · **settled decisions D-1 … D-28** · why F10–F14 are deliberately unspecified |
+| [Intent register (SPEC-000)](product/intent-register.md) | INT-id ↔ spec map · **settled decisions D-1 … D-29** · why F10–F14 are deliberately unspecified |
 | [Open decisions](product/open-decisions/) | One brief per feature blocked on a product decision · poses the choices the data supports · **not authority** — answers land as `D-n` in the intent register §3, then the brief is `Superseded` |
 
 ## Features
