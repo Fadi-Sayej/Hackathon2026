@@ -40,7 +40,11 @@ jobs:
     runs-on: ubuntu-latest
     # Runs took 18 to 27 minutes from 2026-09-17 to 09-26. The deploy check at the end can
     # wait up to 10 more for Vercel's build (#167), so 30 would cut a slow night short.
-    timeout-minutes: 45
+    # Raised from 45 on 2026-10-03, when a night took 37.2 min: Collect is network-bound and
+    # varied 12 to 20 min in the fortnight before, while the steps that read the whole history
+    # had grown by about 9.5 min. Those steps were then made cheaper (presence reader,
+    # market_context), so this is headroom, not the fix; a run that needs it is a regression.
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
