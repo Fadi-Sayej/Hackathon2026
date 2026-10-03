@@ -1,6 +1,8 @@
 import { useI18n } from '../lib/i18n/index.js'
 import { dirProps } from '../lib/utils/rtl.js'
 import { approvedLines, ordersCsv } from './approvedOrders.js'
+import { loadOrderExample } from '../lib/dataAdapters/loadOrderExample.js'
+import { ExamplePreview } from './OrderExample.jsx'
 
 /**
  * Approved orders: what he approved for his suppliers (F8-S1 FR-162), as the repository owner
@@ -27,7 +29,7 @@ function download(lines) {
   URL.revokeObjectURL(url)
 }
 
-export function ApprovedOrdersPage({ ownerState, catalogue, now }) {
+export function ApprovedOrdersPage({ ownerState, catalogue, now, example = false, loadExample = loadOrderExample }) {
   const { t, language } = useI18n()
   const locale = LOCALE[language] || LOCALE.en
   const day = (iso) => new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' })
@@ -67,11 +69,17 @@ export function ApprovedOrdersPage({ ownerState, catalogue, now }) {
         </section>
       ))}
       <div>
-        <button type="button" className="reorder__approve" data-action="csv" disabled={lines.length === 0}
-          onClick={() => download(lines)}>
+        <button type="button" className="reorder__approve" data-action="csv" disabled={example || lines.length === 0}
+          onClick={() => !example && download(lines)}>
           {t('orders.csv')}
         </button>
       </div>
+      {/* D-29: before anything is approved, the page as it will look, from a test shop. */}
+      {!example && lines.length === 0 ? (
+        <ExamplePreview load={loadExample} render={(shop) => (
+          <ApprovedOrdersPage ownerState={shop.owner_state} catalogue={shop.catalogue} now={Date.parse(shop.now)} example />
+        )} />
+      ) : null}
     </section>
   )
 }

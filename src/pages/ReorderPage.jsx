@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { unavailableReason } from '../lib/i18n/unavailableReason.js'
+import { loadOrderExample } from '../lib/dataAdapters/loadOrderExample.js'
+import { ExamplePreview } from './OrderExample.jsx'
 import { useI18n } from '../lib/i18n/index.js'
 import { dirProps } from '../lib/utils/rtl.js'
 
@@ -166,7 +168,9 @@ function Department({ name, info, entries, capability, artefact, onOutcome, read
   )
 }
 
-export function ReorderPage({ artefact, ownerState, onOutcome, readOnly = false }) {
+const ignore = () => {}
+
+export function ReorderPage({ artefact, ownerState, onOutcome, readOnly = false, loadExample = loadOrderExample }) {
   const { t, language } = useI18n()
   const { date } = useDates(language)
   const capability = artefact?.capabilities?.order_quantity
@@ -181,6 +185,10 @@ export function ReorderPage({ artefact, ownerState, onOutcome, readOnly = false 
       <section className="capability reorder" data-capability={capability ? 'order_quantity' : undefined} {...dirProps()}>
         <h2 className="capability__unavailable reorder__waiting">{unavailableReason(t, capability?.unavailable_reason)}</h2>
         <p className="reorder__line">{t('reorder.waiting.next')}</p>
+        {/* D-29: the page as it will look, from a test shop, read-only and fenced off. */}
+        <ExamplePreview load={loadExample} render={(example) => (
+          <ReorderPage artefact={example.artefact} ownerState={{ outcomes: {} }} onOutcome={ignore} readOnly />
+        )} />
       </section>
     )
   }

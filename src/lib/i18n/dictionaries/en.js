@@ -578,6 +578,13 @@ export const en = {
   'orders.day': "Order day",
   'orders.changed': "you changed it from {n}",
   'orders.csv': "Download for your supplier (CSV)",
+  // D-29: the order pages' example, while they wait for daily reports.
+  'example.open': "See how this page looks",
+  'example.close': "Close the example",
+  'example.label': "Example",
+  'example.banner': "Example: a test shop, not your data. Nothing here can be approved, saved or sent.",
+  'example.loading': "Loading the example…",
+  'example.unavailable': "The example could not be loaded.",
 
   // F8 (Phase 5 Task 5.14): the disagreement question, as the repository owner approved it on
   // 2026-09-27 (docs/reviews/F8-screens-mockups.md).

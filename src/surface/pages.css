@@ -652,3 +652,55 @@
   font-weight: 400;
   color: var(--ink-400);
 }
+
+/* D-29: "See how this page looks" on the order pages while they wait. The example is fenced
+   off from the store's own screen: an amber, dashed frame, a banner at its top, and an
+   "Example" tag on every card and table, so no part of it reads as the store's data. (A
+   sticky banner cannot stick here: the body's overflow-x makes it the scroll container.) */
+.example__offer {
+  margin: 16px 0 0;
+}
+.example {
+  margin: 16px 0 0;
+  padding: 0 12px 12px;
+  border: 2px dashed var(--warn);
+  border-radius: var(--radius-lg);
+  background: var(--warn-wash);
+}
+.example__banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin: 0 -12px 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--paper-200);
+  border-bottom: 1px solid var(--warn);
+  color: var(--warn);
+  font-weight: 600;
+  line-height: 1.45;
+}
+.example__close { white-space: nowrap; }
+.example .entry-card,
+.example .reorder__needs,
+.example .orders__department {
+  position: relative;
+}
+.example .entry-card::before,
+.example .reorder__needs::before,
+.example .orders__department::before {
+  content: var(--example-label);
+  position: absolute;
+  inset-block-start: -9px;
+  inset-inline-end: 12px;
+  z-index: 1;
+  padding: 0 8px;
+  border-radius: var(--radius-pill);
+  background: var(--warn);
+  color: var(--paper-100);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+}

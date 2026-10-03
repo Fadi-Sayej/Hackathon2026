@@ -582,6 +582,13 @@ export const ar = {
   'orders.day': "يوم الطلب",
   'orders.changed': "غيّرتها من {n}",
   'orders.csv': "تنزيل للمورّد (CSV)",
+  // D-29: the order pages' example, while they wait for daily reports.
+  'example.open': "شاهد كيف ستبدو هذه الصفحة",
+  'example.close': "إغلاق المثال",
+  'example.label': "مثال",
+  'example.banner': "مثال: متجر تجريبي، وليست بياناتك. لا يمكن هنا اعتماد أي شيء أو حفظه أو إرساله.",
+  'example.loading': "جارٍ تحميل المثال…",
+  'example.unavailable': "تعذّر تحميل المثال.",
 
   // F8 (Phase 5 Task 5.14): the disagreement question, as the repository owner approved it on
   // 2026-09-27 (docs/reviews/F8-screens-mockups.md).
