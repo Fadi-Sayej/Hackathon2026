@@ -5,8 +5,8 @@ Status: Ready for review
 Owner: smartshelf-architect
 Date: 2026-10-04
 Parent: [System Design](../system-design.md) §19
-Related Specs: F12-S1 (FR-201 … FR-207, INV-089, AC-190)
-Inputs: [docs/features/F12-planogram/specs/F12-S1-planogram.md, ADR-003, ADR-009, ADR-029, ADR-034, D-1, D-22]
+Related Specs: F12-S1 (FR-192, FR-201 … FR-209, INV-089, AC-190, AC-196)
+Inputs: [docs/features/F12-planogram/specs/F12-S1-planogram.md, ADR-003, ADR-009, ADR-016, ADR-029, ADR-034, D-1, D-22]
 Updated: 2026-10-04
 ---
 
@@ -16,25 +16,54 @@ Updated: 2026-10-04
 
 ## Context
 
-F12-S1 measures what a plan did in his store (FR-201 … FR-207, the owner's "yes" of 2026-10-04).
-The measurement splits each arrangement's sales into a before window and an after window, so
-it needs the date he rearranged a fixture, recorded by him on the day. Owner state already
-holds his outcomes on entries, written only by the browser and only by the owner (ADR-003,
-ADR-029). Reorder's approvals reuse that model (ADR-034).
+F12-S1 measures what a plan did in his store (FR-201 … FR-209, the owner's "yes" of 2026-10-04).
+The measurement splits each arrangement's sales into a before window and an after window, so it
+needs the date he rearranged a fixture, recorded by him on the day. It also needs the plan's
+window, because the before window ends where that window begins, and the facings he followed.
+Owner state already holds his outcomes on entries, written only by the browser and only by the
+owner (ADR-003, ADR-029). Reorder's approvals reuse that model (ADR-034).
 
 ## Decision
 
-1. **Each fixture's plan is an entry of a new permanent family, `shelf.plan`.** Its variant is the
-   plan's date (ISO). Its id follows ADR-009's construction, with the fixture's id where a
-   product's barcode goes. The id is the same every night that publishes the same plan date, and
-   different for a later plan.
-2. **"I've arranged this shelf" records the existing `acted` status on that entry.** The snapshot
-   is `{signal_family: "shelf.plan", capability: "shelf_plan", fixture, plan_date, facings:
-   {barcode: n}}`: the facings he followed, with no ₪ field (D-1) and no name (D-22). The time
-   of the outcome is the arrangement's date.
-3. **Nothing else maps onto it.** `declined` and `deferred` are not offered on a plan.
-4. **The engine reads arrangements** from the pulled owner state, as it reads every outcome
-   (ADR-003). The measurement uses only `acted` outcomes of `shelf.plan`.
+1. **Each fixture's plan is an entry of a new permanent family, `shelf.plan`**, enumerated in
+   §10.1 and in the engine's `SIGNAL_FAMILIES`. The plan's date is the date of the nightly run
+   that published it, so each night's plan is a new entry.
+2. **Its id is ADR-009's construction with no barcode**, and the variant
+   `<fixture id>|<plan date>`. The fixture id never passes through the barcode normalisation,
+   which strips leading zeros and would make fixtures "01" and "1" one entry.
+3. **The entry's fields** (§11.3):
+   - `barcode`, `product_name` and `department` are null: the entry is a fixture, not a
+     product;
+   - `action` is `arrange_shelf`, a new value;
+   - `characterisation` is `shelf_plan`;
+   - `evidence` carries the fixture, the plan's date, the plan's window, and per shelf its
+     products with their facings;
+   - `value` is null, and `ordering_key` is the fixture's order in the layout file.
+
+   The artefact's schema admits these values for `shelf.plan` only.
+4. **"I've arranged this shelf" records the existing `acted` status on that entry.** The
+   snapshot is:
+
+   ```
+   { signal_family: "shelf.plan", capability: "shelf_plan", barcode: null,
+     fixture, plan_date, plan_window: {first, last}, arranged_on,
+     placements: { [barcode]: { shelf, facings, eye_level } } }
+   ```
+
+   It has no ₪ field (D-1) and no name (D-22). `arranged_on` is the day his device's calendar
+   shows when he presses, and it is the boundary of the measurement. `recordOutcome` gains a
+   `shelf.plan` branch, as it gained an `order.suggestion` one (ADR-034).
+5. **The date is written once.** For every other family, a second `recordOutcome` on the same
+   entry rewrites `at`. On an acted `shelf.plan` entry, it changes nothing. `clearOutcome`
+   (his undo) removes the arrangement, and its measurement with it.
+6. **Nothing else maps onto it.** `declined` and `deferred` are not offered on a plan.
+7. **The engine reads arrangements** from the pulled owner state, as it reads every outcome
+   (ADR-003). Only `acted` outcomes of `shelf.plan` are used, by `shelf_measurement` (F12-S1
+   FR-208). An outcome whose entry is no longer published is still read: its snapshot carries
+   everything the measurement needs, so no past artefact is read.
+8. **The seam is tested.** `ownerStateContract.test.js` records one `shelf.plan` outcome through
+   the real `recordOutcome`. The engine's reader and F12-S1's probe read that fixture, so both
+   are tested against the shape the browser writes.
 
 ## Rejected options
 
@@ -42,10 +71,19 @@ ADR-029). Reorder's approvals reuse that model (ADR-034).
 It would need new Firestore rules, new pull code and new tests, to hold what the outcome model
 already holds: who acted, on what, and when. ADR-034 reused outcomes for the same reason.
 
+### The fixture's id in the barcode slot
+§11.3 reads `barcode` as a product's, and the id's construction normalises it as one. Fixture
+"01" and fixture "1" would share an entry, and every reader of `barcode` would have to know that
+some barcodes are fixtures.
+
+### Keep the latest press's time, as other outcomes do
+The date is the boundary between the two windows. A second press a week later would move a week
+of sales from before to after, and nothing would show it.
+
 ### The team records the arrangement date in the layout file
-The date is the boundary between the two windows, so the whole measurement rests on it. It has to
-be his act, recorded when he does it. A date the team writes down later, from a message, moves
-the boundary by however many days the message took, and nothing would show the error.
+The whole measurement rests on the date, so it has to be his act, recorded when he does it. A
+date the team writes down later, from a message, moves the boundary by however many days the
+message took, and nothing would show the error.
 
 ### Infer the arrangement from the sales
 That is circular. A change in sales would be both the evidence that he rearranged the shelf and
@@ -53,24 +91,27 @@ the effect being measured.
 
 ## Consequences
 
-**We accept:** the plan publishes one entry per fixture, which the capability's entries were not
-otherwise needed for.
+**We accept:**
+- the plan publishes one entry per fixture per night, which the capability's entries were not
+  otherwise needed for;
+- the entry contract gains a case with no product and one action value;
+- `recordOutcome` gains a family-specific branch, and one family whose date is written once.
 
 **We gain:** no new storage, rules or pull code, and arrangements fall under the existing role
 rule: the team cannot write them (ADR-029).
 
 **We will know it was wrong if:** he rearranges fixtures without pressing the button, so
-measurements never start. Then a reminder on the plan, or the photograph check F12-S1 leaves out
-of scope, becomes the next decision.
+`shelf_measurement` stays `no_arrangement_recorded`. Then a reminder on the plan, or the
+photograph check F12-S1 leaves out of scope, becomes the next decision.
 
 ## Reversibility
 
-Easy. Outcomes are additive, and a different recording would only change where the engine reads
-the date.
+Easy before the first arrangement is recorded. After that, the family and its snapshot are
+permanent, like every name in §10.1.
 
 ## Binds
 
 | F# | How this constrains it |
 |---|---|
-| F12 | Arrangements are `acted` outcomes on `shelf.plan` entries (F12-S1 FR-201) |
-| F13 | The pilot measurement counts outcomes; `shelf.plan` is a family it will see |
+| F12 | Arrangements are `acted` outcomes on `shelf.plan` entries (F12-S1 FR-201), read by `shelf_measurement` (FR-208) |
+| F13 | The pilot measurement counts outcomes by family; `shelf.plan` is one it will see, with one entry per fixture per night |
