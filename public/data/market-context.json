@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-02T03:39:08.418705+00:00",
-  "date": "2026-10-02",
+  "generatedAt": "2026-10-03T03:31:42.566372+00:00",
+  "date": "2026-10-03",
   "status": "ok",
   "sources": {
     "weather": "open-meteo",
@@ -9,28 +9,28 @@
     "islamic": "computed_hijri"
   },
   "weather": {
-    "temperatureC": 18.5,
+    "temperatureC": 18.8,
     "precipitation": 0.0,
-    "windSpeed": 5.2,
+    "windSpeed": 4.8,
     "weatherCode": 1,
     "label": "mild",
-    "observedAt": "2026-10-02T06:30",
+    "observedAt": "2026-10-03T06:30",
     "lat": 32.1091501,
     "lon": 34.9624392,
     "source": "open-meteo"
   },
   "hebrew": {
-    "date": "2026-10-02",
+    "date": "2026-10-03",
     "holidays": [
       {
-        "title": "Sukkot VII (Hoshana Raba)",
-        "hebrew": "סוכות ז׳ (הושענא רבה)",
+        "title": "Shmini Atzeret",
+        "hebrew": "שמיני עצרת",
         "category": "holiday"
       }
     ],
     "isErevChag": false,
     "isFastDay": false,
-    "isShabbatEve": true,
+    "isShabbatEve": false,
     "chametz": null,
     "pesachStart": "2027-04-22",
     "windows": {
@@ -41,11 +41,11 @@
     "source": "hebcal"
   },
   "islamic": {
-    "date": "2026-10-02",
+    "date": "2026-10-03",
     "hijri": {
       "year": 1448,
       "month": 4,
-      "day": 19
+      "day": 20
     },
     "isRamadan": false,
     "ramadanDay": null,
@@ -53,8 +53,8 @@
     "isEidAlFitr": false,
     "isEidAlAdha": false,
     "ramadanStart": "2027-02-08",
-    "daysToRamadan": 129,
-    "daysToEidAlFitr": 159,
+    "daysToRamadan": 128,
+    "daysToEidAlFitr": 158,
     "phase": null,
     "windows": {
       "ramadan_build_up_days": 21,
@@ -64,21 +64,9 @@
     },
     "source": "computed_hijri"
   },
-  "demandSignals": {
-    "מוצרי מכולת": 1.1,
-    "מוצרי מקרר": 1.1
-  },
-  "demandBasis": {
-    "מוצרי מכולת": [
-      "shabbat_eve"
-    ],
-    "מוצרי מקרר": [
-      "shabbat_eve"
-    ]
-  },
-  "activeReasons": [
-    "shabbat_eve"
-  ],
+  "demandSignals": {},
+  "demandBasis": {},
+  "activeReasons": [],
   "shelfLife": {
     "categories": {
       "מחלקת -barista": 2,
@@ -152,6 +140,7 @@
       "38000138416",
       "38000138430",
       "38000138607",
+      "38000138638",
       "38000183713",
       "38000232152",
       "38000232176",
@@ -257,6 +246,7 @@
       "5014271330426",
       "5014271350424",
       "5014271400426",
+      "5027324001860",
       "5038483574386",
       "5038483574416",
       "5038483578780",
@@ -296,6 +286,7 @@
       "5410126006377",
       "5410126116953",
       "5411188110835",
+      "5411188115434",
       "5411188127697",
       "5411188129899",
       "5411188134985",
@@ -643,6 +634,7 @@
       "7290000572673",
       "7290000662817",
       "7290000688077",
+      "7290000805597",
       "7290000805900",
       "7290000805917",
       "7290000805924",
@@ -1991,7 +1983,9 @@
       "7290117860090",
       "7290117860144",
       "7290117860946",
+      "7290117907580",
       "7290117907597",
+      "7290117907603",
       "7290117907658",
       "7290117907665",
       "7290118420217",
@@ -2045,6 +2039,7 @@
       "7290119377084",
       "7290119377411",
       "7290119377480",
+      "7290119377657",
       "7290119377688",
       "7290119379200",
       "7290119379934",
@@ -2055,6 +2050,7 @@
       "7290119380794",
       "7290119380800",
       "7290119380824",
+      "7290119381036",
       "7290119381142",
       "7290119381692",
       "7290119381937",
@@ -2459,7 +2455,7 @@
       "9780201321029",
       "9800800056"
     ],
-    "days": 53,
+    "days": 54,
     "status": "ok",
     "lift": 1.15
   }
