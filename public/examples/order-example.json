@@ -1,0 +1,1006 @@
+{
+ "_example": "A test shop, not any store's data (D-29). Built by scripts/build_order_example.py from the order probe's fixture world. Nothing reads it but the order pages' preview.",
+ "artefact": {
+  "capabilities": {
+   "market_boost": {
+    "counts": {
+     "applied": 1,
+     "asked_about": 1,
+     "not_applied": 0,
+     "reason_withheld": 0
+    },
+    "entries": [],
+    "id": "market_boost",
+    "label": "model_estimate",
+    "model": "claude-sonnet-5",
+    "notes": [],
+    "on_day": "2026-08-27",
+    "picks": {
+     "7290001": {
+      "applied": true,
+      "boost_pct": 10,
+      "facts": {
+       "barcode": "7290001",
+       "daily_mean": 3.0,
+       "days_absent": [
+        3
+       ],
+       "department": "משקאות",
+       "product_name": "מים",
+       "shelf_life": {
+        "days": 30
+       },
+       "stores_out": 1,
+       "weekly_units": [
+        21.0,
+        21.0,
+        21.0,
+        21.0
+       ]
+      },
+      "model": "claude-sonnet-5",
+      "model_pick_pct": 10,
+      "not_applied_because": null,
+      "reason": "المحلات القريبة نفدت منها",
+      "reason_withheld_because": null
+     }
+    },
+    "prompt": "configs/prompts/market_boost.v1.md",
+    "requires": [
+     "running_out",
+     "boost_picks"
+    ],
+    "spec": "F8-S1",
+    "status": "available",
+    "thresholds": {
+     "max_pct": 25.0,
+     "model": "claude-sonnet-5",
+     "prompt": "configs/prompts/market_boost.v1.md",
+     "request_ceiling": 200
+    },
+    "unavailable_reason": null,
+    "window": null
+   },
+   "market_running_out": {
+    "counts": {
+     "excluded_store_days": 0,
+     "running_out": 4,
+     "stores": 1
+    },
+    "entries": [],
+    "excluded": [],
+    "id": "market_running_out",
+    "notes": [],
+    "on_day": "2026-08-27",
+    "products": {
+     "7290001": {
+      "days_absent": {
+       "65daeb8779ca7f0a9bf964f3": 3
+      },
+      "stores_out": [
+       "65daeb8779ca7f0a9bf964f3"
+      ]
+     },
+     "7290003": {
+      "days_absent": {
+       "65daeb8779ca7f0a9bf964f3": 3
+      },
+      "stores_out": [
+       "65daeb8779ca7f0a9bf964f3"
+      ]
+     },
+     "7290004": {
+      "days_absent": {
+       "65daeb8779ca7f0a9bf964f3": 3
+      },
+      "stores_out": [
+       "65daeb8779ca7f0a9bf964f3"
+      ]
+     },
+     "7291000": {
+      "days_absent": {
+       "65daeb8779ca7f0a9bf964f3": 3
+      },
+      "stores_out": [
+       "65daeb8779ca7f0a9bf964f3"
+      ]
+     }
+    },
+    "requires": [
+     "running_out"
+    ],
+    "spec": "F8-S1",
+    "status": "available",
+    "stores": [
+     "65daeb8779ca7f0a9bf964f3"
+    ],
+    "thresholds": {
+     "catalogue_change_pct": 10.0,
+     "max_absent": 7,
+     "min_absent": 2,
+     "min_listed": 10,
+     "prior_days": 14,
+     "signal_max_age_days": 2,
+     "signal_min_usable": 10,
+     "thin_collection_ratio": 0.5
+    },
+    "unavailable_reason": null,
+    "window": null
+   },
+   "order_quantity": {
+    "counts": {
+     "covered_by_stock": 1,
+     "no_quantity": 4,
+     "suggested": 6
+    },
+    "departments": {
+     "חטיפים": {
+      "covered_by_stock": 1,
+      "reasons": {},
+      "suggested": 2
+     },
+     "מאפים": {
+      "covered_by_stock": 0,
+      "reasons": {},
+      "suggested": 2
+     },
+     "מוצרי חלב": {
+      "covered_by_stock": 0,
+      "reasons": {
+       "no_shelf_life": 1
+      },
+      "suggested": 0
+     },
+     "משקאות": {
+      "covered_by_stock": 0,
+      "reasons": {
+       "not_moving": 2
+      },
+      "suggested": 2
+     },
+     "ניקיון": {
+      "covered_by_stock": 0,
+      "reasons": {
+       "no_order_schedule": 1
+      },
+      "suggested": 0
+     }
+    },
+    "entries": [
+     {
+      "action": "place_order",
+      "actionable": false,
+      "attention": "today",
+      "barcode": "7290201",
+      "capability": "order_quantity",
+      "characterisation": "order_suggestion",
+      "department": "חטיפים",
+      "evidence": {
+       "adjusted_daily_mean": 5.0,
+       "boost": {
+        "applied": false,
+        "label": null,
+        "model": null,
+        "model_pick_pct": null,
+        "not_applied_because": "market_not_running_out",
+        "pct": null,
+        "reason": null,
+        "reason_withheld_because": null
+       },
+       "cap": 600.0,
+       "capped": false,
+       "count": {
+        "as_of": "2026-08-24",
+        "flags": [],
+        "not_used_because": null,
+        "recorded_stock": 20.0,
+        "used": true
+       },
+       "cycle": {
+        "days": 7,
+        "first_day": "2026-09-01",
+        "last_day": "2026-09-07"
+       },
+       "daily_mean": 5.0,
+       "expected_sales": 35.0,
+       "kind": "net",
+       "need": 35.0,
+       "order_day": "2026-09-01",
+       "quantity": 35,
+       "report_days": 28,
+       "schedule": {
+        "form": "weekdays",
+        "stated_on": "2026-08-01",
+        "weekdays": [
+         "tue"
+        ]
+       },
+       "schedule_changed": false,
+       "shelf_life": {
+        "days": 120,
+        "stated_on": "2026-08-01"
+       },
+       "since_count": {
+        "deliveries": 12.0,
+        "sales": 15.0
+       },
+       "stock_at_order_day": 0.0,
+       "stock_now": 17.0,
+       "units_in_window": 140.0,
+       "weekly_units": [
+        35.0,
+        35.0,
+        35.0,
+        35.0
+       ],
+       "window": {
+        "first_day": "2026-07-30",
+        "last_day": "2026-08-26",
+        "report_days": 28,
+        "weeks": [
+         [
+          "2026-07-30",
+          "2026-08-05"
+         ],
+         [
+          "2026-08-06",
+          "2026-08-12"
+         ],
+         [
+          "2026-08-13",
+          "2026-08-19"
+         ],
+         [
+          "2026-08-20",
+          "2026-08-26"
+         ]
+        ]
+       }
+      },
+      "id": "7b326c2019cddbed",
+      "not_actionable_reason": "not_admitted",
+      "ordering_key": {
+       "name": "units_in_window",
+       "value": 140.0
+      },
+      "product_name": "במבה",
+      "signal_family": "order.suggestion",
+      "value": null
+     },
+     {
+      "action": "place_order",
+      "actionable": false,
+      "attention": "today",
+      "barcode": "7290202",
+      "capability": "order_quantity",
+      "characterisation": "order_suggestion",
+      "department": "חטיפים",
+      "evidence": {
+       "adjusted_daily_mean": 4.0,
+       "boost": {
+        "applied": false,
+        "label": null,
+        "model": null,
+        "model_pick_pct": null,
+        "not_applied_because": "market_not_running_out",
+        "pct": null,
+        "reason": null,
+        "reason_withheld_because": null
+       },
+       "cap": 480.0,
+       "capped": false,
+       "count": {
+        "as_of": "2026-08-24",
+        "flags": [
+         "hygiene.negative_stock"
+        ],
+        "not_used_because": "count_flagged",
+        "recorded_stock": -4.0,
+        "used": false
+       },
+       "cycle": {
+        "days": 7,
+        "first_day": "2026-09-01",
+        "last_day": "2026-09-07"
+       },
+       "daily_mean": 4.0,
+       "expected_sales": 28.0,
+       "kind": "gross",
+       "need": 28.0,
+       "order_day": "2026-09-01",
+       "quantity": 28,
+       "report_days": 28,
+       "schedule": {
+        "form": "weekdays",
+        "stated_on": "2026-08-01",
+        "weekdays": [
+         "tue"
+        ]
+       },
+       "schedule_changed": false,
+       "shelf_life": {
+        "days": 120,
+        "stated_on": "2026-08-01"
+       },
+       "since_count": null,
+       "stock_at_order_day": null,
+       "stock_now": null,
+       "units_in_window": 112.0,
+       "weekly_units": [
+        28.0,
+        28.0,
+        28.0,
+        28.0
+       ],
+       "window": {
+        "first_day": "2026-07-30",
+        "last_day": "2026-08-26",
+        "report_days": 28,
+        "weeks": [
+         [
+          "2026-07-30",
+          "2026-08-05"
+         ],
+         [
+          "2026-08-06",
+          "2026-08-12"
+         ],
+         [
+          "2026-08-13",
+          "2026-08-19"
+         ],
+         [
+          "2026-08-20",
+          "2026-08-26"
+         ]
+        ]
+       }
+      },
+      "id": "f9df987584fbf957",
+      "not_actionable_reason": "not_admitted",
+      "ordering_key": {
+       "name": "units_in_window",
+       "value": 112.0
+      },
+      "product_name": "ביסלי גריל",
+      "signal_family": "order.suggestion",
+      "value": null
+     },
+     {
+      "action": "place_order",
+      "actionable": false,
+      "attention": "today",
+      "barcode": "7290101",
+      "capability": "order_quantity",
+      "characterisation": "order_suggestion",
+      "department": "מאפים",
+      "evidence": {
+       "adjusted_daily_mean": 8.0,
+       "boost": {
+        "applied": false,
+        "label": null,
+        "model": null,
+        "model_pick_pct": null,
+        "not_applied_because": "market_not_running_out",
+        "pct": null,
+        "reason": null,
+        "reason_withheld_because": null
+       },
+       "cap": 16.0,
+       "capped": true,
+       "count": {
+        "as_of": "2026-08-24",
+        "flags": [],
+        "not_used_because": null,
+        "recorded_stock": 10.0,
+        "used": true
+       },
+       "cycle": {
+        "days": 7,
+        "first_day": "2026-08-30",
+        "last_day": "2026-09-05"
+       },
+       "daily_mean": 8.0,
+       "expected_sales": 56.0,
+       "kind": "net",
+       "need": 56.0,
+       "order_day": "2026-08-30",
+       "quantity": 16,
+       "report_days": 28,
+       "schedule": {
+        "form": "weekdays",
+        "stated_on": "2026-08-01",
+        "weekdays": [
+         "sun"
+        ]
+       },
+       "schedule_changed": false,
+       "shelf_life": {
+        "days": 2,
+        "stated_on": "2026-08-01"
+       },
+       "since_count": {
+        "deliveries": 24.0,
+        "sales": 24.0
+       },
+       "stock_at_order_day": 0.0,
+       "stock_now": 10.0,
+       "units_in_window": 224.0,
+       "weekly_units": [
+        56.0,
+        56.0,
+        56.0,
+        56.0
+       ],
+       "window": {
+        "first_day": "2026-07-30",
+        "last_day": "2026-08-26",
+        "report_days": 28,
+        "weeks": [
+         [
+          "2026-07-30",
+          "2026-08-05"
+         ],
+         [
+          "2026-08-06",
+          "2026-08-12"
+         ],
+         [
+          "2026-08-13",
+          "2026-08-19"
+         ],
+         [
+          "2026-08-20",
+          "2026-08-26"
+         ]
+        ]
+       }
+      },
+      "id": "4cf8a391d3d41c24",
+      "not_actionable_reason": "not_admitted",
+      "ordering_key": {
+       "name": "units_in_window",
+       "value": 224.0
+      },
+      "product_name": "לחם אחיד",
+      "signal_family": "order.suggestion",
+      "value": null
+     },
+     {
+      "action": "place_order",
+      "actionable": false,
+      "attention": "today",
+      "barcode": "7290102",
+      "capability": "order_quantity",
+      "characterisation": "order_suggestion",
+      "department": "מאפים",
+      "evidence": {
+       "adjusted_daily_mean": 5.0,
+       "boost": {
+        "applied": false,
+        "label": null,
+        "model": null,
+        "model_pick_pct": null,
+        "not_applied_because": "market_not_running_out",
+        "pct": null,
+        "reason": null,
+        "reason_withheld_because": null
+       },
+       "cap": 10.0,
+       "capped": true,
+       "count": {
+        "as_of": "2026-08-24",
+        "flags": [],
+        "not_used_because": null,
+        "recorded_stock": 6.0,
+        "used": true
+       },
+       "cycle": {
+        "days": 7,
+        "first_day": "2026-08-30",
+        "last_day": "2026-09-05"
+       },
+       "daily_mean": 5.0,
+       "expected_sales": 35.0,
+       "kind": "net",
+       "need": 35.0,
+       "order_day": "2026-08-30",
+       "quantity": 10,
+       "report_days": 28,
+       "schedule": {
+        "form": "weekdays",
+        "stated_on": "2026-08-01",
+        "weekdays": [
+         "sun"
+        ]
+       },
+       "schedule_changed": false,
+       "shelf_life": {
+        "days": 2,
+        "stated_on": "2026-08-01"
+       },
+       "since_count": {
+        "deliveries": 15.0,
+        "sales": 15.0
+       },
+       "stock_at_order_day": 0.0,
+       "stock_now": 6.0,
+       "units_in_window": 140.0,
+       "weekly_units": [
+        35.0,
+        35.0,
+        35.0,
+        35.0
+       ],
+       "window": {
+        "first_day": "2026-07-30",
+        "last_day": "2026-08-26",
+        "report_days": 28,
+        "weeks": [
+         [
+          "2026-07-30",
+          "2026-08-05"
+         ],
+         [
+          "2026-08-06",
+          "2026-08-12"
+         ],
+         [
+          "2026-08-13",
+          "2026-08-19"
+         ],
+         [
+          "2026-08-20",
+          "2026-08-26"
+         ]
+        ]
+       }
+      },
+      "id": "b9714fdf89807712",
+      "not_actionable_reason": "not_admitted",
+      "ordering_key": {
+       "name": "units_in_window",
+       "value": 140.0
+      },
+      "product_name": "פיתות",
+      "signal_family": "order.suggestion",
+      "value": null
+     },
+     {
+      "action": "place_order",
+      "actionable": false,
+      "attention": "today",
+      "barcode": "7290001",
+      "capability": "order_quantity",
+      "characterisation": "order_suggestion",
+      "department": "משקאות",
+      "evidence": {
+       "adjusted_daily_mean": 3.3000000000000003,
+       "boost": {
+        "applied": true,
+        "label": "model_estimate",
+        "model": "claude-sonnet-5",
+        "model_pick_pct": 10,
+        "not_applied_because": null,
+        "pct": 10,
+        "reason": "المحلات القريبة نفدت منها",
+        "reason_withheld_because": null
+       },
+       "cap": 99.00000000000001,
+       "capped": false,
+       "count": {
+        "as_of": "2026-08-24",
+        "flags": [],
+        "not_used_because": null,
+        "recorded_stock": 12.0,
+        "used": true
+       },
+       "cycle": {
+        "days": 7,
+        "first_day": "2026-08-30",
+        "last_day": "2026-09-05"
+       },
+       "daily_mean": 3.0,
+       "expected_sales": 23.1,
+       "kind": "net",
+       "need": 23.1,
+       "order_day": "2026-08-30",
+       "quantity": 23,
+       "report_days": 28,
+       "schedule": {
+        "form": "weekdays",
+        "stated_on": "2026-08-01",
+        "weekdays": [
+         "sun"
+        ]
+       },
+       "schedule_changed": false,
+       "shelf_life": {
+        "days": 30,
+        "stated_on": "2026-08-01"
+       },
+       "since_count": {
+        "deliveries": 6.0,
+        "sales": 9.0
+       },
+       "stock_at_order_day": 0.0,
+       "stock_now": 9.0,
+       "units_in_window": 84.0,
+       "weekly_units": [
+        21.0,
+        21.0,
+        21.0,
+        21.0
+       ],
+       "window": {
+        "first_day": "2026-07-30",
+        "last_day": "2026-08-26",
+        "report_days": 28,
+        "weeks": [
+         [
+          "2026-07-30",
+          "2026-08-05"
+         ],
+         [
+          "2026-08-06",
+          "2026-08-12"
+         ],
+         [
+          "2026-08-13",
+          "2026-08-19"
+         ],
+         [
+          "2026-08-20",
+          "2026-08-26"
+         ]
+        ]
+       }
+      },
+      "id": "23337f5ba1fa260e",
+      "not_actionable_reason": "not_admitted",
+      "ordering_key": {
+       "name": "units_in_window",
+       "value": 84.0
+      },
+      "product_name": "מים",
+      "signal_family": "order.suggestion",
+      "value": null
+     },
+     {
+      "action": "place_order",
+      "actionable": false,
+      "attention": "today",
+      "barcode": "7290002",
+      "capability": "order_quantity",
+      "characterisation": "order_suggestion",
+      "department": "משקאות",
+      "evidence": {
+       "adjusted_daily_mean": 2.0,
+       "boost": {
+        "applied": false,
+        "label": null,
+        "model": null,
+        "model_pick_pct": null,
+        "not_applied_because": "market_not_running_out",
+        "pct": null,
+        "reason": null,
+        "reason_withheld_because": null
+       },
+       "cap": 57.0,
+       "capped": false,
+       "count": {
+        "as_of": "2026-08-24",
+        "flags": [],
+        "not_used_because": null,
+        "recorded_stock": 12.0,
+        "used": true
+       },
+       "cycle": {
+        "days": 7,
+        "first_day": "2026-08-30",
+        "last_day": "2026-09-05"
+       },
+       "daily_mean": 2.0,
+       "expected_sales": 14.0,
+       "kind": "net",
+       "need": 11.0,
+       "order_day": "2026-08-30",
+       "quantity": 11,
+       "report_days": 28,
+       "schedule": {
+        "form": "weekdays",
+        "stated_on": "2026-08-01",
+        "weekdays": [
+         "sun"
+        ]
+       },
+       "schedule_changed": false,
+       "shelf_life": {
+        "days": 30,
+        "stated_on": "2026-08-01"
+       },
+       "since_count": {
+        "deliveries": 3.0,
+        "sales": 6.0
+       },
+       "stock_at_order_day": 3.0,
+       "stock_now": 9.0,
+       "units_in_window": 56.0,
+       "weekly_units": [
+        14.0,
+        14.0,
+        14.0,
+        14.0
+       ],
+       "window": {
+        "first_day": "2026-07-30",
+        "last_day": "2026-08-26",
+        "report_days": 28,
+        "weeks": [
+         [
+          "2026-07-30",
+          "2026-08-05"
+         ],
+         [
+          "2026-08-06",
+          "2026-08-12"
+         ],
+         [
+          "2026-08-13",
+          "2026-08-19"
+         ],
+         [
+          "2026-08-20",
+          "2026-08-26"
+         ]
+        ]
+       }
+      },
+      "id": "0743b0d4c4a64de6",
+      "not_actionable_reason": "not_admitted",
+      "ordering_key": {
+       "name": "units_in_window",
+       "value": 56.0
+      },
+      "product_name": "קולה",
+      "signal_family": "order.suggestion",
+      "value": null
+     }
+    ],
+    "evidence_window": {
+     "first_day": "2026-07-30",
+     "last_day": "2026-08-26",
+     "report_days": 28,
+     "weeks": [
+      [
+       "2026-07-30",
+       "2026-08-05"
+      ],
+      [
+       "2026-08-06",
+       "2026-08-12"
+      ],
+      [
+       "2026-08-13",
+       "2026-08-19"
+      ],
+      [
+       "2026-08-20",
+       "2026-08-26"
+      ]
+     ]
+    },
+    "id": "order_quantity",
+    "notes": [],
+    "rejected_store_facts": [],
+    "requires": [
+     "products",
+     "sales_daily",
+     "store_facts"
+    ],
+    "spec": "F8-S1",
+    "status": "available",
+    "thresholds": {
+     "freshness_days": 7,
+     "max_count_age_days": 7,
+     "min_report_days": 21,
+     "publish_disagreement_questions": true,
+     "window_days": 28
+    },
+    "unavailable_reason": null,
+    "window": null
+   }
+  },
+  "generated_at": "2026-08-27T03:00:00+00:00",
+  "thresholds": {
+   "artefact": {
+    "cost_ratio": 2.0,
+    "min_price": 0.5
+   },
+   "assortment_gap": {
+    "window_days": 14
+   },
+   "catalogue_lifecycle": {
+    "full_annual_cycle_months": 12,
+    "implausible_revenue_share": 0.1,
+    "withdraw_with_stock": false
+   },
+   "competitor_position": {
+    "attention_pct": 100.0,
+    "cost_floor_pct": 10.0,
+    "freshness_days": 14,
+    "policy_pct": 60.0,
+    "uncomparable_min_barcode_digits": 8
+   },
+   "market_boost": {
+    "max_pct": 25.0,
+    "model": "claude-sonnet-5",
+    "prompt": "configs/prompts/market_boost.v1.md",
+    "request_ceiling": 200
+   },
+   "market_running_out": {
+    "catalogue_change_pct": 10.0,
+    "max_absent": 7,
+    "min_absent": 2,
+    "min_listed": 10,
+    "prior_days": 14,
+    "signal_max_age_days": 2,
+    "signal_min_usable": 10,
+    "thin_collection_ratio": 0.5
+   },
+   "order_quantity": {
+    "freshness_days": 7,
+    "max_count_age_days": 7,
+    "min_report_days": 21,
+    "publish_disagreement_questions": true,
+    "window_days": 28
+   },
+   "owner_declared_ceiling_pct": null,
+   "owner_questions": {
+    "limit": 3,
+    "money_basis": "window_revenue_at_shelf_price",
+    "yield_factor": 1.0
+   },
+   "price_consistency": {
+    "band_pct": 2.0,
+    "drop_ratio": 0.75,
+    "max_credible_gap_pct": 300.0,
+    "min_band_count": 20
+   },
+   "published_population": "whole",
+   "question_limit": 3,
+   "surface": {
+    "bound": 10,
+    "engine_ordered": [
+     "assortment_gap",
+     "reconciliation",
+     "competitor_position",
+     "catalogue_lifecycle",
+     "hygiene"
+    ],
+    "rotate": [
+     "reconciliation",
+     "competitor_position",
+     "catalogue_lifecycle",
+     "hygiene"
+    ],
+    "unvalued_caps": {
+     "assortment_gap": 1
+    },
+    "unvalued_order": [
+     "assortment_gap",
+     "reconciliation",
+     "competitor_position",
+     "catalogue_lifecycle",
+     "hygiene"
+    ],
+    "unvalued_places": 3
+   },
+   "version": 1
+  }
+ },
+ "catalogue": {
+  "products": [
+   {
+    "barcode": "7290001",
+    "department": "משקאות",
+    "product_name": "מים"
+   },
+   {
+    "barcode": "7290002",
+    "department": "משקאות",
+    "product_name": "קולה"
+   },
+   {
+    "barcode": "7290003",
+    "department": "משקאות",
+    "product_name": "סודה"
+   },
+   {
+    "barcode": "7290004",
+    "department": "משקאות",
+    "product_name": "מיץ"
+   },
+   {
+    "barcode": "7290101",
+    "department": "מאפים",
+    "product_name": "לחם אחיד"
+   },
+   {
+    "barcode": "7290102",
+    "department": "מאפים",
+    "product_name": "פיתות"
+   },
+   {
+    "barcode": "7290201",
+    "department": "חטיפים",
+    "product_name": "במבה"
+   },
+   {
+    "barcode": "7290202",
+    "department": "חטיפים",
+    "product_name": "ביסלי גריל"
+   },
+   {
+    "barcode": "7290203",
+    "department": "חטיפים",
+    "product_name": "פרינגלס"
+   },
+   {
+    "barcode": "7290301",
+    "department": "מוצרי חלב",
+    "product_name": "חלב 3%"
+   },
+   {
+    "barcode": "7290401",
+    "department": "ניקיון",
+    "product_name": "אקונומיקה"
+   }
+  ]
+ },
+ "now": "2026-08-27T03:00:00+00:00",
+ "owner_state": {
+  "outcomes": {
+   "23337f5ba1fa260e": {
+    "at": 1787799600000,
+    "reason": null,
+    "snapshot": {
+     "barcode": "7290001",
+     "capability": "order_quantity",
+     "kind": "net",
+     "order_day": "2026-08-30",
+     "signal_family": "order.suggestion",
+     "suggested_quantity": 23
+    },
+    "status": "acted"
+   },
+   "4cf8a391d3d41c24": {
+    "at": 1787799600000,
+    "reason": null,
+    "snapshot": {
+     "approved_quantity": 14,
+     "barcode": "7290101",
+     "capability": "order_quantity",
+     "kind": "net",
+     "order_day": "2026-08-30",
+     "signal_family": "order.suggestion",
+     "suggested_quantity": 16
+    },
+    "status": "acted"
+   },
+   "7b326c2019cddbed": {
+    "at": 1787799600000,
+    "reason": null,
+    "snapshot": {
+     "barcode": "7290201",
+     "capability": "order_quantity",
+     "kind": "net",
+     "order_day": "2026-09-01",
+     "signal_family": "order.suggestion",
+     "suggested_quantity": 35
+    },
+    "status": "acted"
+   }
+  }
+ }
+}
