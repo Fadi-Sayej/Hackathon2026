@@ -135,28 +135,41 @@ def _read_listings(source_dir: Path) -> Tuple[Set[Tuple[str, str]], Dict[str, st
         # same rows are not counted twice.
         if "silver" not in path.name:
             continue
+        # Only the four columns used, normalised and de-duplicated in polars. This read every
+        # column and walked every row in Python (28.7 million rows over 54 days), and every
+        # caller replays the whole history: on 2026-10-03 the nightly's two health checks and
+        # market_context spent minutes here, growing each night. The rules are the ones the
+        # row loop applied: a missing value is "", whitespace is trimmed, leading zeros leave
+        # the barcode, a row without a barcode or store says nothing, only a real True or
+        # False marks orderability, and the first non-empty name in file order wins. The two
+        # agreed on all 108 committed day-sources when it changed;
+        # tests/test_presence_reader.py keeps the loop as the reference.
         try:
-            frame = pl.read_parquet(path)
+            schema = pl.read_parquet_schema(path)
+            if "barcode" not in schema or "store_id" not in schema:
+                continue
+            cols = ["barcode", "store_id"] + [c for c in ("product_name", "is_online_available") if c in schema]
+            frame = pl.read_parquet(path, columns=cols)
         except Exception:
             continue
-        if "barcode" not in frame.columns or "store_id" not in frame.columns:
-            continue
-        cols = (["barcode", "store_id"] + (["product_name"] if "product_name" in frame.columns else [])
-                + (["is_online_available"] if "is_online_available" in frame.columns else []))
-        for row in frame.select(cols).iter_rows(named=True):
-            barcode = str(row.get("barcode") or "").strip().lstrip("0")
-            store = str(row.get("store_id") or "").strip()
-            if not barcode or not store:
-                continue
-            pairs.add((barcode, store))
-            flag = row.get("is_online_available")
-            if flag is False:
-                not_orderable.add((barcode, store))
-            elif flag is True:
-                orderable.add((barcode, store))
-            name = row.get("product_name")
-            if name and barcode not in names:
-                names[barcode] = str(name)
+        frame = frame.with_columns(
+            pl.col("barcode").cast(pl.String).fill_null("").str.strip_chars().str.strip_chars_start("0"),
+            pl.col("store_id").cast(pl.String).fill_null("").str.strip_chars(),
+        ).filter((pl.col("barcode") != "") & (pl.col("store_id") != ""))
+        keys = frame.select("barcode", "store_id").unique()
+        pairs.update(zip(keys["barcode"].to_list(), keys["store_id"].to_list()))
+        if "is_online_available" in frame.columns and frame.schema["is_online_available"] == pl.Boolean:
+            flagged = frame.filter(pl.col("is_online_available").is_not_null()).select(
+                "barcode", "store_id", "is_online_available").unique()
+            for barcode, store, flag in zip(flagged["barcode"].to_list(), flagged["store_id"].to_list(),
+                                            flagged["is_online_available"].to_list()):
+                (orderable if flag else not_orderable).add((barcode, store))
+        if "product_name" in frame.columns:
+            named = frame.select("barcode", pl.col("product_name").cast(pl.String)).filter(
+                pl.col("product_name").is_not_null() & (pl.col("product_name") != "")
+            ).unique(subset="barcode", keep="first", maintain_order=True)
+            for barcode, name in zip(named["barcode"].to_list(), named["product_name"].to_list()):
+                names.setdefault(barcode, name)
     # A day's files can list one pair twice. Absent only if no line said it was orderable.
     return pairs, names, not_orderable - orderable
 

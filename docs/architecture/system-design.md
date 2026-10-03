@@ -1251,7 +1251,7 @@ own, so their rows say so rather than grade it after the fact.
 | `scripts/refresh_pipeline.py` | BROKEN (ordering) | `scripts/run_engine.py` (`npm run data:refresh`) | **REFACTOR**, done; the old script, and `pilot_daily.sh`, which ran the same chain, were removed on 2026-09-24 (Phase 4 Task 4.2) |
 | `scripts/print_figures.py` | BROKEN vs specs | `scripts/figures.py` (`npm run figures`) = engine `--print` | **REPLACE** |
 | `src/context/owner_answers.py`, `configs/owner_answers.yaml` | live but empty | `src/owner_state/{pull,model}.py`, `data/owner/owner_state.json` (CI-committed) | **REPLACE** |
-| `src/context/{build,weather,hebrew,islamic,demand_signals,competitor_stockouts,shelf_life}.py`, `public/data/market-context.json` | LIKELY_WORKING, inert | unchanged, produced nightly for V2; not read by V1 | **REUSE (off V1 path)** |
+| `src/context/{build,weather,hebrew,islamic,demand_signals,competitor_stockouts,shelf_life}.py`, `public/data/market-context.json` | LIKELY_WORKING, inert | unchanged, produced nightly for V2; not read by V1. Since 2026-10-03 its `competitorStockouts` is published as `not_computed`: it replayed the whole price history each night and nothing reads it (T4, #49, computes it when specified) | **REUSE (off V1 path)** |
 | `src/expiry/`, `src/internal/receiving.py`, `restock_reconcile.py`, `src/snapshots/*`, `src/market/*` | LIKELY_WORKING, no data / off-path | unchanged; V2 inputs | **REUSE (off V1 path)** |
 | `scripts/check_signals_live.mjs` | VERIFIED_WORKING | retired 2026-09-24 (#77): the V1 probes are `check_v1_signals.py` and `check_independence.py`, blocking in the nightly | **REMOVE**, done (ADR-028) |
 | `src/lib/persistence/*` (adapters, reconcile) | LIKELY_WORKING | `src/owner/persistence/*` | **REUSE** |

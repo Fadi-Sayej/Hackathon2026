@@ -64,6 +64,13 @@ def _competitor_stockouts() -> Dict[str, Any]:
         return {"barcodes": [], "days": 0, "status": "unavailable", "lift": 1.0}
 
 
+def _stockouts_not_computed() -> Dict[str, Any]:
+    """The field's shape, saying plainly that the nightly did not compute it, and why."""
+    return {"barcodes": [], "days": None, "status": "not_computed", "lift": _stockout_lift(),
+            "reason": "replays the whole price history each night and nothing reads it; "
+                      "computed from the committed snapshots when T4 (#49) is specified"}
+
+
 def _stockout_lift() -> float:
     import yaml
 
@@ -123,9 +130,14 @@ def build_market_context(
         "shelfLife": load_shelf_life(),
         # What he has already told us, so the UI never asks a question twice.
         "ownerAnswers": load_owner_answers(),
-        # Competitor stockouts on lines he also sells: a demand adjustment applied
-        # by the reorder engine. Never a gate — see competitor_stockouts.py.
-        "competitorStockouts": _competitor_stockouts(),
+        # Competitor stockouts on lines he also sells. Not computed in the nightly since
+        # 2026-10-03: it classified every barcode over every committed day of the national
+        # price files, 217 s on the runner that night and growing each night, the largest
+        # reason the nightly reached 37 of its 45 minutes. Nothing reads it: the reorder
+        # engine that applied it went with ADR-028, and F8 and F9 read ADR-031's
+        # nearby-market signal. T4 (#49), on hold, would use it, and the committed snapshots
+        # keep everything it is computed from; _competitor_stockouts() still computes it.
+        "competitorStockouts": _stockouts_not_computed(),
     }
 
 
