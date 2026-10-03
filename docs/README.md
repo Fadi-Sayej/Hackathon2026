@@ -107,6 +107,7 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 | [ADR-035](architecture/decisions/ADR-035-a-models-answer-is-collected-data.md) | A model's answer is collected data, sealed as a daily snapshot — accepted 2026-09-26 |
 | [ADR-036](architecture/decisions/ADR-036-a-store-is-configuration-one-copy-per-store.md) | A store is configuration, and each store runs its own copy with only its own data — accepted 2026-09-30 |
 | [ADR-037](architecture/decisions/ADR-037-shelf-layout-is-a-committed-file.md) | The shelf layout, facing widths and arrangement rules are a committed file the team records — `Ready for review` (F12-S1) |
+| [ADR-038](architecture/decisions/ADR-038-a-shelf-arrangement-is-an-outcome-on-the-fixtures-plan.md) | A shelf arrangement is the owner's "acted" outcome on that fixture's plan entry — `Ready for review` (F12-S1) |
 
 ADR-001 … ADR-036 are `Accepted`; ADR-036 was the last, on 2026-09-30. ADR-022 amends a sentence of ADR-019 and was accepted on 2026-09-13, after the defect it fixes was verified end to end: `entry_id` falls back to `product_name`, and `compose.js` skips any entry whose id carries a settled outcome, so two barcode-less rows sharing a name settled together on the owner's screen. ADR-020 was accepted on 2026-09-13 **conditional on GAP-009**:
 `published_population: whole` is the right value while that question is open, and becomes

@@ -1229,6 +1229,7 @@ own, so their rows say so rather than grade it after the fact.
 | [ADR-035](decisions/ADR-035-a-models-answer-is-collected-data.md) | A model's answer is collected data: sealed as a daily snapshot, and reproduction reads it like any other | Easy |
 | [ADR-036](decisions/ADR-036-a-store-is-configuration-one-copy-per-store.md) | A store is configuration, and each store runs its own copy with only its own data (D-28) | Easy |
 | [ADR-037](decisions/ADR-037-shelf-layout-is-a-committed-file.md) | The shelf layout, facing widths and arrangement rules are a committed file the team records from the owner (F12-S1). **Ready for review** | Easy: a later ADR can move widths to photographs if the vision trial succeeds |
+| [ADR-038](decisions/ADR-038-a-shelf-arrangement-is-an-outcome-on-the-fixtures-plan.md) | A shelf arrangement is the owner's `acted` outcome on that fixture's `shelf.plan` entry (F12-S1). **Ready for review** | Easy: outcomes are additive |
 
 ---
 
@@ -1514,6 +1515,7 @@ until the owner approves the spec and its mockups.
 | FR-182 … FR-189, INV-087, INV-088, INV-090, INV-091 | E `shelf_plan`: first facings packed shelf by shelf, known earnings first; an over-full fixture planned not at all; extra facings only where every size is known, greedy with a provisional elasticity; P the plan with its conditions and no money total | ADR-005, ADR-012 | AC-174 … AC-178, AC-180, AC-181 |
 | FR-193 | E `shelf_plan` requires `products`, `store_layout`, `sales_daily`; rule-level `layout_all_rejected`, `no_evidence_window`, `stale_daily_sales` | ADR-014; ADR-030 §4 | AC-172, AC-173, AC-185 |
 | FR-192, FR-194, FR-195, INV-089 | U Store layout and Shelf plan leave their awaiting shells; `value_policy: none`, not admitted; read-only for every role | ADR-028 §1; ADR-029; ADR-012 | AC-173, AC-182, AC-187 |
+| FR-201 … FR-207, INV-092 … INV-094 | O the owner's `acted` outcome on a fixture's `shelf.plan` entry (ADR-038); E the measurement: before and after windows under F8's rules, net of comparison products (difference in differences), the store's own space elasticity with its interval and verdict; the plan uses it only when measured, else 0.17 (F12-S1 §23) | ADR-003, ADR-029, ADR-038; ADR-030 | AC-190 … AC-195 |
 | FR-200 | U the marked example on Shelf plan while it waits for a sales reason; nothing reads it | D-31, after D-29 | AC-189 |
 | NFR-072, NFR-073 | R print mode; no step growing with market history | ADR-002 | Checkpoint of its phase |
 
