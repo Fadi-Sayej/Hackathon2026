@@ -7,7 +7,7 @@ Date: 2026-10-03
 Parent: [System Design](../system-design.md) §19
 Related Specs: F12-S1 (FR-178 … FR-180, FR-190, FR-199, NFR-075, C-74, OQ-1201, OQ-1202)
 Inputs: [docs/features/F12-planogram/specs/F12-S1-planogram.md, D-13, D-22, D-30, ADR-029, ADR-033, ADR-036]
-Updated: 2026-10-03
+Updated: 2026-10-03 (OQ-1201 answered: widths from photographs)
 ---
 
 # ADR-037 — The shelf layout is a committed file the team records; owner state never holds them
@@ -24,8 +24,8 @@ sales arrive (D-30):
 
 ADR-033 settled where the store's other stated facts live (order schedules and shelf lives): a
 committed file, recorded by the team, validated at load, and changed only by commit. Some of these
-facts are stated by the owner (rules, which shelf is at eye level). Others are measured,
-possibly by the team (lengths, widths; F12-S1 OQ-1201).
+facts are stated by the owner (rules, which shelf is at eye level). Others are measured by the
+team (lengths; widths read from his shelf photographs, F12-S1 OQ-1201).
 
 ## Decision
 
@@ -53,7 +53,7 @@ so D-13 holds by construction.
 ## Rejected options
 
 ### A form in the app
-The owner could write owner state, but the measurements are often the team's (F12-S1 OQ-1201),
+The owner could write owner state, but the measurements are the team's (F12-S1 OQ-1201),
 and the team cannot write owner state (ADR-029). It would also mean a form with one width per
 stocked product, the kind ADR-033 rejected for 55 departments, citing F5-S1 C-40 on abandoned
 forms.
@@ -70,8 +70,8 @@ a file F8 reads, for a feature F8 does not need.
 
 ## Consequences
 
-**We accept:** recording widths is work for someone, the team or the owner (OQ-1201), and a plan
-waits until it is done.
+**We accept:** reading widths from his shelf photographs is work for the team (OQ-1201, answered
+2026-10-03: "from photos"), and a plan waits until it is done.
 
 **We gain:** F12 can be set up the day a store states its fixtures, before any sales arrive, with
 no new storage, no image handling and no model cost.

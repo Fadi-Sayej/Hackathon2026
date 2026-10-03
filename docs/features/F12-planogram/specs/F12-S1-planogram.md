@@ -3,12 +3,12 @@ ID: F12-S1
 Title: Planogram — a dated shelf plan from his own sales, waiting for them until they arrive
 Status: Ready for review
 Owner: smartshelf-architect
-Version: 0.3 (2026-10-03, after two independent review rounds)
+Version: 0.4 (2026-10-03: OQ-1201, OQ-1202, OQ-1203 and OQ-1205 answered; D-31; OQ-1206 raised)
 Parent: [F12 — Planogram](../intent.md)
 Related Intents: INT-006
-Inputs: [docs/features/F12-planogram/intent.md (Approved for specification, D-30), docs/product/PRD.md (§5 V4, §6 #7), docs/product/intent-register.md (D-1, D-3, D-13, D-14, D-22, D-23, D-28, D-29, D-30), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (§5 "He stocks", FR-143 … FR-146, FR-156), ADR-001, ADR-002, ADR-005, ADR-007, ADR-011, ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-033, ADR-036, ADR-037, CLAUDE.md]
+Inputs: [docs/features/F12-planogram/intent.md (Approved for specification, D-30), docs/product/PRD.md (§5 V4, §6 #7), docs/product/intent-register.md (D-1, D-3, D-13, D-14, D-22, D-23, D-28, D-29, D-30, D-31), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (§5 "He stocks", FR-143 … FR-146, FR-156), ADR-001, ADR-002, ADR-005, ADR-007, ADR-011, ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-033, ADR-036, ADR-037, CLAUDE.md]
 Answered by: [System Design](../../../architecture/system-design.md) §21 (F12-S1)
-Updated: 2026-10-03
+Updated: 2026-10-03 (the owner's answers; D-31 brings the marked example into scope)
 ---
 
 # F12-S1 — Planogram
@@ -18,12 +18,12 @@ Updated: 2026-10-03
 > **(decided here)** for the owner's approval, or asked in §17.
 
 > **Identifier note.** Every `FR-`, `INV-`, `NFR-`, `AC-`, `SCN-`, `C-`, `ASM-` and `OQ-` id
-> below is new and globally unique: FR-178 … FR-199, INV-084 … INV-091, NFR-072 … NFR-075,
-> AC-172 … AC-188, SCN-159 … SCN-168, C-73 … C-75, ASM-073 … ASM-074, OQ-1201 … OQ-1205.
+> below is new and globally unique: FR-178 … FR-200, INV-084 … INV-091, NFR-072 … NFR-075,
+> AC-172 … AC-189, SCN-159 … SCN-168, C-73 … C-75, ASM-073 … ASM-074, OQ-1201 … OQ-1206.
 
 Implements intent F12. Bound by ADR-001, ADR-002, ADR-005, ADR-007, ADR-011, ADR-012, ADR-014,
 ADR-028, ADR-029, ADR-030, ADR-033, ADR-036 and ADR-037, and settled decisions D-1, D-3, D-13,
-D-14, D-23 and D-30.
+D-14, D-23, D-29, D-30 and D-31.
 
 ## 1. Purpose
 
@@ -61,6 +61,8 @@ Behavioural scope, not a file list. The implementation plan declares the files.
   - **`shelf_plan`** publishes the plan, and waits for daily sales.
 - Two pages that already exist as waiting shells (ADR-028 §1), filled from the artefact:
   **Store layout** from `layout_facts`, and **Shelf plan** from `shelf_plan`.
+- A clearly marked example on Shelf plan while it waits, as on Reorder (D-31, FR-200). What the
+  example is built from is proposed by its plan for his approval.
 - The boundary probe for the new inputs (§20).
 
 ### Out of Scope
@@ -71,8 +73,6 @@ Behavioural scope, not a file list. The implementation plan declares the files.
   Possible later, and only by hand-held photographs (D-13).
 - **The order of products from left to right within a shelf.** The plan gives each product a
   shelf and a number of facings **(decided here)**.
-- **A marked example while the plan waits.** D-29 confines examples to the order pages; this
-  needs its own decision (OQ-1203).
 - **Any money projection.** See INV-087 and §21.
 - **Planning products he does not stock** (F8-S1 §5). Those in his catalogue are listed, not
   planned (FR-198). Products outside his catalogue are F9's.
@@ -115,9 +115,10 @@ used.
 **FR-179** — A fixture holds the planned products of the departments it names. A department named
 on two fixtures is rejected, unless a "keep on" rule assigns its products between them.
 
-**FR-180** — The plan needs each planned product's facing width **(decided here; beyond D-30's
-list, so OQ-1201 asks who measures)**. A product without one is not placed, and is named under
-"no width". A width is never estimated from the category, the price or a photograph (D-3).
+**FR-180** — The plan needs each planned product's facing width. The team reads it from his shelf
+photographs and records it with who read it and when (OQ-1201, answered; ADR-037). A product
+without a recorded width is not placed, and is named under "no width". A width is never
+estimated from the category or the price (D-3).
 
 **FR-181** — Demand is computed by F8's evidence functions over F8's window, never by a second
 derivation. Monthly reports supply no demand (F8-S1 FR-143; CLAUDE.md rule 13). In a department
@@ -225,6 +226,13 @@ It also publishes rule-level reasons of its own:
 reason in the owner's words and language, and no plan, the way Reorder waits for its daily
 reports. It never shows an empty plan as if there were nothing to arrange.
 
+**FR-200** — While `shelf_plan` is unavailable, for any reason, Shelf plan offers a clearly marked
+example of itself, as Reorder does (D-31, after D-29):
+- a banner on every screen of it says it is an example and not the store's data;
+- nothing in it can be approved, changed, saved, exported or sent;
+- the engine, the published artefacts, the owner state and the pilot measurement never read
+  it.
+
 **FR-195** — Neither page has a control that changes anything. A team account sees them the same
 (ADR-029).
 
@@ -290,8 +298,8 @@ known.
 **SCN-160** — Given a layout file and no daily reports, when the nightly runs:
 - `layout_facts` is available, and Store layout shows every recorded fixture with its dates and
   the products without a width;
-- Shelf plan says it is waiting for the daily sales reports (`no_daily_sales`) and shows no plan
-  (D-30).
+- Shelf plan says it is waiting for the daily sales reports (`no_daily_sales`), shows no plan
+  (D-30), and offers the marked example (D-31).
 
 **SCN-161** — Given a window, a fixture of two shelves at 100 cm and 90 cm, and planned products
 with widths and known earnings, when the nightly runs, then:
@@ -445,6 +453,10 @@ and is listed as "stock unknown". *(FR-181, FR-187, FR-197)*
 
 **AC-187** — Neither capability is admitted to the daily surface. *(FR-192)*
 
+**AC-189** — While `shelf_plan` is unavailable, for any reason, Shelf plan offers the marked
+example. No engine step, published artefact, owner state or pilot measurement reads it.
+*(FR-200; D-31)*
+
 **AC-188** — Updating a store's copy from the product leaves its layout file unchanged, and
 `check:store` names the file as missing when it is absent. *(NFR-075)*
 
@@ -459,24 +471,24 @@ depth or height to fit.
 
 ## 17. Open Questions
 
-**OQ-1201** — FR-180 needs a facing width for every planned product, which goes beyond the inputs
-D-30 listed. Who measures them: the team, from his shelf photographs and a tape, or the owner?
-The catalogue holds 7,523 products (`figures["competitor_position.catalogue"]`, artefact of
-2026-10-03), and only the stocked products on recorded fixtures need one. · owner: the
-repository owner · blocks: the first plan.
+**~~OQ-1201~~** — "Who measures product widths: the team, from photos and a tape measure, or the
+store owner?" **Answered 2026-10-03: "from photos".** The team reads the widths from his shelf
+photographs (FR-180).
 
-**OQ-1202** — Should the one-day trial of a vision model reading a real shelf photograph be run,
-before or after a first version that records by hand? · owner: the repository owner · blocks:
-nothing in this spec.
+**~~OQ-1202~~** — "Should we run the one-day test of an AI reading a real shelf photo, before or
+after a first version entered by hand?" **Answered 2026-10-03: "yes why not".** The test is
+to be run. He did not choose between before and after, so its plan proposes the order for his
+approval.
 
-**OQ-1203** — May Shelf plan show a marked example while it waits, as D-29 allows the order pages?
-That needs its own D-n. · owner: the repository owner · blocks: nothing; without it, the page
-waits.
+**~~OQ-1203~~** — "Should the waiting Shelf plan page show a clearly marked example of how it
+will look, like Reorder does? That would be a new decision, D-31." **Answered 2026-10-03:
+"yes", recorded as D-31 (FR-200).**
 
 **OQ-1204** — What are the provisional space-elasticity factor and facings cap (FR-185)? · owner:
 the repository owner, on the architect's proposal · blocks: FR-185's numbers, not its rule.
 
-**OQ-1205** — Are the choices marked **(decided here)** right? They are:
+**~~OQ-1205~~** — "Are my design choices right?" **Answered 2026-10-03: "yes".** The choices
+marked **(decided here)** are:
 - the packing order and eye level (FR-183);
 - the over-full rule (FR-184);
 - first facings only where some sizes are unknown (FR-186);
@@ -489,7 +501,12 @@ the repository owner, on the architect's proposal · blocks: FR-185's numbers, n
   (FR-198);
 - rejecting a split department's unassigned products (FR-199).
 
-· owner: the repository owner · blocks: approval of this spec.
+
+**OQ-1206** — In his words: "the planogram is real science, how our product actually know what to
+tell the owner to put where to give him the best sellings". The plan's rules (FR-183 … FR-185)
+and its provisional elasticity (OQ-1204) need their scientific basis stated, and §21 says the
+plan is not a proven optimum. · owner: the repository owner, on the architect's proposal ·
+blocks: approval of this spec.
 
 ## 18. Non-Goals
 
@@ -510,6 +527,7 @@ the repository owner, on the architect's proposal · blocks: FR-185's numbers, n
 | INT-006 | FR-188 | SCN-164 | AC-178 |
 | INT-006 | FR-189 | SCN-161 | AC-181 |
 | INT-006 | FR-192, FR-195 | SCN-160 | AC-182, AC-187 |
+| INT-006 | FR-200 | SCN-160 | AC-189 |
 | Protected behavior | INV-084 | — | AC-183 |
 | Protected behavior | INV-085 | — | AC-179 |
 | Protected behavior | INV-086, INV-088, INV-090, INV-091 | SCN-162, SCN-163, SCN-165 | AC-175, AC-176, AC-177 |
@@ -538,4 +556,5 @@ the repository owner, on the architect's proposal · blocks: FR-185's numbers, n
 
 None. FR-178 … FR-199 cover the PRD's V4 row: shelf photographs, rules, and generating the plan.
 - Photographs enter only as the team's source for the recorded facts (§3).
-- Facing widths are an input the PRD row does not name (FR-180, OQ-1201).
+- Facing widths are an input the PRD row does not name. They come from his shelf photographs
+  (FR-180, OQ-1201).
