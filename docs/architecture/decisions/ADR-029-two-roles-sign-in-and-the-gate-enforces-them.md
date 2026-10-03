@@ -53,7 +53,7 @@ disabled in the console afterwards. A browser that cannot sign in reads nothing 
 nothing. It does not quietly degrade to an anonymous session.
 
 > **Added 2026-10-03.** Email and password join Google and the email link, at the repository
-> owner's request: on a new device he wanted to type his email and sign in, not wait for a link
+> owner's request: on a new device, type an email and sign in rather than wait for a link
 > (#273, approved the same day). A password belongs to the same Firebase account, so it keeps
 > its role claim. A first password is set through Firebase's password email ("Forgot your
 > password, or never set one?"). It needs the Email/Password provider's first switch on in the
