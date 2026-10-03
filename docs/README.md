@@ -53,10 +53,10 @@ globally unique across the specification layer and were **not** renumbered by th
 | F6 — Daily Action Surface | [intent](features/F6-daily-action-surface/intent.md) | [F6-S1](features/F6-daily-action-surface/specs/F6-S1-daily-action-surface.md) | V1 |
 | F7 — Figure Provenance | [intent](features/F7-figure-provenance/intent.md) | [F7-S1](features/F7-figure-provenance/specs/F7-S1-figure-provenance.md) | V1 |
 | F8 — Order Quantity | [intent](features/F8-order-quantity/intent.md) | [F8-S1](features/F8-order-quantity/specs/F8-S1-order-quantity.md) | V2 |
-| F9 — Assortment Gap | [intent](features/F9-assortment-gap/intent.md) | *not specified* | V2 |
+| F9 — Assortment Gap | [intent](features/F9-assortment-gap/intent.md) | [F9-S1](features/F9-assortment-gap/specs/F9-S1-assortment-gap.md) | V2 |
 | F10 — Expiry-Bounded Ordering | [intent](features/F10-expiry-bounded-ordering/intent.md) | *not specified* | V2 |
 | F11 — Supplier Lead Times | [intent](features/F11-supplier-lead-times/intent.md) | *not specified* | V3 |
-| F12 — Planogram | [intent](features/F12-planogram/intent.md) | *not specified* | V4 |
+| F12 — Planogram | [intent](features/F12-planogram/intent.md) | [F12-S1](features/F12-planogram/specs/F12-S1-planogram.md) — `Ready for review` | V4 |
 | F13 — Pilot Measurement | [intent](features/F13-pilot-measurement/intent.md) | [F13-S1](features/F13-pilot-measurement/specs/F13-S1-pilot-measurement.md) — **`Blocked`** | V1 |
 
 Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](features/gaps-and-open-questions.md)
@@ -106,6 +106,7 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 | [ADR-034](architecture/decisions/ADR-034-a-suggestion-is-identified-by-product-and-order-day.md) | A suggestion is identified by product and order day; a disagreement is a question keyed by product — accepted 2026-09-26 |
 | [ADR-035](architecture/decisions/ADR-035-a-models-answer-is-collected-data.md) | A model's answer is collected data, sealed as a daily snapshot — accepted 2026-09-26 |
 | [ADR-036](architecture/decisions/ADR-036-a-store-is-configuration-one-copy-per-store.md) | A store is configuration, and each store runs its own copy with only its own data — accepted 2026-09-30 |
+| [ADR-037](architecture/decisions/ADR-037-shelf-layout-is-a-committed-file.md) | The shelf layout, facing widths and arrangement rules are a committed file the team records — `Ready for review` (F12-S1) |
 
 ADR-001 … ADR-036 are `Accepted`; ADR-036 was the last, on 2026-09-30. ADR-022 amends a sentence of ADR-019 and was accepted on 2026-09-13, after the defect it fixes was verified end to end: `entry_id` falls back to `product_name`, and `compose.js` skips any entry whose id carries a settled outcome, so two barcode-less rows sharing a name settled together on the owner's screen. ADR-020 was accepted on 2026-09-13 **conditional on GAP-009**:
 `published_population: whole` is the right value while that question is open, and becomes
