@@ -45,3 +45,9 @@ market:
 # secret. The service account that reads it is, and lives in the nightly's secrets only.
 firebase:
   project_id: hackathon26-a6ebd
+
+# The address the site is opened at: the one Firebase sign-in accepts (Authentication → Settings
+# → Authorised domains). The sign-in page links to it when it is opened at any other address,
+# such as a Vercel preview. A bare host, without https://.
+site:
+  address: hackathon2026-fadi19.vercel.app

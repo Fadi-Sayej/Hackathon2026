@@ -1,7 +1,13 @@
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { siteTitlePlugin } from './scripts/store_settings.mjs'
+import { readStoreSettings, siteTitlePlugin } from './scripts/store_settings.mjs'
+
+// The address sign-in works at, for the sign-in page's "only works at …" line: the store's own
+// `site.address` (configs/store.yaml, ADR-036). Not Vercel's VERCEL_PROJECT_PRODUCTION_URL:
+// that is the project's shortest alias, which Firebase does not accept. Vite reads VITE_* from
+// process.env.
+process.env.VITE_SITE_ADDRESS ??= readStoreSettings().siteAddress
 
 // https://vite.dev/config/
 export default defineConfig({

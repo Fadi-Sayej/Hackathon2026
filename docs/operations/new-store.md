@@ -55,13 +55,16 @@ Fill every key. None is defaulted, and every tool stops on the first empty one.
 | `sales.monthly_dir`, `sales.daily_dir` | `data/internal/raw_pos/<store>/sales` and `…/sales_daily` |
 | `market.radius_km` | How far to look for nearby venues (5 at the pilot) |
 | `firebase.project_id` | The copy's Firebase project (step 3) |
+| `site.address` | The address the site is opened at, without `https://` (step 4). Sign-in works only there, and the sign-in page links to it from any other address |
 
 ## 3. Firebase: the owner's decisions and the sign-in
 
 1. Create a Firebase project. In it:
    - enable Firestore;
-   - under Authentication, enable Google and email-link sign-in (ADR-029).
-2. Put the project id in `configs/store.yaml` and in `.firebaserc`.
+   - under Authentication → Sign-in method, enable Google, and Email/Password with its "Email
+     link" option (ADR-029; passwords since 2026-10-03).
+2. Put the project id in `configs/store.yaml` and in `.firebaserc`. Under Authentication →
+   Settings → Authorised domains, add the site's address (`site.address`).
 3. In `firestore.rules`, replace `set-to-the-id-in-configs-store-yaml` with the store's `id`.
    Then deploy the rules: `firebase deploy --only firestore:rules`.
 4. Create a service account key and save its JSON as the repository's Actions secret

@@ -64,6 +64,7 @@ It states what makes a copy one store's:
 | `sales.monthly_dir`, `sales.daily_dir` | Where its monthly and daily reports are committed (ADR-030) |
 | `market.radius_km` | How far the nearby-venue finder looks (§4) |
 | `firebase.project_id` | The copy's own Firebase project (§1), added 2026-09-30 |
+| `site.address` | The address the site is opened at, the one Firebase sign-in accepts; the sign-in page links to it from any other address. Added 2026-10-03 |
 
 One loader, `src/common/store.py`, reads and validates it. Every store-specific reader goes
 through it: the engine, the importers, the weather context, the build (the tab title), the

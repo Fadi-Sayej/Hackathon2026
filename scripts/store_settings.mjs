@@ -38,6 +38,7 @@ export function readStoreSettings(path = STORE_SETTINGS_PATH) {
     id: text(raw, 'id', path),
     siteTitle: text(raw, 'site_title', path),
     firebaseProjectId: text(raw, 'firebase.project_id', path),
+    siteAddress: text(raw, 'site.address', path),
   }
 }
 

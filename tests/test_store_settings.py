@@ -33,6 +33,7 @@ VALID = {
               "daily_dir": "data/internal/raw_pos/store-a/sales_daily"},
     "market": {"radius_km": 5},
     "firebase": {"project_id": "store-a-project"},
+    "site": {"address": "store-a.example.app"},
 }
 
 
@@ -61,6 +62,7 @@ def test_a_complete_file_gives_every_setting(tmp_path):
     assert store.format == "urban_minimarket"
     assert store.market_radius_km == 5.0
     assert store.firebase_project_id == "store-a-project"
+    assert store.site_address == "store-a.example.app"
 
 
 def test_paths_are_read_from_the_repository_root(tmp_path):
@@ -148,3 +150,10 @@ def test_an_environment_naming_another_project_is_refused(tmp_path, key):
     """Another copy's Firebase project holds another store's owner state (D-28)."""
     with pytest.raises(StoreSettingsError, match=key):
         firebase_project_for_owner_state({key: "store-b-project"}, _write(tmp_path, VALID))
+
+
+@pytest.mark.parametrize("address", ["https://store-a.example.app", "store-a.example.app/", "store a.app"])
+def test_the_site_address_is_a_bare_host(tmp_path, address):
+    """It is what Firebase's authorised domains hold, and what the sign-in page links to."""
+    with pytest.raises(StoreSettingsError, match="site.address"):
+        load_store(_write(tmp_path, {**VALID, "site": {"address": address}}))

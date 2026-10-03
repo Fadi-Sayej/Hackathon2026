@@ -65,6 +65,8 @@ market:
   radius_km: 5         # how far scripts/find_nearby_venues.py looks
 firebase:
   project_id: ""       # the copy's own Firebase project
+site:
+  address: ""          # the address the site is opened at, e.g. smartshelf-store.vercel.app (no https://)
 """
 
 TARGETS_TEMPLATE = """\

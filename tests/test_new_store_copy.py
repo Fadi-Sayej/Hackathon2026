@@ -28,7 +28,8 @@ STORE_B = {"id": "store-b", "name": "Store B", "site_title": "SmartShelf AI — 
            "pos": {"export": "store-b-inventory.csv"},
            "sales": {"monthly_dir": "data/internal/raw_pos/store-b/sales",
                      "daily_dir": "data/internal/raw_pos/store-b/sales_daily"},
-           "market": {"radius_km": 5}, "firebase": {"project_id": "store-b-project"}}
+           "market": {"radius_km": 5}, "firebase": {"project_id": "store-b-project"},
+           "site": {"address": "store-b.example.app"}}
 
 
 def _run(*args, cwd=ROOT):
