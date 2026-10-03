@@ -30,6 +30,7 @@ SILVER_INVENTORY = SILVER_POS_ROOT / INVENTORY_TABLE
 REQUIRED_KEYS = (
     "id", "name", "site_title", "location.lat", "location.lon", "format",
     "pos.export", "sales.monthly_dir", "sales.daily_dir", "market.radius_km", "firebase.project_id",
+    "site.address",
 )
 
 
@@ -55,6 +56,7 @@ class StoreSettings:
     sales_daily_dir: Path
     market_radius_km: float
     firebase_project_id: str
+    site_address: str
 
 
 def _get(raw: Mapping, dotted: str, path: Path):
@@ -79,6 +81,15 @@ def _number(raw: Mapping, dotted: str, path: Path, low: float, high: float) -> f
     if isinstance(value, bool) or not isinstance(value, (int, float)) or not (low <= float(value) <= high):
         raise StoreSettingsError(f"{path}: `{dotted}` must be a number from {low} to {high}, not {value!r}.")
     return float(value)
+
+
+def _host(raw: Mapping, dotted: str, path: Path) -> str:
+    """A bare host name, as Firebase's authorised domains hold it: no scheme, path or space."""
+    import re
+    value = _text(raw, dotted, path)
+    if not re.fullmatch(r"[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?", value):
+        raise StoreSettingsError(f"{path}: `{dotted}` must be a bare host like shop.example.app, not {value!r}.")
+    return value
 
 
 def _formats() -> tuple:
@@ -118,6 +129,7 @@ def load_store(path: Optional[Path] = None) -> StoreSettings:
         sales_daily_dir=PROJECT_ROOT / _text(raw, "sales.daily_dir", path),
         market_radius_km=radius,
         firebase_project_id=_text(raw, "firebase.project_id", path),
+        site_address=_host(raw, "site.address", path),
     )
 
 

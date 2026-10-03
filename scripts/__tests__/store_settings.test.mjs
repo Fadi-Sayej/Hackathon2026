@@ -23,6 +23,7 @@ const VALID = [
   'sales: {monthly_dir: a, daily_dir: b}',
   'market: {radius_km: 5}',
   'firebase: {project_id: store-a-project}',
+  'site: {address: store-a.example.app}',
 ].join('\n')
 
 function write(text) {
@@ -35,7 +36,8 @@ function write(text) {
 describe('readStoreSettings', () => {
   it('reads the id and the tab title', () => {
     expect(readStoreSettings(write(VALID)))
-      .toEqual({ id: 'store-a', siteTitle: 'SmartShelf AI — Store A', firebaseProjectId: 'store-a-project' })
+      .toEqual({ id: 'store-a', siteTitle: 'SmartShelf AI — Store A', firebaseProjectId: 'store-a-project',
+        siteAddress: 'store-a.example.app' })
   })
 
   it.each([['id', 'id'], ['site_title', 'site_title'], ['firebase', 'firebase.project_id']])(
