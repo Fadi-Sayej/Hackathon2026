@@ -49,7 +49,7 @@ function SignedIn({ children }) {
           if (!user) {
             setCurrentRole(null)
             // Waiting on an email link is not "signed out": keep that screen.
-            setState((prev) => (['needEmail', 'linkSent'].includes(prev.status) || prev.error ? prev : { status: 'signedOut' }))
+            setState((prev) => (['needEmail', 'linkSent', 'resetSent'].includes(prev.status) || prev.error ? prev : { status: 'signedOut' }))
             return
           }
           setCurrentRole(role)
@@ -86,6 +86,22 @@ function SignedIn({ children }) {
     (error) => setState({ status: 'signedOut', error }),
   ), [attempt])
 
+  // Email and password (2026-10-03). A first password is set through the same link as a
+  // forgotten one: Firebase sends it, and the account keeps its role (same uid).
+  const onPassword = useCallback((email, password) => attempt(
+    () => session.current.signInWithPassword(email, password),
+    (error) => setState({ status: 'signedOut', error }),
+  ), [attempt])
+
+  const onResetPassword = useCallback(async (email) => {
+    try {
+      await session.current.sendPasswordReset(email)
+      setState({ status: 'resetSent', email })
+    } catch (error) {
+      setState({ status: 'signedOut', error: error?.code || true })
+    }
+  }, [])
+
   const onSendLink = useCallback(async (email) => {
     try {
       await session.current.sendEmailLink(email)
@@ -120,6 +136,8 @@ function SignedIn({ children }) {
         error={state.error || false}
         onGoogle={onGoogle}
         onSendLink={onSendLink}
+        onPassword={onPassword}
+        onResetPassword={onResetPassword}
         onFinish={onFinish}
         onUseDifferentEmail={() => setState({ status: 'signedOut' })}
         onSignOut={signOut}

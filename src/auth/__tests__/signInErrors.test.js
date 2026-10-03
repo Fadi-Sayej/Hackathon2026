@@ -14,6 +14,11 @@ describe('errorKey', () => {
     ['auth/missing-email', 'auth.error.email'],
     ['auth/network-request-failed', 'auth.error.offline'],
     ['auth/too-many-requests', 'auth.error.tooMany'],
+    ['auth/invalid-credential', 'auth.error.password'],
+    ['auth/wrong-password', 'auth.error.password'],
+    ['auth/user-not-found', 'auth.error.password'],
+    ['auth/missing-password', 'auth.error.noPassword'],
+    ['auth/operation-not-allowed', 'auth.error.passwordOff'],
   ])('%s says %s', (code, key) => {
     expect(errorKey(code)).toBe(key)
   })

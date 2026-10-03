@@ -8,7 +8,9 @@ import {
   getAuth,
   isSignInWithEmailLink,
   onIdTokenChanged,
+  sendPasswordResetEmail,
   sendSignInLinkToEmail,
+  signInWithEmailAndPassword,
   signInWithEmailLink,
   signInWithPopup,
   signOut,
@@ -65,6 +67,15 @@ export function watchSession(onChange) {
 
 export async function signInWithGoogle() {
   await signInWithPopup(auth(), new GoogleAuthProvider())
+}
+
+export async function signInWithPassword(email, password) {
+  await signInWithEmailAndPassword(auth(), email, password)
+}
+
+/** The link to set a password, or to reset one: it is how a first password is set too. */
+export async function sendPasswordReset(email) {
+  await sendPasswordResetEmail(auth(), email, { url: `${window.location.origin}/` })
 }
 
 export async function sendEmailLink(email) {

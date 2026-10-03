@@ -513,14 +513,19 @@ export const en = {
 
   // ── Sign-in and the team's read-only view (ADR-029; wording approved 2026-09-25) ──
   'auth.signin.title': "Sign in",
-  'auth.signin.lead': "Use your Google account, or we'll email you a sign-in link.",
+  'auth.signin.lead': "Use your Google account, or your email and password.",
   'auth.signin.google': "Continue with Google",
   'auth.signin.or': "or",
   'auth.signin.email': "Email",
-  'auth.signin.sendLink': "Email me a sign-in link",
+  'auth.signin.sendLink': "Email me a sign-in link instead",
+  'auth.signin.password': "Password",
+  'auth.signin.forgot': "Forgot your password, or never set one?",
   'auth.linkSent.title': "Check your email",
   'auth.linkSent.body': "We sent a sign-in link to {email}. Open it on this device.",
   'auth.linkSent.other': "Use a different email",
+  'auth.resetSent.title': "Check your email",
+  'auth.resetSent.body': "We sent a link to set your password to {email}. Set it, then come back here and sign in.",
+  'auth.resetSent.back': "Back to sign in",
   'auth.noAccess.title': "This account has no access",
   'auth.noAccess.body': "You're signed in as {email}. Ask the team to give this account access.",
   'auth.noAccess.signOut': "Sign out and use another account",
@@ -539,6 +544,9 @@ export const en = {
   'auth.error.email': "That doesn't look like an email address.",
   'auth.error.offline': "There's no internet connection. Try again when you're online.",
   'auth.error.tooMany': "Too many tries. Wait a minute, then try again.",
+  'auth.error.password': "The email or password is wrong.",
+  'auth.error.noPassword': "Type your password, or use one of the options below.",
+  'auth.error.passwordOff': "Password sign-in isn't switched on yet. Use Google or the email link.",
 
   // F8 (Phase 5 Task 5.13): Reorder and Approved orders, as the repository owner approved
   // them on 2026-09-27 (docs/reviews/F8-screens-mockups.md).

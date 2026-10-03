@@ -16,7 +16,9 @@ afterEach(cleanup)
 
 const handlers = () => ({
   onGoogle: vi.fn(), onSendLink: vi.fn(), onFinish: vi.fn(), onUseDifferentEmail: vi.fn(), onSignOut: vi.fn(),
+  onPassword: vi.fn(), onResetPassword: vi.fn(),
 })
+const type = (label, value) => fireEvent.change(screen.getByLabelText(label), { target: { value } })
 
 describe('sign in', () => {
   it('offers Google and an email link, in Arabic by default', () => {
@@ -102,5 +104,57 @@ describe('an account with no role', () => {
     expect(document.body.textContent).toContain('someone@example.com')
     fireEvent.click(screen.getByRole('button', { name: en['auth.noAccess.signOut'] }))
     expect(h.onSignOut).toHaveBeenCalledOnce()
+  })
+})
+
+
+describe('email and password (the repository owner, 2026-10-03)', () => {
+  it('signs in with the address and password typed', () => {
+    const h = handlers()
+    renderWithI18n(<SignInPage status="signedOut" {...h} />, { language: 'en' })
+    type(en['auth.signin.email'], ' owner@example.com ')
+    type(en['auth.signin.password'], 'a password')
+    fireEvent.click(screen.getByRole('button', { name: en['auth.signin.title'] }))
+    expect(h.onPassword).toHaveBeenCalledWith('owner@example.com', 'a password')
+    expect(h.onSendLink).not.toHaveBeenCalled()
+  })
+
+  it('asks for the password rather than trying without one', () => {
+    const h = handlers()
+    renderWithI18n(<SignInPage status="signedOut" {...h} />, { language: 'en' })
+    type(en['auth.signin.email'], 'owner@example.com')
+    fireEvent.click(screen.getByRole('button', { name: en['auth.signin.title'] }))
+    expect(h.onPassword).not.toHaveBeenCalled()
+    expect(screen.getByRole('alert').textContent).toBe(en['auth.error.noPassword'])
+  })
+
+  it('sends a link to set or reset the password, to the address typed', () => {
+    const h = handlers()
+    renderWithI18n(<SignInPage status="signedOut" {...h} />, { language: 'en' })
+    type(en['auth.signin.email'], 'owner@example.com')
+    fireEvent.click(screen.getByRole('button', { name: en['auth.signin.forgot'] }))
+    expect(h.onResetPassword).toHaveBeenCalledWith('owner@example.com')
+  })
+
+  it('asks for the address before sending a password link', () => {
+    const h = handlers()
+    renderWithI18n(<SignInPage status="signedOut" {...h} />, { language: 'en' })
+    fireEvent.click(screen.getByRole('button', { name: en['auth.signin.forgot'] }))
+    expect(h.onResetPassword).not.toHaveBeenCalled()
+    expect(screen.getByRole('alert').textContent).toBe(en['auth.error.email'])
+  })
+
+  it('after the password link is sent, names the address and goes back', () => {
+    const h = handlers()
+    renderWithI18n(<SignInPage status="resetSent" email="owner@example.com" {...h} />, { language: 'en' })
+    expect(screen.getByRole('heading', { name: en['auth.resetSent.title'] })).toBeTruthy()
+    expect(document.body.textContent).toContain('owner@example.com')
+    fireEvent.click(screen.getByRole('button', { name: en['auth.resetSent.back'] }))
+    expect(h.onUseDifferentEmail).toHaveBeenCalledOnce()
+  })
+
+  it('says a wrong password plainly', () => {
+    renderWithI18n(<SignInPage status="signedOut" error="auth/invalid-credential" {...handlers()} />, { language: 'en' })
+    expect(screen.getByRole('alert').textContent).toBe(en['auth.error.password'])
   })
 })

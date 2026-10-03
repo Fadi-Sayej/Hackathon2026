@@ -61,7 +61,8 @@ Fill every key. None is defaulted, and every tool stops on the first empty one.
 
 1. Create a Firebase project. In it:
    - enable Firestore;
-   - under Authentication, enable Google and email-link sign-in (ADR-029).
+   - under Authentication → Sign-in method, enable Google, and Email/Password with its "Email
+     link" option (ADR-029; passwords since 2026-10-03).
 2. Put the project id in `configs/store.yaml` and in `.firebaserc`. Under Authentication →
    Settings → Authorised domains, add the site's address (`site.address`).
 3. In `firestore.rules`, replace `set-to-the-id-in-configs-store-yaml` with the store's `id`.

@@ -137,3 +137,23 @@
   .signin__lang { margin-top: 0; }
   .signin__main { align-items: flex-start; padding: 20px 16px 32px; }
 }
+
+/* Email and password (2026-10-03): the other ways in sit under the form as plain links. */
+.auth-card__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px 16px;
+  margin-top: 12px;
+}
+.auth-card__link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--teal-700);
+  font: inherit;
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}

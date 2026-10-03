@@ -517,14 +517,19 @@ export const ar = {
 
   // ── Sign-in and the team's read-only view (ADR-029; wording approved 2026-09-25) ──
   'auth.signin.title': "تسجيل الدخول",
-  'auth.signin.lead': "ادخل بحساب Google، أو نرسل لك رابط دخول على بريدك الإلكتروني.",
+  'auth.signin.lead': "ادخل بحساب Google، أو ببريدك الإلكتروني وكلمة المرور.",
   'auth.signin.google': "المتابعة باستخدام Google",
   'auth.signin.or': "أو",
   'auth.signin.email': "البريد الإلكتروني",
-  'auth.signin.sendLink': "أرسل لي رابط الدخول",
+  'auth.signin.sendLink': "أرسل لي رابط دخول بدلًا من ذلك",
+  'auth.signin.password': "كلمة المرور",
+  'auth.signin.forgot': "نسيت كلمة المرور، أو لم تضعها بعد؟",
   'auth.linkSent.title': "افتح بريدك الإلكتروني",
   'auth.linkSent.body': "أرسلنا رابط الدخول إلى {email}. افتحه على هذا الجهاز.",
   'auth.linkSent.other': "استخدام بريد آخر",
+  'auth.resetSent.title': "افتح بريدك الإلكتروني",
+  'auth.resetSent.body': "أرسلنا إلى {email} رابطًا لتعيين كلمة المرور. عيّنها، ثم ارجع إلى هنا وادخل.",
+  'auth.resetSent.back': "العودة إلى تسجيل الدخول",
   'auth.noAccess.title': "لا يملك هذا الحساب صلاحية الدخول",
   'auth.noAccess.body': "دخلت باسم {email}. اطلب من الفريق منح هذا الحساب صلاحية.",
   'auth.noAccess.signOut': "الخروج والدخول بحساب آخر",
@@ -543,6 +548,9 @@ export const ar = {
   'auth.error.email': "لا يبدو هذا عنوان بريد إلكتروني.",
   'auth.error.offline': "لا يوجد اتصال بالإنترنت. حاول مرة أخرى عند الاتصال.",
   'auth.error.tooMany': "محاولات كثيرة. انتظر دقيقة ثم حاول مرة أخرى.",
+  'auth.error.password': "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+  'auth.error.noPassword': "اكتب كلمة المرور، أو استخدم أحد الخيارات أدناه.",
+  'auth.error.passwordOff': "تسجيل الدخول بكلمة المرور غير مفعّل بعد. استخدم Google أو رابط البريد.",
 
   // F8 (Phase 5 Task 5.13): Reorder and Approved orders, as the repository owner approved
   // them on 2026-09-27 (docs/reviews/F8-screens-mockups.md).

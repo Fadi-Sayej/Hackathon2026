@@ -512,14 +512,19 @@ export const he = {
 
   // ── Sign-in and the team's read-only view (ADR-029; wording approved 2026-09-25) ──
   'auth.signin.title': "כניסה",
-  'auth.signin.lead': "היכנסו עם חשבון Google, או שנשלח לכם קישור כניסה באימייל.",
+  'auth.signin.lead': "היכנסו עם חשבון Google, או עם אימייל וסיסמה.",
   'auth.signin.google': "המשך עם Google",
   'auth.signin.or': "או",
   'auth.signin.email': "אימייל",
-  'auth.signin.sendLink': "שלחו לי קישור כניסה",
+  'auth.signin.sendLink': "שלחו לי קישור כניסה במקום",
+  'auth.signin.password': "סיסמה",
+  'auth.signin.forgot': "שכחתם את הסיסמה, או שעוד לא הגדרתם?",
   'auth.linkSent.title': "בדקו את האימייל",
   'auth.linkSent.body': "שלחנו קישור כניסה אל {email}. פתחו אותו במכשיר הזה.",
   'auth.linkSent.other': "שימוש באימייל אחר",
+  'auth.resetSent.title': "בדקו את האימייל",
+  'auth.resetSent.body': "שלחנו אל {email} קישור להגדרת סיסמה. הגדירו אותה, ואז חזרו לכאן והיכנסו.",
+  'auth.resetSent.back': "חזרה לכניסה",
   'auth.noAccess.title': "לחשבון הזה אין גישה",
   'auth.noAccess.body': "נכנסת בתור {email}. בקשו מהצוות לתת לחשבון הזה גישה.",
   'auth.noAccess.signOut': "התנתקות וכניסה עם חשבון אחר",
@@ -538,6 +543,9 @@ export const he = {
   'auth.error.email': "זו לא נראית כמו כתובת אימייל.",
   'auth.error.offline': "אין חיבור לאינטרנט. נסו שוב כשתהיו מחוברים.",
   'auth.error.tooMany': "יותר מדי ניסיונות. חכו דקה ונסו שוב.",
+  'auth.error.password': "האימייל או הסיסמה שגויים.",
+  'auth.error.noPassword': "הקלידו את הסיסמה, או השתמשו באחת האפשרויות למטה.",
+  'auth.error.passwordOff': "הכניסה עם סיסמה עוד לא הופעלה. היכנסו עם Google או עם קישור באימייל.",
 
   // F8 (Phase 5 Task 5.13): Reorder and Approved orders, as the repository owner approved
   // them on 2026-09-27 (docs/reviews/F8-screens-mockups.md).
