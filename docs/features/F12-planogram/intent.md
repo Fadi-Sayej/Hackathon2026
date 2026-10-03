@@ -48,3 +48,18 @@ F8, and the owner's own arrangement rules.
 
 - The V1 build removes the working planogram demo to a `v1-attic` git tag
   ([System Design §5.4](../../architecture/system-design.md)).
+
+## Added 2026-10-03 (not part of the migrated content)
+
+The repository owner unlocked this feature for specification as **D-30**, answering "should F12
+be unlocked for specification now, with the plan waiting for sales the way F8 does?":
+- **The owner's inputs** (shelf photographs, shelf measurements, his arrangement rules) can be
+  entered as soon as a store exists.
+- **The plan waits for the store's daily sales reports**, and says so. It is never shown empty
+  or invented, the way F8's order pages wait (D-23).
+- **D-13 stands:** no fixed cameras or sensors.
+
+Not decided by D-30, and left to the spec or to the owner: a marked example while the plan
+waits (as D-29 allows the order pages), and whether a first version reads shelves from
+photographs or takes them by hand. The PRD's one-day shelf-photograph trial was never run.
+The status stays `Registered — not specified` until a spec is approved.

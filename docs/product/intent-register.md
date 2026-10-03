@@ -6,7 +6,7 @@ Version: 0.1 (content unchanged from `specs.md` v1.1)
 Parent: [PRD](PRD.md)
 Related Specs: every F#-S# document under `docs/features/`
 Owner: smartshelf-pm
-Updated: 2026-10-03 (D-29: the order pages may show a marked example while they wait)
+Updated: 2026-10-03 (D-30: F12, the planogram, is unlocked for specification)
 ---
 
 > **Migration note.** This is `SPEC-000` from the pre-migration monolithic `specs.md`,
@@ -113,6 +113,7 @@ These are settled. A specification may operationalize them; it may not reopen th
 | D-27 | **F9's card offers a third answer, "I already sell it", and states what the nearby stores list the product at.** "I already sell it" is for a finding that is another size or pack of something he sells (F9-S1 OQ-1001), kept apart from "Not for my store". The price is each nearby store's delivery-app price, with its sale price when there is one and the day it was listed (OQ-1002). It is evidence of what the market charges, never money at stake: the entry still has no value, and nothing is summed. It supersedes D-25 in two respects only: the card had exactly two answers, and carried no ₪ figure | Decided by the repository owner 2026-09-29: "1 yes yes", to the two questions put to him as "'I already sell it' as a third answer?" and "Show the nearby store's price on the card?" |
 | D-28 | **Each store gets its own copy of SmartShelf, with its own data, for privacy, and a new store is set up by configuration, never by changing code.** One copy serves one store: its own site, database, sign-in accounts, committed data and nightly. No store's data, owner state or accounts ever reach another store's copy. What makes a copy a particular store's is one settings file, so setting up a store means filling it in and supplying the store's inputs ([`docs/pilot/next-store.md`](../pilot/next-store.md)). It supersedes D-12 in one respect only: more stores are now in scope, each as its own copy. Within a copy, D-12's single store and single POS import stand | Decided by the repository owner 2026-09-30: "each store gets a copy with its own data for privacy , and yes do all these you said you'll build", choosing between the options "own copy per store" (recommended) and "several stores share one app" |
 | D-29 | **While Reorder and Approved orders wait for daily sales reports, each may show an example of itself, inside a clearly marked preview.** "See how this page looks" opens the real page filled from a test shop, built from the order probe's fixture world by `scripts/build_order_example.py`. A banner on every screen of it says it is an example and not the store's data. Nothing in it can be approved, changed, saved, exported or sent, and the engine, the published artefacts, the owner state and the pilot measurement never read it. It supersedes D-23 and CLAUDE.md rule 7 in this one respect only: everywhere else nothing is simulated, and no other page shows an example | Decided by the repository owner 2026-10-03: "a", choosing between "a live example" (recommended), "pictures only" (the approved mockup screenshots) and "leave them as they are" |
+| D-30 | **F12 (the planogram) is unlocked for specification, and is to be built so that the plan waits for daily sales the way F8 does.** The owner's own inputs (shelf photographs, shelf measurements, his arrangement rules) can be entered as soon as a store exists. The plan itself shows why it is waiting, and never an empty or invented plan, until the store's daily sales reports arrive. D-13 stands: no fixed cameras or sensors. Not decided here, and left to the spec or to the owner: whether the plan may show a marked example while it waits, as D-29 allows the order pages; and whether a first version reads shelves from photographs or takes them by hand (reading a shelf photograph is untested, because the PRD's one-day trial was never run) | Decided by the repository owner 2026-10-03: "unlock", answering "should F12 be unlocked for specification now, with the plan waiting for sales the way F8 does?" |
 
 ---
 
@@ -153,6 +154,8 @@ rather than surfacing them:
   dimensions, real demand from V2, the owner's own arrangement rules). Its deferral does
   **not** reopen D-13: when INT-006 is specified, the sensor and fixed-camera approach
   remains excluded permanently, not merely postponed.
+  *(2026-10-03: unlocked for specification by **D-30**. Its plan is to wait for daily sales the
+  way F8 does, and the three inputs above are still required; D-13 stands.)*
 
 **INT-MEAS** *(2026-09-28: now specified as F13-S1, approved by the repository owner, with no
 success number, D-24; what follows is the record of why it was not.)* It was not specified here for a different reason: `intent.md` §11.1 states it is
