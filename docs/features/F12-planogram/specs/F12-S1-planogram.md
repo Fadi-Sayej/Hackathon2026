@@ -3,7 +3,7 @@ ID: F12-S1
 Title: Planogram — a dated shelf plan from his own sales, waiting for them until they arrive
 Status: Approved — by the repository owner, 2026-10-04
 Owner: smartshelf-architect
-Version: 0.8 (2026-10-04: D-32, the AI's explanation of each shelf; FR-210 … FR-215 await approval as OQ-1209)
+Version: 0.8 (2026-10-04: D-32, the AI's explanation of each fixture's plan; FR-210 … FR-215 await approval as OQ-1209)
 Parent: [F12 — Planogram](../intent.md)
 Related Intents: INT-006
 Inputs: [docs/features/F12-planogram/intent.md (Approved for specification, D-30), docs/product/PRD.md (§5 V4, §6 #7), docs/product/intent-register.md (D-1, D-3, D-13, D-14, D-15, D-16, D-22, D-23, D-28, D-29, D-30, D-31, D-32), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (§5 "He stocks", FR-143 … FR-146, FR-156), ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011, ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037, ADR-038, ADR-039, CLAUDE.md]
@@ -76,7 +76,7 @@ Behavioural scope, not a file list. The implementation plan declares the files.
   - **`shelf_plan`** publishes the plan, and waits for daily sales;
   - **`shelf_measurement`** publishes what his recorded arrangements changed, and waits for
     them as well as for daily sales;
-  - **`shelf_explanation`** publishes the AI's explanation of each shelf's plan, and also waits
+  - **`shelf_explanation`** publishes the AI's explanation of each fixture's plan, and also waits
     for the model's answer (D-32).
 - Two pages that already exist as waiting shells (ADR-028 §1), filled from the artefact:
   **Store layout** from `layout_facts`, and **Shelf plan** from `shelf_plan`,
@@ -514,8 +514,8 @@ a label saying it is the AI's explanation of the plan. When there is none, it sa
 words. The explanation never changes the plan (INV-096). On the marked example (D-31), the
 explanation is the real step's answer for the example's test shop. The team asks for it once,
 by hand with the key, and seals it with the example's inputs, because the example is built in
-print mode, which never calls the model. Until then, the example's fixtures say they have no
-explanation (`no_model_key`).
+print mode, which never calls the model. Until then, the example's builder gives the engine an
+empty snapshot, so each example fixture says its explanation has not been written.
 
 ## 7. Behavioral Invariants
 
@@ -879,7 +879,9 @@ facings, shelf positions and the elasticity used, and it carries no ₪ figure, 
 
 **AC-203** — A fixture whose facts have a sealed explanation from an earlier night is not asked
 again. Past the request ceiling or the time budget, the remaining fixtures say they have no
-explanation tonight. *(FR-213, FR-214, NFR-077)*
+explanation tonight.
+After a request fails twice, no further request is made that night, and the remaining fixtures
+say they have no explanation tonight. *(FR-213, FR-214, NFR-077)*
 
 **AC-204** — The request for a fixture asks for FR-210's four parts. Shelf plan shows the answer
 beside that fixture's plan, under its label and in the page's language, or the reason it has
@@ -1026,7 +1028,9 @@ It also asks:
 - its estimated cost is about $5.40 a month for a 15-fixture store whose every plan changes
   nightly, and about $14.40 at the ceiling. Unchanged plans cost nothing (ADR-039 shows the
   basis);
-- the monthly spend limit and its alert are his to set on the account (D-16). · owner: the repository owner · blocks: building
+- the monthly spend limit and its alert are his to set on the account (D-16);
+- the example's explanation is asked once, by the team, with his key: one request for each of
+  the example's fixtures, about five, which costs a few cents at ADR-039's estimate. · owner: the repository owner · blocks: building
 FR-210 … FR-215, not the rest of F12.
 
 ## 18. Non-Goals

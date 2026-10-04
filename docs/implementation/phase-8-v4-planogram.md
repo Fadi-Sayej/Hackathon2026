@@ -17,7 +17,7 @@ Updated: 2026-10-04 (approved; D-32 adds Task 8.10)
 - his "I've arranged this shelf" record (ADR-038);
 - the probe;
 - the marked example (D-31);
-- the AI's explanation of each shelf (D-32), once he approves its design (F12-S1 OQ-1209);
+- the AI's explanation of each fixture's plan (D-32), once he approves its design (F12-S1 OQ-1209);
 - after he approves their mockups, the Store layout and Shelf plan pages.
 
 **On real data, every F12 capability is unavailable when it ends.** There is no store
@@ -86,7 +86,7 @@ under `shelf:`, and the artefact publishes every one.
 | 8.6 | 8.5 | The probe |
 | 8.7 | 8.3 | The marked example |
 | 8.8 | 8.7 | Mockups for the owner's approval |
-| 8.10 | 8.3; F12-S1 OQ-1209 approved | The AI's explanation of each shelf (D-32) |
+| 8.10 | 8.3; F12-S1 OQ-1209 approved | The AI's explanation of each fixture's plan (D-32) |
 | 8.9 | 8.8 approved | The two pages |
 
 ### Task 8.0: The browser guard, the reason words and the publication dates (AC-187)
@@ -372,7 +372,7 @@ There is no arithmetic in the browser (ADR-001).
 - The e2e invariants pass in three languages on a phone (NFR-074).
 - Every other page is byte-identical by Task 8.0's screenshot method.
 
-### Task 8.10: The AI's explanation of each shelf (D-32; FR-210 … FR-215)
+### Task 8.10: The AI's explanation of each fixture's plan (D-32; FR-210 … FR-215)
 
 **Built only after the owner approves F12-S1 OQ-1209.**
 
@@ -421,16 +421,18 @@ What it does:
 - The boost's suites pass unchanged after the move.
 - A run with the snapshot and one without it publish the same `layout_facts`, `shelf_plan` and
   `shelf_measurement` (INV-096).
-- The example shows "no explanation" (`no_model_key`) until the team seals its explanation by
-  hand with the key (FR-215).
+- Until the team seals the example's explanation by hand, the example's builder gives the engine
+  an empty snapshot, so each example fixture says its explanation has not been written (FR-215).
 
 ## Pull requests
 
 1. **Engine and record:** Tasks 8.0 … 8.5. The proof is YomYom's print-mode artefact, unchanged
    in every existing capability, with three new ones, each `no_store_layout`. The fourth,
    `shelf_explanation`, comes with Task 8.10.
-2. **Probe, example and explanation:** Tasks 8.6, 8.7 and, once OQ-1209 is approved, 8.10.
+2. **Probe and example:** Tasks 8.6 and 8.7.
 3. **Pages:** Task 8.9, after Task 8.8's approval.
+4. **Explanation:** Task 8.10, once OQ-1209 is approved. It is a pull request of its own, so it
+   never holds up the others.
 
 ## Checkpoint 8
 
