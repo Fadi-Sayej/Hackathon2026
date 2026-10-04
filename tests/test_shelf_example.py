@@ -57,6 +57,10 @@ def test_it_shows_the_kinds_of_plan_the_page_can_show(example):
     assert {p["extra_facings"] for p in plans} == {"given", "no_width"}            # FR-185, FR-186
     assert any(p["unplaced"]["no_width"] for p in plans) and any(p["unplaced"]["no_sale_in_window"] for p in plans)
     assert any(prod["facings"] > 1 for p in plans for s in p["shelves"] for prod in s["products"])
+    # FR-185 where it matters: spare length on a shared shelf goes to some products and not others.
+    assert any(len(s["products"]) > 1 and len({prod["facings"] for prod in s["products"]}) > 1
+               for p in plans for s in p["shelves"])
+    assert caps["layout_facts"]["rejected"]                                       # FR-178, named
     assert caps["shelf_plan"]["elasticity"]["source"] == "research"
     # No arrangement yet, as at a new store: the measurement waits, and says why.
     assert caps["shelf_measurement"]["unavailable_reason"] == "no_arrangement_recorded"

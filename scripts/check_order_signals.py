@@ -140,6 +140,16 @@ def withheld_measurement_problems(art: dict, reason: str) -> list:
     return out
 
 
+def shelf_withheld_problems(art: dict, reason: str) -> list:
+    out = []
+    for cap_id in ("shelf_plan", "shelf_measurement"):
+        cap = _cap(art, cap_id)
+        if cap["status"] != "unavailable" or cap["unavailable_reason"] != reason:
+            out.append(f"over the planogram world, without its input {cap_id} published {cap['status']} "
+                       f"({cap['unavailable_reason']}), not {reason} (F12-S1 §20, FR-193, FR-208)")
+    return out
+
+
 def all_arranged_problems(art: dict) -> list:
     m = _cap(art, "shelf_measurement")
     published = [p for a in m.get("arrangements") or [] for p in a.get("products") or [] if p.get("net_change") is not None]
@@ -339,7 +349,6 @@ def _shelf_run(paths: dict, owner) -> dict:
 def _shelf_cases(tmp: Path, done: list) -> list:
     """F12-S1 §20 over the planogram world, which has the arrangements and history the order world lacks."""
     from datetime import timedelta
-    from src.engine.model import entry_id
     from src.owner_state.model import OwnerState
     paths, w = shelf_world.write(tmp / "shelf")
     problems = shelf_baseline_problems(_shelf_run(paths, w["owner"]))
@@ -351,17 +360,23 @@ def _shelf_cases(tmp: Path, done: list) -> list:
                                               "owner_state_unavailable")
     done.append("withholding the owner state   → owner_state_unavailable, never 'no arrangements'")
     day = w["first_day"] + timedelta(days=150)
-    plan_day = day - timedelta(days=2)
-    every = {entry_id("shelf.plan", None, f"{f}|{plan_day.isoformat()}"): {"status": "acted", "at": 0, "snapshot": {
-        "signal_family": "shelf.plan", "fixture": f, "plan_date": plan_day.isoformat(),
-        "plan_window": {"first_day": (plan_day - timedelta(days=28)).isoformat(),
-                        "last_day": (plan_day - timedelta(days=1)).isoformat()},
-        "arranged_on": day.isoformat(),
-        "placements": {shelf_world.barcode(f, n): {"shelf": 1, "facings": 2, "eye_level": True} for n in range(1, 7)}}}
-        for f in shelf_world.FIXTURES}
+    every = dict(shelf_world.arrangement_record(
+        f, day, {shelf_world.barcode(f, n): {"shelf": 1, "facings": 2, "eye_level": True} for n in range(1, 7)})
+        for f in shelf_world.FIXTURES)
     problems += all_arranged_problems(_shelf_run(paths, OwnerState.from_dict(
         {"status": "available", "pulled_at": "t", "outcomes": every})))
     done.append("every fixture arranged at once → no net change: no yardstick")
+
+    # §20 row 1 over this world, where the measurement has something to lose.
+    copy = _copy(tmp / "shelf", tmp / "shelf_no_daily")
+    for path in Path(copy["daily_sales_dir"]).glob("*.csv"):
+        path.unlink()
+    problems += shelf_withheld_problems(_shelf_run({**paths, **copy}, w["owner"]), "no_daily_sales")
+    done.append("withholding the report days  → plan and measurement unavailable (no_daily_sales)")
+    copy = _copy(tmp / "shelf", tmp / "shelf_no_layout")
+    Path(copy["store_layout_path"]).unlink()
+    problems += shelf_withheld_problems(_shelf_run({**paths, **copy}, w["owner"]), "no_store_layout")
+    done.append("withholding the layout file  → plan and measurement unavailable (no_store_layout)")
     return problems
 
 

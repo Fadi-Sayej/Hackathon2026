@@ -10,8 +10,10 @@ scripts/build_order_example.py's own functions, and only the layout is added her
 - a fridge holding the drinks and the dairy, its lower shelf at eye level. The soda has no recorded
   width, so the fridge gets first facings only, and its plan says why (FR-186);
 - a dry-goods unit holding the bread and the snacks, with his rule "at most 2 facings" of the
-  Bamba, where the spare length goes to the products that earn most from it (FR-185);
-- a cleaning shelf with its one product.
+  Bamba, where the spare length on the eye-level shelf goes to the products that earn most from
+  it (FR-185);
+- a cleaning shelf with its one product;
+- one width for a barcode the shop does not sell, which the loader rejects by name (FR-178).
 
 The engine runs in print mode over it, as the approved F8 mockups were drawn, and the result goes to
 public/examples/, which no engine step, loader other than its own, probe or measurement reads.
@@ -36,7 +38,7 @@ import tests.fixtures.order_signals.build as world  # noqa: E402
 OUT = ROOT / "public" / "examples" / "shelf-plan-example.json"
 MEASURED = "measured_by: team, measured_on: 2026-08-01"
 STATED = "stated_by: owner\n    stated_on: 2026-08-01\n    recorded_by: team"
-# barcode: facing width in mm, read from the shop's shelf photographs
+# barcode: facing width in mm, chosen for the test shop (a store's are read from its shelf photographs)
 WIDTHS = {world.BOOSTED: 80, world.STEADY: 75, "7290301": 90, "7290101": 200, "7290102": 180,
           "7290201": 120, "7290202": 130, "7290203": 85, "7290401": 110}       # the soda: none recorded
 
@@ -54,10 +56,13 @@ def _layout(path: Path) -> None:
             f"  מקרר:\n    departments: [{world.DEPT}, מוצרי חלב]\n    chilled: true\n    eye_level_shelf: 2\n"
             f"    {STATED}\n    shelves:\n" + shelf(25) + shelf(20) +
             "  מדף יבש:\n    departments: [מאפים, חטיפים]\n    chilled: false\n    eye_level_shelf: 1\n"
-            f"    {STATED}\n    shelves:\n" + shelf(55) + shelf(60) +
+            f"    {STATED}\n    shelves:\n" + shelf(80) + shelf(60) +
             "  ניקיון:\n    departments: [ניקיון]\n    chilled: false\n"
             f"    {STATED}\n    shelves:\n" + shelf(40) +
             "widths:\n" + "".join(f'  "{b}": {{width_mm: {w}, {MEASURED}}}\n' for b, w in WIDTHS.items()) +
+            # One entry the loader rejects, as Store layout must show (FR-178): a barcode the
+            # shop's catalogue does not have.
+            f'  "7299999": {{width_mm: 60, {MEASURED}}}\n' +
             "rules:\n"
             f'  - {{at_most: {{barcode: "7290201", facings: 2}}, stated_by: owner, stated_on: 2026-08-01, recorded_by: team}}\n')
     path.write_text(body, encoding="utf-8")
