@@ -4,7 +4,7 @@ Title: Phase 8 — V4, F12 Planogram (F12-S1)
 Status: Approved — by the repository owner, 2026-10-04 ("yes"), with the values it proposes. The same answer added D-32, an AI explanation of each shelf (Task 8.10)
 Owner: smartshelf-architect
 Parent: [Implementation plan](plan.md)
-Inputs: [docs/features/F12-planogram/specs/F12-S1-planogram.md (Approved 2026-10-04), ADR-037 and ADR-038 (Accepted 2026-10-04), ADR-009, ADR-014, ADR-016, ADR-029, ADR-030, ADR-036, D-29, D-30, D-31, src/engine/order_evidence.py, src/engine/store_facts.py, src/engine/registry.py, src/engine/model.py, src/engine/publish.py, src/common/store.py, src/common/store_readiness.py, src/surface/compose.js, src/owner/ownerState.js, src/App.jsx, scripts/check_order_signals.py, scripts/build_order_example.py, src/lib/dataAdapters/loadOrderExample.js]
+Inputs: [docs/features/F12-planogram/specs/F12-S1-planogram.md (Approved 2026-10-04), ADR-037 and ADR-038 (Accepted 2026-10-04), D-32, ADR-032, ADR-035, ADR-039 (Ready for review), src/engine/market_boost.py, ADR-009, ADR-014, ADR-016, ADR-029, ADR-030, ADR-036, D-29, D-30, D-31, src/engine/order_evidence.py, src/engine/store_facts.py, src/engine/registry.py, src/engine/model.py, src/engine/publish.py, src/common/store.py, src/common/store_readiness.py, src/surface/compose.js, src/owner/ownerState.js, src/App.jsx, scripts/check_order_signals.py, scripts/build_order_example.py, src/lib/dataAdapters/loadOrderExample.js]
 Updated: 2026-10-04 (approved; D-32 adds Task 8.10)
 ---
 
@@ -12,13 +12,15 @@ Updated: 2026-10-04 (approved; D-32 adds Task 8.10)
 
 **Goal.** Build F12-S1:
 - a layout file the team records (ADR-037);
-- three capabilities: `layout_facts`, `shelf_plan` and `shelf_measurement`;
+- four capabilities: `layout_facts`, `shelf_plan`, `shelf_measurement` and, for D-32,
+  `shelf_explanation`;
 - his "I've arranged this shelf" record (ADR-038);
 - the probe;
 - the marked example (D-31);
+- the AI's explanation of each shelf (D-32), once he approves its design (F12-S1 OQ-1209);
 - after he approves their mockups, the Store layout and Shelf plan pages.
 
-**On real data, all three capabilities are unavailable when it ends.** There is no store
+**On real data, all four capabilities are unavailable when it ends.** There is no store
 (D-23), so there is no layout file and no daily reports. Each says why: `no_store_layout`,
 like F8's `no_daily_sales`. Everything is proven on fixture worlds, as Phase 5 was.
 
@@ -31,7 +33,7 @@ like F8's `no_daily_sales`. Everything is proven on fixture worlds, as Phase 5 w
   `order_evidence.product_evidence`. It never re-derives them (INV-085). The window's values are
   read from `order.*` in policy, never copied (one fact, decided once).
 - **No ₪ anywhere.** The publisher refuses a value, or any money-named field other than a placed
-  product's `margin_per_sale`, in all three capabilities (INV-087).
+  product's `margin_per_sale`, in every F12 capability (INV-087).
 - **No invented store data.** The fixture worlds are test shops under `tests/fixtures/`. The
   example is built from one of them, under D-31's banner. No task writes a layout file, a sales
   report or an arrangement for a real store (D-23, CLAUDE.md rule 7).
@@ -82,7 +84,8 @@ under `shelf:`, and the artefact publishes every one.
 | 8.6 | 8.5 | The probe |
 | 8.7 | 8.5 | The marked example |
 | 8.8 | 8.7 | Mockups for the owner's approval |
-| 8.9 | 8.8 approved | The two pages |
+| 8.10 | 8.3; F12-S1 OQ-1209 approved | The AI's explanation of each shelf (D-32) |
+| 8.9 | 8.8 approved, 8.10 | The two pages |
 
 ### Task 8.0: The browser guard, the reason words and the publication dates (AC-187)
 
@@ -191,7 +194,7 @@ unknown") pass.
     only.
 - The plan publishes the elasticity it used and why (FR-189, FR-206). Until Task 8.5 that is
   the policy value, "his own is not yet measured".
-- The publisher's money guard covers all three capabilities (INV-087).
+- The publisher's money guard covers every F12 capability (INV-087).
 
 **Done when:**
 - AC-174 … AC-181, AC-185 and AC-187 pass on a fixture shop, and so does AC-186's half on
@@ -293,8 +296,8 @@ Task 8.9 tests it on the page.
 **Files:** `scripts/check_order_signals.py`, `scripts/check_v1_signals.py`, `tests/test_check_v1_signals.py`
 
 - `check:order-signals` gains F12-S1 §20's cases over the planogram world:
-  - it withholds the daily reports, the layout file, one width, the arrangement records and the
-    owner-state pull;
+  - it withholds the daily reports, the layout file, one width, the arrangement records, the
+    owner-state pull and, once Task 8.10 is in, the sealed explanations;
   - separately, it arranges every fixture.
 
   It reads the published artefact only.
@@ -331,7 +334,9 @@ What is shown, in Hebrew and Arabic, from Task 8.7's example:
   - its shelves, with products and facings;
   - the unplaced lists, with their reasons;
   - the conditions, including the elasticity used and why;
-  - "I've arranged this shelf", its warning while a measurement runs, and undo.
+  - "I've arranged this shelf", its warning while a measurement runs, and undo;
+  - the AI's explanation beside the plan, under its label, and each reason it may have none.
+    The mockup's text is illustrative, and says so.
 - **The measurement:**
   - its windows;
   - per-product changes, with no verdict;
@@ -350,7 +355,7 @@ Present them, and **stop until he approves.** Record his answer with its date.
 `src/pages/__tests__/`, `e2e/`
 
 Built against the approved mockups. Each page reads:
-- the artefact, through `loadDashboard.js`;
+- the artefact, through `loadDashboard.js`, including `shelf_explanation` (FR-215);
 - the example, through `loadShelfExample.js`, only while `shelf_plan` is unavailable;
 - this device's own arrangement record, until the nightly has published it (ADR-038
   Decision 6).
@@ -363,17 +368,63 @@ There is no arithmetic in the browser (ADR-001).
 - The e2e invariants pass in three languages on a phone (NFR-074).
 - Every other page is byte-identical by Task 8.0's screenshot method.
 
+### Task 8.10: The AI's explanation of each shelf (D-32; FR-210 … FR-215)
+
+**Built only after the owner approves F12-S1 OQ-1209.**
+
+**Files:**
+- `src/engine/model_client.py`: the request, the transport, `DIGIT` and `facts_digest`, moved
+  out of `src/engine/market_boost.py`, which imports them (ADR-039 Decision 3);
+- `src/engine/shelf_explanation.py`, `configs/prompts/shelf_explanation.v1.md`;
+- `src/engine/inputs.py`, `src/engine/registry.py`, `src/engine/run.py`;
+- `configs/policy.yaml`, `src/engine/policy.py`;
+- `.github/workflows/collect-daily.yml`: the boost's commit step also takes
+  `shelf_explanations`;
+- `src/surface/compose.js`: `shelf_explanation` joins Task 8.0's lists;
+- `src/lib/i18n/dictionaries/{he,ar,en}.js`;
+- `tests/engine/test_model_client.py`, `tests/engine/test_shelf_explanation.py`.
+
+What it does:
+- **The live step.** It runs after `shelf_plan`. For each fixture plan, it builds FR-211's facts
+  and their digest, then:
+  - reuses a sealed explanation with the same digest from an earlier night;
+  - otherwise asks the model, within the ceiling and the time budget;
+  - checks the answer (FR-212);
+  - seals the night's snapshot, and reads it back as the input.
+- **Print mode** reads the snapshot and never calls the model.
+- **The capability** requires `products`, `store_layout`, `sales_daily` and `shelf_explanations`
+  (`INPUT_REASONS`: `no_model_key`). It is unavailable with `shelf_plan`'s reason whenever
+  `shelf_plan` is. Its `published_from` is set.
+- **Policy:**
+  - `shelf.explanation_request_ceiling: 40`;
+  - `shelf.explanation_time_budget_s: 300`;
+  - `shelf.explanation_max_chars: 600`.
+
+  All three are provisional (OQ-1209).
+- **Words** for `no_model_key` and the three "no explanation" reasons: withheld, out of date,
+  not written tonight.
+
+**Done when:**
+- AC-199 … AC-203 pass, with a fake transport, as the boost's tests run: no network in any
+  test.
+- The boost's suites pass unchanged after the move.
+- A run with the snapshot and one without it publish the same plans, measurements and figures
+  (INV-096).
+- The example shows "no explanation: no model key" until a key exists, as the store's plan
+  would (FR-215).
+
 ## Pull requests
 
 1. **Engine and record:** Tasks 8.0 … 8.5. The proof is YomYom's print-mode artefact, unchanged
-   in every existing capability, with three new ones, each `no_store_layout`.
-2. **Probe and example:** Tasks 8.6 and 8.7.
+   in every existing capability, with three new ones, each `no_store_layout`. The fourth,
+   `shelf_explanation`, comes with Task 8.10.
+2. **Probe, example and explanation:** Tasks 8.6, 8.7 and, once OQ-1209 is approved, 8.10.
 3. **Pages:** Task 8.9, after Task 8.8's approval.
 
 ## Checkpoint 8
 
-- Tasks 8.0 … 8.7 are merged, and `check:signals` covers all three capabilities.
-- On real data, all three are published `unavailable` with `no_store_layout`, and every other
+- Tasks 8.0 … 8.7 and 8.10 are merged, and `check:signals` covers all four capabilities.
+- On real data, all four are published `unavailable` with `no_store_layout`, and every other
   capability's output is unchanged.
 - The mockups are approved with the date recorded (Task 8.8), and the pages are built and pass
   (Task 8.9).
