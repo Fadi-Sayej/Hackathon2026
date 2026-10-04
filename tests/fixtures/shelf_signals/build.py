@@ -50,13 +50,36 @@ def barcode(fixture: str, n: int) -> str:
     return f"73{fixture[1:]}{n:02d}1"
 
 
+CONTRACT = "5e1f0a9b8c7d6e5f"      # the arrangement ownerStateContract.test.js writes through recordOutcome
+
+
+def arrangement_record(fixture: str, arranged_on: date, placements: dict) -> tuple:
+    """(entry id, record) in the browser's own shape (F12-S1 §20 row 2, ADR-038 Decision 9).
+
+    The record is the contract fixture's arrangement, which the real recordOutcome wrote, with only
+    the fixture, its dates and its placements changed. If the browser renamed a field, this world
+    would carry the new name too, and the measurement reading the old one would fail the probe."""
+    import copy
+    import json
+    from pathlib import Path
+    from src.engine.model import entry_id
+    contract = json.loads((Path(__file__).resolve().parents[1] / "owner_state_firestore_contract.json")
+                          .read_text(encoding="utf-8"))["outcomes"][CONTRACT]
+    plan_date, plan_first, plan_last = _plan_window(arranged_on)
+    record = copy.deepcopy(contract)
+    record["snapshot"].update({"fixture": fixture, "plan_date": plan_date.isoformat(),
+                               "plan_window": {"first_day": plan_first.isoformat(), "last_day": plan_last.isoformat()},
+                               "arranged_on": arranged_on.isoformat(), "placements": placements})
+    assert set(record["snapshot"]) == set(contract["snapshot"]), "the contract's arrangement changed shape"
+    return entry_id("shelf.plan", None, f"{fixture}|{plan_date.isoformat()}"), record
+
+
 def _plan_window(arranged_on: date) -> tuple:
     plan_date = arranged_on - timedelta(days=2)
     return plan_date, plan_date - timedelta(days=28), plan_date - timedelta(days=1)
 
 
 def world(variant: str = "known", *, tmp_path=None) -> dict:
-    from src.engine.model import entry_id
     from src.engine.store_layout import load_store_layout
     from src.owner_state.model import OwnerState
 
@@ -85,13 +108,9 @@ def world(variant: str = "known", *, tmp_path=None) -> dict:
             shelf = 1 if n <= 3 else 2
             placements[b] = {"shelf": shelf, "facings": facings, "eye_level": shelf == 1}
             after[b] = (arranged_on, placements[b])
-        eid = entry_id("shelf.plan", None, f"{fixture}|{plan_date.isoformat()}")
         arrangements[fixture] = arranged_on
-        outcomes[eid] = {"status": "acted", "reason": None, "at": 0, "snapshot": {
-            "signal_family": "shelf.plan", "capability": "shelf_plan", "barcode": None,
-            "characterisation": "shelf_plan", "fixture": fixture, "plan_date": plan_date.isoformat(),
-            "plan_window": {"first_day": plan_first.isoformat(), "last_day": plan_last.isoformat()},
-            "arranged_on": arranged_on.isoformat(), "placements": placements}}
+        eid, record = arrangement_record(fixture, arranged_on, placements)
+        outcomes[eid] = record
 
     sales = []
     for t in range(days):
@@ -127,3 +146,52 @@ def world(variant: str = "known", *, tmp_path=None) -> dict:
     owner = OwnerState.from_dict({"status": "available", "pulled_at": "2026-10-01T03:00:00Z", "outcomes": outcomes})
     return {"products": products, "sales_daily": sales, "store_layout": layout, "owner": owner,
             "run_at": RUN_AT, "arrangements": arrangements, "layout_text": body, "first_day": first}
+
+
+HEADER = "תאור פריט,ברקוד/קוד,מכר,מחיר קניה,מחיר מכירה,עלות המכר (חנות),כניסות מלאי,מחיר קניה נטו,הנחה,קוד מחלקה,\n"
+
+
+def roots(root) -> dict:
+    from pathlib import Path
+    root = Path(root)
+    return {"silver_dir": root / "silver", "daily_sales_dir": root / "daily", "sales_dir": root / "monthly",
+            "store_facts_path": root / "store_facts.yaml", "store_layout_path": root / "store_layout.yaml",
+            "snapshots_root": root / "snapshots", "signals_dir": root / "signals",
+            "matches_path": root / "matches.parquet"}
+
+
+def write(root, variant: str = "known") -> tuple:
+    """The world as the engine reads it from disk, for the probe (F12-S1 §20): silver POS tables, one
+    daily report a day, and the layout file. Returns (paths, world); the owner state is the
+    probe's to give the engine, as check_order_signals gives its own."""
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+    from collections import defaultdict
+    from pathlib import Path
+
+    paths = roots(root)
+    Path(root).mkdir(parents=True, exist_ok=True)
+    w = world(variant, tmp_path=Path(root))
+    base = {"_source_file": "inv.csv", "_as_of": COUNTED, "_as_of_source": "declared"}
+    prod = [{"barcode": p["barcode"], "product_name": p["product_name"], "category": p["department"],
+             "selling_price": p["shelf_price"], "wolt_price": 0.0, "cost_price": p["cost_price"], **base}
+            for p in w["products"]]
+    inv = [{"barcode": p["barcode"], "product_name": p["product_name"], "current_stock": p["recorded_stock"], **base}
+           for p in w["products"]]
+    paths["silver_dir"].mkdir(parents=True, exist_ok=True)
+    pq.write_table(pa.Table.from_pylist(prod), paths["silver_dir"] / "products.parquet")
+    pq.write_table(pa.Table.from_pylist(inv), paths["silver_dir"] / "inventory.parquet")
+    by_day = defaultdict(list)
+    names = {p["barcode"]: p["product_name"] for p in w["products"]}
+    for r in w["sales_daily"]:
+        u = int(r["units"])
+        # Deliveries left blank: the world has none recorded (None), and a 0 would be a statement.
+        by_day[r["day"]].append(f"{names[r['barcode']]},{r['barcode']},{u},6,10,{u * 6},,6,0,1,")
+    paths["daily_sales_dir"].mkdir(parents=True, exist_ok=True)
+    for day, lines in by_day.items():
+        (paths["daily_sales_dir"] / f"דוח מכירות יום {day}.csv").write_text(
+            "﻿" + HEADER + "\n".join(lines) + "\n", encoding="utf-8")
+    paths["sales_dir"].mkdir(parents=True, exist_ok=True)
+    paths["snapshots_root"].mkdir(parents=True, exist_ok=True)
+    paths["store_layout_path"].write_text(w["layout_text"], encoding="utf-8")
+    return paths, w

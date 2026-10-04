@@ -14,6 +14,9 @@ fixture world, and the PUBLISHED artefact is read, never a capability's return v
 | an answered disagreement | it is not raised again (D-20) |
 | the layout file | F12's layout_facts and shelf_plan unavailable (no_store_layout); without the report days the layout stays available and the plan does not (F12-S1 §20) |
 | one product's width | the plan does not place it, and names it under "no width" (F12-S1 INV-086) |
+| his arrangement records | over the planogram world: shelf_measurement unavailable (no_arrangement_recorded), the plan still published on the research value, saying why (FR-206, FR-208) |
+| the owner-state pull | the same, as owner_state_unavailable: his arrangements are never read as absent (rule 10) |
+| every fixture arranged at once | no net change published: there is no unchanged fixture to compare with (INV-092) |
 
 It also proves the quantity and the boost fail independently: without the picks the quantity
 still publishes, and without the report days the boost is still available.
@@ -48,6 +51,12 @@ sys.path.insert(0, str(ROOT / "tests" / "fixtures" / "order_signals"))
 import src.engine.run as run_mod  # noqa: E402
 from src.engine.policy import load_policy  # noqa: E402
 import build as world  # noqa: E402
+import importlib.util  # noqa: E402
+
+# The planogram world (F12-S1 §20). Loaded under its own name: both worlds' builders are build.py.
+_spec = importlib.util.spec_from_file_location("shelf_world", ROOT / "tests" / "fixtures" / "shelf_signals" / "build.py")
+shelf_world = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(shelf_world)
 
 ARTEFACT = ROOT / "public" / "data" / "dashboard.json"
 
@@ -106,6 +115,48 @@ def withheld_width_problems(art: dict, barcode: str) -> list:
         return [f"without its width {barcode} was still placed: a width was estimated (F12-S1 INV-086)"]
     if plan["status"] != "available" or not any(barcode in e["evidence"]["unplaced"]["no_width"] for e in plan["entries"]):
         return [f"without its width {barcode} is not named under \"no width\" (F12-S1 FR-180)"]
+    return []
+
+
+def shelf_baseline_problems(art: dict) -> list:
+    m = _cap(art, "shelf_measurement")
+    if m["status"] != "available" or not any(a["status"] == "measured" for a in m.get("arrangements") or []):
+        return ["the planogram world's baseline measures no arrangement, so withholding them proves nothing"]
+    if (m.get("plan_uses") or {}).get("source") != "his_store":
+        return ["the planogram world's baseline does not reach his own elasticity, so its withdrawal proves nothing"]
+    return []
+
+
+def withheld_measurement_problems(art: dict, reason: str) -> list:
+    out = []
+    m, plan = _cap(art, "shelf_measurement"), _cap(art, "shelf_plan")
+    if m["status"] != "unavailable" or m["unavailable_reason"] != reason:
+        out.append(f"shelf_measurement published {m['status']} ({m['unavailable_reason']}), not {reason}: "
+                   "his arrangements were read as absent, or measured from nothing (F12-S1 FR-208)")
+    uses = plan.get("elasticity") or {}
+    if plan["status"] != "available" or uses.get("source") != "research" or uses.get("measurement_reason") != reason:
+        out.append(f"without the measurement the plan published {plan['status']} using {uses}: it must stay up on the "
+                   f"research value and say why (FR-206)")
+    return out
+
+
+def shelf_withheld_problems(art: dict, reason: str) -> list:
+    out = []
+    for cap_id in ("shelf_plan", "shelf_measurement"):
+        cap = _cap(art, cap_id)
+        if cap["status"] != "unavailable" or cap["unavailable_reason"] != reason:
+            out.append(f"over the planogram world, without its input {cap_id} published {cap['status']} "
+                       f"({cap['unavailable_reason']}), not {reason} (F12-S1 §20, FR-193, FR-208)")
+    return out
+
+
+def all_arranged_problems(art: dict) -> list:
+    m = _cap(art, "shelf_measurement")
+    published = [p for a in m.get("arrangements") or [] for p in a.get("products") or [] if p.get("net_change") is not None]
+    reasons = {a.get("reason") for a in m.get("arrangements") or []}
+    if published or reasons != {"no_unchanged_fixture"}:
+        return [f"with every fixture arranged at once, {len(published)} net changes were published and the reasons "
+                f"were {sorted(map(str, reasons))}: there is no yardstick (F12-S1 INV-092)"]
     return []
 
 
@@ -274,6 +325,8 @@ def probe(tmp: Path) -> tuple:
     problems += withheld_width_problems(_run(paths)[0], world.BOOSTED)
     done.append("withholding one width        → that product is not placed, and is named")
 
+    problems += _shelf_cases(tmp, done)
+
     answered = world.owner(answered=[world.SLOW])
     problems += answered_problems(_run(world.roots(built), owner=answered)[0], world.SLOW)
     done.append("an answered disagreement    → not raised again")
@@ -286,6 +339,45 @@ def probe(tmp: Path) -> tuple:
 # The capabilities this probe covers whose publication on real data comes from F8 or F9.
 # owner_questions is not one: F5's cost questions keep it available with no F8 input at all.
 PROBED = ("order_quantity", "market_boost", "assortment_gap")
+
+
+def _shelf_run(paths: dict, owner) -> dict:
+    with _engine_as(owner):
+        return run_mod.run_engine(mode="print", skip_market=True, now=shelf_world.RUN_AT, **paths)["artefact"]
+
+
+def _shelf_cases(tmp: Path, done: list) -> list:
+    """F12-S1 §20 over the planogram world, which has the arrangements and history the order world lacks."""
+    from datetime import timedelta
+    from src.owner_state.model import OwnerState
+    paths, w = shelf_world.write(tmp / "shelf")
+    problems = shelf_baseline_problems(_shelf_run(paths, w["owner"]))
+    done.append("planogram world: his elasticity measured, and the plan uses it")
+    none = OwnerState.from_dict({"status": "available", "pulled_at": "t", "outcomes": {}})
+    problems += withheld_measurement_problems(_shelf_run(paths, none), "no_arrangement_recorded")
+    done.append("withholding his arrangements  → no measurement, the plan on 0.17 and saying why")
+    problems += withheld_measurement_problems(_shelf_run(paths, OwnerState.unavailable("no_credentials")),
+                                              "owner_state_unavailable")
+    done.append("withholding the owner state   → owner_state_unavailable, never 'no arrangements'")
+    day = w["first_day"] + timedelta(days=150)
+    every = dict(shelf_world.arrangement_record(
+        f, day, {shelf_world.barcode(f, n): {"shelf": 1, "facings": 2, "eye_level": True} for n in range(1, 7)})
+        for f in shelf_world.FIXTURES)
+    problems += all_arranged_problems(_shelf_run(paths, OwnerState.from_dict(
+        {"status": "available", "pulled_at": "t", "outcomes": every})))
+    done.append("every fixture arranged at once → no net change: no yardstick")
+
+    # §20 row 1 over this world, where the measurement has something to lose.
+    copy = _copy(tmp / "shelf", tmp / "shelf_no_daily")
+    for path in Path(copy["daily_sales_dir"]).glob("*.csv"):
+        path.unlink()
+    problems += shelf_withheld_problems(_shelf_run({**paths, **copy}, w["owner"]), "no_daily_sales")
+    done.append("withholding the report days  → plan and measurement unavailable (no_daily_sales)")
+    copy = _copy(tmp / "shelf", tmp / "shelf_no_layout")
+    Path(copy["store_layout_path"]).unlink()
+    problems += shelf_withheld_problems(_shelf_run({**paths, **copy}, w["owner"]), "no_store_layout")
+    done.append("withholding the layout file  → plan and measurement unavailable (no_store_layout)")
+    return problems
 
 
 def blocking() -> bool:
