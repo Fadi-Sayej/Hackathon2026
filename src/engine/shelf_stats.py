@@ -140,7 +140,9 @@ def bootstrap(units: Sequence[Unit], terms: tuple, *, draws: int, seed: int, lev
         attempts += 1
         sample = _draw(rng, clusters, by_cluster)
         arranged = [u for u in sample if u.arranged]
-        if not arranged or ("log_facings" in terms and len({round(u.log_facings, 12) for u in arranged}) < 2):
+        if (not arranged or ("log_facings" in terms and len({round(u.log_facings, 12) for u in arranged}) < 2)
+                or ("eye_change" in terms and not any(u.eye_change for u in arranged))):
+            # A term the full sample fits but this draw cannot: drawn again, and counted as such.
             redrawn += 1
             continue
         result = fit(sample, terms)

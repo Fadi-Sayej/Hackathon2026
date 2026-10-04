@@ -45,7 +45,10 @@ _CREDENTIAL_GATED = frozenset({"answer_storage_unavailable"})
 # the daily reports, so counting them made this command exit 1 everywhere.
 # tests/engine/test_figures_verdict.py checks this list against the committed artefact.
 # F9's findings are observations carried on its entries (nights, stores), not a headline count.
-_REGISTERS_NO_FIGURE = frozenset({"market_running_out", "market_boost", "order_quantity", "assortment_gap"})
+# F12's layout, plan and measurement are a page's facts and advice, never a headline count, and
+# all three are unavailable on every machine until a store records its shelves (Phase 8).
+_REGISTERS_NO_FIGURE = frozenset({"market_running_out", "market_boost", "order_quantity", "assortment_gap",
+                                  "layout_facts", "shelf_plan", "shelf_measurement"})
 
 # AC-127 is "on the same data". The market half is rebuilt on each machine from the committed
 # snapshots, so a laptop's can be older than the artefact it is compared with, and then every

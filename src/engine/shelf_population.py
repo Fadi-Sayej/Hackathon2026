@@ -51,8 +51,8 @@ def population(layout: dict, products: list, sales_daily: Optional[list], window
                itemised_departments: set) -> dict:
     """`{fixture: {barcode: {status, kept_on}}}` for every fixture the layout holds.
 
-    `kept_on` is True where a "keep on" rule put the product on this fixture. Such a product is
-    planned with one facing only (FR-198), which the plan reads from this flag.
+    `kept_on` is True where a "keep on" rule is the only reason the product is planned: he does not
+    stock it. Such a product gets one facing only (FR-198), which the plan reads from this flag.
     """
     rows = defaultdict(list)
     for r in sales_daily or []:
@@ -79,9 +79,11 @@ def population(layout: dict, products: list, sales_daily: Optional[list], window
                 out[name][barcode] = {"status": "rejected", "kept_on": False}
                 continue
             status = _status(p, rows.get(barcode, []), window, p.get("department") in itemised_departments)
-            if on_rule is not None and status != PLANNED:
-                status = PLANNED                 # FR-198: planned all the same, with one facing
-            out[name][barcode] = {"status": status, "kept_on": on_rule is not None}
+            # FR-198: a product he does not stock is planned all the same, with one facing, when a
+            # "keep on" rule names it. A stocked product a rule merely places (FR-199's split
+            # departments) is planned like any other, and earns its facings like any other.
+            forced = on_rule is not None and status != PLANNED
+            out[name][barcode] = {"status": PLANNED if forced else status, "kept_on": forced}
     return out
 
 

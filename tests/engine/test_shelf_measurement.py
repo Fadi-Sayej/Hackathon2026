@@ -182,10 +182,15 @@ def test_without_the_history_for_a_placebo_it_is_not_run_and_017_stays():
 
 
 def test_the_placebo_windows_are_as_far_apart_as_the_measured_ones(known):
+    # FR-209: the placebo tests drift over the same distance the measurement spans.
     _, m = known
-    a = m["arrangements"][0]
-    distance = date.fromisoformat(a["after_window"]["first_day"]) - date.fromisoformat(a["before_window"]["first_day"])
-    assert distance.days > 28        # the measured windows are a plan's window apart, not adjacent
+    used = [a for a in m["arrangements"] if a["placebo_windows"]["used"]]
+    assert len(used) == 8
+    for a in used:
+        real = date.fromisoformat(a["after_window"]["first_day"]) - date.fromisoformat(a["before_window"]["first_day"])
+        pw = a["placebo_windows"]
+        placebo = date.fromisoformat(pw["later"]["first_day"]) - date.fromisoformat(pw["earlier"]["first_day"])
+        assert placebo == real and real.days > 28 and pw["later"] == a["before_window"]
 
 
 # ── Unavailable, and never silent (FR-208, AC-196, SCN-173) ──────────────────
@@ -217,10 +222,12 @@ def test_it_publishes_units_only_and_no_fixture_total(known):
     assert cap["thresholds"]["window_days"] == load_policy().order_window_days
 
 
-def test_print_mode_reproduces_the_interval(known):
-    # NFR-073: the bootstrap's seed is policy, so the same inputs give the same interval.
+def test_the_same_inputs_give_the_same_interval_in_a_fresh_run(known):
+    # NFR-073's engine half: the bootstrap's seed is policy, so new inputs read from the same data give
+    # the same interval. The probe's print-mode runs and `npm run figures` are Task 8.6's.
     w, m = known
     again = sm.measure(_inputs(w))
+    assert again is not m
     assert again["elasticity"]["interval"] == m["elasticity"]["interval"]
 
 
@@ -230,3 +237,79 @@ def test_the_plan_s_window_is_f8_s_own(known):
     window = evidence_window({r["day"] for r in w["sales_daily"]}, load_policy(), w["run_at"])
     assert out.extras["evidence_window"]["last_day"] == window.last_day
     assert not math.isnan(out.counts["placed"])
+
+
+
+# ── The review's cases (Phase 8 PR 1) ────────────────────────────────────────
+
+def test_an_undone_or_unreadable_arrangement_never_takes_the_plan_down(known):
+    # C1: an undo is a null tombstone; a record with null dates or zero facings is unreadable. Each
+    # is named, and the rest are measured.
+    w, _ = known
+    outcomes = copy.deepcopy(w["owner"].outcomes)
+    outcomes["undone"] = None
+    bad_id, bad = _arrangement("F14", W.LAST - timedelta(days=40), _placements("F14"))
+    bad["snapshot"]["plan_window"]["first_day"] = None
+    zero_id, zero = _arrangement("F13", W.LAST - timedelta(days=40), {W.barcode("F13", 1): {"shelf": 1, "facings": 0}})
+    outcomes.update({bad_id: bad, zero_id: zero})
+    m = sm.measure(_inputs(w, outcomes=outcomes))
+    assert {u["entry_id"] for u in m["unreadable"]} == {bad_id, zero_id}
+    assert sum(a["status"] == "measured" for a in m["arrangements"]) == 8
+
+
+def test_the_plan_stays_up_when_the_measurement_fails(known, monkeypatch):
+    # ADR-014: two capabilities fail apart. FR-206: the plan then says it used the research value.
+    w, _ = known
+
+    def boom(inputs):
+        raise RuntimeError("a defect in the measurement")
+    monkeypatch.setattr(sm, "_measure", boom)
+    out = shelf_plan.run(_inputs(w))
+    assert out.status == "available"
+    assert out.extras["elasticity"] == {"value": 0.17, "source": "research", "why": "measurement_unavailable",
+                                        "measurement_reason": "capability_error"}
+
+
+def test_before_facings_come_from_the_latest_record_only(known):
+    # A previous arrangement that did not place a product means it was off the shelf, even when an
+    # older count says otherwise; it is then left out of the estimate, never given the old count.
+    w, _ = known
+    outcomes = copy.deepcopy(w["owner"].outcomes)
+    f14 = {W.barcode("F14", n): {"shelf": 1, "facings": 2, "eye_level": True} for n in range(2, 7)}  # 1 is not placed
+    first_id, first = _arrangement("F14", w["first_day"] + timedelta(days=40), f14)
+    second_id, second = _arrangement("F14", w["first_day"] + timedelta(days=150), _placements("F14"))
+    outcomes.update({first_id: first, second_id: second})
+    arr = next(a for a in sm.arrangements(OwnerState.from_dict({"status": "available", "pulled_at": "t",
+                                                                "outcomes": outcomes}))[0] if a["entry_id"] == second_id)
+    earlier = sm.arrangements(OwnerState.from_dict({"status": "available", "pulled_at": "t", "outcomes": outcomes}))[0]
+    gone = sm._before_record(arr, W.barcode("F14", 1), w["store_layout"], earlier)
+    kept = sm._before_record(arr, W.barcode("F14", 2), w["store_layout"], earlier)
+    assert gone == {"facings": 0, "eye_level": False, "from": "previous_arrangement"}
+    assert kept == {"facings": 2, "eye_level": True, "from": "previous_arrangement"}
+
+
+def test_a_comparison_product_that_did_not_sell_in_the_plans_window_is_named(known):
+    # AC-193's yardstick half.
+    w, _ = known
+    first_on = w["first_day"] + timedelta(days=W.SHAPES["known"][1][0])
+    plan_first, plan_last = first_on - timedelta(days=30), first_on - timedelta(days=3)
+    quiet = W.barcode("F12", 3)
+    sales = [{**r, "units": 0.0} if r["barcode"] == quiet and plan_first <= date.fromisoformat(r["day"]) <= plan_last
+             else r for r in w["sales_daily"]]
+    m = sm.measure(_inputs(w, sales=sales))
+    f01 = next(a for a in m["arrangements"] if a["fixture"] == "F01")
+    assert {"barcode": quiet, "reason": "no_sale_in_plan_window"} in f01["comparison"]["left_out"]
+
+
+@pytest.mark.parametrize("elasticity, placebo, why", [
+    ({"verdict": "measured_and_not_significant", "estimate": 0.1, "why_not_measurable": None}, "passed",
+     "his_own_not_significant"),
+    ({"verdict": "measured", "estimate": 1.4, "why_not_measurable": None}, "passed", "his_own_outside_range"),
+    ({"verdict": "measured", "estimate": -0.2, "why_not_measurable": None}, "passed", "his_own_outside_range"),
+    ({"verdict": "measured", "estimate": 0.3, "why_not_measurable": None}, "not_run", "placebo_not_run"),
+    ({"verdict": "not_measurable", "estimate": None, "why_not_measurable": "too_few_arrangements_or_products"},
+     "not_run", "his_own_not_yet_measured"),
+])
+def test_fr_206_keeps_the_research_value_on_each_failed_condition(elasticity, placebo, why):
+    assert sm._plan_uses(elasticity, {"status": placebo}, load_policy()) == {"value": 0.17, "source": "research",
+                                                                          "why": why}

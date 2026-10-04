@@ -97,7 +97,8 @@ def plan_fixture(name: str, fixture: dict, members: dict, products: dict, widths
             for b in candidates}
     kept_on = {b for b in candidates if members[b]["kept_on"]}
     here = [r for r in rules if _applies(r, name, fixture, members)]
-    at_least = {r["barcode"]: r for r in here if r["kind"] == "at_least" and r["barcode"] in width}
+    at_least_any = {r["barcode"]: r for r in here if r["kind"] == "at_least"}
+    at_least = {b: r for b, r in at_least_any.items() if b in width}
     at_most = {r["barcode"]: r for r in here if r["kind"] == "at_most" and r["barcode"] in width}
     unplaced = {reason: sorted(b for b, m in members.items() if m["status"] == reason)
                 for reason in UNPLACED_FROM_POPULATION}
@@ -109,6 +110,19 @@ def plan_fixture(name: str, fixture: dict, members: dict, products: dict, widths
         return {**base, "state": "stopped_by_rule", "stopped_by": {**rule, "why": why}, "shelves": None,
                 "planned": planned}
 
+    if not planned:
+        return {**base, "state": "no_planned_products", "shelves": None, "planned": []}   # §12: no plan
+    if not candidates:
+        return {**base, "state": "nothing_placeable", "shelves": None, "planned": planned}
+
+    # FR-188: a rule that cannot be met stops the plan and is named, never dropped. "At least N" on a
+    # product the plan does not place (not stocked, kept off, no width, too wide) cannot be met.
+    for b, r in sorted(at_least_any.items()):
+        if b not in width:
+            status = members[b]["status"]
+            why = ("no_width" if b in no_width else "too_wide" if b in too_wide else
+                   "product_not_planned" if status != PLANNED else "product_not_placed")
+            return stopped(r, why)
     # A rule that contradicts itself, or a "together" set split across fixtures, cannot be met.
     for b, low in at_least.items():
         if b in at_most and at_most[b]["facings"] < low["facings"]:
@@ -121,6 +135,7 @@ def plan_fixture(name: str, fixture: dict, members: dict, products: dict, widths
                 return stopped(r, "products_on_another_fixture")
 
     need = {b: max(1, at_least[b]["facings"]) if b in at_least else 1 for b in candidates}
+    unknown_sizes = bool(no_width or too_wide)
     dept_of = {b: products[b].get("department") for b in candidates}
     units = _groups(candidates, here, dept_of)
 
@@ -130,31 +145,44 @@ def plan_fixture(name: str, fixture: dict, members: dict, products: dict, widths
             return (0, -max(known), unit[0])
         return (1, 0.0, unit[0])
 
+    # FR-183, FR-184: one facing each, packed in the earnings order. Whether the fixture is over-full
+    # is decided here, on first facings alone, before any rule asks for more.
     free = dict(length_mm)
     facings, shelf_of, did_not_fit = {}, {}, []
     for unit in sorted(units, key=key):
-        wanted = sum(need[b] * width[b] for b in unit)
         single = sum(width[b] for b in unit)
-        spot = next((s for s in order if free[s] >= wanted), None)
-        if spot is not None:
-            for b in unit:
-                facings[b], shelf_of[b] = need[b], spot
-            free[spot] -= wanted
-            continue
         if len(unit) > 1 and single > longest:
             rule = next(r for r in here if r["kind"] == "together" and (
                 ("department" in r and dept_of[unit[0]] == r["department"]) or set(unit) & set(r.get("barcodes", []))))
             return stopped(rule, "longer_than_any_shelf")
-        if wanted > single and any(free[s] >= single for s in order):
-            heaviest = max((b for b in unit if b in at_least), key=lambda b: (need[b] * width[b], b))
-            return stopped(at_least[heaviest], "does_not_fit")
-        did_not_fit.append(unit)
+        spot = next((s for s in order if free[s] >= single), None)
+        if spot is None:
+            did_not_fit.append(unit)
+            continue
+        for b in unit:
+            facings[b], shelf_of[b] = 1, spot
+        free[spot] -= single
     if did_not_fit:
         return {**base, "state": "over_full", "shelves": None, "planned": planned,
                 "did_not_fit_cm": round(sum(width[b] for u in did_not_fit for b in u) / 10, 1)}
 
+    # FR-188: his "at least N", on the shelf that holds the product's first facing (FR-185). Where a
+    # size is unknown, no spare length is known to be free (FR-186, INV-091), so it cannot be met.
+    # It is obeyed for a product of unknown earnings too: INV-086 keeps the plan from giving such a
+    # product facings from a guess, and these are facings he stated, not facings the plan chose.
+    for b in sorted(at_least, key=lambda b: (order.index(shelf_of[b]), b)):
+        more = need[b] - 1
+        if more <= 0:
+            continue
+        if unknown_sizes:
+            return stopped(at_least[b], "sizes_unknown")
+        if free[shelf_of[b]] < more * width[b]:
+            return stopped(at_least[b], "does_not_fit")
+        facings[b] += more
+        free[shelf_of[b]] -= more * width[b]
+
     # FR-186: only where every size is known is any spare length known to be free.
-    extras = "given" if not no_width and not too_wide else ("no_width" if no_width else "too_wide")
+    extras = "given" if not unknown_sizes else ("no_width" if no_width else "too_wide")
     if extras == "given":
         e = elasticity["value"]
         limit = {b: min(at_most[b]["facings"] if b in at_most else float("inf"),
@@ -191,8 +219,8 @@ def plan_fixture(name: str, fixture: dict, members: dict, products: dict, widths
                 "barcode": b, "product_name": products[b].get("product_name"),
                 "department": products[b].get("department"), "facings": facings[b],
                 "width_mm": width[b], "width_measured_on": widths[b]["measured_on"],
-                "earnings_rank": rank.get(b), "earnings_unknown": earn[b]["unknown"],
-                "earnings_unknown_because": earn[b]["because"],
+                "rank": rank.get(b), "unknown_parts": earn[b]["unknown"],
+                "unknown_because": earn[b]["because"],
                 "margin_per_sale": earn[b]["margin_per_sale"], "daily_mean": earn[b]["daily_mean"],
                 "kept_on_by_his_rule": b in kept_on,
                 "rules": [r["kind"] for r in (at_least.get(b), at_most.get(b)) if r],
@@ -252,6 +280,8 @@ def run(inputs) -> CapabilityOutput:
     states = [e.evidence["state"] for e in entries]
     counts = {"fixtures": len(entries), "planned": states.count("planned"), "over_full": states.count("over_full"),
               "stopped_by_rule": states.count("stopped_by_rule"),
+              "no_planned_products": states.count("no_planned_products"),
+              "nothing_placeable": states.count("nothing_placeable"),
               "placed": sum(e.evidence.get("placed") or 0 for e in entries),
               "no_width": sum(len(e.evidence["unplaced"]["no_width"]) for e in entries),
               "too_wide": sum(len(e.evidence["unplaced"]["too_wide"]) for e in entries)}

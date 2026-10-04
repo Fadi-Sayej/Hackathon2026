@@ -60,6 +60,24 @@ class _Rejected(Exception):
     pass
 
 
+class _Loader(yaml.SafeLoader):
+    """Safe YAML that refuses a mapping naming one key twice. PyYAML keeps the last silently, and
+    fixture keys `01` and `1` both read as the name "1": one fixture would vanish unrejected."""
+
+
+def _mapping_without_duplicates(loader, node, deep=False):
+    seen = set()
+    for key_node, _ in node.value:
+        key = str(loader.construct_object(key_node, deep=deep))
+        if key in seen:
+            raise yaml.constructor.ConstructorError(None, None, f"{key!r} is named twice", key_node.start_mark)
+        seen.add(key)
+    return loader.construct_mapping(node, deep=deep)
+
+
+_Loader.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, _mapping_without_duplicates)
+
+
 def _day(value, what: str) -> str:
     """A calendar day, as YAML reads `2026-10-04` or as an ISO string. Never a timestamp."""
     if isinstance(value, datetime):
@@ -218,7 +236,7 @@ def load_store_layout(path: Path | str, catalogue: Iterable[dict]) -> dict:
     departments = {p["department"] for p in products.values() if p.get("department")}
     empty = {"fixtures": {}, "widths": {}, "current": {}, "rules": [], "assigned": {}}
     try:
-        raw = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+        raw = yaml.load(Path(path).read_text(encoding="utf-8"), Loader=_Loader)   # noqa: S506 — a SafeLoader
     except (yaml.YAMLError, UnicodeDecodeError) as err:
         return {**empty, "rejected": [{"kind": "file", "key": None, "reason": f"unreadable: {err}"}]}
     if not isinstance(raw, dict) or not raw.get("fixtures"):

@@ -269,3 +269,10 @@ def test_the_run_names_every_rejected_entry_in_its_steps(tmp_path, monkeypatch):
     step = next(s for s in result["steps"] if s["step"] == "store_layout")
     assert step["status"] == "degraded" and "fixture F2" in step["error"] and "F1" not in step["error"]
     assert result["status"] == "ok"
+
+
+def test_two_fixtures_whose_names_read_alike_are_refused_not_merged(tmp_path):
+    # YAML reads 01 and 1 as the same name; one fixture would vanish without a word (FR-178, ADR-038).
+    out = _load(tmp_path, "fixtures:\n" + _fixture("01", "[drinks]") + _fixture("1", "[snacks]"))
+    assert out["fixtures"] == {} and out["rejected"][0]["kind"] == "file"
+    assert "named twice" in out["rejected"][0]["reason"]

@@ -48,8 +48,9 @@ def check_assortment_gap_entry(entry: dict) -> None:
 # used for the order and never published; any other money-named field, at any depth, is refused.
 _MARGIN_PER_SALE = re.compile(r"^shelves\[\d+\]\.products\[\d+\]\.margin_per_sale$")
 # A rate of money over shelf space is the "margin per metre" figure INV-087 names, whatever it is
-# called, so it is refused by its shape as well as by the money words.
-_SPACE_RATE = re.compile(r"per_(cm|metre|meter)|earnings_per", re.IGNORECASE)
+# called, so it is refused by its shape as well as by the money words; and in F12 any earnings,
+# profit or gain field is one too, so none is published under that name either.
+_SPACE_RATE = re.compile(r"per_(cm|metre|meter)|earning|profit|gain", re.IGNORECASE)
 F12_CAPABILITIES = ("layout_facts", "shelf_plan", "shelf_measurement", "shelf_explanation")
 _CONTRACT = {"id", "spec", "requires", "status", "unavailable_reason", "window", "thresholds", "counts",
              "entries", "notes"}

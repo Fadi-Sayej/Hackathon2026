@@ -52,16 +52,27 @@ def arrangements(owner) -> tuple:
     """(readable arrangements, unreadable ones), from the owner's acted shelf.plan outcomes."""
     out, unreadable = [], []
     for entry_id, record in sorted((owner.outcomes or {}).items()):
-        snap = (record or {}).get("snapshot") or {}
+        record = record or {}            # an undo reaches the engine as a null tombstone (clearOutcome)
+        snap = record.get("snapshot") or {}
         if record.get("status") != "acted" or snap.get("signal_family") != FAMILY:
             continue
         try:
-            out.append({"entry_id": entry_id, "fixture": str(snap["fixture"]), "plan_date": snap["plan_date"],
-                        "plan_window": {"first_day": snap["plan_window"]["first_day"],
-                                        "last_day": snap["plan_window"]["last_day"]},
-                        "arranged_on": _d(snap["arranged_on"]).isoformat(),
-                        "placements": {str(b): dict(p) for b, p in (snap.get("placements") or {}).items()}})
-        except (KeyError, TypeError, ValueError) as err:
+            placements = {}
+            for b, p in (snap.get("placements") or {}).items():
+                facings = p.get("facings")
+                if not isinstance(facings, int) or isinstance(facings, bool) or facings < 1:
+                    raise ValueError(f"product {b} has facings {facings!r}")
+                placements[str(b)] = {"shelf": p.get("shelf"), "facings": facings, "eye_level": bool(p.get("eye_level"))}
+            if not placements:
+                raise ValueError("it places no product")
+            window = snap["plan_window"]
+            out.append({"entry_id": entry_id, "fixture": str(snap["fixture"]),
+                        "plan_date": _d(snap["plan_date"]).isoformat(),
+                        "plan_window": {"first_day": _d(window["first_day"]).isoformat(),
+                                        "last_day": _d(window["last_day"]).isoformat()},
+                        "arranged_on": _d(snap["arranged_on"]).isoformat(), "placements": placements})
+        except (KeyError, TypeError, ValueError, AttributeError) as err:
+            # Named, never guessed at: an arrangement the measurement cannot read is not one it measures.
             unreadable.append({"entry_id": entry_id, "reason": f"unreadable arrangement: {err}"})
     return sorted(out, key=lambda a: (a["arranged_on"], a["fixture"], a["entry_id"])), unreadable
 
@@ -78,20 +89,26 @@ def _sold_in(rows: list, first: str, last: str) -> bool:
 
 
 def _before_record(arr: dict, barcode: str, layout: dict, earlier: list) -> Optional[dict]:
-    """The later-dated of the team's count and his previous arrangement, dated no later than this."""
-    found = []
+    """What stood on the shelf before: the later-dated of the team's count and his previous
+    arrangement of the fixture, dated no later than this one (FR-205).
+
+    The latest record is chosen first and the product read from it. A previous arrangement that did
+    not place the product means it was not on the shelf (ASM-077), never that an older count of it
+    still holds."""
     current = (layout.get("current") or {}).get(barcode)
     fixture = (layout.get("fixtures") or {}).get(arr["fixture"])
-    if current and current["fixture"] == arr["fixture"] and current["measured_on"] <= arr["arranged_on"] and fixture:
-        found.append((current["measured_on"], {"facings": current["facings"],
-                                               "eye_level": current["shelf"] == fixture.get("eye_level_shelf"),
-                                               "from": "count"}))
-    for prev in earlier:
-        if prev["fixture"] == arr["fixture"] and prev["arranged_on"] < arr["arranged_on"] and barcode in prev["placements"]:
-            p = prev["placements"][barcode]
-            found.append((prev["arranged_on"], {"facings": p.get("facings"), "eye_level": bool(p.get("eye_level")),
-                                                "from": "previous_arrangement"}))
-    return max(found, key=lambda kv: kv[0])[1] if found else None
+    count = None
+    if current and fixture and current["fixture"] == arr["fixture"] and current["measured_on"] <= arr["arranged_on"]:
+        count = (current["measured_on"], {"facings": current["facings"],
+                                          "eye_level": current["shelf"] == fixture.get("eye_level_shelf"),
+                                          "from": "count"})
+    previous = max((p for p in earlier if p["fixture"] == arr["fixture"] and p["arranged_on"] < arr["arranged_on"]),
+                   key=lambda p: (p["arranged_on"], p["entry_id"]), default=None)
+    if previous is not None and (count is None or previous["arranged_on"] >= count[0]):
+        placed = previous["placements"].get(barcode)
+        return {"facings": placed["facings"] if placed else 0, "eye_level": bool(placed and placed["eye_level"]),
+                "from": "previous_arrangement"}
+    return count[1] if count else None
 
 
 def _evidence(rows: list, window) -> tuple:
@@ -241,21 +258,36 @@ def _measure(inputs) -> dict:
         if not comp or not sum(u.before for u in comp) or not sum(u.after for u in comp):
             record.update(status="not_measurable", reason="comparison_did_not_sell")
             continue
-        record.update(status="measured", comparison={"fixtures": comparison_fixtures, "products": len(comp)},
+        # FR-204 for the yardstick too: a comparison product that did not sell in the plan's window
+        # is named, as an arranged one is (AC-193).
+        not_eligible = sorted(b for f in comparison_fixtures for b in members[f] if not eligible(b))
+        record.update(status="measured",
+                      comparison={"fixtures": comparison_fixtures, "products": len(comp),
+                                  "left_out": [{"barcode": b, "reason": "no_sale_in_plan_window"} for b in not_eligible]},
                       products=[{**p, "product_name": names.get(p["barcode"])} for p in products])
         main_units += units
 
         # FR-209: the placebo, on two earlier windows as far apart as these, while nothing changed.
         distance = after_first - before_first
         early_first = before_first - distance
-        early = window_between(early_first, early_first + span - timedelta(days=1), report_days, policy)
-        if early is not None and not arranged_between(arr["fixture"], early_first, before_last, arr["entry_id"]):
+        early_last = early_first + span - timedelta(days=1)
+        record["placebo_windows"] = {"earlier": {"first_day": early_first.isoformat(), "last_day": early_last.isoformat()},
+                                     "later": record["before_window"], "used": False, "why_not": None}
+        early = window_between(early_first, early_last, report_days, policy)
+        if early is None:
+            record["placebo_windows"]["why_not"] = "history_too_short"
+        elif arranged_between(arr["fixture"], early_first, before_last, arr["entry_id"]):
+            record["placebo_windows"]["why_not"] = "rearranged_inside"
+        else:
             placebo_comparison = {f: [b for b in members[f] if eligible(b)] for f in members
                                   if f != arr["fixture"] and not arranged_between(f, early_first, before_last, "")}
-            if placebo_comparison:
+            if not placebo_comparison:
+                record["placebo_windows"]["why_not"] = "no_unchanged_fixture"
+            else:
                 p_units, _ = _units_for(arr, early, before, arranged=arranged, comparison=placebo_comparison,
                                         rows=rows, layout=layout, earlier=arranged_all)
                 placebo_units += p_units
+                record["placebo_windows"]["used"] = True
 
     main = _verdict(main_units, policy, ("log_facings",))
     full = fit(usable(main_units), tuple(main["terms"] or terms_with_variation(usable(main_units)))) if main_units else None
@@ -318,8 +350,15 @@ def _plan_uses(elasticity: dict, placebo: dict, policy) -> dict:
 
 
 def plan_elasticity(inputs) -> dict:
-    """What shelf_plan uses, and why (FR-206). Never silent about an unavailable measurement."""
-    m = measure(inputs)
+    """What shelf_plan uses, and why (FR-206). Never silent about an unavailable measurement.
+
+    The plan never fails because the measurement did: they are two capabilities (ADR-014), and a
+    defect in the measurement must leave the plan on the research value, saying so."""
+    try:
+        m = measure(inputs)
+    except Exception:                       # noqa: BLE001 — isolation is the point
+        return {"value": inputs.policy.shelf_elasticity, "source": "research", "why": "measurement_unavailable",
+                "measurement_reason": "capability_error"}
     if m["status"] != "available":
         return {"value": inputs.policy.shelf_elasticity, "source": "research", "why": "measurement_unavailable",
                 "measurement_reason": m["reason"]}
