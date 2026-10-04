@@ -80,7 +80,7 @@ CAPABILITIES = {
     # own capability, so a missing key never touches the plan (ADR-014, INV-096).
     "shelf_explanation":   CapabilitySpec("shelf_explanation",   "F12-S1",   "none",     False, "fixture_order",
                                           ("products", "store_layout", "sales_daily", "shelf_explanations"),
-                                          published_from="2026-10-06"),
+                                          published_from="2026-10-05"),
 }
 
 # The reason belongs to the missing input, not to the capability: catalogue_lifecycle with
