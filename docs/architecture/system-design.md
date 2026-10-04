@@ -1235,6 +1235,7 @@ own, so their rows say so rather than grade it after the fact.
 | [ADR-036](decisions/ADR-036-a-store-is-configuration-one-copy-per-store.md) | A store is configuration, and each store runs its own copy with only its own data (D-28) | Easy |
 | [ADR-037](decisions/ADR-037-shelf-layout-is-a-committed-file.md) | The shelf layout, facing widths and arrangement rules are a committed file the team records from the owner (F12-S1). Accepted 2026-10-04 | Easy: a later ADR can move widths to photographs if the vision trial succeeds |
 | [ADR-038](decisions/ADR-038-a-shelf-arrangement-is-an-outcome-on-the-fixtures-plan.md) | A shelf arrangement is the owner's `acted` outcome on that fixture's `shelf.plan` entry (F12-S1). Accepted 2026-10-04 | Easy before the first arrangement is recorded |
+| [ADR-039](decisions/ADR-039-a-shelf-explanation-is-a-pinned-models-answer-checked-and-sealed.md) | A shelf plan's explanation is a pinned model's answer, checked and sealed as the boost's is (F12-S1, D-32). **Ready for review** | Easy: text beside the plan; no figure depends on it |
 
 ---
 
@@ -1508,9 +1509,10 @@ it needs a store to send anything. The plan that builds it is
 ### F12-S1 — Planogram (V4: specified, Approved 2026-10-04; not built)
 
 F12-S1 builds D-30, which unlocked F12 for specification on 2026-10-03 with the plan waiting for
-daily sales the way F8 does. It adds three engine capabilities (ADR-014): `layout_facts`, which
-needs no sales; `shelf_plan`, which waits for them; and `shelf_measurement`, which also waits for
-his recorded arrangements (ADR-038). It adds one committed file of layout facts (ADR-037).
+daily sales the way F8 does. It adds four engine capabilities (ADR-014): `layout_facts`, which
+needs no sales; `shelf_plan`, which waits for them; `shelf_measurement`, which also waits for
+his recorded arrangements (ADR-038); and `shelf_explanation`, the AI's explanation of each plan,
+which also waits for the model (D-32, ADR-039; not yet approved). It adds one committed file of layout facts (ADR-037).
 Nothing is built until the owner approves the spec and its mockups.
 
 | Requirement | Design element | Flow / contract | Verification |
@@ -1520,10 +1522,11 @@ Nothing is built until the owner approves the spec and its mockups.
 | FR-190, FR-191, FR-196 … FR-199 | E `layout_facts` (requires `products`, `store_layout`): the facts with dates, what is missing, and the catalogue products not planned with their reasons; available without sales | ADR-014 | AC-172, AC-173, AC-176, AC-184, AC-186 |
 | FR-182 … FR-189, INV-087, INV-088, INV-090, INV-091 | E `shelf_plan`: first facings packed shelf by shelf, known earnings first; an over-full fixture planned not at all; extra facings only where every size is known, greedy with a provisional elasticity; P the plan with its conditions and no money total | ADR-005, ADR-012 | AC-174 … AC-178, AC-180, AC-181 |
 | FR-193 | E `shelf_plan` requires `products`, `store_layout`, `sales_daily`; rule-level `layout_all_rejected`, `no_evidence_window`, `stale_daily_sales` | ADR-014; ADR-030 §4 | AC-172, AC-173, AC-185 |
-| FR-192, FR-194, FR-195, INV-089 | U Store layout and Shelf plan leave their awaiting shells; all three capabilities `value_policy: none`, not admitted; read-only for every role, except the owner's arrangement record and its undo on Shelf plan | ADR-028 §1; ADR-029; ADR-012; ADR-038 | AC-173, AC-182, AC-187 |
+| FR-192, FR-194, FR-195, INV-089 | U Store layout and Shelf plan leave their awaiting shells; every F12 capability `value_policy: none`, not admitted; read-only for every role, except the owner's arrangement record and its undo on Shelf plan | ADR-028 §1; ADR-029; ADR-012; ADR-038 | AC-173, AC-182, AC-187 |
 | FR-201, INV-089 | O the owner's `acted` outcome on that night's `shelf.plan` entry: fixture, date written once, plan's date and window, placements (ADR-038); undo removes it; U every device shows the published arrangement, and the button warns while a measurement runs | ADR-003, ADR-016, ADR-029, ADR-038 | AC-190 |
 | FR-202 … FR-205, FR-207, FR-209, INV-092, INV-093, INV-095 | E `shelf_measurement`: a before window ending where the plan's window begins and an after window from the arrangement, under F8's rules; products measured if they sold in the plan's window; the store elasticity by one Poisson regression with product and window terms, an arranged term, log facing ratio and eye-level change; each product's net change against the same regression's window terms; interval by a bootstrap over whole fixtures; a placebo on two earlier windows as far apart as the measured ones, testing the arranged and facing terms; units only | ADR-030; F8-S1 FR-144 | AC-191 … AC-195, AC-197, AC-198 |
 | FR-206, FR-208, INV-094 | E `shelf_measurement` requires `products`, `store_layout`, `sales_daily`; rule-level `layout_all_rejected`, `owner_state_unavailable`, `no_arrangement_recorded`; runs before `shelf_plan`, which uses its elasticity only when measured, between 0 and 1 and with a passed placebo, else 0.17, naming which and why | ADR-014; ADR-003 | AC-194, AC-196 |
+| FR-210 … FR-215, INV-096, INV-097, NFR-077 (awaiting approval, OQ-1209) | E `shelf_explanation` (requires `products`, `store_layout`, `sales_daily`, `shelf_explanations`; `no_model_key`): after `shelf_plan`, the pinned model is asked once per fixture whose facts digest has no sealed explanation; the answer in three languages, checked for digits outside product names and withheld whole on failure; sealed per night and reproduced from the snapshot; per-run ceiling and time budget; U shown beside each plan as the AI's explanation; never read back | ADR-032, ADR-035, ADR-039; D-16, D-32 | AC-199 … AC-203 |
 | FR-200 | U the marked example on Shelf plan while `shelf_plan` is unavailable, for any reason; nothing reads it | D-31, after D-29 | AC-189 |
 | NFR-072, NFR-073, NFR-076 | R print mode, with the bootstrap's seed fixed; no step growing with market history; no past artefact read | ADR-002 | Checkpoint of its phase |
 

@@ -3,28 +3,33 @@ ID: F12-S1
 Title: Planogram — a dated shelf plan from his own sales, waiting for them until they arrive
 Status: Approved — by the repository owner, 2026-10-04
 Owner: smartshelf-architect
-Version: 0.7 (2026-10-04: OQ-1206 answered; the arrangement record and the before-and-after measurement; §23; two rounds of the measurement's review)
+Version: 0.8 (2026-10-04: D-32, the AI's explanation of each fixture's plan; FR-210 … FR-215 await approval as OQ-1209)
 Parent: [F12 — Planogram](../intent.md)
 Related Intents: INT-006
-Inputs: [docs/features/F12-planogram/intent.md (Approved for specification, D-30), docs/product/PRD.md (§5 V4, §6 #7), docs/product/intent-register.md (D-1, D-3, D-13, D-14, D-22, D-23, D-28, D-29, D-30, D-31), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (§5 "He stocks", FR-143 … FR-146, FR-156), ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011, ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-033, ADR-036, ADR-037, ADR-038, CLAUDE.md]
+Inputs: [docs/features/F12-planogram/intent.md (Approved for specification, D-30), docs/product/PRD.md (§5 V4, §6 #7), docs/product/intent-register.md (D-1, D-3, D-13, D-14, D-15, D-16, D-22, D-23, D-28, D-29, D-30, D-31, D-32), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (§5 "He stocks", FR-143 … FR-146, FR-156), ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011, ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037, ADR-038, ADR-039, CLAUDE.md]
 Answered by: [System Design](../../../architecture/system-design.md) §21 (F12-S1)
-Updated: 2026-10-04 (approved by the repository owner, OQ-1208 with it; earlier the same day, the measurement and its two reviews)
+Updated: 2026-10-04 (D-32's explanation, for approval as OQ-1209; earlier the same day, approved with OQ-1208, and OQ-1204 and OQ-1207 answered with the plan)
 ---
 
 # F12-S1 — Planogram
 
 > **Approved by the repository owner on 2026-10-04.** D-30 unlocked this spec on 2026-10-03: the
 > plan waits for daily sales the way F8 does, and D-13 stands. Everything D-30 left open is either
-> decided here, marked **(decided here)** and approved with the spec (OQ-1205, OQ-1208), or still
-> asked in §17 (OQ-1204, OQ-1207).
+> decided here, marked **(decided here)** and approved with the spec (OQ-1205, OQ-1208), or answered
+> with the Phase 8 plan (OQ-1204, OQ-1207, 2026-10-04).
+>
+> **FR-210 … FR-215 are not yet approved.** They specify D-32, the AI's explanation of each
+> shelf, which the owner asked for on 2026-10-04. They await his answer to OQ-1209. Everything
+> else in this spec stands approved.
 
 > **Identifier note.** Every `FR-`, `INV-`, `NFR-`, `AC-`, `SCN-`, `C-`, `ASM-` and `OQ-` id
-> below is new and globally unique: FR-178 … FR-209, INV-084 … INV-095, NFR-072 … NFR-076,
-> AC-172 … AC-198, SCN-159 … SCN-174, C-73 … C-75, ASM-073 … ASM-082, OQ-1201 … OQ-1208.
+> below is new and globally unique: FR-178 … FR-215, INV-084 … INV-097, NFR-072 … NFR-077,
+> AC-172 … AC-204, SCN-159 … SCN-177, C-73 … C-75, ASM-073 … ASM-083, OQ-1201 … OQ-1209.
 
 Implements intent F12. Bound by ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011,
-ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-033, ADR-036, ADR-037 and ADR-038, and settled
-decisions D-1, D-3, D-13, D-14, D-23, D-29, D-30 and D-31.
+ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037,
+ADR-038 and ADR-039, and settled decisions D-1, D-3, D-13, D-14, D-16, D-23, D-29, D-30, D-31 and
+D-32.
 
 ## 1. Purpose
 
@@ -42,6 +47,10 @@ against fixtures he did not touch. Once enough arrangements are measured, and ch
 that was there already, his store's own response replaces the research average (FR-201 …
 FR-209). Until then it claims no gain. The intent's "+20–68% margin per linear metre" is a figure
 from elsewhere (§21).
+
+Each fixture's plan comes with the AI's explanation of why to organize the shelf that way, in
+his language (D-32, FR-210 … FR-215). The explanation puts the plan's own reasons into words. It never
+changes the plan.
 
 ## 2. Intent Traceability
 
@@ -62,18 +71,21 @@ Behavioural scope, not a file list. The implementation plan declares the files.
   - each stocked product's facing width, and its current facings and shelf, all read from his
     shelf photographs;
   - the owner's arrangement rules.
-- Three engine capabilities, because they fail on different days (ADR-014):
+- Four engine capabilities, because they fail on different days (ADR-014):
   - **`layout_facts`** publishes the recorded facts and what is missing, and needs no sales;
   - **`shelf_plan`** publishes the plan, and waits for daily sales;
   - **`shelf_measurement`** publishes what his recorded arrangements changed, and waits for
-    them as well as for daily sales.
+    them as well as for daily sales;
+  - **`shelf_explanation`** publishes the AI's explanation of each fixture's plan, and also waits
+    for the model's answer (D-32).
 - Two pages that already exist as waiting shells (ADR-028 §1), filled from the artefact:
-  **Store layout** from `layout_facts`, and **Shelf plan** from `shelf_plan` and
-  `shelf_measurement`.
+  **Store layout** from `layout_facts`, and **Shelf plan** from `shelf_plan`,
+  `shelf_measurement` and `shelf_explanation`.
 - His "I've arranged this shelf" record, and the before-and-after measurement it starts
   (FR-201 … FR-209; OQ-1206, answered).
 - A clearly marked example on Shelf plan while it waits, as on Reorder (D-31, FR-200). What the
-  example is built from is proposed by its plan for his approval.
+  example is built from the same test shop as Reorder's example, with a shelf layout added, as
+  the owner approved with the Phase 8 plan on 2026-10-04.
 - The boundary probe for the new inputs (§20).
 
 ### Out of Scope
@@ -97,7 +109,8 @@ Behavioural scope, not a file list. The implementation plan declares the files.
 |---|---|---|
 | The owner | States his fixtures and rules; sends or allows shelf photographs | At setup, and when a fixture changes |
 | The team | Measures shelves, facing widths and current facings; records them and his rules in the layout file (ADR-037); commits | When something is measured or stated |
-| The nightly engine | Computes `layout_facts`, `shelf_measurement` and `shelf_plan` | Nightly (ADR-007) |
+| The nightly engine | Computes `layout_facts`, `shelf_measurement`, `shelf_plan` and `shelf_explanation` | Nightly (ADR-007) |
+| The language model | Writes each fixture's explanation from its plan's facts, once a night (ADR-032, ADR-039) | Nightly, only for a plan it has not explained before |
 | The owner | Opens Store layout or Shelf plan | Any time |
 | The owner | Presses "I've arranged this shelf" on a fixture's plan, after he rearranges it | When he does |
 | A team account | Opens either page | Any time; read-only (ADR-029) |
@@ -124,6 +137,7 @@ Behavioural scope, not a file list. The implementation plan declares the files.
 | Before and after windows | The window ending the day before the plan's window begins, and the window starting the day after the arrangement, each held to F8's window rules (FR-202). |
 | Comparison products | Products on fixtures with no arrangement from the before window's first day to the after window's last day (FR-203). |
 | Placebo | The same estimate between two earlier windows, when nothing was rearranged, to test for drift that was there already (FR-209). |
+| Explanation | The AI's account, in his language, of why one fixture's plan is arranged as it is, written from that plan's facts (FR-210). |
 
 ## 6. Functional Requirements
 
@@ -224,7 +238,7 @@ That makes it the "dated plan with its conditions" (PRD §6 #7). A planned produ
 zero (the evidence itemises its department and records no sale) has a known earnings figure of
 zero, keeps its first facing, and gets no more.
 
-**FR-192** — All three capabilities are `value_policy: none`, and none is admitted to the daily
+**FR-192** — All F12 capabilities are `value_policy: none`, and none is admitted to the daily
 surface **(decided here)**. `shelf_plan` publishes each fixture's plan as one entry of the family
 `shelf.plan` (ADR-038). The plan's date is the date of the nightly run that published it, so each
 night's plan is a new entry. The plan is a page he opens, not one of Today's places. Margin per
@@ -430,11 +444,84 @@ arrangements that have the history for it, it is "not run", not passed, and FR-2
 research value. A placebo is weak evidence even when it runs: passing it is necessary for FR-206,
 not proof that nothing drifted (ASM-078).
 
+#### Explaining the plan (D-32)
+
+**FR-210** — Each fixture's plan carries an explanation, written by a language model, of why the
+shelf is arranged that way:
+- why the products at eye level are there;
+- why some products get more facings than others;
+- why some products are not placed, or the fixture has no plan;
+- which of the plan's rules, and which research finding (§23), each of those rests on.
+
+It is written once a night, from that fixture's published plan facts, and published with it.
+It is never written at request time. That is D-16's method for an AI-written reason, applied
+here **(decided here)**: D-32 settled that there is an explanation, not how it is made.
+
+**FR-211** — The model is given only what that fixture's plan publishes **(decided here)**:
+- its shelves in order, and which is at eye level;
+- each placed product's name, department, shelf and facings, and the plan's reason for them;
+- the order of the placed products by earnings per centimetre, as an order only, and for a
+  product whose earnings are unknown, which part is unknown;
+- the unplaced products and their reasons;
+- his rules, and whether the fixture was over-full or stopped by a rule;
+- the elasticity the plan used, and why.
+
+The research findings of §23 are fixed text in the versioned prompt. The only numbers sent are
+each product's facings, the shelves' positions and the elasticity used. No ₪ figure, margin or
+demand goes in (D-1), and the order carries the ranking without the amounts. The answer may not
+repeat any number as a digit (FR-212).
+
+**FR-212** — The answer is checked mechanically before anything is published **(decided here)**:
+- it must parse as the explanation in Hebrew, Arabic and English, each within the policy's
+  length;
+- no text may contain a digit (0–9, ٠–٩ or ۰–۹) outside the product names it was given. This is
+  D-16's figure check. It is looser than the boost's (ADR-032), which removes nothing, because a
+  size such as "1.5L" is part of a name **(decided here)**. Only that fixture's names are removed,
+  exactly as given and longest first, and the prompt requires every name to be copied exactly as
+  given, in all three languages. A name changed in the copying keeps its digits, and fails.
+
+An answer that fails is withheld whole, so the three languages never disagree. The plan is still
+shown, and says why it has no explanation. A number written in words, or a promised gain, cannot
+be caught mechanically. The prompt forbids both, and ASM-083 states what is left.
+
+**FR-213** — Each night's explanations are sealed and reproduced as the boost's picks are
+(ADR-035, ADR-039) **(decided here)**:
+- the snapshot records, per fixture, the model, the prompt's version and the digest of the facts
+  it was given;
+- print mode never calls the model, and reads the snapshot;
+- an explanation whose digest no longer matches the plan's facts is not shown, and the plan says
+  its explanation is out of date;
+- a fixture is not asked again when the most recent earlier snapshot holds an accepted
+  explanation with the same facts digest, model and prompt version. Tonight's snapshot copies
+  it, so each night's snapshot is complete on its own, and an unchanged plan is paid for once.
+  A withheld answer is never reused, and a new prompt or model asks again.
+
+**FR-214** — `shelf_explanation` is a capability of its own, `value_policy: none` and not
+admitted, because it fails on different days from the plan (ADR-014) **(decided here)**:
+- it requires `products`, `store_layout`, `sales_daily` and `shelf_explanations`, the night's
+  sealed snapshot. Without a model key the live run asks nothing, so there is no snapshot, and
+  the reason is `no_model_key`;
+- whenever `shelf_plan` is unavailable, so is it, with `shelf_plan`'s reason;
+- it publishes, per fixture plan, its explanation, or why it has none: withheld, out of date, or
+  not written tonight;
+- spending has ADR-032's two limits. The account's monthly limit is the owner's, in the
+  provider's console, with its alert (D-16), and is shared with the boost. A per-night ceiling
+  of requests sits in policy, counted as the boost's is. A fixture past the ceiling, or past the step's time budget, has no explanation
+  tonight and says so.
+
+**FR-215** — Shelf plan shows each fixture's explanation beside its plan, in his language, under
+a label saying it is the AI's explanation of the plan. When there is none, it says why, in his
+words. The explanation never changes the plan (INV-096). On the marked example (D-31), the
+explanation is the real step's answer for the example's test shop. The team asks for it once,
+by hand with the key, and seals it with the example's inputs, because the example is built in
+print mode, which never calls the model. Until then, the example's builder gives the engine an
+empty snapshot, so each example fixture says its explanation has not been written.
+
 ## 7. Behavioral Invariants
 
 **INV-084** — No fixed camera, sensor or continuous image feed is ever an input (D-13).
-*Violated if* any input reaches any of the three capabilities other than the committed layout
-file, owner state and the existing artefact inputs.
+*Violated if* any input reaches any F12 capability other than the committed layout file, owner
+state, the sealed explanations (FR-213) and the existing artefact inputs.
 
 **INV-085** — Demand is computed by F8's own evidence functions over F8's window, never derived a
 second time. *Violated if* a product's demand in the plan differs from the `daily_mean`
@@ -448,7 +535,7 @@ facing.
 metre" figure. Margin per sale appears only as a unit figure in a product's evidence, never
 summed (ADR-012; CLAUDE.md rule 8). The publisher enforces it as it does for F8 and F9: it
 refuses a value, or any money-named field other than a placed product's `margin_per_sale`, in
-any of the three. *Violated if* any money figure in them adds products, facings or fixtures
+any of them. *Violated if* any money figure in them adds products, facings or fixtures
 together.
 
 **INV-088** — Every catalogue product of a fixture's departments is either placed or named with
@@ -485,9 +572,18 @@ whose placebo did not run or did not pass.
 followed (FR-202). *Violated if* a published before window and the followed plan's window
 overlap.
 
+**INV-096** — No figure of `layout_facts`, `shelf_plan` or `shelf_measurement` comes from the model.
+The explanation is text beside the plan, and nothing reads it back. *Violated if* any placement,
+facing count, elasticity, measurement or figure of those three differs between a run with the
+sealed explanations and one without them. `shelf_explanation`'s own counts of requests and reuse
+(NFR-077) are not figures of the plan.
+
+**INV-097** — An explanation is shown only beside the facts it was written from. *Violated if* an
+explanation is published for a plan whose facts digest differs from the one it recorded.
+
 ## 8. Behavioral Scenarios
 
-**SCN-159** — Given no layout file, when the nightly runs, then all three capabilities are
+**SCN-159** — Given no layout file, when the nightly runs, then every F12 capability is
 unavailable (`no_store_layout`). Both pages say the measurements have not been recorded.
 
 **SCN-160** — Given a layout file and no daily reports, when the nightly runs:
@@ -550,37 +646,50 @@ nightly runs, then that arrangement is not measurable ("history too short"). Giv
 arrangement of the same fixture inside the first one's after window, the first is not measurable
 ("rearranged again before its measurement ended").
 
+**SCN-175** — Given a fixture's plan and a model key, when the nightly runs, then the model is asked
+once for that fixture. The answer is checked and sealed, and Shelf plan shows it beside the plan
+in his language, labelled as the AI's explanation.
+
+**SCN-176** — Given no model key, when the nightly runs, then every plan is shown as before, and each
+fixture says it has no explanation (`no_model_key`).
+
+**SCN-177** — Given an answer that says the arrangement will sell 20% more, when it is checked, then
+it is withheld, and the plan says its explanation was withheld because it stated a figure.
+
 ## 9. Inputs and Observable Outputs
 
 | Input | Source | Required? |
 |---|---|---|
-| Layout facts, with `measured_by` / `measured_on` or `stated_by` / `stated_on` | The committed layout file (ADR-037) | Yes, for all three capabilities |
-| His catalogue: products, departments, shelf prices, unit costs, latest counts | The POS export (`products`) and his answered costs | Yes, for all three |
-| Daily reports, F8's window and evidence | ADR-030; F8-S1 §5, FR-143 … FR-146 | Yes, for `shelf_plan` and `shelf_measurement` |
+| Layout facts, with `measured_by` / `measured_on` or `stated_by` / `stated_on` | The committed layout file (ADR-037) | Yes, for every F12 capability |
+| His catalogue: products, departments, shelf prices, unit costs, latest counts | The POS export (`products`) and his answered costs | Yes, for every F12 capability |
+| Daily reports, F8's window and evidence | ADR-030; F8-S1 §5, FR-143 … FR-146 | Yes, for `shelf_plan`, `shelf_measurement` and `shelf_explanation` |
 | His arrangement records | Owner state, pulled (ADR-003, ADR-038) | For `shelf_measurement`; without it, `owner_state_unavailable` (FR-208) |
+| The night's explanations | The model's answers, checked and sealed under `data/external/snapshots/` (ADR-039) | For `shelf_explanation`; without them, `no_model_key` (FR-214) |
 
 | Output | Where it is observable |
 |---|---|
 | `layout_facts`: the recorded facts with dates, what is missing, rejected entries | `dashboard.json`; the Store layout page |
 | `shelf_plan`: per fixture and shelf, products with facings and the reason; the unplaced lists; the conditions, including the elasticity used (FR-189) | `dashboard.json`; the Shelf plan page |
 | `shelf_measurement`: per arrangement, its windows and products' changes; the store elasticity with its interval, counts, verdict and placebo (FR-207) | `dashboard.json`; the Shelf plan page |
+| `shelf_explanation`: per fixture plan, its explanation in three languages, or why it has none (FR-214) | `dashboard.json`; the Shelf plan page |
 | Rejected layout entries, by name and reason | The run's steps |
 
 ## 10. State / Lifecycle Semantics
 
-Two things persist between runs:
+Three things persist between runs:
 - the committed layout file, whose history of commits records what was measured or stated, and
   when (ADR-037);
-- his arrangement records in owner state, which he alone writes (ADR-038).
+- his arrangement records in owner state, which he alone writes (ADR-038);
+- the sealed explanations, one snapshot a night (ADR-039).
 
-All three capabilities are recomputed every night from those, the catalogue and the daily
+Every F12 capability is recomputed every night from those, the catalogue and the daily
 reports. No past artefact is read: each arrangement record carries the plan's date, the plan's
 window and the facings he followed, and the windows are recomputed from the daily reports. A new
 measurement of the layout, or a new arrangement, changes the next night's plan.
 
 ## 11. Failure and Recovery Behavior
 
-- **Layout file absent:** all three capabilities are `no_store_layout`. Not an empty plan
+- **Layout file absent:** every F12 capability is `no_store_layout`. Not an empty plan
   (CLAUDE.md rule 10).
 - **Every fixture rejected:** `layout_all_rejected`, and the rejections are named.
 - **Some entries rejected:** named in the run's steps; the rest are used (SCN-167).
@@ -594,6 +703,8 @@ measurement of the layout, or a new arrangement, changes the next night's plan.
 - **An arrangement recorded on two devices:** the browser does not read owner state back, so
   each device knows only its own presses. After the nightly, every device shows the published
   arrangement (FR-201). An undo can still be reversed by the other device (ASM-082).
+- **No model key, or the model fails:** the plans are published as they would be without it.
+  Each fixture says it has no explanation, and why (FR-214).
 - **A department on no fixture:** listed by `layout_facts`. Not an error.
 
 ## 12. Edge Cases
@@ -613,8 +724,9 @@ measurement of the layout, or a new arrangement, changes the next night's plan.
 
 ## 13. Non-Functional Requirements
 
-**NFR-072** — None of the three capabilities adds a step whose time grows with the collected
-market history. They read only the layout file, the catalogue, the daily reports and owner state
+**NFR-072** — No F12 capability adds a step whose time grows with the collected
+market history. They read only the layout file, the catalogue, the daily reports, owner state
+and, for the explanation, tonight's and the most recent earlier night's sealed explanations
 (compare the 2026-10-03 nightly, #276).
 
 **NFR-073** — Reproduction: print mode and `npm run figures` compute the same plan and the same
@@ -631,6 +743,12 @@ overwrites it, and `check:store` reports whether it is present (ADR-036, ADR-037
 owner state, and no past artefact. Its time grows with the arrangements he records and the bootstrap's draws, not
 with the collected market history.
 
+**NFR-077** — The explanation step never holds the plan up. Its requests are bounded by the
+policy's ceiling and its time by the policy's budget, which is checked before each request. A
+request that fails twice leaves that fixture without an explanation tonight, and the step asks
+nothing more that night, as the boost's does. The number of requests made, and how many
+explanations were reused, are published each night.
+
 ## 14. Compatibility and External Constraints
 
 **C-73** — One store per copy (ADR-036, D-28). The layout file belongs to that copy's store.
@@ -643,7 +761,7 @@ after he approves them.
 
 ## 15. Acceptance Criteria
 
-**AC-172** — With no layout file, all three capabilities are `unavailable` (`no_store_layout`),
+**AC-172** — With no layout file, every F12 capability is `unavailable` (`no_store_layout`),
 and both pages say the measurements have not been recorded. *(FR-191, FR-193, FR-194, FR-196)*
 
 **AC-173** — With a layout file and no daily reports, `layout_facts` is available and Store layout
@@ -679,8 +797,8 @@ counts of FR-189 and the elasticity it used. *(FR-189)*
 **AC-182** — Neither page writes owner state except FR-201's arrangement record and its undo, and
 a team account writes nothing. *(FR-195, INV-089)*
 
-**AC-183** — No input other than the layout file, owner state and the existing artefact inputs
-reaches any F12 capability. *(INV-084; D-13)*
+**AC-183** — No input other than the layout file, owner state, the sealed explanations and the
+existing artefact inputs reaches any F12 capability. *(INV-084; D-13)*
 
 **AC-184** — A malformed fixture, rule or width is named in the run's steps, and the rest are used.
 A department on two fixtures without a "keep on" rule is rejected, and so is a product of a split
@@ -745,6 +863,30 @@ The placebo's windows are as far apart as the measured ones. *(FR-206, FR-209)*
 arrangement with too little history, or with another arrangement of its fixture inside its
 windows, is not measurable and says which. *(FR-202, INV-095)*
 
+**AC-199** — Withholding the sealed explanations leaves every plan, measurement and figure
+unchanged, and each fixture says it has no explanation and why. *(FR-214, INV-096)*
+
+**AC-200** — An answer with a digit outside the product names it was given, or one that does not
+parse, is withheld whole, and the plan says why. An answer naming a product whose name holds a
+digit passes. *(FR-212)*
+
+**AC-201** — Print mode never calls the model, and reproduces the published explanations from the
+snapshot. An explanation whose facts digest no longer matches is not shown. *(FR-213, INV-097)*
+
+**AC-202** — The request built for a fixture carries only FR-211's facts. Its only numbers are
+facings, shelf positions and the elasticity used, and it carries no ₪ figure, margin or demand.
+*(FR-211)*
+
+**AC-203** — A fixture whose facts have a sealed explanation from an earlier night is not asked
+again. Past the request ceiling or the time budget, the remaining fixtures say they have no
+explanation tonight.
+After a request fails twice, no further request is made that night, and the remaining fixtures
+say they have no explanation tonight. *(FR-213, FR-214, NFR-077)*
+
+**AC-204** — The request for a fixture asks for FR-210's four parts. Shelf plan shows the answer
+beside that fixture's plan, under its label and in the page's language, or the reason it has
+none, in his words. *(FR-210, FR-215)*
+
 ## 16. Assumptions
 
 **ASM-073** — A product's facing width does not change between packs of the same barcode.
@@ -793,6 +935,12 @@ then undoes on one. The other device sends its record again when the app next lo
 arrangement comes back. Nothing here detects it until the browser reads owner state back (System
 Design §11.5).
 
+**ASM-083** — The model's explanation is faithful to the facts it was given. *Falsified if* it
+gives a reason the facts do not carry, or promises a gain in words ("this will double your
+sales"). No mechanical check catches either. The prompt forbids both, and the page labels the
+text as the AI's explanation of the plan: the plan, not the text, is what the product stands
+behind (INV-096).
+
 ## 17. Open Questions
 
 **~~OQ-1201~~** — "Who measures product widths: the team, from photos and a tape measure, or the
@@ -801,17 +949,21 @@ photographs (FR-180).
 
 **~~OQ-1202~~** — "Should we run the one-day test of an AI reading a real shelf photo, before or
 after a first version entered by hand?" **Answered 2026-10-03: "yes why not".** The test is
-to be run. He did not choose between before and after, so its plan proposes the order for his
-approval.
+to be run. He did not choose between before and after, so its plan proposed the order: after
+Phase 8, on the next store's first shelf photographs, against the team's own readings. He
+approved it with the plan on 2026-10-04.
 
 **~~OQ-1203~~** — "Should the waiting Shelf plan page show a clearly marked example of how it
 will look, like Reorder does? That would be a new decision, D-31." **Answered 2026-10-03:
 "yes", recorded as D-31 (FR-200).**
 
-**OQ-1204** — What are the provisional space-elasticity factor and facings cap (FR-185)? The
-architect proposes 0.17 for the factor, the meta-analysis mean (§23). The cap has no research
-figure behind it and is still to be proposed. · owner: the repository owner · blocks: FR-185's
-numbers, not its rule.
+**~~OQ-1204~~** — What are the provisional space-elasticity factor and facings cap (FR-185)?
+**Answered 2026-10-04: "yes"**, to "Do you approve the plan and these numbers?", as part of "yes but i need you to add ai explanation to this also so the ai tells why to organize the shelf this way":
+- the factor is 0.17, the meta-analysis mean (§23);
+- the cap is 4 facings a product, a judgement the Phase 8 plan explains. His "at least N" rule
+  overrides it.
+
+Both stay provisional policy values.
 
 **~~OQ-1205~~** — "Are my design choices right?" **Answered 2026-10-03: "yes".** The choices
 marked **(decided here)** at that time were:
@@ -835,15 +987,16 @@ parts:**
   spec?" FR-201 … FR-209 measure the plan in his own store. Once his own elasticity meets
   FR-206's conditions, it replaces the research value.
 
-**OQ-1207** — What are the measurement's provisional values? The architect proposes them, and the
-owner approves:
-- the window's length and minimum report days (F8's);
-- the interval's level;
-- the minimum numbers of arrangements and of products for a store elasticity;
-- the bootstrap's number of draws.
+**~~OQ-1207~~** — What are the measurement's provisional values? **Answered 2026-10-04, with
+OQ-1204:**
+- the window's length and minimum report days are F8's, 28 and 21, read from `order.*`;
+- the interval's level is 95%;
+- a store elasticity needs at least 8 arrangements on different fixtures, and 40 arranged
+  products;
+- the bootstrap makes 1,000 draws, with a fixed seed. That value was not among the numbers put
+  to him, but it is in the plan he approved.
 
-· owner: the repository owner · blocks: the numbers in FR-202, FR-205 and FR-209, not their
-rules.
+All are provisional policy values, as the Phase 8 plan sets them out.
 
 **~~OQ-1208~~** — Are the measurement's design choices right? **Answered 2026-10-04:
 "approved"**, to "Do you approve the spec as written? The new design choices are listed in its
@@ -859,6 +1012,27 @@ open question OQ-1208." The choices marked **(decided here)** in FR-201 … FR-2
 - a third capability, not on Today (FR-208);
 - the placebo, on both terms and over the same distance (FR-209).
 
+**OQ-1209** — Are the explanation's design choices right? D-32 settled that there is an AI
+explanation. These are the choices marked **(decided here)** in FR-210 … FR-214:
+- one explanation per fixture's plan, written once a night, never on request (FR-210);
+- the model sees the plan's facts and order, and no amount (FR-211);
+- no digit outside product names, a looser check than the boost's, and a failing answer
+  withheld whole (FR-212);
+- an unchanged plan's explanation reused, not paid for again (FR-213);
+- a capability of its own, and ADR-032's two spending limits (FR-214).
+
+It also asks:
+- the model is the one he chose for the boost, Sonnet 5, on the same account (ADR-032);
+- the proposed values are a ceiling of 40 requests a night, a time budget of five minutes, 600
+  characters per language, and 1,200 tokens an answer;
+- its estimated cost is about $5.40 a month for a 15-fixture store whose every plan changes
+  nightly, and about $14.40 at the ceiling. Unchanged plans cost nothing (ADR-039 shows the
+  basis);
+- the monthly spend limit and its alert are his to set on the account (D-16);
+- the example's explanation is asked once, by the team, with his key: one request for each of
+  the example's fixtures, about five, which costs a few cents at ADR-039's estimate. · owner: the repository owner · blocks: building
+FR-210 … FR-215, not the rest of F12.
+
 ## 18. Non-Goals
 
 - A plan built from monthly reports, or from assumed demand, to show something now.
@@ -867,6 +1041,7 @@ open question OQ-1208." The choices marked **(decided here)** in FR-201 … FR-2
 - A measured gain in money, or one claimed for the whole store (FR-207, INV-093).
 - A verdict on one product's or one fixture's change (FR-203, §21).
 - How products affect each other's sales (cross-space elasticities).
+- An AI choosing the arrangement. The engine's rules choose it; the AI explains them (INV-096).
 
 ## 19. Traceability Matrix
 
@@ -885,6 +1060,8 @@ open question OQ-1208." The choices marked **(decided here)** in FR-201 … FR-2
 | INT-006 | FR-202, FR-203, FR-204 | SCN-170, SCN-171, SCN-174 | AC-191, AC-192, AC-193, AC-198 |
 | INT-006 | FR-205, FR-206, FR-207, FR-209 | SCN-172 | AC-192, AC-194, AC-195, AC-197 |
 | INT-006 | FR-208 | SCN-173 | AC-196 |
+| INT-006 · D-32 | FR-210, FR-211, FR-212, FR-215 | SCN-175, SCN-177 | AC-200, AC-202, AC-204 |
+| INT-006 · D-32 | FR-213, FR-214 | SCN-176 | AC-199, AC-201, AC-203 |
 | Protected behavior | INV-084 | — | AC-183 |
 | Protected behavior | INV-085 | — | AC-179 |
 | Protected behavior | INV-086, INV-088, INV-090, INV-091 | SCN-162, SCN-163, SCN-165 | AC-175, AC-176, AC-177 |
@@ -894,6 +1071,9 @@ open question OQ-1208." The choices marked **(decided here)** in FR-201 … FR-2
 | Protected behavior | INV-093 | — | AC-194, AC-195 |
 | Protected behavior | INV-094 | SCN-172 | AC-194 |
 | Protected behavior | INV-095 | SCN-174 | AC-198 |
+| Protected behavior | INV-096 | SCN-176 | AC-199 |
+| Protected behavior | INV-097 | — | AC-201 |
+| Protected behavior | NFR-077 | — | AC-203 |
 | Protected behavior | NFR-075 | — | AC-188 |
 
 ---
@@ -904,7 +1084,8 @@ open question OQ-1208." The choices marked **(decided here)** in FR-201 … FR-2
 |---|---|---|
 | `npm run check:order-signals` (exists), extended over its fixture world, which carries daily reports. The extension withholds the daily reports, the layout file and one product's width. | `shelf_plan` or `shelf_measurement` published without daily sales or a layout; `layout_facts` failing without sales; a product placed without a width | `collect-daily.yml` |
 | The same probe, given arrangement records over the fixture world's daily reports. The records are taken from the contract fixture that `ownerStateContract.test.js` writes through the real `recordOutcome`, so they have the browser's shape (ADR-038). The probe withholds the records, then the owner state pull, and separately leaves every fixture arranged. | A measurement made without an arrangement; arrangements treated as absent when owner state was not pulled; a net change published with no comparison products (INV-092) | `collect-daily.yml` |
-| `scripts/check_v1_signals.py`'s `PROBED_ELSEWHERE` guard (exists) | Once the `store_layout` input is in any capability's `requires`, `tests/test_check_v1_signals.py` fails until it is listed. Listing it also needs the probe's own word for it in that test | CI |
+| The same probe, with the sealed explanations withheld | An explanation published from nothing; a plan or figure that changes without the model's answer (INV-096) | `collect-daily.yml` |
+| `scripts/check_v1_signals.py`'s `PROBED_ELSEWHERE` guard (exists) | Once the `store_layout` or `shelf_explanations` input is in any capability's `requires`, `tests/test_check_v1_signals.py` fails until it is listed. Listing it also needs the probe's own word for it in that test | CI |
 
 ## 21. Claim Limits
 
@@ -914,11 +1095,12 @@ open question OQ-1208." The choices marked **(decided here)** in FR-201 … FR-2
 | "Arranging this fixture raised its sales by X%" | not measurable | One fixture's products share whatever else happened on it, so its own change cannot be told apart from the arrangement's effect. FR-203 states each product's change as what happened, with no verdict. |
 | "Space elasticity in this store is E" | measured, measured and not significant, or not measurable (FR-205) | Across all his measurable arrangements, with its interval and placebo. Until it meets FR-206, 0.17 is the research average, not his. |
 | "This product sells X a day", from the monthly reports | not measurable | Monthly rows have no days (rule 13). Only F8's daily window is used. |
+| "The AI's explanation shows why this arrangement is right" | not measurable | The explanation puts the plan's own rules into words (FR-210). The arrangement's grounds are the rules and §23, and its effect is what FR-205 measures. |
 | "The plan is optimal" | not measurable | The allocation is greedy with a provisional elasticity (OQ-1204). It is a defensible ranking, not a proven optimum. |
 
 ## 22. Unmapped PRD Acceptance Lines
 
-None. FR-178 … FR-209 cover the PRD's V4 row: shelf photographs, rules, and generating the plan.
+None. FR-178 … FR-215 cover the PRD's V4 row: shelf photographs, rules, and generating the plan.
 - Photographs enter only as the team's source for the recorded facts (§3).
 - Facing widths are an input the PRD row does not name. They come from his shelf photographs
   (FR-180, OQ-1201).

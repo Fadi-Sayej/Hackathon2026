@@ -76,3 +76,7 @@ The repository owner approved [F12-S1](specs/F12-S1-planogram.md), answering "Do
 the spec as written?" with "approved". It includes the "I've arranged this shelf" record and the
 before-and-after measurement he had asked for on 2026-10-04 ("the planogram is real science",
 F12-S1 OQ-1206). Building it follows his approval of its plan and its mockups (F12-S1 C-75).
+
+He then approved its build plan, answering "Do you approve the plan and these numbers?" with "yes but i need you to add ai explanation to this also so the ai tells why to organize the shelf this way". That second part is **D-32**: Shelf plan
+has the AI explain why to organize the shelf the way the plan says. F12-S1 specifies how, for his
+approval.
