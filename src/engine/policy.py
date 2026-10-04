@@ -70,6 +70,15 @@ class Policy:
     boost_request_ceiling: int
     boost_prompt: str
     assortment_gap_window_days: int     # F9-S1 §5 "recent"
+    # F12-S1 FR-185 (OQ-1204, answered 2026-10-04 with the Phase 8 plan). Provisional.
+    shelf_elasticity: float
+    shelf_facings_cap: int
+    # F12-S1 FR-205, FR-209 (OQ-1207, answered 2026-10-04 with the Phase 8 plan). Provisional.
+    shelf_interval_level: float
+    shelf_min_arrangements: int
+    shelf_min_products: int
+    shelf_bootstrap_draws: int
+    shelf_bootstrap_seed: int
 
     def as_dict(self) -> dict:
         """The artefact's `thresholds` block, grouped as design §11.4 defines it.
@@ -142,6 +151,19 @@ class Policy:
             },
             "assortment_gap": {
                 "window_days": self.assortment_gap_window_days,
+            },
+            "shelf_plan": {
+                "elasticity": self.shelf_elasticity,
+                "facings_cap": self.shelf_facings_cap,
+            },
+            "shelf_measurement": {
+                "window_days": self.order_window_days,
+                "min_report_days": self.order_min_report_days,
+                "interval_level": self.shelf_interval_level,
+                "min_arrangements": self.shelf_min_arrangements,
+                "min_products": self.shelf_min_products,
+                "bootstrap_draws": self.shelf_bootstrap_draws,
+                "bootstrap_seed": self.shelf_bootstrap_seed,
             },
             "question_limit": self.question_limit,
             "published_population": self.published_population,
@@ -223,6 +245,13 @@ def load_policy(path: Path | str | None = None) -> Policy:
         boost_request_ceiling=_required(raw, "boost", "request_ceiling", int),
         boost_prompt=_required(raw, "boost", "prompt", str),
         assortment_gap_window_days=_required(raw, "assortment_gap", "window_days", int),
+        shelf_elasticity=_required(raw, "shelf", "elasticity", float),
+        shelf_facings_cap=_required(raw, "shelf", "facings_cap", int),
+        shelf_interval_level=_required(raw, "shelf", "interval_level", float),
+        shelf_min_arrangements=_required(raw, "shelf", "min_arrangements", int),
+        shelf_min_products=_required(raw, "shelf", "min_products", int),
+        shelf_bootstrap_draws=_required(raw, "shelf", "bootstrap_draws", int),
+        shelf_bootstrap_seed=_required(raw, "shelf", "bootstrap_seed", int),
     )
     if policy.withdraw_with_stock:
         raise ValueError(
@@ -267,6 +296,15 @@ def load_policy(path: Path | str | None = None) -> Policy:
     for cap_id in policy.surface_rotate:
         if cap_id not in policy.surface_unvalued_order:
             raise ValueError(f"surface.rotate names {cap_id!r}, which is not in surface.unvalued_order")
+    if not 0 < policy.shelf_elasticity < 1:
+        # FR-185: each further facing counts for less only between 0 and 1 (FR-206's range).
+        raise ValueError("shelf.elasticity must be above 0 and below 1 (F12-S1 FR-185, FR-206)")
+    if policy.shelf_facings_cap < 1:
+        raise ValueError("shelf.facings_cap must be at least 1 (F12-S1 FR-185)")
+    if not 0 < policy.shelf_interval_level < 1:
+        raise ValueError("shelf.interval_level must be above 0 and below 1 (F12-S1 FR-205)")
+    if policy.shelf_min_arrangements < 2 or policy.shelf_min_products < 2 or policy.shelf_bootstrap_draws < 100:
+        raise ValueError("shelf minimums must be at least 2 and bootstrap_draws at least 100 (F12-S1 FR-205)")
     if policy.assortment_gap_window_days < 1:
         raise ValueError("assortment_gap.window_days must be at least 1")
     return policy

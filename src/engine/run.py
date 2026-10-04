@@ -36,9 +36,10 @@ MATCHES_PATH = MATCHING_ROOT / "product_matches.parquet"
 
 # Filled by Phase 1: capability id -> callable(inputs) -> CapabilityOutput
 def _runners() -> dict:
-    from src.engine import (assortment_gap, catalogue_lifecycle, competitor_position, margin_below_cost,
-                            market_boost, market_running_out, order_quantity, owner_questions,
-                            price_consistency, reconciliation)
+    from src.engine import (assortment_gap, catalogue_lifecycle, competitor_position, layout_facts,
+                            margin_below_cost, market_boost, market_running_out, order_quantity,
+                            owner_questions, price_consistency, reconciliation, shelf_measurement,
+                            shelf_plan)
     return {"catalogue_lifecycle": catalogue_lifecycle.run, "price_consistency": price_consistency.run,
             "reconciliation": reconciliation.run, "hygiene": reconciliation.run_hygiene,
             "competitor_position": competitor_position.run,
@@ -46,7 +47,9 @@ def _runners() -> dict:
             # Registered in the same change as its registry entry: a real run whose artefact
             # lacks a registered id is refused (publish.require_complete_registry).
             "market_running_out": market_running_out.run, "market_boost": market_boost.run,
-            "order_quantity": order_quantity.run, "assortment_gap": assortment_gap.run}
+            "order_quantity": order_quantity.run, "assortment_gap": assortment_gap.run,
+            "layout_facts": layout_facts.run, "shelf_measurement": shelf_measurement.run,
+            "shelf_plan": shelf_plan.run}
 
 
 DEFAULT_RUNNERS: dict = {}          # populated lazily by run_engine
@@ -117,6 +120,16 @@ def _store_facts_verdict(store_facts) -> tuple:
         return "ok", None
     return "degraded", "rejected: " + "; ".join(
         f"{r['department'] if r['department'] is not None else 'the file'} ({r['reason']})" for r in rejected)
+
+
+def _store_layout_verdict(store_layout) -> tuple:
+    """F12-S1 FR-178: a rejected fixture, width, count or rule is named here, by kind, key and
+    reason, and the rest are used. Like a rejected store fact, it is not the run's failure."""
+    rejected = (store_layout or {}).get("rejected") or []
+    if not rejected:
+        return "ok", None
+    return "degraded", "rejected: " + "; ".join(
+        f"{r['kind']} {r['key'] if r['key'] is not None else 'the file'} ({r['reason']})" for r in rejected)
 
 
 def _boost_verdict(result) -> tuple:
@@ -198,7 +211,7 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
                signals_dir: Optional[Path] = None, matches_path: Optional[Path] = None,
                catalogue_path: Optional[Path] = None, daily_sales_dir: Optional[Path] = None,
                store_facts_path: Optional[Path] = None, snapshots_root: Optional[Path] = None,
-               boost_transport=None) -> dict:
+               boost_transport=None, store_layout_path: Optional[Path] = None) -> dict:
     # Resolved here, not in the signature: a default bound at import time cannot be
     # redirected by a caller that patches the module global, which is how Task 1.9
     # runs the engine over a copy of the data with an input withheld.
@@ -236,13 +249,15 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
 
     # Named only when the caller named them, so a test that redirects neither reads the
     # committed store facts and market snapshots exactly as the nightly does.
-    sources = {"store_facts_path": store_facts_path, "snapshots_root": snapshots_root}
+    sources = {"store_facts_path": store_facts_path, "snapshots_root": snapshots_root,
+               "store_layout_path": store_layout_path}
     sources = {k: v for k, v in sources.items() if v}
     inputs = _step(steps, "load_inputs", lambda: load_inputs(policy=policy, owner=owner, run_at=now, silver_dir=silver_dir,
                                                            signals_dir=signals_dir, matches_path=matches_path,
                                                            **sources))
     if inputs is not None:
         _step(steps, "store_facts", lambda: inputs.store_facts, verdict=_store_facts_verdict)
+        _step(steps, "store_layout", lambda: inputs.store_layout, verdict=_store_layout_verdict)
     if inputs is not None and mode == "publish":
         # ADR-035 Decision 3: the one step the live run has and print mode does not. It asks the
         # model, seals the picks, and the inputs are read again so the run uses exactly what

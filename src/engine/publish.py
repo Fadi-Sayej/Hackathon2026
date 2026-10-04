@@ -43,6 +43,42 @@ def check_assortment_gap_entry(entry: dict) -> None:
         raise PublishRefused(f"assortment_gap entry {entry['id']} carries money-named fields {fields} (INV-081)")
 
 
+# F12-S1 INV-087: a placed product's margin per sale is the one ₪ figure any F12 capability may
+# publish, a unit figure in its evidence, never summed. Earnings per centimetre, a ₪ rate, is
+# used for the order and never published; any other money-named field, at any depth, is refused.
+_MARGIN_PER_SALE = re.compile(r"^shelves\[\d+\]\.products\[\d+\]\.margin_per_sale$")
+# A rate of money over shelf space is the "margin per metre" figure INV-087 names, whatever it is
+# called, so it is refused by its shape as well as by the money words; and in F12 any earnings,
+# profit or gain field is one too, so none is published under that name either.
+_SPACE_RATE = re.compile(r"per_(cm|metre|meter)|earning|profit|gain", re.IGNORECASE)
+F12_CAPABILITIES = ("layout_facts", "shelf_plan", "shelf_measurement", "shelf_explanation")
+_CONTRACT = {"id", "spec", "requires", "status", "unavailable_reason", "window", "thresholds", "counts",
+             "entries", "notes"}
+
+
+def _rate_fields(obj, path=""):
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            here = f"{path}.{key}" if path else str(key)
+            if _SPACE_RATE.search(str(key)):
+                yield here
+            yield from _rate_fields(value, here)
+    elif isinstance(obj, list):
+        for i, value in enumerate(obj):
+            yield from _rate_fields(value, f"{path}[{i}]")
+
+
+def check_f12_capability(cap_id: str, cap: dict) -> None:
+    extras = {k: v for k, v in cap.items() if k not in _CONTRACT}
+    fields = list(_money_fields(extras)) + list(_rate_fields(extras))
+    for e in cap.get("entries") or []:
+        evidence = e.get("evidence") or {}
+        fields += [f"{e['id']}.{f}" for f in _money_fields(evidence) if not _MARGIN_PER_SALE.match(f)]
+        fields += [f"{e['id']}.{f}" for f in _rate_fields(evidence)]
+    if fields:
+        raise PublishRefused(f"{cap_id} carries money-named fields {fields} (F12-S1 INV-087)")
+
+
 def _check_order_suggestion(entry: dict, max_pct: float) -> None:
     fields = list(_money_fields(entry.get("evidence") or {}))
     if fields:
@@ -126,6 +162,8 @@ def validate_artefact(artefact: dict, *, require_complete_registry: bool = False
         if cap_id == "assortment_gap":
             for e in cap["entries"]:
                 check_assortment_gap_entry(e)
+        if cap_id in F12_CAPABILITIES:
+            check_f12_capability(cap_id, cap)
         if cap_id == "order_quantity":
             declared = ((artefact.get("thresholds") or {}).get("market_boost") or {}).get("max_pct")
             max_pct = min(D21_MAX_BOOST_PCT, declared) if isinstance(declared, (int, float)) else D21_MAX_BOOST_PCT

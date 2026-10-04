@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import {
   ANSWER_STATUS, OUTCOME_REASONS, OUTCOME_STATUS, STORAGE_KEY,
-  loadOwnerState, recordAnswer, recordOutcome, resetCacheForTests,
+  clearOutcome, loadOwnerState, recordAnswer, recordOutcome, resetCacheForTests,
 } from '../ownerState'
 
 const LEGACY_ACTIONS = 'smartshelf.operationalActions.v1'
@@ -209,5 +209,58 @@ describe('answers are stored per fact (Phase 5 Task 5.14, ADR-034 Decision 3)', 
 
   it('refuses a fact nobody asks', async () => {
     await expect(recordAnswer(B, 'shelf_colour', { value: 'red' })).rejects.toThrow(/fact/)
+  })
+})
+
+// Phase 8 Task 8.4 (F12-S1 FR-201, ADR-038). "I've arranged this shelf" on a fixture's plan.
+describe('a shelf arrangement', () => {
+  const plan = {
+    id: '5e1f0a9b8c7d6e5f', signal_family: 'shelf.plan', capability: 'shelf_plan', barcode: null,
+    characterisation: 'shelf_plan', value: null,
+    evidence: {
+      fixture: 'F1', plan_date: '2026-10-12', plan_window: { first_day: '2026-09-14', last_day: '2026-10-11' },
+      shelves: [
+        { shelf: 1, eye_level: true, products: [{ barcode: '7290001', facings: 2 }, { barcode: '7290002', facings: 1 }] },
+        { shelf: 2, eye_level: false, products: [{ barcode: '7290003', facings: 1 }] },
+      ],
+    },
+  }
+
+  it('records the fixture, the plan, the day and what he followed, and no ₪ or name', async () => {
+    await recordOutcome(plan, { status: OUTCOME_STATUS.ACTED })
+    const snap = loadOwnerState().outcomes[plan.id].snapshot
+    expect(snap).toMatchObject({
+      signal_family: 'shelf.plan', barcode: null, fixture: 'F1', plan_date: '2026-10-12',
+      plan_window: { first_day: '2026-09-14', last_day: '2026-10-11' },
+      placements: {
+        7290001: { shelf: 1, facings: 2, eye_level: true },
+        7290002: { shelf: 1, facings: 1, eye_level: true },
+        7290003: { shelf: 2, facings: 1, eye_level: false },
+      },
+    })
+    expect(snap.arranged_on).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+    expect(JSON.stringify(snap)).not.toMatch(/value|price|cost|name/)
+  })
+
+  it('keeps its first day when pressed again: the measurement rests on it (ADR-038 Decision 5)', async () => {
+    await recordOutcome(plan, { status: OUTCOME_STATUS.ACTED })
+    const first = JSON.stringify(loadOwnerState().outcomes[plan.id])
+    await new Promise((r) => setTimeout(r, 5))
+    await recordOutcome({ ...plan, evidence: { ...plan.evidence, plan_date: '2026-10-13' } }, { status: OUTCOME_STATUS.ACTED })
+    expect(JSON.stringify(loadOwnerState().outcomes[plan.id])).toBe(first)
+  })
+
+  it('records only "acted": nothing maps onto declined or deferred (ADR-038 Decision 7)', async () => {
+    await expect(recordOutcome(plan, { status: OUTCOME_STATUS.DECLINED, reason: OUTCOME_REASONS.NOT_WORTH_IT }))
+      .rejects.toThrow(/only "acted"/)
+    expect(loadOwnerState().outcomes[plan.id]).toBeUndefined()
+  })
+
+  it('is undone by clearOutcome, after which a new press is a new day', async () => {
+    await recordOutcome(plan, { status: OUTCOME_STATUS.ACTED })
+    expect(await clearOutcome(plan.id)).toBe(true)
+    expect(loadOwnerState().outcomes[plan.id]).toBeUndefined()
+    await recordOutcome(plan, { status: OUTCOME_STATUS.ACTED })
+    expect(loadOwnerState().outcomes[plan.id].status).toBe('acted')
   })
 })

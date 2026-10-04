@@ -59,6 +59,14 @@ async function produceDocuments() {
   await recordOutcome({ id: '8f6ebc2c4a19e4f4', signal_family: 'competitor.policy_breach', capability: 'competitor_position',
     barcode: '7290017888729', characterisation: 'policy_breach_review' },
   { status: OUTCOME_STATUS.DEFERRED, deferredUntil: FIXED + 7 * DAY })
+  // Phase 8 Task 8.4 (ADR-038 Decision 9): an arrangement, as Shelf plan will record it. The
+  // engine's shelf_measurement and F12-S1's probe read this shape, so it is pinned here.
+  await recordOutcome({ id: '5e1f0a9b8c7d6e5f', signal_family: 'shelf.plan', capability: 'shelf_plan', barcode: null,
+    characterisation: 'shelf_plan', value: null,
+    evidence: { fixture: 'F1', plan_date: '2026-09-13', plan_window: { first_day: '2026-08-16', last_day: '2026-09-12' },
+      shelves: [{ shelf: 1, eye_level: true, products: [{ barcode: '7290001', facings: 2 }] },
+        { shelf: 2, eye_level: false, products: [{ barcode: '7290002', facings: 1 }] }] } },
+  { status: OUTCOME_STATUS.ACTED })
   // a cost answer, and one on a barcode with leading zeros — keying on the wrong form of a
   // barcode is one of the four silent failures CLAUDE.md rule 12 records
   await recordAnswer('7290000041445', 'cost_price', { value: 9.9, status: ANSWER_STATUS.ANSWERED })

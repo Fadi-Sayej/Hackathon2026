@@ -24,6 +24,7 @@ FEEDS = {
     "sales_monthly": ("sales_summary", "window"),
     "sales_daily": ("sales_daily",),
     "store_facts": ("store_facts",),
+    "store_layout": ("store_layout",),
     "nearby_venues": ("running_out", "market_recent", "observations", "matches"),
     "boost_key": ("boost_picks",),
 }
@@ -94,6 +95,18 @@ def _store_facts(path: Path) -> dict:
     return _item("store_facts", label, "present", f"{len(departments)} departments in {_rel(path)}")
 
 
+def _store_layout(path: Path) -> dict:
+    label = "Shelf layout: fixtures, shelf lengths, product widths and today's facings"
+    if not path.exists():
+        return _item("store_layout", label, "missing",
+                     f"{_rel(path)} is not committed: the team records it from the owner's shelves (ADR-037)")
+    raw = (yaml.safe_load(path.read_text(encoding="utf-8")) or {})
+    fixtures = raw.get("fixtures") if isinstance(raw, dict) else None
+    if not fixtures:
+        return _item("store_layout", label, "missing", f"no fixture in {_rel(path)} (ADR-037)")
+    return _item("store_layout", label, "present", f"{len(fixtures)} fixtures in {_rel(path)}")
+
+
 def _targets(path: Path) -> list[dict]:
     raw = (yaml.safe_load(path.read_text(encoding="utf-8")) or {}) if path.exists() else {}
     return [t for t in raw.get("targets") or [] if t.get("enabled", True)]
@@ -160,9 +173,11 @@ def _secret(key: str, label: str, name: str, secret_names: Optional[set], missin
 
 def readiness(store: StoreSettings, *, today: date, facts_path: Optional[Path] = None,
               targets_path: Optional[Path] = None, store_types_path: Optional[Path] = None,
-              snapshots_root: Optional[Path] = None, secret_names: Optional[set] = None) -> list[dict]:
+              snapshots_root: Optional[Path] = None, secret_names: Optional[set] = None,
+              layout_path: Optional[Path] = None) -> list[dict]:
     from src.engine.policy import load_policy
     from src.engine.store_facts import DEFAULT_PATH as FACTS_PATH
+    from src.engine.store_layout import DEFAULT_PATH as LAYOUT_PATH
     stores = load_store_types(store_types_path) if store_types_path else load_store_types()
     targets = _targets(targets_path or PROJECT_ROOT / "configs" / "delivery_targets.yaml")
     return [
@@ -170,6 +185,7 @@ def readiness(store: StoreSettings, *, today: date, facts_path: Optional[Path] =
         _sales_monthly(store),
         _sales_daily(store, today, load_policy().order_freshness_days),
         _store_facts(facts_path or FACTS_PATH),
+        _store_layout(layout_path or LAYOUT_PATH),
         _client_venue(stores, targets),
         _nearby_venues(targets),
         _venue_formats(stores, snapshots_root or EXTERNAL_SNAPSHOTS_ROOT),

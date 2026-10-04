@@ -1,0 +1,129 @@
+# tests/fixtures/shelf_signals/build.py
+"""The planogram world F12-S1's measurement is proven on (Phase 8 Task 8.5). A test shop: no store's data.
+
+Fourteen fixtures, one department each, six products a fixture. Eight fixtures are arranged on
+staggered days, each once, so every arrangement keeps the six never-arranged fixtures as its
+comparison. Sales are drawn day by day from a known model, so the measurement has a true answer
+to find:
+
+    daily units ~ Poisson(base × season(day) × facings ^ TRUE_ELASTICITY × EYE_LIFT ^ at_eye_level)
+
+The facings and eye level are what the layout's count says until the product's fixture is
+arranged, and what he recorded following after. The variants break one assumption each (F12-S1
+AC-197):
+- `known`: nothing else moves. AC-192's interval should hold TRUE_ELASTICITY;
+- `drifting`: the arranged fixtures' departments were already rising before any arrangement, so
+  the placebo's "arranged at all" term should fail;
+- `rising`: the products that get more space were already rising, and the ones that get less
+  falling, so the placebo's facing term should fail;
+- `short`: too little history for any placebo, so it is "not run".
+
+`world(variant)` returns the engine's inputs in memory, for the unit tests. Every number is drawn
+from a seeded generator, so the world is the same world on every run.
+"""
+from __future__ import annotations
+
+import math
+from datetime import date, datetime, timedelta, timezone
+
+import numpy as np
+
+TRUE_ELASTICITY = 0.2
+EYE_LIFT = math.exp(0.25)
+LAST = date(2026, 9, 30)
+RUN_AT = datetime(2026, 10, 1, 3, 0, tzinfo=timezone.utc)
+COUNTED = "2026-01-02"                 # the team's count, before any window
+FIXTURES = [f"F{n:02d}" for n in range(1, 15)]
+ARRANGED = FIXTURES[:8]
+PRODUCTS_PER_FIXTURE = 6
+MEASURED = "measured_by: team, measured_on: 2026-01-02"
+STATED = "stated_by: owner\n    stated_on: 2026-01-02\n    recorded_by: team"
+SHAPES = {   # history in days, and the day index of each arrangement (0 = the first report day)
+    "known": (240, [120, 132, 144, 156, 168, 180, 192, 204]),
+    "drifting": (240, [120, 132, 144, 156, 168, 180, 192, 204]),
+    "rising": (240, [120, 132, 144, 156, 168, 180, 192, 204]),
+    "short": (150, [60, 68, 76, 84, 92, 100, 108, 116]),
+}
+
+
+def barcode(fixture: str, n: int) -> str:
+    return f"73{fixture[1:]}{n:02d}1"
+
+
+def _plan_window(arranged_on: date) -> tuple:
+    plan_date = arranged_on - timedelta(days=2)
+    return plan_date, plan_date - timedelta(days=28), plan_date - timedelta(days=1)
+
+
+def world(variant: str = "known", *, tmp_path=None) -> dict:
+    from src.engine.model import entry_id
+    from src.engine.store_layout import load_store_layout
+    from src.owner_state.model import OwnerState
+
+    days, arranged_at = SHAPES[variant]
+    first = LAST - timedelta(days=days - 1)
+    rng = np.random.default_rng({"known": 11, "drifting": 12, "rising": 13, "short": 14}[variant])
+    products, before, after, base = [], {}, {}, {}
+    for f_index, fixture in enumerate(FIXTURES):
+        for n in range(1, PRODUCTS_PER_FIXTURE + 1):
+            b = barcode(fixture, n)
+            products.append({"barcode": b, "has_identifier": True, "product_name": f"{fixture}-{n}",
+                             "department": f"D{fixture[1:]}", "shelf_price": 10.0, "delivery_price": None,
+                             "cost_price": 6.0, "cost_source": "pos", "recorded_stock": 10.0})
+            before[b] = {"shelf": 1 + (n % 2), "facings": int(rng.integers(1, 4))}
+            base[b] = float(rng.uniform(6, 15))
+    outcomes, arrangements = {}, {}
+    for fixture, day_index in zip(ARRANGED, arranged_at):
+        arranged_on = first + timedelta(days=day_index)
+        plan_date, plan_first, plan_last = _plan_window(arranged_on)
+        placements = {}
+        for n in range(1, PRODUCTS_PER_FIXTURE + 1):
+            b = barcode(fixture, n)
+            facings = int(rng.integers(1, 5))
+            if facings == before[b]["facings"]:
+                facings = facings % 4 + 1                 # every arranged product's space changes
+            shelf = 1 if n <= 3 else 2
+            placements[b] = {"shelf": shelf, "facings": facings, "eye_level": shelf == 1}
+            after[b] = (arranged_on, placements[b])
+        eid = entry_id("shelf.plan", None, f"{fixture}|{plan_date.isoformat()}")
+        arrangements[fixture] = arranged_on
+        outcomes[eid] = {"status": "acted", "reason": None, "at": 0, "snapshot": {
+            "signal_family": "shelf.plan", "capability": "shelf_plan", "barcode": None,
+            "characterisation": "shelf_plan", "fixture": fixture, "plan_date": plan_date.isoformat(),
+            "plan_window": {"first_day": plan_first.isoformat(), "last_day": plan_last.isoformat()},
+            "arranged_on": arranged_on.isoformat(), "placements": placements}}
+
+    sales = []
+    for t in range(days):
+        day = first + timedelta(days=t)
+        season = 1 + 0.2 * math.sin(2 * math.pi * t / 60)
+        for p in products:
+            b, fixture = p["barcode"], "F" + p["department"][1:]
+            state = before[b]
+            facings, eye = state["facings"], state["shelf"] == 1
+            if b in after and day > after[b][0]:
+                facings, eye = after[b][1]["facings"], after[b][1]["eye_level"]
+            lam = base[b] * season * facings ** TRUE_ELASTICITY * (EYE_LIFT if eye else 1.0)
+            if variant == "drifting" and fixture in ARRANGED:
+                lam *= math.exp(0.006 * t)                 # the arranged departments rise anyway
+            if variant == "rising" and b in after:
+                more = after[b][1]["facings"] > state["facings"]
+                lam *= math.exp((0.008 if more else -0.008) * t)
+            sales.append({"barcode": b, "day": day.isoformat(), "units": float(rng.poisson(lam)), "receipts": None})
+
+    body = "fixtures:\n"
+    for fixture in FIXTURES:
+        body += (f"  {fixture}:\n    departments: [D{fixture[1:]}]\n    chilled: false\n    eye_level_shelf: 1\n"
+                 f"    {STATED}\n    shelves:\n      - {{length_cm: 120, {MEASURED}}}\n      - {{length_cm: 120, {MEASURED}}}\n")
+    body += "widths:\n" + "".join(f'  "{p["barcode"]}": {{width_mm: 100, {MEASURED}}}\n' for p in products)
+    body += "current:\n" + "".join(
+        f'  "{b}": {{fixture: F{b[2:4]}, shelf: {s["shelf"]}, facings: {s["facings"]}, {MEASURED}}}\n'
+        for b, s in before.items())
+    import tempfile
+    from pathlib import Path
+    folder = Path(tmp_path) if tmp_path else Path(tempfile.mkdtemp())
+    (folder / "store_layout.yaml").write_text(body, encoding="utf-8")
+    layout = load_store_layout(folder / "store_layout.yaml", products)
+    owner = OwnerState.from_dict({"status": "available", "pulled_at": "2026-10-01T03:00:00Z", "outcomes": outcomes})
+    return {"products": products, "sales_daily": sales, "store_layout": layout, "owner": owner,
+            "run_at": RUN_AT, "arrangements": arrangements, "layout_text": body, "first_day": first}

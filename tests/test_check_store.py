@@ -36,7 +36,8 @@ def _empty_copy(tmp_path: Path):
     (tmp_path / "store_types.yaml").write_text(yaml.safe_dump(types), encoding="utf-8")
     return dict(store=store, today=date(2026, 10, 1), facts_path=tmp_path / "store_facts.yaml",
                 targets_path=tmp_path / "delivery_targets.yaml", store_types_path=tmp_path / "store_types.yaml",
-                snapshots_root=tmp_path / "snapshots", secret_names=set())
+                snapshots_root=tmp_path / "snapshots", secret_names=set(),
+                layout_path=tmp_path / "store_layout.yaml")
 
 
 def _by_key(items):
@@ -45,13 +46,14 @@ def _by_key(items):
 
 def test_an_empty_copy_is_missing_every_input(tmp_path):
     items = _by_key(readiness(**_empty_copy(tmp_path)))
-    for key in ("pos_export", "sales_monthly", "sales_daily", "store_facts", "client_venue", "nearby_venues"):
+    for key in ("pos_export", "sales_monthly", "sales_daily", "store_facts", "store_layout", "client_venue",
+                "nearby_venues"):
         assert items[key]["status"] == "missing", key
 
 
 def test_a_missing_input_names_what_it_blocks_from_the_registry(tmp_path):
     items = _by_key(readiness(**_empty_copy(tmp_path)))
-    assert items["sales_daily"]["blocks"] == ["order_quantity"]
+    assert items["sales_daily"]["blocks"] == ["order_quantity", "shelf_measurement", "shelf_plan"]
     assert items["store_facts"]["blocks"] == ["order_quantity"]
     assert "price_consistency" in items["pos_export"]["blocks"]
     assert "reconciliation" in items["sales_monthly"]["blocks"]
@@ -78,8 +80,9 @@ def test_this_copy_reports_what_it_holds():
     assert items["pos_export"]["status"] == "present"
     assert "2026-06-06" in items["pos_export"]["detail"]
     assert items["sales_monthly"]["status"] == "present"
-    assert items["sales_daily"]["status"] == "missing" and items["sales_daily"]["blocks"] == ["order_quantity"]
+    assert items["sales_daily"]["status"] == "missing" and items["sales_daily"]["blocks"] == ["order_quantity", "shelf_measurement", "shelf_plan"]
     assert items["store_facts"]["status"] == "missing"
+    assert items["store_layout"]["status"] == "missing"     # ADR-037: no store has recorded one yet
     assert items["client_venue"]["status"] == "present"
     assert items["venue_formats"]["status"] == "present"
 
@@ -102,3 +105,13 @@ def test_it_never_prints_a_secret_value():
     for value in env.values():
         if "sekret" in value:
             assert value not in output
+
+
+def test_a_store_layout_is_present_once_it_records_a_fixture(tmp_path):
+    kwargs = _empty_copy(tmp_path)
+    assert "is not committed" in _by_key(readiness(**kwargs))["store_layout"]["detail"]
+    (tmp_path / "store_layout.yaml").write_text("fixtures: {}\n", encoding="utf-8")
+    assert _by_key(readiness(**kwargs))["store_layout"]["status"] == "missing"
+    (tmp_path / "store_layout.yaml").write_text("fixtures:\n  F1: {}\n", encoding="utf-8")
+    item = _by_key(readiness(**kwargs))["store_layout"]
+    assert item["status"] == "present" and item["detail"].startswith("1 fixtures in")

@@ -92,7 +92,7 @@ def test_a_filled_copy_says_every_input_is_still_to_supply(copy):
     assert result.returncode == 0, result.stderr
     assert "Store: Store B (store-b)" in result.stdout
     for label in ("POS inventory export", "Monthly sales reports", "Daily sales reports",
-                  "Department order days", "The store's own entries", "Nearby venues collected"):
+                  "Department order days", "Shelf layout", "The store's own entries", "Nearby venues collected"):
         assert f"✗ {label}" in result.stdout, label
 
 

@@ -51,6 +51,12 @@ const ENGINE_REASONS = [
   'market_signal_stale',
   'boost_unavailable',
   'stale_daily_sales',
+  // Phase 8 Task 8.0, F12-S1: the layout file, the window, owner state, his arrangements
+  'no_store_layout',
+  'layout_all_rejected',
+  'no_evidence_window',
+  'owner_state_unavailable',
+  'no_arrangement_recorded',
   // run-level
   'capability_error',
 ]
@@ -101,6 +107,32 @@ describe('an unknown reason degrades to a sentence, not an identifier', () => {
       for (const reason of [...ENGINE_REASONS, 'not_a_real_reason']) {
         expect(unavailableReason(translate, reason)).not.toMatch(/^unavailable\./)
       }
+    }
+  })
+})
+
+describe('a capability may say a shared reason in its own words (F12-S1 FR-194)', () => {
+  it('reads unavailable.<capability>.<reason> first, and only for that capability', () => {
+    for (const language of Object.keys(DICTIONARIES)) {
+      const translate = createTranslator(language)
+      const dict = DICTIONARIES[language]
+      expect(unavailableReason(translate, 'no_daily_sales', 'shelf_plan')).toBe(dict['unavailable.shelf_plan.no_daily_sales'])
+      expect(unavailableReason(translate, 'no_daily_sales', 'order_quantity')).toBe(dict['unavailable.no_daily_sales'])
+      expect(unavailableReason(translate, 'no_daily_sales')).toBe(dict['unavailable.no_daily_sales'])
+    }
+  })
+
+  it('falls back to the shared sentence where the capability has none', () => {
+    const t = createTranslator('en')
+    expect(unavailableReason(t, 'no_store_layout', 'shelf_plan')).toBe(en['unavailable.no_store_layout'])
+    expect(unavailableReason(t, 'not_a_real_reason', 'shelf_plan')).toBe(en[UNKNOWN_REASON_KEY])
+  })
+
+  it('gives every scoped sentence a shared one in every language, so no scope is the only words', () => {
+    for (const [language, dict] of Object.entries(DICTIONARIES)) {
+      const scoped = Object.keys(dict).filter((k) => /^unavailable\.[a-z_]+\.[a-z_]+$/.test(k))
+      expect(scoped.length, language).toBeGreaterThan(0)
+      for (const key of scoped) expect(`unavailable.${key.split('.')[2]}` in dict, `${language} ${key}`).toBe(true)
     }
   })
 })

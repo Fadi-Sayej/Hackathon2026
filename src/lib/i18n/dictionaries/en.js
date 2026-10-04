@@ -203,6 +203,8 @@ export const en = {
   'outcome.failed': "We could not save your decision — it was not recorded.",
   'characterisation.confirmed_loss': "Confirmed loss",
   'characterisation.market_ran_out': "A store near you ran out of this. You don't sell it.",
+  // F12-S1 (Phase 8 Task 8.3): a fixture's plan entry. Shown only once Task 8.9 builds Shelf plan.
+  'characterisation.shelf_plan': "A plan for this shelf unit: what goes on each shelf, and how many facings.",
   'characterisation.question': "Outside your policy — intentional?",
   'characterisation.hygiene': "A record to fix",
   'characterisation.inconsistent': "Numbers that do not add up",
@@ -242,6 +244,16 @@ export const en = {
   'unavailable.no_daily_sales': "We are waiting for the daily sales reports: an order quantity needs sales per day.",
   'unavailable.stale_daily_sales': "The latest daily sales report is too old to size tonight's orders.",
   'unavailable.no_store_facts': "The store facts file is missing, so no order schedule or shelf life is known.",
+  // F12-S1 (Phase 8 Task 8.0). The capability-scoped keys say what the shared sentence
+  // would get wrong on Shelf plan (unavailableReason.js).
+  'unavailable.no_store_layout': "The shelf measurements have not been recorded yet.",
+  'unavailable.layout_all_rejected': "Every shelf unit in the layout file was rejected, so nothing can be planned. The reasons are listed on Store layout.",
+  'unavailable.no_evidence_window': "Daily sales reports are arriving, but not yet enough of them to plan on.",
+  'unavailable.owner_state_unavailable': "Your recorded decisions could not be read tonight, so nothing that depends on them is shown.",
+  'unavailable.no_arrangement_recorded': "No shelf has been marked as arranged yet.",
+  'unavailable.shelf_plan.no_daily_sales': "We are waiting for the daily sales reports: a shelf plan needs sales per day.",
+  'unavailable.shelf_plan.stale_daily_sales': "The latest daily sales report is too old to plan the shelves on.",
+  'unavailable.shelf_measurement.no_daily_sales': "We are waiting for the daily sales reports: measuring an arrangement needs sales per day.",
   'data.title': "Where the numbers came from",
   'data.none': "none",
   'data.hidden.title': "Items you hid",

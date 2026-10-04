@@ -429,7 +429,8 @@
             "catalogue.implausible_quantity",
             "margin.below_cost",
             "order.suggestion",
-            "assortment.market_ran_out"
+            "assortment.market_ran_out",
+            "shelf.plan"
           ]
         },
         "capability": {
@@ -462,7 +463,8 @@
             "review_policy",
             "check_purchase_cost",
             "place_order",
-            "try_product"
+            "try_product",
+            "arrange_shelf"
           ]
         },
         "characterisation": {
@@ -602,6 +604,48 @@
                   "listed_at",
                   "window",
                   "market_name"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "comment": "F12-S1 FR-192, ADR-038 (Phase 8 Task 8.3): a fixture's plan. It names a fixture, not a product, and never carries a value.",
+          "if": {
+            "properties": {
+              "signal_family": {
+                "const": "shelf.plan"
+              }
+            },
+            "required": [
+              "signal_family"
+            ]
+          },
+          "then": {
+            "properties": {
+              "action": {
+                "const": "arrange_shelf"
+              },
+              "value": {
+                "type": "null"
+              },
+              "barcode": {
+                "type": "null"
+              },
+              "product_name": {
+                "type": "null"
+              },
+              "department": {
+                "type": "null"
+              },
+              "evidence": {
+                "type": "object",
+                "required": [
+                  "fixture",
+                  "plan_date",
+                  "plan_window",
+                  "state",
+                  "shelves"
                 ]
               }
             }

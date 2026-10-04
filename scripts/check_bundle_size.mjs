@@ -45,7 +45,11 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const CEILING_KB = 925         // measured 922 KB on a fresh local build, 2026-10-03 (CI reads about 1 KB
+const CEILING_KB = 930         // measured 926 KB on a fresh local build, 2026-10-04 (CI reads about 1 KB
+                               // higher): F12's reasons in the owner's words (Phase 8 Task 8.0), eight
+                               // unavailable sentences and the plan's characterisation in three languages,
+                               // and the per-capability lookup that keeps Reorder's wording off Shelf plan:
+                               // main grew 4.4 KB. Before that it was 925, measured 922 KB on a fresh local build, 2026-10-03 (CI reads about 1 KB
                                // higher): email-and-password sign-in, Firebase's signInWithEmailAndPassword
                                // and sendPasswordResetEmail in its lazily loaded chunk, and ten strings in
                                // three languages. Before that it was 920, measured 917 KB on a fresh local build, 2026-10-03 (CI reads about 1 KB

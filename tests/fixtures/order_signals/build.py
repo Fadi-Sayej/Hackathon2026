@@ -7,6 +7,8 @@ what each product is for, which a directory of binary files cannot. `build(root)
 - silver POS tables for four products in one department, counted on 2026-08-24 (declared);
 - 28 daily sales reports ending 2026-08-26, with deliveries, and one monthly report;
 - the store facts for that department (Sundays, 30 days);
+- a shelf layout (F12, ADR-037): one fixture holding the department, two shelves, and widths for
+  two of the products, so the third stocked one has none;
 - 30 days of delivery-catalogue snapshots at Wolt Market, a store above the format floor;
 - the boost picks, sealed by the real live step with a fake model that picks 10%.
 
@@ -77,6 +79,19 @@ def _facts(path: Path) -> None:
                     "    stated_by: owner\n    stated_on: 2026-08-01\n    recorded_by: team\n", encoding="utf-8")
 
 
+def _layout(path: Path) -> None:
+    """One fixture, F1, holding the department. 7290003 is stocked and has no recorded width."""
+    measured = "measured_by: team, measured_on: 2026-08-01"
+    path.write_text(
+        "fixtures:\n  F1:\n"
+        f"    departments: [{DEPT}]\n    chilled: true\n    eye_level_shelf: 1\n"
+        "    stated_by: owner\n    stated_on: 2026-08-01\n    recorded_by: team\n"
+        f"    shelves:\n      - {{length_cm: 100, {measured}}}\n      - {{length_cm: 90, {measured}}}\n"
+        "widths:\n"
+        f'  "{BOOSTED}": {{width_mm: 80, {measured}}}\n  "{STEADY}": {{width_mm: 70, {measured}}}\n',
+        encoding="utf-8")
+
+
 def _snapshots(root: Path) -> None:
     import polars as pl
     first = RUN_AT.date() - timedelta(days=29)
@@ -99,7 +114,8 @@ def _snapshots(root: Path) -> None:
 
 def roots(root: Path) -> dict:
     return {"silver_dir": root / "silver", "daily_sales_dir": root / "daily", "sales_dir": root / "monthly",
-            "store_facts_path": root / "store_facts.yaml", "snapshots_root": root / "snapshots",
+            "store_facts_path": root / "store_facts.yaml", "store_layout_path": root / "store_layout.yaml",
+            "snapshots_root": root / "snapshots",
             "signals_dir": root / "signals", "matches_path": root / "matches.parquet"}
 
 
@@ -131,6 +147,7 @@ def build(root: Path) -> dict:
     _daily(paths["daily_sales_dir"])
     _monthly(paths["sales_dir"])
     _facts(paths["store_facts_path"])
+    _layout(paths["store_layout_path"])
     _snapshots(paths["snapshots_root"])
     saved = os.environ.get(KEY_ENV)
     os.environ[KEY_ENV] = "fixture-key"

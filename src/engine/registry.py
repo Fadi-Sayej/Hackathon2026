@@ -64,6 +64,18 @@ CAPABILITIES = {
     "assortment_gap":      CapabilitySpec("assortment_gap",      "F9-S1",    "none",     True,  "nights_ran_out",
                                           ("products", "running_out", "market_recent"),
                                           published_from="2026-09-29"),
+    # F12 (V4). The store's recorded shelves and what is missing from them. It needs no sales
+    # (D-30), and it is a page's facts, never one of Today's places (F12-S1 FR-192).
+    "layout_facts":        CapabilitySpec("layout_facts",        "F12-S1",   "none",     False, "fixture_order",
+                                          ("products", "store_layout"), published_from="2026-10-05"),
+    # F12 (V4). Each fixture's dated plan. It waits for daily sales the way F8 does (D-30), so
+    # the reports are an input like the layout; F8's freshness and window stop it as they stop F8.
+    "shelf_plan":          CapabilitySpec("shelf_plan",          "F12-S1",   "none",     False, "fixture_order",
+                                          ("products", "store_layout", "sales_daily"), published_from="2026-10-05"),
+    # F12 (V4). What his recorded arrangements changed, in units (FR-202 … FR-209). Owner state is
+    # not a registry input: its absence is the rule-level owner_state_unavailable, as F13's is.
+    "shelf_measurement":   CapabilitySpec("shelf_measurement",   "F12-S1",   "none",     False, "arranged_on",
+                                          ("products", "store_layout", "sales_daily"), published_from="2026-10-05"),
 }
 
 # The reason belongs to the missing input, not to the capability: catalogue_lifecycle with
@@ -88,6 +100,9 @@ INPUT_REASONS = {
     "sales_daily": "no_daily_sales",
     # ADR-033: the store facts file itself is absent (an empty one is a file with no facts).
     "store_facts": "no_store_facts",
+    # ADR-037: the layout file itself is absent. A new copy starts without it (ADR-036), so this
+    # is what a store says until the team records its first fixture.
+    "store_layout": "no_store_layout",
 }
 
 # Admitted capabilities that may never carry money (D-1). Their precedence for the three

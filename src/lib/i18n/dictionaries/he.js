@@ -204,6 +204,8 @@ export const he = {
   'outcome.failed': "לא הצלחנו לשמור — לא נרשם.",
   'characterisation.confirmed_loss': "הפסד ודאי",
   'characterisation.market_ran_out': "המוצר הזה אזל בחנות קרובה אליך. אצלך הוא לא נמכר.",
+  // F12-S1 (Phase 8 Task 8.3): a fixture's plan entry. Shown only once Task 8.9 builds Shelf plan.
+  'characterisation.shelf_plan': "תוכנית ליחידת המדפים הזו: מה מונח על כל מדף, וכמה פנים.",
   'characterisation.question': "מחוץ למדיניות שלך — בכוונה?",
   'characterisation.hygiene': "רשומה לתיקון",
   'characterisation.inconsistent': "מספרים שלא מסתדרים",
@@ -243,6 +245,16 @@ export const he = {
   'unavailable.no_daily_sales': "ממתינים לדוחות המכירות היומיים: כמות הזמנה דורשת מכירות לפי יום.",
   'unavailable.stale_daily_sales': "דוח המכירות היומי האחרון ישן מדי כדי לקבוע את ההזמנות של הלילה.",
   'unavailable.no_store_facts': "קובץ נתוני החנות חסר, ולכן לא ידועים לוח ההזמנות וחיי המדף.",
+  // F12-S1 (Phase 8 Task 8.0). The capability-scoped keys say what the shared sentence
+  // would get wrong on Shelf plan (unavailableReason.js).
+  'unavailable.no_store_layout': "מידות המדפים עדיין לא נרשמו.",
+  'unavailable.layout_all_rejected': "כל יחידות המדפים בקובץ התוכנית נדחו, ולכן אין מה לתכנן. הסיבות מופיעות בתוכנית החנות.",
+  'unavailable.no_evidence_window': "דוחות המכירות היומיים מגיעים, אבל עדיין אין מספיק מהם כדי לתכנן לפיהם.",
+  'unavailable.owner_state_unavailable': "לא ניתן היה לקרוא הלילה את ההחלטות שרשמת, ולכן לא מוצג דבר שתלוי בהן.",
+  'unavailable.no_arrangement_recorded': "עדיין לא סומן אף מדף כמסודר.",
+  'unavailable.shelf_plan.no_daily_sales': "ממתינים לדוחות המכירות היומיים: תוכנית מדף דורשת מכירות לפי יום.",
+  'unavailable.shelf_plan.stale_daily_sales': "דוח המכירות היומי האחרון ישן מדי כדי לתכנן לפיו את המדפים.",
+  'unavailable.shelf_measurement.no_daily_sales': "ממתינים לדוחות המכירות היומיים: מדידת סידור דורשת מכירות לפי יום.",
   'data.title': "מאיפה הגיעו המספרים",
   'data.none': "אין",
   'data.hidden.title': "פריטים שהסתרת",

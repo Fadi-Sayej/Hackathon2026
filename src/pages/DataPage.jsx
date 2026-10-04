@@ -168,7 +168,7 @@ export function DataPage({ artefact, ownerState, onRestore, now, readOnly = fals
         {Object.entries(capabilities).filter(([id]) => !NOT_YET_SHOWN.has(id)).map(([id, capability]) => (
           <li key={id} data-capability-status={id}>
             {t(`capability.${id}`)} — {capability.status === 'unavailable'
-              ? unavailableReason(t, capability.unavailable_reason)
+              ? unavailableReason(t, capability.unavailable_reason, id)
               : t('data.available')}
           </li>
         ))}
