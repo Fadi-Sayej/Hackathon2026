@@ -3,12 +3,12 @@ ID: F12-S1
 Title: Planogram — a dated shelf plan from his own sales, waiting for them until they arrive
 Status: Approved — by the repository owner, 2026-10-04
 Owner: smartshelf-architect
-Version: 0.8 (2026-10-04: D-32, the AI's explanation of each fixture's plan; FR-210 … FR-215 await approval as OQ-1209)
+Version: 0.8 (2026-10-04: D-32, the AI's explanation of each fixture's plan; FR-210 … FR-215 approved as OQ-1209)
 Parent: [F12 — Planogram](../intent.md)
 Related Intents: INT-006
 Inputs: [docs/features/F12-planogram/intent.md (Approved for specification, D-30), docs/product/PRD.md (§5 V4, §6 #7), docs/product/intent-register.md (D-1, D-3, D-13, D-14, D-15, D-16, D-22, D-23, D-28, D-29, D-30, D-31, D-32), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (§5 "He stocks", FR-143 … FR-146, FR-156), ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011, ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037, ADR-038, ADR-039, CLAUDE.md]
 Answered by: [System Design](../../../architecture/system-design.md) §21 (F12-S1)
-Updated: 2026-10-04 (D-32's explanation, for approval as OQ-1209; earlier the same day, approved with OQ-1208, and OQ-1204 and OQ-1207 answered with the plan)
+Updated: 2026-10-04 (D-32's explanation approved, OQ-1209; earlier the same day, approved with OQ-1208, and OQ-1204 and OQ-1207 answered with the plan)
 ---
 
 # F12-S1 — Planogram
@@ -18,9 +18,8 @@ Updated: 2026-10-04 (D-32's explanation, for approval as OQ-1209; earlier the sa
 > decided here, marked **(decided here)** and approved with the spec (OQ-1205, OQ-1208), or answered
 > with the Phase 8 plan (OQ-1204, OQ-1207, 2026-10-04).
 >
-> **FR-210 … FR-215 are not yet approved.** They specify D-32, the AI's explanation of each
-> shelf, which the owner asked for on 2026-10-04. They await his answer to OQ-1209. Everything
-> else in this spec stands approved.
+> **FR-210 … FR-215 specify D-32**, the AI's explanation of each fixture's plan, which the owner
+> asked for on 2026-10-04. He approved them the same day (OQ-1209).
 
 > **Identifier note.** Every `FR-`, `INV-`, `NFR-`, `AC-`, `SCN-`, `C-`, `ASM-` and `OQ-` id
 > below is new and globally unique: FR-178 … FR-215, INV-084 … INV-097, NFR-072 … NFR-077,
@@ -1012,8 +1011,9 @@ open question OQ-1208." The choices marked **(decided here)** in FR-201 … FR-2
 - a third capability, not on Today (FR-208);
 - the placebo, on both terms and over the same distance (FR-209).
 
-**OQ-1209** — Are the explanation's design choices right? D-32 settled that there is an AI
-explanation. These are the choices marked **(decided here)** in FR-210 … FR-214:
+**~~OQ-1209~~** — Are the explanation's design choices right? **Answered 2026-10-04: "approve"**,
+to "Do you approve the AI explanation as designed?", after being shown how it works, its model, its check, its reuse and its estimated
+cost. D-32 settled that there is an AI explanation. These are the choices marked **(decided here)** in FR-210 … FR-214:
 - one explanation per fixture's plan, written once a night, never on request (FR-210);
 - the model sees the plan's facts and order, and no amount (FR-211);
 - no digit outside product names, a looser check than the boost's, and a failing answer
@@ -1030,8 +1030,7 @@ It also asks:
   basis);
 - the monthly spend limit and its alert are his to set on the account (D-16);
 - the example's explanation is asked once, by the team, with his key: one request for each of
-  the example's fixtures, about five, which costs a few cents at ADR-039's estimate. · owner: the repository owner · blocks: building
-FR-210 … FR-215, not the rest of F12.
+  the example's fixtures, about five, which costs a few cents at ADR-039's estimate. · owner: the repository owner · blocks: nothing now.
 
 ## 18. Non-Goals
 

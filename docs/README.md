@@ -19,7 +19,7 @@ PRD                     what the product is, for whom, and what is out of scope
 2. [**Feature Intents**](features/) — `features/F#-*/intent.md`
 3. [**Approved Feature Specs**](features/) — `features/F#-*/specs/F#-S#-*.md`
 4. [**System Design**](architecture/system-design.md) — the single authoritative architecture
-5. [**ADRs**](architecture/decisions/) — ADR-001 … ADR-038
+5. [**ADRs**](architecture/decisions/) — ADR-001 … ADR-039
 6. [**Implementation Plan**](implementation/plan.md)
 7. **Code** — evidence of what exists, never product authority
 
@@ -56,7 +56,7 @@ globally unique across the specification layer and were **not** renumbered by th
 | F9 — Assortment Gap | [intent](features/F9-assortment-gap/intent.md) | [F9-S1](features/F9-assortment-gap/specs/F9-S1-assortment-gap.md) | V2 |
 | F10 — Expiry-Bounded Ordering | [intent](features/F10-expiry-bounded-ordering/intent.md) | *not specified* | V2 |
 | F11 — Supplier Lead Times | [intent](features/F11-supplier-lead-times/intent.md) | *not specified* | V3 |
-| F12 — Planogram | [intent](features/F12-planogram/intent.md) | [F12-S1](features/F12-planogram/specs/F12-S1-planogram.md) — approved 2026-10-04; D-32's explanation (FR-210 … FR-215) awaiting approval | V4 |
+| F12 — Planogram | [intent](features/F12-planogram/intent.md) | [F12-S1](features/F12-planogram/specs/F12-S1-planogram.md) — approved 2026-10-04, with D-32's explanation | V4 |
 | F13 — Pilot Measurement | [intent](features/F13-pilot-measurement/intent.md) | [F13-S1](features/F13-pilot-measurement/specs/F13-S1-pilot-measurement.md) — **`Blocked`** | V1 |
 
 Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](features/gaps-and-open-questions.md)
@@ -66,7 +66,7 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 
 - [**System Design**](architecture/system-design.md) — one document, system-level, answering
   all seven approved specs as one coherent system. Not owned by any feature.
-- [**ADRs**](architecture/decisions/) — ADR-001 … ADR-038, one file each.
+- [**ADRs**](architecture/decisions/) — ADR-001 … ADR-039, one file each.
 
 | ADR | Decision |
 |---|---|
@@ -108,9 +108,9 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 | [ADR-036](architecture/decisions/ADR-036-a-store-is-configuration-one-copy-per-store.md) | A store is configuration, and each store runs its own copy with only its own data — accepted 2026-09-30 |
 | [ADR-037](architecture/decisions/ADR-037-shelf-layout-is-a-committed-file.md) | The shelf layout, facing widths and arrangement rules are a committed file the team records — accepted 2026-10-04 |
 | [ADR-038](architecture/decisions/ADR-038-a-shelf-arrangement-is-an-outcome-on-the-fixtures-plan.md) | A shelf arrangement is the owner's "acted" outcome on that fixture's plan entry — accepted 2026-10-04 |
-| [ADR-039](architecture/decisions/ADR-039-a-shelf-explanation-is-a-pinned-models-answer-checked-and-sealed.md) | A shelf plan's explanation is a pinned model's answer, checked and sealed as the boost's is — `Ready for review` (F12-S1, D-32) |
+| [ADR-039](architecture/decisions/ADR-039-a-shelf-explanation-is-a-pinned-models-answer-checked-and-sealed.md) | A shelf plan's explanation is a pinned model's answer, checked and sealed as the boost's is — accepted 2026-10-04 (F12-S1, D-32) |
 
-ADR-001 … ADR-038 are `Accepted`; ADR-037 and ADR-038 were the last, on 2026-10-04, with F12-S1. ADR-022 amends a sentence of ADR-019 and was accepted on 2026-09-13, after the defect it fixes was verified end to end: `entry_id` falls back to `product_name`, and `compose.js` skips any entry whose id carries a settled outcome, so two barcode-less rows sharing a name settled together on the owner's screen. ADR-020 was accepted on 2026-09-13 **conditional on GAP-009**:
+ADR-001 … ADR-039 are `Accepted`; ADR-037, ADR-038 and ADR-039 were the last, on 2026-10-04, with F12-S1. ADR-022 amends a sentence of ADR-019 and was accepted on 2026-09-13, after the defect it fixes was verified end to end: `entry_id` falls back to `product_name`, and `compose.js` skips any entry whose id carries a settled outcome, so two barcode-less rows sharing a name settled together on the owner's screen. ADR-020 was accepted on 2026-09-13 **conditional on GAP-009**:
 `published_population: whole` is the right value while that question is open, and becomes
 `living` when it closes.
 

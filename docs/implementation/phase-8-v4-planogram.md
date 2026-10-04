@@ -1,10 +1,10 @@
 ---
 ID: PLAN-PHASE-8
 Title: Phase 8 — V4, F12 Planogram (F12-S1)
-Status: Approved — by the repository owner, 2026-10-04 ("yes"): Tasks 8.0–8.9, as shown, with their values. Task 8.10, added for D-32 in the same answer, is Ready for review until F12-S1 OQ-1209 is answered
+Status: Approved — by the repository owner, 2026-10-04 ("yes"): Tasks 8.0–8.9, as shown, with their values. Task 8.10, added for D-32 in the same answer, was approved with F12-S1 OQ-1209 ("approve"), the same day
 Owner: smartshelf-architect
 Parent: [Implementation plan](plan.md)
-Inputs: [docs/features/F12-planogram/specs/F12-S1-planogram.md (Approved 2026-10-04), ADR-037 and ADR-038 (Accepted 2026-10-04), D-32, ADR-032, ADR-035, ADR-039 (Ready for review), src/engine/market_boost.py, ADR-009, ADR-014, ADR-016, ADR-029, ADR-030, ADR-036, D-29, D-30, D-31, src/engine/order_evidence.py, src/engine/store_facts.py, src/engine/registry.py, src/engine/model.py, src/engine/publish.py, src/common/store.py, src/common/store_readiness.py, src/surface/compose.js, src/owner/ownerState.js, src/App.jsx, scripts/check_order_signals.py, scripts/build_order_example.py, src/lib/dataAdapters/loadOrderExample.js]
+Inputs: [docs/features/F12-planogram/specs/F12-S1-planogram.md (Approved 2026-10-04), ADR-037 and ADR-038 (Accepted 2026-10-04), D-32, ADR-032, ADR-035, ADR-039 (Accepted 2026-10-04), src/engine/market_boost.py, ADR-009, ADR-014, ADR-016, ADR-029, ADR-030, ADR-036, D-29, D-30, D-31, src/engine/order_evidence.py, src/engine/store_facts.py, src/engine/registry.py, src/engine/model.py, src/engine/publish.py, src/common/store.py, src/common/store_readiness.py, src/surface/compose.js, src/owner/ownerState.js, src/App.jsx, scripts/check_order_signals.py, scripts/build_order_example.py, src/lib/dataAdapters/loadOrderExample.js]
 Updated: 2026-10-04 (approved; D-32 adds Task 8.10)
 ---
 
@@ -17,7 +17,7 @@ Updated: 2026-10-04 (approved; D-32 adds Task 8.10)
 - his "I've arranged this shelf" record (ADR-038);
 - the probe;
 - the marked example (D-31);
-- the AI's explanation of each fixture's plan (D-32), once he approves its design (F12-S1 OQ-1209);
+- the AI's explanation of each fixture's plan (D-32, approved as F12-S1 OQ-1209);
 - after he approves their mockups, the Store layout and Shelf plan pages.
 
 **On real data, every F12 capability is unavailable when it ends.** There is no store
@@ -86,7 +86,7 @@ under `shelf:`, and the artefact publishes every one.
 | 8.6 | 8.5 | The probe |
 | 8.7 | 8.3 | The marked example |
 | 8.8 | 8.7 | Mockups for the owner's approval |
-| 8.10 | 8.3; F12-S1 OQ-1209 approved | The AI's explanation of each fixture's plan (D-32) |
+| 8.10 | 8.3 | The AI's explanation of each fixture's plan (D-32) |
 | 8.9 | 8.8 approved | The two pages |
 
 ### Task 8.0: The browser guard, the reason words and the publication dates (AC-187)
@@ -374,7 +374,7 @@ There is no arithmetic in the browser (ADR-001).
 
 ### Task 8.10: The AI's explanation of each fixture's plan (D-32; FR-210 … FR-215)
 
-**Built only after the owner approves F12-S1 OQ-1209.**
+**Approved with F12-S1 OQ-1209 on 2026-10-04.**
 
 **Files:**
 - `src/engine/model_client.py`: the request (its token limit now a parameter), the transport,
@@ -411,7 +411,7 @@ What it does:
   - `shelf.explanation_max_chars: 600`;
   - `shelf.explanation_max_tokens: 1200`.
 
-  All four are provisional (OQ-1209).
+  All four are provisional, as approved with OQ-1209.
 - **Words** for `no_model_key` and the three "no explanation" reasons: withheld, out of date,
   not written tonight.
 
@@ -431,8 +431,7 @@ What it does:
    `shelf_explanation`, comes with Task 8.10.
 2. **Probe and example:** Tasks 8.6 and 8.7.
 3. **Pages:** Task 8.9, after Task 8.8's approval.
-4. **Explanation:** Task 8.10, once OQ-1209 is approved. It is a pull request of its own, so it
-   never holds up the others.
+4. **Explanation:** Task 8.10. It is a pull request of its own, so it never holds up the others.
 
 ## Checkpoint 8
 
@@ -443,5 +442,5 @@ What it does:
   (Task 8.9).
 - The provisional values above are in `configs/policy.yaml` as approved, and published.
 
-**Task 8.10, once OQ-1209 is approved:** merged, and covered by `check:signals`. On real data
+**Task 8.10:** merged, and covered by `check:signals`. On real data
 `shelf_explanation` is `no_store_layout` like the rest, and the other three are unchanged by it.
