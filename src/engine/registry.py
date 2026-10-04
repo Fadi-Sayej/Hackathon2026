@@ -76,6 +76,11 @@ CAPABILITIES = {
     # not a registry input: its absence is the rule-level owner_state_unavailable, as F13's is.
     "shelf_measurement":   CapabilitySpec("shelf_measurement",   "F12-S1",   "none",     False, "arranged_on",
                                           ("products", "store_layout", "sales_daily"), published_from="2026-10-05"),
+    # F12 (V4, D-32). The AI's explanation of each fixture's plan, sealed nightly (ADR-039). Its
+    # own capability, so a missing key never touches the plan (ADR-014, INV-096).
+    "shelf_explanation":   CapabilitySpec("shelf_explanation",   "F12-S1",   "none",     False, "fixture_order",
+                                          ("products", "store_layout", "sales_daily", "shelf_explanations"),
+                                          published_from="2026-10-06"),
 }
 
 # The reason belongs to the missing input, not to the capability: catalogue_lifecycle with
@@ -103,6 +108,9 @@ INPUT_REASONS = {
     # ADR-037: the layout file itself is absent. A new copy starts without it (ADR-036), so this
     # is what a store says until the team records its first fixture.
     "store_layout": "no_store_layout",
+    # ADR-039: no explanations were sealed for the night. A live run with a key always seals a
+    # manifest, so the only night without one is a night with no key, as with the boost.
+    "shelf_explanations": "no_model_key",
 }
 
 # Admitted capabilities that may never carry money (D-1). Their precedence for the three

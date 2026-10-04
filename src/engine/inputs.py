@@ -59,6 +59,8 @@ class EngineInputs:
     market_recent: Optional[dict] = None
     # ADR-037: {fixtures, widths, current, rules, assigned, rejected}; None when the file is absent.
     store_layout: Optional[dict] = None
+    # ADR-039: the night's sealed explanations, {on_day, explanations, manifest}; None when none.
+    shelf_explanations: Optional[dict] = None
 
 
 def _rows(path: Path) -> Optional[list]:
@@ -326,6 +328,9 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
     # without the file (STARTS_WITHOUT), and an absent file is the missing input no_store_layout.
     store_layout = (load_store_layout(store_layout_path, products or [])
                     if Path(store_layout_path).exists() else None)
+    # ADR-039 Decision 5: read like the boost's picks, from the night the plan is dated (the run's).
+    from src.engine.shelf_explanation import read as read_explanations   # local: it imports this module
+    shelf_explanations = read_explanations(snapshots_root, run_at.date().isoformat())
     monthly = _rows(silver_dir / "sales_monthly.parquet")
     # ADR-030. The importer writes this table only when a daily report parsed, and removes an
     # older one when none did, so its absence is the honest "nothing has arrived yet".
@@ -400,14 +405,15 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
                          for k in ("months", "first", "last", "full_annual_cycle", "reconcile_before")}
     digest = _digest(products, summary_rows, monthly, observations, matches, policy, owner,
                      reconcile_before, sales_daily, store_facts, running_out, boost_picks, market_recent,
-                     store_layout)
+                     store_layout, shelf_explanations)
     return EngineInputs(products=products, inventory=inventory or None,
                         sales_monthly=monthly, sales_daily=sales_daily, sales_summary=summary, window=window,
                         observations=observations, matches=matches, stores=stores, withdrawn=None, idle=None, conflicting=conflicting,
                         store_facts=store_facts, running_out=running_out, boost_picks=boost_picks,
                         inputs_digest=digest,
                         vintages=vintages, owner=owner, policy=policy, run_at=run_at,
-                        market_recent=market_recent, store_layout=store_layout)
+                        market_recent=market_recent, store_layout=store_layout,
+                        shelf_explanations=shelf_explanations)
 
 
 # When a row was imported is not what the row says. `sales_import` rewrites its tables on
@@ -432,7 +438,7 @@ def _digest(products, summary_rows, monthly, observations, matches, policy, owne
             reconcile_before: Optional[str], sales_daily: Optional[list] = None,
             store_facts: Optional[dict] = None, running_out: Optional[dict] = None,
             boost_picks: Optional[dict] = None, market_recent: Optional[dict] = None,
-            store_layout: Optional[dict] = None) -> str:
+            store_layout: Optional[dict] = None, shelf_explanations: Optional[dict] = None) -> str:
     """A hex digest over the CONTENT the run read, not over the files it read them from.
 
     Content, because a parquet rewritten with identical rows is the same input and must
@@ -486,6 +492,9 @@ def _digest(products, summary_rows, monthly, observations, matches, policy, owne
     # with the store facts, rejected entries are not facts, so only what is used is digested.
     feed("store_layout", None if store_layout is None else
          [{k: store_layout[k]} for k in ("fixtures", "widths", "current", "rules", "assigned")])
+    # ADR-039: a sealed explanation is an input like a sealed pick, so the live run (which reloads
+    # after sealing) and a reproduction digest the same text.
+    feed("shelf_explanations", None if shelf_explanations is None else shelf_explanations["explanations"])
     feed("observations", observations)
     feed("matches", matches)
     feed("policy", policy.as_dict())

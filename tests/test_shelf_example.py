@@ -64,6 +64,11 @@ def test_it_shows_the_kinds_of_plan_the_page_can_show(example):
     assert caps["shelf_plan"]["elasticity"]["source"] == "research"
     # No arrangement yet, as at a new store: the measurement waits, and says why.
     assert caps["shelf_measurement"]["unavailable_reason"] == "no_arrangement_recorded"
+    # FR-215: until the team seals its explanation by hand with the key, each plan says it has
+    # not been written, never "no model key".
+    explanation = caps["shelf_explanation"]
+    assert explanation["status"] == "available"
+    assert {e["why_none"] for e in explanation["explanations"]} <= {"not_written_tonight", None}
 
 
 def test_nothing_but_the_preview_reads_it():

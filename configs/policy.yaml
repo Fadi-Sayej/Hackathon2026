@@ -149,3 +149,10 @@ shelf:
   min_products: 40              # a judgement: about five arranged products an arrangement
   bootstrap_draws: 1000
   bootstrap_seed: 20261004      # fixed, so print mode and npm run figures reproduce the interval
+  # F12-S1 FR-210 … FR-215: the AI's explanation of each fixture's plan (D-32; approved with
+  # OQ-1209 on 2026-10-04, ADR-039). Provisional. The model is the boost's (boost.model).
+  explanation_prompt: configs/prompts/shelf_explanation.v1.md
+  explanation_request_ceiling: 40   # a night, counted across the night's runs
+  explanation_time_budget_s: 300    # checked before each request; the step ends within ~300 + 61 s
+  explanation_max_chars: 600        # a language
+  explanation_max_tokens: 1200      # three languages; the boost's 300 would cut them off

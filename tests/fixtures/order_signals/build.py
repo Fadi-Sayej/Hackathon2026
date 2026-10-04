@@ -136,6 +136,18 @@ class FakeModel:
         return 200, json.dumps({"content": [{"type": "text", "text": self.answer}]}).encode()
 
 
+EXPLANATION = ('{"he": "המוצרים שמרוויחים הכי הרבה לכל סנטימטר עומדים בגובה העיניים.", '
+               '"ar": "المنتجات التي تربح أكثر لكل سنتيمتر في مستوى النظر.", '
+               '"en": "The products that earn the most per centimetre stand at eye level."}')
+
+
+class FakeExplainer(FakeModel):
+    """Answers every shelf-explanation request with one valid explanation (ADR-039), and counts them."""
+
+    def __init__(self, answer: str = EXPLANATION):
+        super().__init__(answer)
+
+
 def build(root: Path) -> dict:
     """Write the world under `root`, seal tonight's picks through the live step, return its paths."""
     import os
@@ -153,7 +165,7 @@ def build(root: Path) -> dict:
     os.environ[KEY_ENV] = "fixture-key"
     try:
         run_mod.run_engine(mode="publish", skip_market=True, now=RUN_AT, artefact_path=root / "out" / "dashboard.json",
-                           boost_transport=FakeModel(), **paths)
+                           boost_transport=FakeModel(), explanation_transport=FakeExplainer(), **paths)
     finally:
         if saved is None:
             os.environ.pop(KEY_ENV, None)

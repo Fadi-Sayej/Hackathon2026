@@ -14,6 +14,7 @@ fixture world, and the PUBLISHED artefact is read, never a capability's return v
 | an answered disagreement | it is not raised again (D-20) |
 | the layout file | F12's layout_facts and shelf_plan unavailable (no_store_layout); without the report days the layout stays available and the plan does not (F12-S1 §20) |
 | one product's width | the plan does not place it, and names it under "no width" (F12-S1 INV-086) |
+| the sealed explanations | shelf_explanation unavailable (no_model_key), and every plan exactly as before: the explanation is text beside the plan, never an input to it (ADR-039, INV-096) |
 | his arrangement records | over the planogram world: shelf_measurement unavailable (no_arrangement_recorded), the plan still published on the research value, saying why (FR-206, FR-208) |
 | the owner-state pull | the same, as owner_state_unavailable: his arrangements are never read as absent (rule 10) |
 | every fixture arranged at once | no net change published: there is no unchanged fixture to compare with (INV-092) |
@@ -98,6 +99,20 @@ def baseline_problems(art: dict) -> list:
         out.append("the baseline publishes no layout, so withholding the layout file proves nothing for F12")
     if not _placed(art, world.BOOSTED):
         out.append("the baseline plan does not place 7290001, so withholding its width proves nothing")
+    explained = _cap(art, "shelf_explanation")
+    if explained["status"] != "available" or not any(e.get("text") for e in explained.get("explanations") or []):
+        out.append("the baseline explains no plan, so withholding the sealed explanations proves nothing")
+    return out
+
+
+def withheld_explanations_problems(art: dict, baseline: dict) -> list:
+    out = []
+    cap = _cap(art, "shelf_explanation")
+    if cap["status"] != "unavailable" or cap["unavailable_reason"] != "no_model_key":
+        out.append(f"without the sealed explanations shelf_explanation published {cap['status']} "
+                   f"({cap['unavailable_reason']}): an explanation came from no model (ADR-039)")
+    if _cap(art, "shelf_plan")["entries"] != _cap(baseline, "shelf_plan")["entries"]:
+        out.append("without the sealed explanations the plan changed: the explanation was read back into it (INV-096)")
     return out
 
 
@@ -324,6 +339,12 @@ def probe(tmp: Path) -> tuple:
                               if f'"{world.BOOSTED}"' not in line), encoding="utf-8")
     problems += withheld_width_problems(_run(paths)[0], world.BOOSTED)
     done.append("withholding one width        → that product is not placed, and is named")
+
+    paths = _copy(built, tmp / "no_explanations")
+    for folder in paths["snapshots_root"].glob("*/shelf_explanations"):
+        shutil.rmtree(folder)
+    problems += withheld_explanations_problems(_run(paths)[0], baseline)
+    done.append("withholding the explanations → shelf_explanation unavailable (no_model_key), plans unchanged")
 
     problems += _shelf_cases(tmp, done)
 

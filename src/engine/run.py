@@ -38,8 +38,8 @@ MATCHES_PATH = MATCHING_ROOT / "product_matches.parquet"
 def _runners() -> dict:
     from src.engine import (assortment_gap, catalogue_lifecycle, competitor_position, layout_facts,
                             margin_below_cost, market_boost, market_running_out, order_quantity,
-                            owner_questions, price_consistency, reconciliation, shelf_measurement,
-                            shelf_plan)
+                            owner_questions, price_consistency, reconciliation, shelf_explanation,
+                            shelf_measurement, shelf_plan)
     return {"catalogue_lifecycle": catalogue_lifecycle.run, "price_consistency": price_consistency.run,
             "reconciliation": reconciliation.run, "hygiene": reconciliation.run_hygiene,
             "competitor_position": competitor_position.run,
@@ -49,7 +49,7 @@ def _runners() -> dict:
             "market_running_out": market_running_out.run, "market_boost": market_boost.run,
             "order_quantity": order_quantity.run, "assortment_gap": assortment_gap.run,
             "layout_facts": layout_facts.run, "shelf_measurement": shelf_measurement.run,
-            "shelf_plan": shelf_plan.run}
+            "shelf_plan": shelf_plan.run, "shelf_explanation": shelf_explanation.run}
 
 
 DEFAULT_RUNNERS: dict = {}          # populated lazily by run_engine
@@ -132,6 +132,16 @@ def _store_layout_verdict(store_layout) -> tuple:
         f"{r['kind']} {r['key'] if r['key'] is not None else 'the file'} ({r['reason']})" for r in rejected)
 
 
+def _explanation_verdict(result) -> tuple:
+    """ADR-039: like the boost, optional. Its absence never degrades the run; a request that failed
+    is said here, and each fixture says it to the owner (FR-214)."""
+    if not result:
+        return "ok", None
+    if result.get("error"):
+        return "degraded", f"the model was not asked again tonight: {result['error']}"
+    return "ok", None
+
+
 def _boost_verdict(result) -> tuple:
     """ADR-032 Decision 6: the boost is an optional input, so its absence never degrades the
     run. The step still says what happened, and the capability says it to the owner."""
@@ -211,7 +221,8 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
                signals_dir: Optional[Path] = None, matches_path: Optional[Path] = None,
                catalogue_path: Optional[Path] = None, daily_sales_dir: Optional[Path] = None,
                store_facts_path: Optional[Path] = None, snapshots_root: Optional[Path] = None,
-               boost_transport=None, store_layout_path: Optional[Path] = None) -> dict:
+               boost_transport=None, store_layout_path: Optional[Path] = None,
+               explanation_transport=None) -> dict:
     # Resolved here, not in the signature: a default bound at import time cannot be
     # redirected by a caller that patches the module global, which is how Task 1.9
     # runs the engine over a copy of the data with an input withheld.
@@ -270,6 +281,18 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
             transport=boost_transport or market_boost.urllib_transport, now=now), verdict=_boost_verdict)
         if boost and boost.get("wrote"):
             inputs = _step(steps, "load_inputs_with_picks", lambda: load_inputs(
+                policy=policy, owner=owner, run_at=now, silver_dir=silver_dir, signals_dir=signals_dir,
+                matches_path=matches_path, **sources)) or inputs
+        # ADR-039: the same for the shelf explanations, after the plan they explain. It asks only
+        # with the key; print mode never gets here, and reads the night's snapshot instead.
+        from src.engine import shelf_explanation
+        from src.engine.model_client import KEY_ENV, urllib_transport
+        explained = _step(steps, "shelf_explanation", lambda: shelf_explanation.live_step(
+            inputs, snapshots_root=snapshots_root or EXTERNAL_SNAPSHOTS_ROOT,
+            key=os.environ.get(KEY_ENV) or None,
+            transport=explanation_transport or urllib_transport, now=now), verdict=_explanation_verdict)
+        if explained and explained.get("wrote"):
+            inputs = _step(steps, "load_inputs_with_explanations", lambda: load_inputs(
                 policy=policy, owner=owner, run_at=now, silver_dir=silver_dir, signals_dir=signals_dir,
                 matches_path=matches_path, **sources)) or inputs
     outputs: list[CapabilityOutput] = []

@@ -59,7 +59,9 @@ _F8_WORDING = {"sales_daily": "report days", "running_out": "market snapshots",
                # F9-S1: the same snapshots, withheld in the same case (AC-165).
                "market_recent": "F9's assortment gap goes unavailable",
                # F12-S1 §20 (Phase 8 Task 8.2).
-               "store_layout": "the layout file"}
+               "store_layout": "the layout file",
+               # Task 8.10 (ADR-039).
+               "shelf_explanations": "the sealed explanations"}
 
 
 def test_the_f8_probe_withholds_each_input_exempted_to_it():

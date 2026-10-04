@@ -265,17 +265,18 @@ describe('Phase 8 Task 8.0 — the F12 capabilities reach no screen before their
     layout_facts: cap([], { status: 'unavailable', unavailable_reason: 'no_store_layout' }),
     shelf_plan: cap([entry({ capability: 'shelf_plan', signal_family: 'shelf.plan', barcode: null })]),
     shelf_measurement: cap([], { status: 'unavailable', unavailable_reason: 'no_arrangement_recorded' }),
+    shelf_explanation: cap([], { status: 'unavailable', unavailable_reason: 'no_model_key' }),
   })
 
-  it('keeps all three F12 ids off Today for good, and off every screen until their pages exist', () => {
+  it('keeps every F12 id off Today for good, and off every screen until their pages exist', () => {
     for (const id of Object.keys(f12())) {
       expect(NOT_ON_TODAY.has(id)).toBe(true)
       expect(NOT_YET_SHOWN.has(id)).toBe(true)
     }
     expect([...NOT_ON_TODAY].sort()).toEqual(['layout_facts', 'market_boost', 'market_running_out',
-      'order_quantity', 'shelf_measurement', 'shelf_plan'])
+      'order_quantity', 'shelf_explanation', 'shelf_measurement', 'shelf_plan'])
     expect([...NOT_YET_SHOWN].sort()).toEqual(['layout_facts', 'market_boost', 'market_running_out',
-      'shelf_measurement', 'shelf_plan'])
+      'shelf_explanation', 'shelf_measurement', 'shelf_plan'])
   })
 
   it('composes an artefact carrying them exactly as one without them', () => {

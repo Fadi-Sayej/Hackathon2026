@@ -20,7 +20,7 @@ const NOT_ENTRIES = new Set(['owner_questions'])
 // saying "waiting for daily sales" every morning would be the day's first thing to read.
 export const NOT_ON_TODAY = new Set(['order_quantity', 'market_running_out', 'market_boost',
   // F12-S1 FR-192: the planogram is a page he opens, never one of Today's places.
-  'layout_facts', 'shelf_plan', 'shelf_measurement'])
+  'layout_facts', 'shelf_plan', 'shelf_measurement', 'shelf_explanation'])
 
 // Phase 5 Task 5.0: published before any screen for it existed, so kept off every screen.
 // Task 5.13 took `order_quantity` off (Reorder renders it whole, and Data names it). The market
@@ -30,7 +30,7 @@ export const NOT_ON_TODAY = new Set(['order_quantity', 'market_running_out', 'ma
 // Phase 8 Task 8.0: F12's capabilities, until Task 8.9 builds their pages on the owner's
 // approval of the mockups (F12-S1 C-75).
 export const NOT_YET_SHOWN = new Set(['market_running_out', 'market_boost',
-  'layout_facts', 'shelf_plan', 'shelf_measurement'])
+  'layout_facts', 'shelf_plan', 'shelf_measurement', 'shelf_explanation'])
 
 const SETTLED = new Set(['acted', 'declined'])
 

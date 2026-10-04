@@ -219,6 +219,70 @@
     },
     "without_width_counts": "planned"
    },
+   "shelf_explanation": {
+    "counts": {
+     "explained": 0,
+     "not_written_tonight": 3,
+     "out_of_date": 0,
+     "requests_made": 0,
+     "reused": 0,
+     "withheld": 0
+    },
+    "entries": [],
+    "explanations": [
+     {
+      "fixture": "מקרר",
+      "model": null,
+      "plan_entry_id": "fe0dfe4b4e3ead10",
+      "prompt": null,
+      "reused_from": null,
+      "text": null,
+      "why_none": "not_written_tonight",
+      "withheld_because": null
+     },
+     {
+      "fixture": "מדף יבש",
+      "model": null,
+      "plan_entry_id": "4fb6de5debb0427d",
+      "prompt": null,
+      "reused_from": null,
+      "text": null,
+      "why_none": "not_written_tonight",
+      "withheld_because": null
+     },
+     {
+      "fixture": "ניקיון",
+      "model": null,
+      "plan_entry_id": "76d50fc14de2e814",
+      "prompt": null,
+      "reused_from": null,
+      "text": null,
+      "why_none": "not_written_tonight",
+      "withheld_because": null
+     }
+    ],
+    "id": "shelf_explanation",
+    "notes": [],
+    "plan_date": "2026-08-27",
+    "requires": [
+     "products",
+     "store_layout",
+     "sales_daily",
+     "shelf_explanations"
+    ],
+    "spec": "F12-S1",
+    "status": "available",
+    "thresholds": {
+     "max_chars": 600,
+     "max_tokens": 1200,
+     "model": "claude-sonnet-5",
+     "prompt": "configs/prompts/shelf_explanation.v1.md",
+     "request_ceiling": 40,
+     "time_budget_s": 300
+    },
+    "unavailable_reason": null,
+    "window": null
+   },
    "shelf_measurement": {
     "counts": {},
     "entries": [],
@@ -718,6 +782,14 @@
    },
    "published_population": "whole",
    "question_limit": 3,
+   "shelf_explanation": {
+    "max_chars": 600,
+    "max_tokens": 1200,
+    "model": "claude-sonnet-5",
+    "prompt": "configs/prompts/shelf_explanation.v1.md",
+    "request_ceiling": 40,
+    "time_budget_s": 300
+   },
    "shelf_measurement": {
     "bootstrap_draws": 1000,
     "bootstrap_seed": 20261004,

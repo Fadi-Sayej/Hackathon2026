@@ -181,7 +181,7 @@ jobs:
                   print(f"::warning::step {s['step']} {s['status']} {s.get('error') or ''}")
           PY
 
-      - name: Commit tonight's boost picks
+      - name: Commit tonight's boost picks and shelf explanations
         # ADR-035 Decision 2. The model's picks are paid for, and asking again would not give
         # the same answers, so they are sealed as a snapshot here: after the engine and BEFORE
         # the blocking probes, so a probe that fails never throws away what was bought. The
@@ -191,17 +191,21 @@ jobs:
         # data/external/ is ignored, so the add is forced, and it names only the picks: the
         # engine also rewrote silver/, which rule 9 keeps out of git. With no key there are no
         # picks, the add matches nothing, and the step does nothing.
+        #
+        # ADR-039 Decision 5: the shelf explanations are paid for the same way and sealed the same
+        # way, so this step takes them too. No key or no plan: nothing to add.
         if: always() && steps.engine.outcome != 'cancelled'
         run: |
           git config user.name  "smartshelf-collector"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -f -- ':(glob)data/external/snapshots/*/boost_picks/*.json' 2>/dev/null || true
+          git add -f -- ':(glob)data/external/snapshots/*/shelf_explanations/*.json' 2>/dev/null || true
           if git diff --cached --quiet; then
-            echo "No boost picks to commit."
+            echo "No boost picks or shelf explanations to commit."
             exit 0
           fi
           DAY=$(date -u +%Y-%m-%d)
-          git commit -q -m "snapshot: boost picks for ${DAY}"
+          git commit -q -m "snapshot: boost picks and shelf explanations for ${DAY}"
           git pull --rebase --autostash origin main || true
           git push origin HEAD:main
 

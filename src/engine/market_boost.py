@@ -30,14 +30,10 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-import re
-import time
-import urllib.error
-import urllib.request
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import Callable, Optional, Tuple
+from typing import Optional, Tuple
 
 from src.engine.inputs import EngineInputs
 from src.engine.market_running_out import is_stale
@@ -48,21 +44,15 @@ from src.engine.registry import derive_status
 CAP, SPEC = "market_boost", "F8-S1"
 ROOT = Path(__file__).resolve().parents[2]
 
-KEY_ENV = "SMARTSHELF_ANTHROPIC_API_KEY"
-API_URL = "https://api.anthropic.com/v1/messages"
-API_VERSION = "2023-06-01"
-TIMEOUT_S = 30.0
 MAX_TOKENS = 300
 MAX_REASON_CHARS = 160
-RETRY_PAUSE_S = 1.0
-# D-16's figure check: Western, Arabic-Indic and Extended Arabic-Indic digits.
-DIGIT = re.compile(r"[0-9٠-٩۰-۹]")
+# ADR-039 Decision 3: the request, the key, the figure check and the digest are shared with the
+# shelf explanation, and live in model_client. These names stay here for the boost's readers.
+from src.engine.model_client import (DIGIT, KEY_ENV, ModelUnavailable, Transport,  # noqa: E402
+                                     facts_digest, urllib_transport)
+from src.engine.model_client import ask as _ask  # noqa: E402
 
-Transport = Callable[[str, dict, bytes, float], Tuple[int, bytes]]
-
-
-class BoostUnavailable(Exception):
-    """The model could not be asked: no answer, or not one the API recognises as an answer."""
+BoostUnavailable = ModelUnavailable
 
 
 # ── Who is asked ─────────────────────────────────────────────────────────────
@@ -115,51 +105,11 @@ def candidates(inputs: EngineInputs) -> list:
     return [facts for _units, facts in out]
 
 
-def facts_digest(facts: dict) -> str:
-    """What a pick was an answer to. A pick is replayed only onto the same facts."""
-    return hashlib.sha256(json.dumps(facts, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()
-
-
 # ── Asking ───────────────────────────────────────────────────────────────────
 
-def urllib_transport(url: str, headers: dict, body: bytes, timeout: float) -> Tuple[int, bytes]:
-    request = urllib.request.Request(url, data=body, headers=headers, method="POST")
-    try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:     # noqa: S310 — fixed https URL
-            return response.status, response.read()
-    except urllib.error.HTTPError as err:
-        return err.code, err.read()
-
-
 def ask(payload: dict, *, model: str, key: str, transport: Transport) -> str:
-    """One Messages API call, with one retry for a transport failure, a 429 or a 5xx.
-
-    No sampling parameter is sent: current models reject `temperature`, and determinism
-    comes from the recorded pick, not from the call (ADR-032 Decision 2).
-    """
-    body = json.dumps({"model": model, "max_tokens": MAX_TOKENS, "system": payload["system"],
-                       "messages": [{"role": "user", "content": payload["user"]}]},
-                      ensure_ascii=False).encode("utf-8")
-    headers = {"x-api-key": key, "anthropic-version": API_VERSION, "content-type": "application/json"}
-    last = "no attempt"
-    for attempt in range(2):
-        try:
-            status, raw = transport(API_URL, headers, body, TIMEOUT_S)
-        except Exception as err:  # noqa: BLE001 — any transport failure is "no answer"
-            last = f"{type(err).__name__}: {err}"
-        else:
-            if status == 200:
-                try:
-                    blocks = json.loads(raw)["content"]
-                    return next(b["text"] for b in blocks if b.get("type") == "text")
-                except (ValueError, KeyError, TypeError, StopIteration) as err:
-                    raise BoostUnavailable(f"an answer the API does not describe as text: {err}")
-            last = f"http {status}"
-            if status != 429 and status < 500:
-                raise BoostUnavailable(last)             # a request the API refuses will not improve
-        if attempt == 0:
-            time.sleep(RETRY_PAUSE_S)
-    raise BoostUnavailable(last)
+    """One Messages API call for a pick, a short answer (ADR-032)."""
+    return _ask(payload, model=model, key=key, transport=transport, max_tokens=MAX_TOKENS)
 
 
 # ── Checking (ADR-032 Decision 4) ────────────────────────────────────────────

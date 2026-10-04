@@ -123,7 +123,8 @@ def build() -> dict:
         try:
             run_mod.run_engine(mode="publish", skip_market=True, now=world.RUN_AT,
                                artefact_path=Path(tmp) / "out" / "dashboard.json",
-                               boost_transport=world.FakeModel(), **paths)        # seals the picks
+                               boost_transport=world.FakeModel(), explanation_transport=world.FakeExplainer(),
+                               **paths)        # seals the picks
             art = run_mod.run_engine(mode="print", skip_market=True, now=world.RUN_AT,
                                      boost_transport=world.FakeModel(), **paths)["artefact"]
         finally:
