@@ -127,3 +127,51 @@ def world(variant: str = "known", *, tmp_path=None) -> dict:
     owner = OwnerState.from_dict({"status": "available", "pulled_at": "2026-10-01T03:00:00Z", "outcomes": outcomes})
     return {"products": products, "sales_daily": sales, "store_layout": layout, "owner": owner,
             "run_at": RUN_AT, "arrangements": arrangements, "layout_text": body, "first_day": first}
+
+
+HEADER = "תאור פריט,ברקוד/קוד,מכר,מחיר קניה,מחיר מכירה,עלות המכר (חנות),כניסות מלאי,מחיר קניה נטו,הנחה,קוד מחלקה,\n"
+
+
+def roots(root) -> dict:
+    from pathlib import Path
+    root = Path(root)
+    return {"silver_dir": root / "silver", "daily_sales_dir": root / "daily", "sales_dir": root / "monthly",
+            "store_facts_path": root / "store_facts.yaml", "store_layout_path": root / "store_layout.yaml",
+            "snapshots_root": root / "snapshots", "signals_dir": root / "signals",
+            "matches_path": root / "matches.parquet"}
+
+
+def write(root, variant: str = "known") -> dict:
+    """The world as the engine reads it from disk, for the probe (F12-S1 §20): silver POS tables, one
+    daily report a day, and the layout file. Returns (paths, world); the owner state is the
+    probe's to give the engine, as check_order_signals gives its own."""
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+    from collections import defaultdict
+    from pathlib import Path
+
+    paths = roots(root)
+    Path(root).mkdir(parents=True, exist_ok=True)
+    w = world(variant, tmp_path=Path(root))
+    base = {"_source_file": "inv.csv", "_as_of": COUNTED, "_as_of_source": "declared"}
+    prod = [{"barcode": p["barcode"], "product_name": p["product_name"], "category": p["department"],
+             "selling_price": p["shelf_price"], "wolt_price": 0.0, "cost_price": p["cost_price"], **base}
+            for p in w["products"]]
+    inv = [{"barcode": p["barcode"], "product_name": p["product_name"], "current_stock": p["recorded_stock"], **base}
+           for p in w["products"]]
+    paths["silver_dir"].mkdir(parents=True, exist_ok=True)
+    pq.write_table(pa.Table.from_pylist(prod), paths["silver_dir"] / "products.parquet")
+    pq.write_table(pa.Table.from_pylist(inv), paths["silver_dir"] / "inventory.parquet")
+    by_day = defaultdict(list)
+    names = {p["barcode"]: p["product_name"] for p in w["products"]}
+    for r in w["sales_daily"]:
+        u = int(r["units"])
+        by_day[r["day"]].append(f"{names[r['barcode']]},{r['barcode']},{u},6,10,{u * 6},0,6,0,1,")
+    paths["daily_sales_dir"].mkdir(parents=True, exist_ok=True)
+    for day, lines in by_day.items():
+        (paths["daily_sales_dir"] / f"דוח מכירות יום {day}.csv").write_text(
+            "﻿" + HEADER + "\n".join(lines) + "\n", encoding="utf-8")
+    paths["sales_dir"].mkdir(parents=True, exist_ok=True)
+    paths["snapshots_root"].mkdir(parents=True, exist_ok=True)
+    paths["store_layout_path"].write_text(w["layout_text"], encoding="utf-8")
+    return paths, w

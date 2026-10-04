@@ -159,3 +159,37 @@ def test_a_withheld_width_must_leave_its_product_unplaced_and_named():
     assert probe.withheld_width_problems(_art(plans=[_plan(no_width=["x"])]), "x") == []
     assert probe.withheld_width_problems(_art(plans=[_plan(placed=["x"])]), "x")
     assert probe.withheld_width_problems(_art(plans=[_plan()]), "x")
+
+
+# ── F12-S1 §20 over the planogram world (Phase 8 Task 8.6) ───────────────────
+
+def _shelf(m_status="available", m_reason=None, arrangements=(), plan_uses=None, plan_status="available",
+           elasticity=None):
+    return {"capabilities": {
+        "shelf_measurement": {"status": m_status, "unavailable_reason": m_reason, "arrangements": list(arrangements),
+                              "plan_uses": plan_uses},
+        "shelf_plan": {"status": plan_status, "elasticity": elasticity}}}
+
+
+def test_the_planogram_baseline_must_measure_and_reach_his_value():
+    measured = [{"status": "measured"}]
+    assert probe.shelf_baseline_problems(_shelf(arrangements=measured, plan_uses={"source": "his_store"})) == []
+    assert probe.shelf_baseline_problems(_shelf(arrangements=measured, plan_uses={"source": "research"}))
+    assert probe.shelf_baseline_problems(_shelf(m_status="unavailable"))
+
+
+def test_a_withheld_measurement_keeps_the_plan_on_017_and_names_why():
+    research = {"source": "research", "measurement_reason": "owner_state_unavailable"}
+    good = _shelf(m_status="unavailable", m_reason="owner_state_unavailable", elasticity=research)
+    assert probe.withheld_measurement_problems(good, "owner_state_unavailable") == []
+    # Owner state that could not be read, taken for "no arrangements": rule 10's silent failure.
+    assert probe.withheld_measurement_problems(_shelf(m_status="unavailable", m_reason="no_arrangement_recorded",
+                                                      elasticity=research), "owner_state_unavailable")
+    # The plan taken down with it, or silent about why.
+    assert probe.withheld_measurement_problems(_shelf(m_status="unavailable", m_reason="owner_state_unavailable",
+                                                      plan_status="unavailable"), "owner_state_unavailable")
+
+
+def test_every_fixture_arranged_must_publish_no_net_change():
+    assert probe.all_arranged_problems(_shelf(arrangements=[{"reason": "no_unchanged_fixture", "products": []}])) == []
+    assert probe.all_arranged_problems(_shelf(arrangements=[{"reason": None, "products": [{"net_change": 1.1}]}]))
