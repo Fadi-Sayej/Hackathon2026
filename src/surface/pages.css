@@ -478,7 +478,8 @@
 
 /* The one decision that commits: filled, where the card's other buttons are outlined. */
 .entry-card__actions .reorder__approve,
-.orders .reorder__approve {
+.orders .reorder__approve,
+.plan__arrange .reorder__approve {
   min-height: 40px;
   padding: 0 14px;
   border: 1px solid var(--teal-700);
@@ -491,7 +492,8 @@
 }
 
 .entry-card__actions .reorder__approve:disabled,
-.orders .reorder__approve:disabled {
+.orders .reorder__approve:disabled,
+.plan__arrange .reorder__approve:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
@@ -704,3 +706,265 @@
   font-weight: 700;
   line-height: 18px;
 }
+
+/* ── F12: Store layout and Shelf plan (F12-S1 FR-191, FR-194; docs/reviews/F12-screens-mockups.md) ── */
+.layout,
+.plan {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.layout__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+}
+.layout__head .entry-card__name { margin: 0; }
+.layout__head .layout__dated { margin-inline-start: auto; }
+.layout__tag {
+  display: inline-block;
+  padding: 1px 9px;
+  border-radius: var(--radius-pill);
+  background: var(--info-wash);
+  color: var(--ink-900);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.layout__tag--eye {
+  background: var(--teal-050);
+  color: var(--teal-700);
+}
+.layout__dated,
+.plan__muted {
+  margin: 0;
+  color: var(--ink-600);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.layout__shelves {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.layout__shelf {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius-md);
+}
+.layout__shelf[data-eye-level] { border-color: var(--teal-700); }
+.layout__shelf-name { font-weight: 600; color: var(--ink-900); }
+.layout__shelf-length { font-variant-numeric: tabular-nums; color: var(--ink-900); }
+.layout__shelf .layout__dated { margin-inline-start: auto; }
+.layout__rules h4,
+.plan__unplaced h4,
+.plan__measure h4,
+.layout__missing h3 {
+  margin: 0 0 4px;
+  font-size: 14px;
+  color: var(--ink-900);
+}
+.layout__rules ul,
+.layout__missing ul {
+  margin: 0;
+  padding-inline-start: 18px;
+  color: var(--ink-900);
+  line-height: 1.5;
+}
+.layout__missing li { margin-block-end: 6px; }
+.layout__counting,
+.layout__team-note {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink-600);
+  font-size: 13px;
+}
+
+/* The shelf to scale. Widths come from the published lengths through flex-grow; nothing here
+   works a length out (ADR-001). */
+.plan__shelves { gap: 12px; }
+.plan__shelf {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius-md);
+}
+.plan__shelf[data-eye-level] { border-color: var(--teal-700); }
+.plan__shelf-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+.plan__bar {
+  display: flex;
+  min-height: 34px;
+  border-block-end: 4px solid var(--ink-600);
+  font-size: 12px;
+}
+.plan__used {
+  display: flex;
+  flex-basis: 0;
+  min-width: 0;
+}
+.plan__block {
+  flex: calc(var(--w) * var(--n)) 1 0;
+  min-width: 0;
+  overflow: hidden;
+  padding: 8px 4px 4px;
+  border-inline-end: 1px solid var(--paper-100);
+  background:
+    repeating-linear-gradient(to right, transparent 0, transparent calc(100% / var(--n) - 1px),
+      rgba(255, 255, 255, 0.55) calc(100% / var(--n) - 1px), rgba(255, 255, 255, 0.55) calc(100% / var(--n))),
+    var(--teal-700);
+  color: #fff;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.plan__free {
+  flex-basis: 0;
+  min-width: 0;
+  overflow: hidden;
+  padding: 8px 4px 4px;
+  background: repeating-linear-gradient(-45deg, var(--paper-200) 0 6px, transparent 6px 12px);
+  color: var(--ink-600);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+.plan__products {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.plan__products li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  line-height: 1.45;
+}
+.plan__product-name { font-weight: 600; color: var(--ink-900); }
+.plan__facings { color: var(--teal-700); font-weight: 600; }
+.plan__product-notes { flex-basis: 100%; color: var(--ink-600); font-size: 13px; }
+.plan__conditions {
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: var(--paper-200);
+  color: var(--ink-900);
+  line-height: 1.5;
+}
+.plan__conditions p { margin: 0; }
+.plan__conditions p + p { margin-top: 4px; color: var(--ink-600); }
+.plan__unplaced-line { margin: 0 0 4px; line-height: 1.5; }
+.plan__unplaced-why { font-weight: 600; color: var(--ink-900); }
+
+/* The AI's explanation: beside the plan, under its own label, never part of it (FR-215). */
+.plan__why {
+  padding: 10px 12px;
+  border-inline-start: 4px solid var(--info, #3b6ea5);
+  border-radius: var(--radius-md);
+  background: var(--info-wash);
+  color: var(--ink-900);
+  line-height: 1.55;
+}
+.plan__why h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 4px;
+  font-size: 14px;
+}
+.plan__ai-tag {
+  padding: 0 7px;
+  border-radius: var(--radius-pill);
+  background: var(--ink-900);
+  color: var(--paper-100);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+}
+.plan__why-text,
+.plan__why-none { margin: 0; }
+.plan__why-none { color: var(--ink-600); }
+.plan__why-note { margin: 6px 0 0; color: var(--ink-600); font-size: 12px; }
+
+.plan__measure {
+  padding: 10px 12px;
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius-md);
+}
+.plan__measure > p { margin: 4px 0 0; }
+.plan__progress { font-weight: 600; color: var(--ink-900); }
+.plan__changes {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+.plan__changes li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 10px;
+  padding: 6px 0;
+  border-block-end: 1px solid var(--ink-line);
+  line-height: 1.45;
+}
+.plan__change-line { flex-basis: 100%; color: var(--ink-600); font-size: 13px; }
+.plan__change-net { color: var(--ink-900); font-weight: 600; }
+.plan__eye-move {
+  color: var(--teal-700);
+  font-size: 12px;
+  font-weight: 600;
+}
+.plan__arrange {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.plan__arranged {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 0;
+  font-weight: 600;
+  color: var(--teal-700);
+}
+.plan__warning {
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--warn);
+  border-radius: var(--radius-md);
+  background: var(--warn-wash);
+  color: var(--ink-900);
+}
+.plan__store {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius-lg);
+}
+.plan__store h2 { margin: 0; font-size: 17px; color: var(--ink-900); }
+.plan__store p { margin: 0; line-height: 1.5; }
+.plan__store-figure { font-size: 16px; font-weight: 600; color: var(--ink-900); }
+.example .layout__fixture,
+.example .plan__fixture { position: relative; }
