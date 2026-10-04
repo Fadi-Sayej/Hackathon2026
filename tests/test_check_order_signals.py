@@ -220,11 +220,14 @@ def test_withheld_inputs_over_the_planogram_world_must_take_both_down():
 
 
 def test_withheld_explanations_say_no_model_key_and_leave_every_plan_alone():
-    base = {"capabilities": {"shelf_plan": {"entries": [{"id": "p"}]},
+    rest = {"layout_facts": {"status": "available"}, "shelf_measurement": {"status": "unavailable"}}
+    base = {"capabilities": {**rest, "shelf_plan": {"entries": [{"id": "p"}]},
                              "shelf_explanation": {"status": "available", "unavailable_reason": None}}}
-    gone = {"capabilities": {"shelf_plan": {"entries": [{"id": "p"}]},
+    gone = {"capabilities": {**rest, "shelf_plan": {"entries": [{"id": "p"}]},
                              "shelf_explanation": {"status": "unavailable", "unavailable_reason": "no_model_key"}}}
     assert probe.withheld_explanations_problems(gone, base) == []
     changed = {"capabilities": {**gone["capabilities"], "shelf_plan": {"entries": [{"id": "q"}]}}}
-    assert probe.withheld_explanations_problems(changed, base)          # INV-096
+    assert probe.withheld_explanations_problems(changed, base)          # INV-096, the plan
+    moved = {"capabilities": {**gone["capabilities"], "shelf_measurement": {"status": "available"}}}
+    assert probe.withheld_explanations_problems(moved, base)            # INV-096, the measurement
     assert probe.withheld_explanations_problems(base, base)             # an explanation from no model

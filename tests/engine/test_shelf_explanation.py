@@ -205,6 +205,8 @@ def test_past_the_time_budget_nothing_more_is_asked(tmp_path):
     inputs, fake = _inputs(tmp_path), Fake()
     _seal(tmp_path, inputs, fake, clock=lambda: next(ticks))
     assert fake.calls == 1
+    manifest = se.read(tmp_path / "snap", RUN_AT.date().isoformat())["manifest"]
+    assert manifest["runs"][-1]["not_asked"] == [{"fixture": "F2", "why": "time_budget_spent"}]
 
 
 def test_a_request_that_fails_twice_ends_the_nights_asking(tmp_path, monkeypatch):
@@ -239,3 +241,49 @@ def test_print_mode_never_asks(tmp_path):
     assert se.live_step(_inputs(tmp_path), snapshots_root=tmp_path / "snap", key=None, transport=fake,
                         now=RUN_AT)["skipped"] == "no_model_key"
     assert fake.calls == 0 and not (tmp_path / "snap").exists()
+
+
+
+def test_a_withheld_answer_is_published_as_withheld_with_its_reason(tmp_path):
+    # AC-200's "says why": the plan shows it has no explanation because the check held it back.
+    inputs = _inputs(tmp_path)
+    figure = json.dumps({"he": "ימכור 20% יותר", "ar": "حسن", "en": "fine"}, ensure_ascii=False)
+    _seal(tmp_path, inputs, Fake([figure]))
+    out = _published(tmp_path, inputs)
+    assert {(e["why_none"], e["withheld_because"]) for e in out.extras["explanations"]} == {("withheld", "stated_a_figure")}
+    assert out.counts["withheld"] == 2
+
+
+def test_a_new_model_asks_again(tmp_path):
+    day1 = _inputs(tmp_path)
+    _seal(tmp_path, day1, Fake())
+    newer = replace(day1.policy, boost_model="a-newer-model")
+    fake = Fake()
+    _seal(tmp_path, _inputs(tmp_path, run_at=RUN_AT + timedelta(days=1), policy=newer), fake)
+    assert fake.calls == 2
+
+
+def test_print_mode_replays_the_live_explanations_without_asking(tmp_path):
+    # AC-201 over the real engine: publish mode asks and seals; print mode reads the seal, asks no one,
+    # and publishes the same explanations and the same digest.
+    import importlib.util
+    from pathlib import Path
+    import src.engine.run as run_mod
+    spec = importlib.util.spec_from_file_location(
+        "order_world", Path(__file__).resolve().parents[1] / "fixtures" / "order_signals" / "build.py")
+    world = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(world)
+    paths = world.build(tmp_path)
+    live = json.loads((tmp_path / "out" / "dashboard.json").read_text(encoding="utf-8"))
+    counting = Fake()
+    saved = run_mod._pull_owner_state
+    run_mod._pull_owner_state = lambda: world.owner()
+    try:
+        replay = run_mod.run_engine(mode="print", skip_market=True, now=world.RUN_AT,
+                                    boost_transport=world.FakeModel(), explanation_transport=counting, **paths)
+    finally:
+        run_mod._pull_owner_state = saved
+    assert counting.calls == 0
+    cap = replay["artefact"]["capabilities"]["shelf_explanation"]
+    assert cap["status"] == "available" and cap["counts"]["explained"] >= 1
+    assert cap == live["capabilities"]["shelf_explanation"]

@@ -111,8 +111,9 @@ def withheld_explanations_problems(art: dict, baseline: dict) -> list:
     if cap["status"] != "unavailable" or cap["unavailable_reason"] != "no_model_key":
         out.append(f"without the sealed explanations shelf_explanation published {cap['status']} "
                    f"({cap['unavailable_reason']}): an explanation came from no model (ADR-039)")
-    if _cap(art, "shelf_plan")["entries"] != _cap(baseline, "shelf_plan")["entries"]:
-        out.append("without the sealed explanations the plan changed: the explanation was read back into it (INV-096)")
+    for cap_id in ("layout_facts", "shelf_plan", "shelf_measurement"):
+        if _cap(art, cap_id) != _cap(baseline, cap_id):
+            out.append(f"without the sealed explanations {cap_id} changed: the explanation was read back into it (INV-096)")
     return out
 
 

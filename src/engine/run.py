@@ -137,8 +137,12 @@ def _explanation_verdict(result) -> tuple:
     is said here, and each fixture says it to the owner (FR-214)."""
     if not result:
         return "ok", None
+    if result.get("skipped"):
+        return "skipped", result["skipped"]
     if result.get("error"):
         return "degraded", f"the model was not asked again tonight: {result['error']}"
+    if not result.get("completed"):
+        return "degraded", "some plans wait for another night: the request ceiling or the time budget"
     return "ok", None
 
 

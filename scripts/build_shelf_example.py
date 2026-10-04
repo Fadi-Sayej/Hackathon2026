@@ -107,6 +107,9 @@ def explain() -> int:
         finally:
             run_mod._pull_owner_state = saved
         sealed = read(paths["snapshots_root"], world.RUN_AT.date().isoformat())
+    if not sealed or not sealed["explanations"]:
+        print("the model was not asked, or answered nothing: nothing sealed (see the run's steps)", file=sys.stderr)
+        return 1
     SEALED.parent.mkdir(parents=True, exist_ok=True)
     SEALED.write_text(json.dumps(sealed["explanations"], ensure_ascii=False, indent=1, sort_keys=True), encoding="utf-8")
     print(f"Sealed {len(sealed['explanations'])} explanations in {SEALED.relative_to(ROOT)}")
