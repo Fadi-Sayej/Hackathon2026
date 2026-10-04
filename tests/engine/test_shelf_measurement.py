@@ -271,8 +271,8 @@ def test_the_plan_stays_up_when_the_measurement_fails(known, monkeypatch):
 
 
 def test_before_facings_come_from_the_latest_record_only(known):
-    # A previous arrangement that did not place a product means it was off the shelf, even when an
-    # older count says otherwise; it is then left out of the estimate, never given the old count.
+    # A previous arrangement that did not place a product says nothing of what stood there, even
+    # when an older count does: its before facings are unknown, never 0 and never the old count.
     w, _ = known
     outcomes = copy.deepcopy(w["owner"].outcomes)
     f14 = {W.barcode("F14", n): {"shelf": 1, "facings": 2, "eye_level": True} for n in range(2, 7)}  # 1 is not placed
@@ -284,7 +284,7 @@ def test_before_facings_come_from_the_latest_record_only(known):
     earlier = sm.arrangements(OwnerState.from_dict({"status": "available", "pulled_at": "t", "outcomes": outcomes}))[0]
     gone = sm._before_record(arr, W.barcode("F14", 1), w["store_layout"], earlier)
     kept = sm._before_record(arr, W.barcode("F14", 2), w["store_layout"], earlier)
-    assert gone == {"facings": 0, "eye_level": False, "from": "previous_arrangement"}
+    assert gone is None              # off the shelf, or there at a size unknown: no number (rule 8)
     assert kept == {"facings": 2, "eye_level": True, "from": "previous_arrangement"}
 
 

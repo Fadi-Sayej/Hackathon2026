@@ -272,7 +272,13 @@ def test_the_run_names_every_rejected_entry_in_its_steps(tmp_path, monkeypatch):
 
 
 def test_two_fixtures_whose_names_read_alike_are_refused_not_merged(tmp_path):
-    # YAML reads 01 and 1 as the same name; one fixture would vanish without a word (FR-178, ADR-038).
-    out = _load(tmp_path, "fixtures:\n" + _fixture("01", "[drinks]") + _fixture("1", "[snacks]"))
-    assert out["fixtures"] == {} and out["rejected"][0]["kind"] == "file"
-    assert "named twice" in out["rejected"][0]["reason"]
+    # YAML reads 01 and 1 as the same name; one fixture would vanish without a word (ADR-038). Both
+    # are refused by name, and the rest of the file is used (FR-178).
+    out = _load(tmp_path, "fixtures:\n" + _fixture("01", "[drinks]") + _fixture("1", "[snacks]")
+                + _fixture("F3", "[dairy  products]") + """\
+widths:
+  "7290001": {width_mm: 75, measured_by: team, measured_on: 2026-10-10, width_mm: 80}
+""")
+    assert list(out["fixtures"]) == ["F3"]
+    assert _reasons(out, "fixture") == {"1": "the file names this fixture twice, so neither entry is used"}
+    assert "names width_mm twice" in _reasons(out, "width")["7290001"]

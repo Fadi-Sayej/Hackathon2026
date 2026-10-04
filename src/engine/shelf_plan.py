@@ -166,16 +166,18 @@ def plan_fixture(name: str, fixture: dict, members: dict, products: dict, widths
         return {**base, "state": "over_full", "shelves": None, "planned": planned,
                 "did_not_fit_cm": round(sum(width[b] for u in did_not_fit for b in u) / 10, 1)}
 
-    # FR-188: his "at least N", on the shelf that holds the product's first facing (FR-185). Where a
-    # size is unknown, no spare length is known to be free (FR-186, INV-091), so it cannot be met.
-    # It is obeyed for a product of unknown earnings too: INV-086 keeps the plan from giving such a
-    # product facings from a guess, and these are facings he stated, not facings the plan chose.
+    # FR-188: his "at least N", on the shelf that holds the product's first facing (FR-185). It
+    # cannot be met where a size is unknown, because no spare length is known to be free (FR-186,
+    # INV-091), nor for a product whose earnings are unknown, which gets no more than one facing
+    # (FR-187, INV-086). A rule that cannot be met stops the plan and is named.
     for b in sorted(at_least, key=lambda b: (order.index(shelf_of[b]), b)):
         more = need[b] - 1
         if more <= 0:
             continue
         if unknown_sizes:
             return stopped(at_least[b], "sizes_unknown")
+        if earn[b]["unknown"]:
+            return stopped(at_least[b], "earnings_unknown")
         if free[shelf_of[b]] < more * width[b]:
             return stopped(at_least[b], "does_not_fit")
         facings[b] += more

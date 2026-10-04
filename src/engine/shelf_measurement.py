@@ -93,8 +93,9 @@ def _before_record(arr: dict, barcode: str, layout: dict, earlier: list) -> Opti
     arrangement of the fixture, dated no later than this one (FR-205).
 
     The latest record is chosen first and the product read from it. A previous arrangement that did
-    not place the product means it was not on the shelf (ASM-077), never that an older count of it
-    still holds."""
+    not place the product does not say what stood there: kept off and unstocked mean none, but no
+    width or too wide mean a facing of unknown size (FR-186). So it is unknown, never 0 and never an
+    older count (rule 8: no number rather than a wrong one)."""
     current = (layout.get("current") or {}).get(barcode)
     fixture = (layout.get("fixtures") or {}).get(arr["fixture"])
     count = None
@@ -106,8 +107,9 @@ def _before_record(arr: dict, barcode: str, layout: dict, earlier: list) -> Opti
                    key=lambda p: (p["arranged_on"], p["entry_id"]), default=None)
     if previous is not None and (count is None or previous["arranged_on"] >= count[0]):
         placed = previous["placements"].get(barcode)
-        return {"facings": placed["facings"] if placed else 0, "eye_level": bool(placed and placed["eye_level"]),
-                "from": "previous_arrangement"}
+        if placed is None:
+            return None
+        return {"facings": placed["facings"], "eye_level": bool(placed["eye_level"]), "from": "previous_arrangement"}
     return count[1] if count else None
 
 

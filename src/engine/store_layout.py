@@ -61,18 +61,30 @@ class _Rejected(Exception):
 
 
 class _Loader(yaml.SafeLoader):
-    """Safe YAML that refuses a mapping naming one key twice. PyYAML keeps the last silently, and
-    fixture keys `01` and `1` both read as the name "1": one fixture would vanish unrejected."""
+    """Safe YAML that remembers a key named twice. PyYAML keeps the last silently, and fixture keys
+    `01` and `1` both read as the name "1": one fixture would vanish unrejected."""
+
+
+class _Mapping(dict):
+    """A mapping read from the file, with the keys it named more than once."""
+    twice: frozenset = frozenset()
 
 
 def _mapping_without_duplicates(loader, node, deep=False):
-    seen = set()
+    seen, twice = set(), set()
     for key_node, _ in node.value:
         key = str(loader.construct_object(key_node, deep=deep))
-        if key in seen:
-            raise yaml.constructor.ConstructorError(None, None, f"{key!r} is named twice", key_node.start_mark)
-        seen.add(key)
-    return loader.construct_mapping(node, deep=deep)
+        (twice if key in seen else seen).add(key)
+    out = _Mapping(loader.construct_mapping(node, deep=deep))
+    out.twice = frozenset(twice)
+    return out
+
+
+def _twice(entry) -> None:
+    """FR-178: the one entry is rejected, and the rest of the file is used."""
+    named = sorted(getattr(entry, "twice", ()))
+    if named:
+        raise _Rejected(f"names {', '.join(named)} twice, so neither is used")
 
 
 _Loader.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, _mapping_without_duplicates)
@@ -160,6 +172,7 @@ def _fixture(entry, departments: set) -> dict:
     for number, shelf in enumerate(shelves, start=1):
         try:
             _keys(shelf, SHELF_KEYS, "a shelf")
+            _twice(shelf)
             out_shelves.append({"shelf": number, "length_cm": _positive(shelf.get("length_cm"), "length_cm"),
                                 **_measured(shelf)})
         except _Rejected as err:
@@ -168,6 +181,7 @@ def _fixture(entry, departments: set) -> dict:
     if eye is not None and (not _whole(eye) or not 1 <= eye <= len(out_shelves)):
         # One shelf, by its number: a list or a second shelf is the edge case F12-S1 §12 rejects.
         raise _Rejected(f"eye_level_shelf must name one shelf, 1 to {len(out_shelves)}: {eye!r}")
+    _twice(entry)
     return {"departments": named, "chilled": entry["chilled"], "eye_level_shelf": eye,
             "shelves": out_shelves, **provenance}
 
@@ -250,19 +264,30 @@ def load_store_layout(path: Path | str, catalogue: Iterable[dict]) -> dict:
     fixtures = {}
     # In the file's order, which is the order Shelf plan lists them in (ADR-038). YAML reads a
     # mapping in that order, so it is as deterministic as sorting, and it is his order.
-    for name, entry in _mapping(raw, "fixtures", rejected).items():
+    listed = _mapping(raw, "fixtures", rejected)
+    for name, entry in listed.items():
+        if str(name) in getattr(listed, "twice", ()):
+            rejected.append({"kind": "fixture", "key": str(name),
+                             "reason": "the file names this fixture twice, so neither entry is used"})
+            continue
         try:
             fixtures[str(name)] = _fixture(entry, departments)
         except _Rejected as err:
             rejected.append({"kind": "fixture", "key": str(name), "reason": str(err)})
 
     widths = {}
-    for code, entry in sorted(_mapping(raw, "widths", rejected).items(), key=lambda kv: str(kv[0])):
+    listed = _mapping(raw, "widths", rejected)
+    for code, entry in sorted(listed.items(), key=lambda kv: str(kv[0])):
+        if str(code) in getattr(listed, "twice", ()):
+            rejected.append({"kind": "width", "key": str(code),
+                             "reason": "the file names this barcode twice, so neither entry is used"})
+            continue
         try:
             barcode = _barcode(code, products)
             if barcode in widths:
                 raise _Rejected("the barcode has two widths")
             _keys(entry, WIDTH_KEYS, "a width")
+            _twice(entry)
             widths[barcode] = {"width_mm": _positive(entry.get("width_mm"), "width_mm"), **_measured(entry)}
         except _Rejected as err:
             rejected.append({"kind": "width", "key": str(code), "reason": str(err)})
@@ -303,10 +328,16 @@ def load_store_layout(path: Path | str, catalogue: Iterable[dict]) -> dict:
                                        "and no keep_on rule names it"})
 
     current = {}
-    for code, entry in sorted(_mapping(raw, "current", rejected).items(), key=lambda kv: str(kv[0])):
+    listed = _mapping(raw, "current", rejected)
+    for code, entry in sorted(listed.items(), key=lambda kv: str(kv[0])):
+        if str(code) in getattr(listed, "twice", ()):
+            rejected.append({"kind": "current", "key": str(code),
+                             "reason": "the file names this barcode twice, so neither entry is used"})
+            continue
         try:
             barcode = _barcode(code, products)
             _keys(entry, CURRENT_KEYS, "a current placement")
+            _twice(entry)
             fixture = str(entry.get("fixture"))
             if fixture not in fixtures:
                 raise _Rejected(f"no recorded fixture is named {entry.get('fixture')!r}")

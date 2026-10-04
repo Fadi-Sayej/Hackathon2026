@@ -317,7 +317,9 @@ def test_the_plans_demand_is_order_quantitys_daily_mean(tmp_path):
     # AC-179 (INV-085): wherever order_quantity publishes a daily_mean, the plan's demand equals it.
     from src.engine import order_quantity
     cat = [P("1"), P("2")]
-    daily = _daily({"1": 3, "2": 1})
+    # Units that change by the day, so a demand taken over any other window would not match.
+    daily = [{**r, "units": float((int(r["day"][-2:]) * (3 if r["barcode"] == "1" else 1)) % 7)}
+             for r in _daily({"1": 1, "2": 1}, days=60)]
     facts = {"facts": {"drinks": {"order_schedule": {"form": "weekdays", "weekdays": ["sun"]},
                                   "shelf_life": {"days": 30}, "stated_by": "owner", "stated_on": "2026-10-01",
                                   "recorded_by": "team"}}, "rejected": []}
@@ -353,3 +355,13 @@ def test_no_f12_capability_registers_a_figure(tmp_path):
     for module in (layout_facts, shelf_plan, shelf_measurement):
         assert module.run(inputs).figures == [], module.CAP
         assert module.CAP in figures._REGISTERS_NO_FIGURE
+
+
+
+def test_at_least_on_a_product_of_unknown_earnings_cannot_be_met(tmp_path):
+    # FR-187, INV-086: such a product gets no more than one facing, so his rule cannot be obeyed,
+    # and FR-188 stops the plan and names it.
+    cat = [P("A", cost=None), P("B")]
+    rules = '  - {at_least: {barcode: "A", facings: 3}, stated_by: owner, stated_on: 2026-10-01, recorded_by: team}\n'
+    plan = _plan(_run(tmp_path, cat, _daily({"A": 2, "B": 2}), shelves=(500,), widths={"A": 100, "B": 100}, rules=rules))
+    assert (plan["state"], plan["stopped_by"]["why"]) == ("stopped_by_rule", "earnings_unknown")
