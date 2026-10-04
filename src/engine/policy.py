@@ -79,6 +79,13 @@ class Policy:
     shelf_min_products: int
     shelf_bootstrap_draws: int
     shelf_bootstrap_seed: int
+    # F12-S1 FR-210 … FR-215 (D-32, OQ-1209 approved 2026-10-04). Provisional; the model is the
+    # boost's pinned one (ADR-039 Decision 2).
+    shelf_explanation_prompt: str
+    shelf_explanation_request_ceiling: int
+    shelf_explanation_time_budget_s: int
+    shelf_explanation_max_chars: int
+    shelf_explanation_max_tokens: int
 
     def as_dict(self) -> dict:
         """The artefact's `thresholds` block, grouped as design §11.4 defines it.
@@ -164,6 +171,14 @@ class Policy:
                 "min_products": self.shelf_min_products,
                 "bootstrap_draws": self.shelf_bootstrap_draws,
                 "bootstrap_seed": self.shelf_bootstrap_seed,
+            },
+            "shelf_explanation": {
+                "model": self.boost_model,
+                "prompt": self.shelf_explanation_prompt,
+                "request_ceiling": self.shelf_explanation_request_ceiling,
+                "time_budget_s": self.shelf_explanation_time_budget_s,
+                "max_chars": self.shelf_explanation_max_chars,
+                "max_tokens": self.shelf_explanation_max_tokens,
             },
             "question_limit": self.question_limit,
             "published_population": self.published_population,
@@ -252,6 +267,11 @@ def load_policy(path: Path | str | None = None) -> Policy:
         shelf_min_products=_required(raw, "shelf", "min_products", int),
         shelf_bootstrap_draws=_required(raw, "shelf", "bootstrap_draws", int),
         shelf_bootstrap_seed=_required(raw, "shelf", "bootstrap_seed", int),
+        shelf_explanation_prompt=_required(raw, "shelf", "explanation_prompt", str),
+        shelf_explanation_request_ceiling=_required(raw, "shelf", "explanation_request_ceiling", int),
+        shelf_explanation_time_budget_s=_required(raw, "shelf", "explanation_time_budget_s", int),
+        shelf_explanation_max_chars=_required(raw, "shelf", "explanation_max_chars", int),
+        shelf_explanation_max_tokens=_required(raw, "shelf", "explanation_max_tokens", int),
     )
     if policy.withdraw_with_stock:
         raise ValueError(

@@ -53,7 +53,9 @@ def test_hygiene_is_a_capability_of_its_own_and_spec_002_produces_two():
                                  # (Task 5.6, ADR-032) and quantity (Task 5.8, ADR-034)
                                  "market_running_out", "market_boost", "order_quantity", "assortment_gap",
                                  # Phase 8: F12's layout (Task 8.2) and plan (Task 8.3)
-                                 "layout_facts", "shelf_plan", "shelf_measurement"}
+                                 "layout_facts", "shelf_plan", "shelf_measurement",
+                                 # and the AI's explanation (Task 8.10, D-32)
+                                 "shelf_explanation"}
     assert CAPABILITIES["hygiene"].spec == CAPABILITIES["reconciliation"].spec == "SPEC-002"
     assert "sales_summary" not in CAPABILITIES["hygiene"].requires
 
@@ -85,7 +87,7 @@ def test_the_unvalued_order_in_policy_covers_every_unvalued_capability():
 def test_f12_reads_only_the_layout_file_and_the_existing_inputs():
     """F12-S1 INV-084, AC-183 (D-13): no camera, sensor or image feed is ever an input. Every F12
     capability's inputs are the layout file and inputs the engine already had."""
-    allowed = {"products", "store_layout", "sales_daily"}
+    allowed = {"products", "store_layout", "sales_daily", "shelf_explanations"}   # the last: ADR-039's snapshot
     f12 = {cid: set(c.requires) for cid, c in CAPABILITIES.items() if c.spec == "F12-S1"}
     assert {"layout_facts", "shelf_plan", "shelf_measurement"} <= set(f12)
     for cid, needs in f12.items():

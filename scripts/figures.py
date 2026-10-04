@@ -48,7 +48,7 @@ _CREDENTIAL_GATED = frozenset({"answer_storage_unavailable"})
 # F12's layout, plan and measurement are a page's facts and advice, never a headline count, and
 # all three are unavailable on every machine until a store records its shelves (Phase 8).
 _REGISTERS_NO_FIGURE = frozenset({"market_running_out", "market_boost", "order_quantity", "assortment_gap",
-                                  "layout_facts", "shelf_plan", "shelf_measurement"})
+                                  "layout_facts", "shelf_plan", "shelf_measurement", "shelf_explanation"})
 
 # AC-127 is "on the same data". The market half is rebuilt on each machine from the committed
 # snapshots, so a laptop's can be older than the artefact it is compared with, and then every

@@ -26,7 +26,7 @@ FEEDS = {
     "store_facts": ("store_facts",),
     "store_layout": ("store_layout",),
     "nearby_venues": ("running_out", "market_recent", "observations", "matches"),
-    "boost_key": ("boost_picks",),
+    "boost_key": ("boost_picks", "shelf_explanations"),     # one key, two uses (ADR-039 Decision 2)
 }
 DAY_IN_NAME = re.compile(r"(\d{4}-\d{2}-\d{2})")
 NIGHTLY_SECRET = "FIREBASE_SERVICE_ACCOUNT_JSON"
@@ -191,6 +191,6 @@ def readiness(store: StoreSettings, *, today: date, facts_path: Optional[Path] =
         _venue_formats(stores, snapshots_root or EXTERNAL_SNAPSHOTS_ROOT),
         {**_secret("nightly_secrets", "The nightly's Firebase credential", NIGHTLY_SECRET, secret_names,
                    "the owner's decisions never reach the published artefact"), "blocks": []},
-        _secret("boost_key", "The market boost's model key", BOOST_SECRET, secret_names,
-                "the boost stays unavailable (no_boost_key)"),
+        _secret("boost_key", "The model key, for the market boost and the shelf explanation", BOOST_SECRET,
+                secret_names, "the boost and the explanation stay unavailable (no_boost_key, no_model_key)"),
     ]

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """build_shelf_example.py — the example behind Shelf plan's preview (D-31, F12-S1 FR-200).
 
-    python3 scripts/build_shelf_example.py          # rewrites public/examples/shelf-plan-example.json
+    python3 scripts/build_shelf_example.py            # rewrites public/examples/shelf-plan-example.json
+    python3 scripts/build_shelf_example.py --explain  # once, by hand, with the model key: seals its explanation
 
 While Shelf plan waits, D-31 lets it show a clearly marked example of itself, as Reorder does under
 D-29. The owner approved its source with the Phase 8 plan on 2026-10-04: **the same test shop as
@@ -18,7 +19,13 @@ scripts/build_order_example.py's own functions, and only the layout is added her
 The engine runs in print mode over it, as the approved F8 mockups were drawn, and the result goes to
 public/examples/, which no engine step, loader other than its own, probe or measurement reads.
 The shop has 28 days of reports and no arrangement, so its measurement shows the waiting state a
-new store's would. tests/test_shelf_example.py fails when the committed file differs from a fresh
+new store's would.
+
+Its explanation (F12-S1 FR-215, D-32) is the real step's answer for this shop. Print mode never asks
+the model, so the team asks once, by hand, with `--explain` and the key, and the answer is sealed in
+tests/fixtures/shelf_example/explanations.json. Until then the builder gives the engine an empty
+snapshot, so each fixture says its explanation has not been written; "no model key" would be wrong
+for a page the team may well have a key for. tests/test_shelf_example.py fails when the committed file differs from a fresh
 build.
 """
 from __future__ import annotations
@@ -36,6 +43,7 @@ if str(ROOT) not in sys.path:
 import tests.fixtures.order_signals.build as world  # noqa: E402
 
 OUT = ROOT / "public" / "examples" / "shelf-plan-example.json"
+SEALED = ROOT / "tests" / "fixtures" / "shelf_example" / "explanations.json"
 MEASURED = "measured_by: team, measured_on: 2026-08-01"
 STATED = "stated_by: owner\n    stated_on: 2026-08-01\n    recorded_by: team"
 # barcode: facing width in mm, chosen for the test shop (a store's are read from its shelf photographs)
@@ -68,17 +76,63 @@ def _layout(path: Path) -> None:
     path.write_text(body, encoding="utf-8")
 
 
+def _seal_snapshot(snapshots_root: Path) -> None:
+    """The example's explanations, or an empty snapshot: present, so "not written", never "no key"."""
+    from src.engine.shelf_explanation import folder
+    target = folder(snapshots_root, world.RUN_AT.date().isoformat())
+    target.mkdir(parents=True, exist_ok=True)
+    explanations = SEALED.read_text(encoding="utf-8") if SEALED.exists() else "{}"
+    (target / "explanations.json").write_text(explanations, encoding="utf-8")
+    (target / "_manifest.json").write_text(json.dumps({"runs": [], "example": True}), encoding="utf-8")
+
+
+def explain() -> int:
+    """Ask the model once for the example's plans, with the key, and seal the answers (FR-215)."""
+    import os
+    import src.engine.run as run_mod
+    from src.engine.model_client import KEY_ENV
+    from src.engine.shelf_explanation import read
+    if not os.environ.get(KEY_ENV):
+        print(f"{KEY_ENV} is not set: the example's explanation needs the model key", file=sys.stderr)
+        return 1
+    shop = _order_example()
+    with tempfile.TemporaryDirectory() as tmp:
+        paths = _shop(shop, Path(tmp))
+        saved = run_mod._pull_owner_state
+        run_mod._pull_owner_state = lambda: world.owner()
+        try:
+            run_mod.run_engine(mode="publish", skip_market=True, now=world.RUN_AT,
+                               artefact_path=Path(tmp) / "out" / "dashboard.json",
+                               boost_transport=world.FakeModel(), **paths)
+        finally:
+            run_mod._pull_owner_state = saved
+        sealed = read(paths["snapshots_root"], world.RUN_AT.date().isoformat())
+    if not sealed or not sealed["explanations"]:
+        print("the model was not asked, or answered nothing: nothing sealed (see the run's steps)", file=sys.stderr)
+        return 1
+    SEALED.parent.mkdir(parents=True, exist_ok=True)
+    SEALED.write_text(json.dumps(sealed["explanations"], ensure_ascii=False, indent=1, sort_keys=True), encoding="utf-8")
+    print(f"Sealed {len(sealed['explanations'])} explanations in {SEALED.relative_to(ROOT)}")
+    return 0
+
+
+def _shop(shop, root: Path) -> dict:
+    paths = world.roots(root)
+    shop._silver(paths["silver_dir"])
+    shop._daily(paths["daily_sales_dir"])
+    world._monthly(paths["sales_dir"])
+    shop._facts(paths["store_facts_path"])
+    _layout(paths["store_layout_path"])
+    world._snapshots(paths["snapshots_root"])
+    return paths
+
+
 def build() -> dict:
     import src.engine.run as run_mod
     shop = _order_example()
     with tempfile.TemporaryDirectory() as tmp:
-        paths = world.roots(Path(tmp))
-        shop._silver(paths["silver_dir"])
-        shop._daily(paths["daily_sales_dir"])
-        world._monthly(paths["sales_dir"])
-        shop._facts(paths["store_facts_path"])
-        _layout(paths["store_layout_path"])
-        world._snapshots(paths["snapshots_root"])
+        paths = _shop(shop, Path(tmp))
+        _seal_snapshot(paths["snapshots_root"])
         saved = run_mod._pull_owner_state
         run_mod._pull_owner_state = lambda: world.owner()          # the shop's owner: no arrangement yet
         try:
@@ -95,7 +149,8 @@ def build() -> dict:
                     "Reorder's example shop with a shelf layout added. Nothing reads it but Shelf plan's preview.",
         "now": world.RUN_AT.isoformat(),
         "artefact": {"generated_at": art["generated_at"], "thresholds": art["thresholds"],
-                     "capabilities": {k: caps[k] for k in ("layout_facts", "shelf_plan", "shelf_measurement")}},
+                     "capabilities": {k: caps[k] for k in ("layout_facts", "shelf_plan", "shelf_measurement",
+                                                          "shelf_explanation")}},
         "catalogue": {"products": catalogue},
         "owner_state": {"outcomes": {}},
     }
@@ -106,6 +161,8 @@ def render(payload: dict) -> str:
 
 
 def main() -> int:
+    if "--explain" in sys.argv[1:]:
+        return explain()
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(render(build()), encoding="utf-8")
     print(f"Wrote {OUT.relative_to(ROOT)}")

@@ -316,7 +316,7 @@ def test_the_live_run_asks_seals_and_publishes_and_print_mode_replays_it(tmp_pat
     world = _world(tmp_path)
     fake = Fake()
     live = run_mod.run_engine(mode="publish", artefact_path=tmp_path / "out" / "dashboard.json",
-                              now=RUN_AT, boost_transport=fake, **world)
+                              now=RUN_AT, boost_transport=fake, explanation_transport=fake, **world)
     assert [c["facts"]["barcode"] for c in fake.calls] == ["7290999"]
     assert (world["snapshots_root"] / LAST.isoformat() / "boost_picks" / "picks.json").exists()
     live_cap = live["artefact"]["capabilities"]["market_boost"]

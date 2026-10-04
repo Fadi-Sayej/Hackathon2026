@@ -69,6 +69,8 @@ PROBED_ELSEWHERE = {
     "boost_picks": "scripts/check_order_signals.py",
     # F12-S1 §20: no store has a layout file, so on real data it is withheld at baseline.
     "store_layout": "scripts/check_order_signals.py",
+    # ADR-039: no key on a real night means no snapshot, so it too is withheld at baseline here.
+    "shelf_explanations": "scripts/check_order_signals.py",
 }
 
 failures: list[str] = []

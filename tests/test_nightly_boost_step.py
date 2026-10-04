@@ -50,10 +50,12 @@ def test_it_runs_whether_or_not_the_engine_step_succeeded():
     assert "always()" in step.get("if", "")
 
 
-def test_it_force_adds_only_the_picks():
+def test_it_force_adds_only_the_picks_and_the_shelf_explanations():
+    """ADR-039 Decision 5: the explanations are sealed in the same step, and nothing else is added."""
     script = _boost_step(_steps())["run"]
     adds = [line.strip() for line in script.splitlines() if line.strip().startswith("git add")]
-    assert adds and all("-f" in a.split() and "boost_picks" in a for a in adds)
+    assert len(adds) == 2 and all("-f" in a.split() for a in adds)
+    assert {("boost_picks" in a, "shelf_explanations" in a) for a in adds} == {(True, False), (False, True)}
     assert "silver" not in script
 
 

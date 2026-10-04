@@ -65,6 +65,8 @@ KNOWN = {
     "no_evidence_window",
     "owner_state_unavailable",
     "no_arrangement_recorded",
+    # Task 8.10 (ADR-039): no explanations sealed for the night, as no_boost_key is for picks.
+    "no_model_key",
 }
 
 

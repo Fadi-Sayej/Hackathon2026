@@ -29,6 +29,7 @@ def _art(*, oq_status="available", oq_reason=None, entries=(), boost_status="ava
         # F12-S1 §20 (Phase 8 Task 8.2): the layout, which needs no sales.
         "layout_facts": {"status": layout_status, "unavailable_reason": layout_reason, "fixtures": fixtures},
         "shelf_plan": {"status": plan_status, "unavailable_reason": plan_reason, "entries": list(plans)},
+        "shelf_explanation": {"status": "available", "explanations": [{"text": {"en": "why"}}]},
         "order_quantity": {"status": oq_status, "unavailable_reason": oq_reason, "entries": list(entries)},
         # F9-S1: withheld with the market snapshots it is replayed from (AC-165).
         "assortment_gap": {"status": gap_status, "entries": list(gap_entries)},
@@ -216,3 +217,17 @@ def test_withheld_inputs_over_the_planogram_world_must_take_both_down():
     half = {"capabilities": {**gone["capabilities"], "shelf_measurement": {"status": "unavailable",
                                                                          "unavailable_reason": "capability_error"}}}
     assert probe.shelf_withheld_problems(half, "no_daily_sales")
+
+
+def test_withheld_explanations_say_no_model_key_and_leave_every_plan_alone():
+    rest = {"layout_facts": {"status": "available"}, "shelf_measurement": {"status": "unavailable"}}
+    base = {"capabilities": {**rest, "shelf_plan": {"entries": [{"id": "p"}]},
+                             "shelf_explanation": {"status": "available", "unavailable_reason": None}}}
+    gone = {"capabilities": {**rest, "shelf_plan": {"entries": [{"id": "p"}]},
+                             "shelf_explanation": {"status": "unavailable", "unavailable_reason": "no_model_key"}}}
+    assert probe.withheld_explanations_problems(gone, base) == []
+    changed = {"capabilities": {**gone["capabilities"], "shelf_plan": {"entries": [{"id": "q"}]}}}
+    assert probe.withheld_explanations_problems(changed, base)          # INV-096, the plan
+    moved = {"capabilities": {**gone["capabilities"], "shelf_measurement": {"status": "available"}}}
+    assert probe.withheld_explanations_problems(moved, base)            # INV-096, the measurement
+    assert probe.withheld_explanations_problems(base, base)             # an explanation from no model

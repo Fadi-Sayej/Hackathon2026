@@ -257,6 +257,11 @@ export const ar = {
   'unavailable.no_evidence_window': "تقارير المبيعات اليومية تصل، لكنها لم تكفِ بعد للتخطيط عليها.",
   'unavailable.owner_state_unavailable': "تعذّرت قراءة قراراتك المسجّلة الليلة، فلا يُعرض شيء يعتمد عليها.",
   'unavailable.no_arrangement_recorded': "لم يُعلَّم أي رف بعد على أنه رُتّب.",
+  // Task 8.10 (D-32, F12-S1 FR-214, FR-215): the explanation's key, and why a plan has none.
+  'unavailable.no_model_key': "شرح الرفوف متوقّف: لم يُضبط مفتاح للنموذج.",
+  'shelfExplanation.none.withheld': "تمّ حجب شرح الذكاء الاصطناعي: لم يجتز الفحص.",
+  'shelfExplanation.none.out_of_date': "كُتب شرح الذكاء الاصطناعي لخطة سابقة، فلا يُعرض.",
+  'shelfExplanation.none.not_written_tonight': "لم يشرح الذكاء الاصطناعي هذه الخطة بعد.",
   'unavailable.shelf_plan.no_daily_sales': "بانتظار تقارير المبيعات اليومية: تخطيط الرف يحتاج إلى مبيعات كل يوم.",
   'unavailable.shelf_plan.stale_daily_sales': "آخر تقرير مبيعات يومي أقدم من أن يُبنى عليه تخطيط الرفوف.",
   'unavailable.shelf_measurement.no_daily_sales': "بانتظار تقارير المبيعات اليومية: قياس الترتيب يحتاج إلى مبيعات كل يوم.",

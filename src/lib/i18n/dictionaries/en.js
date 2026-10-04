@@ -251,6 +251,11 @@ export const en = {
   'unavailable.no_evidence_window': "Daily sales reports are arriving, but not yet enough of them to plan on.",
   'unavailable.owner_state_unavailable': "Your recorded decisions could not be read tonight, so nothing that depends on them is shown.",
   'unavailable.no_arrangement_recorded': "No shelf has been marked as arranged yet.",
+  // Task 8.10 (D-32, F12-S1 FR-214, FR-215): the explanation's key, and why a plan has none.
+  'unavailable.no_model_key': "The shelf explanation is off: no key for the model has been set up.",
+  'shelfExplanation.none.withheld': "The AI's explanation was held back: it did not pass the check.",
+  'shelfExplanation.none.out_of_date': "The AI's explanation was written for an earlier plan, so it is not shown.",
+  'shelfExplanation.none.not_written_tonight': "The AI has not explained this plan yet.",
   'unavailable.shelf_plan.no_daily_sales': "We are waiting for the daily sales reports: a shelf plan needs sales per day.",
   'unavailable.shelf_plan.stale_daily_sales': "The latest daily sales report is too old to plan the shelves on.",
   'unavailable.shelf_measurement.no_daily_sales': "We are waiting for the daily sales reports: measuring an arrangement needs sales per day.",

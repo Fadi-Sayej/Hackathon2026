@@ -57,6 +57,7 @@ const ENGINE_REASONS = [
   'no_evidence_window',
   'owner_state_unavailable',
   'no_arrangement_recorded',
+  'no_model_key',
   // run-level
   'capability_error',
 ]

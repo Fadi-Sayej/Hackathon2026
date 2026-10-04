@@ -869,6 +869,14 @@
    },
    "published_population": "whole",
    "question_limit": 3,
+   "shelf_explanation": {
+    "max_chars": 600,
+    "max_tokens": 1200,
+    "model": "claude-sonnet-5",
+    "prompt": "configs/prompts/shelf_explanation.v1.md",
+    "request_ceiling": 40,
+    "time_budget_s": 300
+   },
    "shelf_measurement": {
     "bootstrap_draws": 1000,
     "bootstrap_seed": 20261004,

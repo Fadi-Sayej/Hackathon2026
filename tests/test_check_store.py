@@ -53,7 +53,7 @@ def test_an_empty_copy_is_missing_every_input(tmp_path):
 
 def test_a_missing_input_names_what_it_blocks_from_the_registry(tmp_path):
     items = _by_key(readiness(**_empty_copy(tmp_path)))
-    assert items["sales_daily"]["blocks"] == ["order_quantity", "shelf_measurement", "shelf_plan"]
+    assert items["sales_daily"]["blocks"] == ["order_quantity", "shelf_explanation", "shelf_measurement", "shelf_plan"]
     assert items["store_facts"]["blocks"] == ["order_quantity"]
     assert "price_consistency" in items["pos_export"]["blocks"]
     assert "reconciliation" in items["sales_monthly"]["blocks"]
@@ -66,7 +66,7 @@ def test_secrets_are_checked_by_name(tmp_path):
     present = _by_key(readiness(**{**kwargs, "secret_names": {"FIREBASE_SERVICE_ACCOUNT_JSON", "ANTHROPIC_API_KEY"}}))
     assert missing["nightly_secrets"]["status"] == "missing"
     assert present["nightly_secrets"]["status"] == "present"
-    assert missing["boost_key"]["blocks"] == ["market_boost"]
+    assert missing["boost_key"]["blocks"] == ["market_boost", "shelf_explanation"]
 
 
 def test_unknown_secrets_are_said_to_be_unchecked(tmp_path):
@@ -80,7 +80,7 @@ def test_this_copy_reports_what_it_holds():
     assert items["pos_export"]["status"] == "present"
     assert "2026-06-06" in items["pos_export"]["detail"]
     assert items["sales_monthly"]["status"] == "present"
-    assert items["sales_daily"]["status"] == "missing" and items["sales_daily"]["blocks"] == ["order_quantity", "shelf_measurement", "shelf_plan"]
+    assert items["sales_daily"]["status"] == "missing" and items["sales_daily"]["blocks"] == ["order_quantity", "shelf_explanation", "shelf_measurement", "shelf_plan"]
     assert items["store_facts"]["status"] == "missing"
     assert items["store_layout"]["status"] == "missing"     # ADR-037: no store has recorded one yet
     assert items["client_venue"]["status"] == "present"

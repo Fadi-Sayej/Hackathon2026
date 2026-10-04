@@ -252,6 +252,11 @@ export const he = {
   'unavailable.no_evidence_window': "דוחות המכירות היומיים מגיעים, אבל עדיין אין מספיק מהם כדי לתכנן לפיהם.",
   'unavailable.owner_state_unavailable': "לא ניתן היה לקרוא הלילה את ההחלטות שרשמת, ולכן לא מוצג דבר שתלוי בהן.",
   'unavailable.no_arrangement_recorded': "עדיין לא סומן אף מדף כמסודר.",
+  // Task 8.10 (D-32, F12-S1 FR-214, FR-215): the explanation's key, and why a plan has none.
+  'unavailable.no_model_key': "ההסבר למדפים כבוי: לא הוגדר מפתח למודל.",
+  'shelfExplanation.none.withheld': "ההסבר של הבינה המלאכותית נעצר: הוא לא עבר את הבדיקה.",
+  'shelfExplanation.none.out_of_date': "ההסבר של הבינה המלאכותית נכתב לתוכנית קודמת, ולכן אינו מוצג.",
+  'shelfExplanation.none.not_written_tonight': "הבינה המלאכותית עדיין לא הסבירה את התוכנית הזו.",
   'unavailable.shelf_plan.no_daily_sales': "ממתינים לדוחות המכירות היומיים: תוכנית מדף דורשת מכירות לפי יום.",
   'unavailable.shelf_plan.stale_daily_sales': "דוח המכירות היומי האחרון ישן מדי כדי לתכנן לפיו את המדפים.",
   'unavailable.shelf_measurement.no_daily_sales': "ממתינים לדוחות המכירות היומיים: מדידת סידור דורשת מכירות לפי יום.",
