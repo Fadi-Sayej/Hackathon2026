@@ -6,7 +6,7 @@ Version: 0.1 (content unchanged from `specs.md` v1.1)
 Parent: [PRD](PRD.md)
 Related Specs: every F#-S# document under `docs/features/`
 Owner: smartshelf-pm
-Updated: 2026-10-04 (INT-006 specified: F12-S1 approved)
+Updated: 2026-10-04 (D-32: Shelf plan explains each shelf in an AI's words)
 ---
 
 > **Migration note.** This is `SPEC-000` from the pre-migration monolithic `specs.md`,
@@ -115,6 +115,7 @@ These are settled. A specification may operationalize them; it may not reopen th
 | D-29 | **While Reorder and Approved orders wait for daily sales reports, each may show an example of itself, inside a clearly marked preview.** "See how this page looks" opens the real page filled from a test shop, built from the order probe's fixture world by `scripts/build_order_example.py`. A banner on every screen of it says it is an example and not the store's data. Nothing in it can be approved, changed, saved, exported or sent, and the engine, the published artefacts, the owner state and the pilot measurement never read it. It supersedes D-23 and CLAUDE.md rule 7 in this one respect only: everywhere else nothing is simulated, and no other page shows an example | Decided by the repository owner 2026-10-03: "a", choosing between "a live example" (recommended), "pictures only" (the approved mockup screenshots) and "leave them as they are" |
 | D-30 | **F12 (the planogram) is unlocked for specification now, with the plan waiting for daily sales the way F8 does:** it shows why it is waiting, never an empty or invented plan, until the store's daily sales reports arrive. As the option was put to him, the owner's own inputs (shelf photographs, shelf measurements, his arrangement rules) would not wait for sales. D-13 stands: no fixed cameras or sensors. Not decided here: building it, which follows his approval of the spec and its mockups; a marked example while the plan waits, which needs a decision of its own because D-29 confines examples to the order pages; and whether a first version reads shelves from photographs or takes them by hand, for the spec to propose and the owner to approve (reading a shelf photograph is untested; the PRD's one-day trial was never run) | Decided by the repository owner 2026-10-03: "unlock", answering "should F12 be unlocked for specification now, with the plan waiting for sales the way F8 does?" |
 | D-31 | **While Shelf plan waits, it may show a clearly marked example of itself, as Reorder does under D-29.** It sits under a banner saying it is an example and not the store's data. Nothing in it can be approved, changed, saved, exported or sent, and the engine, the published artefacts, the owner state and the pilot measurement never read it. It extends D-29's exception to this one page. Everywhere else, D-23 and CLAUDE.md rule 7 stand. Not decided here: what the example is built from, which F12-S1's plan proposes for his approval | Decided by the repository owner 2026-10-03: "yes", answering "Should the waiting Shelf plan page show a clearly marked example of how it will look, like Reorder does? That would be a new decision, D-31." |
+| D-32 | **Shelf plan explains, in an AI's words, why each shelf is arranged the way the plan says.** The owner asked for it on approving the planogram's build plan: the AI tells him why to organize the shelf this way. It is F12's own explanation, and does not widen F14, which D-15 keeps to order suggestions. Not decided here: how the explanation is written, checked and paid for. F12-S1 proposes that for his approval, following the conditions D-16 set for an AI-written reason | Decided by the repository owner 2026-10-04: "yes but i need you to add ai explanation to this also so the ai tells why to organize the shelf this way", answering "Do you approve the plan and these numbers?" |
 
 ---
 
@@ -158,6 +159,8 @@ rather than surfacing them:
   remains excluded permanently, not merely postponed.
   *(2026-10-03: unlocked for specification by **D-30**, with the plan waiting for daily sales
   the way F8 does. The three inputs above are still required; D-13 stands.)*
+  *(2026-10-04: specified as F12-S1 and approved, with its build plan. **D-32** adds an AI's
+  explanation of each shelf, which F12-S1 specifies for his approval.)*
 
 **INT-MEAS** *(2026-09-28: now specified as F13-S1, approved by the repository owner, with no
 success number, D-24; what follows is the record of why it was not.)* It was not specified here for a different reason: `intent.md` §11.1 states it is
