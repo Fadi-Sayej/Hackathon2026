@@ -4,10 +4,10 @@ Title: SmartShelf V1 Implementation Plan
 Status: Partial — Phases 0, 1, 2 and 3 built (Task 2.7's cut-over done 2026-09-12, once ADR-020 removed D-14 as a blocker); Phase 4 done: Tasks 4.0 … 4.3 and 4.5 done (4.1 re-scoped by ADR-028, less §20.1's scripts row; 4.5 rebuilt the measurement surface, F13-S1, which let 4.2 finish), Checkpoint 4 closed 2026-09-28; Phase 5 (V2, F8) built 2026-09-27 (Tasks 5.0–5.14, Checkpoint 5 met), and unavailable on real data until another store sends daily reports (D-23); Phase 6 (V2, F9-S1) built 2026-09-28/29, Checkpoint 6 met, on screen
 Owner: smartshelf-architect
 Inputs: [docs/architecture/system-design.md, docs/features/F1-*/specs … F8-*/specs, docs/architecture/decisions/]
-Updated: 2026-09-30 (Phase 7 planned: a new store without code changes, D-28 and ADR-036)
+Updated: 2026-10-04 (Phase 8 planned: F12-S1, the planogram, approved the same day)
 Version: 1.1 (written 2026-09-08 against System Design v1.0; refreshed the same day against v1.1)
 Parent: [System Design](../architecture/system-design.md)
-Related Specs: F1-S1 … F7-S1 for Phases 0–4; F8-S1 for Phase 5 (see the System Design's §21 traceability matrix)
+Related Specs: F1-S1 … F7-S1 for Phases 0–4; F8-S1 for Phase 5; F9-S1 for Phase 6; F12-S1 for Phase 8 (see the System Design's §21 traceability matrix)
 ---
 
 > **Refreshed against System Design v1.1 on 2026-09-08.** The 2026-09-08 documentation
@@ -81,6 +81,7 @@ Copied verbatim from `docs/architecture/system-design.md`; every task's requirem
 | Phase 5 — V2: Order quantity (F8-S1) — **built 2026-09-27; dormant until another store sends daily reports (D-23)** | [`phase-5-v2-order-quantity.md`](phase-5-v2-order-quantity.md) | F8-S1 (Approved), ADR-030 … ADR-035 (Accepted); independent of Phase 4 | Per-day import, store facts, the market's running-out signal, the model's boost (sealed snapshot), the quantity, the disagreement question, then the Reorder and Approved orders pages after their mockups are approved. **Checkpoint 5:** all green on fixtures; on real data `order_quantity` is unavailable with `no_daily_sales` and says so |
 | Phase 6 — V2: Assortment gap (F9-S1) — **built 2026-09-28/29; Checkpoint 6 met 2026-09-29; on screen** | [`phase-6-v2-assortment-gap.md`](phase-6-v2-assortment-gap.md) | F9-S1 (Approved); independent of Phase 5's release conditions | `assortment_gap` over D-18's market and data already held (D-23); at most one unvalued place on Today, the first; hidden until the card is approved. **Checkpoint 6:** Tasks 6.1–6.4 merged, the nightly publishes it on real data, `check:signals` covers it |
 | Phase 7 — A new store without code changes (ADR-036) — **approved 2026-09-30; code starts after the 2026-10-01 Actions reset** | [`phase-7-store-onboarding.md`](phase-7-store-onboarding.md) | D-28; ADR-036 (Accepted) | `configs/store.yaml` read by the engine, importers, build and nightly; a nearby-venue finder; `npm run check:store`; a copy made without the previous store's data; the fake POS generator removed. **Checkpoint 7:** YomYom's artefact unchanged, and a clean copy builds, passes the suites and lists what a store must send |
+| Phase 8 — V4: Planogram (F12-S1) — **planned 2026-10-04; Ready for review** | [`phase-8-v4-planogram.md`](phase-8-v4-planogram.md) | F12-S1 (Approved), ADR-037 and ADR-038 (Accepted); Phase 7's store-data manifest | A layout file the team records; `layout_facts`, `shelf_plan` and `shelf_measurement`; his arrangement record; the probe and the marked example; then Store layout and Shelf plan after their mockups are approved. **Checkpoint 8:** all green on fixture worlds; on real data all three unavailable with `no_store_layout` and saying so |
 
 ## Prerequisites that are not code (do before Phase 0, Task 0.13 checks them)
 
