@@ -1233,8 +1233,8 @@ own, so their rows say so rather than grade it after the fact.
 | [ADR-034](decisions/ADR-034-a-suggestion-is-identified-by-product-and-order-day.md) | An order suggestion is identified by its product and order day; a disagreement is a question keyed by its product | Easy before first use |
 | [ADR-035](decisions/ADR-035-a-models-answer-is-collected-data.md) | A model's answer is collected data: sealed as a daily snapshot, and reproduction reads it like any other | Easy |
 | [ADR-036](decisions/ADR-036-a-store-is-configuration-one-copy-per-store.md) | A store is configuration, and each store runs its own copy with only its own data (D-28) | Easy |
-| [ADR-037](decisions/ADR-037-shelf-layout-is-a-committed-file.md) | The shelf layout, facing widths and arrangement rules are a committed file the team records from the owner (F12-S1). **Ready for review** | Easy: a later ADR can move widths to photographs if the vision trial succeeds |
-| [ADR-038](decisions/ADR-038-a-shelf-arrangement-is-an-outcome-on-the-fixtures-plan.md) | A shelf arrangement is the owner's `acted` outcome on that fixture's `shelf.plan` entry (F12-S1). **Ready for review** | Easy before the first arrangement is recorded |
+| [ADR-037](decisions/ADR-037-shelf-layout-is-a-committed-file.md) | The shelf layout, facing widths and arrangement rules are a committed file the team records from the owner (F12-S1). Accepted 2026-10-04 | Easy: a later ADR can move widths to photographs if the vision trial succeeds |
+| [ADR-038](decisions/ADR-038-a-shelf-arrangement-is-an-outcome-on-the-fixtures-plan.md) | A shelf arrangement is the owner's `acted` outcome on that fixture's `shelf.plan` entry (F12-S1). Accepted 2026-10-04 | Easy before the first arrangement is recorded |
 
 ---
 
@@ -1505,7 +1505,7 @@ it needs a store to send anything. The plan that builds it is
 | FR-175 | B `NOT_YET_SHOWN` until the card is approved | Phase 5 Task 5.0's precedent | AC-170 |
 | FR-176, NFR-070, NFR-071 | R print mode over the committed snapshots | ADR-002, ADR-005 | AC-164; Checkpoint 3's budget |
 
-### F12-S1 — Planogram (V4: specified, Ready for review; not built)
+### F12-S1 — Planogram (V4: specified, Approved 2026-10-04; not built)
 
 F12-S1 builds D-30, which unlocked F12 for specification on 2026-10-03 with the plan waiting for
 daily sales the way F8 does. It adds three engine capabilities (ADR-014): `layout_facts`, which

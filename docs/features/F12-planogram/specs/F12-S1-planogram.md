@@ -1,21 +1,22 @@
 ---
 ID: F12-S1
 Title: Planogram — a dated shelf plan from his own sales, waiting for them until they arrive
-Status: Ready for review
+Status: Approved — by the repository owner, 2026-10-04
 Owner: smartshelf-architect
 Version: 0.7 (2026-10-04: OQ-1206 answered; the arrangement record and the before-and-after measurement; §23; two rounds of the measurement's review)
 Parent: [F12 — Planogram](../intent.md)
 Related Intents: INT-006
 Inputs: [docs/features/F12-planogram/intent.md (Approved for specification, D-30), docs/product/PRD.md (§5 V4, §6 #7), docs/product/intent-register.md (D-1, D-3, D-13, D-14, D-22, D-23, D-28, D-29, D-30, D-31), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (§5 "He stocks", FR-143 … FR-146, FR-156), ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011, ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-033, ADR-036, ADR-037, ADR-038, CLAUDE.md]
 Answered by: [System Design](../../../architecture/system-design.md) §21 (F12-S1)
-Updated: 2026-10-04 (the measurement's review: a before window apart from the plan's, one Poisson regression, a fixture bootstrap, a placebo, `shelf_measurement`; eligibility from the plan's window, one net change, a spaced placebo on both terms, arrangements shown from the artefact)
+Updated: 2026-10-04 (approved by the repository owner, OQ-1208 with it; earlier the same day, the measurement and its two reviews)
 ---
 
 # F12-S1 — Planogram
 
-> **Ready for review.** D-30 unlocked this spec on 2026-10-03: the plan waits for daily sales the
-> way F8 does, and D-13 stands. Everything D-30 left open is either decided here, marked
-> **(decided here)** for the owner's approval, or asked in §17.
+> **Approved by the repository owner on 2026-10-04.** D-30 unlocked this spec on 2026-10-03: the
+> plan waits for daily sales the way F8 does, and D-13 stands. Everything D-30 left open is either
+> decided here, marked **(decided here)** and approved with the spec (OQ-1205, OQ-1208), or still
+> asked in §17 (OQ-1204, OQ-1207).
 
 > **Identifier note.** Every `FR-`, `INV-`, `NFR-`, `AC-`, `SCN-`, `C-`, `ASM-` and `OQ-` id
 > below is new and globally unique: FR-178 … FR-209, INV-084 … INV-095, NFR-072 … NFR-076,
@@ -844,8 +845,9 @@ owner approves:
 · owner: the repository owner · blocks: the numbers in FR-202, FR-205 and FR-209, not their
 rules.
 
-**OQ-1208** — Are the measurement's design choices right? The choices marked **(decided here)**
-in FR-201 … FR-209 are:
+**~~OQ-1208~~** — Are the measurement's design choices right? **Answered 2026-10-04:
+"approved"**, to "Do you approve the spec as written? The new design choices are listed in its
+open question OQ-1208." The choices marked **(decided here)** in FR-201 … FR-209 are:
 - the first date of an arrangement stands, and undoing it removes its measurement (FR-201);
 - the before window ends where the plan's window begins (FR-202);
 - one product's change carries no verdict, and uses the regression's yardstick (FR-203);
@@ -856,8 +858,6 @@ in FR-201 … FR-209 are:
 - no fixture total (FR-207);
 - a third capability, not on Today (FR-208);
 - the placebo, on both terms and over the same distance (FR-209).
-
-· owner: the repository owner · blocks: building the measurement, not the plan.
 
 ## 18. Non-Goals
 

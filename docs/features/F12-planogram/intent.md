@@ -5,7 +5,7 @@ Status: Approved — for specification, by the repository owner on 2026-10-03 (D
 Release: V4
 Parent: [PRD](../../product/PRD.md)
 Intent IDs: INT-006
-Specs: none
+Specs: [F12-S1](specs/F12-S1-planogram.md) (Approved 2026-10-04)
 ---
 
 # F12 — رتّب رفوفي لأربح أكثر · Planogram
@@ -69,3 +69,10 @@ Not decided by D-30:
 
 The status above records his approval for specification, as F8's did (ca47a35). The banner at
 the top describes the state before D-30, and is kept as the record.
+
+## Added 2026-10-04 (not part of the migrated content)
+
+The repository owner approved [F12-S1](specs/F12-S1-planogram.md), answering "Do you approve
+the spec as written?" with "approved". It includes the "I've arranged this shelf" record and the
+before-and-after measurement he had asked for on 2026-10-04 ("the planogram is real science",
+F12-S1 OQ-1206). Building it follows his approval of its plan and its mockups (F12-S1 C-75).

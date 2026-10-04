@@ -1,7 +1,7 @@
 ---
 ID: ADR-037
 Title: The shelf layout, facing widths and arrangement rules are a committed file the team records; owner state never holds them
-Status: Ready for review
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-10-03
 Parent: [System Design](../system-design.md) §19
@@ -12,7 +12,7 @@ Updated: 2026-10-04 (current facings, for F12-S1's measurement)
 
 # ADR-037 — The shelf layout is a committed file the team records; owner state never holds them
 
-**Status:** Ready for review · **Recorded in:** [System Design](../system-design.md) §19
+**Status:** Accepted (2026-10-04, by the repository owner: "approved", with F12-S1, whose requirements are written on it) · **Recorded in:** [System Design](../system-design.md) §19
 
 ## Context
 

@@ -6,7 +6,7 @@ Version: 0.1 (content unchanged from `specs.md` v1.1)
 Parent: [PRD](PRD.md)
 Related Specs: every F#-S# document under `docs/features/`
 Owner: smartshelf-pm
-Updated: 2026-10-03 (D-31: Shelf plan may show a marked example while it waits)
+Updated: 2026-10-04 (INT-006 specified: F12-S1 approved)
 ---
 
 > **Migration note.** This is `SPEC-000` from the pre-migration monolithic `specs.md`,
@@ -41,7 +41,7 @@ owner.
 | **INT-003** | "Are my prices reasonable against my neighbours?" | V1 | SPEC-003 |
 | **INT-004** | "What do I order today, and how much?" | V2 | F8-S1 |
 | **INT-005** | "What does the market sell that I don't?" | V2 | F9-S1 (Approved 2026-09-28) |
-| **INT-006** | "Arrange my shelves so I earn more" | V4 | Not specified — see §4 |
+| **INT-006** | "Arrange my shelves so I earn more" | V4 | F12-S1 (Approved 2026-10-04) |
 | **INT-007** | "How much do I order so it does not spoil?" | V2 | Not specified — see §4 |
 | **INT-008** | "When does each supplier actually deliver?" | V3 | Not specified — see §4 |
 | **INT-009** | "Clean my catalogue of dead products" | V1 | SPEC-004 |
@@ -120,10 +120,10 @@ These are settled. A specification may operationalize them; it may not reopen th
 
 ### 4. Intents deliberately not specified in this phase
 
-**INT-007, INT-008 (V2/V3) and INT-006 (V4)** are not given specifications here.
-INT-004 and INT-005 now are (F8-S1, 2026-09-25; F9-S1, 2026-09-28); their entries below keep
-the record of how their decisions were taken. INT-006 was unlocked for specification by D-30
-(2026-10-03); its spec is to come.
+**INT-007 and INT-008 (V2/V3)** are not given specifications here.
+INT-004, INT-005 and INT-006 now are (F8-S1, 2026-09-25; F9-S1, 2026-09-28; F12-S1, 2026-10-04);
+their entries below keep the record of how their decisions were taken. INT-006 was unlocked for
+specification by D-30 (2026-10-03).
 
 The reason is not scheduling. Each rests on a product decision that the intent layer
 has explicitly left open, and writing requirements now would mean inventing those answers
