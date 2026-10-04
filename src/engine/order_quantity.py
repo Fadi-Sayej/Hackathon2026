@@ -76,7 +76,8 @@ def _schedule_changed(inputs: EngineInputs, barcode: str, order_day: str, run_da
     """ADR-034 Decision 4: an approval recorded for a pending order day that is no longer the
     department's next one. It never carries to the new day; the engine says so."""
     for rec in (inputs.owner.outcomes or {}).values():
-        snap = (rec or {}).get("snapshot") or {}
+        rec = rec or {}                  # an undo reaches the engine as a null tombstone (clearOutcome)
+        snap = rec.get("snapshot") or {}
         if (rec.get("status") == "acted" and snap.get("signal_family") == FAMILY
                 and snap.get("barcode") == barcode and snap.get("order_day")
                 and run_day <= snap["order_day"] != order_day):

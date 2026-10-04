@@ -342,3 +342,13 @@ def test_a_print_mode_rerun_reproduces_every_quantity_and_fact(tmp_path, monkeyp
         need = ev["expected_sales"] - (ev["stock_at_order_day"] or 0.0) if ev["kind"] == "net" else ev["expected_sales"]
         cap_units = int(ev["adjusted_daily_mean"] * ev["shelf_life"]["days"] - (ev["stock_at_order_day"] or 0.0))
         assert ev["quantity"] == min(int(need + 0.5), cap_units)
+
+
+def test_an_undone_outcome_does_not_crash_the_schedule_check():
+    """clearOutcome writes a null tombstone, and the pull passes it through. Reading it as a record
+    raised AttributeError and took order_quantity down as capability_error."""
+    from src.engine.order_quantity import _schedule_changed
+    from src.owner_state.model import OwnerState
+    inputs = make_inputs(products=[], owner=OwnerState.from_dict(
+        {"status": "available", "pulled_at": "t", "outcomes": {"undone": None}}))
+    assert _schedule_changed(inputs, "1", "2026-10-05", "2026-10-04") is False
