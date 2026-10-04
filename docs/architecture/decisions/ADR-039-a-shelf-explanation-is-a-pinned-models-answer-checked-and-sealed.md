@@ -16,10 +16,13 @@ Updated: 2026-10-04
 
 ## Context
 
-D-32 asks that the AI explain why each shelf is arranged as the plan says. D-16 already fixed how
+D-32 asks that the AI explain why to organize the shelf the way the plan says. D-16 already fixed how
 an AI-written reason is made in this product: once a night, from published facts, with a paid
-account, a spending ceiling, and a mechanical check that it states no figure its facts do not
-carry. ADR-032 and ADR-035 built that for the market boost:
+account, a monthly spending ceiling with an alert, and a mechanical check that it states no
+figure its facts do not carry. D-32 settled that there is an explanation, not how it is made;
+this ADR proposes D-16's method for it, for the owner's approval (F12-S1 OQ-1209).
+
+ADR-032 and ADR-035 built that method for the market boost:
 - a pinned model;
 - a JSON answer checked for digits;
 - two spending limits;
@@ -39,12 +42,20 @@ The explanation needs the same, with two differences:
    The prompt is a versioned file, `configs/prompts/shelf_explanation.v1.md`, and it holds §23's
    findings in plain words. The model id and prompt version are recorded with every
    explanation.
-3. **One client, not two.** The request, the transport, the digit pattern and the facts digest
-   move out of `market_boost.py` into one module that both steps use. The check is one rule,
-   applied in one place.
+3. **One client, not two.** The request, the transport, the key's name (`KEY_ENV`), the digit
+   pattern and the facts digest move out of `market_boost.py` into one module that both steps
+   use. Two changes come with the move:
+   - the request takes its token limit as a parameter. The boost keeps its 300. The
+     explanation's three languages need more, `shelf.explanation_max_tokens`, proposed at 1,200,
+     or every answer would be cut off and fail to parse;
+   - one check of the key gives two reasons, each in its own capability's words: the boost's
+     `no_boost_key` and the explanation's `no_model_key`. They are one fact, the secret being
+     unset, said where each applies.
 4. **What it is given and what it may return:** F12-S1 FR-211 and FR-212.
    - The answer is JSON: `{"he": …, "ar": …, "en": …}`, each at most the policy's length.
-   - The digit check runs after removing the product names it was given.
+   - The digit check runs after removing the product names it was given: that fixture's only,
+     exactly as given, longest first. That is looser than the boost's check, which removes
+     nothing, and F12-S1 FR-212 marks it decided here.
    - A failing answer is withheld whole.
 5. **Sealed as ADR-035 seals the boost.**
    - The snapshot lives under `data/external/snapshots/<plan date>/shelf_explanations/`. It
@@ -57,18 +68,25 @@ The explanation needs the same, with two differences:
    - **Print mode never calls the model.** It reads the night's snapshot. With none, the
      explanations are withheld input: every plan is unchanged, and each fixture says it has no
      explanation.
-   - **Reuse.** Before asking, the step looks for the same facts digest in earlier nights'
-     snapshots. If it finds one, it copies that explanation into tonight's snapshot with
-     `reused_from`, and makes no request. Each night's snapshot stays complete on its own, and
-     an unchanged plan is paid for once.
-6. **Spending, ADR-032's two limits.**
-   - The account's monthly spend limit is the one the owner sets in the provider's console. It
-     is shared with the boost.
-   - A per-run ceiling in policy: `shelf.explanation_request_ceiling`, proposed at 40.
-   - A time budget in policy: `shelf.explanation_time_budget_s`, proposed at 300 (F12-S1
-     NFR-077). The nightly ran 29.5 minutes of its 60 on 2026-10-04 (run 37174519014). At
-     ADR-032's 30-second timeout, 40 slow requests would take 20 minutes, so the budget is what
-     keeps the step from threatening the timeout.
+   - **Reuse.** Before asking, the step reads the most recent earlier night's snapshot, and only
+     that one. Each snapshot is complete on its own, so one file holds every explanation still in
+     use. An explanation is reused only if it was accepted, and its facts digest, model and
+     prompt version all match tonight's. It is copied into tonight's snapshot with
+     `reused_from`, and no request is made. A withheld answer is asked again, and so is every
+     fixture after a prompt or model change. Reading one earlier file keeps the step's time
+     independent of the history (F12-S1 NFR-072).
+6. **Spending, ADR-032's two limits, and a time budget.**
+   - The account's monthly spend limit, and the alert D-16 asks for with it, are the owner's to
+     set where the account is managed. They are shared with the boost.
+   - A per-night ceiling in policy, `shelf.explanation_request_ceiling`, proposed at 40. It is
+     counted across the night's runs, as the boost's ceiling is (`market_boost.py`'s `live_step`).
+   - A time budget in policy, `shelf.explanation_time_budget_s`, proposed at 300 (F12-S1
+     NFR-077). The nightly ran 29.5 minutes of its 60 on 2026-10-04 (run 37174519014). A request
+     times out at 30 seconds (`TIMEOUT_S`, `market_boost.py`), and a failed one is retried once
+     after a one-second pause, so a single request can take about 61 seconds. Forty of them could
+     take about 41 minutes. The budget is checked before each request, so the step ends within
+     about 300 + 61 seconds. A request that fails twice ends the night's asking, as the boost's
+     does.
 
    **What it would cost**, at the prices ADR-032 read from Anthropic's pricing page on
    2026-09-26 ($2 in, $10 out, per million tokens). The estimate assumes about 1,500 tokens in

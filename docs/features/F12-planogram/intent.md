@@ -78,5 +78,5 @@ before-and-after measurement he had asked for on 2026-10-04 ("the planogram is r
 F12-S1 OQ-1206). Building it follows his approval of its plan and its mockups (F12-S1 C-75).
 
 He then approved its build plan, answering "Do you approve the plan and these numbers?" with "yes but i need you to add ai explanation to this also so the ai tells why to organize the shelf this way". That second part is **D-32**: Shelf plan
-explains, in an AI's words, why each shelf is arranged as it is. F12-S1 specifies how, for his
+has the AI explain why to organize the shelf the way the plan says. F12-S1 specifies how, for his
 approval.

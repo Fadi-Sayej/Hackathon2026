@@ -24,7 +24,7 @@ Updated: 2026-10-04 (D-32's explanation, for approval as OQ-1209; earlier the sa
 
 > **Identifier note.** Every `FR-`, `INV-`, `NFR-`, `AC-`, `SCN-`, `C-`, `ASM-` and `OQ-` id
 > below is new and globally unique: FR-178 … FR-215, INV-084 … INV-097, NFR-072 … NFR-077,
-> AC-172 … AC-203, SCN-159 … SCN-177, C-73 … C-75, ASM-073 … ASM-083, OQ-1201 … OQ-1209.
+> AC-172 … AC-204, SCN-159 … SCN-177, C-73 … C-75, ASM-073 … ASM-083, OQ-1201 … OQ-1209.
 
 Implements intent F12. Bound by ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011,
 ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037,
@@ -48,8 +48,8 @@ that was there already, his store's own response replaces the research average (
 FR-209). Until then it claims no gain. The intent's "+20–68% margin per linear metre" is a figure
 from elsewhere (§21).
 
-Each shelf's plan comes with an AI's explanation of why it is arranged that way, in his language
-(D-32, FR-210 … FR-215). The explanation puts the plan's own reasons into words. It never
+Each fixture's plan comes with the AI's explanation of why to organize the shelf that way, in
+his language (D-32, FR-210 … FR-215). The explanation puts the plan's own reasons into words. It never
 changes the plan.
 
 ## 2. Intent Traceability
@@ -84,8 +84,8 @@ Behavioural scope, not a file list. The implementation plan declares the files.
 - His "I've arranged this shelf" record, and the before-and-after measurement it starts
   (FR-201 … FR-209; OQ-1206, answered).
 - A clearly marked example on Shelf plan while it waits, as on Reorder (D-31, FR-200). What the
-  example is built from the planogram test shop, as Reorder's is, approved with the Phase 8 plan
-  on 2026-10-04.
+  example is built from the same test shop as Reorder's example, with a shelf layout added, as
+  the owner approved with the Phase 8 plan on 2026-10-04.
 - The boundary probe for the new inputs (§20).
 
 ### Out of Scope
@@ -454,8 +454,8 @@ shelf is arranged that way:
 - which of the plan's rules, and which research finding (§23), each of those rests on.
 
 It is written once a night, from that fixture's published plan facts, and published with it.
-It is never written at request time. That is D-16's method for an AI-written reason, which D-32
-brings to F12 **(decided here)**.
+It is never written at request time. That is D-16's method for an AI-written reason, applied
+here **(decided here)**: D-32 settled that there is an explanation, not how it is made.
 
 **FR-211** — The model is given only what that fixture's plan publishes **(decided here)**:
 - its shelves in order, and which is at eye level;
@@ -466,15 +466,19 @@ brings to F12 **(decided here)**.
 - his rules, and whether the fixture was over-full or stopped by a rule;
 - the elasticity the plan used, and why.
 
-The research findings of §23 are fixed text in the versioned prompt. No ₪ figure, margin,
-demand or other quantity goes in (D-1). The order carries the ranking without the amounts.
+The research findings of §23 are fixed text in the versioned prompt. The only numbers sent are
+each product's facings, the shelves' positions and the elasticity used. No ₪ figure, margin or
+demand goes in (D-1), and the order carries the ranking without the amounts. The answer may not
+repeat any number as a digit (FR-212).
 
 **FR-212** — The answer is checked mechanically before anything is published **(decided here)**:
 - it must parse as the explanation in Hebrew, Arabic and English, each within the policy's
   length;
-- no text may contain a digit (0–9, ٠–٩ or ۰–۹) outside the product names it was given. The
-  names are removed before the check, because a size such as "1.5L" is part of a name. This is
-  D-16's figure check, applied as ADR-032 applies it to the boost's reason.
+- no text may contain a digit (0–9, ٠–٩ or ۰–۹) outside the product names it was given. This is
+  D-16's figure check. It is looser than the boost's (ADR-032), which removes nothing, because a
+  size such as "1.5L" is part of a name **(decided here)**. Only that fixture's names are removed,
+  exactly as given and longest first, and the prompt requires every name to be copied exactly as
+  given, in all three languages. A name changed in the copying keeps its digits, and fails.
 
 An answer that fails is withheld whole, so the three languages never disagree. The plan is still
 shown, and says why it has no explanation. A number written in words, or a promised gain, cannot
@@ -487,9 +491,10 @@ be caught mechanically. The prompt forbids both, and ASM-083 states what is left
 - print mode never calls the model, and reads the snapshot;
 - an explanation whose digest no longer matches the plan's facts is not shown, and the plan says
   its explanation is out of date;
-- a fixture whose facts already have a sealed explanation, from any earlier night, is not asked
-  again. Tonight's snapshot records the explanation it reuses, so an unchanged plan is not paid
-  for twice.
+- a fixture is not asked again when the most recent earlier snapshot holds an accepted
+  explanation with the same facts digest, model and prompt version. Tonight's snapshot copies
+  it, so each night's snapshot is complete on its own, and an unchanged plan is paid for once.
+  A withheld answer is never reused, and a new prompt or model asks again.
 
 **FR-214** — `shelf_explanation` is a capability of its own, `value_policy: none` and not
 admitted, because it fails on different days from the plan (ADR-014) **(decided here)**:
@@ -500,15 +505,17 @@ admitted, because it fails on different days from the plan (ADR-014) **(decided 
 - it publishes, per fixture plan, its explanation, or why it has none: withheld, out of date, or
   not written tonight;
 - spending has ADR-032's two limits. The account's monthly limit is the owner's, in the
-  provider's console, and is shared with the boost. A per-run ceiling of requests sits in
-  policy. A fixture past the ceiling, or past the step's time budget, has no explanation
+  provider's console, with its alert (D-16), and is shared with the boost. A per-night ceiling
+  of requests sits in policy, counted as the boost's is. A fixture past the ceiling, or past the step's time budget, has no explanation
   tonight and says so.
 
 **FR-215** — Shelf plan shows each fixture's explanation beside its plan, in his language, under
 a label saying it is the AI's explanation of the plan. When there is none, it says why, in his
 words. The explanation never changes the plan (INV-096). On the marked example (D-31), the
-explanation is the one the real step writes for the example's test shop. Until a model key
-exists, the example shows "no explanation: no model key", as the store's plan would.
+explanation is the real step's answer for the example's test shop. The team asks for it once,
+by hand with the key, and seals it with the example's inputs, because the example is built in
+print mode, which never calls the model. Until then, the example's fixtures say they have no
+explanation (`no_model_key`).
 
 ## 7. Behavioral Invariants
 
@@ -565,9 +572,11 @@ whose placebo did not run or did not pass.
 followed (FR-202). *Violated if* a published before window and the followed plan's window
 overlap.
 
-**INV-096** — No figure F12 publishes comes from the model. The explanation is text beside the
-plan, and nothing reads it back. *Violated if* any placement, facing count, elasticity,
-measurement or figure differs between a run with the sealed explanations and one without them.
+**INV-096** — No figure of `layout_facts`, `shelf_plan` or `shelf_measurement` comes from the model.
+The explanation is text beside the plan, and nothing reads it back. *Violated if* any placement,
+facing count, elasticity, measurement or figure of those three differs between a run with the
+sealed explanations and one without them. `shelf_explanation`'s own counts of requests and reuse
+(NFR-077) are not figures of the plan.
 
 **INV-097** — An explanation is shown only beside the facts it was written from. *Violated if* an
 explanation is published for a plan whose facts digest differs from the one it recorded.
@@ -716,7 +725,8 @@ measurement of the layout, or a new arrangement, changes the next night's plan.
 ## 13. Non-Functional Requirements
 
 **NFR-072** — No F12 capability adds a step whose time grows with the collected
-market history. They read only the layout file, the catalogue, the daily reports and owner state
+market history. They read only the layout file, the catalogue, the daily reports, owner state
+and, for the explanation, tonight's and the most recent earlier night's sealed explanations
 (compare the 2026-10-03 nightly, #276).
 
 **NFR-073** — Reproduction: print mode and `npm run figures` compute the same plan and the same
@@ -734,8 +744,9 @@ owner state, and no past artefact. Its time grows with the arrangements he recor
 with the collected market history.
 
 **NFR-077** — The explanation step never holds the plan up. Its requests are bounded by the
-policy's ceiling and its time by the policy's budget. A request that fails or times out leaves
-that fixture without an explanation tonight. The number of requests made, and how many
+policy's ceiling and its time by the policy's budget, which is checked before each request. A
+request that fails twice leaves that fixture without an explanation tonight, and the step asks
+nothing more that night, as the boost's does. The number of requests made, and how many
 explanations were reused, are published each night.
 
 ## 14. Compatibility and External Constraints
@@ -862,12 +873,17 @@ digit passes. *(FR-212)*
 **AC-201** — Print mode never calls the model, and reproduces the published explanations from the
 snapshot. An explanation whose facts digest no longer matches is not shown. *(FR-213, INV-097)*
 
-**AC-202** — The request built for a fixture carries only FR-211's facts, and no ₪ figure, margin,
-demand or other quantity. *(FR-211)*
+**AC-202** — The request built for a fixture carries only FR-211's facts. Its only numbers are
+facings, shelf positions and the elasticity used, and it carries no ₪ figure, margin or demand.
+*(FR-211)*
 
 **AC-203** — A fixture whose facts have a sealed explanation from an earlier night is not asked
 again. Past the request ceiling or the time budget, the remaining fixtures say they have no
 explanation tonight. *(FR-213, FR-214, NFR-077)*
+
+**AC-204** — The request for a fixture asks for FR-210's four parts. Shelf plan shows the answer
+beside that fixture's plan, under its label and in the page's language, or the reason it has
+none, in his words. *(FR-210, FR-215)*
 
 ## 16. Assumptions
 
@@ -975,7 +991,8 @@ OQ-1204:**
 - the interval's level is 95%;
 - a store elasticity needs at least 8 arrangements on different fixtures, and 40 arranged
   products;
-- the bootstrap makes 1,000 draws, with a fixed seed.
+- the bootstrap makes 1,000 draws, with a fixed seed. That value was not among the numbers put
+  to him, but it is in the plan he approved.
 
 All are provisional policy values, as the Phase 8 plan sets them out.
 
@@ -997,12 +1014,19 @@ open question OQ-1208." The choices marked **(decided here)** in FR-201 … FR-2
 explanation. These are the choices marked **(decided here)** in FR-210 … FR-214:
 - one explanation per fixture's plan, written once a night, never on request (FR-210);
 - the model sees the plan's facts and order, and no amount (FR-211);
-- no digit outside product names, and a failing answer withheld whole (FR-212);
+- no digit outside product names, a looser check than the boost's, and a failing answer
+  withheld whole (FR-212);
 - an unchanged plan's explanation reused, not paid for again (FR-213);
 - a capability of its own, and ADR-032's two spending limits (FR-214).
 
-The proposed values are a ceiling of 40 requests a night, a time budget of five minutes, and
-600 characters per language (ADR-039). · owner: the repository owner · blocks: building
+It also asks:
+- the model is the one he chose for the boost, Sonnet 5, on the same account (ADR-032);
+- the proposed values are a ceiling of 40 requests a night, a time budget of five minutes, 600
+  characters per language, and 1,200 tokens an answer;
+- its estimated cost is about $5.40 a month for a 15-fixture store whose every plan changes
+  nightly, and about $14.40 at the ceiling. Unchanged plans cost nothing (ADR-039 shows the
+  basis);
+- the monthly spend limit and its alert are his to set on the account (D-16). · owner: the repository owner · blocks: building
 FR-210 … FR-215, not the rest of F12.
 
 ## 18. Non-Goals
@@ -1032,7 +1056,7 @@ FR-210 … FR-215, not the rest of F12.
 | INT-006 | FR-202, FR-203, FR-204 | SCN-170, SCN-171, SCN-174 | AC-191, AC-192, AC-193, AC-198 |
 | INT-006 | FR-205, FR-206, FR-207, FR-209 | SCN-172 | AC-192, AC-194, AC-195, AC-197 |
 | INT-006 | FR-208 | SCN-173 | AC-196 |
-| INT-006 · D-32 | FR-210, FR-211, FR-212, FR-215 | SCN-175, SCN-177 | AC-200, AC-202 |
+| INT-006 · D-32 | FR-210, FR-211, FR-212, FR-215 | SCN-175, SCN-177 | AC-200, AC-202, AC-204 |
 | INT-006 · D-32 | FR-213, FR-214 | SCN-176 | AC-199, AC-201, AC-203 |
 | Protected behavior | INV-084 | — | AC-183 |
 | Protected behavior | INV-085 | — | AC-179 |

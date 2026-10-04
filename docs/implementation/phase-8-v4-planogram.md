@@ -1,7 +1,7 @@
 ---
 ID: PLAN-PHASE-8
 Title: Phase 8 — V4, F12 Planogram (F12-S1)
-Status: Approved — by the repository owner, 2026-10-04 ("yes"), with the values it proposes. The same answer added D-32, an AI explanation of each shelf (Task 8.10)
+Status: Approved — by the repository owner, 2026-10-04 ("yes"): Tasks 8.0–8.9, as shown, with their values. Task 8.10, added for D-32 in the same answer, is Ready for review until F12-S1 OQ-1209 is answered
 Owner: smartshelf-architect
 Parent: [Implementation plan](plan.md)
 Inputs: [docs/features/F12-planogram/specs/F12-S1-planogram.md (Approved 2026-10-04), ADR-037 and ADR-038 (Accepted 2026-10-04), D-32, ADR-032, ADR-035, ADR-039 (Ready for review), src/engine/market_boost.py, ADR-009, ADR-014, ADR-016, ADR-029, ADR-030, ADR-036, D-29, D-30, D-31, src/engine/order_evidence.py, src/engine/store_facts.py, src/engine/registry.py, src/engine/model.py, src/engine/publish.py, src/common/store.py, src/common/store_readiness.py, src/surface/compose.js, src/owner/ownerState.js, src/App.jsx, scripts/check_order_signals.py, scripts/build_order_example.py, src/lib/dataAdapters/loadOrderExample.js]
@@ -20,7 +20,7 @@ Updated: 2026-10-04 (approved; D-32 adds Task 8.10)
 - the AI's explanation of each shelf (D-32), once he approves its design (F12-S1 OQ-1209);
 - after he approves their mockups, the Store layout and Shelf plan pages.
 
-**On real data, all four capabilities are unavailable when it ends.** There is no store
+**On real data, every F12 capability is unavailable when it ends.** There is no store
 (D-23), so there is no layout file and no daily reports. Each says why: `no_store_layout`,
 like F8's `no_daily_sales`. Everything is proven on fixture worlds, as Phase 5 was.
 
@@ -47,7 +47,7 @@ like F8's `no_daily_sales`. Everything is proven on fixture worlds, as Phase 5 w
 - **Actions minutes.** Three pull requests. Each is tested locally first (the suites, lint,
   build and bundle, e2e, `check:signals`) and pushed once.
 
-## Provisional values, proposed for the owner's approval
+## Provisional values, approved 2026-10-04
 
 F12-S1 leaves these to the plan (OQ-1204, OQ-1207). The new values go into `configs/policy.yaml`
 under `shelf:`, and the artefact publishes every one.
@@ -60,12 +60,14 @@ under `shelf:`, and the artefact publishes every one.
 | Interval level | 95% | The level the repository's other intervals use (`wilson_interval`, `sales_movement`, z = 1.96) |
 | Minimum arrangements for a store elasticity | 8, each on a different fixture | A judgement. The bootstrap resamples fixtures, so the minimum counts fixtures. A small store has ten to twenty fixtures, and intervals from so few clusters run too narrow (Cameron, Gelbach and Miller, 2008). That makes a false "measured" more likely, not less. The guards against one replacing 0.17 are the placebo and the 0-to-1 range (FR-206, FR-209). The estimate publishes how many fixtures it rests on |
 | Minimum arranged products | 40 | A judgement: about five per arrangement |
-| Bootstrap draws, and the seed | 1,000; a fixed seed | 1,000 is common for a 95% percentile interval. Its time is measured in Task 8.5 (NFR-072, NFR-076) |
+| Bootstrap draws, and the seed | 1,000; a fixed seed | 1,000 is common for a 95% percentile interval. Its time is measured in Task 8.5 (NFR-072, NFR-076). Not among the numbers put to him, but in the plan he approved |
 
-## Proposed for the owner, from earlier answers
+## From earlier answers, approved 2026-10-04
 
-- **The example's source (D-31).** It is built like Reorder's: by `scripts/build_shelf_example.py`,
-  in print mode, from Task 8.5's planogram world, into `public/examples/shelf-plan-example.json`.
+- **The example's source (D-31).** It is built from the same test shop as Reorder's example
+  (`scripts/build_order_example.py`'s), with a shelf layout added for its departments, as he was
+  told when he approved it. Its 28 days of reports give a plan. Its measurement shows the waiting
+  state a new store's would, because the shop has no arrangement and no long history.
 - **The photo-reading test (OQ-1202, "yes why not").** It runs after this phase, on the next
   store's first shelf photographs. A model's reading of each facing width is compared with the
   team's own reading of the same photographs. Nothing in this phase waits on it, because there
@@ -82,10 +84,10 @@ under `shelf:`, and the artefact publishes every one.
 | 8.4 | — | The arrangement record in the browser |
 | 8.5 | 8.3, 8.4 | The planogram world, `shelf_measurement`, and the plan reading its elasticity |
 | 8.6 | 8.5 | The probe |
-| 8.7 | 8.5 | The marked example |
+| 8.7 | 8.3 | The marked example |
 | 8.8 | 8.7 | Mockups for the owner's approval |
 | 8.10 | 8.3; F12-S1 OQ-1209 approved | The AI's explanation of each shelf (D-32) |
-| 8.9 | 8.8 approved, 8.10 | The two pages |
+| 8.9 | 8.8 approved | The two pages |
 
 ### Task 8.0: The browser guard, the reason words and the publication dates (AC-187)
 
@@ -314,8 +316,9 @@ hand.
 **Files:** `scripts/build_shelf_example.py`, `public/examples/shelf-plan-example.json`,
 `src/lib/dataAdapters/loadShelfExample.js`, `tests/test_shelf_example.py`
 
-The example is built as Reorder's is:
-- from the planogram world, in print mode;
+The example is built as Reorder's is, and from the same test shop:
+- from `build_order_example.py`'s shop, with a shelf layout added for its departments, in print
+  mode. Its measurement shows the waiting state, because the shop has no arrangements;
 - into `public/examples/`, which no engine step, loader other than its own, probe or
   measurement reads;
 - read only through `loadShelfExample.js`.
@@ -355,7 +358,8 @@ Present them, and **stop until he approves.** Record his answer with its date.
 `src/pages/__tests__/`, `e2e/`
 
 Built against the approved mockups. Each page reads:
-- the artefact, through `loadDashboard.js`, including `shelf_explanation` (FR-215);
+- the artefact, through `loadDashboard.js`, and, once Task 8.10 is in, `shelf_explanation`
+  (FR-215);
 - the example, through `loadShelfExample.js`, only while `shelf_plan` is unavailable;
 - this device's own arrangement record, until the nightly has published it (ADR-038
   Decision 6).
@@ -373,15 +377,21 @@ There is no arithmetic in the browser (ADR-001).
 **Built only after the owner approves F12-S1 OQ-1209.**
 
 **Files:**
-- `src/engine/model_client.py`: the request, the transport, `DIGIT` and `facts_digest`, moved
-  out of `src/engine/market_boost.py`, which imports them (ADR-039 Decision 3);
+- `src/engine/model_client.py`: the request (its token limit now a parameter), the transport,
+  `KEY_ENV`, `DIGIT` and `facts_digest`, moved out of `src/engine/market_boost.py`, which
+  imports them (ADR-039 Decision 3);
 - `src/engine/shelf_explanation.py`, `configs/prompts/shelf_explanation.v1.md`;
 - `src/engine/inputs.py`, `src/engine/registry.py`, `src/engine/run.py`;
 - `configs/policy.yaml`, `src/engine/policy.py`;
 - `.github/workflows/collect-daily.yml`: the boost's commit step also takes
   `shelf_explanations`;
 - `src/surface/compose.js`: `shelf_explanation` joins Task 8.0's lists;
-- `src/lib/i18n/dictionaries/{he,ar,en}.js`;
+- `src/lib/i18n/dictionaries/{he,ar,en}.js`, `src/lib/i18n/__tests__/unavailableReason.test.js`,
+  `tests/engine/test_unavailable_reasons.py`;
+- `scripts/check_order_signals.py`, `scripts/check_v1_signals.py`, `tests/test_check_v1_signals.py`:
+  §20's case, and `shelf_explanations` in `PROBED_ELSEWHERE`;
+- `scripts/build_shelf_example.py`: the example's explanation, asked once by hand with the key
+  and sealed with the example's inputs (FR-215);
 - `tests/engine/test_model_client.py`, `tests/engine/test_shelf_explanation.py`.
 
 What it does:
@@ -398,9 +408,10 @@ What it does:
 - **Policy:**
   - `shelf.explanation_request_ceiling: 40`;
   - `shelf.explanation_time_budget_s: 300`;
-  - `shelf.explanation_max_chars: 600`.
+  - `shelf.explanation_max_chars: 600`;
+  - `shelf.explanation_max_tokens: 1200`.
 
-  All three are provisional (OQ-1209).
+  All four are provisional (OQ-1209).
 - **Words** for `no_model_key` and the three "no explanation" reasons: withheld, out of date,
   not written tonight.
 
@@ -408,10 +419,10 @@ What it does:
 - AC-199 … AC-203 pass, with a fake transport, as the boost's tests run: no network in any
   test.
 - The boost's suites pass unchanged after the move.
-- A run with the snapshot and one without it publish the same plans, measurements and figures
-  (INV-096).
-- The example shows "no explanation: no model key" until a key exists, as the store's plan
-  would (FR-215).
+- A run with the snapshot and one without it publish the same `layout_facts`, `shelf_plan` and
+  `shelf_measurement` (INV-096).
+- The example shows "no explanation" (`no_model_key`) until the team seals its explanation by
+  hand with the key (FR-215).
 
 ## Pull requests
 
@@ -423,9 +434,12 @@ What it does:
 
 ## Checkpoint 8
 
-- Tasks 8.0 … 8.7 and 8.10 are merged, and `check:signals` covers all four capabilities.
-- On real data, all four are published `unavailable` with `no_store_layout`, and every other
+- Tasks 8.0 … 8.7 are merged, and `check:signals` covers all three capabilities.
+- On real data, all three are published `unavailable` with `no_store_layout`, and every other
   capability's output is unchanged.
 - The mockups are approved with the date recorded (Task 8.8), and the pages are built and pass
   (Task 8.9).
 - The provisional values above are in `configs/policy.yaml` as approved, and published.
+
+**Task 8.10, once OQ-1209 is approved:** merged, and covered by `check:signals`. On real data
+`shelf_explanation` is `no_store_layout` like the rest, and the other three are unchanged by it.
