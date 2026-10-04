@@ -7,7 +7,7 @@ Date: 2026-10-03
 Parent: [System Design](../system-design.md) §19
 Related Specs: F12-S1 (FR-178 … FR-180, FR-190, FR-199, NFR-075, C-74, OQ-1201, OQ-1202)
 Inputs: [docs/features/F12-planogram/specs/F12-S1-planogram.md, D-13, D-22, D-30, ADR-029, ADR-033, ADR-036]
-Updated: 2026-10-04 (current facings, for F12-S1's measurement)
+Updated: 2026-10-04 (current facings, for F12-S1's measurement; §5 names the right ADR-036 list)
 ---
 
 # ADR-037 — The shelf layout is a committed file the team records; owner state never holds them
@@ -48,9 +48,15 @@ and follow ADR-033's rules:
    the "before" only for an arrangement recorded after that date, and only until a later
    recorded arrangement of the fixture replaces them (F12-S1 FR-205).
 4. **Changed only by commit.** The history records what was measured or stated, and when.
-5. **Store data under ADR-036.** The file is in a new copy's manifest of files that start empty,
-   so updating a copy from the product never overwrites a store's layout. `check:store` reports
+5. **Store data under ADR-036.** The file is store data, so a new copy never inherits it, and
+   updating a copy from the product never overwrites a store's layout. `check:store` reports
    whether it is present (F12-S1 NFR-075).
+
+   *Corrected 2026-10-04 (Phase 8 plan, Task 8.1).* This said the file was in the manifest of
+   files that "start empty". ADR-036 has two lists, and the file belongs in the other one: a new
+   copy starts without it. An empty file is still a file (F12-S1 FR-193), so a copy that
+   started with one would never say `no_store_layout`. The decision, that the file is store data
+   a copy neither inherits nor overwrites, is unchanged.
 
 Shelf photographs are the team's source for these facts. They are never an input to the engine,
 so D-13 holds by construction.
