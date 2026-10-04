@@ -248,6 +248,16 @@ export const ar = {
   'unavailable.no_daily_sales': "بانتظار تقارير المبيعات اليومية: كمية الطلب تحتاج إلى مبيعات كل يوم.",
   'unavailable.stale_daily_sales': "آخر تقرير مبيعات يومي أقدم من أن يُبنى عليه طلب الليلة.",
   'unavailable.no_store_facts': "ملف معطيات المتجر مفقود، فلا يُعرف جدول الطلبات ولا مدة الصلاحية.",
+  // F12-S1 (Phase 8 Task 8.0). The capability-scoped keys say what the shared sentence
+  // would get wrong on Shelf plan (unavailableReason.js).
+  'unavailable.no_store_layout': "لم تُسجَّل قياسات الرفوف بعد.",
+  'unavailable.layout_all_rejected': "رُفضت كل وحدات الرفوف في ملف المخطط، فلا يوجد ما يُخطَّط له. الأسباب مذكورة في مخطط المتجر.",
+  'unavailable.no_evidence_window': "تقارير المبيعات اليومية تصل، لكنها لم تكفِ بعد للتخطيط عليها.",
+  'unavailable.owner_state_unavailable': "تعذّرت قراءة قراراتك المسجّلة الليلة، فلا يُعرض شيء يعتمد عليها.",
+  'unavailable.no_arrangement_recorded': "لم يُعلَّم أي رف بعد على أنه رُتّب.",
+  'unavailable.shelf_plan.no_daily_sales': "بانتظار تقارير المبيعات اليومية: تخطيط الرف يحتاج إلى مبيعات كل يوم.",
+  'unavailable.shelf_plan.stale_daily_sales': "آخر تقرير مبيعات يومي أقدم من أن يُبنى عليه تخطيط الرفوف.",
+  'unavailable.shelf_measurement.no_daily_sales': "بانتظار تقارير المبيعات اليومية: قياس الترتيب يحتاج إلى مبيعات كل يوم.",
   'data.title': "من أين جاءت الأرقام",
   'data.none': "لا يوجد",
   'data.hidden.title': "عناصر أخفيتها",

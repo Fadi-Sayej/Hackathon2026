@@ -58,6 +58,13 @@ KNOWN = {
     "no_daily_sales",
     "stale_daily_sales",
     "no_store_facts",
+    # Phase 8 Task 8.0 (F12-S1 FR-193, FR-196, FR-208): the layout file, the window, owner
+    # state and his arrangements.
+    "no_store_layout",
+    "layout_all_rejected",
+    "no_evidence_window",
+    "owner_state_unavailable",
+    "no_arrangement_recorded",
 }
 
 

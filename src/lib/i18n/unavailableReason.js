@@ -26,9 +26,22 @@ export const UNKNOWN_REASON_KEY = 'unavailable.unknown'
 /**
  * @param {(key: string) => string} t  translator from useI18n()
  * @param {string|null|undefined} reason  `unavailable_reason` as the artefact carries it
+ * @param {string} [capability]  the capability that published it, when the caller knows
+ *
+ * WHY A CAPABILITY MAY HAVE ITS OWN WORDS
+ *   A reason is shared vocabulary, but its sentence was written for the first page that
+ *   needed it. `no_daily_sales` says "an order quantity needs sales per day", which is
+ *   true on Reorder and wrong on Shelf plan (F12-S1 FR-194). So
+ *   `unavailable.<capability>.<reason>` is read first when it exists, and every other
+ *   capability keeps the shared sentence unchanged.
  */
-export function unavailableReason(t, reason) {
+export function unavailableReason(t, reason, capability) {
   if (!reason) return t(UNKNOWN_REASON_KEY)
+  if (capability) {
+    const own = `unavailable.${capability}.${reason}`
+    const ownText = t(own)
+    if (ownText !== own) return ownText
+  }
   const key = `unavailable.${reason}`
   const text = t(key)
   // The translator echoes the key when it has no entry; that is the miss signal.
