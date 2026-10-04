@@ -12,6 +12,7 @@ fixture world, and the PUBLISHED artefact is read, never a capability's return v
 | the market snapshots | suggestions still publish, unadjusted, and no disagreement is raised; F9's assortment gap goes unavailable |
 | the boost picks | no boost, and zero calls to the model |
 | an answered disagreement | it is not raised again (D-20) |
+| the layout file | F12's layout_facts unavailable (no_store_layout); without the report days it stays available (F12-S1 §20) |
 
 It also proves the quantity and the boost fail independently: without the picks the quantity
 still publishes, and without the report days the boost is still available.
@@ -82,7 +83,18 @@ def baseline_problems(art: dict) -> list:
     gap = _cap(art, "assortment_gap")
     if gap["status"] != "available" or not gap["entries"]:
         out.append("the baseline finds no assortment gap, so withholding the market proves nothing for F9")
+    layout = _cap(art, "layout_facts")
+    if layout["status"] != "available" or not layout.get("fixtures"):
+        out.append("the baseline publishes no layout, so withholding the layout file proves nothing for F12")
     return out
+
+
+def withheld_layout_problems(art: dict) -> list:
+    cap = _cap(art, "layout_facts")
+    if cap["status"] != "unavailable" or cap["unavailable_reason"] != "no_store_layout":
+        return [f"without the layout file layout_facts published {cap['status']} ({cap['unavailable_reason']}): "
+                "the measurements were never recorded, and it must say so (F12-S1 FR-196)"]
+    return []
 
 
 def withheld_daily_problems(art: dict) -> list:
@@ -142,6 +154,8 @@ def independence_problems(without_picks: dict, without_daily: dict) -> list:
     if (_cap(without_daily, "order_quantity")["status"] != "unavailable"
             or _cap(without_daily, "market_boost")["status"] != "available"):
         out.append("without the report days the quantity must be unavailable while the boost stays available")
+    if _cap(without_daily, "layout_facts")["status"] != "available":
+        out.append("without the report days layout_facts must stay available: the layout needs no sales (D-30)")
     return out
 
 
@@ -222,12 +236,17 @@ def probe(tmp: Path) -> tuple:
     problems += withheld_picks_problems(no_picks, calls)
     done.append("withholding the boost picks → no boost, no model call")
 
+    paths = _copy(built, tmp / "no_layout")
+    paths["store_layout_path"].unlink()
+    problems += withheld_layout_problems(_run(paths)[0])
+    done.append("withholding the layout file → layout_facts unavailable (no_store_layout)")
+
     answered = world.owner(answered=[world.SLOW])
     problems += answered_problems(_run(world.roots(built), owner=answered)[0], world.SLOW)
     done.append("an answered disagreement    → not raised again")
 
     problems += independence_problems(no_picks, no_daily)
-    done.append("quantity and boost fail independently")
+    done.append("quantity and boost fail independently; the layout needs no sales")
     return problems, done
 
 

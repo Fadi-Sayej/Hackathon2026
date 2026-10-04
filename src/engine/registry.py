@@ -64,6 +64,10 @@ CAPABILITIES = {
     "assortment_gap":      CapabilitySpec("assortment_gap",      "F9-S1",    "none",     True,  "nights_ran_out",
                                           ("products", "running_out", "market_recent"),
                                           published_from="2026-09-29"),
+    # F12 (V4). The store's recorded shelves and what is missing from them. It needs no sales
+    # (D-30), and it is a page's facts, never one of Today's places (F12-S1 FR-192).
+    "layout_facts":        CapabilitySpec("layout_facts",        "F12-S1",   "none",     False, "fixture_order",
+                                          ("products", "store_layout"), published_from="2026-10-06"),
 }
 
 # The reason belongs to the missing input, not to the capability: catalogue_lifecycle with

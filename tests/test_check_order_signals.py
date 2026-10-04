@@ -23,8 +23,10 @@ def _entry(barcode, kind="gross", applied=False):
 
 
 def _art(*, oq_status="available", oq_reason=None, entries=(), boost_status="available", disagreements=(),
-         gap_status="available", gap_entries=()):
+         gap_status="available", gap_entries=(), layout_status="available", layout_reason=None, fixtures=None):
     return {"capabilities": {
+        # F12-S1 §20 (Phase 8 Task 8.2): the layout, which needs no sales.
+        "layout_facts": {"status": layout_status, "unavailable_reason": layout_reason, "fixtures": fixtures},
         "order_quantity": {"status": oq_status, "unavailable_reason": oq_reason, "entries": list(entries)},
         # F9-S1: withheld with the market snapshots it is replayed from (AC-165).
         "assortment_gap": {"status": gap_status, "entries": list(gap_entries)},
@@ -33,12 +35,13 @@ def _art(*, oq_status="available", oq_reason=None, entries=(), boost_status="ava
                             + [{"fact": "market_disagreement", "barcode": b} for b in disagreements]}}}
 
 
-GOOD = _art(entries=[_entry("a", "net", applied=True), _entry("b")], disagreements=["s"], gap_entries=[{"id": "g"}])
+GOOD = _art(entries=[_entry("a", "net", applied=True), _entry("b")], disagreements=["s"], gap_entries=[{"id": "g"}],
+            fixtures={"F1": {}})
 
 
 def test_a_baseline_with_nothing_to_withhold_is_refused():
     assert probe.baseline_problems(GOOD) == []
-    assert len(probe.baseline_problems(_art())) == 5
+    assert len(probe.baseline_problems(_art())) == 6
     # F9: a baseline with no assortment-gap finding proves nothing when the market is withheld.
     no_gap = _art(entries=[_entry("a", "net", applied=True)], disagreements=["s"])
     assert [m for m in probe.baseline_problems(no_gap) if "assortment gap" in m]
@@ -89,6 +92,9 @@ def test_the_quantity_and_the_boost_must_fail_apart():
     no_picks = _art(entries=[_entry("a")], boost_status="unavailable")
     no_daily = _art(oq_status="unavailable", oq_reason="no_daily_sales", boost_status="available")
     assert probe.independence_problems(no_picks, no_daily) == []
+    # F12: the layout needs no sales, so it must not go with the report days (D-30).
+    assert probe.independence_problems(no_picks, _art(oq_status="unavailable", oq_reason="no_daily_sales",
+                                                      layout_status="unavailable"))
     assert probe.independence_problems(_art(entries=[], boost_status="unavailable"), no_daily)
     assert probe.independence_problems(no_picks, _art(oq_status="unavailable", boost_status="unavailable"))
 
@@ -127,3 +133,9 @@ def test_it_blocks_once_any_capability_it_probes_is_live(tmp_path, monkeypatch):
     assert probe.blocking() is True             # today, 2026-09-29
     publish(order_quantity="unavailable", market_boost="available", assortment_gap="unavailable")
     assert probe.blocking() is True
+
+
+def test_the_layout_file_withheld_must_say_no_store_layout():
+    assert probe.withheld_layout_problems(_art(layout_status="unavailable", layout_reason="no_store_layout")) == []
+    assert probe.withheld_layout_problems(_art(fixtures={"F1": {}}))
+    assert probe.withheld_layout_problems(_art(layout_status="unavailable", layout_reason="capability_error"))
