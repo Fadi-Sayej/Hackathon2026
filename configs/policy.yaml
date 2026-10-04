@@ -141,3 +141,11 @@ shelf:
   # A judgement: at 0.17 a 5th facing adds under 4% to a product's sales. His "at least N"
   # rule overrides it.
   facings_cap: 4
+  # F12-S1 FR-205, FR-209: measuring what an arrangement changed (OQ-1207, approved 2026-10-04
+  # with the Phase 8 plan). The windows are F8's own, read from order.window_days and
+  # order.min_report_days, never copied here.
+  interval_level: 0.95          # the level the repository's other intervals use (z = 1.96)
+  min_arrangements: 8           # a judgement, counted on distinct fixtures (the bootstrap's clusters)
+  min_products: 40              # a judgement: about five arranged products an arrangement
+  bootstrap_draws: 1000
+  bootstrap_seed: 20261004      # fixed, so print mode and npm run figures reproduce the interval

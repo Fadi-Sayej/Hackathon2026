@@ -36,16 +36,12 @@ from src.engine.model import CapabilityOutput, Entry, entry_id
 from src.engine.order_evidence import evidence_window, product_evidence
 from src.engine.order_quantity import itemised_departments
 from src.engine.registry import derive_status
+from src.engine.shelf_measurement import plan_elasticity
 from src.engine.shelf_population import PLANNED, population
 
 CAP, SPEC = "shelf_plan", "F12-S1"
 FAMILY, ACTION = "shelf.plan", "arrange_shelf"
 UNPLACED_FROM_POPULATION = ("no_sale_in_window", "count_zero_or_below", "stock_unknown", "kept_off", "rejected")
-
-
-def research_elasticity(policy) -> dict:
-    """The value the plan uses until his store's own is measured (FR-206). Task 8.5 adds the other case."""
-    return {"value": policy.shelf_elasticity, "source": "research", "why": "his_own_not_yet_measured"}
 
 
 def _earnings(p: dict, rows: list, window, itemised: bool, width_mm: int) -> dict:
@@ -235,7 +231,7 @@ def run(inputs) -> CapabilityOutput:
     rows = defaultdict(list)
     for r in inputs.sales_daily:
         rows[r["barcode"]].append(r)
-    elasticity = research_elasticity(policy)
+    elasticity = plan_elasticity(inputs)   # FR-206: his own only on its three conditions
     planned_on = {b: name for name, members in pop.items() for b, m in members.items() if m["status"] == PLANNED}
     plan_day = run_day.isoformat()
     plan_window = {"first_day": window.first_day, "last_day": window.last_day}

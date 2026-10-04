@@ -221,7 +221,9 @@ def test_one_shelf_plan_entry_per_fixture_with_no_value_and_no_product(tmp_path)
     assert (e.signal_family, e.action, e.barcode, e.product_name, e.department, e.value) == \
         ("shelf.plan", "arrange_shelf", None, None, None, None)
     assert e.id == entry_id("shelf.plan", None, "F1|2026-10-12")
-    assert out.extras["elasticity"] == {"value": 0.17, "source": "research", "why": "his_own_not_yet_measured"}
+    # FR-206: no arrangement recorded, so the research value, saying why.
+    assert out.extras["elasticity"] == {"value": 0.17, "source": "research", "why": "measurement_unavailable",
+                                        "measurement_reason": "no_arrangement_recorded"}
     assert out.thresholds == {"elasticity": 0.17, "facings_cap": 4}
 
 

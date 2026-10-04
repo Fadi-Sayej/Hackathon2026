@@ -64,8 +64,19 @@ def evidence_window(report_days: Iterable, policy, run_at: datetime) -> Optional
     last = days[-1]
     if (run_day - last).days > policy.order_freshness_days:
         return None
-    first = last - timedelta(days=policy.order_window_days - 1)
-    inside = [d for d in days if d >= first]
+    return window_between(last - timedelta(days=policy.order_window_days - 1), last, days, policy)
+
+
+def window_between(first, last, report_days: Iterable, policy) -> Optional[Window]:
+    """The span `first` … `last` held to FR-144's rules, or None when it fails them.
+
+    It must hold at least `order.min_report_days` report days, and each of its 7-day weeks,
+    counted back from `last`, at least one. F8's own window is the span ending on its latest
+    report day (`evidence_window`). F12-S1's before and after windows (FR-202) are spans fixed
+    by a plan and an arrangement. Both are judged here, so the rule is written once.
+    """
+    first, last = _day(first), _day(last)
+    inside = sorted({_day(d) for d in report_days if first <= _day(d) <= last})
     if len(inside) < policy.order_min_report_days:
         return None
     weeks = []

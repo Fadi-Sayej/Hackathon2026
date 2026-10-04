@@ -869,6 +869,15 @@
    },
    "published_population": "whole",
    "question_limit": 3,
+   "shelf_measurement": {
+    "bootstrap_draws": 1000,
+    "bootstrap_seed": 20261004,
+    "interval_level": 0.95,
+    "min_arrangements": 8,
+    "min_products": 40,
+    "min_report_days": 21,
+    "window_days": 28
+   },
    "shelf_plan": {
     "elasticity": 0.17,
     "facings_cap": 4
