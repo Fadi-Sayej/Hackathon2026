@@ -1,11 +1,11 @@
 ---
 ID: PLAN-PHASE-8
 Title: Phase 8 — V4, F12 Planogram (F12-S1)
-Status: Ready for review
+Status: Approved — by the repository owner, 2026-10-04 ("yes"), with the values it proposes. The same answer added D-32, an AI explanation of each shelf (Task 8.10)
 Owner: smartshelf-architect
 Parent: [Implementation plan](plan.md)
 Inputs: [docs/features/F12-planogram/specs/F12-S1-planogram.md (Approved 2026-10-04), ADR-037 and ADR-038 (Accepted 2026-10-04), ADR-009, ADR-014, ADR-016, ADR-029, ADR-030, ADR-036, D-29, D-30, D-31, src/engine/order_evidence.py, src/engine/store_facts.py, src/engine/registry.py, src/engine/model.py, src/engine/publish.py, src/common/store.py, src/common/store_readiness.py, src/surface/compose.js, src/owner/ownerState.js, src/App.jsx, scripts/check_order_signals.py, scripts/build_order_example.py, src/lib/dataAdapters/loadOrderExample.js]
-Updated: 2026-10-04
+Updated: 2026-10-04 (approved; D-32 adds Task 8.10)
 ---
 
 # Phase 8 — V4, F12 Planogram

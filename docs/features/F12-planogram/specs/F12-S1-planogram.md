@@ -15,8 +15,8 @@ Updated: 2026-10-04 (approved by the repository owner, OQ-1208 with it; earlier 
 
 > **Approved by the repository owner on 2026-10-04.** D-30 unlocked this spec on 2026-10-03: the
 > plan waits for daily sales the way F8 does, and D-13 stands. Everything D-30 left open is either
-> decided here, marked **(decided here)** and approved with the spec (OQ-1205, OQ-1208), or still
-> asked in §17 (OQ-1204, OQ-1207).
+> decided here, marked **(decided here)** and approved with the spec (OQ-1205, OQ-1208), or answered
+> with the Phase 8 plan (OQ-1204, OQ-1207, 2026-10-04).
 
 > **Identifier note.** Every `FR-`, `INV-`, `NFR-`, `AC-`, `SCN-`, `C-`, `ASM-` and `OQ-` id
 > below is new and globally unique: FR-178 … FR-209, INV-084 … INV-095, NFR-072 … NFR-076,
@@ -73,7 +73,8 @@ Behavioural scope, not a file list. The implementation plan declares the files.
 - His "I've arranged this shelf" record, and the before-and-after measurement it starts
   (FR-201 … FR-209; OQ-1206, answered).
 - A clearly marked example on Shelf plan while it waits, as on Reorder (D-31, FR-200). What the
-  example is built from is proposed by its plan for his approval.
+  example is built from the planogram test shop, as Reorder's is, approved with the Phase 8 plan
+  on 2026-10-04.
 - The boundary probe for the new inputs (§20).
 
 ### Out of Scope
@@ -801,17 +802,21 @@ photographs (FR-180).
 
 **~~OQ-1202~~** — "Should we run the one-day test of an AI reading a real shelf photo, before or
 after a first version entered by hand?" **Answered 2026-10-03: "yes why not".** The test is
-to be run. He did not choose between before and after, so its plan proposes the order for his
-approval.
+to be run. He did not choose between before and after, so its plan proposed the order: after
+Phase 8, on the next store's first shelf photographs, against the team's own readings. He
+approved it with the plan on 2026-10-04.
 
 **~~OQ-1203~~** — "Should the waiting Shelf plan page show a clearly marked example of how it
 will look, like Reorder does? That would be a new decision, D-31." **Answered 2026-10-03:
 "yes", recorded as D-31 (FR-200).**
 
-**OQ-1204** — What are the provisional space-elasticity factor and facings cap (FR-185)? The
-architect proposes 0.17 for the factor, the meta-analysis mean (§23). The cap has no research
-figure behind it and is still to be proposed. · owner: the repository owner · blocks: FR-185's
-numbers, not its rule.
+**~~OQ-1204~~** — What are the provisional space-elasticity factor and facings cap (FR-185)?
+**Answered 2026-10-04: "yes"**, to "Do you approve the plan and these numbers?", as part of "yes but i need you to add ai explanation to this also so the ai tells why to organize the shelf this way":
+- the factor is 0.17, the meta-analysis mean (§23);
+- the cap is 4 facings a product, a judgement the Phase 8 plan explains. His "at least N" rule
+  overrides it.
+
+Both stay provisional policy values.
 
 **~~OQ-1205~~** — "Are my design choices right?" **Answered 2026-10-03: "yes".** The choices
 marked **(decided here)** at that time were:
@@ -835,15 +840,15 @@ parts:**
   spec?" FR-201 … FR-209 measure the plan in his own store. Once his own elasticity meets
   FR-206's conditions, it replaces the research value.
 
-**OQ-1207** — What are the measurement's provisional values? The architect proposes them, and the
-owner approves:
-- the window's length and minimum report days (F8's);
-- the interval's level;
-- the minimum numbers of arrangements and of products for a store elasticity;
-- the bootstrap's number of draws.
+**~~OQ-1207~~** — What are the measurement's provisional values? **Answered 2026-10-04, with
+OQ-1204:**
+- the window's length and minimum report days are F8's, 28 and 21, read from `order.*`;
+- the interval's level is 95%;
+- a store elasticity needs at least 8 arrangements on different fixtures, and 40 arranged
+  products;
+- the bootstrap makes 1,000 draws, with a fixed seed.
 
-· owner: the repository owner · blocks: the numbers in FR-202, FR-205 and FR-209, not their
-rules.
+All are provisional policy values, as the Phase 8 plan sets them out.
 
 **~~OQ-1208~~** — Are the measurement's design choices right? **Answered 2026-10-04:
 "approved"**, to "Do you approve the spec as written? The new design choices are listed in its
