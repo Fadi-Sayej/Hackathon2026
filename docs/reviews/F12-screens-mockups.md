@@ -51,6 +51,13 @@ claude.ai page used for F8 could not be published from this session.
 1. **The screens below.** Store layout (filled, waiting, every unit rejected). Shelf plan
    (filled, after "I've arranged this shelf", with the measurement, while a measurement runs, your
    store's own figure, waiting with the example, waiting for daily reports, and the team's view).
+
+   On 2026-10-04 he asked, before accepting, that the plan look like a printed planogram (his
+   picture: the whole unit from the front, shelves stacked, each product shown on the shelf, and
+   a key), "but customized to the store that take picture of the shelf". The screens below are
+   drawn that way: each unit from the front, its shelves stacked from the top, every facing a tile
+   as wide as the product, and a numbered key under it. The drawing is the shelf itself, so it
+   runs left to right in every language, with products in the plan's order from the left.
 2. **A fault the mockups found: the plan leaves shelves empty.** The approved packing rule
    (F12-S1 FR-183, FR-185) puts every product's first facing on the eye-level shelf while it has
    room. Extra facings then go only on the shelf that already holds that product. So a unit whose
@@ -71,15 +78,24 @@ claude.ai page used for F8 could not be published from this session.
      shelves.
 
    Either one changes the spec (FR-183 and FR-185), the engine and its tests. That comes back as
-   F12-S1 v0.9 for approval before the pages are built.
-3. **All the new wording** (the table at the end). The Hebrew and Arabic are the engineer's
+   F12-S1 v0.9 for approval before the pages are built. The front view makes the fault plain: in
+   the measurement shop every unit is a full shelf over an empty one.
+3. **Product pictures on the tiles, from the store's own photos.** No product picture exists
+   anywhere in the system today, and none may be invented (D-23). They can come from the photos the
+   store already sends: when the team reads each product's width from a shelf photo (OQ-1201), it
+   also crops that product's front from the same photo, and records who cropped it and when. Each
+   tile then shows the store's own product. A product without a picture yet keeps its coloured,
+   numbered tile, as on every screen below, because no store has sent photos. This needs a new
+   requirement in F12-S1 v0.9 and a decision on where the pictures are kept: they are store data,
+   kept beside the layout file and never overwritten by a product update (ADR-036, ADR-037).
+4. **All the new wording** (the table at the end). The Hebrew and Arabic are the engineer's
    translations and need a daily reader. Three choices in it:
    - **"Facing":** "חזית / חזיתות" in Hebrew and "واجهة / واجهات" in Arabic. The old page
      descriptions said "פנים" and "وجهة".
    - **The page names stay**, but their hints and descriptions change. "Draw your shelves once" and
      "top view" were wrong: nobody draws anything. The team measures the shelves from his photos.
    - **The AI label** is "AI" in all three languages, beside "Why this arrangement".
-4. **The team's note on a rejected entry.** When the layout file has an entry the engine cannot
+5. **The team's note on a rejected entry.** When the layout file has an entry the engine cannot
    use, Store layout names it in his language, then shows the loader's reason in English, marked
    "Note for the team". The alternative is to show him only what was not used, and keep the reason
    for the team.
@@ -124,7 +140,7 @@ Each rejected unit named, with the team's note.
 
 #### Filled
 
-The plan's window, and the elasticity it uses and why. Per unit: each shelf drawn to scale (products as wide as their facings, then the free length), each product's facings and earnings rank, his rule where one applies, the products not on the plan and why, why no extra facings were given, the dates of the facts used, the AI's explanation (illustrative on the fridge, held back on the dry unit, out of date on the cleaning unit), and "I've arranged this shelf".
+The plan's window, and the elasticity it uses and why. Per unit: the unit from the front, its shelves stacked, every facing a tile as wide as the product with its number, then the free length; the key, with each product's shelf, facings and earnings rank and his rule where one applies; the products not on the plan and why, why no extra facings were given, the dates of the facts used, the AI's explanation (illustrative on the fridge, held back on the dry unit, out of date on the cleaning unit), and "I've arranged this shelf".
 
 | العربية | עברית |
 |---|---|
