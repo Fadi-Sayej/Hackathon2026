@@ -34,53 +34,77 @@ function Elasticity({ elasticity }) {
   )
 }
 
-function Shelf({ shelf, nameOf, rules }) {
-  const { t, language } = useI18n()
+// One colour per product on a unit, so a tile and its line in the key are matched at a glance,
+// as on a printed planogram. The palette repeats after twelve.
+const TILE_COLOURS = 12
+
+/**
+ * The unit drawn from the front, the way a planogram is printed: its shelves stacked from the top,
+ * each facing a tile as wide as the product, then the shelf's free length. Each tile carries the
+ * product's number in the key below. The drawing is the shelf itself, so it runs left to right in
+ * every language: products stand in the plan's order from the left.
+ */
+function UnitDrawing({ shelves, keyOf }) {
+  const { t } = useI18n()
   const { number } = useDates()
   return (
-    <li className="plan__shelf" data-shelf={shelf.shelf} data-eye-level={shelf.eye_level || undefined}>
-      <div className="plan__shelf-head">
-        <span className="layout__shelf-name">{t('layout.shelf', { n: shelf.shelf })}</span>
-        {shelf.eye_level ? <span className="layout__tag layout__tag--eye">{t('layout.eyeLevel')}</span> : null}
-        <span className="layout__shelf-length"><bdi>{t('layout.length', { cm: shelf.length_cm })}</bdi></span>
-      </div>
-      {/* The shelf to scale: each product a block as wide as its facings, then the free length. */}
-      <div className="plan__bar" aria-hidden="true">
-        <div className="plan__used" style={{ flexGrow: shelf.used_cm }}>
-          {shelf.products.map((p) => (
-            <span key={p.barcode} className="plan__block" style={{ '--w': p.width_mm, '--n': p.facings }}>
-              <bdi>{p.product_name || nameOf(p.barcode)}</bdi>
-            </span>
-          ))}
-        </div>
-        {shelf.free_cm > 0 ? (
-          <div className="plan__free" style={{ flexGrow: shelf.free_cm }}>
-            <bdi>{t(shelf.products.length ? 'shelf.free' : 'shelf.empty', { cm: number(shelf.free_cm, 1) })}</bdi>
+    <div className="unit" aria-hidden="true">
+      {shelves.map((shelf) => (
+        <div key={shelf.shelf} className="unit__shelf" data-eye-level={shelf.eye_level || undefined}>
+          <div className="unit__label" {...dirProps()}>
+            <span className="layout__shelf-name">{t('layout.shelf', { n: shelf.shelf })}</span>
+            <bdi>{t('layout.length', { cm: shelf.length_cm })}</bdi>
+            {shelf.eye_level ? <span className="layout__tag layout__tag--eye">{t('layout.eyeLevel')}</span> : null}
           </div>
-        ) : null}
-      </div>
-      <ul className="plan__products">
-        {shelf.products.map((p) => {
-          const notes = []
-          if (p.rank) notes.push(t('shelf.rank', { rank: p.rank }))
-          if (p.unknown_parts?.length) {
-            notes.push(t('shelf.unknown', { why: p.unknown_because.map((b) => t(`shelf.unknown.${b}`)).join(t('shelf.and')) }))
-          }
-          if (p.kept_on_by_his_rule) notes.push(t('shelf.keptOn'))
-          for (const kind of p.rules || []) {
-            const rule = rules.find((r) => r.kind === kind && r.barcode === p.barcode)
-            if (rule) notes.push(t('shelf.yourRule', { rule: ruleText(t, rule, nameOf) }))
-          }
-          return (
-            <li key={p.barcode}>
-              <span className="plan__product-name"><bdi>{p.product_name || nameOf(p.barcode)}</bdi></span>
-              <span className="plan__facings">{facingsText(p.facings, language)}</span>
-              {notes.length ? <span className="plan__product-notes">{notes.join(' · ')}</span> : null}
-            </li>
-          )
-        })}
-      </ul>
-    </li>
+          <div className="unit__row" dir="ltr">
+            {shelf.products.length ? (
+              <div className="unit__used" style={{ flexGrow: shelf.used_cm }}>
+                {shelf.products.flatMap((p) => Array.from({ length: p.facings }, (_, i) => (
+                  <span key={`${p.barcode}|${i}`} className="unit__tile" style={{ flexGrow: p.width_mm }}
+                    data-colour={(keyOf(p.barcode) - 1) % TILE_COLOURS}>
+                    <span className="unit__number">{keyOf(p.barcode)}</span>
+                  </span>
+                )))}
+              </div>
+            ) : null}
+            {shelf.free_cm > 0 ? (
+              <div className="unit__free" style={{ flexGrow: shelf.free_cm }}>
+                <bdi>{t(shelf.products.length ? 'shelf.free' : 'shelf.empty', { cm: number(shelf.free_cm, 1) })}</bdi>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/** The key: each product's number, as on its tiles, with its name, facings and why. */
+function Key({ shelves, keyOf, nameOf, rules }) {
+  const { t, language } = useI18n()
+  return (
+    <ol className="unit__key">
+      {shelves.flatMap((shelf) => shelf.products.map((p) => {
+        const notes = [t('layout.shelf', { n: shelf.shelf })]
+        if (p.rank) notes.push(t('shelf.rank', { rank: p.rank }))
+        if (p.unknown_parts?.length) {
+          notes.push(t('shelf.unknown', { why: p.unknown_because.map((b) => t(`shelf.unknown.${b}`)).join(t('shelf.and')) }))
+        }
+        if (p.kept_on_by_his_rule) notes.push(t('shelf.keptOn'))
+        for (const kind of p.rules || []) {
+          const rule = rules.find((r) => r.kind === kind && r.barcode === p.barcode)
+          if (rule) notes.push(t('shelf.yourRule', { rule: ruleText(t, rule, nameOf) }))
+        }
+        return (
+          <li key={p.barcode}>
+            <span className="unit__badge" data-colour={(keyOf(p.barcode) - 1) % TILE_COLOURS}>{keyOf(p.barcode)}</span>
+            <span className="plan__product-name"><bdi>{p.product_name || nameOf(p.barcode)}</bdi></span>
+            <span className="plan__facings">{facingsText(p.facings, language)}</span>
+            <span className="plan__product-notes">{notes.join(' · ')}</span>
+          </li>
+        )
+      }))}
+    </ol>
   )
 }
 
@@ -220,6 +244,9 @@ function FixturePlan({ entry, plan, explanations, arrangements, outcomes, nameOf
   const { t } = useI18n()
   const { date, number } = useDates()
   const ev = entry.evidence
+  // Numbered from the top shelf down, in the plan's order on each: the order he reads the drawing.
+  const numbers = new Map((ev.shelves || []).flatMap((s) => s.products.map((p) => p.barcode)).map((b, i) => [b, i + 1]))
+  const keyOf = (barcode) => numbers.get(barcode)
   const mine = outcomes[entry.id]?.status === 'acted' ? outcomes[entry.id] : null
   const latest = arrangements.filter((a) => a.fixture === ev.fixture)
     .sort((x, y) => y.arranged_on.localeCompare(x.arranged_on))[0]
@@ -234,9 +261,10 @@ function FixturePlan({ entry, plan, explanations, arrangements, outcomes, nameOf
       </header>
       <p className="reorder__line">{t('layout.departments')} <Names barcodes={ev.departments} nameOf={(d) => d} /></p>
       {ev.state === 'planned' ? (
-        <ol className="layout__shelves plan__shelves">
-          {ev.shelves.map((s) => <Shelf key={s.shelf} shelf={s} nameOf={nameOf} rules={ev.rules || []} />)}
-        </ol>
+        <>
+          <UnitDrawing shelves={ev.shelves} keyOf={keyOf} />
+          <Key shelves={ev.shelves} keyOf={keyOf} nameOf={nameOf} rules={ev.rules || []} />
+        </>
       ) : (
         <p className="reorder__needs" data-plan-state={ev.state}>
           <span className="reorder__needs-pill">{t('shelf.noPlan')}</span>
