@@ -57,7 +57,7 @@ Updated: 2026-09-29 (D-26 and D-27 recorded)
 | [F9](../features/F9-assortment-gap/intent.md) | INT-005 | «ماذا يبيع السوق ولا أبيعه أنا؟» | [F9-S1](../features/F9-assortment-gap/specs/F9-S1-assortment-gap.md) | V2 · حُسم قراره — D-25 |
 | [F10](../features/F10-expiry-bounded-ordering/intent.md) | INT-007 | «كم أطلب حتى لا يتلف؟» | — | V2 |
 | [F11](../features/F11-supplier-lead-times/intent.md) | INT-008 | «متى يصل كل مورّد فعلاً؟» | — | V3 |
-| [F12](../features/F12-planogram/intent.md) | INT-006 | «رتّب رفوفي لأربح أكثر» | — | V4 |
+| [F12](../features/F12-planogram/intent.md) | INT-006 | «رتّب رفوفي لأربح أكثر» | [F12-S1](../features/F12-planogram/specs/F12-S1-planogram.md) | V4 |
 | [F13](../features/F13-pilot-measurement/intent.md) | INT-MEAS | رقم النجاح بعد 30 يوماً | — | V1 · غير محدَّد |
 | [F14](../features/F14-decision-explanations/intent.md) | INT-EXPL | «اشرح لي لماذا» — مساعد يشرح كل قرار، وعدٌ للعميل (#54) | — | V2 · مع F8 · بلا موعد — D-15 … D-17 |
 

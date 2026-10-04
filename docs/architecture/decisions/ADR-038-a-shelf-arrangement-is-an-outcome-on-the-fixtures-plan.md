@@ -1,7 +1,7 @@
 ---
 ID: ADR-038
 Title: A shelf arrangement is the owner's "acted" outcome on that fixture's plan entry
-Status: Ready for review
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-10-04
 Parent: [System Design](../system-design.md) §19
@@ -12,7 +12,7 @@ Updated: 2026-10-04
 
 # ADR-038 — A shelf arrangement is the owner's "acted" outcome on that fixture's plan entry
 
-**Status:** Ready for review · **Recorded in:** [System Design](../system-design.md) §19
+**Status:** Accepted (2026-10-04, by the repository owner: "approved", with F12-S1, whose requirements are written on it) · **Recorded in:** [System Design](../system-design.md) §19
 
 ## Context
 
