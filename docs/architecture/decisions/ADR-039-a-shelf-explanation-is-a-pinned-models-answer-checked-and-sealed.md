@@ -1,7 +1,7 @@
 ---
 ID: ADR-039
 Title: A shelf plan's explanation is a pinned model's answer, checked and sealed as the boost's is
-Status: Ready for review
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-10-04
 Parent: [System Design](../system-design.md) §19
@@ -12,7 +12,7 @@ Updated: 2026-10-04
 
 # ADR-039 — A shelf plan's explanation is a pinned model's answer, checked and sealed as the boost's is
 
-**Status:** Ready for review · **Recorded in:** [System Design](../system-design.md) §19
+**Status:** Accepted (2026-10-04, by the repository owner: "approve", answering "Do you approve the AI explanation as designed?", F12-S1 OQ-1209) · **Recorded in:** [System Design](../system-design.md) §19
 
 ## Context
 
