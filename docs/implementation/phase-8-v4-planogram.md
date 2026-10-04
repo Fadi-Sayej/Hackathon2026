@@ -56,7 +56,7 @@ under `shelf:`, and the artefact publishes every one.
 | Facings cap per product | 4 | A judgement. At 0.17, a product's 2nd facing adds 12.5% to its sales, the 3rd 7.1%, the 4th 5.0%, and a 5th would add 3.9%. The cap stops one product taking a shelf for a few percent per facing. His "at least N" rule overrides it |
 | Window length and minimum report days | F8's: 28 and 21, a report in every week | Read from `order.window_days` and `order.min_report_days`, not copied, so the measurement's windows are the plan's |
 | Interval level | 95% | The level the repository's other intervals use (`wilson_interval`, `sales_movement`, z = 1.96) |
-| Minimum arrangements for a store elasticity | 8, each on a different fixture | A judgement. The bootstrap resamples fixtures, so the minimum counts fixtures. With a small store's ten to twenty fixtures, intervals from so few clusters run too narrow (Cameron, Gelbach and Miller, 2008), so "measured" is harder to reach than it looks. Erring that way keeps 0.17 |
+| Minimum arrangements for a store elasticity | 8, each on a different fixture | A judgement. The bootstrap resamples fixtures, so the minimum counts fixtures. A small store has ten to twenty fixtures, and intervals from so few clusters run too narrow (Cameron, Gelbach and Miller, 2008). That makes a false "measured" more likely, not less. The guards against one replacing 0.17 are the placebo and the 0-to-1 range (FR-206, FR-209). The estimate publishes how many fixtures it rests on |
 | Minimum arranged products | 40 | A judgement: about five per arrangement |
 | Bootstrap draws, and the seed | 1,000; a fixed seed | 1,000 is common for a 95% percentile interval. Its time is measured in Task 8.5 (NFR-072, NFR-076) |
 
@@ -96,23 +96,27 @@ Today and Data list every capability an artefact publishes, unless `compose.js` 
 registry's `admitted: false` is not enough on its own. So, as Phase 5's Task 5.0 did:
 - `layout_facts`, `shelf_plan` and `shelf_measurement` join `NOT_ON_TODAY` for good (FR-192).
   They also join `NOT_YET_SHOWN` until Task 8.9.
-- Each registry entry gets its `published_from`, the date of the first nightly that publishes
-  it. `check_deploy_data` then accepts an earlier artefact without it.
+- The registry entries come later, each with its runner: Tasks 8.2, 8.3 and 8.5. An entry with
+  no runner would stop the nightly from publishing. Each of those tasks sets its entry's
+  `published_from`, so `check_deploy_data` accepts an earlier artefact without it. That script
+  needs no change.
 - Every new reason gets its words in all three dictionaries, as his words (FR-194). The new
   reasons are `no_store_layout`, `layout_all_rejected`, `no_evidence_window`,
   `owner_state_unavailable` and `no_arrangement_recorded`. Of FR-193's reasons, only
   `stale_daily_sales` and `no_daily_sales` have words already. F8 says "no window" per
   department, not for the capability.
 
-**Done when:** the suites pass with the three ids registered, and Today and every page are
+**Done when:** a test artefact carrying the three ids renders exactly as one without them: the same
+DOM on Today and Data, and nothing composed. The suites pass, and Today and every page are
 byte-identical before and after. The proof is the before-and-after screenshot method of Phase 5
 and #185: every page, in three languages and two widths, each side served on its own port.
 
 ### Task 8.1: The layout file's loader (ADR-037; FR-178 … FR-180, FR-199; AC-183)
 
 **Files:** `src/engine/store_layout.py`, `src/engine/inputs.py`, `src/engine/registry.py`,
-`src/common/store.py`, `src/common/store_readiness.py`, `tests/engine/test_store_layout.py`,
-`tests/test_new_store_copy.py`, `tests/test_check_store.py`
+`src/common/store.py`, `src/common/store_readiness.py` (its inventory and a `FEEDS` entry),
+`docs/pilot/next-store.md` (the list `check:store` mirrors), `docs/operations/new-store.md`,
+`tests/engine/test_store_layout.py`, `tests/test_new_store_copy.py`, `tests/test_check_store.py`
 
 - The loader follows `store_facts.load_store_facts`: it validates, never repairs, rejects entries
   by name with a reason, and checks provenance by kind. A measurement carries `measured_by` and
