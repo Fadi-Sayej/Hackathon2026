@@ -1,0 +1,816 @@
+{
+ "_example": "A test shop, not any store's data (D-31). Built by scripts/build_shelf_example.py from Reorder's example shop with a shelf layout added. Nothing reads it but Shelf plan's preview.",
+ "artefact": {
+  "capabilities": {
+   "layout_facts": {
+    "counts": {
+     "departments_on_no_fixture": 0,
+     "fixtures": 3,
+     "rejected": 0,
+     "without_width": 1
+    },
+    "current": {},
+    "departments_on_no_fixture": [],
+    "entries": [],
+    "evidence_window": {
+     "first_day": "2026-07-30",
+     "last_day": "2026-08-26",
+     "report_days": 28,
+     "weeks": [
+      [
+       "2026-07-30",
+       "2026-08-05"
+      ],
+      [
+       "2026-08-06",
+       "2026-08-12"
+      ],
+      [
+       "2026-08-13",
+       "2026-08-19"
+      ],
+      [
+       "2026-08-20",
+       "2026-08-26"
+      ]
+     ]
+    },
+    "fixtures": {
+     "מדף יבש": {
+      "chilled": false,
+      "departments": [
+       "מאפים",
+       "חטיפים"
+      ],
+      "eye_level_shelf": 1,
+      "recorded_by": "team",
+      "rules": [
+       {
+        "barcode": "7290201",
+        "facings": 2,
+        "kind": "at_most",
+        "recorded_by": "team",
+        "stated_by": "owner",
+        "stated_on": "2026-08-01"
+       }
+      ],
+      "shelves": [
+       {
+        "length_cm": 55,
+        "measured_by": "team",
+        "measured_on": "2026-08-01",
+        "shelf": 1
+       },
+       {
+        "length_cm": 60,
+        "measured_by": "team",
+        "measured_on": "2026-08-01",
+        "shelf": 2
+       }
+      ],
+      "stated_by": "owner",
+      "stated_on": "2026-08-01"
+     },
+     "מקרר": {
+      "chilled": true,
+      "departments": [
+       "משקאות",
+       "מוצרי חלב"
+      ],
+      "eye_level_shelf": 2,
+      "recorded_by": "team",
+      "rules": [],
+      "shelves": [
+       {
+        "length_cm": 25,
+        "measured_by": "team",
+        "measured_on": "2026-08-01",
+        "shelf": 1
+       },
+       {
+        "length_cm": 20,
+        "measured_by": "team",
+        "measured_on": "2026-08-01",
+        "shelf": 2
+       }
+      ],
+      "stated_by": "owner",
+      "stated_on": "2026-08-01"
+     },
+     "ניקיון": {
+      "chilled": false,
+      "departments": [
+       "ניקיון"
+      ],
+      "eye_level_shelf": null,
+      "recorded_by": "team",
+      "rules": [],
+      "shelves": [
+       {
+        "length_cm": 40,
+        "measured_by": "team",
+        "measured_on": "2026-08-01",
+        "shelf": 1
+       }
+      ],
+      "stated_by": "owner",
+      "stated_on": "2026-08-01"
+     }
+    },
+    "id": "layout_facts",
+    "notes": [],
+    "rejected": [],
+    "requires": [
+     "products",
+     "store_layout"
+    ],
+    "spec": "F12-S1",
+    "status": "available",
+    "thresholds": {},
+    "unavailable_reason": null,
+    "unplanned": {
+     "מדף יבש": {
+      "count_zero_or_below": [],
+      "kept_off": [],
+      "no_sale_in_window": [],
+      "rejected": [],
+      "stock_unknown": [],
+      "waiting_for_window": []
+     },
+     "מקרר": {
+      "count_zero_or_below": [],
+      "kept_off": [],
+      "no_sale_in_window": [
+       "7290004"
+      ],
+      "rejected": [],
+      "stock_unknown": [],
+      "waiting_for_window": []
+     },
+     "ניקיון": {
+      "count_zero_or_below": [],
+      "kept_off": [],
+      "no_sale_in_window": [],
+      "rejected": [],
+      "stock_unknown": [],
+      "waiting_for_window": []
+     }
+    },
+    "widths": {
+     "7290001": {
+      "measured_by": "team",
+      "measured_on": "2026-08-01",
+      "width_mm": 80
+     },
+     "7290002": {
+      "measured_by": "team",
+      "measured_on": "2026-08-01",
+      "width_mm": 75
+     },
+     "7290101": {
+      "measured_by": "team",
+      "measured_on": "2026-08-01",
+      "width_mm": 200
+     },
+     "7290102": {
+      "measured_by": "team",
+      "measured_on": "2026-08-01",
+      "width_mm": 180
+     },
+     "7290201": {
+      "measured_by": "team",
+      "measured_on": "2026-08-01",
+      "width_mm": 120
+     },
+     "7290202": {
+      "measured_by": "team",
+      "measured_on": "2026-08-01",
+      "width_mm": 130
+     },
+     "7290203": {
+      "measured_by": "team",
+      "measured_on": "2026-08-01",
+      "width_mm": 85
+     },
+     "7290301": {
+      "measured_by": "team",
+      "measured_on": "2026-08-01",
+      "width_mm": 90
+     },
+     "7290401": {
+      "measured_by": "team",
+      "measured_on": "2026-08-01",
+      "width_mm": 110
+     }
+    },
+    "window": null,
+    "without_width": {
+     "מדף יבש": [],
+     "מקרר": [
+      "7290003"
+     ],
+     "ניקיון": []
+    },
+    "without_width_counts": "planned"
+   },
+   "shelf_measurement": {
+    "counts": {},
+    "entries": [],
+    "id": "shelf_measurement",
+    "notes": [],
+    "requires": [
+     "products",
+     "store_layout",
+     "sales_daily"
+    ],
+    "spec": "F12-S1",
+    "status": "unavailable",
+    "thresholds": {},
+    "unavailable_reason": "no_arrangement_recorded",
+    "window": null
+   },
+   "shelf_plan": {
+    "counts": {
+     "fixtures": 3,
+     "no_planned_products": 0,
+     "no_width": 1,
+     "nothing_placeable": 0,
+     "over_full": 0,
+     "placed": 9,
+     "planned": 3,
+     "stopped_by_rule": 0,
+     "too_wide": 0
+    },
+    "elasticity": {
+     "measurement_reason": "no_arrangement_recorded",
+     "source": "research",
+     "value": 0.17,
+     "why": "measurement_unavailable"
+    },
+    "entries": [
+     {
+      "action": "arrange_shelf",
+      "actionable": false,
+      "attention": "today",
+      "barcode": null,
+      "capability": "shelf_plan",
+      "characterisation": "shelf_plan",
+      "department": null,
+      "evidence": {
+       "chilled": true,
+       "departments": [
+        "משקאות",
+        "מוצרי חלב"
+       ],
+       "elasticity": {
+        "measurement_reason": "no_arrangement_recorded",
+        "source": "research",
+        "value": 0.17,
+        "why": "measurement_unavailable"
+       },
+       "extra_facings": "no_width",
+       "fixture": "מקרר",
+       "placed": 3,
+       "plan_date": "2026-08-27",
+       "plan_window": {
+        "first_day": "2026-07-30",
+        "last_day": "2026-08-26"
+       },
+       "rules": [],
+       "shelves": [
+        {
+         "eye_level": false,
+         "free_cm": 17.5,
+         "length_cm": 25,
+         "measured_on": "2026-08-01",
+         "products": [
+          {
+           "barcode": "7290002",
+           "daily_mean": 2.0,
+           "department": "משקאות",
+           "facings": 1,
+           "kept_on_by_his_rule": false,
+           "margin_per_sale": 3.0,
+           "product_name": "קולה",
+           "rank": 3,
+           "rules": [],
+           "unknown_because": [],
+           "unknown_parts": [],
+           "width_measured_on": "2026-08-01",
+           "width_mm": 75
+          }
+         ],
+         "shelf": 1,
+         "used_cm": 7.5
+        },
+        {
+         "eye_level": true,
+         "free_cm": 3.0,
+         "length_cm": 20,
+         "measured_on": "2026-08-01",
+         "products": [
+          {
+           "barcode": "7290301",
+           "daily_mean": 6.0,
+           "department": "מוצרי חלב",
+           "facings": 1,
+           "kept_on_by_his_rule": false,
+           "margin_per_sale": 3.0,
+           "product_name": "חלב 3%",
+           "rank": 1,
+           "rules": [],
+           "unknown_because": [],
+           "unknown_parts": [],
+           "width_measured_on": "2026-08-01",
+           "width_mm": 90
+          },
+          {
+           "barcode": "7290001",
+           "daily_mean": 3.0,
+           "department": "משקאות",
+           "facings": 1,
+           "kept_on_by_his_rule": false,
+           "margin_per_sale": 3.0,
+           "product_name": "מים",
+           "rank": 2,
+           "rules": [],
+           "unknown_because": [],
+           "unknown_parts": [],
+           "width_measured_on": "2026-08-01",
+           "width_mm": 80
+          }
+         ],
+         "shelf": 2,
+         "used_cm": 17.0
+        }
+       ],
+       "state": "planned",
+       "stated_on": "2026-08-01",
+       "unplaced": {
+        "count_zero_or_below": [],
+        "kept_off": [],
+        "no_sale_in_window": [
+         "7290004"
+        ],
+        "no_width": [
+         "7290003"
+        ],
+        "rejected": [],
+        "stock_unknown": [],
+        "too_wide": []
+       }
+      },
+      "id": "fe0dfe4b4e3ead10",
+      "not_actionable_reason": "not_admitted",
+      "ordering_key": {
+       "name": "fixture_order",
+       "value": 0
+      },
+      "product_name": null,
+      "signal_family": "shelf.plan",
+      "value": null
+     },
+     {
+      "action": "arrange_shelf",
+      "actionable": false,
+      "attention": "today",
+      "barcode": null,
+      "capability": "shelf_plan",
+      "characterisation": "shelf_plan",
+      "department": null,
+      "evidence": {
+       "chilled": false,
+       "departments": [
+        "מאפים",
+        "חטיפים"
+       ],
+       "elasticity": {
+        "measurement_reason": "no_arrangement_recorded",
+        "source": "research",
+        "value": 0.17,
+        "why": "measurement_unavailable"
+       },
+       "extra_facings": "given",
+       "fixture": "מדף יבש",
+       "placed": 5,
+       "plan_date": "2026-08-27",
+       "plan_window": {
+        "first_day": "2026-07-30",
+        "last_day": "2026-08-26"
+       },
+       "rules": [
+        {
+         "barcode": "7290201",
+         "facings": 2,
+         "kind": "at_most",
+         "recorded_by": "team",
+         "stated_by": "owner",
+         "stated_on": "2026-08-01"
+        }
+       ],
+       "shelves": [
+        {
+         "eye_level": true,
+         "free_cm": 1.5,
+         "length_cm": 55,
+         "measured_on": "2026-08-01",
+         "products": [
+          {
+           "barcode": "7290201",
+           "daily_mean": 5.0,
+           "department": "חטיפים",
+           "facings": 1,
+           "kept_on_by_his_rule": false,
+           "margin_per_sale": 3.0,
+           "product_name": "במבה",
+           "rank": 1,
+           "rules": [
+            "at_most"
+           ],
+           "unknown_because": [],
+           "unknown_parts": [],
+           "width_measured_on": "2026-08-01",
+           "width_mm": 120
+          },
+          {
+           "barcode": "7290101",
+           "daily_mean": 8.0,
+           "department": "מאפים",
+           "facings": 1,
+           "kept_on_by_his_rule": false,
+           "margin_per_sale": 3.0,
+           "product_name": "לחם אחיד",
+           "rank": 2,
+           "rules": [],
+           "unknown_because": [],
+           "unknown_parts": [],
+           "width_measured_on": "2026-08-01",
+           "width_mm": 200
+          },
+          {
+           "barcode": "7290202",
+           "daily_mean": 4.0,
+           "department": "חטיפים",
+           "facings": 1,
+           "kept_on_by_his_rule": false,
+           "margin_per_sale": 3.0,
+           "product_name": "ביסלי גריל",
+           "rank": 3,
+           "rules": [],
+           "unknown_because": [],
+           "unknown_parts": [],
+           "width_measured_on": "2026-08-01",
+           "width_mm": 130
+          },
+          {
+           "barcode": "7290203",
+           "daily_mean": 1.0,
+           "department": "חטיפים",
+           "facings": 1,
+           "kept_on_by_his_rule": false,
+           "margin_per_sale": 3.0,
+           "product_name": "פרינגלס",
+           "rank": 5,
+           "rules": [],
+           "unknown_because": [],
+           "unknown_parts": [],
+           "width_measured_on": "2026-08-01",
+           "width_mm": 85
+          }
+         ],
+         "shelf": 1,
+         "used_cm": 53.5
+        },
+        {
+         "eye_level": false,
+         "free_cm": 6.0,
+         "length_cm": 60,
+         "measured_on": "2026-08-01",
+         "products": [
+          {
+           "barcode": "7290102",
+           "daily_mean": 5.0,
+           "department": "מאפים",
+           "facings": 3,
+           "kept_on_by_his_rule": false,
+           "margin_per_sale": 3.0,
+           "product_name": "פיתות",
+           "rank": 4,
+           "rules": [],
+           "unknown_because": [],
+           "unknown_parts": [],
+           "width_measured_on": "2026-08-01",
+           "width_mm": 180
+          }
+         ],
+         "shelf": 2,
+         "used_cm": 54.0
+        }
+       ],
+       "state": "planned",
+       "stated_on": "2026-08-01",
+       "unplaced": {
+        "count_zero_or_below": [],
+        "kept_off": [],
+        "no_sale_in_window": [],
+        "no_width": [],
+        "rejected": [],
+        "stock_unknown": [],
+        "too_wide": []
+       }
+      },
+      "id": "4fb6de5debb0427d",
+      "not_actionable_reason": "not_admitted",
+      "ordering_key": {
+       "name": "fixture_order",
+       "value": 1
+      },
+      "product_name": null,
+      "signal_family": "shelf.plan",
+      "value": null
+     },
+     {
+      "action": "arrange_shelf",
+      "actionable": false,
+      "attention": "today",
+      "barcode": null,
+      "capability": "shelf_plan",
+      "characterisation": "shelf_plan",
+      "department": null,
+      "evidence": {
+       "chilled": false,
+       "departments": [
+        "ניקיון"
+       ],
+       "elasticity": {
+        "measurement_reason": "no_arrangement_recorded",
+        "source": "research",
+        "value": 0.17,
+        "why": "measurement_unavailable"
+       },
+       "extra_facings": "given",
+       "fixture": "ניקיון",
+       "placed": 1,
+       "plan_date": "2026-08-27",
+       "plan_window": {
+        "first_day": "2026-07-30",
+        "last_day": "2026-08-26"
+       },
+       "rules": [],
+       "shelves": [
+        {
+         "eye_level": false,
+         "free_cm": 7.0,
+         "length_cm": 40,
+         "measured_on": "2026-08-01",
+         "products": [
+          {
+           "barcode": "7290401",
+           "daily_mean": 1.0,
+           "department": "ניקיון",
+           "facings": 3,
+           "kept_on_by_his_rule": false,
+           "margin_per_sale": 3.0,
+           "product_name": "אקונומיקה",
+           "rank": 1,
+           "rules": [],
+           "unknown_because": [],
+           "unknown_parts": [],
+           "width_measured_on": "2026-08-01",
+           "width_mm": 110
+          }
+         ],
+         "shelf": 1,
+         "used_cm": 33.0
+        }
+       ],
+       "state": "planned",
+       "stated_on": "2026-08-01",
+       "unplaced": {
+        "count_zero_or_below": [],
+        "kept_off": [],
+        "no_sale_in_window": [],
+        "no_width": [],
+        "rejected": [],
+        "stock_unknown": [],
+        "too_wide": []
+       }
+      },
+      "id": "76d50fc14de2e814",
+      "not_actionable_reason": "not_admitted",
+      "ordering_key": {
+       "name": "fixture_order",
+       "value": 2
+      },
+      "product_name": null,
+      "signal_family": "shelf.plan",
+      "value": null
+     }
+    ],
+    "evidence_window": {
+     "first_day": "2026-07-30",
+     "last_day": "2026-08-26",
+     "report_days": 28,
+     "weeks": [
+      [
+       "2026-07-30",
+       "2026-08-05"
+      ],
+      [
+       "2026-08-06",
+       "2026-08-12"
+      ],
+      [
+       "2026-08-13",
+       "2026-08-19"
+      ],
+      [
+       "2026-08-20",
+       "2026-08-26"
+      ]
+     ]
+    },
+    "id": "shelf_plan",
+    "notes": [],
+    "plan_date": "2026-08-27",
+    "rejected_layout": [],
+    "requires": [
+     "products",
+     "store_layout",
+     "sales_daily"
+    ],
+    "spec": "F12-S1",
+    "status": "available",
+    "thresholds": {
+     "elasticity": 0.17,
+     "facings_cap": 4
+    },
+    "unavailable_reason": null,
+    "window": null
+   }
+  },
+  "generated_at": "2026-08-27T03:00:00+00:00",
+  "thresholds": {
+   "artefact": {
+    "cost_ratio": 2.0,
+    "min_price": 0.5
+   },
+   "assortment_gap": {
+    "window_days": 14
+   },
+   "catalogue_lifecycle": {
+    "full_annual_cycle_months": 12,
+    "implausible_revenue_share": 0.1,
+    "withdraw_with_stock": false
+   },
+   "competitor_position": {
+    "attention_pct": 100.0,
+    "cost_floor_pct": 10.0,
+    "freshness_days": 14,
+    "policy_pct": 60.0,
+    "uncomparable_min_barcode_digits": 8
+   },
+   "market_boost": {
+    "max_pct": 25.0,
+    "model": "claude-sonnet-5",
+    "prompt": "configs/prompts/market_boost.v1.md",
+    "request_ceiling": 200
+   },
+   "market_running_out": {
+    "catalogue_change_pct": 10.0,
+    "max_absent": 7,
+    "min_absent": 2,
+    "min_listed": 10,
+    "prior_days": 14,
+    "signal_max_age_days": 2,
+    "signal_min_usable": 10,
+    "thin_collection_ratio": 0.5
+   },
+   "order_quantity": {
+    "freshness_days": 7,
+    "max_count_age_days": 7,
+    "min_report_days": 21,
+    "publish_disagreement_questions": true,
+    "window_days": 28
+   },
+   "owner_declared_ceiling_pct": null,
+   "owner_questions": {
+    "limit": 3,
+    "money_basis": "window_revenue_at_shelf_price",
+    "yield_factor": 1.0
+   },
+   "price_consistency": {
+    "band_pct": 2.0,
+    "drop_ratio": 0.75,
+    "max_credible_gap_pct": 300.0,
+    "min_band_count": 20
+   },
+   "published_population": "whole",
+   "question_limit": 3,
+   "shelf_measurement": {
+    "bootstrap_draws": 1000,
+    "bootstrap_seed": 20261004,
+    "interval_level": 0.95,
+    "min_arrangements": 8,
+    "min_products": 40,
+    "min_report_days": 21,
+    "window_days": 28
+   },
+   "shelf_plan": {
+    "elasticity": 0.17,
+    "facings_cap": 4
+   },
+   "surface": {
+    "bound": 10,
+    "engine_ordered": [
+     "assortment_gap",
+     "reconciliation",
+     "competitor_position",
+     "catalogue_lifecycle",
+     "hygiene"
+    ],
+    "rotate": [
+     "reconciliation",
+     "competitor_position",
+     "catalogue_lifecycle",
+     "hygiene"
+    ],
+    "unvalued_caps": {
+     "assortment_gap": 1
+    },
+    "unvalued_order": [
+     "assortment_gap",
+     "reconciliation",
+     "competitor_position",
+     "catalogue_lifecycle",
+     "hygiene"
+    ],
+    "unvalued_places": 3
+   },
+   "version": 1
+  }
+ },
+ "catalogue": {
+  "products": [
+   {
+    "barcode": "7290001",
+    "department": "משקאות",
+    "product_name": "מים"
+   },
+   {
+    "barcode": "7290002",
+    "department": "משקאות",
+    "product_name": "קולה"
+   },
+   {
+    "barcode": "7290003",
+    "department": "משקאות",
+    "product_name": "סודה"
+   },
+   {
+    "barcode": "7290004",
+    "department": "משקאות",
+    "product_name": "מיץ"
+   },
+   {
+    "barcode": "7290101",
+    "department": "מאפים",
+    "product_name": "לחם אחיד"
+   },
+   {
+    "barcode": "7290102",
+    "department": "מאפים",
+    "product_name": "פיתות"
+   },
+   {
+    "barcode": "7290201",
+    "department": "חטיפים",
+    "product_name": "במבה"
+   },
+   {
+    "barcode": "7290202",
+    "department": "חטיפים",
+    "product_name": "ביסלי גריל"
+   },
+   {
+    "barcode": "7290203",
+    "department": "חטיפים",
+    "product_name": "פרינגלס"
+   },
+   {
+    "barcode": "7290301",
+    "department": "מוצרי חלב",
+    "product_name": "חלב 3%"
+   },
+   {
+    "barcode": "7290401",
+    "department": "ניקיון",
+    "product_name": "אקונומיקה"
+   }
+  ]
+ },
+ "now": "2026-08-27T03:00:00+00:00",
+ "owner_state": {
+  "outcomes": {}
+ }
+}
