@@ -68,6 +68,10 @@ CAPABILITIES = {
     # (D-30), and it is a page's facts, never one of Today's places (F12-S1 FR-192).
     "layout_facts":        CapabilitySpec("layout_facts",        "F12-S1",   "none",     False, "fixture_order",
                                           ("products", "store_layout"), published_from="2026-10-06"),
+    # F12 (V4). Each fixture's dated plan. It waits for daily sales the way F8 does (D-30), so
+    # the reports are an input like the layout; F8's freshness and window stop it as they stop F8.
+    "shelf_plan":          CapabilitySpec("shelf_plan",          "F12-S1",   "none",     False, "fixture_order",
+                                          ("products", "store_layout", "sales_daily"), published_from="2026-10-06"),
 }
 
 # The reason belongs to the missing input, not to the capability: catalogue_lifecycle with

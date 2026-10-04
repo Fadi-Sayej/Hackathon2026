@@ -209,6 +209,8 @@ export const ar = {
   'outcome.failed': "لم نستطع حفظ قرارك — لم يُسجَّل.",
   'characterisation.confirmed_loss': "خسارة مؤكدة",
   'characterisation.market_ran_out': "نفد هذا المنتج من متجر قريب منك. أنت لا تبيعه.",
+  // F12-S1 (Phase 8 Task 8.3): a fixture's plan entry. Shown only once Task 8.9 builds Shelf plan.
+  'characterisation.shelf_plan': "خطة لوحدة الرفوف هذه: ماذا يوضع على كل رف، وكم وجهة.",
   'characterisation.question': "خارج سياستك — مقصود؟",
   'characterisation.hygiene': "سجل يحتاج تصحيحاً",
   'characterisation.inconsistent': "أرقام لا تتطابق",

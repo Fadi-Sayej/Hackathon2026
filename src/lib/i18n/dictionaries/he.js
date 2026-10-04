@@ -204,6 +204,8 @@ export const he = {
   'outcome.failed': "לא הצלחנו לשמור — לא נרשם.",
   'characterisation.confirmed_loss': "הפסד ודאי",
   'characterisation.market_ran_out': "המוצר הזה אזל בחנות קרובה אליך. אצלך הוא לא נמכר.",
+  // F12-S1 (Phase 8 Task 8.3): a fixture's plan entry. Shown only once Task 8.9 builds Shelf plan.
+  'characterisation.shelf_plan': "תוכנית ליחידת המדפים הזו: מה מונח על כל מדף, וכמה פנים.",
   'characterisation.question': "מחוץ למדיניות שלך — בכוונה?",
   'characterisation.hygiene': "רשומה לתיקון",
   'characterisation.inconsistent': "מספרים שלא מסתדרים",

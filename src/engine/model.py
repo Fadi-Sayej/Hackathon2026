@@ -40,6 +40,8 @@ SIGNAL_FAMILIES = (
     "order.suggestion",
     # F9 (V2, F9-S1 FR-170). No variant: the barcode alone, so an answer keeps applying.
     "assortment.market_ran_out",
+    # F12 (V4, ADR-038). One entry per fixture's plan: no barcode, the variant `fixture|plan date`.
+    "shelf.plan",
 )
 
 

@@ -131,3 +131,13 @@ boost:
 # own fortnight: the span its signal must cover, and the history that makes a listing steady.
 assortment_gap:
   window_days: 14
+
+# F12-S1 FR-185: how much each further facing of a product counts for. Provisional values,
+# approved by the repository owner on 2026-10-04 with the Phase 8 plan (OQ-1204).
+shelf:
+  # Eisend 2014's mean over 1,268 estimates (F12-S1 §23), until the store's own value meets
+  # FR-206's three conditions.
+  elasticity: 0.17
+  # A judgement: at 0.17 a 5th facing adds under 4% to a product's sales. His "at least N"
+  # rule overrides it.
+  facings_cap: 4

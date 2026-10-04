@@ -203,6 +203,8 @@ export const en = {
   'outcome.failed': "We could not save your decision — it was not recorded.",
   'characterisation.confirmed_loss': "Confirmed loss",
   'characterisation.market_ran_out': "A store near you ran out of this. You don't sell it.",
+  // F12-S1 (Phase 8 Task 8.3): a fixture's plan entry. Shown only once Task 8.9 builds Shelf plan.
+  'characterisation.shelf_plan': "A plan for this shelf unit: what goes on each shelf, and how many facings.",
   'characterisation.question': "Outside your policy — intentional?",
   'characterisation.hygiene': "A record to fix",
   'characterisation.inconsistent': "Numbers that do not add up",

@@ -230,7 +230,9 @@ def load_store_layout(path: Path | str, catalogue: Iterable[dict]) -> dict:
                          "reason": f"unknown key {', '.join(map(str, unknown))}; the keys are {sorted(TOP_KEYS)}"})
 
     fixtures = {}
-    for name, entry in sorted(_mapping(raw, "fixtures", rejected).items(), key=lambda kv: str(kv[0])):
+    # In the file's order, which is the order Shelf plan lists them in (ADR-038). YAML reads a
+    # mapping in that order, so it is as deterministic as sorting, and it is his order.
+    for name, entry in _mapping(raw, "fixtures", rejected).items():
         try:
             fixtures[str(name)] = _fixture(entry, departments)
         except _Rejected as err:

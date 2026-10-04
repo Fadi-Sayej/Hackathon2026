@@ -869,6 +869,10 @@
    },
    "published_population": "whole",
    "question_limit": 3,
+   "shelf_plan": {
+    "elasticity": 0.17,
+    "facings_cap": 4
+   },
    "surface": {
     "bound": 10,
     "engine_ordered": [

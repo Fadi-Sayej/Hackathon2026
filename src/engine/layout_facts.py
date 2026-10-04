@@ -45,7 +45,7 @@ def run(inputs) -> CapabilityOutput:
     pop = population(layout, inputs.products, inputs.sales_daily, window, itemised_departments(inputs))
     widths = layout.get("widths") or {}
     fixtures, without_width, unplanned = {}, {}, {}
-    for name, fixture in sorted(layout["fixtures"].items()):
+    for name, fixture in layout["fixtures"].items():     # the file's order (ADR-038)
         members = pop[name]
         fixtures[name] = {**fixture, "rules": [r for r in layout.get("rules") or [] if _concerns(r, name, fixture, members)]}
         counted = ([b for b, m in members.items() if m["status"] == PLANNED] if window is not None

@@ -12,7 +12,8 @@ fixture world, and the PUBLISHED artefact is read, never a capability's return v
 | the market snapshots | suggestions still publish, unadjusted, and no disagreement is raised; F9's assortment gap goes unavailable |
 | the boost picks | no boost, and zero calls to the model |
 | an answered disagreement | it is not raised again (D-20) |
-| the layout file | F12's layout_facts unavailable (no_store_layout); without the report days it stays available (F12-S1 §20) |
+| the layout file | F12's layout_facts and shelf_plan unavailable (no_store_layout); without the report days the layout stays available and the plan does not (F12-S1 §20) |
+| one product's width | the plan does not place it, and names it under "no width" (F12-S1 INV-086) |
 
 It also proves the quantity and the boost fail independently: without the picks the quantity
 still publishes, and without the report days the boost is still available.
@@ -86,15 +87,36 @@ def baseline_problems(art: dict) -> list:
     layout = _cap(art, "layout_facts")
     if layout["status"] != "available" or not layout.get("fixtures"):
         out.append("the baseline publishes no layout, so withholding the layout file proves nothing for F12")
+    if not _placed(art, world.BOOSTED):
+        out.append("the baseline plan does not place 7290001, so withholding its width proves nothing")
     return out
 
 
-def withheld_layout_problems(art: dict) -> list:
-    cap = _cap(art, "layout_facts")
-    if cap["status"] != "unavailable" or cap["unavailable_reason"] != "no_store_layout":
-        return [f"without the layout file layout_facts published {cap['status']} ({cap['unavailable_reason']}): "
-                "the measurements were never recorded, and it must say so (F12-S1 FR-196)"]
+def _placed(art: dict, barcode: str) -> bool:
+    plan = _cap(art, "shelf_plan")
+    if plan["status"] != "available":
+        return False
+    return any(p["barcode"] == barcode for e in plan["entries"] for s in (e["evidence"].get("shelves") or [])
+               for p in s["products"])
+
+
+def withheld_width_problems(art: dict, barcode: str) -> list:
+    plan = _cap(art, "shelf_plan")
+    if _placed(art, barcode):
+        return [f"without its width {barcode} was still placed: a width was estimated (F12-S1 INV-086)"]
+    if plan["status"] != "available" or not any(barcode in e["evidence"]["unplaced"]["no_width"] for e in plan["entries"]):
+        return [f"without its width {barcode} is not named under \"no width\" (F12-S1 FR-180)"]
     return []
+
+
+def withheld_layout_problems(art: dict) -> list:
+    out = []
+    for cap_id in ("layout_facts", "shelf_plan"):
+        cap = _cap(art, cap_id)
+        if cap["status"] != "unavailable" or cap["unavailable_reason"] != "no_store_layout":
+            out.append(f"without the layout file {cap_id} published {cap['status']} ({cap['unavailable_reason']}): "
+                       "the measurements were never recorded, and it must say so (F12-S1 FR-196, FR-193)")
+    return out
 
 
 def withheld_daily_problems(art: dict) -> list:
@@ -156,6 +178,10 @@ def independence_problems(without_picks: dict, without_daily: dict) -> list:
         out.append("without the report days the quantity must be unavailable while the boost stays available")
     if _cap(without_daily, "layout_facts")["status"] != "available":
         out.append("without the report days layout_facts must stay available: the layout needs no sales (D-30)")
+    plan = _cap(without_daily, "shelf_plan")
+    if plan["status"] != "unavailable" or plan["unavailable_reason"] != "no_daily_sales" or plan["entries"]:
+        out.append(f"without the report days shelf_plan published {plan['status']} ({plan['unavailable_reason']}): "
+                   "the plan waits for daily sales the way F8 does (D-30)")
     return out
 
 
@@ -239,7 +265,14 @@ def probe(tmp: Path) -> tuple:
     paths = _copy(built, tmp / "no_layout")
     paths["store_layout_path"].unlink()
     problems += withheld_layout_problems(_run(paths)[0])
-    done.append("withholding the layout file → layout_facts unavailable (no_store_layout)")
+    done.append("withholding the layout file → layout_facts and shelf_plan unavailable (no_store_layout)")
+
+    paths = _copy(built, tmp / "no_width")
+    layout = paths["store_layout_path"]
+    layout.write_text("".join(line for line in layout.read_text(encoding="utf-8").splitlines(keepends=True)
+                              if f'"{world.BOOSTED}"' not in line), encoding="utf-8")
+    problems += withheld_width_problems(_run(paths)[0], world.BOOSTED)
+    done.append("withholding one width        → that product is not placed, and is named")
 
     answered = world.owner(answered=[world.SLOW])
     problems += answered_problems(_run(world.roots(built), owner=answered)[0], world.SLOW)
