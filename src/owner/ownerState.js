@@ -69,6 +69,29 @@ export function loadOwnerState() {
   return state
 }
 
+/** The day on this device's calendar, as YYYY-MM-DD: the day he says he arranged the shelf. */
+export function deviceDay(now = new Date()) {
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
+}
+
+function arrangementSnapshot(entry) {
+  const evidence = entry.evidence ?? {}
+  const placements = {}
+  for (const shelf of evidence.shelves ?? []) {
+    for (const product of shelf.products ?? []) {
+      placements[product.barcode] = { shelf: shelf.shelf, facings: product.facings, eye_level: Boolean(shelf.eye_level) }
+    }
+  }
+  return {
+    fixture: evidence.fixture ?? null,
+    plan_date: evidence.plan_date ?? null,
+    plan_window: evidence.plan_window ?? null,
+    arranged_on: deviceDay(new Date(Date.now())),
+    placements,
+  }
+}
+
 export async function recordOutcome(entry, { status, reason = null, deferredUntil = null, approvedQuantity = null } = {}) {
   if (!entry?.id) throw new Error('recordOutcome: entry.id is required')
   // ADR-016. entry_id is a hash with no inverse, so an outcome written without the family
@@ -91,8 +114,18 @@ export async function recordOutcome(entry, { status, reason = null, deferredUnti
   if (status === OUTCOME_STATUS.DEFERRED && !Number.isFinite(deferredUntil)) {
     throw new Error('recordOutcome: a deferral needs deferredUntil; without one it is a permanent dismissal (#139)')
   }
+  const shelfPlan = entry.signal_family === 'shelf.plan'
+  // ADR-038 Decision 7: an arrangement is the one thing a plan records. Nothing maps onto
+  // declined or deferred, so neither is accepted here rather than stored as a meaningless fact.
+  if (shelfPlan && status !== OUTCOME_STATUS.ACTED) {
+    throw new Error(`recordOutcome: a shelf plan records only "acted", not ${String(status)} (ADR-038)`)
+  }
 
   const state = loadOwnerState()
+  // ADR-038 Decision 5: the day he arranged a fixture is the boundary of its measurement
+  // (F12-S1 FR-202). A second press must not move it, as it would for any other outcome,
+  // where rewriting `at` is right. Undo is clearOutcome.
+  if (shelfPlan && state.outcomes?.[entry.id]?.status === OUTCOME_STATUS.ACTED) return
   const next = {
     ...state,
     outcomes: {
@@ -128,6 +161,9 @@ export async function recordOutcome(entry, { status, reason = null, deferredUnti
                 ...(Number.isInteger(approvedQuantity) && approvedQuantity > 0 ? { approved_quantity: approvedQuantity } : {}),
               }
             : {}),
+          // ADR-038 Decision 4: everything the measurement needs, so no past artefact is read
+          // (F12-S1 §10). No ₪ field (D-1) and no name (D-22).
+          ...(shelfPlan ? arrangementSnapshot(entry) : {}),
         },
       },
     },

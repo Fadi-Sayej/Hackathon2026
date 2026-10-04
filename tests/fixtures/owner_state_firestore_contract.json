@@ -57,6 +57,36 @@
         "barcode": "7290017888729",
         "characterisation": "policy_breach_review"
       }
+    },
+    "5e1f0a9b8c7d6e5f": {
+      "status": "acted",
+      "reason": null,
+      "at": 1789290000000,
+      "snapshot": {
+        "signal_family": "shelf.plan",
+        "capability": "shelf_plan",
+        "barcode": null,
+        "characterisation": "shelf_plan",
+        "fixture": "F1",
+        "plan_date": "2026-09-13",
+        "plan_window": {
+          "first_day": "2026-08-16",
+          "last_day": "2026-09-12"
+        },
+        "arranged_on": "2026-09-13",
+        "placements": {
+          "7290001": {
+            "shelf": 1,
+            "facings": 2,
+            "eye_level": true
+          },
+          "7290002": {
+            "shelf": 2,
+            "facings": 1,
+            "eye_level": false
+          }
+        }
+      }
     }
   },
   "devices": {

@@ -115,3 +115,16 @@ def test_the_engine_never_publishes_the_device_id():
     device_id = next(iter(docs["devices"]))
     assert device_id in json.dumps(docs)          # the browser did write it
     assert device_id not in json.dumps(device_register(_pulled()))
+
+
+def test_an_arrangement_crosses_the_seam_with_everything_the_measurement_reads():
+    """Phase 8 Task 8.4 (ADR-038 Decision 9). F12-S1's measurement reads an arrangement from this
+    record alone, with no past artefact, so every field it needs must survive the pull."""
+    state = _pulled()
+    record = state.outcomes["5e1f0a9b8c7d6e5f"]
+    assert record["status"] == "acted"
+    snap = record["snapshot"]
+    assert snap["signal_family"] == "shelf.plan" and snap["barcode"] is None
+    assert (snap["fixture"], snap["plan_date"], snap["arranged_on"]) == ("F1", "2026-09-13", "2026-09-13")
+    assert snap["plan_window"] == {"first_day": "2026-08-16", "last_day": "2026-09-12"}
+    assert snap["placements"]["7290001"] == {"shelf": 1, "facings": 2, "eye_level": True}
