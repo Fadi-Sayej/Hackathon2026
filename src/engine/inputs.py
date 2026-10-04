@@ -19,6 +19,7 @@ from src.engine.policy import Policy
 from src.internal_pos.pos_importer import read_pos_vintage
 from src.engine.stock_date import usable_stock_date
 from src.engine.store_facts import DEFAULT_PATH as STORE_FACTS_PATH, load_store_facts
+from src.engine.store_layout import DEFAULT_PATH as STORE_LAYOUT_PATH, load_store_layout
 from src.market.presence import DELIVERY_CATALOG, load_presence
 from src.market.listed_prices import snapshot_price_reader
 from src.market.recent import recent_market
@@ -56,6 +57,8 @@ class EngineInputs:
     # F9-S1 §5: ADR-031's rule replayed over the recent window (src/market/recent.py). None
     # whenever `running_out` is None: the replay exists exactly when tonight's signal does.
     market_recent: Optional[dict] = None
+    # ADR-037: {fixtures, widths, current, rules, assigned, rejected}; None when the file is absent.
+    store_layout: Optional[dict] = None
 
 
 def _rows(path: Path) -> Optional[list]:
@@ -308,6 +311,7 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
                 matches_path: Path = MATCHING_ROOT / "product_matches.parquet",
                 stores: Optional[StoreTypeConfig] = None,
                 store_facts_path: Path = STORE_FACTS_PATH,
+                store_layout_path: Path = STORE_LAYOUT_PATH,
                 snapshots_root: Path = EXTERNAL_SNAPSHOTS_ROOT) -> EngineInputs:
     stores = stores or load_store_types()
     products_raw = _rows(silver_dir / PRODUCTS_TABLE)
@@ -318,6 +322,10 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
     # fact can only ever attach to a department that exists. Absent file, absent input.
     store_facts = (load_store_facts(store_facts_path, {p["department"] for p in products or [] if p["department"]})
                    if Path(store_facts_path).exists() else None)
+    # ADR-037. Checked against the catalogue as printed, like the facts above. A new copy starts
+    # without the file (STARTS_WITHOUT), and an absent file is the missing input no_store_layout.
+    store_layout = (load_store_layout(store_layout_path, products or [])
+                    if Path(store_layout_path).exists() else None)
     monthly = _rows(silver_dir / "sales_monthly.parquet")
     # ADR-030. The importer writes this table only when a daily report parsed, and removes an
     # older one when none did, so its absence is the honest "nothing has arrived yet".
@@ -391,14 +399,15 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
     vintages["sales"] = {k: vintages["sales"][k]
                          for k in ("months", "first", "last", "full_annual_cycle", "reconcile_before")}
     digest = _digest(products, summary_rows, monthly, observations, matches, policy, owner,
-                     reconcile_before, sales_daily, store_facts, running_out, boost_picks, market_recent)
+                     reconcile_before, sales_daily, store_facts, running_out, boost_picks, market_recent,
+                     store_layout)
     return EngineInputs(products=products, inventory=inventory or None,
                         sales_monthly=monthly, sales_daily=sales_daily, sales_summary=summary, window=window,
                         observations=observations, matches=matches, stores=stores, withdrawn=None, idle=None, conflicting=conflicting,
                         store_facts=store_facts, running_out=running_out, boost_picks=boost_picks,
                         inputs_digest=digest,
                         vintages=vintages, owner=owner, policy=policy, run_at=run_at,
-                        market_recent=market_recent)
+                        market_recent=market_recent, store_layout=store_layout)
 
 
 # When a row was imported is not what the row says. `sales_import` rewrites its tables on
@@ -422,7 +431,8 @@ def _content_only(row):
 def _digest(products, summary_rows, monthly, observations, matches, policy, owner,
             reconcile_before: Optional[str], sales_daily: Optional[list] = None,
             store_facts: Optional[dict] = None, running_out: Optional[dict] = None,
-            boost_picks: Optional[dict] = None, market_recent: Optional[dict] = None) -> str:
+            boost_picks: Optional[dict] = None, market_recent: Optional[dict] = None,
+            store_layout: Optional[dict] = None) -> str:
     """A hex digest over the CONTENT the run read, not over the files it read them from.
 
     Content, because a parquet rewritten with identical rows is the same input and must
@@ -472,6 +482,10 @@ def _digest(products, summary_rows, monthly, observations, matches, policy, owne
     # F9-S1: the recent replay is read from the same snapshots, but it is what the finding is
     # computed from, so a reproduction must digest the same one.
     feed("market_recent", market_recent)
+    # ADR-037. The shelves a plan is packed into, with the day each was measured or stated. As
+    # with the store facts, rejected entries are not facts, so only what is used is digested.
+    feed("store_layout", None if store_layout is None else
+         [{k: store_layout[k]} for k in ("fixtures", "widths", "current", "rules", "assigned")])
     feed("observations", observations)
     feed("matches", matches)
     feed("policy", policy.as_dict())

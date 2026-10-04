@@ -38,6 +38,7 @@ Nothing on this list may be simulated while it is missing (D-23).
 
 | What | Unlocks | Where it goes |
 |---|---|---|
+| **The shelves: each fixture, its shelves' lengths, its departments and eye-level shelf; each product's width and today's facings, read from shelf photographs; and the owner's arrangement rules** | F12's layout, shelf plan and its measurement. Without the file all three say the measurements have not been recorded (`no_store_layout`) | `configs/store_layout.yaml`, recorded by the team with who measured or stated each fact and when (ADR-037). No store has one yet |
 | **For each department: the days it is ordered, and how many days it keeps** | F8's quantities. A department without both facts gets no quantity, and F8 says which fact is missing (FR-155) | `configs/store_facts.yaml`, recorded by the team with the date it was said (ADR-033). No department is listed today |
 | **GAP-009:** name twenty products missing from a monthly report, and confirm they sold nothing | Whether F4 may ever show the owner "no longer sold" (D-14). The same question for the daily reports is F8's ASM-065 | #66; the gaps register |
 | **GAP-011:** is the ceiling the engine derives (18% at YomYom) the owner's own pricing policy? | F1 keeps everything under the ceiling silent. A stated number replaces the derived one, which stays published beside it | `policy.owner_declared_ceiling_pct`; #66 |

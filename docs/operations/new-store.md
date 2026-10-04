@@ -119,6 +119,9 @@ nearest first. For each venue to collect:
 
 - For each department: the days it is ordered, and how many days it keeps. Record them in
   `configs/store_facts.yaml`, with the date they were said (ADR-033).
+- The shelves: fixtures, shelf lengths, departments and eye-level shelf, and the owner's
+  arrangement rules, stated; product widths and today's facings, read from shelf photographs.
+  Record them in `configs/store_layout.yaml`, which a new copy starts without (ADR-037).
 - The owner's price rule: `price_policy_pct` in `configs/policy.yaml` is the pilot owner's
   +60%. Ask the new owner for theirs.
 - GAP-009 and GAP-011 ([next-store.md](../pilot/next-store.md) §3).

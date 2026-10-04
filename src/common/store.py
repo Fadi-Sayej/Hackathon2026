@@ -182,6 +182,9 @@ STARTS_WITHOUT = (
     "public/data/*.json",          # the published artefacts, built from that store's data
     "docs/pilot/**",               # that store's handover, conversations and questions
     "configs/measured_weights.yaml",   # measured from that store's sales (analyse_sales_movement)
+    # ADR-037, F12-S1: that store's shelves. Absent, not empty, in a new copy: an empty file is a
+    # present one (FR-193), and only an absent one says the measurements were never recorded.
+    "configs/store_layout.yaml",
     "samples/**",
 )
 KEPT_IN_EVERY_COPY = ("docs/pilot/next-store.md",)

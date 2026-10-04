@@ -88,6 +88,9 @@ INPUT_REASONS = {
     "sales_daily": "no_daily_sales",
     # ADR-033: the store facts file itself is absent (an empty one is a file with no facts).
     "store_facts": "no_store_facts",
+    # ADR-037: the layout file itself is absent. A new copy starts without it (ADR-036), so this
+    # is what a store says until the team records its first fixture.
+    "store_layout": "no_store_layout",
 }
 
 # Admitted capabilities that may never carry money (D-1). Their precedence for the three
