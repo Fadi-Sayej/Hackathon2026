@@ -1,24 +1,25 @@
 ---
 ID: ADR-040
-Title: A product's shelf picture is a file the team crops from the store's own photos, listed in the layout file and served as it is
+Title: A product's shelf picture is a file cut from the store's own photos, listed with its provenance and served as it is
 Status: Proposal — awaiting the repository owner's acceptance with F12-S1 v0.9
 Owner: smartshelf-architect
 Date: 2026-10-05
 Parent: [System Design](../system-design.md) §19
 Related Specs: F12-S1 (FR-216, FR-217, AC-206, NFR-078)
-Inputs: [D-13, D-22, D-23, D-33, docs/features/F12-planogram/specs/F12-S1-planogram.md, ADR-001, ADR-036, ADR-037]
+Inputs: [D-13, D-22, D-23, D-33, D-34, docs/features/F12-planogram/specs/F12-S1-planogram.md, ADR-001, ADR-036, ADR-037, ADR-041]
 Updated: 2026-10-05
 ---
 
-# ADR-040 — A product's shelf picture is a file the team crops from the store's own photos
+# ADR-040 — A product's shelf picture is a file cut from the store's own photos
 
 **Status:** Proposal, for the repository owner's acceptance with F12-S1 v0.9.
 
 ## Context
 
-D-33 (2026-10-05): Shelf plan shows each product's picture on its shelf, cropped by the team from
-the store's own shelf photos. A product without a picture yet shows its numbered tile. D-33
-leaves open where the pictures are kept and how they reach the page.
+D-33 (2026-10-05): Shelf plan shows each product's picture on its shelf, from the store's own
+shelf photos. A product without a picture yet shows its numbered tile. D-34, the same day: the
+shelf reader cuts them, not people ([ADR-041](ADR-041-a-shelf-reader-reads-the-stores-photos.md)).
+Neither says where the pictures are kept and how they reach the page.
 
 ADR-037 already makes the store's shelves a committed file the team records from his photos, with
 who measured each fact and when. It also says the photos are never an input to the engine, and
@@ -30,19 +31,19 @@ a store would send.
 
 ## Decision
 
-1. **One file per product, in the store's copy, at `public/store/shelf-pictures/`.** The team
-   crops the product's front from the photo it reads the product's width from, and commits the
-   file there. `public/` is what the site serves, so the page reads the file as it is, and no step
+1. **One file per product, in the store's copy, at `public/store/shelf-pictures/`.** The shelf
+   reader cuts the product's front from the photo it reads the product's width from, and writes
+   the file there; the reading is committed with it. `public/` is what the site serves, so the page reads the file as it is, and no step
    copies or converts it.
-2. **Listed in the layout file, with its provenance.** A new section of
-   `configs/store_layout.yaml`:
+2. **Listed with its provenance**, in a `pictures` section in the layout file's format. The
+   reader writes it to its readings file, `configs/shelf_readings.yaml` (ADR-041):
 
    ```yaml
    pictures:
-     "<barcode>": {file: <barcode>.jpg, cropped_by: team, cropped_on: 2026-10-10}
+     "<barcode>": {file: <barcode>.jpg, cropped_by: reader, cropped_on: 2026-10-10}
    ```
 
-   `cropped_by` is `team`, as D-33 says. No name or email is written (D-22). A file in the folder
+   `cropped_by` is `reader`, as D-34 says. No name or email is written (D-22). A file in the folder
    that the layout file does not list is not shown.
 3. **Validated at load, never repaired** (ADR-037 rule 2). A picture entry is rejected by name, and
    the product keeps its numbered tile, when:
@@ -74,9 +75,8 @@ somewhere else would be a picture of another shop's product, and its use is not 
 D-23: nothing stands in for what a store would send. A product without a picture keeps its
 numbered tile, which says that the picture has not been taken.
 
-### Cropping by a vision model
-Finding and cutting each product out of a photo automatically is the vision trial ADR-037 already
-left open (F12-S1 OQ-1202). The team crops by hand, as it reads widths by hand.
+### Cropping by hand
+D-34: no one cuts pictures.
 
 ### Keeping the files in `configs/`, copied into `public/` each night
 It would add a copy step and a commit of image files to the nightly, for files that do not
@@ -85,15 +85,14 @@ file that lists them.
 
 ## Consequences
 
-**We accept:** cropping is work for the team, one picture per product, on top of the widths
-(OQ-1201). Pictures add to the repository's size: at 150 KB at most, a store of 300 products adds
+**We accept:** pictures add to the repository's size: at 150 KB at most, a store of 300 products adds
 at most 45 MB, and a typical crop is far smaller.
 
-**We gain:** the plan looks like his own shelf, drawn from his own photos, with no model, no
-cost and no new kind of storage.
+**We gain:** the plan looks like his own shelf, drawn from his own photos, with no new kind of
+storage.
 
-**We will know it was wrong if:** a store's pictures are mostly missing long after its widths are
-recorded. Then cropping is the bottleneck, and the vision trial (OQ-1202) is the next decision.
+**We will know it was wrong if:** most products have no picture after a reading. Then the reader's
+identity step (ADR-041 Decision 4) is the bottleneck, not where pictures are kept.
 
 ## Reversibility
 
