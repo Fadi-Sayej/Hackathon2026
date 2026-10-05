@@ -5,7 +5,7 @@ Status: Ready for review — awaiting the repository owner's approval
 Owner: smartshelf-engineer (Phase 8 Task 8.8)
 Parent: [Phase 8 plan](../implementation/phase-8-v4-planogram.md), Task 8.8
 Inputs: [docs/features/F12-planogram/specs/F12-S1-planogram.md (FR-190 … FR-215, AC-172, AC-173, AC-182, AC-189, AC-190, AC-204, NFR-074, C-75), ADR-029, ADR-037, ADR-038, ADR-039, D-30, D-31, D-32, public/examples/shelf-plan-example.json, tests/fixtures/shelf_signals/build.py]
-Updated: 2026-10-04
+Updated: 2026-10-05 (redrawn as a planogram on his request; packing per F12-S1 v0.9 as proposed)
 ---
 
 # F12 screens — mockups for approval
@@ -16,8 +16,10 @@ will build, and nothing else. Until he approves them, the F12 capabilities stay 
 
 **How they were made.** They were drawn inside the real app, in the e2e build, at phone size
 (390 × 844), so the header, fonts, colours and buttons are the app's own. The page code is on the
-branch `feat/phase-8-pages`, which is not merged. Every figure on them is the engine's. Three
-sources were used, and all three are test shops, not a store's data:
+branch `feat/phase-8-pages`, which is not merged. Every figure on them is the engine's, with the
+packing rule proposed in F12-S1 v0.9 (decision 2 below), from the unmerged branch
+`feat/f12-spread-shelves`. Three sources were used, and all three are test shops, not a store's
+data:
 
 - **Store layout and Shelf plan, filled:** the marked example (Task 8.7,
   `public/examples/shelf-plan-example.json`), which has three units. It is shown here as if it
@@ -58,8 +60,8 @@ claude.ai page used for F8 could not be published from this session.
    drawn that way: each unit from the front, its shelves stacked from the top, every facing a tile
    as wide as the product, and a numbered key under it. The drawing is the shelf itself, so it
    runs left to right in every language, with products in the plan's order from the left.
-2. **A fault the mockups found: the plan leaves shelves empty.** The approved packing rule
-   (F12-S1 FR-183, FR-185) puts every product's first facing on the eye-level shelf while it has
+2. **A fault the mockups found: the plan left shelves empty.** The approved packing rule
+   (F12-S1 v0.8 FR-183, FR-185) puts every product's first facing on the eye-level shelf while it has
    room. Extra facings then go only on the shelf that already holds that product. So a unit whose
    products fit at eye level leaves its other shelves **empty**:
    - the example's dry unit leaves its 60 cm bottom shelf empty;
@@ -78,8 +80,14 @@ claude.ai page used for F8 could not be published from this session.
      shelves.
 
    Either one changes the spec (FR-183 and FR-185), the engine and its tests. That comes back as
-   F12-S1 v0.9 for approval before the pages are built. The front view makes the fault plain: in
-   the measurement shop every unit is a full shelf over an empty one.
+   F12-S1 v0.9 for approval before the pages are built. The front view made the fault plain: in
+   the measurement shop every unit was a full shelf over an empty one.
+
+   **The screens below show A**, written into F12-S1 v0.9 (FR-183, AC-205, OQ-1210, Ready for
+   review) and built on `feat/f12-spread-shelves`. Every shelf in both test shops now holds
+   products. Where a product of unknown size stands on the unit (the fridge), there are no extra
+   facings to fill the shelves with, so A keeps the top earners at eye level, as before. B is not
+   drawn.
 3. **Product pictures on the tiles, from the store's own photos.** No product picture exists
    anywhere in the system today, and none may be invented (D-23). They can come from the photos the
    store already sends: when the team reads each product's width from a shelf photo (OQ-1201), it
