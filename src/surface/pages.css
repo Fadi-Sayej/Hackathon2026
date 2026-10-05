@@ -478,7 +478,8 @@
 
 /* The one decision that commits: filled, where the card's other buttons are outlined. */
 .entry-card__actions .reorder__approve,
-.orders .reorder__approve {
+.orders .reorder__approve,
+.plan__arrange .reorder__approve {
   min-height: 40px;
   padding: 0 14px;
   border: 1px solid var(--teal-700);
@@ -491,7 +492,8 @@
 }
 
 .entry-card__actions .reorder__approve:disabled,
-.orders .reorder__approve:disabled {
+.orders .reorder__approve:disabled,
+.plan__arrange .reorder__approve:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
@@ -704,3 +706,331 @@
   font-weight: 700;
   line-height: 18px;
 }
+
+/* ── F12: Store layout and Shelf plan (F12-S1 FR-191, FR-194; docs/reviews/F12-screens-mockups.md) ── */
+.layout,
+.plan {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.layout__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+}
+.layout__head .entry-card__name { margin: 0; }
+.layout__head .layout__dated { margin-inline-start: auto; }
+.layout__tag {
+  display: inline-block;
+  padding: 1px 9px;
+  border-radius: var(--radius-pill);
+  background: var(--info-wash);
+  color: var(--ink-900);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.layout__tag--eye {
+  background: var(--teal-050);
+  color: var(--teal-700);
+}
+.layout__dated,
+.plan__muted {
+  margin: 0;
+  color: var(--ink-600);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.layout__shelves {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.layout__shelf {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius-md);
+}
+.layout__shelf[data-eye-level] { border-color: var(--teal-700); }
+.layout__shelf-name { font-weight: 600; color: var(--ink-900); }
+.layout__shelf-length { font-variant-numeric: tabular-nums; color: var(--ink-900); }
+.layout__shelf .layout__dated { margin-inline-start: auto; }
+.layout__rules h4,
+.plan__unplaced h4,
+.plan__measure h4,
+.layout__missing h3 {
+  margin: 0 0 4px;
+  font-size: 14px;
+  color: var(--ink-900);
+}
+.layout__rules ul,
+.layout__missing ul {
+  margin: 0;
+  padding-inline-start: 18px;
+  color: var(--ink-900);
+  line-height: 1.5;
+}
+.layout__missing li { margin-block-end: 6px; }
+.layout__counting,
+.layout__team-note {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink-600);
+  font-size: 13px;
+}
+
+/* The unit from the front, as a planogram is printed: shelves stacked, each facing a tile as wide
+   as the product, then the free length. Widths come from the published lengths through
+   flex-grow; nothing here works a length out (ADR-001). */
+.unit {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 8px 10px;
+  border: 3px solid var(--ink-600);
+  border-radius: 6px;
+  background: var(--paper-100);
+}
+.unit__label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  margin: 4px 0 2px;
+  font-size: 13px;
+  color: var(--ink-600);
+}
+.unit__row {
+  display: flex;
+  align-items: flex-end;
+  height: 84px;
+  border-bottom: 6px solid #9aa0a6;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.12);
+}
+.unit__used {
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  flex-basis: 0;
+  min-width: 0;
+  height: 100%;
+}
+.unit__tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-basis: 0;
+  min-width: 0;
+  height: 76px;
+  border-radius: 4px 4px 1px 1px;
+  background: var(--tile);
+  box-shadow: inset 0 -8px 0 rgba(0, 0, 0, 0.12);
+}
+/* D-33: the store's own picture fills the tile; its number stays in the corner, for the key. */
+.unit__tile[data-picture] {
+  position: relative;
+  align-items: flex-end;
+  justify-content: flex-start;
+  overflow: hidden;
+  background: var(--paper-100);
+  box-shadow: none;
+}
+.unit__picture {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+}
+.unit__tile[data-picture] .unit__number {
+  position: relative;
+  margin: 0 0 2px 2px;
+  min-width: 16px;
+  height: 16px;
+  font-size: 10px;
+  background: var(--tile);
+  color: #fff;
+}
+.unit__number,
+.unit__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.unit__number {
+  background: rgba(255, 255, 255, 0.92);
+  color: #1d1b18;
+}
+.unit__badge {
+  background: var(--tile);
+  color: #fff;
+}
+.unit__free {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-basis: 0;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  background: repeating-linear-gradient(-45deg, var(--paper-200) 0 6px, transparent 6px 12px);
+  color: var(--ink-600);
+  font-size: 11px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+[data-colour='0'] { --tile: #c0392b; }
+[data-colour='1'] { --tile: #2980b9; }
+[data-colour='2'] { --tile: #27ae60; }
+[data-colour='3'] { --tile: #d68910; }
+[data-colour='4'] { --tile: #8e44ad; }
+[data-colour='5'] { --tile: #16a085; }
+[data-colour='6'] { --tile: #b03a6f; }
+[data-colour='7'] { --tile: #2c3e50; }
+[data-colour='8'] { --tile: #a04000; }
+[data-colour='9'] { --tile: #5d6d7e; }
+[data-colour='10'] { --tile: #1e8449; }
+[data-colour='11'] { --tile: #6c3483; }
+.unit__key {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.unit__key li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  line-height: 1.45;
+}
+.plan__product-name { font-weight: 600; color: var(--ink-900); }
+.plan__facings { color: var(--teal-700); font-weight: 600; }
+.plan__product-notes { flex-basis: 100%; color: var(--ink-600); font-size: 13px; }
+.plan__conditions {
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: var(--paper-200);
+  color: var(--ink-900);
+  line-height: 1.5;
+}
+.plan__conditions p { margin: 0; }
+.plan__conditions p + p { margin-top: 4px; color: var(--ink-600); }
+.plan__unplaced-line { margin: 0 0 4px; line-height: 1.5; }
+.plan__unplaced-why { font-weight: 600; color: var(--ink-900); }
+
+/* The AI's explanation: beside the plan, under its own label, never part of it (FR-215). */
+.plan__why {
+  padding: 10px 12px;
+  border-inline-start: 4px solid var(--info, #3b6ea5);
+  border-radius: var(--radius-md);
+  background: var(--info-wash);
+  color: var(--ink-900);
+  line-height: 1.55;
+}
+.plan__why h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 4px;
+  font-size: 14px;
+}
+.plan__ai-tag {
+  padding: 0 7px;
+  border-radius: var(--radius-pill);
+  background: var(--ink-900);
+  color: var(--paper-100);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+}
+.plan__why-text,
+.plan__why-none { margin: 0; }
+.plan__why-none { color: var(--ink-600); }
+.plan__why-note { margin: 6px 0 0; color: var(--ink-600); font-size: 12px; }
+
+.plan__measure {
+  padding: 10px 12px;
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius-md);
+}
+.plan__measure > p { margin: 4px 0 0; }
+.plan__progress { font-weight: 600; color: var(--ink-900); }
+.plan__changes {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+.plan__changes li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 10px;
+  padding: 6px 0;
+  border-block-end: 1px solid var(--ink-line);
+  line-height: 1.45;
+}
+.plan__change-line { flex-basis: 100%; color: var(--ink-600); font-size: 13px; }
+.plan__change-net { color: var(--ink-900); font-weight: 600; }
+.plan__eye-move {
+  color: var(--teal-700);
+  font-size: 12px;
+  font-weight: 600;
+}
+.plan__arrange {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.plan__arranged {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 0;
+  font-weight: 600;
+  color: var(--teal-700);
+}
+.plan__warning {
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--warn);
+  border-radius: var(--radius-md);
+  background: var(--warn-wash);
+  color: var(--ink-900);
+}
+.plan__store {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius-lg);
+}
+.plan__store h2 { margin: 0; font-size: 17px; color: var(--ink-900); }
+.plan__store p { margin: 0; line-height: 1.5; }
+.plan__store-figure { font-size: 16px; font-weight: 600; color: var(--ink-900); }
+.example .layout__fixture,
+.example .plan__fixture { position: relative; }

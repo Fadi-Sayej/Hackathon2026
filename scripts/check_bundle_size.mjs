@@ -45,7 +45,12 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const CEILING_KB = 930         // measured 926 KB on a fresh local build, 2026-10-04 (CI reads about 1 KB
+const CEILING_KB = 985         // measured 981 KB on a fresh local build, 2026-10-05 (CI reads about 1 KB
+                               // higher): Store layout and Shelf plan (Phase 8 Task 8.9), approved by the
+                               // owner on 2026-10-05. main grew 54.5 KB (203,154 → 257,624 bytes), most of
+                               // it the 134 phrases of the two pages in three languages, and the CSS 6.2 KB.
+                               // The owner's entry, index.html, went from 385 KB to 439 KB, under its 500 KB
+                               // target. Before that it was 930, measured 926 KB on a fresh local build, 2026-10-04 (CI reads about 1 KB
                                // higher): F12's reasons in the owner's words (Phase 8 Task 8.0), eight
                                // unavailable sentences and the plan's characterisation in three languages,
                                // and the per-capability lookup that keeps Reorder's wording off Shelf plan:

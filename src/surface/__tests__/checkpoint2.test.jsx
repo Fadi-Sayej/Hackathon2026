@@ -38,7 +38,8 @@ const catalogue = existsSync(CATALOGUE) ? JSON.parse(readFileSync(CATALOGUE, 'ut
 const NOW = Date.parse('2026-09-12T12:00:00Z')
 
 // A capability whose page is named for what the owner does there, not for the capability.
-const PAGE_OF = { order_quantity: 'recommendations', assortment_gap: 'assortment' }
+const PAGE_OF = { order_quantity: 'recommendations', assortment_gap: 'assortment',
+  layout_facts: 'store-layout', shelf_plan: 'shelf-plan' }
 const pageOf = (id) => PAGE_OF[id] ?? id
 
 function createStorage() {

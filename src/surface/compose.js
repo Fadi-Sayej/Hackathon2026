@@ -27,10 +27,13 @@ export const NOT_ON_TODAY = new Set(['order_quantity', 'market_running_out', 'ma
 // signal and the boost stay: the owner approved them as facts ON the Reorder cards, not as
 // capabilities of their own, and approved no label that would name them on Data.
 // Phase 6 Task 6.5 took `assortment_gap` off, once the repository owner approved its card.
-// Phase 8 Task 8.0: F12's capabilities, until Task 8.9 builds their pages on the owner's
-// approval of the mockups (F12-S1 C-75).
+// Phase 8 Task 8.0 kept F12's four capabilities here until their pages were built. Task 8.9 took
+// `layout_facts` and `shelf_plan` off: Store layout and Shelf plan render them whole, as the owner
+// approved on 2026-10-05 (docs/reviews/F12-screens-mockups.md). The measurement and the AI's
+// explanation stay, as the boost does: they are approved as parts of each unit's plan on Shelf
+// plan, not as capabilities of their own, and no label of their own was approved for Data.
 export const NOT_YET_SHOWN = new Set(['market_running_out', 'market_boost',
-  'layout_facts', 'shelf_plan', 'shelf_measurement', 'shelf_explanation'])
+  'shelf_measurement', 'shelf_explanation'])
 
 const SETTLED = new Set(['acted', 'declined'])
 

@@ -76,7 +76,10 @@ def test_nothing_but_the_preview_reads_it():
                              "api", "middleware.ts"], cwd=ROOT, capture_output=True, text=True).stdout.split()
     assert set(listed) <= {"src/lib/dataAdapters/loadShelfExample.js", "scripts/build_shelf_example.py",
                            "src/pages/ShelfPlanPage.jsx", "src/lib/dataAdapters/__tests__/loadShelfExample.test.js",
-                           "src/pages/__tests__/shelfPlanPreview.test.jsx"}, listed
+                           "src/pages/__tests__/shelfPlanPreview.test.jsx",
+                           # Phase 8 Task 8.9: the pages' tests read the engine-built example as their
+                           # filled state, so every figure they check is the engine's.
+                           "src/pages/__tests__/ShelfPages.test.jsx"}, listed
 
 
 def test_every_store_copy_keeps_it():
