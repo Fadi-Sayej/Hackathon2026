@@ -185,6 +185,8 @@ STARTS_WITHOUT = (
     # ADR-037, F12-S1: that store's shelves. Absent, not empty, in a new copy: an empty file is a
     # present one (FR-193), and only an absent one says the measurements were never recorded.
     "configs/store_layout.yaml",
+    # ADR-040, F12-S1 NFR-078: that store's product pictures, cropped from its own shelf photos.
+    "public/store/**",
     "samples/**",
 )
 KEPT_IN_EVERY_COPY = ("docs/pilot/next-store.md",)

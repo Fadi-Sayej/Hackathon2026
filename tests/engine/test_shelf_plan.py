@@ -403,3 +403,35 @@ def test_at_least_on_a_product_of_unknown_earnings_cannot_be_met(tmp_path):
     rules = '  - {at_least: {barcode: "A", facings: 3}, stated_by: owner, stated_on: 2026-10-01, recorded_by: team}\n'
     plan = _plan(_run(tmp_path, cat, _daily({"A": 2, "B": 2}), shelves=(500,), widths={"A": 100, "B": 100}, rules=rules))
     assert (plan["state"], plan["stopped_by"]["why"]) == ("stopped_by_rule", "earnings_unknown")
+
+
+# ── Pictures (D-33; F12-S1 FR-216, FR-217, AC-206) ───────────────────────────
+
+def test_a_pictures_address_reaches_the_plan_and_changes_nothing_else(tmp_path):
+    import copy
+    from src.engine import layout_facts
+    cat = [P("1", shelf=10, cost=4), P("2", shelf=10, cost=6)]
+    daily = _daily({"1": 2, "2": 2})
+    plain = _layout(tmp_path, cat, shelves=(100,), widths={"1": 100, "2": 100})
+    pictured = copy.deepcopy(plain)
+    pictured["pictures"] = {"1": {"file": "1.png", "src": "/store/shelf-pictures/1.png?v=2026-10-01",
+                                  "cropped_by": "team", "cropped_on": "2026-10-01"}}
+
+    def run(layout):
+        inputs = make_inputs(products=cat, sales_daily=daily, run_at=RUN_AT, store_layout=layout)
+        return shelf_plan.run(inputs).to_dict(), layout_facts.run(inputs).to_dict()
+
+    (plan_a, facts_a), (plan_b, facts_b) = run(plain), run(pictured)
+    placed = {p["barcode"]: p for s in plan_b["entries"][0]["evidence"]["shelves"] for p in s["products"]}
+    assert placed["1"]["picture"] == "/store/shelf-pictures/1.png?v=2026-10-01" and placed["2"]["picture"] is None
+    assert facts_b["pictures"] == {"1": {"src": "/store/shelf-pictures/1.png?v=2026-10-01", "cropped_on": "2026-10-01"}}
+    assert facts_b["without_picture"] == {"F1": ["2"]} and facts_a["without_picture"] == {"F1": ["1", "2"]}
+
+    # AC-206: take the picture fields away, and both capabilities are what they were without them.
+    for s in plan_b["entries"][0]["evidence"]["shelves"]:
+        for p in s["products"]:
+            p["picture"] = None
+    assert plan_b == plan_a
+    for f in (facts_a, facts_b):
+        f.pop("pictures"), f.pop("without_picture"), f["counts"].pop("without_picture")
+    assert facts_b == facts_a

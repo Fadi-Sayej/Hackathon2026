@@ -115,3 +115,20 @@ def test_a_store_layout_is_present_once_it_records_a_fixture(tmp_path):
     (tmp_path / "store_layout.yaml").write_text("fixtures:\n  F1: {}\n", encoding="utf-8")
     item = _by_key(readiness(**kwargs))["store_layout"]
     assert item["status"] == "present" and item["detail"].startswith("1 fixtures in")
+
+
+def test_check_store_counts_the_pictures_listed_and_present(tmp_path):
+    # F12-S1 NFR-078: optional, so a missing picture never makes the layout missing.
+    kwargs = _empty_copy(tmp_path)
+    pictures = tmp_path / "shelf-pictures"
+    pictures.mkdir()
+    (pictures / "1.png").write_bytes(b"\x89PNG\r\n\x1a\n")
+    (tmp_path / "store_layout.yaml").write_text(
+        "fixtures:\n  F1: {}\npictures:\n  '1': {file: 1.png}\n  '2': {file: 2.png}\n", encoding="utf-8")
+    item = _by_key(readiness(**kwargs, pictures_dir=pictures))["store_layout"]
+    assert item["status"] == "present" and item["detail"].endswith("2 product pictures listed, 1 present")
+
+
+def test_a_new_copy_starts_without_the_stores_pictures():
+    from src.common.store import STARTS_WITHOUT
+    assert "public/store/**" in STARTS_WITHOUT

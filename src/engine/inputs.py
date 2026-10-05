@@ -19,7 +19,7 @@ from src.engine.policy import Policy
 from src.internal_pos.pos_importer import read_pos_vintage
 from src.engine.stock_date import usable_stock_date
 from src.engine.store_facts import DEFAULT_PATH as STORE_FACTS_PATH, load_store_facts
-from src.engine.store_layout import DEFAULT_PATH as STORE_LAYOUT_PATH, load_store_layout
+from src.engine.store_layout import DEFAULT_PATH as STORE_LAYOUT_PATH, PICTURES_DIR as SHELF_PICTURES_DIR, load_store_layout
 from src.market.presence import DELIVERY_CATALOG, load_presence
 from src.market.listed_prices import snapshot_price_reader
 from src.market.recent import recent_market
@@ -314,6 +314,7 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
                 stores: Optional[StoreTypeConfig] = None,
                 store_facts_path: Path = STORE_FACTS_PATH,
                 store_layout_path: Path = STORE_LAYOUT_PATH,
+                shelf_pictures_dir: Path = SHELF_PICTURES_DIR,
                 snapshots_root: Path = EXTERNAL_SNAPSHOTS_ROOT) -> EngineInputs:
     stores = stores or load_store_types()
     products_raw = _rows(silver_dir / PRODUCTS_TABLE)
@@ -326,7 +327,7 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
                    if Path(store_facts_path).exists() else None)
     # ADR-037. Checked against the catalogue as printed, like the facts above. A new copy starts
     # without the file (STARTS_WITHOUT), and an absent file is the missing input no_store_layout.
-    store_layout = (load_store_layout(store_layout_path, products or [])
+    store_layout = (load_store_layout(store_layout_path, products or [], shelf_pictures_dir)
                     if Path(store_layout_path).exists() else None)
     # ADR-039 Decision 5: read like the boost's picks, from the night the plan is dated (the run's).
     from src.engine.shelf_explanation import read as read_explanations   # local: it imports this module

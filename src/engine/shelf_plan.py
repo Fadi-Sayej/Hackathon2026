@@ -81,7 +81,9 @@ def _groups(candidates: list, rules: list, dept_of: dict) -> list:
 
 
 def plan_fixture(name: str, fixture: dict, members: dict, products: dict, widths: dict, rules: list,
-                 rows: dict, window, itemised: set, policy, elasticity: dict, planned_elsewhere: dict) -> dict:
+                 rows: dict, window, itemised: set, policy, elasticity: dict, planned_elsewhere: dict,
+                 pictures: Optional[dict] = None) -> dict:
+    pictures = pictures or {}
     eye = fixture.get("eye_level_shelf")
     shelves = fixture["shelves"]
     order = ([eye] if eye else []) + [s["shelf"] for s in shelves if s["shelf"] != eye]
@@ -243,6 +245,8 @@ def plan_fixture(name: str, fixture: dict, members: dict, products: dict, widths
                 "margin_per_sale": earn[b]["margin_per_sale"], "daily_mean": earn[b]["daily_mean"],
                 "kept_on_by_his_rule": b in kept_on,
                 "rules": [r["kind"] for r in (at_least.get(b), at_most.get(b)) if r],
+                # F12-S1 FR-217, ADR-040: the address of the store's own picture, or none.
+                "picture": (pictures.get(b) or {}).get("src"),
             } for b in here_products]})
     return {**base, "state": "planned", "shelves": out_shelves, "extra_facings": extras,
             "placed": len(candidates)}
@@ -286,7 +290,7 @@ def run(inputs) -> CapabilityOutput:
     entries = []
     for index, (name, fixture) in enumerate(layout["fixtures"].items()):
         plan = plan_fixture(name, fixture, pop[name], products, layout.get("widths") or {}, layout.get("rules") or [],
-                            rows, window, itemised, policy, elasticity, planned_on)
+                            rows, window, itemised, policy, elasticity, planned_on, layout.get("pictures"))
         evidence = {"fixture": name, "plan_date": plan_day, "plan_window": plan_window,
                     "departments": fixture["departments"], "chilled": fixture["chilled"],
                     "stated_on": fixture["stated_on"], **plan}

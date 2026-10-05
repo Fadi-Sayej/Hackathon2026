@@ -44,22 +44,30 @@ def run(inputs) -> CapabilityOutput:
     window = window_of(inputs)
     pop = population(layout, inputs.products, inputs.sales_daily, window, itemised_departments(inputs))
     widths = layout.get("widths") or {}
-    fixtures, without_width, unplanned = {}, {}, {}
+    pictures = layout.get("pictures") or {}
+    fixtures, without_width, without_picture, unplanned = {}, {}, {}, {}
     for name, fixture in layout["fixtures"].items():     # the file's order (ADR-038)
         members = pop[name]
         fixtures[name] = {**fixture, "rules": [r for r in layout.get("rules") or [] if _concerns(r, name, fixture, members)]}
         counted = ([b for b, m in members.items() if m["status"] == PLANNED] if window is not None
                    else [b for b, m in members.items() if m["status"] not in ("kept_off", "rejected")])
         without_width[name] = sorted(b for b in counted if b not in widths)
+        # F12-S1 FR-217: counted as the widths are, so the two lists say the same "which products".
+        without_picture[name] = sorted(b for b in counted if b not in pictures)
         unplanned[name] = {r: sorted(b for b, m in members.items() if m["status"] == r) for r in REASONS}
 
     no_fixture = departments_on_no_fixture(layout, inputs.products)
     counts = {"fixtures": len(fixtures), "departments_on_no_fixture": len(no_fixture),
-              "without_width": sum(len(v) for v in without_width.values()), "rejected": len(rejected)}
+              "without_width": sum(len(v) for v in without_width.values()),
+              "without_picture": sum(len(v) for v in without_picture.values()), "rejected": len(rejected)}
     return CapabilityOutput(
         id=CAP, spec=SPEC, status="available", counts=counts,
         extras={"fixtures": fixtures, "departments_on_no_fixture": no_fixture,
                 "without_width": without_width, "without_width_counts": "planned" if window is not None else "catalogue",
+                "without_picture": without_picture,
+                # ADR-040 Decision 4: an address and its date, never the picture itself.
+                "pictures": {b: {"src": pictures[b]["src"], "cropped_on": pictures[b]["cropped_on"]}
+                             for b in sorted(pictures) if any(b in pop[n] for n in pop)},
                 "unplanned": unplanned,
                 "widths": {b: widths[b] for b in sorted(widths) if any(b in pop[n] for n in pop)},
                 "current": dict(sorted((layout.get("current") or {}).items())),
