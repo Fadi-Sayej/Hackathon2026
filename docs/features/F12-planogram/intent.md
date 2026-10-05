@@ -87,3 +87,9 @@ team crop each product's front from the store's own shelf photos (the same photo
 widths from), with tiles showing their number until then?", said "the picture should be added".
 That is **D-33**: each product's picture on its shelf, cropped by the team from the store's own
 photos. F12-S1 specifies how, for his approval.
+
+Asked who "the team" was, he said the same day: "i want an engine cutting the photos or the ai,
+but not manual". A council of five advisors recommended a shelf reader, put to him as four
+questions, and he answered "3 no but everything else yes". That is **D-34**: a shelf reader, not
+people, reads the widths and cuts the pictures from the store's own photos, within ±5 mm per
+product, with no printed card on the shelves. It supersedes D-33's "cropped by the team".
