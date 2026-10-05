@@ -1,0 +1,214 @@
+// @vitest-environment jsdom
+
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react'
+
+import { renderWithI18n } from '../../test/renderWithI18n.jsx'
+import { ShelfPlanPage } from '../ShelfPlanPage.jsx'
+import { StoreLayoutPage } from '../StoreLayoutPage.jsx'
+
+/**
+ * Phase 8 Task 8.9: Store layout and Shelf plan, as the repository owner approved them on
+ * 2026-10-05 (docs/reviews/F12-screens-mockups.md). The filled states read the marked example,
+ * which the engine builds (scripts/build_shelf_example.py), so every figure here is the engine's.
+ */
+afterEach(cleanup)
+
+const EXAMPLE = JSON.parse(readFileSync(resolve(process.cwd(), 'public/examples/shelf-plan-example.json'), 'utf8'))
+const clone = (x) => JSON.parse(JSON.stringify(x))
+const unavailable = (id, reason) => ({ id, status: 'unavailable', unavailable_reason: reason, entries: [], counts: {}, thresholds: {} })
+const F12 = ['layout_facts', 'shelf_plan', 'shelf_measurement', 'shelf_explanation']
+
+function waiting(reason) {
+  return { capabilities: Object.fromEntries(F12.map((id) => [id, unavailable(id, reason)])) }
+}
+
+function filled(edit = () => {}) {
+  const art = clone(EXAMPLE.artefact)
+  edit(art.capabilities)
+  return art
+}
+
+const plan = (art) => [...art.capabilities.shelf_plan.entries].sort((a, b) => a.ordering_key.value - b.ordering_key.value)
+
+describe('Store layout (F12-S1 FR-190, FR-191, FR-196)', () => {
+  it('AC-172: with no layout file, it says the measurements have not been recorded', () => {
+    renderWithI18n(<StoreLayoutPage artefact={waiting('no_store_layout')} catalogue={null} />, { language: 'en' })
+    expect(screen.getByRole('heading', { name: 'The shelf measurements have not been recorded yet.' })).toBeTruthy()
+    expect(document.querySelector('[data-capability="layout_facts"]')).not.toBeNull()
+    expect(document.querySelector('.layout__fixture')).toBeNull()
+  })
+
+  it('names what was rejected when every unit in the file was', () => {
+    const art = waiting('layout_all_rejected')
+    art.capabilities.layout_facts.rejected = [{ kind: 'fixture', key: 'מקרר', reason: 'shelves must list at least one shelf' }]
+    renderWithI18n(<StoreLayoutPage artefact={art} catalogue={null} />, { language: 'en' })
+    expect(screen.getByText(/The reasons are below\./)).toBeTruthy()
+    const item = document.querySelector('[data-missing="rejected"] li')
+    expect(item.textContent).toContain('Shelf unit: מקרר')
+    expect(item.textContent).toContain('shelves must list at least one shelf')
+  })
+
+  it('AC-173: shows every recorded unit, with its dates, eye level, rules and what is missing', () => {
+    const art = filled()
+    renderWithI18n(<StoreLayoutPage artefact={art} catalogue={EXAMPLE.catalogue} />, { language: 'en' })
+    const facts = art.capabilities.layout_facts
+    const cards = [...document.querySelectorAll('.layout__fixture')]
+    expect(cards.map((c) => c.dataset.fixture)).toEqual(facts.fixture_order)
+    const fridge = document.querySelector('[data-fixture="מקרר"]')
+    expect(fridge.textContent).toContain('Chilled')
+    expect(fridge.textContent).toContain('measured 1 Aug')
+    expect(fridge.querySelector('[data-eye-level]').textContent).toContain('Shelf 2')
+    expect(fridge.querySelector('[data-missing="width"]').textContent).toContain('סודה')   // a name, not a barcode
+    expect(document.querySelector('[data-fixture="מדף יבש"] .layout__rules').textContent).toContain('At most 2 facings of במבה')
+    expect(document.querySelector('[data-missing="rejected"]').textContent).toContain('Product width: 7299999')
+  })
+
+  it('lists the units in the order the file gives, even when their names read as numbers', () => {
+    const art = filled((c) => {
+      const f = c.layout_facts
+      const [a, b] = f.fixture_order
+      f.fixtures = { 1: f.fixtures[a], 2: f.fixtures[b] }
+      f.fixture_order = ['2', '1']
+      f.without_width = { 1: [], 2: [] }
+      f.without_picture = { 1: [], 2: [] }
+    })
+    renderWithI18n(<StoreLayoutPage artefact={art} catalogue={null} />, { language: 'en' })
+    expect([...document.querySelectorAll('.layout__fixture')].map((c) => c.dataset.fixture)).toEqual(['2', '1'])
+  })
+})
+
+describe('Shelf plan, waiting (F12-S1 FR-194, FR-200)', () => {
+  it('AC-172 and AC-189: the reason in his words, no plan, and the marked example offered', async () => {
+    const load = vi.fn(async () => ({ status: 'ok', example: EXAMPLE }))
+    const onOutcome = vi.fn()
+    renderWithI18n(<ShelfPlanPage artefact={waiting('no_store_layout')} ownerState={{ outcomes: {} }} catalogue={null}
+      onOutcome={onOutcome} loadExample={load} />, { language: 'en' })
+    expect(screen.getByRole('heading', { name: 'The shelf measurements have not been recorded yet.' })).toBeTruthy()
+    expect(document.querySelector('.plan__fixture')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'See how this page looks' }))
+    await waitFor(() => expect(document.querySelector('.example .plan__fixture')).not.toBeNull())
+    const arranged = [...document.querySelectorAll('.example [data-action="arranged"]')]
+    expect(arranged.length).toBe(3)
+    for (const button of arranged) {
+      expect(button.disabled).toBe(true)
+      fireEvent.click(button)
+    }
+    expect(onOutcome).not.toHaveBeenCalled()
+  })
+
+  it('AC-173: waits for the daily reports with the plan\'s own sentence', () => {
+    renderWithI18n(<ShelfPlanPage artefact={waiting('no_daily_sales')} ownerState={{ outcomes: {} }} catalogue={null} />,
+      { language: 'en' })
+    expect(screen.getByRole('heading', { name: 'We are waiting for the daily sales reports: a shelf plan needs sales per day.' })).toBeTruthy()
+    expect(document.querySelector('.plan__fixture')).toBeNull()
+  })
+})
+
+describe('Shelf plan, filled (F12-S1 FR-194, FR-201, FR-215, FR-217)', () => {
+  it('draws each unit from the front: one tile per facing, numbered for the key', () => {
+    const art = filled()
+    renderWithI18n(<ShelfPlanPage artefact={art} ownerState={{ outcomes: {} }} catalogue={EXAMPLE.catalogue} />, { language: 'en' })
+    for (const entry of plan(art)) {
+      const card = document.querySelector(`[data-fixture="${entry.evidence.fixture}"]`)
+      const facings = entry.evidence.shelves.flatMap((s) => s.products).reduce((n, p) => n + p.facings, 0)
+      expect(card.querySelectorAll('.unit__tile').length).toBe(facings)
+      const names = entry.evidence.shelves.flatMap((s) => s.products.map((p) => p.product_name))
+      expect([...card.querySelectorAll('.unit__key .plan__product-name')].map((n) => n.textContent)).toEqual(names)
+    }
+    const fridge = document.querySelector('[data-fixture="מקרר"]')
+    expect(fridge.querySelector('[data-unplaced="no_width"]').textContent).toContain('סודה')
+    expect(fridge.textContent).toContain('No extra facings on this unit')
+    expect(document.querySelector('.plan__conditions').textContent).toContain('0.17')
+  })
+
+  it('shows a product\'s own picture on its tiles, and a numbered tile without one', () => {
+    const art = filled((c) => { c.shelf_plan.entries.forEach((e) => e.evidence.shelves?.forEach((s) => s.products.forEach((p, i) => {
+      if (i === 0) p.picture = `/store/shelf-pictures/${p.barcode}.png?v=2026-08-01`
+    }))) })
+    renderWithI18n(<ShelfPlanPage artefact={art} ownerState={{ outcomes: {} }} catalogue={EXAMPLE.catalogue} />, { language: 'en' })
+    const pictured = [...document.querySelectorAll('.unit__tile[data-picture] img')]
+    expect(pictured.length).toBeGreaterThan(0)
+    expect(pictured[0].getAttribute('src')).toMatch(/^\/store\/shelf-pictures\/\d+\.png\?v=2026-08-01$/)
+    expect(document.querySelectorAll('.unit__tile:not([data-picture])').length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/A numbered tile means that product's picture has not been taken yet\./).length).toBeGreaterThan(0)
+  })
+
+  it('AC-204: the AI\'s explanation in the page\'s language, or the reason it has none', () => {
+    const art = filled((c) => {
+      const [first, second] = c.shelf_explanation.explanations
+      Object.assign(first, { text: { en: 'English words', he: 'מילים בעברית', ar: 'كلمات' }, why_none: null })
+      Object.assign(second, { why_none: 'withheld' })
+    })
+    renderWithI18n(<ShelfPlanPage artefact={art} ownerState={{ outcomes: {} }} catalogue={EXAMPLE.catalogue} />, { language: 'he' })
+    const panels = [...document.querySelectorAll('.plan__why')].map((p) => p.dataset.explanation)
+    expect(panels).toContain('shown')
+    expect(panels).toContain('withheld')
+    expect(screen.getByText('מילים בעברית')).toBeTruthy()
+    cleanup()
+    const off = filled((c) => { c.shelf_explanation = unavailable('shelf_explanation', 'no_model_key') })
+    renderWithI18n(<ShelfPlanPage artefact={off} ownerState={{ outcomes: {} }} catalogue={EXAMPLE.catalogue} />, { language: 'en' })
+    expect(screen.getAllByText('The shelf explanation is off: no key for the model has been set up.').length).toBe(3)
+  })
+
+  it('AC-190: pressing "I\'ve arranged this shelf" records the acted outcome; the device then shows it, with undo', () => {
+    const art = filled()
+    const entry = plan(art)[0]
+    const onOutcome = vi.fn()
+    const onUndo = vi.fn()
+    renderWithI18n(<ShelfPlanPage artefact={art} ownerState={{ outcomes: {} }} catalogue={EXAMPLE.catalogue}
+      onOutcome={onOutcome} onUndoOutcome={onUndo} />, { language: 'en' })
+    const card = document.querySelector(`[data-fixture="${entry.evidence.fixture}"]`)
+    fireEvent.click(card.querySelector('[data-action="arranged"]'))
+    expect(onOutcome).toHaveBeenCalledTimes(1)
+    expect(onOutcome).toHaveBeenCalledWith(entry, { status: 'acted' })
+    cleanup()
+    const outcomes = { [entry.id]: { status: 'acted', snapshot: { arranged_on: '2026-08-28' } } }
+    renderWithI18n(<ShelfPlanPage artefact={art} ownerState={{ outcomes }} catalogue={EXAMPLE.catalogue}
+      onOutcome={onOutcome} onUndoOutcome={onUndo} />, { language: 'en' })
+    const mine = document.querySelector(`[data-fixture="${entry.evidence.fixture}"] [data-arranged="this-device"]`)
+    expect(mine.textContent).toContain('You marked it arranged on 28 Aug.')
+    fireEvent.click(mine.querySelector('[data-action="undo"]'))
+    expect(onUndo).toHaveBeenCalledWith(entry.id)
+  })
+
+  it('AC-182: a team account sees the button disabled, and its press writes nothing', () => {
+    const onOutcome = vi.fn()
+    renderWithI18n(<ShelfPlanPage artefact={filled()} ownerState={{ outcomes: {} }} catalogue={EXAMPLE.catalogue}
+      onOutcome={onOutcome} readOnly />, { language: 'en' })
+    for (const button of document.querySelectorAll('[data-action="arranged"]')) {
+      expect(button.disabled).toBe(true)
+      fireEvent.click(button)
+    }
+    expect(onOutcome).not.toHaveBeenCalled()
+  })
+
+  it('shows the published arrangement, warns while its measurement runs, and states his store\'s figure', () => {
+    const art = filled((c) => {
+      const fixture = c.shelf_plan.entries[0].evidence.fixture
+      c.shelf_measurement = {
+        id: 'shelf_measurement', status: 'available', unavailable_reason: null, entries: [], counts: {},
+        thresholds: { min_arrangements: 8, min_products: 40 },
+        arrangements: [{
+          entry_id: 'abc', fixture, arranged_on: '2026-08-20', plan_date: '2026-08-18',
+          before_window: { first_day: '2026-06-23', last_day: '2026-07-20' },
+          after_window: { first_day: '2026-08-21', last_day: '2026-09-17' },
+          status: 'waiting', reason: null, waiting: { report_days_so_far: 6, report_days_needed: 21, days_left: 22 },
+          comparison: null, products: [], left_out: [],
+        }],
+        elasticity: { estimate: 0.186, interval: [0.167, 0.203], level: 0.95, verdict: 'measured', why_not_measurable: null,
+          arrangements: 8, fixtures: 8, products: 48 },
+        placebo: { status: 'passed', failed_on: [] },
+      }
+    })
+    renderWithI18n(<ShelfPlanPage artefact={art} ownerState={{ outcomes: {} }} catalogue={EXAMPLE.catalogue} />, { language: 'en' })
+    expect(screen.getByText('Arranged on 20 Aug, to the plan of 18 Aug.', { exact: false })).toBeTruthy()
+    expect(screen.getByText(/Being measured: 6 report days so far, of the 21 needed\. The after window ends in 22 days\./)).toBeTruthy()
+    expect(screen.getByRole('note').textContent).toContain('Arranging it again ends that measurement.')
+    const figure = document.querySelector('.plan__store')
+    expect(figure.textContent).toContain('Your store: 0.19, most likely between 0.17 and 0.20 (95% interval).')
+    expect(figure.textContent).toContain('Check for earlier trends: passed.')
+  })
+})

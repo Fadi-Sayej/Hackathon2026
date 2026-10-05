@@ -570,6 +570,9 @@ export const ar = {
 
   // F8 (Phase 5 Task 5.13): Reorder and Approved orders, as the repository owner approved
   // them on 2026-09-27 (docs/reviews/F8-screens-mockups.md).
+  // Phase 8 Task 8.9: Data names them by their pages' approved names.
+  'capability.layout_facts': "مخطط المتجر",
+  'capability.shelf_plan': "تخطيط الرف",
   'capability.order_quantity': 'اقتراحات إعادة الطلب',
   'reorder.basis': "حسب مبيعاتك اليومية من {first} إلى {last}: {days} يوم تقرير.",
   'reorder.nextOrder': "الطلب القادم {day} · يغطي {days}",

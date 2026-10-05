@@ -36,6 +36,11 @@
       ]
      ]
     },
+    "fixture_order": [
+     "מקרר",
+     "מדף יבש",
+     "ניקיון"
+    ],
     "fixtures": {
      "מדף יבש": {
       "chilled": false,

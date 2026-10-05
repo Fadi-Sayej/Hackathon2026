@@ -116,7 +116,7 @@ export function StoreLayoutPage({ artefact, catalogue }) {
   return (
     <section className="capability layout" data-capability="layout_facts" {...dirProps()}>
       <p className="reorder__line">{t('layout.shelfOrder')}</p>
-      {Object.entries(capability.fixtures || {}).map(([name, fixture]) => (
+      {(capability.fixture_order || Object.keys(capability.fixtures || {})).map((name) => [name, capability.fixtures[name]]).map(([name, fixture]) => (
         <Fixture key={name} name={name} fixture={fixture} withoutWidth={capability.without_width?.[name] || []}
           withoutPicture={capability.without_picture?.[name] || []}
           unplanned={capability.unplanned?.[name]} nameOf={nameOf} counting={counting} />

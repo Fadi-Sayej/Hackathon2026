@@ -161,3 +161,22 @@ describe('Phase 5 Task 5.13 — order_quantity has its screen', () => {
     expect(reached.get('order_quantity')).toBe('recommendations')
   })
 })
+
+describe('Phase 8 Task 8.9 — Store layout and Shelf plan render their capabilities whole', () => {
+  it('reaches layout_facts and shelf_plan from the nav, and the plan\'s two parts nowhere of their own', async () => {
+    const f12 = (id, reason) => ({ id, status: 'unavailable', unavailable_reason: reason, counts: {}, thresholds: {}, entries: [] })
+    serve({ ...fixture, capabilities: { ...fixture.capabilities,
+      layout_facts: f12('layout_facts', 'no_store_layout'), shelf_plan: f12('shelf_plan', 'no_store_layout'),
+      shelf_measurement: f12('shelf_measurement', 'no_store_layout'), shelf_explanation: f12('shelf_explanation', 'no_store_layout') } })
+    // Both pages wait for the catalogue, for product names, so each is read once it has loaded.
+    renderWithI18n(<App />, { language: 'en' })
+    await waitFor(() => expect(document.querySelector('.spine__loading')).toBeNull())
+    const sections = async (nav) => {
+      fireEvent.click(document.querySelector(`.nav-item[data-nav="${nav}"]`))
+      await waitFor(() => expect(document.querySelector('.page-body .spine__loading')).toBeNull())
+      return [...document.querySelectorAll('.page-body section.capability[data-capability]')].map((s) => s.dataset.capability)
+    }
+    expect(await sections('store-layout')).toEqual(['layout_facts'])
+    expect(await sections('shelf-plan')).toEqual(['shelf_plan'])
+  })
+})

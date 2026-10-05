@@ -62,7 +62,9 @@ def run(inputs) -> CapabilityOutput:
               "without_picture": sum(len(v) for v in without_picture.values()), "rejected": len(rejected)}
     return CapabilityOutput(
         id=CAP, spec=SPEC, status="available", counts=counts,
-        extras={"fixtures": fixtures, "departments_on_no_fixture": no_fixture,
+        # The file's order, as a list: a browser reorders object keys that read as numbers (a
+        # fixture named "1"), and a file written with sorted keys loses it (F12-S1 FR-191).
+        extras={"fixtures": fixtures, "fixture_order": list(fixtures), "departments_on_no_fixture": no_fixture,
                 "without_width": without_width, "without_width_counts": "planned" if window is not None else "catalogue",
                 "without_picture": without_picture,
                 # ADR-040 Decision 4: an address and its date, never the picture itself.

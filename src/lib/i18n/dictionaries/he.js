@@ -565,6 +565,9 @@ export const he = {
 
   // F8 (Phase 5 Task 5.13): Reorder and Approved orders, as the repository owner approved
   // them on 2026-09-27 (docs/reviews/F8-screens-mockups.md).
+  // Phase 8 Task 8.9: Data names them by their pages' approved names.
+  'capability.layout_facts': "תוכנית החנות",
+  'capability.shelf_plan': "תוכנית מדף",
   'capability.order_quantity': 'המלצות הזמנה',
   'reorder.basis': "לפי המכירות היומיות שלך מ-{first} עד {last}: {days} ימי דוח.",
   'reorder.nextOrder': "ההזמנה הבאה {day} · מכסה {days}",

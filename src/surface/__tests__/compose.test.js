@@ -258,8 +258,10 @@ describe('Phase 5 Task 5.0 — the F8 capabilities reach no screen before their 
   })
 })
 
-describe('Phase 8 Task 8.0 — the F12 capabilities reach no screen before their mockups are approved', () => {
-  // F12-S1 FR-192: never on Today. C-75: on no screen at all until Task 8.9. Each state a
+describe('Phase 8 — the F12 capabilities are never on Today, and only their pages show them', () => {
+  // F12-S1 FR-192: never on Today. Task 8.9 (the mockups approved 2026-10-05) took layout_facts and
+  // shelf_plan off NOT_YET_SHOWN: Store layout and Shelf plan render them whole, and Data names them.
+  // The measurement and the explanation stay on it, shown only inside Shelf plan. Each state a
   // capability can be published in: unavailable with a reason, and available with entries.
   const f12 = () => ({
     layout_facts: cap([], { status: 'unavailable', unavailable_reason: 'no_store_layout' }),
@@ -268,15 +270,12 @@ describe('Phase 8 Task 8.0 — the F12 capabilities reach no screen before their
     shelf_explanation: cap([], { status: 'unavailable', unavailable_reason: 'no_model_key' }),
   })
 
-  it('keeps every F12 id off Today for good, and off every screen until their pages exist', () => {
-    for (const id of Object.keys(f12())) {
-      expect(NOT_ON_TODAY.has(id)).toBe(true)
-      expect(NOT_YET_SHOWN.has(id)).toBe(true)
-    }
+  it('keeps every F12 id off Today for good, and the two parts of Shelf plan off every other screen', () => {
+    for (const id of Object.keys(f12())) expect(NOT_ON_TODAY.has(id)).toBe(true)
     expect([...NOT_ON_TODAY].sort()).toEqual(['layout_facts', 'market_boost', 'market_running_out',
       'order_quantity', 'shelf_explanation', 'shelf_measurement', 'shelf_plan'])
-    expect([...NOT_YET_SHOWN].sort()).toEqual(['layout_facts', 'market_boost', 'market_running_out',
-      'shelf_explanation', 'shelf_measurement', 'shelf_plan'])
+    expect([...NOT_YET_SHOWN].sort()).toEqual(['market_boost', 'market_running_out',
+      'shelf_explanation', 'shelf_measurement'])
   })
 
   it('composes an artefact carrying them exactly as one without them', () => {

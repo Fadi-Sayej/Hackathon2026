@@ -566,6 +566,9 @@ export const en = {
 
   // F8 (Phase 5 Task 5.13): Reorder and Approved orders, as the repository owner approved
   // them on 2026-09-27 (docs/reviews/F8-screens-mockups.md).
+  // Phase 8 Task 8.9: Data names them by their pages' approved names.
+  'capability.layout_facts': "Store layout",
+  'capability.shelf_plan': "Shelf plan",
   'capability.order_quantity': 'Reorder suggestions',
   'reorder.basis': "From your daily sales, {first} to {last}: {days} report days.",
   'reorder.nextOrder': "Next order {day} · covers {days}",
