@@ -481,7 +481,7 @@
        "shelves": [
         {
          "eye_level": true,
-         "free_cm": 0.0,
+         "free_cm": 16.0,
          "length_cm": 80,
          "measured_on": "2026-08-01",
          "products": [
@@ -489,7 +489,7 @@
            "barcode": "7290201",
            "daily_mean": 5.0,
            "department": "חטיפים",
-           "facings": 1,
+           "facings": 2,
            "kept_on_by_his_rule": false,
            "margin_per_sale": 3.0,
            "product_name": "במבה",
@@ -506,7 +506,7 @@
            "barcode": "7290101",
            "daily_mean": 8.0,
            "department": "מאפים",
-           "facings": 1,
+           "facings": 2,
            "kept_on_by_his_rule": false,
            "margin_per_sale": 3.0,
            "product_name": "לחם אחיד",
@@ -516,12 +516,22 @@
            "unknown_parts": [],
            "width_measured_on": "2026-08-01",
            "width_mm": 200
-          },
+          }
+         ],
+         "shelf": 1,
+         "used_cm": 64.0
+        },
+        {
+         "eye_level": false,
+         "free_cm": 7.5,
+         "length_cm": 60,
+         "measured_on": "2026-08-01",
+         "products": [
           {
            "barcode": "7290202",
            "daily_mean": 4.0,
            "department": "חטיפים",
-           "facings": 1,
+           "facings": 2,
            "kept_on_by_his_rule": false,
            "margin_per_sale": 3.0,
            "product_name": "ביסלי גריל",
@@ -551,7 +561,7 @@
            "barcode": "7290203",
            "daily_mean": 1.0,
            "department": "חטיפים",
-           "facings": 2,
+           "facings": 1,
            "kept_on_by_his_rule": false,
            "margin_per_sale": 3.0,
            "product_name": "פרינגלס",
@@ -563,17 +573,8 @@
            "width_mm": 85
           }
          ],
-         "shelf": 1,
-         "used_cm": 80.0
-        },
-        {
-         "eye_level": false,
-         "free_cm": 60.0,
-         "length_cm": 60,
-         "measured_on": "2026-08-01",
-         "products": [],
          "shelf": 2,
-         "used_cm": 0.0
+         "used_cm": 52.5
         }
        ],
        "state": "planned",

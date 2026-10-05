@@ -145,17 +145,34 @@ def plan_fixture(name: str, fixture: dict, members: dict, products: dict, widths
             return (0, -max(known), unit[0])
         return (1, 0.0, unit[0])
 
-    # FR-183, FR-184: one facing each, packed in the earnings order. Whether the fixture is over-full
-    # is decided here, on first facings alone, before any rule asks for more.
+    # FR-183, FR-184: one facing each, in the earnings order. Where every size is known, they are
+    # spread over the shelves in proportion to their lengths, so the top earners stand at eye level,
+    # no shelf is left empty while products remain, and each shelf's spare length becomes extra
+    # facings (FR-185). Where a size is unknown there are no extra facings (FR-186), so spreading
+    # would only take top earners off eye level; each goes on the first shelf with room instead.
+    # Whether the fixture is over-full is decided here, on first facings alone, before any rule asks
+    # for more.
     free = dict(length_mm)
+    total = sum(width.values())
+    share = {s: total * length_mm[s] / sum(length_mm.values()) for s in order}
     facings, shelf_of, did_not_fit = {}, {}, []
+    turn = 0                                  # the shelf, in `order`, whose share is being filled
     for unit in sorted(units, key=key):
         single = sum(width[b] for b in unit)
         if len(unit) > 1 and single > longest:
             rule = next(r for r in here if r["kind"] == "together" and (
                 ("department" in r and dept_of[unit[0]] == r["department"]) or set(unit) & set(r.get("barcodes", []))))
             return stopped(rule, "longer_than_any_shelf")
-        spot = next((s for s in order if free[s] >= single), None)
+        first_with_room = next((s for s in order if free[s] >= single), None)
+        if unknown_sizes:
+            spot = first_with_room
+        else:
+            # A shelf takes the next unit while it is empty or stays within its share; then the next
+            # shelf takes over. The last shelf takes the rest.
+            while (turn < len(order) - 1 and free[order[turn]] < length_mm[order[turn]]
+                   and length_mm[order[turn]] - free[order[turn]] + single > share[order[turn]]):
+                turn += 1
+            spot = order[turn] if free[order[turn]] >= single else first_with_room
         if spot is None:
             did_not_fit.append(unit)
             continue
