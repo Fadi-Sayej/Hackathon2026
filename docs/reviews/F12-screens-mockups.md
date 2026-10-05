@@ -1,7 +1,7 @@
 ---
 ID: F12-S1-MOCKUPS
 Title: F12 screens — Store layout and Shelf plan, mockups for the repository owner's approval
-Status: Ready for review — awaiting the repository owner's approval
+Status: Approved — by the repository owner, 2026-10-05 ("approve")
 Owner: smartshelf-engineer (Phase 8 Task 8.8)
 Parent: [Phase 8 plan](../implementation/phase-8-v4-planogram.md), Task 8.8
 Inputs: [docs/features/F12-planogram/specs/F12-S1-planogram.md (FR-190 … FR-215, AC-172, AC-173, AC-182, AC-189, AC-190, AC-204, NFR-074, C-75), ADR-029, ADR-037, ADR-038, ADR-039, D-30, D-31, D-32, public/examples/shelf-plan-example.json, tests/fixtures/shelf_signals/build.py]
@@ -9,6 +9,12 @@ Updated: 2026-10-05 (redrawn as a planogram on his request; packing per F12-S1 v
 ---
 
 # F12 screens — mockups for approval
+
+> **Approved by the repository owner on 2026-10-05** ("approve"), to "You can say 'approve all',
+> or name what to change", asked of six items: the screens; the empty shelves, A or B; where
+> pictures are kept (ADR-040); the shelf reader (ADR-041) with its starting values; the wording;
+> and showing or hiding the team's note on rejected layout entries. Recorded as all six as drawn:
+> A, and the note shown. Built in Phase 8 Task 8.9.
 
 Front-end work waits for the repository owner (F12-S1 C-75). These are the two pages Task 8.9
 will build, and nothing else. Until he approves them, the F12 capabilities stay in
@@ -399,4 +405,6 @@ Every phrase the two pages add or change, as the dictionaries hold it on the bra
 - **2026-10-05**, "proceed": the work went on. Recorded as no decision.
 - **2026-10-05**, "the picture should be added", to decision 3: **D-33**.
 
-Decisions 1, 2, 4 and 5 await him.
+- **2026-10-05**, "approve", to "You can say 'approve all', or name what to change": every item
+  as drawn. The screens, A (OQ-1210), ADR-040 and ADR-041 with the reader's values (OQ-1211), the
+  wording, and the team's note shown.
