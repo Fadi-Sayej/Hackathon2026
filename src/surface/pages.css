@@ -812,7 +812,7 @@
 .unit__row {
   display: flex;
   align-items: flex-end;
-  height: 62px;
+  height: 84px;
   border-bottom: 6px solid #9aa0a6;
   box-shadow: 0 3px 0 rgba(0, 0, 0, 0.12);
 }
@@ -830,10 +830,36 @@
   justify-content: center;
   flex-basis: 0;
   min-width: 0;
-  height: 54px;
+  height: 76px;
   border-radius: 4px 4px 1px 1px;
   background: var(--tile);
   box-shadow: inset 0 -8px 0 rgba(0, 0, 0, 0.12);
+}
+/* D-33: the store's own picture fills the tile; its number stays in the corner, for the key. */
+.unit__tile[data-picture] {
+  position: relative;
+  align-items: flex-end;
+  justify-content: flex-start;
+  overflow: hidden;
+  background: var(--paper-100);
+  box-shadow: none;
+}
+.unit__picture {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+}
+.unit__tile[data-picture] .unit__number {
+  position: relative;
+  margin: 0 0 2px 2px;
+  min-width: 16px;
+  height: 16px;
+  font-size: 10px;
+  background: var(--tile);
+  color: #fff;
 }
 .unit__number,
 .unit__badge {

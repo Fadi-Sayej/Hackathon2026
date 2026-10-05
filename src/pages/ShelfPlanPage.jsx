@@ -43,6 +43,9 @@ const TILE_COLOURS = 12
  * each facing a tile as wide as the product, then the shelf's free length. Each tile carries the
  * product's number in the key below. The drawing is the shelf itself, so it runs left to right in
  * every language: products stand in the plan's order from the left.
+ *
+ * A tile shows the product's own picture, cropped by the team from the store's shelf photos (D-33,
+ * F12-S1 FR-217), wherever the plan gives one, and its numbered colour until then.
  */
 function UnitDrawing({ shelves, keyOf }) {
   const { t } = useI18n()
@@ -61,7 +64,8 @@ function UnitDrawing({ shelves, keyOf }) {
               <div className="unit__used" style={{ flexGrow: shelf.used_cm }}>
                 {shelf.products.flatMap((p) => Array.from({ length: p.facings }, (_, i) => (
                   <span key={`${p.barcode}|${i}`} className="unit__tile" style={{ flexGrow: p.width_mm }}
-                    data-colour={(keyOf(p.barcode) - 1) % TILE_COLOURS}>
+                    data-colour={(keyOf(p.barcode) - 1) % TILE_COLOURS} data-picture={p.picture ? 'yes' : undefined}>
+                    {p.picture ? <img className="unit__picture" src={p.picture} alt="" loading="lazy" /> : null}
                     <span className="unit__number">{keyOf(p.barcode)}</span>
                   </span>
                 )))}
@@ -263,6 +267,8 @@ function FixturePlan({ entry, plan, explanations, arrangements, outcomes, nameOf
       {ev.state === 'planned' ? (
         <>
           <UnitDrawing shelves={ev.shelves} keyOf={keyOf} />
+          {ev.shelves.some((s) => s.products.some((p) => !p.picture))
+            ? <p className="plan__muted">{t('shelf.pictures.missing')}</p> : null}
           <Key shelves={ev.shelves} keyOf={keyOf} nameOf={nameOf} rules={ev.rules || []} />
         </>
       ) : (

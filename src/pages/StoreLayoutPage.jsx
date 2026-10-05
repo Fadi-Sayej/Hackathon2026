@@ -35,7 +35,7 @@ function Rejected({ rejected, nameOf }) {
   )
 }
 
-function Fixture({ name, fixture, withoutWidth, unplanned, nameOf, counting }) {
+function Fixture({ name, fixture, withoutWidth, withoutPicture, unplanned, nameOf, counting }) {
   const { t } = useI18n()
   const { date } = useDates()
   return (
@@ -70,6 +70,15 @@ function Fixture({ name, fixture, withoutWidth, unplanned, nameOf, counting }) {
         </p>
       ) : (
         <p className="layout__dated">{t('layout.allMeasured')}</p>
+      )}
+      {/* D-33, F12-S1 FR-217: the pictures the team has still to crop from his photos. */}
+      {withoutPicture.length ? (
+        <p className="reorder__needs" data-missing="picture">
+          <span className="reorder__needs-pill">{t('layout.noPicture')}</span>
+          <Names barcodes={withoutPicture} nameOf={nameOf} />
+        </p>
+      ) : (
+        <p className="layout__dated">{t('layout.allPictured')}</p>
       )}
       {LAYOUT_REASONS.filter((r) => unplanned?.[r]?.length).map((r) => (
         <p key={r} className="reorder__needs" data-missing={r}>
@@ -109,6 +118,7 @@ export function StoreLayoutPage({ artefact, catalogue }) {
       <p className="reorder__line">{t('layout.shelfOrder')}</p>
       {Object.entries(capability.fixtures || {}).map(([name, fixture]) => (
         <Fixture key={name} name={name} fixture={fixture} withoutWidth={capability.without_width?.[name] || []}
+          withoutPicture={capability.without_picture?.[name] || []}
           unplanned={capability.unplanned?.[name]} nameOf={nameOf} counting={counting} />
       ))}
       {capability.departments_on_no_fixture?.length ? (
