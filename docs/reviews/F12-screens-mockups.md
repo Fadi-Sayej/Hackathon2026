@@ -5,7 +5,7 @@ Status: Ready for review — awaiting the repository owner's approval
 Owner: smartshelf-engineer (Phase 8 Task 8.8)
 Parent: [Phase 8 plan](../implementation/phase-8-v4-planogram.md), Task 8.8
 Inputs: [docs/features/F12-planogram/specs/F12-S1-planogram.md (FR-190 … FR-215, AC-172, AC-173, AC-182, AC-189, AC-190, AC-204, NFR-074, C-75), ADR-029, ADR-037, ADR-038, ADR-039, D-30, D-31, D-32, public/examples/shelf-plan-example.json, tests/fixtures/shelf_signals/build.py]
-Updated: 2026-10-05 (redrawn as a planogram on his request; packing per F12-S1 v0.9 as proposed)
+Updated: 2026-10-05 (redrawn as a planogram on his request; packing per F12-S1 v0.9 as proposed; D-33's pictures)
 ---
 
 # F12 screens — mockups for approval
@@ -88,14 +88,14 @@ claude.ai page used for F8 could not be published from this session.
    products. Where a product of unknown size stands on the unit (the fridge), there are no extra
    facings to fill the shelves with, so A keeps the top earners at eye level, as before. B is not
    drawn.
-3. **Product pictures on the tiles, from the store's own photos.** No product picture exists
-   anywhere in the system today, and none may be invented (D-23). They can come from the photos the
-   store already sends: when the team reads each product's width from a shelf photo (OQ-1201), it
-   also crops that product's front from the same photo, and records who cropped it and when. Each
-   tile then shows the store's own product. A product without a picture yet keeps its coloured,
-   numbered tile, as on every screen below, because no store has sent photos. This needs a new
-   requirement in F12-S1 v0.9 and a decision on where the pictures are kept: they are store data,
-   kept beside the layout file and never overwritten by a product update (ADR-036, ADR-037).
+3. **Product pictures on the tiles, from the store's own photos. Decided 2026-10-05 (D-33):**
+   "the picture should be added". The team crops each product's front from the store's own shelf
+   photos, the ones it reads the widths from, and a product without a picture keeps its numbered
+   tile. How it is done is for his approval with the rest: F12-S1 v0.9 FR-216 and FR-217, and
+   ADR-040 (a proposal). Each picture is a file in the store's copy, listed in the layout file with
+   the day it was cropped; only its size and first bytes are checked, and nothing reads what it
+   shows. The screens "With pictures" below use **drawn TEST pictures**, stamped TEST and labelled
+   on the page, because no store has sent photos; a store's tiles show crops of its own photos.
 4. **All the new wording** (the table at the end). The Hebrew and Arabic are the engineer's
    translations and need a daily reader. Three choices in it:
    - **"Facing":** "חזית / חזיתות" in Hebrew and "واجهة / واجهات" in Arabic. The old page
@@ -127,6 +127,14 @@ Each unit with its departments, the day he described it, and each shelf's length
 | العربية | עברית |
 |---|---|
 | ![Filled, Arabic](F12-screens-mockups/layout-filled-ar.png) | ![Filled, Hebrew](F12-screens-mockups/layout-filled-he.png) |
+
+#### With pictures
+
+Store layout lists, per unit, the products whose picture has not been taken yet, as it lists those without a width (FR-217). Drawn TEST pictures.
+
+| العربية | עברית |
+|---|---|
+| ![With pictures, Arabic](F12-screens-mockups/layout-pictures-ar.png) | ![With pictures, Hebrew](F12-screens-mockups/layout-pictures-he.png) |
 
 #### Today: no layout file
 
@@ -161,6 +169,22 @@ This device's record, with its date and Undo, until the nightly publishes it (AD
 | العربية | עברית |
 |---|---|
 | ![After "I've arranged this shelf", Arabic](F12-screens-mockups/plan-arranged-ar.png) | ![After "I've arranged this shelf", Hebrew](F12-screens-mockups/plan-arranged-he.png) |
+
+#### With pictures: the dry unit
+
+Each facing shows the product's picture, with its number in the corner for the key; the Pringles have no picture yet and keep their numbered tile (D-33, FR-217). Drawn TEST pictures, labelled on the page.
+
+| العربية | עברית |
+|---|---|
+| ![With pictures: the dry unit, Arabic](F12-screens-mockups/plan-pictures-dry-ar.png) | ![With pictures: the dry unit, Hebrew](F12-screens-mockups/plan-pictures-dry-he.png) |
+
+#### With pictures: the fridge
+
+The same on a chilled unit. Drawn TEST pictures, labelled on the page.
+
+| العربية | עברית |
+|---|---|
+| ![With pictures: the fridge, Arabic](F12-screens-mockups/plan-pictures-fridge-ar.png) | ![With pictures: the fridge, Hebrew](F12-screens-mockups/plan-pictures-fridge-he.png) |
 
 #### When his store's own figure is in use
 
@@ -263,6 +287,10 @@ Every phrase the two pages add or change, as the dictionaries hold it on the bra
 | `layout.rejected.kind.current` | Current facings | החזיתות הנוכחיות | الواجهات الحالية |
 | `layout.rejected.kind.department` | Department | מחלקה | قسم |
 | `layout.rejected.kind.product` | Product | מוצר | منتج |
+| `layout.noPicture` | Picture not taken yet | עדיין אין תמונה | لم تُلتقط صورة بعد |
+| `layout.allPictured` | Every product has its picture. | לכל המוצרים יש תמונה. | لكل المنتجات صورها. |
+| `layout.rejected.kind.picture` | Product picture | תמונת מוצר | صورة منتج |
+| `shelf.pictures.missing` | Each picture is cut from your own shelf photos. A numbered tile means that product's picture has not been taken yet. | כל תמונה נחתכת מתמונות המדפים שלך. משבצת עם מספר פירושה שעדיין אין תמונה של המוצר הזה. | كل صورة مقصوصة من صور رفوفك. المربع المرقّم يعني أن صورة ذلك المنتج لم تُلتقط بعد. |
 | `layout.rejected.teamNote` | Note for the team: | הערה לצוות: | ملاحظة للفريق: |
 | `shelf.rule.together` | Keep together on one shelf: {names} | לשמור יחד על מדף אחד: {names} | إبقاؤها معًا على رف واحد: {names} |
 | `shelf.rule.togetherDepartment` | Keep the {department} department together on one shelf | לשמור את מחלקת {department} יחד על מדף אחד | إبقاء قسم {department} معًا على رف واحد |
@@ -365,4 +393,10 @@ Every phrase the two pages add or change, as the dictionaries hold it on the bra
 
 ## His answer
 
-_Awaiting the repository owner._
+- **2026-10-04**, shown the first screens, before accepting: the planogram "should look like this
+  but customized to the store that take picture of the shelf", with a picture of a printed
+  planogram. The screens were redrawn as the unit from the front.
+- **2026-10-05**, "proceed": the work went on. Recorded as no decision.
+- **2026-10-05**, "the picture should be added", to decision 3: **D-33**.
+
+Decisions 1, 2, 4 and 5 await him.
