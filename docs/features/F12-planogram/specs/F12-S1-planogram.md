@@ -1,14 +1,14 @@
 ---
 ID: F12-S1
 Title: Planogram — a dated shelf plan from his own sales, waiting for them until they arrive
-Status: Ready for review — v0.9 revises FR-183 (OQ-1210); v0.8 was approved by the repository owner on 2026-10-04
+Status: Ready for review — v0.9 revises FR-183 (OQ-1210) and adds D-33's pictures (FR-216, FR-217, ADR-040); v0.8 was approved by the repository owner on 2026-10-04
 Owner: smartshelf-architect
-Version: 0.9 (2026-10-05: FR-183 revised, because the mockups showed the v0.8 rule leaving shelves empty; AC-205, OQ-1210). 0.8 (2026-10-04: D-32, the AI's explanation of each fixture's plan; FR-210 … FR-215 approved as OQ-1209)
+Version: 0.9 (2026-10-05: FR-183 revised, because the mockups showed the v0.8 rule leaving shelves empty; AC-205, OQ-1210. D-33's product pictures: FR-216, FR-217, AC-206, NFR-078, ADR-040). 0.8 (2026-10-04: D-32, the AI's explanation of each fixture's plan; FR-210 … FR-215 approved as OQ-1209)
 Parent: [F12 — Planogram](../intent.md)
 Related Intents: INT-006
-Inputs: [docs/features/F12-planogram/intent.md (Approved for specification, D-30), docs/product/PRD.md (§5 V4, §6 #7), docs/product/intent-register.md (D-1, D-3, D-13, D-14, D-15, D-16, D-22, D-23, D-28, D-29, D-30, D-31, D-32), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (§5 "He stocks", FR-143 … FR-146, FR-156), ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011, ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037, ADR-038, ADR-039, CLAUDE.md]
+Inputs: [docs/features/F12-planogram/intent.md (Approved for specification, D-30), docs/product/PRD.md (§5 V4, §6 #7), docs/product/intent-register.md (D-1, D-3, D-13, D-14, D-15, D-16, D-22, D-23, D-28, D-29, D-30, D-31, D-32, D-33), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (§5 "He stocks", FR-143 … FR-146, FR-156), ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011, ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037, ADR-038, ADR-039, ADR-040, CLAUDE.md]
 Answered by: [System Design](../../../architecture/system-design.md) §21 (F12-S1)
-Updated: 2026-10-05 (v0.9: FR-183 revised, OQ-1210, awaiting the repository owner). 2026-10-04 (D-32's explanation approved, OQ-1209; earlier the same day, approved with OQ-1208, and OQ-1204 and OQ-1207 answered with the plan)
+Updated: 2026-10-05 (v0.9: FR-183 revised, OQ-1210; D-33's pictures, FR-216, FR-217; awaiting the repository owner). 2026-10-04 (D-32's explanation approved, OQ-1209; earlier the same day, approved with OQ-1208, and OQ-1204 and OQ-1207 answered with the plan)
 ---
 
 # F12-S1 — Planogram
@@ -24,11 +24,13 @@ Updated: 2026-10-05 (v0.9: FR-183 revised, OQ-1210, awaiting the repository owne
 > **v0.9 (2026-10-05) is awaiting his approval.** The Task 8.8 mockups showed that v0.8's FR-183
 > leaves a unit's other shelves empty when its products fit at eye level: 15 of 33 shelves across
 > the two test shops (docs/reviews/F12-screens-mockups.md). v0.9 revises FR-183 and adds AC-205.
-> OQ-1210 puts the choice to him. Everything else is as approved.
+> OQ-1210 puts the choice to him. It also specifies **D-33** (2026-10-05), each product's picture
+> on its shelf, cropped by the team from the store's own photos: FR-216, FR-217, AC-206 and
+> NFR-078, on ADR-040. Everything else is as approved.
 
 > **Identifier note.** Every `FR-`, `INV-`, `NFR-`, `AC-`, `SCN-`, `C-`, `ASM-` and `OQ-` id
-> below is new and globally unique: FR-178 … FR-215, INV-084 … INV-097, NFR-072 … NFR-077,
-> AC-172 … AC-205, SCN-159 … SCN-177, C-73 … C-75, ASM-073 … ASM-083, OQ-1201 … OQ-1210.
+> below is new and globally unique: FR-178 … FR-217, INV-084 … INV-097, NFR-072 … NFR-078,
+> AC-172 … AC-206, SCN-159 … SCN-177, C-73 … C-75, ASM-073 … ASM-083, OQ-1201 … OQ-1210.
 
 Implements intent F12. Bound by ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011,
 ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037,
@@ -538,6 +540,27 @@ by hand with the key, and seals it with the example's inputs, because the exampl
 print mode, which never calls the model. Until then, the example's builder gives the engine an
 empty snapshot, so each example fixture says its explanation has not been written.
 
+#### Product pictures (D-33)
+
+**FR-216** — The layout file may give a product a picture: its front, cropped by the team from the
+store's own shelf photographs, the ones its width is read from (FR-180, OQ-1201). Each entry names
+the file and carries `cropped_by: team` and `cropped_on` (ADR-040). The file sits in the store's
+copy at `public/store/shelf-pictures/`. An entry is rejected by name, and the product keeps its
+numbered tile, when:
+- its barcode is in no catalogue product;
+- its file name is not a plain name ending `.jpg`, `.jpeg`, `.png` or `.webp`;
+- the file is missing, larger than 150 KB, or does not begin as the type its name says.
+
+No picture is generated, drawn, or taken from anywhere but the store's own photos (D-23)
+**(decided here)**. The engine reads a picture's size and its first bytes, and nothing else. No
+figure depends on a picture, and nothing looks at what one shows (D-13).
+
+**FR-217** — `layout_facts` publishes each listed product's picture address and its `cropped_on`.
+Per fixture, it also publishes the planned products without a picture, counted as FR-190 counts
+those without a width. `shelf_plan` gives each placed product its picture's address, or none.
+Shelf plan draws each facing of a product with its picture, and with its numbered tile when it has
+none. Store layout lists, per fixture, the products whose picture has not been taken yet.
+
 ## 7. Behavioral Invariants
 
 **INV-084** — No fixed camera, sensor or continuous image feed is ever an input (D-13).
@@ -770,6 +793,10 @@ request that fails twice leaves that fixture without an explanation tonight, and
 nothing more that night, as the boost's does. The number of requests made, and how many
 explanations were reused, are published each night.
 
+**NFR-078** — The pictures are store data under ADR-036, as the layout file is (NFR-075): a new copy
+starts without `public/store/**`, and updating a copy from the product never overwrites it.
+`check:store` reports how many pictures the layout file lists, and how many of those are present.
+
 ## 14. Compatibility and External Constraints
 
 **C-73** — One store per copy (ADR-036, D-28). The layout file belongs to that copy's store.
@@ -912,6 +939,11 @@ none, in his words. *(FR-210, FR-215)*
 order while it is empty or within its FR-183 share, eye level first. So two equal shelves and six
 equal products put three on each, the top three at eye level. Where a size is unknown, each
 product is on the first shelf with room, eye level first. *(FR-183, v0.9)*
+
+**AC-206** — A listed, valid picture is published with its address and date, and Shelf plan draws
+it on every facing of that product. A missing, oversized, wrongly named or wrongly typed one is
+rejected by name, and that product's tiles stay numbered. Removing every picture changes no other
+field of any capability. *(FR-216, FR-217, D-33)*
 
 ## 16. Assumptions
 
@@ -1116,6 +1148,9 @@ repository owner · blocks: Task 8.9.
 | Protected behavior | INV-097 | — | AC-201 |
 | Protected behavior | NFR-077 | — | AC-203 |
 | Protected behavior | NFR-075 | — | AC-188 |
+| INT-006 · D-33 | FR-216, FR-217 | — | AC-206 |
+| Protected behavior | NFR-078 | — | AC-206 |
+| INT-006 | FR-183 (v0.9) | SCN-161 | AC-205 |
 
 ---
 
@@ -1141,7 +1176,7 @@ repository owner · blocks: Task 8.9.
 
 ## 22. Unmapped PRD Acceptance Lines
 
-None. FR-178 … FR-215 cover the PRD's V4 row: shelf photographs, rules, and generating the plan.
+None. FR-178 … FR-217 cover the PRD's V4 row: shelf photographs, rules, and generating the plan.
 - Photographs enter only as the team's source for the recorded facts (§3).
 - Facing widths are an input the PRD row does not name. They come from his shelf photographs
   (FR-180, OQ-1201).

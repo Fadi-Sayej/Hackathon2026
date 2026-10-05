@@ -7,7 +7,7 @@ Date: 2026-10-03
 Parent: [System Design](../system-design.md) §19
 Related Specs: F12-S1 (FR-178 … FR-180, FR-190, FR-199, NFR-075, C-74, OQ-1201, OQ-1202)
 Inputs: [docs/features/F12-planogram/specs/F12-S1-planogram.md, D-13, D-22, D-30, ADR-029, ADR-033, ADR-036]
-Updated: 2026-10-04 (current facings, for F12-S1's measurement; §5 names the right ADR-036 list)
+Updated: 2026-10-05 (ADR-040, a proposal, would add product pictures beside this file); 2026-10-04 (current facings, for F12-S1's measurement; §5 names the right ADR-036 list)
 ---
 
 # ADR-037 — The shelf layout is a committed file the team records; owner state never holds them
@@ -86,6 +86,11 @@ a file F8 reads, for a feature F8 does not need.
 
 **We gain:** F12 can be set up the day a store states its fixtures, before any sales arrive, with
 no new storage, no image handling and no model cost.
+
+*Note, 2026-10-05.* D-33 adds each product's picture, cropped by the team from the store's own
+photos. [ADR-040](ADR-040-a-product-picture-is-a-file-the-team-crops-from-the-stores-photos.md),
+a proposal, keeps them beside this file and lists them in it. If it is accepted, "no image
+handling" no longer holds; the photos stay outside every figure, and the rest of this ADR stands.
 
 **We will know it was wrong if:** widths are never recorded for most stocked products, so plans
 keep saying "no width". Then the vision trial (OQ-1202) becomes the next decision.
