@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-04T03:57:13.564073+00:00",
-  "date": "2026-10-04",
+  "generatedAt": "2026-10-05T03:34:17.764633+00:00",
+  "date": "2026-10-05",
   "status": "ok",
   "sources": {
     "weather": "open-meteo",
@@ -9,25 +9,19 @@
     "islamic": "computed_hijri"
   },
   "weather": {
-    "temperatureC": 17.7,
+    "temperatureC": 18.2,
     "precipitation": 0.0,
-    "windSpeed": 3.7,
-    "weatherCode": 1,
+    "windSpeed": 4.2,
+    "weatherCode": 3,
     "label": "mild",
-    "observedAt": "2026-10-04T06:45",
+    "observedAt": "2026-10-05T06:30",
     "lat": 32.1091501,
     "lon": 34.9624392,
     "source": "open-meteo"
   },
   "hebrew": {
-    "date": "2026-10-04",
-    "holidays": [
-      {
-        "title": "Simchat Torah",
-        "hebrew": "שמחת תורה",
-        "category": "holiday"
-      }
-    ],
+    "date": "2026-10-05",
+    "holidays": [],
     "isErevChag": false,
     "isFastDay": false,
     "isShabbatEve": false,
@@ -41,11 +35,11 @@
     "source": "hebcal"
   },
   "islamic": {
-    "date": "2026-10-04",
+    "date": "2026-10-05",
     "hijri": {
       "year": 1448,
       "month": 4,
-      "day": 21
+      "day": 22
     },
     "isRamadan": false,
     "ramadanDay": null,
@@ -53,8 +47,8 @@
     "isEidAlFitr": false,
     "isEidAlAdha": false,
     "ramadanStart": "2027-02-08",
-    "daysToRamadan": 127,
-    "daysToEidAlFitr": 157,
+    "daysToRamadan": 126,
+    "daysToEidAlFitr": 156,
     "phase": null,
     "windows": {
       "ramadan_build_up_days": 21,
