@@ -6,7 +6,7 @@ Version: 0.1 (content unchanged from `specs.md` v1.1)
 Parent: [PRD](PRD.md)
 Related Specs: every F#-S# document under `docs/features/`
 Owner: smartshelf-pm
-Updated: 2026-10-04 (D-32: the AI explains why to organize the shelf as the plan says)
+Updated: 2026-10-05 (D-33: Shelf plan shows each product's picture, cropped from the store's own shelf photos)
 ---
 
 > **Migration note.** This is `SPEC-000` from the pre-migration monolithic `specs.md`,
@@ -116,6 +116,7 @@ These are settled. A specification may operationalize them; it may not reopen th
 | D-30 | **F12 (the planogram) is unlocked for specification now, with the plan waiting for daily sales the way F8 does:** it shows why it is waiting, never an empty or invented plan, until the store's daily sales reports arrive. As the option was put to him, the owner's own inputs (shelf photographs, shelf measurements, his arrangement rules) would not wait for sales. D-13 stands: no fixed cameras or sensors. Not decided here: building it, which follows his approval of the spec and its mockups; a marked example while the plan waits, which needs a decision of its own because D-29 confines examples to the order pages; and whether a first version reads shelves from photographs or takes them by hand, for the spec to propose and the owner to approve (reading a shelf photograph is untested; the PRD's one-day trial was never run) | Decided by the repository owner 2026-10-03: "unlock", answering "should F12 be unlocked for specification now, with the plan waiting for sales the way F8 does?" |
 | D-31 | **While Shelf plan waits, it may show a clearly marked example of itself, as Reorder does under D-29.** It sits under a banner saying it is an example and not the store's data. Nothing in it can be approved, changed, saved, exported or sent, and the engine, the published artefacts, the owner state and the pilot measurement never read it. It extends D-29's exception to this one page. Everywhere else, D-23 and CLAUDE.md rule 7 stand. Not decided here: what the example is built from, which F12-S1's plan proposes for his approval | Decided by the repository owner 2026-10-03: "yes", answering "Should the waiting Shelf plan page show a clearly marked example of how it will look, like Reorder does? That would be a new decision, D-31." |
 | D-32 | **Shelf plan has the AI explain why to organize the shelf the way the plan says.** The owner asked for it on approving the planogram's build plan: the AI tells him why to organize the shelf this way. It is F12's own explanation, and does not widen F14, which D-15 keeps to order suggestions. Not decided here: how the explanation is written, checked and paid for, which F12-S1 proposes for his approval | Decided by the repository owner 2026-10-04: "yes but i need you to add ai explanation to this also so the ai tells why to organize the shelf this way", answering "Do you approve the plan and these numbers?" |
+| D-33 | **Shelf plan shows each product's picture on its shelf, cropped by the team from the store's own shelf photos.** The owner asked, before accepting the mockups, that the plan look like a printed planogram "but customized to the store that take picture of the shelf". The team crops each product's front from the photos it already reads the widths from (F12-S1 OQ-1201). A product without a picture yet shows its numbered tile. D-13 stands: the pictures are shown, not monitored, and none is made up (D-23). Not decided here: where the pictures are kept and how they reach the page, which F12-S1 and an ADR propose for his approval | Decided by the repository owner 2026-10-05: "the picture should be added", answering "Should the team crop each product's front from the store's own shelf photos (the same photos they measure widths from), with tiles showing their number until then?" |
 
 ---
 
@@ -162,6 +163,8 @@ rather than surfacing them:
   *(2026-10-04: specified as F12-S1 and approved, with its build plan. **D-32** adds the AI's
   explanation of why to organize the shelf as the plan says, which F12-S1 specifies for his
   approval.)*
+  *(2026-10-05: **D-33** adds each product's picture on the plan, cropped by the team from the
+  store's own shelf photos, which F12-S1 specifies for his approval.)*
 
 **INT-MEAS** *(2026-09-28: now specified as F13-S1, approved by the repository owner, with no
 success number, D-24; what follows is the record of why it was not.)* It was not specified here for a different reason: `intent.md` §11.1 states it is

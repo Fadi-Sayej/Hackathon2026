@@ -80,3 +80,10 @@ F12-S1 OQ-1206). Building it follows his approval of its plan and its mockups (F
 He then approved its build plan, answering "Do you approve the plan and these numbers?" with "yes but i need you to add ai explanation to this also so the ai tells why to organize the shelf this way". That second part is **D-32**: Shelf plan
 has the AI explain why to organize the shelf the way the plan says. F12-S1 specifies how, for his
 approval.
+
+Shown the mockups, he asked on 2026-10-04 that the plan look like a printed planogram "but
+customized to the store that take picture of the shelf", and on 2026-10-05, answering "Should the
+team crop each product's front from the store's own shelf photos (the same photos they measure
+widths from), with tiles showing their number until then?", said "the picture should be added".
+That is **D-33**: each product's picture on its shelf, cropped by the team from the store's own
+photos. F12-S1 specifies how, for his approval.
