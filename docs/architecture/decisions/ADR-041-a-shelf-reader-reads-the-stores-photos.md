@@ -1,7 +1,7 @@
 ---
 ID: ADR-041
 Title: A shelf reader reads widths, facings and pictures from the store's own photos; people never measure them
-Status: Proposal — awaiting the repository owner's acceptance with F12-S1 v0.9
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-10-05
 Parent: [System Design](../system-design.md) §19
@@ -12,7 +12,7 @@ Updated: 2026-10-05
 
 # ADR-041 — A shelf reader reads the store's own photos
 
-**Status:** Proposal, for the repository owner's acceptance with F12-S1 v0.9. It amends ADR-037
+**Status:** Accepted (2026-10-05, by the repository owner: "approve", with F12-S1 v0.9). It amends ADR-037
 (who writes widths, current facings and pictures) and ADR-040 (who crops the pictures).
 
 ## Context

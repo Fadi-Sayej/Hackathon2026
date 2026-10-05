@@ -1,14 +1,14 @@
 ---
 ID: F12-S1
 Title: Planogram — a dated shelf plan from his own sales, waiting for them until they arrive
-Status: Ready for review — v0.9 revises FR-183 (OQ-1210), adds D-33's pictures (FR-216, FR-217, ADR-040) and D-34's shelf reader (FR-218 … FR-223, ADR-041); v0.8 was approved by the repository owner on 2026-10-04
+Status: Approved — by the repository owner, 2026-10-04 (v0.8) and 2026-10-05 (v0.9: "approve")
 Owner: smartshelf-architect
 Version: 0.9 (2026-10-05: FR-183 revised, because the mockups showed the v0.8 rule leaving shelves empty; AC-205, OQ-1210. D-33's product pictures: FR-216, FR-217, AC-206, NFR-078, ADR-040. D-34 and D-35's shelf reader: FR-180 revised, FR-218 … FR-223, AC-207 … AC-210, NFR-079, OQ-1211, ADR-041). 0.8 (2026-10-04: D-32, the AI's explanation of each fixture's plan; FR-210 … FR-215 approved as OQ-1209)
 Parent: [F12 — Planogram](../intent.md)
 Related Intents: INT-006
 Inputs: [docs/features/F12-planogram/intent.md (Approved for specification, D-30), docs/product/PRD.md (§5 V4, §6 #7), docs/product/intent-register.md (D-1, D-3, D-13, D-14, D-15, D-16, D-22, D-23, D-28, D-29, D-30, D-31, D-32, D-33, D-34, D-35), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (§5 "He stocks", FR-143 … FR-146, FR-156), ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011, ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037, ADR-038, ADR-039, ADR-040, ADR-041, CLAUDE.md]
 Answered by: [System Design](../../../architecture/system-design.md) §21 (F12-S1)
-Updated: 2026-10-05 (v0.9: FR-183 revised, OQ-1210; D-33's pictures, FR-216, FR-217; D-34 and D-35's shelf reader, FR-218 … FR-223; awaiting the repository owner). 2026-10-04 (D-32's explanation approved, OQ-1209; earlier the same day, approved with OQ-1208, and OQ-1204 and OQ-1207 answered with the plan)
+Updated: 2026-10-05 (v0.9 approved: FR-183 revised, OQ-1210 answered A; D-33's pictures, FR-216, FR-217; D-34 and D-35's shelf reader, FR-218 … FR-223, OQ-1211 answered). 2026-10-04 (D-32's explanation approved, OQ-1209; earlier the same day, approved with OQ-1208, and OQ-1204 and OQ-1207 answered with the plan)
 ---
 
 # F12-S1 — Planogram
@@ -21,7 +21,7 @@ Updated: 2026-10-05 (v0.9: FR-183 revised, OQ-1210; D-33's pictures, FR-216, FR-
 > **FR-210 … FR-215 specify D-32**, the AI's explanation of each fixture's plan, which the owner
 > asked for on 2026-10-04. He approved them the same day (OQ-1209).
 >
-> **v0.9 (2026-10-05) is awaiting his approval.** The Task 8.8 mockups showed that v0.8's FR-183
+> **v0.9 was approved on 2026-10-05** ("approve"). The Task 8.8 mockups showed that v0.8's FR-183
 > leaves a unit's other shelves empty when its products fit at eye level: 15 of 33 shelves across
 > the two test shops (docs/reviews/F12-screens-mockups.md). v0.9 revises FR-183 and adds AC-205.
 > OQ-1210 puts the choice to him. It also specifies **D-33** (2026-10-05), each product's picture
@@ -1167,14 +1167,12 @@ It also asks:
 - the example's explanation is asked once, by the team, with his key: one request for each of
   the example's fixtures, about five, which costs a few cents at ADR-039's estimate. · owner: the repository owner · blocks: nothing now.
 
-**OQ-1211** — The shelf reader's provisional values, for his approval with v0.9 (ADR-041):
+**~~OQ-1211~~** — The shelf reader's provisional values, for his approval with v0.9 (ADR-041). **Answered 2026-10-05: "approve", to "You can say 'approve all', or name what to change", asked of six items: the screens; the empty shelves, A (shown in the screens) or B; where pictures are kept (ADR-040); the shelf reader (ADR-041) with its starting values; the wording; and showing or hiding the team's note on rejected layout entries.** Approved as listed, and provisional:
 - the recent window for candidates: 90 days of sales;
 - the acceptance run: at least 20 products, every one within ±5 mm (the ±5 mm is his, D-34);
 - a request ceiling of 60 a reading, and a time budget of 10 minutes.
 
-· owner: the repository owner · blocks: building the reader.
-
-**OQ-1210** — How should the plan use a unit's shelves when its products fit at eye level? The
+**~~OQ-1210~~** — How should the plan use a unit's shelves when its products fit at eye level? **Answered 2026-10-05: A**, as written into FR-183 v0.9 and shown in the screens, by "approve", to "You can say 'approve all', or name what to change", asked of six items: the screens; the empty shelves, A (shown in the screens) or B; where pictures are kept (ADR-040); the shelf reader (ADR-041) with its starting values; the wording; and showing or hiding the team's note on rejected layout entries. The
 Task 8.8 mockups showed v0.8's FR-183 leaving the other shelves empty: the example's dry unit
 leaves its 60 cm bottom shelf empty, and all 14 units of the measurement test shop leave their
 second 120 cm shelf empty (docs/reviews/F12-screens-mockups.md). The options:
@@ -1185,9 +1183,8 @@ second 120 cm shelf empty (docs/reviews/F12-screens-mockups.md). The options:
 - **B:** keep v0.8's packing, and let extra facings stand on any shelf. Empty shelves fill with
   more facings of the top earners, so one product can stand on two shelves.
 
-Built on the branch `feat/f12-spread-shelves` so that he can see it: the dry unit then holds two
-products at eye level and three below. Nothing is merged until he answers. · owner: the
-repository owner · blocks: Task 8.9.
+Built on the branch `feat/f12-spread-shelves` so that he could see it: the dry unit then holds two
+products at eye level and three below.
 
 ## 18. Non-Goals
 

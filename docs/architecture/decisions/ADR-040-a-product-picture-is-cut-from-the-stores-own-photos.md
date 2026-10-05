@@ -1,7 +1,7 @@
 ---
 ID: ADR-040
 Title: A product's shelf picture is a file cut from the store's own photos, listed with its provenance and served as it is
-Status: Proposal — awaiting the repository owner's acceptance with F12-S1 v0.9
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-10-05
 Parent: [System Design](../system-design.md) §19
@@ -12,7 +12,7 @@ Updated: 2026-10-05
 
 # ADR-040 — A product's shelf picture is a file cut from the store's own photos
 
-**Status:** Proposal, for the repository owner's acceptance with F12-S1 v0.9.
+**Status:** Accepted (2026-10-05, by the repository owner: "approve", with F12-S1 v0.9).
 
 ## Context
 

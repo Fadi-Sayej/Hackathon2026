@@ -19,7 +19,7 @@ PRD                     what the product is, for whom, and what is out of scope
 2. [**Feature Intents**](features/) — `features/F#-*/intent.md`
 3. [**Approved Feature Specs**](features/) — `features/F#-*/specs/F#-S#-*.md`
 4. [**System Design**](architecture/system-design.md) — the single authoritative architecture
-5. [**ADRs**](architecture/decisions/) — ADR-001 … ADR-039
+5. [**ADRs**](architecture/decisions/) — ADR-001 … ADR-041
 6. [**Implementation Plan**](implementation/plan.md)
 7. **Code** — evidence of what exists, never product authority
 
@@ -66,7 +66,7 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 
 - [**System Design**](architecture/system-design.md) — one document, system-level, answering
   all seven approved specs as one coherent system. Not owned by any feature.
-- [**ADRs**](architecture/decisions/) — ADR-001 … ADR-039, one file each.
+- [**ADRs**](architecture/decisions/) — ADR-001 … ADR-041, one file each.
 
 | ADR | Decision |
 |---|---|
@@ -109,8 +109,10 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 | [ADR-037](architecture/decisions/ADR-037-shelf-layout-is-a-committed-file.md) | The shelf layout, facing widths and arrangement rules are a committed file the team records — accepted 2026-10-04 |
 | [ADR-038](architecture/decisions/ADR-038-a-shelf-arrangement-is-an-outcome-on-the-fixtures-plan.md) | A shelf arrangement is the owner's "acted" outcome on that fixture's plan entry — accepted 2026-10-04 |
 | [ADR-039](architecture/decisions/ADR-039-a-shelf-explanation-is-a-pinned-models-answer-checked-and-sealed.md) | A shelf plan's explanation is a pinned model's answer, checked and sealed as the boost's is — accepted 2026-10-04 (F12-S1, D-32) |
+| [ADR-040](architecture/decisions/ADR-040-a-product-picture-is-cut-from-the-stores-own-photos.md) | A product's shelf picture is a file cut from the store's own photos, listed with its provenance and served as it is — accepted 2026-10-05 (F12-S1 v0.9, D-33) |
+| [ADR-041](architecture/decisions/ADR-041-a-shelf-reader-reads-the-stores-photos.md) | A shelf reader reads widths, facings and pictures from the store's own photos; people never measure them — accepted 2026-10-05 (F12-S1 v0.9, D-34, D-35) |
 
-ADR-001 … ADR-039 are `Accepted`; ADR-037, ADR-038 and ADR-039 were the last, on 2026-10-04, with F12-S1. ADR-022 amends a sentence of ADR-019 and was accepted on 2026-09-13, after the defect it fixes was verified end to end: `entry_id` falls back to `product_name`, and `compose.js` skips any entry whose id carries a settled outcome, so two barcode-less rows sharing a name settled together on the owner's screen. ADR-020 was accepted on 2026-09-13 **conditional on GAP-009**:
+ADR-001 … ADR-041 are `Accepted`; ADR-040 and ADR-041 were the last, on 2026-10-05, with F12-S1 v0.9. ADR-022 amends a sentence of ADR-019 and was accepted on 2026-09-13, after the defect it fixes was verified end to end: `entry_id` falls back to `product_name`, and `compose.js` skips any entry whose id carries a settled outcome, so two barcode-less rows sharing a name settled together on the owner's screen. ADR-020 was accepted on 2026-09-13 **conditional on GAP-009**:
 `published_population: whole` is the right value while that question is open, and becomes
 `living` when it closes.
 
