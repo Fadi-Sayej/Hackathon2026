@@ -415,7 +415,7 @@ def test_a_pictures_address_reaches_the_plan_and_changes_nothing_else(tmp_path):
     plain = _layout(tmp_path, cat, shelves=(100,), widths={"1": 100, "2": 100})
     pictured = copy.deepcopy(plain)
     pictured["pictures"] = {"1": {"file": "1.png", "src": "/store/shelf-pictures/1.png?v=2026-10-01",
-                                  "cropped_by": "team", "cropped_on": "2026-10-01"}}
+                                  "cropped_by": "reader", "cropped_on": "2026-10-01"}}
 
     def run(layout):
         inputs = make_inputs(products=cat, sales_daily=daily, run_at=RUN_AT, store_layout=layout)

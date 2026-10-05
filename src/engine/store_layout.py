@@ -17,8 +17,8 @@ holds four kinds of fact, and each carries who stated or measured it, and when:
       "<barcode>": {width_mm: 75, measured_by: team, measured_on: 2026-10-10}
     current:                        # what stands on the shelf today: the measurement's "before"
       "<barcode>": {fixture: <fixture>, shelf: <n>, facings: <n>, measured_by: team, measured_on: …}
-    pictures:                       # a product's front, cropped by the team from his shelf photos (D-33)
-      "<barcode>": {file: <barcode>.jpg, cropped_by: team, cropped_on: 2026-10-10}
+    pictures:                       # a product's front, cut by the shelf reader from his photos (D-33, D-34)
+      "<barcode>": {file: <barcode>.jpg, cropped_by: reader, cropped_on: 2026-10-10}
     rules:                          # the owner's arrangement rules, a closed set (FR-188)
       - {together: {barcodes: [...]} | {department: <department>}, stated_by: owner, stated_on: …, recorded_by: team}
       - {keep_on:  {barcode: …, fixture: …}, …}
@@ -255,8 +255,9 @@ def _picture(entry, folder: Path) -> dict:
     """FR-216: a listed file, of a type the site shows, small enough, beginning as its type says."""
     _keys(entry, PICTURE_KEYS, "a picture")
     _twice(entry)
-    if entry.get("cropped_by") != "team":
-        raise _Rejected(f"cropped_by must be 'team', not {entry.get('cropped_by')!r}")
+    # D-34: no one cuts pictures by hand; the shelf reader does (F12-S1 FR-216, FR-222; ADR-041).
+    if entry.get("cropped_by") != "reader":
+        raise _Rejected(f"cropped_by must be 'reader', not {entry.get('cropped_by')!r}")
     if "cropped_on" not in entry:
         raise _Rejected("cropped_on is missing: every picture carries the day it was cropped")
     cropped_on = _day(entry["cropped_on"], "cropped_on")
@@ -275,7 +276,7 @@ def _picture(entry, folder: Path) -> dict:
         start = handle.read(12)
     if not start.startswith(PICTURE_START[kind]) or (kind == "webp" and start[8:12] != b"WEBP"):
         raise _Rejected(f"{name!r} does not begin as a .{kind} file does")
-    return {"file": name, "src": f"{PICTURES_URL}{name}?v={cropped_on}", "cropped_by": "team",
+    return {"file": name, "src": f"{PICTURES_URL}{name}?v={cropped_on}", "cropped_by": "reader",
             "cropped_on": cropped_on}
 
 
