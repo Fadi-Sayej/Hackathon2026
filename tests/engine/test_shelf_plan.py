@@ -97,6 +97,42 @@ def test_scn_161_eye_level_first_by_earnings_then_the_rest_by_fr_185(tmp_path):
     assert [p["rank"] for p in plan["shelves"][0]["products"]] == [1, 2]
 
 
+def test_no_shelf_is_left_empty_while_products_remain(tmp_path):
+    # F12-S1 v0.9 FR-183, found by the mockups (docs/reviews/F12-screens-mockups.md): six 10 cm
+    # products fit on one 120 cm shelf, and the old packing left the other 120 cm shelf empty.
+    # First facings now spread by shelf length, 30 cm a shelf, so each shelf holds three, the top
+    # three earners at eye level, and each shelf's spare length becomes extra facings.
+    cat = [P(str(n), shelf=10, cost=10 - n) for n in range(1, 7)]
+    plan = _plan(_run(tmp_path, cat, _daily({str(n): 2 for n in range(1, 7)}), shelves=(120, 120),
+                      widths={str(n): 100 for n in range(1, 7)}))
+    eye, other = plan["shelves"]
+    assert eye["eye_level"] and [p["rank"] for p in eye["products"]] == [1, 2, 3]
+    assert [p["rank"] for p in other["products"]] == [4, 5, 6]
+    assert eye["used_cm"] == 120 and other["used_cm"] == 120      # the cap of 4 fills both
+
+
+def test_where_a_size_is_unknown_the_top_earners_keep_eye_level(tmp_path):
+    # A product of unmeasured width stands on the unit, so no spare length is known to be free and
+    # no extra facings are given (FR-186). Spreading would then only move top earners off eye level
+    # into space nothing fills, so each product goes on the first shelf with room, as before v0.9.
+    cat = [P(str(n), shelf=10, cost=10 - n) for n in range(1, 8)]
+    plan = _plan(_run(tmp_path, cat, _daily({str(n): 2 for n in range(1, 8)}), shelves=(120, 120),
+                      widths={str(n): 100 for n in range(1, 7)}))
+    assert plan["extra_facings"] == "no_width" and plan["unplaced"]["no_width"] == ["7"]
+    assert [p["rank"] for p in plan["shelves"][0]["products"]] == [1, 2, 3, 4, 5, 6]
+
+
+def test_a_shelf_too_short_for_its_share_still_takes_its_top_earner(tmp_path):
+    # The eye-level shelf's share (20 cm of 60 cm on 40 + 80) is narrower than the top earner,
+    # which goes there all the same: a shelf takes the next product while it is empty.
+    # Earnings a cm at the same demand: 6/30, 2/15 and 1/15, so they rank 1, 3, 2.
+    cat = [P("1", shelf=10, cost=4), P("2", shelf=10, cost=9), P("3", shelf=10, cost=8)]
+    plan = _plan(_run(tmp_path, cat, _daily({"1": 2, "2": 2, "3": 2}), shelves=(40, 80),
+                      widths={"1": 300, "2": 150, "3": 150}))
+    assert [p["barcode"] for p in plan["shelves"][0]["products"]] == ["1"]
+    assert [p["barcode"] for p in plan["shelves"][1]["products"]] == ["3", "2"]
+
+
 def test_each_further_facing_counts_for_less(tmp_path):
     # A lone top earner and a modest one share a long shelf: the top earner does not take every
     # facing, because its fourth earns less than the modest one's second.
@@ -150,13 +186,15 @@ def test_a_fixture_with_nothing_to_place_gets_no_plan(tmp_path):
 
 def test_unknown_earnings_keep_one_facing_and_come_after_every_known_one(tmp_path):
     # INV-090, SCN-165: product 2 has no unit cost, so its margin is unknown. It sells most, yet it
-    # is packed after both known products, off the eye-level shelf, with one facing.
+    # is packed after both known products, off the eye-level shelf, with one facing. The 60 cm of
+    # first facings spread 30 cm a shelf (FR-183): the top earner alone at eye level, where its
+    # spare 20 cm becomes a second facing, and the other two on shelf 2.
     cat = [P("1", shelf=10, cost=6), P("2", shelf=10, cost=None), P("3", shelf=10, cost=8)]
     plan = _plan(_run(tmp_path, cat, _daily({"1": 1, "2": 9, "3": 1}), shelves=(40, 40),
                       widths={"1": 200, "2": 200, "3": 200}))
     f = _facings(plan)
-    assert f["1"] == (1, 1) and f["3"] == (1, 1) and f["2"] == (2, 1)
-    unknown = plan["shelves"][1]["products"][0]
+    assert f["1"] == (1, 2) and f["3"] == (2, 1) and f["2"] == (2, 1)
+    unknown = next(p for p in plan["shelves"][1]["products"] if p["barcode"] == "2")
     assert unknown["unknown_parts"] == ["margin"] and unknown["unknown_because"] == ["no_unit_cost"]
     assert unknown["rank"] is None
 
@@ -365,3 +403,35 @@ def test_at_least_on_a_product_of_unknown_earnings_cannot_be_met(tmp_path):
     rules = '  - {at_least: {barcode: "A", facings: 3}, stated_by: owner, stated_on: 2026-10-01, recorded_by: team}\n'
     plan = _plan(_run(tmp_path, cat, _daily({"A": 2, "B": 2}), shelves=(500,), widths={"A": 100, "B": 100}, rules=rules))
     assert (plan["state"], plan["stopped_by"]["why"]) == ("stopped_by_rule", "earnings_unknown")
+
+
+# ── Pictures (D-33; F12-S1 FR-216, FR-217, AC-206) ───────────────────────────
+
+def test_a_pictures_address_reaches_the_plan_and_changes_nothing_else(tmp_path):
+    import copy
+    from src.engine import layout_facts
+    cat = [P("1", shelf=10, cost=4), P("2", shelf=10, cost=6)]
+    daily = _daily({"1": 2, "2": 2})
+    plain = _layout(tmp_path, cat, shelves=(100,), widths={"1": 100, "2": 100})
+    pictured = copy.deepcopy(plain)
+    pictured["pictures"] = {"1": {"file": "1.png", "src": "/store/shelf-pictures/1.png?v=2026-10-01",
+                                  "cropped_by": "reader", "cropped_on": "2026-10-01"}}
+
+    def run(layout):
+        inputs = make_inputs(products=cat, sales_daily=daily, run_at=RUN_AT, store_layout=layout)
+        return shelf_plan.run(inputs).to_dict(), layout_facts.run(inputs).to_dict()
+
+    (plan_a, facts_a), (plan_b, facts_b) = run(plain), run(pictured)
+    placed = {p["barcode"]: p for s in plan_b["entries"][0]["evidence"]["shelves"] for p in s["products"]}
+    assert placed["1"]["picture"] == "/store/shelf-pictures/1.png?v=2026-10-01" and placed["2"]["picture"] is None
+    assert facts_b["pictures"] == {"1": {"src": "/store/shelf-pictures/1.png?v=2026-10-01", "cropped_on": "2026-10-01"}}
+    assert facts_b["without_picture"] == {"F1": ["2"]} and facts_a["without_picture"] == {"F1": ["1", "2"]}
+
+    # AC-206: take the picture fields away, and both capabilities are what they were without them.
+    for s in plan_b["entries"][0]["evidence"]["shelves"]:
+        for p in s["products"]:
+            p["picture"] = None
+    assert plan_b == plan_a
+    for f in (facts_a, facts_b):
+        f.pop("pictures"), f.pop("without_picture"), f["counts"].pop("without_picture")
+    assert facts_b == facts_a

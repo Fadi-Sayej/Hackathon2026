@@ -282,3 +282,65 @@ widths:
     assert list(out["fixtures"]) == ["F3"]
     assert _reasons(out, "fixture") == {"1": "the file names this fixture twice, so neither entry is used"}
     assert "names width_mm twice" in _reasons(out, "width")["7290001"]
+
+
+# ── Pictures (D-33; F12-S1 FR-216, AC-206; ADR-040) ──────────────────────────
+
+PNG = b"\x89PNG\r\n\x1a\n" + b"\x00" * 64
+JPEG = b"\xff\xd8\xff\xe0" + b"\x00" * 64
+WEBP = b"RIFF\x00\x00\x00\x00WEBP" + b"\x00" * 64
+
+
+def _pictures(tmp_path, entries: str, files: dict) -> dict:
+    folder = tmp_path / "shelf-pictures"
+    folder.mkdir(exist_ok=True)
+    for name, data in files.items():
+        (folder / name).write_bytes(data)
+    path = tmp_path / "store_layout.yaml"
+    path.write_text("fixtures:\n" + _fixture("F1", "[drinks]") + "pictures:\n"
+                    + textwrap.indent(textwrap.dedent(entries), "  "), encoding="utf-8")
+    return load_store_layout(path, CATALOGUE, folder)
+
+
+def test_a_listed_picture_is_kept_with_its_address_and_date(tmp_path):
+    out = _pictures(tmp_path, """\
+      "7290001": {file: 7290001.png, cropped_by: reader, cropped_on: 2026-10-10}
+      "7290002": {file: cola-front.jpg, cropped_by: reader, cropped_on: 2026-10-11}
+      "7290003": {file: 7290003.webp, cropped_by: reader, cropped_on: 2026-10-12}
+    """, {"7290001.png": PNG, "cola-front.jpg": JPEG, "7290003.webp": WEBP})
+    assert out["rejected"] == []
+    assert out["pictures"]["7290001"] == {"file": "7290001.png", "src": "/store/shelf-pictures/7290001.png?v=2026-10-10",
+                                          "cropped_by": "reader", "cropped_on": "2026-10-10"}
+    assert set(out["pictures"]) == {"7290001", "7290002", "7290003"}
+
+
+def test_a_bad_picture_is_rejected_by_name_and_the_rest_are_used(tmp_path):
+    out = _pictures(tmp_path, """\
+      "7290001": {file: 7290001.png, cropped_by: reader, cropped_on: 2026-10-10}
+      "7290002": {file: ../../configs/store.yaml, cropped_by: reader, cropped_on: 2026-10-10}
+      "7290003": {file: missing.png, cropped_by: reader, cropped_on: 2026-10-10}
+      "7291001": {file: big.jpg, cropped_by: reader, cropped_on: 2026-10-10}
+      "7291002": {file: renamed.png, cropped_by: reader, cropped_on: 2026-10-10}
+      "7292001": {file: 7292001.png, cropped_by: team, cropped_on: 2026-10-10}
+      "7299999": {file: 7290001.png, cropped_by: reader, cropped_on: 2026-10-10}
+    """, {"7290001.png": PNG, "big.jpg": JPEG + b"\x00" * (151 * 1024), "renamed.png": JPEG, "7292001.png": PNG})
+    assert set(out["pictures"]) == {"7290001"}
+    reasons = _reasons(out, "picture")
+    assert "plain name" in reasons["7290002"]                   # a path never reaches outside the folder
+    assert "no file 'missing.png'" in reasons["7290003"]
+    assert "at most 150 KB" in reasons["7291001"]
+    assert "does not begin as a .png" in reasons["7291002"]
+    assert "cropped_by must be 'reader'" in reasons["7292001"]      # D-34: never by hand
+    assert "no catalogue product" in reasons["7299999"]
+
+
+def test_a_picture_without_its_date_is_rejected(tmp_path):
+    out = _pictures(tmp_path, """\
+      "7290001": {file: 7290001.png, cropped_by: reader}
+    """, {"7290001.png": PNG})
+    assert out["pictures"] == {} and "cropped_on is missing" in _reasons(out, "picture")["7290001"]
+
+
+def test_no_pictures_section_means_no_pictures(tmp_path):
+    out = _load(tmp_path, "fixtures:\n" + _fixture("F1", "[drinks]"))
+    assert out["pictures"] == {} and out["rejected"] == []

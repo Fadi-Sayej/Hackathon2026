@@ -1,14 +1,14 @@
 ---
 ID: F12-S1
 Title: Planogram — a dated shelf plan from his own sales, waiting for them until they arrive
-Status: Approved — by the repository owner, 2026-10-04
+Status: Approved — by the repository owner, 2026-10-04 (v0.8) and 2026-10-05 (v0.9: "approve")
 Owner: smartshelf-architect
-Version: 0.8 (2026-10-04: D-32, the AI's explanation of each fixture's plan; FR-210 … FR-215 approved as OQ-1209)
+Version: 0.9 (2026-10-05: FR-183 revised, because the mockups showed the v0.8 rule leaving shelves empty; AC-205, OQ-1210. D-33's product pictures: FR-216, FR-217, AC-206, NFR-078, ADR-040. D-34 and D-35's shelf reader: FR-180 revised, FR-218 … FR-223, AC-207 … AC-210, NFR-079, OQ-1211, ADR-041). 0.8 (2026-10-04: D-32, the AI's explanation of each fixture's plan; FR-210 … FR-215 approved as OQ-1209)
 Parent: [F12 — Planogram](../intent.md)
 Related Intents: INT-006
-Inputs: [docs/features/F12-planogram/intent.md (Approved for specification, D-30), docs/product/PRD.md (§5 V4, §6 #7), docs/product/intent-register.md (D-1, D-3, D-13, D-14, D-15, D-16, D-22, D-23, D-28, D-29, D-30, D-31, D-32), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (§5 "He stocks", FR-143 … FR-146, FR-156), ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011, ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037, ADR-038, ADR-039, CLAUDE.md]
+Inputs: [docs/features/F12-planogram/intent.md (Approved for specification, D-30), docs/product/PRD.md (§5 V4, §6 #7), docs/product/intent-register.md (D-1, D-3, D-13, D-14, D-15, D-16, D-22, D-23, D-28, D-29, D-30, D-31, D-32, D-33, D-34, D-35), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (§5 "He stocks", FR-143 … FR-146, FR-156), ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011, ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037, ADR-038, ADR-039, ADR-040, ADR-041, CLAUDE.md]
 Answered by: [System Design](../../../architecture/system-design.md) §21 (F12-S1)
-Updated: 2026-10-04 (D-32's explanation approved, OQ-1209; earlier the same day, approved with OQ-1208, and OQ-1204 and OQ-1207 answered with the plan)
+Updated: 2026-10-05 (v0.9 approved: FR-183 revised, OQ-1210 answered A; D-33's pictures, FR-216, FR-217; D-34 and D-35's shelf reader, FR-218 … FR-223, OQ-1211 answered). 2026-10-04 (D-32's explanation approved, OQ-1209; earlier the same day, approved with OQ-1208, and OQ-1204 and OQ-1207 answered with the plan)
 ---
 
 # F12-S1 — Planogram
@@ -20,10 +20,19 @@ Updated: 2026-10-04 (D-32's explanation approved, OQ-1209; earlier the same day,
 >
 > **FR-210 … FR-215 specify D-32**, the AI's explanation of each fixture's plan, which the owner
 > asked for on 2026-10-04. He approved them the same day (OQ-1209).
+>
+> **v0.9 was approved on 2026-10-05** ("approve"). The Task 8.8 mockups showed that v0.8's FR-183
+> leaves a unit's other shelves empty when its products fit at eye level: 15 of 33 shelves across
+> the two test shops (docs/reviews/F12-screens-mockups.md). v0.9 revises FR-183 and adds AC-205.
+> OQ-1210 puts the choice to him. It also specifies **D-33** (2026-10-05), each product's picture
+> on its shelf, from the store's own photos: FR-216, FR-217, AC-206 and NFR-078, on ADR-040. And
+> **D-34** and **D-35** (2026-10-05): a shelf reader, not people, reads the widths, the current
+> facings and the pictures from those photos: FR-180 revised, FR-218 … FR-223, AC-207 … AC-210,
+> NFR-079 and OQ-1211, on ADR-041. Everything else is as approved.
 
 > **Identifier note.** Every `FR-`, `INV-`, `NFR-`, `AC-`, `SCN-`, `C-`, `ASM-` and `OQ-` id
-> below is new and globally unique: FR-178 … FR-215, INV-084 … INV-097, NFR-072 … NFR-077,
-> AC-172 … AC-204, SCN-159 … SCN-177, C-73 … C-75, ASM-073 … ASM-083, OQ-1201 … OQ-1209.
+> below is new and globally unique: FR-178 … FR-223, INV-084 … INV-097, NFR-072 … NFR-079,
+> AC-172 … AC-210, SCN-159 … SCN-177, C-73 … C-75, ASM-073 … ASM-083, OQ-1201 … OQ-1211.
 
 Implements intent F12. Bound by ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011,
 ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037,
@@ -63,13 +72,13 @@ changes the plan.
 Behavioural scope, not a file list. The implementation plan declares the files.
 
 ### In Scope
-- The store's **layout facts**, recorded by the team from the owner in a committed file
-  (ADR-037):
+- The store's **layout facts**, in a committed file (ADR-037):
   - each fixture's shelves and their usable lengths;
   - the departments it holds, whether it is chilled, and which shelf is at eye level;
-  - each stocked product's facing width, and its current facings and shelf, all read from his
-    shelf photographs;
   - the owner's arrangement rules.
+- **The shelf reader** (v0.9; D-34, D-35; ADR-041): each stocked product's facing width, its
+  current facings and shelf, and its picture, read from the store's own shelf photographs, never
+  by a person.
 - Four engine capabilities, because they fail on different days (ADR-014):
   - **`layout_facts`** publishes the recorded facts and what is missing, and needs no sales;
   - **`shelf_plan`** publishes the plan, and waits for daily sales;
@@ -88,9 +97,8 @@ Behavioural scope, not a file list. The implementation plan declares the files.
 - The boundary probe for the new inputs (§20).
 
 ### Out of Scope
-- **Reading shelves from photographs.** The team records the facts by hand from photographs he
-  sends or they take. A vision model reading a shelf is untested, because the PRD's one-day
-  trial was never run (OQ-1202) **(decided here)**.
+- ~~**Reading shelves from photographs.**~~ In scope from v0.9: the shelf reader (D-34,
+  FR-218 … FR-223). What stays out is reading anything else from a photo.
 - **Checking a rearranged shelf against the plan** (compliance from a second photograph).
   Possible later, and only by hand-held photographs (D-13).
 - **The order of products from left to right within a shelf.** The plan gives each product a
@@ -150,10 +158,11 @@ used.
 **FR-179** — A fixture holds the planned products of the departments it names. A department named
 on two fixtures is rejected, unless a "keep on" rule assigns its products between them.
 
-**FR-180** — The plan needs each planned product's facing width. The team reads it from his shelf
-photographs and records it with who read it and when (OQ-1201, answered; ADR-037). A product
-without a recorded width is not placed, and is named under "no width". A width is never
-estimated from the category or the price (D-3).
+**FR-180** — The plan needs each planned product's facing width. **(v0.9)** The shelf reader
+measures it from the store's own shelf photographs (D-34, FR-218 … FR-223). No person measures
+one, and no barcode database supplies one (D-35). A product without a width the reader has
+measured, checked and had accepted (FR-223) is not placed, and is named under "no width". A
+width is never estimated from the category or the price (D-3).
 
 **FR-181** — Demand is computed by F8's evidence functions over F8's window, never by a second
 derivation. Monthly reports supply no demand (F8-S1 FR-143; CLAUDE.md rule 13). In a department
@@ -180,11 +189,28 @@ products.
 nothing: which products he keeps is his and F4's question, and D-14 forbids a figure that depends
 on automatic withdrawal.
 
-**FR-183** — First facings are packed shelf by shelf, each product on the first shelf in this
-order with room for it **(decided here)**:
-1. products whose earnings per centimetre is known, highest first, on the eye-level shelf first
-   and then the other shelves in the order recorded;
+**FR-183** — First facings are placed in this order of products **(decided here)**:
+1. products whose earnings per centimetre is known, highest first;
 2. then products whose earnings per centimetre is unknown, by barcode.
+
+The shelves are taken eye level first, then the others in the order recorded. **(v0.9, OQ-1210)**
+Where every planned product's size is known, the first facings are spread over the shelves in
+proportion to their lengths:
+- each shelf's share is the fixture's total first-facing width × the shelf's length ÷ the
+  fixture's total shelf length;
+- a shelf takes the next product while the shelf is empty, or while the product keeps it within its
+  share. Then the next shelf takes over, and the last shelf takes the rest;
+- a product with no room on its shelf goes on the first shelf, in that order, with room.
+
+Each shelf's spare length then becomes extra facings (FR-185). So the shelves share the products in
+proportion to their lengths, and the top earners still stand at eye level. A shelf can still be
+left empty when there are fewer products than shelves, or when the products before it already
+took more than their shares.
+
+Where a product of unknown size stands on the fixture, no spare length is known to be free, and
+there are no extra facings (FR-186). Spreading would then only move top earners off eye level into
+space that nothing fills. So each product goes on the first shelf, in that order, with room for it,
+as in v0.8.
 
 Eye level goes to what his own sales show earns most. A product whose earnings are unknown is
 never ranked for it (D-3).
@@ -373,7 +399,7 @@ estimates the same model.
 
 The before facings and shelf are the later-dated of two records, provided it is dated no later
 than the arrangement:
-- the team's count from his shelf photographs (ADR-037);
+- the shelf reader's count from his shelf photographs (FR-222);
 - his previous arrangement of the fixture.
 
 The after facings and shelf are the ones he recorded following (FR-201). A product whose before
@@ -515,6 +541,77 @@ explanation is the real step's answer for the example's test shop. The team asks
 by hand with the key, and seals it with the example's inputs, because the example is built in
 print mode, which never calls the model. Until then, the example's builder gives the engine an
 empty snapshot, so each example fixture says its explanation has not been written.
+
+#### Product pictures (D-33)
+
+**FR-216** — A product may have a picture: its front, cut by the shelf reader from the store's own
+shelf photographs, the ones its width is read from (FR-222, D-34). Each entry names the file and
+carries `cropped_by: reader` and `cropped_on` (ADR-040, ADR-041). The file sits in the store's
+copy at `public/store/shelf-pictures/`. An entry is rejected by name, and the product keeps its
+numbered tile, when:
+- its barcode is in no catalogue product;
+- its file name is not a plain name ending `.jpg`, `.jpeg`, `.png` or `.webp`;
+- the file is missing, larger than 150 KB, or does not begin as the type its name says.
+
+No picture is generated, drawn, or taken from anywhere but the store's own photos (D-23)
+**(decided here)**. The engine reads a picture's size and its first bytes, and nothing else. No
+figure depends on a picture, and nothing looks at what one shows (D-13).
+
+**FR-217** — `layout_facts` publishes each listed product's picture address and its `cropped_on`.
+Per fixture, it also publishes the planned products without a picture, counted as FR-190 counts
+those without a width. `shelf_plan` gives each placed product its picture's address, or none.
+Shelf plan draws each facing of a product with its picture, and with its numbered tile when it has
+none. Store layout lists, per fixture, the products whose picture has not been taken yet.
+
+#### The shelf reader (D-34, D-35)
+
+**FR-218** — The store photographs each shelving unit from the front, straight on, with the whole
+unit in frame, by hand (D-13). The photos are store data, kept in the store's copy and never
+published (ADR-041). Nothing reads them but the shelf reader, and nothing leaves them but a
+product's picture (FR-222). The reader runs when photos arrive, never in the nightly.
+
+**FR-219** — The AI reads each photo, and each shelf again as a full-resolution strip. Per shelf it
+gives the shelf's two ends at the line of the product fronts. Per run of identical facings, left to
+right, it gives a rough box, the facing count and the text of the tag below the run. The answer is
+sealed with the model, the prompt's version and the photo's digest. It is reused while those are
+unchanged, and print mode never asks (ADR-039's method) **(decided here)**.
+
+**FR-220** — A run is a product only when **(decided here)**:
+- its tag shows a code that is exactly one candidate's barcode or store code; or
+- its tag's name matches exactly one candidate, after normalising spaces and punctuation, and
+  the tag's price equals that product's shelf price.
+
+The candidates are the catalogue products sold in the policy's recent window. Anything else
+leaves the run unknown. The model's own confidence is never used (D-34).
+
+**FR-221** — Image processing finds, on the full-resolution photo and within the AI's rough box,
+the run's left and right edges and the boundaries between its facings. It finds the shelf's ends
+at the line of the product fronts the same way. The width is the run's width ÷ its facings ÷ the
+shelf's span × the shelf's recorded length (ADR-037): the one real length the reader needs,
+stated once per shelf **(decided here)**. A width is recorded only when:
+- the facings found equal the AI's count;
+- the facings within the run agree within ±5 mm;
+- a product read in two runs or two photos agrees within ±5 mm;
+- the runs fit within the shelf's span.
+
+Otherwise the width stays unknown, with its reason (D-3).
+
+**FR-222** — For each run that is a product, the reader cuts one facing as its picture (FR-216). It
+also records the run as the product's current fixture, shelf and facings: FR-205's "before". The
+readings are written to the store's readings file, `configs/shelf_readings.yaml`, in the layout
+file's format, each with `measured_by: reader` or `cropped_by: reader` and the photo's date. The
+layout file keeps what is stated: fixtures, shelf lengths and rules (ADR-041).
+
+**FR-223** — The reader's widths are used only once its acceptance run passes (D-34). About 20
+products, measured by hand on the same store's first photos, are recorded with who measured them
+and when. The engine compares them with the reader's widths at every run. It passes when at least
+the policy's number are listed, and every one is within ±5 mm. Until then:
+- the reader's widths are recorded, not used;
+- those products plan as "no width", and Shelf plan says the reader's widths are waiting for
+  their acceptance run;
+- pictures and current facings are used from the first reading.
+
+The hand readings never enter a plan.
 
 ## 7. Behavioral Invariants
 
@@ -748,6 +845,15 @@ request that fails twice leaves that fixture without an explanation tonight, and
 nothing more that night, as the boost's does. The number of requests made, and how many
 explanations were reused, are published each night.
 
+**NFR-078** — The pictures are store data under ADR-036, as the layout file is (NFR-075): a new copy
+starts without `public/store/**`, and updating a copy from the product never overwrites it.
+`check:store` reports how many pictures the layout file lists, and how many of those are present.
+
+**NFR-079** — A reading's AI requests are bounded by the policy's ceiling, and its time by the
+policy's budget. Its cost is estimated before it is switched on: about $0.05 a photo and $0.80
+for a 15-unit store at ADR-041's assumptions, replaced by the first reading's measured usage. It
+counts under ADR-032's monthly limit.
+
 ## 14. Compatibility and External Constraints
 
 **C-73** — One store per copy (ADR-036, D-28). The layout file belongs to that copy's store.
@@ -767,8 +873,8 @@ and both pages say the measurements have not been recorded. *(FR-191, FR-193, FR
 shows every recorded fixture with its dates. `shelf_plan` is `unavailable` (`no_daily_sales`), and
 Shelf plan shows no plan. *(FR-190, FR-193, FR-194; D-30)*
 
-**AC-174** — With a window, every planned product with a width gets one facing, packed shelf by
-shelf, eye level first by earnings per centimetre, and the remaining length goes by FR-185.
+**AC-174** — With a window, every planned product with a width gets one facing, placed eye level
+first by earnings per centimetre, and the remaining length goes by FR-185.
 *(FR-182, FR-183, FR-185)*
 
 **AC-175** — A product without a width is never placed, is named under "no width", and its fixture
@@ -886,6 +992,33 @@ say they have no explanation tonight. *(FR-213, FR-214, NFR-077)*
 beside that fixture's plan, under its label and in the page's language, or the reason it has
 none, in his words. *(FR-210, FR-215)*
 
+**AC-205** — On a fixture whose every planned size is known, a shelf takes products in the earnings
+order while it is empty or within its FR-183 share, eye level first. So two equal shelves and six
+equal products put three on each, the top three at eye level. Where a size is unknown, each
+product is on the first shelf with room, eye level first. *(FR-183, v0.9)*
+
+**AC-206** — A listed, valid picture is published with its address and date, and Shelf plan draws
+it on every facing of that product. A missing, oversized, wrongly named or wrongly typed one is
+rejected by name, and that product's tiles stay numbered. Removing every picture changes no other
+field of any capability. *(FR-216, FR-217, D-33)*
+
+**AC-207** — A run whose tag shows exactly one candidate's code is that product. A run whose name
+matches one candidate at a different price, or two candidates, is unknown. No step reads the
+model's confidence. *(FR-220, D-34)*
+
+**AC-208** — A width is the run's width ÷ facings ÷ shelf span × the shelf's length. A run whose
+facing count differs from the AI's, whose facings disagree by more than 5 mm, whose product reads
+differently elsewhere by more than 5 mm, or whose shelf's runs do not fit, has no width, and says
+why. *(FR-221)*
+
+**AC-209** — Until the acceptance run lists the policy's number of products and every one is
+within ±5 mm, no width from the reader reaches a plan, and Shelf plan says why. Pictures and
+current facings are used from the first reading, and no hand reading enters a plan. *(FR-223)*
+
+**AC-210** — Print mode never asks the model. A reading reuses its sealed answer while the photo,
+model and prompt are unchanged. No photo is published, only a product's picture. *(FR-218,
+FR-219)*
+
 ## 16. Assumptions
 
 **ASM-073** — A product's facing width does not change between packs of the same barcode.
@@ -904,8 +1037,8 @@ promotion or a supplier display. *Falsified if* he ran a promotion there. The co
 products absorb store-wide changes, not changes on one fixture.
 
 **ASM-077** — When he records an arrangement, the fixture matches the plan he followed, and it
-stays so until his next recorded arrangement. Before then, it matched the later of the team's
-count and his previous arrangement. *Falsified if* he arranges part of it, or moves products
+stays so until his next recorded arrangement. Before then, it matched the later of the shelf
+reader's count and his previous arrangement. *Falsified if* he arranges part of it, or moves products
 without recording it. The facings used would then be wrong, and nothing here checks them: the
 photograph check is out of scope (§3).
 
@@ -944,13 +1077,15 @@ behind (INV-096).
 
 **~~OQ-1201~~** — "Who measures product widths: the team, from photos and a tape measure, or the
 store owner?" **Answered 2026-10-03: "from photos".** The team reads the widths from his shelf
-photographs (FR-180).
+photographs (FR-180). **Superseded 2026-10-05 by D-34:** no one measures by hand; the shelf
+reader does (FR-180 v0.9, FR-218 … FR-223).
 
 **~~OQ-1202~~** — "Should we run the one-day test of an AI reading a real shelf photo, before or
 after a first version entered by hand?" **Answered 2026-10-03: "yes why not".** The test is
 to be run. He did not choose between before and after, so its plan proposed the order: after
 Phase 8, on the next store's first shelf photographs, against the team's own readings. He
-approved it with the plan on 2026-10-04.
+approved it with the plan on 2026-10-04. **From 2026-10-05 (D-34)** the test is the shelf reader's
+acceptance run (FR-223): about 20 hand readings grade the reader once and never feed a plan.
 
 **~~OQ-1203~~** — "Should the waiting Shelf plan page show a clearly marked example of how it
 will look, like Reorder does? That would be a new decision, D-31." **Answered 2026-10-03:
@@ -1032,6 +1167,25 @@ It also asks:
 - the example's explanation is asked once, by the team, with his key: one request for each of
   the example's fixtures, about five, which costs a few cents at ADR-039's estimate. · owner: the repository owner · blocks: nothing now.
 
+**~~OQ-1211~~** — The shelf reader's provisional values, for his approval with v0.9 (ADR-041). **Answered 2026-10-05: "approve", to "You can say 'approve all', or name what to change", asked of six items: the screens; the empty shelves, A (shown in the screens) or B; where pictures are kept (ADR-040); the shelf reader (ADR-041) with its starting values; the wording; and showing or hiding the team's note on rejected layout entries.** Approved as listed, and provisional:
+- the recent window for candidates: 90 days of sales;
+- the acceptance run: at least 20 products, every one within ±5 mm (the ±5 mm is his, D-34);
+- a request ceiling of 60 a reading, and a time budget of 10 minutes.
+
+**~~OQ-1210~~** — How should the plan use a unit's shelves when its products fit at eye level? **Answered 2026-10-05: A**, as written into FR-183 v0.9 and shown in the screens, by "approve", to "You can say 'approve all', or name what to change", asked of six items: the screens; the empty shelves, A (shown in the screens) or B; where pictures are kept (ADR-040); the shelf reader (ADR-041) with its starting values; the wording; and showing or hiding the team's note on rejected layout entries. The
+Task 8.8 mockups showed v0.8's FR-183 leaving the other shelves empty: the example's dry unit
+leaves its 60 cm bottom shelf empty, and all 14 units of the measurement test shop leave their
+second 120 cm shelf empty (docs/reviews/F12-screens-mockups.md). The options:
+- **A (proposed, and written into FR-183 v0.9):** spread the products down the unit by shelf
+  length. The top earners keep eye level, the shelves share the products, and each shelf's spare
+  length becomes extra facings. Each product stands in one place. Where a size is unknown, there
+  are no extra facings to fill the shelves with, so eye level first is kept.
+- **B:** keep v0.8's packing, and let extra facings stand on any shelf. Empty shelves fill with
+  more facings of the top earners, so one product can stand on two shelves.
+
+Built on the branch `feat/f12-spread-shelves` so that he could see it: the dry unit then holds two
+products at eye level and three below.
+
 ## 18. Non-Goals
 
 - A plan built from monthly reports, or from assumed demand, to show something now.
@@ -1074,6 +1228,12 @@ It also asks:
 | Protected behavior | INV-097 | — | AC-201 |
 | Protected behavior | NFR-077 | — | AC-203 |
 | Protected behavior | NFR-075 | — | AC-188 |
+| INT-006 · D-33 | FR-216, FR-217 | — | AC-206 |
+| Protected behavior | NFR-078 | — | AC-206 |
+| INT-006 | FR-183 (v0.9) | SCN-161 | AC-205 |
+| INT-006 · D-34 · D-35 | FR-180 (v0.9), FR-218, FR-219, FR-220 | — | AC-207, AC-210 |
+| INT-006 · D-34 · D-35 | FR-221, FR-222, FR-223 | — | AC-208, AC-209 |
+| Protected behavior | NFR-079 | — | AC-210 |
 
 ---
 
@@ -1099,10 +1259,10 @@ It also asks:
 
 ## 22. Unmapped PRD Acceptance Lines
 
-None. FR-178 … FR-215 cover the PRD's V4 row: shelf photographs, rules, and generating the plan.
-- Photographs enter only as the team's source for the recorded facts (§3).
-- Facing widths are an input the PRD row does not name. They come from his shelf photographs
-  (FR-180, OQ-1201).
+None. FR-178 … FR-223 cover the PRD's V4 row: shelf photographs, rules, and generating the plan.
+- Photographs enter through the shelf reader (FR-218 … FR-223).
+- Facing widths are an input the PRD row does not name. The reader measures them from his shelf
+  photographs (FR-180, D-34).
 
 ---
 

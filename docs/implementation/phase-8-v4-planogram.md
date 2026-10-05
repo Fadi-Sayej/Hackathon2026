@@ -1,11 +1,11 @@
 ---
 ID: PLAN-PHASE-8
 Title: Phase 8 — V4, F12 Planogram (F12-S1)
-Status: Approved — by the repository owner, 2026-10-04 ("yes"): Tasks 8.0–8.9, as shown, with their values. Task 8.10, added for D-32 in the same answer, was approved with F12-S1 OQ-1209 ("approve"), the same day
+Status: Approved — by the repository owner, 2026-10-04 ("yes"): Tasks 8.0–8.9, as shown, with their values. Task 8.10, added for D-32 in the same answer, was approved with F12-S1 OQ-1209 ("approve"), the same day. Tasks 8.11 and 8.12, added 2026-10-05 for F12-S1 v0.9, are Ready for review
 Owner: smartshelf-architect
 Parent: [Implementation plan](plan.md)
 Inputs: [docs/features/F12-planogram/specs/F12-S1-planogram.md (Approved 2026-10-04), ADR-037 and ADR-038 (Accepted 2026-10-04), D-32, ADR-032, ADR-035, ADR-039 (Accepted 2026-10-04), src/engine/market_boost.py, ADR-009, ADR-014, ADR-016, ADR-029, ADR-030, ADR-036, D-29, D-30, D-31, src/engine/order_evidence.py, src/engine/store_facts.py, src/engine/registry.py, src/engine/model.py, src/engine/publish.py, src/common/store.py, src/common/store_readiness.py, src/surface/compose.js, src/owner/ownerState.js, src/App.jsx, scripts/check_order_signals.py, scripts/build_order_example.py, src/lib/dataAdapters/loadOrderExample.js]
-Updated: 2026-10-04 (approved; D-32 adds Task 8.10)
+Updated: 2026-10-05 (Task 8.8's mockups approved; Tasks 8.11 and 8.12 for F12-S1 v0.9: the packing, the pictures and the shelf reader); 2026-10-04 (approved; D-32 adds Task 8.10)
 ---
 
 # Phase 8 — V4, F12 Planogram
@@ -351,6 +351,10 @@ What is shown, in Hebrew and Arabic, from Task 8.7's example:
 
 Present them, and **stop until he approves.** Record his answer with its date.
 
+**Approved 2026-10-05** ("approve"), after he asked on 2026-10-04 that the plan look like a
+printed planogram, which redrew the units from the front, and after D-33 (pictures), D-34 (the
+shelf reader) and F12-S1 v0.9 (docs/reviews/F12-screens-mockups.md).
+
 ### Task 8.9: The two pages (FR-191, FR-194, FR-195, FR-200, FR-201; NFR-074)
 
 **Files:** `src/pages/StoreLayoutPage.jsx`, `src/pages/ShelfPlanPage.jsx`, `src/App.jsx` (out of
@@ -424,6 +428,65 @@ What it does:
 - Until the team seals the example's explanation by hand, the example's builder gives the engine
   an empty snapshot, so each example fixture says its explanation has not been written (FR-215).
 
+### Task 8.11: F12-S1 v0.9's packing and pictures (FR-183 v0.9, FR-216, FR-217; AC-205, AC-206; ADR-040)
+
+**Ready for review, 2026-10-05.** Built on `feat/f12-spread-shelves` while the mockups were
+drawn, so that he could see them.
+
+**Files:** `src/engine/shelf_plan.py`, `src/engine/store_layout.py`, `src/engine/layout_facts.py`,
+`src/engine/inputs.py`, `src/engine/run.py`, `src/common/store.py`, `src/common/store_readiness.py`,
+`public/examples/shelf-plan-example.json`, and their tests.
+
+- First facings spread over the shelves by length where every size is known, eye level first.
+- A `pictures` section: files in `public/store/shelf-pictures/`, `cropped_by: reader`, checked
+  by size and first bytes. Their addresses are published.
+- `public/store/**` is store data, and `check:store` counts the pictures.
+
+**Done when:** AC-205 and AC-206 pass; the suite and `check_order_signals` pass; the example is
+rebuilt; YomYom's artefact is unchanged, because its four F12 capabilities stay `no_store_layout`.
+
+### Task 8.12: The shelf reader (FR-180 v0.9, FR-218 … FR-223; AC-207 … AC-210; NFR-079; ADR-041)
+
+**Ready for review, 2026-10-05.**
+
+**Files:**
+- `scripts/read_shelves.py` (`npm run read:shelves`);
+- `src/engine/shelf_reader/` (the request, identity, edges, width, the checks, the readings
+  file);
+- `configs/prompts/shelf_reader.v1.md`;
+- `configs/policy.yaml` (the OQ-1211 values), `src/engine/store_layout.py` (reading
+  `configs/shelf_readings.yaml` and the acceptance file);
+- `src/common/store.py` (the photos, the readings and the acceptance file as store data);
+- `requirements.txt` (Pillow);
+- `tests/fixtures/shelf_photos/`, tests.
+
+Steps:
+1. **The AI step.** Each photo, whole and in full-resolution shelf strips, goes to the pinned
+   model with the prompt, through `model_client`. The answer is checked against its schema, then
+   sealed and reused like the explanation (ADR-039's method). There is a ceiling and a time
+   budget, and print mode never asks.
+2. **Identity** (FR-220): an exact code, or a unique name at the shelf price, among products sold
+   in the last 90 days. Otherwise unknown.
+3. **Edges and width** (FR-221): the run's edges and facing boundaries are found by image
+   processing within the AI's box, then the shelf's span, then the width from the stated
+   length. The four checks follow, or the width stays unknown with its reason.
+4. **Pictures and current facings** (FR-222), written to `configs/shelf_readings.yaml`. The
+   loader reads it beside the layout file.
+5. **The acceptance gate** (FR-223): widths are used only when at least 20 hand readings are all
+   within ±5 mm. Shelf plan says when they are waiting.
+
+**Proven on drawn test shelves** under `tests/fixtures/shelf_photos/`: images the tests draw,
+with known widths, and a fake transport for the model, as the boost's tests run. They are test
+fixtures, not a store's data (D-23). The real proof is the acceptance run, on the next store's
+first photos.
+
+**Done when:**
+- AC-207 … AC-210 pass;
+- the drawn shelves' widths come back within ±5 mm, and every check's failure leaves a width
+  unknown with its reason;
+- no test touches the network;
+- YomYom's artefact is unchanged.
+
 ## Pull requests
 
 1. **Engine and record:** Tasks 8.0 … 8.5. The proof is YomYom's print-mode artefact, unchanged
@@ -432,6 +495,9 @@ What it does:
 2. **Probe and example:** Tasks 8.6 and 8.7.
 3. **Pages:** Task 8.9, after Task 8.8's approval.
 4. **Explanation:** Task 8.10. It is a pull request of its own, so it never holds up the others.
+5. **v0.9's packing and pictures, with the records:** Task 8.11, with D-33 … D-35, F12-S1 v0.9,
+   ADR-040 and ADR-041. It goes before the pages, which read its fields.
+6. **The shelf reader:** Task 8.12.
 
 ## Checkpoint 8
 

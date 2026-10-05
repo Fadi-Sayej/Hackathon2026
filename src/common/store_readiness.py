@@ -95,7 +95,7 @@ def _store_facts(path: Path) -> dict:
     return _item("store_facts", label, "present", f"{len(departments)} departments in {_rel(path)}")
 
 
-def _store_layout(path: Path) -> dict:
+def _store_layout(path: Path, pictures_dir: Optional[Path] = None) -> dict:
     label = "Shelf layout: fixtures, shelf lengths, product widths and today's facings"
     if not path.exists():
         return _item("store_layout", label, "missing",
@@ -104,7 +104,14 @@ def _store_layout(path: Path) -> dict:
     fixtures = raw.get("fixtures") if isinstance(raw, dict) else None
     if not fixtures:
         return _item("store_layout", label, "missing", f"no fixture in {_rel(path)} (ADR-037)")
-    return _item("store_layout", label, "present", f"{len(fixtures)} fixtures in {_rel(path)}")
+    # F12-S1 NFR-078, ADR-040: the pictures are optional, so they never make the layout missing.
+    from src.engine.store_layout import PICTURES_DIR
+    listed = raw.get("pictures") if isinstance(raw.get("pictures"), dict) else {}
+    folder = pictures_dir or PICTURES_DIR
+    present = sum(1 for e in listed.values() if isinstance(e, dict) and isinstance(e.get("file"), str)
+                  and "/" not in e["file"] and (folder / e["file"]).is_file())
+    return _item("store_layout", label, "present",
+                 f"{len(fixtures)} fixtures in {_rel(path)}; {len(listed)} product pictures listed, {present} present")
 
 
 def _targets(path: Path) -> list[dict]:
@@ -174,7 +181,7 @@ def _secret(key: str, label: str, name: str, secret_names: Optional[set], missin
 def readiness(store: StoreSettings, *, today: date, facts_path: Optional[Path] = None,
               targets_path: Optional[Path] = None, store_types_path: Optional[Path] = None,
               snapshots_root: Optional[Path] = None, secret_names: Optional[set] = None,
-              layout_path: Optional[Path] = None) -> list[dict]:
+              layout_path: Optional[Path] = None, pictures_dir: Optional[Path] = None) -> list[dict]:
     from src.engine.policy import load_policy
     from src.engine.store_facts import DEFAULT_PATH as FACTS_PATH
     from src.engine.store_layout import DEFAULT_PATH as LAYOUT_PATH
@@ -185,7 +192,7 @@ def readiness(store: StoreSettings, *, today: date, facts_path: Optional[Path] =
         _sales_monthly(store),
         _sales_daily(store, today, load_policy().order_freshness_days),
         _store_facts(facts_path or FACTS_PATH),
-        _store_layout(layout_path or LAYOUT_PATH),
+        _store_layout(layout_path or LAYOUT_PATH, pictures_dir),
         _client_venue(stores, targets),
         _nearby_venues(targets),
         _venue_formats(stores, snapshots_root or EXTERNAL_SNAPSHOTS_ROOT),

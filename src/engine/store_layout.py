@@ -17,6 +17,8 @@ holds four kinds of fact, and each carries who stated or measured it, and when:
       "<barcode>": {width_mm: 75, measured_by: team, measured_on: 2026-10-10}
     current:                        # what stands on the shelf today: the measurement's "before"
       "<barcode>": {fixture: <fixture>, shelf: <n>, facings: <n>, measured_by: team, measured_on: …}
+    pictures:                       # a product's front, cut by the shelf reader from his photos (D-33, D-34)
+      "<barcode>": {file: <barcode>.jpg, cropped_by: reader, cropped_on: 2026-10-10}
     rules:                          # the owner's arrangement rules, a closed set (FR-188)
       - {together: {barcodes: [...]} | {department: <department>}, stated_by: owner, stated_on: …, recorded_by: team}
       - {keep_on:  {barcode: …, fixture: …}, …}
@@ -29,12 +31,17 @@ rejected by name with its reason, and the rest are used. Nothing here estimates 
 length, or fills a missing one (D-3, INV-086). The file is store data a copy never inherits
 (ADR-036 STARTS_WITHOUT): absent, it is the missing input `no_store_layout`.
 
+A picture's file sits in the store's copy at `public/store/shelf-pictures/`, where the site
+serves it as it is (ADR-040). Only its size and first bytes are read: it feeds no figure, and
+nothing looks at what it shows (F12-S1 FR-216, D-13).
+
 A department named on two fixtures is used only as far as "keep on" rules assign its products
 between them (FR-179, FR-199). With no such rule it is rejected on both, and a product of a
 split department that no rule names is rejected by name.
 """
 from __future__ import annotations
 
+import re
 from datetime import date, datetime
 from pathlib import Path
 from typing import Iterable, Optional
@@ -45,6 +52,15 @@ from src.engine.model import norm_barcode
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_PATH = ROOT / "configs" / "store_layout.yaml"
+# ADR-040: where the store's product pictures sit, and the address the site serves them at.
+PICTURES_DIR = ROOT / "public" / "store" / "shelf-pictures"
+PICTURES_URL = "/store/shelf-pictures/"
+MAX_PICTURE_BYTES = 150 * 1024
+# A plain file name: a path is never accepted, so an entry cannot reach outside the folder.
+PICTURE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*\.(jpg|jpeg|png|webp)")
+# How each type's file begins. Checked so a renamed file of another kind is rejected, not shown broken.
+PICTURE_START = {"jpg": (b"\xff\xd8\xff",), "jpeg": (b"\xff\xd8\xff",), "png": (b"\x89PNG\r\n\x1a\n",),
+                 "webp": (b"RIFF",)}
 
 STATED = {"stated_by": "owner", "recorded_by": "team"}
 MEASURERS = ("team", "owner")
@@ -53,7 +69,8 @@ FIXTURE_KEYS = {"departments", "chilled", "eye_level_shelf", "shelves", "stated_
 SHELF_KEYS = {"length_cm", "measured_by", "measured_on"}
 WIDTH_KEYS = {"width_mm", "measured_by", "measured_on"}
 CURRENT_KEYS = {"fixture", "shelf", "facings", "measured_by", "measured_on"}
-TOP_KEYS = {"fixtures", "widths", "current", "rules"}
+PICTURE_KEYS = {"file", "cropped_by", "cropped_on"}
+TOP_KEYS = {"fixtures", "widths", "current", "pictures", "rules"}
 
 
 class _Rejected(Exception):
@@ -234,8 +251,37 @@ def _mapping(raw: dict, key: str, rejected: list) -> dict:
     return value
 
 
-def load_store_layout(path: Path | str, catalogue: Iterable[dict]) -> dict:
-    """`{fixtures, widths, current, rules, assigned, rejected}`, never raising.
+def _picture(entry, folder: Path) -> dict:
+    """FR-216: a listed file, of a type the site shows, small enough, beginning as its type says."""
+    _keys(entry, PICTURE_KEYS, "a picture")
+    _twice(entry)
+    # D-34: no one cuts pictures by hand; the shelf reader does (F12-S1 FR-216, FR-222; ADR-041).
+    if entry.get("cropped_by") != "reader":
+        raise _Rejected(f"cropped_by must be 'reader', not {entry.get('cropped_by')!r}")
+    if "cropped_on" not in entry:
+        raise _Rejected("cropped_on is missing: every picture carries the day it was cropped")
+    cropped_on = _day(entry["cropped_on"], "cropped_on")
+    name = entry.get("file")
+    match = PICTURE_NAME.fullmatch(name) if isinstance(name, str) else None
+    if not match:
+        raise _Rejected(f"file must be a plain name ending .jpg, .jpeg, .png or .webp: {name!r}")
+    file = folder / name
+    if not file.is_file():
+        raise _Rejected(f"no file {name!r} in {PICTURES_URL}")
+    size = file.stat().st_size
+    if size > MAX_PICTURE_BYTES:
+        raise _Rejected(f"{name!r} is {size // 1024} KB; a picture is at most {MAX_PICTURE_BYTES // 1024} KB")
+    kind = match.group(1)
+    with file.open("rb") as handle:
+        start = handle.read(12)
+    if not start.startswith(PICTURE_START[kind]) or (kind == "webp" and start[8:12] != b"WEBP"):
+        raise _Rejected(f"{name!r} does not begin as a .{kind} file does")
+    return {"file": name, "src": f"{PICTURES_URL}{name}?v={cropped_on}", "cropped_by": "reader",
+            "cropped_on": cropped_on}
+
+
+def load_store_layout(path: Path | str, catalogue: Iterable[dict], pictures_dir: Path | str | None = None) -> dict:
+    """`{fixtures, widths, current, pictures, rules, assigned, rejected}`, never raising.
 
     `catalogue` is the shaped products list: barcodes and departments are checked against what
     the catalogue actually prints, so a fact can only attach to a product or department that
@@ -248,7 +294,7 @@ def load_store_layout(path: Path | str, catalogue: Iterable[dict]) -> dict:
     """
     products = {p["barcode"]: p for p in catalogue or () if p.get("barcode")}
     departments = {p["department"] for p in products.values() if p.get("department")}
-    empty = {"fixtures": {}, "widths": {}, "current": {}, "rules": [], "assigned": {}}
+    empty = {"fixtures": {}, "widths": {}, "current": {}, "pictures": {}, "rules": [], "assigned": {}}
     try:
         raw = yaml.load(Path(path).read_text(encoding="utf-8"), Loader=_Loader)   # noqa: S506 — a SafeLoader
     except (yaml.YAMLError, UnicodeDecodeError) as err:
@@ -352,5 +398,21 @@ def load_store_layout(path: Path | str, catalogue: Iterable[dict]) -> dict:
         except _Rejected as err:
             rejected.append({"kind": "current", "key": str(code), "reason": str(err)})
 
-    return {"fixtures": fixtures, "widths": widths, "current": current, "rules": rules,
+    pictures = {}
+    folder = Path(pictures_dir) if pictures_dir is not None else PICTURES_DIR
+    listed = _mapping(raw, "pictures", rejected)
+    for code, entry in sorted(listed.items(), key=lambda kv: str(kv[0])):
+        if str(code) in getattr(listed, "twice", ()):
+            rejected.append({"kind": "picture", "key": str(code),
+                             "reason": "the file names this barcode twice, so neither entry is used"})
+            continue
+        try:
+            barcode = _barcode(code, products)
+            if barcode in pictures:
+                raise _Rejected("the barcode has two pictures")
+            pictures[barcode] = _picture(entry, folder)
+        except _Rejected as err:
+            rejected.append({"kind": "picture", "key": str(code), "reason": str(err)})
+
+    return {"fixtures": fixtures, "widths": widths, "current": current, "pictures": pictures, "rules": rules,
             "assigned": assigned, "rejected": rejected}

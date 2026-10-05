@@ -1236,6 +1236,8 @@ own, so their rows say so rather than grade it after the fact.
 | [ADR-037](decisions/ADR-037-shelf-layout-is-a-committed-file.md) | The shelf layout, facing widths and arrangement rules are a committed file the team records from the owner (F12-S1). Accepted 2026-10-04 | Easy: a later ADR can move widths to photographs if the vision trial succeeds |
 | [ADR-038](decisions/ADR-038-a-shelf-arrangement-is-an-outcome-on-the-fixtures-plan.md) | A shelf arrangement is the owner's `acted` outcome on that fixture's `shelf.plan` entry (F12-S1). Accepted 2026-10-04 | Easy before the first arrangement is recorded |
 | [ADR-039](decisions/ADR-039-a-shelf-explanation-is-a-pinned-models-answer-checked-and-sealed.md) | A shelf plan's explanation is a pinned model's answer, checked and sealed as the boost's is (F12-S1, D-32). Accepted 2026-10-04 | Easy: text beside the plan; no figure depends on it |
+| [ADR-040](decisions/ADR-040-a-product-picture-is-cut-from-the-stores-own-photos.md) | A product's shelf picture is a file cut from the store's own photos, kept in the store's copy and served as it is (F12-S1, D-33). Accepted 2026-10-05 | Easy: no figure depends on a picture |
+| [ADR-041](decisions/ADR-041-a-shelf-reader-reads-the-stores-photos.md) | A shelf reader reads widths, current facings and pictures from the store's own photos; its widths wait for an acceptance run (F12-S1, D-34, D-35). Accepted 2026-10-05 | Moderate: its readings share the layout file's format |
 
 ---
 
@@ -1506,7 +1508,7 @@ it needs a store to send anything. The plan that builds it is
 | FR-175 | B `NOT_YET_SHOWN` until the card is approved | Phase 5 Task 5.0's precedent | AC-170 |
 | FR-176, NFR-070, NFR-071 | R print mode over the committed snapshots | ADR-002, ADR-005 | AC-164; Checkpoint 3's budget |
 
-### F12-S1 — Planogram (V4: specified, Approved 2026-10-04; not built)
+### F12-S1 — Planogram (V4: specified, Approved 2026-10-04, v0.9 approved 2026-10-05; being built)
 
 F12-S1 builds D-30, which unlocked F12 for specification on 2026-10-03 with the plan waiting for
 daily sales the way F8 does. It adds four engine capabilities (ADR-014): `layout_facts`, which
@@ -1529,6 +1531,9 @@ Nothing is built until the owner approves the spec and its mockups.
 | FR-210 … FR-215, INV-096, INV-097, NFR-077 | E `shelf_explanation` (requires `products`, `store_layout`, `sales_daily`, `shelf_explanations`; `no_model_key`): after `shelf_plan`, the pinned model is asked once per fixture whose facts digest has no sealed explanation; the answer in three languages, checked for digits outside product names and withheld whole on failure; sealed per night and reproduced from the snapshot; per-run ceiling and time budget; U shown beside each plan as the AI's explanation; never read back | ADR-032, ADR-035, ADR-039; D-16, D-32 | AC-199 … AC-203 |
 | FR-200 | U the marked example on Shelf plan while `shelf_plan` is unavailable, for any reason; nothing reads it | D-31, after D-29 | AC-189 |
 | NFR-072, NFR-073, NFR-076 | R print mode, with the bootstrap's seed fixed; no step growing with market history; no past artefact read | ADR-002 | Checkpoint of its phase |
+| FR-183 (v0.9) | E `shelf_plan`: first facings spread over the shelves by length where every size is known, eye level first; else the first shelf with room | OQ-1210, answered A | AC-205 |
+| FR-216, FR-217, NFR-078 | I product pictures in the store's copy at `public/store/shelf-pictures/`, listed with provenance, checked by size and first bytes; E `layout_facts` and `shelf_plan` publish addresses | ADR-040, ADR-036 | AC-206 |
+| FR-180 (v0.9), FR-218 … FR-223, NFR-079 | R the shelf reader, on demand: the AI reads photos and tags (sealed), identity by exact code or unique name at the shelf price, image processing finds edges, four checks; readings in `configs/shelf_readings.yaml`; widths used only after the acceptance run | ADR-041, ADR-039's method | AC-207 … AC-210 |
 
 ### Cross-cutting decisions
 
