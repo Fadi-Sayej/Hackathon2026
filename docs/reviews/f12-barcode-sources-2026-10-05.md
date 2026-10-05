@@ -1,7 +1,7 @@
 ---
 ID: F12-BARCODE-SOURCES
 Title: Where a product's pack width could come from, by barcode — the half-day check D-34 asked for
-Status: Ready for review — findings for the repository owner
+Status: Closed — D-35 (2026-10-05): GS1 Israel is not contacted
 Owner: smartshelf-engineer
 Parent: [D-34](../product/intent-register.md#3-decisions-already-made-by-the-intent-layer)
 Inputs: [D-3, D-23, D-33, D-34, data/internal/raw_pos/yomyom/sales/*.csv, data/external/snapshots/2026-10-04/, https://www.gs1il.org/, https://world.openfoodfacts.org/]
@@ -80,3 +80,6 @@ Its images are not usable for D-33 either way: D-34 allows only the store's own 
 Contacting GS1 Israel is outward-facing, and it is the repository owner's to do or to approve:
 the four questions are which fields the catalogue holds, what share of these 1,778 barcodes it
 covers, what access costs, and whether its figures may be stored and published in the app.
+
+**Answered 2026-10-05 (D-35):** "i am not going to ask these or contact gs1". The shelf reader
+measures every width from the store's own photos, as point 4 above describes.

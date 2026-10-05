@@ -93,3 +93,7 @@ but not manual". A council of five advisors recommended a shelf reader, put to h
 questions, and he answered "3 no but everything else yes". That is **D-34**: a shelf reader, not
 people, reads the widths and cuts the pictures from the store's own photos, within ±5 mm per
 product, with no printed card on the shelves. It supersedes D-33's "cropped by the team".
+
+A check of barcode databases found none we can reach that holds a pack width. Asked whether to
+draft an inquiry to GS1 Israel, the one likely source, he said "i am not going to ask these or
+contact gs1". That is **D-35**: the reader measures every width from the store's own photos.
