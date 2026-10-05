@@ -1,14 +1,14 @@
 ---
 ID: F12-S1
 Title: Planogram — a dated shelf plan from his own sales, waiting for them until they arrive
-Status: Approved — by the repository owner, 2026-10-04
+Status: Ready for review — v0.9 revises FR-183 (OQ-1210); v0.8 was approved by the repository owner on 2026-10-04
 Owner: smartshelf-architect
-Version: 0.8 (2026-10-04: D-32, the AI's explanation of each fixture's plan; FR-210 … FR-215 approved as OQ-1209)
+Version: 0.9 (2026-10-05: FR-183 revised, because the mockups showed the v0.8 rule leaving shelves empty; AC-205, OQ-1210). 0.8 (2026-10-04: D-32, the AI's explanation of each fixture's plan; FR-210 … FR-215 approved as OQ-1209)
 Parent: [F12 — Planogram](../intent.md)
 Related Intents: INT-006
 Inputs: [docs/features/F12-planogram/intent.md (Approved for specification, D-30), docs/product/PRD.md (§5 V4, §6 #7), docs/product/intent-register.md (D-1, D-3, D-13, D-14, D-15, D-16, D-22, D-23, D-28, D-29, D-30, D-31, D-32), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (§5 "He stocks", FR-143 … FR-146, FR-156), ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011, ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037, ADR-038, ADR-039, CLAUDE.md]
 Answered by: [System Design](../../../architecture/system-design.md) §21 (F12-S1)
-Updated: 2026-10-04 (D-32's explanation approved, OQ-1209; earlier the same day, approved with OQ-1208, and OQ-1204 and OQ-1207 answered with the plan)
+Updated: 2026-10-05 (v0.9: FR-183 revised, OQ-1210, awaiting the repository owner). 2026-10-04 (D-32's explanation approved, OQ-1209; earlier the same day, approved with OQ-1208, and OQ-1204 and OQ-1207 answered with the plan)
 ---
 
 # F12-S1 — Planogram
@@ -20,10 +20,15 @@ Updated: 2026-10-04 (D-32's explanation approved, OQ-1209; earlier the same day,
 >
 > **FR-210 … FR-215 specify D-32**, the AI's explanation of each fixture's plan, which the owner
 > asked for on 2026-10-04. He approved them the same day (OQ-1209).
+>
+> **v0.9 (2026-10-05) is awaiting his approval.** The Task 8.8 mockups showed that v0.8's FR-183
+> leaves a unit's other shelves empty when its products fit at eye level: 15 of 33 shelves across
+> the two test shops (docs/reviews/F12-screens-mockups.md). v0.9 revises FR-183 and adds AC-205.
+> OQ-1210 puts the choice to him. Everything else is as approved.
 
 > **Identifier note.** Every `FR-`, `INV-`, `NFR-`, `AC-`, `SCN-`, `C-`, `ASM-` and `OQ-` id
 > below is new and globally unique: FR-178 … FR-215, INV-084 … INV-097, NFR-072 … NFR-077,
-> AC-172 … AC-204, SCN-159 … SCN-177, C-73 … C-75, ASM-073 … ASM-083, OQ-1201 … OQ-1209.
+> AC-172 … AC-205, SCN-159 … SCN-177, C-73 … C-75, ASM-073 … ASM-083, OQ-1201 … OQ-1210.
 
 Implements intent F12. Bound by ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011,
 ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037,
@@ -180,11 +185,28 @@ products.
 nothing: which products he keeps is his and F4's question, and D-14 forbids a figure that depends
 on automatic withdrawal.
 
-**FR-183** — First facings are packed shelf by shelf, each product on the first shelf in this
-order with room for it **(decided here)**:
-1. products whose earnings per centimetre is known, highest first, on the eye-level shelf first
-   and then the other shelves in the order recorded;
+**FR-183** — First facings are placed in this order of products **(decided here)**:
+1. products whose earnings per centimetre is known, highest first;
 2. then products whose earnings per centimetre is unknown, by barcode.
+
+The shelves are taken eye level first, then the others in the order recorded. **(v0.9, OQ-1210)**
+Where every planned product's size is known, the first facings are spread over the shelves in
+proportion to their lengths:
+- each shelf's share is the fixture's total first-facing width × the shelf's length ÷ the
+  fixture's total shelf length;
+- a shelf takes the next product while the shelf is empty, or while the product keeps it within its
+  share. Then the next shelf takes over, and the last shelf takes the rest;
+- a product with no room on its shelf goes on the first shelf, in that order, with room.
+
+Each shelf's spare length then becomes extra facings (FR-185). So the shelves share the products in
+proportion to their lengths, and the top earners still stand at eye level. A shelf can still be
+left empty when there are fewer products than shelves, or when the products before it already
+took more than their shares.
+
+Where a product of unknown size stands on the fixture, no spare length is known to be free, and
+there are no extra facings (FR-186). Spreading would then only move top earners off eye level into
+space that nothing fills. So each product goes on the first shelf, in that order, with room for it,
+as in v0.8.
 
 Eye level goes to what his own sales show earns most. A product whose earnings are unknown is
 never ranked for it (D-3).
@@ -767,8 +789,8 @@ and both pages say the measurements have not been recorded. *(FR-191, FR-193, FR
 shows every recorded fixture with its dates. `shelf_plan` is `unavailable` (`no_daily_sales`), and
 Shelf plan shows no plan. *(FR-190, FR-193, FR-194; D-30)*
 
-**AC-174** — With a window, every planned product with a width gets one facing, packed shelf by
-shelf, eye level first by earnings per centimetre, and the remaining length goes by FR-185.
+**AC-174** — With a window, every planned product with a width gets one facing, placed eye level
+first by earnings per centimetre, and the remaining length goes by FR-185.
 *(FR-182, FR-183, FR-185)*
 
 **AC-175** — A product without a width is never placed, is named under "no width", and its fixture
@@ -885,6 +907,11 @@ say they have no explanation tonight. *(FR-213, FR-214, NFR-077)*
 **AC-204** — The request for a fixture asks for FR-210's four parts. Shelf plan shows the answer
 beside that fixture's plan, under its label and in the page's language, or the reason it has
 none, in his words. *(FR-210, FR-215)*
+
+**AC-205** — On a fixture whose every planned size is known, a shelf takes products in the earnings
+order while it is empty or within its FR-183 share, eye level first. So two equal shelves and six
+equal products put three on each, the top three at eye level. Where a size is unknown, each
+product is on the first shelf with room, eye level first. *(FR-183, v0.9)*
 
 ## 16. Assumptions
 
@@ -1031,6 +1058,21 @@ It also asks:
 - the monthly spend limit and its alert are his to set on the account (D-16);
 - the example's explanation is asked once, by the team, with his key: one request for each of
   the example's fixtures, about five, which costs a few cents at ADR-039's estimate. · owner: the repository owner · blocks: nothing now.
+
+**OQ-1210** — How should the plan use a unit's shelves when its products fit at eye level? The
+Task 8.8 mockups showed v0.8's FR-183 leaving the other shelves empty: the example's dry unit
+leaves its 60 cm bottom shelf empty, and all 14 units of the measurement test shop leave their
+second 120 cm shelf empty (docs/reviews/F12-screens-mockups.md). The options:
+- **A (proposed, and written into FR-183 v0.9):** spread the products down the unit by shelf
+  length. The top earners keep eye level, the shelves share the products, and each shelf's spare
+  length becomes extra facings. Each product stands in one place. Where a size is unknown, there
+  are no extra facings to fill the shelves with, so eye level first is kept.
+- **B:** keep v0.8's packing, and let extra facings stand on any shelf. Empty shelves fill with
+  more facings of the top earners, so one product can stand on two shelves.
+
+Built on the branch `feat/f12-spread-shelves` so that he can see it: the dry unit then holds two
+products at eye level and three below. Nothing is merged until he answers. · owner: the
+repository owner · blocks: Task 8.9.
 
 ## 18. Non-Goals
 
