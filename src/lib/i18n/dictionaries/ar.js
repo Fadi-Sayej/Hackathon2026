@@ -673,6 +673,9 @@ export const ar = {
   'layout.allPictured': "لكل المنتجات صورها.",
   'layout.rejected.kind.picture': "صورة منتج",
   'shelf.pictures.missing': "كل صورة مقصوصة من صور رفوفك. المربع المرقّم يعني أن صورة ذلك المنتج لم تُلتقط بعد.",
+  // F12-S1 FR-223 (D-34): the reader's widths, read but waiting for their acceptance run.
+  // Approved by the repository owner on 2026-10-06 ("yes").
+  'layout.reader.waiting': "قرأ قارئ الرفوف {n} عرضًا من صورك في {date}. تُستخدم بعد أن ينجح فحصه: {min} منتجًا قيست باليد، كل منها ضمن {tol} مم من العرض الذي قرأه. حتى الآن: {within} من {listed}.",
   'layout.rejected.teamNote': "ملاحظة للفريق:",
   'shelf.rule.together': "إبقاؤها معًا على رف واحد: {names}",
   'shelf.rule.togetherDepartment': "إبقاء قسم {department} معًا على رف واحد",

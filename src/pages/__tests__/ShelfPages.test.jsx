@@ -212,3 +212,41 @@ describe('Shelf plan, filled (F12-S1 FR-194, FR-201, FR-215, FR-217)', () => {
     expect(figure.textContent).toContain('Check for earlier trends: passed.')
   })
 })
+
+describe('The shelf reader\'s widths, waiting for their acceptance run (F12-S1 FR-223)', () => {
+  const reader = (status) => ({ status, read_on: '2026-10-10', widths: 42,
+    acceptance: { listed: 7, within: 6, minimum: 20, tolerance_mm: 5 } })
+  const SENTENCE = 'The shelf reader read 42 widths from your photos on 10 Oct. They are used once its check passes: '
+    + '20 products measured by hand, each within 5 mm of the reader\'s width. So far: 6 of 7.'
+
+  it('says so at the top of Store layout and under the plan\'s conditions on Shelf plan', () => {
+    const art = filled((c) => { c.layout_facts.reader = reader('waiting_for_acceptance') })
+    renderWithI18n(<StoreLayoutPage artefact={art} catalogue={EXAMPLE.catalogue} />, { language: 'en' })
+    expect(document.querySelector('[data-reader="waiting_for_acceptance"]').textContent).toBe(SENTENCE)
+    cleanup()
+    renderWithI18n(<ShelfPlanPage artefact={art} ownerState={{ outcomes: {} }} catalogue={EXAMPLE.catalogue} />, { language: 'en' })
+    const sentence = document.querySelector('[data-reader="waiting_for_acceptance"]')
+    expect(sentence.textContent).toBe(SENTENCE)
+    expect(sentence.previousElementSibling.dataset.elasticity).toBeTruthy()
+  })
+
+  it('says nothing once the run has passed, or before anything was read', () => {
+    for (const status of ['accepted', 'no_readings']) {
+      const art = filled((c) => { c.layout_facts.reader = reader(status) })
+      renderWithI18n(<StoreLayoutPage artefact={art} catalogue={EXAMPLE.catalogue} />, { language: 'en' })
+      expect(document.querySelector('[data-reader]')).toBeNull()
+      cleanup()
+    }
+  })
+
+  it('reads in Hebrew and Arabic, with no key left showing', () => {
+    const art = filled((c) => { c.layout_facts.reader = reader('waiting_for_acceptance') })
+    for (const language of ['he', 'ar']) {
+      renderWithI18n(<StoreLayoutPage artefact={art} catalogue={EXAMPLE.catalogue} />, { language })
+      const text = document.querySelector('[data-reader]').textContent
+      expect(text).not.toMatch(/layout\.reader|\{/)
+      expect(text).toContain('42')
+      cleanup()
+    }
+  })
+})
