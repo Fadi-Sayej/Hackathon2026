@@ -614,7 +614,7 @@ reachable afterwards.
 > `barcode_matches.parquet`.
 >
 > **Kept, and why.** `build_velocity_from_snapshots.py` has its own npm script,
-> `data:velocity`. `build_expiry_report.py` is the README's command for the expiry report,
+> `data:velocity`. *(Removed on 2026-10-06, with velocity.py's writer: it wrote into `yomyom_sales.parquet`, which Task 0.6 deleted.)* `build_expiry_report.py` is the README's command for the expiry report,
 > whose module §20.1 keeps for V2. `smoke_test_pipeline.py` keeps its two live checks, the
 > expiry report and the snapshot comparison. Its `sources.json` check had been failing since
 > that file was retired on 2026-09-13, unnoticed, because CI never runs it.
