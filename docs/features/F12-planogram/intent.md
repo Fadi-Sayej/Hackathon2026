@@ -97,3 +97,9 @@ product, with no printed card on the shelves. It supersedes D-33's "cropped by t
 A check of barcode databases found none we can reach that holds a pack width. Asked whether to
 draft an inquiry to GS1 Israel, the one likely source, he said "i am not going to ask these or
 contact gs1". That is **D-35**: the reader measures every width from the store's own photos.
+
+Asked what happens when a shelf has no tags under the products, and offered three ways, he chose
+"a" on 2026-10-06: **D-36**. Where there is no tag, the AI reads the brand, name and size printed
+on the package's front, matched only against the products sold recently in that unit's
+departments, as the single match, with any printed size agreeing with the POS name; anything
+else stays unknown.
