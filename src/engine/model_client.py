@@ -50,8 +50,12 @@ def urllib_transport(url: str, headers: dict, body: bytes, timeout: float) -> Tu
         return err.code, err.read()
 
 
-def ask(payload: dict, *, model: str, key: str, transport: Transport, max_tokens: int) -> str:
-    """One Messages API call, with one retry for a transport failure, a 429 or a 5xx."""
+def ask(payload: dict, *, model: str, key: str, transport: Transport, max_tokens: int,
+        timeout: float = TIMEOUT_S) -> str:
+    """One Messages API call, with one retry for a transport failure, a 429 or a 5xx.
+
+    `payload["user"]` is the message's content: a string, or a list of content blocks, so the
+    shelf reader can send a photo's images beside its text (ADR-041)."""
     body = json.dumps({"model": model, "max_tokens": max_tokens, "system": payload["system"],
                        "messages": [{"role": "user", "content": payload["user"]}]},
                       ensure_ascii=False).encode("utf-8")
@@ -59,7 +63,7 @@ def ask(payload: dict, *, model: str, key: str, transport: Transport, max_tokens
     last = "no attempt"
     for attempt in range(2):
         try:
-            status, raw = transport(API_URL, headers, body, TIMEOUT_S)
+            status, raw = transport(API_URL, headers, body, timeout)
         except Exception as err:  # noqa: BLE001 — any transport failure is "no answer"
             last = f"{type(err).__name__}: {err}"
         else:

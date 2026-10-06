@@ -24,6 +24,10 @@ httpx>=0.27
 beautifulsoup4>=4.12
 lxml>=5.0
 
+# Imaging: the shelf reader reads a store's shelf photos and cuts each product's picture
+# (F12-S1 FR-218 … FR-222, ADR-041 Decision 11)
+Pillow>=10.0
+
 # Firestore writer (Python admin SDK) + .env loader
 firebase-admin>=6.5
 python-dotenv>=1.0

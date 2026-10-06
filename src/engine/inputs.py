@@ -19,7 +19,9 @@ from src.engine.policy import Policy
 from src.internal_pos.pos_importer import read_pos_vintage
 from src.engine.stock_date import usable_stock_date
 from src.engine.store_facts import DEFAULT_PATH as STORE_FACTS_PATH, load_store_facts
-from src.engine.store_layout import DEFAULT_PATH as STORE_LAYOUT_PATH, PICTURES_DIR as SHELF_PICTURES_DIR, load_store_layout
+from src.engine.store_layout import (ACCEPTANCE_PATH as SHELF_ACCEPTANCE_PATH, DEFAULT_PATH as STORE_LAYOUT_PATH,
+                                     PICTURES_DIR as SHELF_PICTURES_DIR, READINGS_PATH as SHELF_READINGS_PATH,
+                                     load_store_layout, merge_readings)
 from src.market.presence import DELIVERY_CATALOG, load_presence
 from src.market.listed_prices import snapshot_price_reader
 from src.market.recent import recent_market
@@ -315,6 +317,8 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
                 store_facts_path: Path = STORE_FACTS_PATH,
                 store_layout_path: Path = STORE_LAYOUT_PATH,
                 shelf_pictures_dir: Path = SHELF_PICTURES_DIR,
+                shelf_readings_path: Optional[Path] = None,
+                shelf_acceptance_path: Optional[Path] = None,
                 snapshots_root: Path = EXTERNAL_SNAPSHOTS_ROOT) -> EngineInputs:
     stores = stores or load_store_types()
     products_raw = _rows(silver_dir / PRODUCTS_TABLE)
@@ -329,6 +333,17 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
     # without the file (STARTS_WITHOUT), and an absent file is the missing input no_store_layout.
     store_layout = (load_store_layout(store_layout_path, products or [], shelf_pictures_dir)
                     if Path(store_layout_path).exists() else None)
+    # ADR-041: the shelf reader's widths, current facings and pictures, its widths only once its
+    # acceptance run has passed (F12-S1 FR-222, FR-223).
+    # Beside the layout file they belong to, unless named: a test world's layout never reads a
+    # store's readings, and a store's readings never meet another layout.
+    folder = Path(store_layout_path).parent
+    store_layout = merge_readings(store_layout, products or [],
+                                  readings_path=shelf_readings_path or folder / SHELF_READINGS_PATH.name,
+                                  acceptance_path=shelf_acceptance_path or folder / SHELF_ACCEPTANCE_PATH.name,
+                                  pictures_dir=shelf_pictures_dir,
+                                  tolerance_mm=policy.shelf_reader_tolerance_mm,
+                                  minimum=policy.shelf_reader_acceptance_min)
     # ADR-039 Decision 5: read like the boost's picks, from the night the plan is dated (the run's).
     from src.engine.shelf_explanation import read as read_explanations   # local: it imports this module
     shelf_explanations = read_explanations(snapshots_root, run_at.date().isoformat())

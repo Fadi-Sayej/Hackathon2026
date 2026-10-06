@@ -126,6 +126,17 @@
     "id": "layout_facts",
     "notes": [],
     "pictures": {},
+    "reader": {
+     "acceptance": {
+      "listed": 0,
+      "minimum": 20,
+      "tolerance_mm": 5,
+      "within": 0
+     },
+     "read_on": null,
+     "status": "no_readings",
+     "widths": 0
+    },
     "rejected": [
      {
       "key": "7299999",
