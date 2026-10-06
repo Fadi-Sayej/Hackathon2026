@@ -67,6 +67,8 @@ def run(inputs) -> CapabilityOutput:
         extras={"fixtures": fixtures, "fixture_order": list(fixtures), "departments_on_no_fixture": no_fixture,
                 "without_width": without_width, "without_width_counts": "planned" if window is not None else "catalogue",
                 "without_picture": without_picture,
+                # F12-S1 FR-223: whether the shelf reader's widths are used yet, and why not.
+                "reader": layout.get("reader"),
                 # ADR-040 Decision 4: an address and its date, never the picture itself.
                 "pictures": {b: {"src": pictures[b]["src"], "cropped_on": pictures[b]["cropped_on"]}
                              for b in sorted(pictures) if any(b in pop[n] for n in pop)},

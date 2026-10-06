@@ -86,6 +86,16 @@ class Policy:
     shelf_explanation_time_budget_s: int
     shelf_explanation_max_chars: int
     shelf_explanation_max_tokens: int
+    # F12-S1 FR-218 … FR-223 (D-34, OQ-1211 approved 2026-10-05; ADR-041). The reader runs on its
+    # own, not in the nightly, so these are not published with the artefact's thresholds.
+    shelf_reader_prompt: str
+    shelf_reader_candidate_window_days: int
+    shelf_reader_tolerance_mm: int
+    shelf_reader_acceptance_min: int
+    shelf_reader_request_ceiling: int
+    shelf_reader_time_budget_s: int
+    shelf_reader_timeout_s: int
+    shelf_reader_max_tokens: int
 
     def as_dict(self) -> dict:
         """The artefact's `thresholds` block, grouped as design §11.4 defines it.
@@ -272,6 +282,14 @@ def load_policy(path: Path | str | None = None) -> Policy:
         shelf_explanation_time_budget_s=_required(raw, "shelf", "explanation_time_budget_s", int),
         shelf_explanation_max_chars=_required(raw, "shelf", "explanation_max_chars", int),
         shelf_explanation_max_tokens=_required(raw, "shelf", "explanation_max_tokens", int),
+        shelf_reader_prompt=_required(raw, "shelf", "reader_prompt", str),
+        shelf_reader_candidate_window_days=_required(raw, "shelf", "reader_candidate_window_days", int),
+        shelf_reader_tolerance_mm=_required(raw, "shelf", "reader_tolerance_mm", int),
+        shelf_reader_acceptance_min=_required(raw, "shelf", "reader_acceptance_min", int),
+        shelf_reader_request_ceiling=_required(raw, "shelf", "reader_request_ceiling", int),
+        shelf_reader_time_budget_s=_required(raw, "shelf", "reader_time_budget_s", int),
+        shelf_reader_timeout_s=_required(raw, "shelf", "reader_timeout_s", int),
+        shelf_reader_max_tokens=_required(raw, "shelf", "reader_max_tokens", int),
     )
     if policy.withdraw_with_stock:
         raise ValueError(

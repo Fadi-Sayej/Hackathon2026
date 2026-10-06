@@ -1,7 +1,7 @@
 ---
 ID: PLAN-PHASE-8
 Title: Phase 8 — V4, F12 Planogram (F12-S1)
-Status: Approved — by the repository owner, 2026-10-04 ("yes"): Tasks 8.0–8.9, as shown, with their values. Task 8.10, added for D-32 in the same answer, was approved with F12-S1 OQ-1209 ("approve"), the same day. Tasks 8.11 and 8.12, added 2026-10-05 for F12-S1 v0.9, are Ready for review
+Status: Approved — by the repository owner, 2026-10-04 ("yes"): Tasks 8.0–8.9, as shown, with their values. Task 8.10, added for D-32 in the same answer, was approved with F12-S1 OQ-1209 ("approve"), the same day. Tasks 8.11 and 8.12, added 2026-10-05 for F12-S1 v0.9: Task 8.11 merged in #288 on v0.9's approval; Task 8.12 approved 2026-10-06 ("ok", to "Shall I start building it?")
 Owner: smartshelf-architect
 Parent: [Implementation plan](plan.md)
 Inputs: [docs/features/F12-planogram/specs/F12-S1-planogram.md (Approved 2026-10-04), ADR-037 and ADR-038 (Accepted 2026-10-04), D-32, ADR-032, ADR-035, ADR-039 (Accepted 2026-10-04), src/engine/market_boost.py, ADR-009, ADR-014, ADR-016, ADR-029, ADR-030, ADR-036, D-29, D-30, D-31, src/engine/order_evidence.py, src/engine/store_facts.py, src/engine/registry.py, src/engine/model.py, src/engine/publish.py, src/common/store.py, src/common/store_readiness.py, src/surface/compose.js, src/owner/ownerState.js, src/App.jsx, scripts/check_order_signals.py, scripts/build_order_example.py, src/lib/dataAdapters/loadOrderExample.js]
@@ -430,8 +430,8 @@ What it does:
 
 ### Task 8.11: F12-S1 v0.9's packing and pictures (FR-183 v0.9, FR-216, FR-217; AC-205, AC-206; ADR-040)
 
-**Ready for review, 2026-10-05.** Built on `feat/f12-spread-shelves` while the mockups were
-drawn, so that he could see them.
+**Merged in #288 (2026-10-05)**, on F12-S1 v0.9's approval. Built on `feat/f12-spread-shelves`
+while the mockups were drawn, so that he could see them.
 
 **Files:** `src/engine/shelf_plan.py`, `src/engine/store_layout.py`, `src/engine/layout_facts.py`,
 `src/engine/inputs.py`, `src/engine/run.py`, `src/common/store.py`, `src/common/store_readiness.py`,
@@ -447,7 +447,7 @@ rebuilt; YomYom's artefact is unchanged, because its four F12 capabilities stay 
 
 ### Task 8.12: The shelf reader (FR-180 v0.9, FR-218 … FR-223; AC-207 … AC-210; NFR-079; ADR-041)
 
-**Ready for review, 2026-10-05.**
+**Approved 2026-10-06** ("ok", to "Shall I start building it?").
 
 **Files:**
 - `scripts/read_shelves.py` (`npm run read:shelves`);

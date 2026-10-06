@@ -156,3 +156,13 @@ shelf:
   explanation_time_budget_s: 300    # checked before each request; the step ends within ~300 + 61 s
   explanation_max_chars: 600        # a language
   explanation_max_tokens: 1200      # three languages; the boost's 300 would cut them off
+  # F12-S1 FR-218 … FR-223 (D-34, D-35; ADR-041): the shelf reader, run when photos arrive, never
+  # in the nightly. OQ-1211's values, approved 2026-10-05 as provisional. The model is the boost's.
+  reader_prompt: configs/prompts/shelf_reader.v1.md
+  reader_candidate_window_days: 90  # products sold in this window are the only ones a tag can name
+  reader_tolerance_mm: 5            # D-34: the owner's ±5 mm per product
+  reader_acceptance_min: 20         # hand readings, every one within the tolerance, before widths are used
+  reader_request_ceiling: 60        # a reading
+  reader_time_budget_s: 600         # a reading; checked before each request
+  reader_timeout_s: 120             # one request with a dozen images takes longer than a text one
+  reader_max_tokens: 4000           # a unit's shelves, runs and tags as JSON

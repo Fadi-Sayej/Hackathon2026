@@ -187,6 +187,10 @@ STARTS_WITHOUT = (
     "configs/store_layout.yaml",
     # ADR-040, F12-S1 NFR-078: that store's product pictures, cropped from its own shelf photos.
     "public/store/**",
+    # ADR-041: what the shelf reader read from that store's photos, and its acceptance run's hand
+    # readings. The photos themselves are under data/internal/**, above.
+    "configs/shelf_readings.yaml",
+    "configs/shelf_reader_acceptance.yaml",
     "samples/**",
 )
 KEPT_IN_EVERY_COPY = ("docs/pilot/next-store.md",)

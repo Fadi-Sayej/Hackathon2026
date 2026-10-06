@@ -146,9 +146,10 @@ def _stated(entry: dict) -> dict:
     return {"stated_by": "owner", "stated_on": _day(entry["stated_on"], "stated_on"), "recorded_by": "team"}
 
 
-def _measured(entry: dict) -> dict:
-    if entry.get("measured_by") not in MEASURERS:
-        raise _Rejected(f"measured_by must be one of {list(MEASURERS)}, not {entry.get('measured_by')!r}")
+def _measured(entry: dict, measurers: tuple = None) -> dict:
+    measurers = measurers or MEASURERS
+    if entry.get("measured_by") not in measurers:
+        raise _Rejected(f"measured_by must be one of {list(measurers)}, not {entry.get('measured_by')!r}")
     if "measured_on" not in entry:
         raise _Rejected("measured_on is missing: every measurement carries the day it was taken")
     return {"measured_by": entry["measured_by"], "measured_on": _day(entry["measured_on"], "measured_on")}
@@ -280,6 +281,71 @@ def _picture(entry, folder: Path) -> dict:
             "cropped_on": cropped_on}
 
 
+def _twice_named(listed, code, kind: str, rejected: list) -> bool:
+    if str(code) in getattr(listed, "twice", ()):
+        rejected.append({"kind": kind, "key": str(code),
+                         "reason": "the file names this barcode twice, so neither entry is used"})
+        return True
+    return False
+
+
+def _widths(listed, products: dict, rejected: list, measurers: tuple) -> dict:
+    widths = {}
+    for code, entry in sorted(listed.items(), key=lambda kv: str(kv[0])):
+        if _twice_named(listed, code, "width", rejected):
+            continue
+        try:
+            barcode = _barcode(code, products)
+            if barcode in widths:
+                raise _Rejected("the barcode has two widths")
+            _keys(entry, WIDTH_KEYS, "a width")
+            _twice(entry)
+            widths[barcode] = {"width_mm": _positive(entry.get("width_mm"), "width_mm"), **_measured(entry, measurers)}
+        except _Rejected as err:
+            rejected.append({"kind": "width", "key": str(code), "reason": str(err)})
+    return widths
+
+
+def _currents(listed, products: dict, fixtures: dict, rejected: list, measurers: tuple) -> dict:
+    current = {}
+    for code, entry in sorted(listed.items(), key=lambda kv: str(kv[0])):
+        if _twice_named(listed, code, "current", rejected):
+            continue
+        try:
+            barcode = _barcode(code, products)
+            _keys(entry, CURRENT_KEYS, "a current placement")
+            _twice(entry)
+            fixture = str(entry.get("fixture"))
+            if fixture not in fixtures:
+                raise _Rejected(f"no recorded fixture is named {entry.get('fixture')!r}")
+            shelf = entry.get("shelf")
+            if not _whole(shelf) or not 1 <= shelf <= len(fixtures[fixture]["shelves"]):
+                raise _Rejected(f"shelf must be 1 to {len(fixtures[fixture]['shelves'])} on {fixture}: {shelf!r}")
+            facings = entry.get("facings")
+            # 0 is a statement: on no shelf today. FR-205 leaves such a product out of the estimate.
+            if not _whole(facings) or facings < 0:
+                raise _Rejected(f"facings must be a whole number, 0 or more: {facings!r}")
+            current[barcode] = {"fixture": fixture, "shelf": shelf, "facings": facings, **_measured(entry, measurers)}
+        except _Rejected as err:
+            rejected.append({"kind": "current", "key": str(code), "reason": str(err)})
+    return current
+
+
+def _pictures(listed, products: dict, rejected: list, folder: Path) -> dict:
+    pictures = {}
+    for code, entry in sorted(listed.items(), key=lambda kv: str(kv[0])):
+        if _twice_named(listed, code, "picture", rejected):
+            continue
+        try:
+            barcode = _barcode(code, products)
+            if barcode in pictures:
+                raise _Rejected("the barcode has two pictures")
+            pictures[barcode] = _picture(entry, folder)
+        except _Rejected as err:
+            rejected.append({"kind": "picture", "key": str(code), "reason": str(err)})
+    return pictures
+
+
 def load_store_layout(path: Path | str, catalogue: Iterable[dict], pictures_dir: Path | str | None = None) -> dict:
     """`{fixtures, widths, current, pictures, rules, assigned, rejected}`, never raising.
 
@@ -321,22 +387,7 @@ def load_store_layout(path: Path | str, catalogue: Iterable[dict], pictures_dir:
         except _Rejected as err:
             rejected.append({"kind": "fixture", "key": str(name), "reason": str(err)})
 
-    widths = {}
-    listed = _mapping(raw, "widths", rejected)
-    for code, entry in sorted(listed.items(), key=lambda kv: str(kv[0])):
-        if str(code) in getattr(listed, "twice", ()):
-            rejected.append({"kind": "width", "key": str(code),
-                             "reason": "the file names this barcode twice, so neither entry is used"})
-            continue
-        try:
-            barcode = _barcode(code, products)
-            if barcode in widths:
-                raise _Rejected("the barcode has two widths")
-            _keys(entry, WIDTH_KEYS, "a width")
-            _twice(entry)
-            widths[barcode] = {"width_mm": _positive(entry.get("width_mm"), "width_mm"), **_measured(entry)}
-        except _Rejected as err:
-            rejected.append({"kind": "width", "key": str(code), "reason": str(err)})
+    widths = _widths(_mapping(raw, "widths", rejected), products, rejected, MEASURERS)
 
     rules = []
     listed_rules = raw.get("rules") or []
@@ -373,46 +424,80 @@ def load_store_layout(path: Path | str, catalogue: Iterable[dict], pictures_dir:
                              "reason": f"its department {dept!r} is split across {', '.join(names)}, "
                                        "and no keep_on rule names it"})
 
-    current = {}
-    listed = _mapping(raw, "current", rejected)
-    for code, entry in sorted(listed.items(), key=lambda kv: str(kv[0])):
-        if str(code) in getattr(listed, "twice", ()):
-            rejected.append({"kind": "current", "key": str(code),
-                             "reason": "the file names this barcode twice, so neither entry is used"})
-            continue
-        try:
-            barcode = _barcode(code, products)
-            _keys(entry, CURRENT_KEYS, "a current placement")
-            _twice(entry)
-            fixture = str(entry.get("fixture"))
-            if fixture not in fixtures:
-                raise _Rejected(f"no recorded fixture is named {entry.get('fixture')!r}")
-            shelf = entry.get("shelf")
-            if not _whole(shelf) or not 1 <= shelf <= len(fixtures[fixture]["shelves"]):
-                raise _Rejected(f"shelf must be 1 to {len(fixtures[fixture]['shelves'])} on {fixture}: {shelf!r}")
-            facings = entry.get("facings")
-            # 0 is a statement: on no shelf today. FR-205 leaves such a product out of the estimate.
-            if not _whole(facings) or facings < 0:
-                raise _Rejected(f"facings must be a whole number, 0 or more: {facings!r}")
-            current[barcode] = {"fixture": fixture, "shelf": shelf, "facings": facings, **_measured(entry)}
-        except _Rejected as err:
-            rejected.append({"kind": "current", "key": str(code), "reason": str(err)})
-
-    pictures = {}
-    folder = Path(pictures_dir) if pictures_dir is not None else PICTURES_DIR
-    listed = _mapping(raw, "pictures", rejected)
-    for code, entry in sorted(listed.items(), key=lambda kv: str(kv[0])):
-        if str(code) in getattr(listed, "twice", ()):
-            rejected.append({"kind": "picture", "key": str(code),
-                             "reason": "the file names this barcode twice, so neither entry is used"})
-            continue
-        try:
-            barcode = _barcode(code, products)
-            if barcode in pictures:
-                raise _Rejected("the barcode has two pictures")
-            pictures[barcode] = _picture(entry, folder)
-        except _Rejected as err:
-            rejected.append({"kind": "picture", "key": str(code), "reason": str(err)})
+    current = _currents(_mapping(raw, "current", rejected), products, fixtures, rejected, MEASURERS)
+    pictures = _pictures(_mapping(raw, "pictures", rejected), products, rejected,
+                         Path(pictures_dir) if pictures_dir is not None else PICTURES_DIR)
 
     return {"fixtures": fixtures, "widths": widths, "current": current, "pictures": pictures, "rules": rules,
             "assigned": assigned, "rejected": rejected}
+
+
+# ── The shelf reader's readings (F12-S1 FR-222, FR-223; D-34; ADR-041 Decisions 8, 9) ───────────
+
+READINGS_PATH = ROOT / "configs" / "shelf_readings.yaml"
+ACCEPTANCE_PATH = ROOT / "configs" / "shelf_reader_acceptance.yaml"
+READING_KEYS = {"reading", "widths", "current", "pictures"}
+READER = ("reader",)
+HAND = ("team", "owner")
+
+
+def _read_yaml(path: Path, kind: str, rejected: list):
+    try:
+        raw = yaml.load(Path(path).read_text(encoding="utf-8"), Loader=_Loader)   # noqa: S506 — a SafeLoader
+    except (yaml.YAMLError, UnicodeDecodeError) as err:
+        rejected.append({"kind": kind, "key": None, "reason": f"unreadable: {err}"})
+        return None
+    if raw is not None and not isinstance(raw, dict):
+        rejected.append({"kind": kind, "key": None, "reason": "the file must be a mapping"})
+        return None
+    return raw or {}
+
+
+def merge_readings(layout: Optional[dict], catalogue: Iterable[dict], *, readings_path: Path | str = READINGS_PATH,
+                   acceptance_path: Path | str = ACCEPTANCE_PATH, pictures_dir: Path | str | None = None,
+                   tolerance_mm: int, minimum: int) -> Optional[dict]:
+    """The layout with the reader's readings in it, and `reader`, which says how far they are used.
+
+    Pictures and current facings are used from the first reading. Widths are used only once the
+    acceptance run passes: at least `minimum` products measured by hand on the same photos, every
+    one within `tolerance_mm` of the reader's width. Until then they are kept apart, unused, and
+    those products plan as "no width". The hand readings grade the reader and never enter a plan.
+    """
+    if layout is None:
+        return None
+    products = {p["barcode"]: p for p in catalogue or () if p.get("barcode")}
+    rejected = list(layout.get("rejected") or [])
+    status = {"status": "no_readings", "read_on": None, "widths": 0,
+              "acceptance": {"listed": 0, "within": 0, "minimum": minimum, "tolerance_mm": tolerance_mm}}
+    if not Path(readings_path).exists():
+        return {**layout, "reader": status}
+    raw = _read_yaml(readings_path, "readings", rejected)
+    if raw is None:
+        return {**layout, "rejected": rejected, "reader": status}
+    unknown = sorted(set(raw) - READING_KEYS, key=str)
+    if unknown:
+        rejected.append({"kind": "readings", "key": None,
+                         "reason": f"unknown key {', '.join(map(str, unknown))}; the keys are {sorted(READING_KEYS)}"})
+    reading = raw.get("reading") if isinstance(raw.get("reading"), dict) else {}
+    # D-34: no one measures by hand, so every reading is the reader's.
+    widths = _widths(_mapping(raw, "widths", rejected), products, rejected, READER)
+    current = _currents(_mapping(raw, "current", rejected), products, layout["fixtures"], rejected, READER)
+    pictures = _pictures(_mapping(raw, "pictures", rejected), products, rejected,
+                         Path(pictures_dir) if pictures_dir is not None else PICTURES_DIR)
+
+    listed, within = 0, 0
+    if Path(acceptance_path).exists():
+        accepted_raw = _read_yaml(acceptance_path, "acceptance", rejected) or {}
+        hand = _widths(_mapping(accepted_raw, "products", rejected), products, rejected, HAND)
+        listed = len(hand)
+        within = sum(1 for b, h in hand.items()
+                     if b in widths and abs(widths[b]["width_mm"] - h["width_mm"]) <= tolerance_mm)
+    passed = listed >= minimum and within == listed
+    status = {"status": "accepted" if passed else "waiting_for_acceptance",
+              "read_on": str(reading.get("day")) if reading.get("day") else None, "widths": len(widths),
+              "acceptance": {"listed": listed, "within": within, "minimum": minimum, "tolerance_mm": tolerance_mm}}
+    return {**layout,
+            "widths": {**layout.get("widths", {}), **widths} if passed else dict(layout.get("widths") or {}),
+            "current": {**layout.get("current", {}), **current},
+            "pictures": {**layout.get("pictures", {}), **pictures},
+            "rejected": rejected, "reader": status}
