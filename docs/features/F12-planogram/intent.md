@@ -103,3 +103,7 @@ Asked what happens when a shelf has no tags under the products, and offered thre
 on the package's front, matched only against the products sold recently in that unit's
 departments, as the single match, with any printed size agreeing with the POS name; anything
 else stays unknown.
+
+The same day the owner said yes to an upload screen in the app, so the store's photos reach the reader
+without anyone moving files: **D-37**. How the photos travel, and the screen, are proposed for the owner's
+approval.
