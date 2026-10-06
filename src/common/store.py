@@ -182,6 +182,7 @@ STARTS_WITHOUT = (
     "public/data/*.json",          # the published artefacts, built from that store's data
     "docs/pilot/**",               # that store's handover, conversations and questions
     "configs/measured_weights.yaml",   # measured from that store's sales (analyse_sales_movement)
+    "configs/store_policy.yaml",       # what that store's sales showed it carries; nothing reads it
     # ADR-037, F12-S1: that store's shelves. Absent, not empty, in a new copy: an empty file is a
     # present one (FR-193), and only an absent one says the measurements were never recorded.
     "configs/store_layout.yaml",
@@ -198,7 +199,6 @@ STARTS_EMPTY = (
     "configs/store.yaml",
     "configs/store_facts.yaml",
     "configs/owner_answers.yaml",
-    "configs/store_policy.yaml",
     "configs/delivery_targets.yaml",
     "configs/store_types.yaml",    # its scale and affinity kept; its stores emptied
     "firestore.rules",             # the pinned store id

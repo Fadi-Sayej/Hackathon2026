@@ -109,8 +109,6 @@ def templates(store: StoreSettings) -> dict:
     for fmt in (types.get("formats") or {}).values():
         fmt.pop("note", None)                     # the notes describe this copy's store
     types["stores"] = {}
-    policy = yaml.safe_load(read("configs/store_policy.yaml"))
-    policy["stores"] = {}
     answers = yaml.safe_load(read("configs/owner_answers.yaml")) or {}
     env_lines = []
     for line in read(".env.example").splitlines():
@@ -124,9 +122,6 @@ def templates(store: StoreSettings) -> dict:
         "configs/store_facts.yaml": _header(read("configs/store_facts.yaml")) + "departments: {}\n",
         "configs/owner_answers.yaml": _header(read("configs/owner_answers.yaml"))
         + _dump({key: {} for key in answers}),
-        "configs/store_policy.yaml": "# store_policy.yaml — what the store chooses to carry. `stores` is filled for\n"
-                                     "# this store once its sales are in (scripts/derive_store_policy.py).\n\n"
-                                     + _dump(policy),
         "configs/delivery_targets.yaml": TARGETS_TEMPLATE,
         "configs/store_types.yaml": "# store_types.yaml — the format scale and affinity (ADR-008), and each store's\n"
                                     "# format. Fill `stores` with the store's own entries (`role: client`) and every\n"

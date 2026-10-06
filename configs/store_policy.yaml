@@ -18,13 +18,21 @@
 # `verified` — WHERE THE ANSWER CAME FROM
 #   manual   an owner said so. Never overwritten by any script.
 #   derived  computed from the store's own sales history by
-#            scripts/derive_store_policy.py. Evidence is recorded below.
+#            scripts/derive_store_policy.py (removed 2026-10-06, below).
+#            Evidence is recorded below.
 #   (absent) nothing known — carries everything.
 #
 # WHY NOT JUST LET THE MANAGER DISMISS THEM IN THE UI
 #   He can, and dismissals are tracked (see src/telemetry/). But a shop that does not
 #   sell alcohol should not have to dismiss 26 beers every week to reach the snacks.
 #   A standing policy is set once; a dismissal is paid for repeatedly.
+#
+# NOTHING READS THIS FILE (2026-10-06)
+#   No engine step or page reads it, so these exclusions are applied nowhere. The script
+#   that derived the entry below was removed on 2026-10-06: it read
+#   silver_pos/yomyom_sales.parquet, which Task 0.6 deleted, so it could not run for any
+#   store. The entry stays as the record of what seven months of sales showed. A new
+#   store's copy starts without this file (ADR-036 §3).
 
 version: 1
 

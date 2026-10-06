@@ -76,6 +76,12 @@ def test_every_setting_starts_empty_and_names_nothing_of_this_store(copy):
     assert types["stores"] == {} and types["formats"] and types["affinity"]
 
 
+def test_a_copy_starts_without_what_only_this_stores_sales_made(copy):
+    """Derived from this store's sales by a script, and read by nothing in the engine (ADR-036 §3)."""
+    assert not (copy / "configs" / "measured_weights.yaml").exists()
+    assert not (copy / "configs" / "store_policy.yaml").exists()
+
+
 def test_the_copy_has_one_commit_and_no_history(copy):
     log = subprocess.run(["git", "log", "--oneline"], cwd=copy, capture_output=True, text=True).stdout
     assert len(log.strip().splitlines()) == 1

@@ -7,7 +7,7 @@ Date: 2026-09-30
 Parent: [System Design](../system-design.md) §19
 Related Specs: every F#-S# (each reads the store through its inputs); F13-S1; F8-S1 (D-18's market)
 Inputs: [D-12, D-22, D-23, D-28, ADR-003, ADR-029, ADR-030, ADR-033, docs/pilot/next-store.md, src/engine/inputs.py, src/engine/run.py, src/common/paths.py, src/context/weather.py, scripts/import_yomyom_pos.py, scripts/import_yomyom_sales.py, configs/delivery_targets.yaml, configs/store_types.yaml, firestore.rules, scripts/check_firebase_config.mjs, .github/workflows/collect-daily.yml]
-Updated: 2026-09-30
+Updated: 2026-10-06
 ---
 
 # ADR-036 — A store is configuration, and each store runs its own copy with only its own data
@@ -118,6 +118,14 @@ touches a manifest path. Both refuse to run if the result would contain the sour
 > A copy also leaves out `.github/workflows/ci.yml`. Many tests read committed store data a
 > clean copy does not have, and a copy changes no code: code is tested here before `--update`
 > carries it. The ignore rules follow any store's folder, not YomYom's.
+
+> **Clarified 2026-10-06.** `configs/store_policy.yaml` moved from the templates to what a copy
+> starts without, for the reason `measured_weights.yaml` did: it was derived from the store's
+> sales, and nothing in the engine reads it. The copy's template told a new store to fill it
+> with `scripts/derive_store_policy.py`, which could not run: it read
+> `silver_pos/yomyom_sales.parquet`, deleted in Task 0.6, and defaulted to YomYom's store id.
+> The script is removed. If an engine step comes to apply a store's exclusions, the file
+> returns as a template, with a working way to fill it.
 
 ### 4. Nearby venues are found, then confirmed by a person
 
