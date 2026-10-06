@@ -21,9 +21,8 @@
 #   an entry in data/profiles/product_profiles.jsonl, that wins and these rules are
 #   skipped. Until then, this keeps the pipeline honest instead of blocked.
 #
-# Consumers:
-#   - scripts/derive_store_policy.py    (reads the segments)
-#   - configs/store_policy.yaml         (decides what to do with the tag)
+# Consumers: none since 2026-10-06. scripts/derive_store_policy.py read the segments to
+#   derive configs/store_policy.yaml, and was removed with its input (see that file).
 
 version: 1
 
