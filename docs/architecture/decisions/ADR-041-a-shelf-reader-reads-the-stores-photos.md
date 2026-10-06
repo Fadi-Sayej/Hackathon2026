@@ -7,7 +7,7 @@ Date: 2026-10-05
 Parent: [System Design](../system-design.md) §19
 Related Specs: F12-S1 (FR-180, FR-205, FR-216, FR-218 … FR-223, AC-207 … AC-210, NFR-079, OQ-1211)
 Inputs: [D-3, D-13, D-23, D-33, D-34, D-35, docs/reviews/f12-barcode-sources-2026-10-05.md, ADR-032, ADR-035, ADR-036, ADR-037, ADR-039, ADR-040]
-Updated: 2026-10-05
+Updated: 2026-10-06 (D-36: the package's printed name where there is no tag)
 ---
 
 # ADR-041 — A shelf reader reads the store's own photos
@@ -65,6 +65,12 @@ unit stated once, like its departments.
    Anything else leaves the run unknown, and the model's own confidence is never used. A 1 L and a
    1.5 L bottle of one brand differ in name or price on the tag, and a tie between them is
    unknown.
+
+   *Amended 2026-10-06 by D-36.* Where a run has no tag, the AI transcribes the brand, name and
+   size printed on the package's front, and the run is the single candidate in the unit's
+   departments whose POS words, apart from its size, are all printed there, with no printed size
+   contradicting its POS name (F12-S1 FR-220 v0.10). The tag, where there is one, is still the
+   only thing read.
 5. **Edges and width.** Within the AI's rough box, image processing finds the run's left and
    right edges, and the boundaries between its facings, on the full-resolution photo. It finds the
    shelf's ends at the line of the product fronts the same way. Then:
