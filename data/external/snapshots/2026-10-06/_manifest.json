@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-06",
+  "collected_at": "2026-10-06T04:27:21.234958+00:00",
+  "collector_version": "smartshelf@1.0.0",
+  "status": "partial",
+  "sources": {
+    "price_transparency": {
+      "status": "ok",
+      "files": 2,
+      "bytes": 8171688,
+      "sha256": "d0886ff50ddfc36227040d6768dffff1fe0e0686a9b0551bb174b05e40606b3e",
+      "rows": 524689,
+      "stores": 156
+    },
+    "delivery_catalog": {
+      "status": "partial",
+      "files": 14,
+      "bytes": 1374801,
+      "sha256": "3e809d934cbc2a41691384592293ac5b6f461351ce726c41f57c342211ce643d",
+      "rows": 3239,
+      "venues": 7,
+      "expected": 9,
+      "note": "reached 7 of 9 declared venues",
+      "errors": [
+        "victory_shabazi: HTTPStatusError: Client error '429 Too Many Requests' for url 'https://wolt.com/en/isr/petah-tikva/venue/victory-rosh-haayin'",
+        "For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
+        "shufersal_rosh_haayin: HTTPStatusError: Client error '429 Too Many Requests' for url 'https://wolt.com/en/isr/petah-tikva/venue/shufersal-rosh-haayin'",
+        "For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429"
+      ]
+    }
+  }
+}
