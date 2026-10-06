@@ -56,7 +56,8 @@ def read(*, day: str, photo_root: Path, layout: dict, products: list, sales_dail
             g = measure.gray(image)
             for number, (shelf, stated) in enumerate(zip(answer["shelves"], unit["shelves"]), start=1):
                 span, measured = measure.read_shelf(g, shelf)
-                runs = [(position, run, *identity.identify(run.get("tag"), pool), *measured[position - 1])
+                runs = [(position, run, *identity.identify(run.get("tag"), pool, run.get("package"), unit["departments"]),
+                         *measured[position - 1])
                         for position, run in enumerate(shelf["runs"], start=1)]
                 fits = span is not None and measure.runs_fit([e for *_, e, _ in runs if e], span,
                                                              stated["length_cm"] * 10, tolerance)

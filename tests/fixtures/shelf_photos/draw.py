@@ -57,7 +57,8 @@ def draw(path: Path, unit: dict) -> dict:
                 x += face
             pen.rectangle((start, floor + 18, min(x, start + 120), floor + 44), fill=(255, 255, 255), outline=(0, 0, 0))
             shelf["runs"].append({"box": (start, product_top, x, floor), "facings": run["facings"],
-                                  "tag": run.get("tag"), "barcode": run.get("barcode"), "width_mm": run["width_mm"]})
+                                  "tag": run.get("tag"), "package": run.get("package"),
+                                  "barcode": run.get("barcode"), "width_mm": run["width_mm"]})
             x += int(run.get("gap_mm", 15) * PX_PER_MM)
         truth["shelves"].append(shelf)
     image.save(path, format="JPEG", quality=92)
@@ -78,7 +79,7 @@ def answer(truth: dict, *, jitter: float = 0.04, seed: int = 1, facings: dict = 
             box = [max(0.0, (x0 + rng.uniform(-wobble, wobble)) / width), y0 / height,
                    min(1.0, (x1 + rng.uniform(-wobble, wobble)) / width), y1 / height]
             runs.append({"box": box, "facings": (facings or {}).get((s_index, r_index), run["facings"]),
-                         "tag": run["tag"]})
+                         "tag": run["tag"], "package": run.get("package")})
         shelves.append({"y_top": shelf["y_top"] / height, "y_bottom": shelf["y_bottom"] / height,
                         "left_x": (shelf["left"] + rng.uniform(-8, 8)) / width,
                         "right_x": (shelf["right"] + rng.uniform(-8, 8)) / width, "runs": runs})

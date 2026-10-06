@@ -1,14 +1,14 @@
 ---
 ID: F12-S1
 Title: Planogram — a dated shelf plan from his own sales, waiting for them until they arrive
-Status: Approved — by the repository owner, 2026-10-04 (v0.8) and 2026-10-05 (v0.9: "approve")
+Status: Approved — by the repository owner, 2026-10-04 (v0.8), 2026-10-05 (v0.9: "approve") and 2026-10-06 (v0.10: D-36, "a")
 Owner: smartshelf-architect
-Version: 0.9 (2026-10-05: FR-183 revised, because the mockups showed the v0.8 rule leaving shelves empty; AC-205, OQ-1210. D-33's product pictures: FR-216, FR-217, AC-206, NFR-078, ADR-040. D-34 and D-35's shelf reader: FR-180 revised, FR-218 … FR-223, AC-207 … AC-210, NFR-079, OQ-1211, ADR-041). 0.8 (2026-10-04: D-32, the AI's explanation of each fixture's plan; FR-210 … FR-215 approved as OQ-1209)
+Version: 0.10 (2026-10-06: FR-220 revised for D-36, the package read where there is no shelf tag; AC-211). 0.9 (2026-10-05: FR-183 revised, because the mockups showed the v0.8 rule leaving shelves empty; AC-205, OQ-1210. D-33's product pictures: FR-216, FR-217, AC-206, NFR-078, ADR-040. D-34 and D-35's shelf reader: FR-180 revised, FR-218 … FR-223, AC-207 … AC-210, NFR-079, OQ-1211, ADR-041). 0.8 (2026-10-04: D-32, the AI's explanation of each fixture's plan; FR-210 … FR-215 approved as OQ-1209)
 Parent: [F12 — Planogram](../intent.md)
 Related Intents: INT-006
-Inputs: [docs/features/F12-planogram/intent.md (Approved for specification, D-30), docs/product/PRD.md (§5 V4, §6 #7), docs/product/intent-register.md (D-1, D-3, D-13, D-14, D-15, D-16, D-22, D-23, D-28, D-29, D-30, D-31, D-32, D-33, D-34, D-35), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (§5 "He stocks", FR-143 … FR-146, FR-156), ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011, ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037, ADR-038, ADR-039, ADR-040, ADR-041, CLAUDE.md]
+Inputs: [docs/features/F12-planogram/intent.md (Approved for specification, D-30), docs/product/PRD.md (§5 V4, §6 #7), docs/product/intent-register.md (D-1, D-3, D-13, D-14, D-15, D-16, D-22, D-23, D-28, D-29, D-30, D-31, D-32, D-33, D-34, D-35, D-36), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (§5 "He stocks", FR-143 … FR-146, FR-156), ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011, ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037, ADR-038, ADR-039, ADR-040, ADR-041, CLAUDE.md]
 Answered by: [System Design](../../../architecture/system-design.md) §21 (F12-S1)
-Updated: 2026-10-05 (v0.9 approved: FR-183 revised, OQ-1210 answered A; D-33's pictures, FR-216, FR-217; D-34 and D-35's shelf reader, FR-218 … FR-223, OQ-1211 answered). 2026-10-04 (D-32's explanation approved, OQ-1209; earlier the same day, approved with OQ-1208, and OQ-1204 and OQ-1207 answered with the plan)
+Updated: 2026-10-06 (v0.10: FR-220 per D-36, as put to him). 2026-10-05 (v0.9 approved: FR-183 revised, OQ-1210 answered A; D-33's pictures, FR-216, FR-217; D-34 and D-35's shelf reader, FR-218 … FR-223, OQ-1211 answered). 2026-10-04 (D-32's explanation approved, OQ-1209; earlier the same day, approved with OQ-1208, and OQ-1204 and OQ-1207 answered with the plan)
 ---
 
 # F12-S1 — Planogram
@@ -32,7 +32,7 @@ Updated: 2026-10-05 (v0.9 approved: FR-183 revised, OQ-1210 answered A; D-33's p
 
 > **Identifier note.** Every `FR-`, `INV-`, `NFR-`, `AC-`, `SCN-`, `C-`, `ASM-` and `OQ-` id
 > below is new and globally unique: FR-178 … FR-223, INV-084 … INV-097, NFR-072 … NFR-079,
-> AC-172 … AC-210, SCN-159 … SCN-177, C-73 … C-75, ASM-073 … ASM-083, OQ-1201 … OQ-1211.
+> AC-172 … AC-211, SCN-159 … SCN-177, C-73 … C-75, ASM-073 … ASM-083, OQ-1201 … OQ-1211.
 
 Implements intent F12. Bound by ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011,
 ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037,
@@ -579,10 +579,16 @@ unchanged, and print mode never asks (ADR-039's method) **(decided here)**.
 **FR-220** — A run is a product only when **(decided here)**:
 - its tag shows a code that is exactly one candidate's barcode or store code; or
 - its tag's name matches exactly one candidate, after normalising spaces and punctuation, and
-  the tag's price equals that product's shelf price.
+  the tag's price equals that product's shelf price; or
+- **(v0.10, D-36)** it has no tag, and the brand, name and size printed on the package's front
+  match exactly one candidate among those in the unit's departments. A candidate matches when
+  every word of its POS name, apart from its size, is printed on the package, and when the
+  package's printed size, if one is read, equals the size in its POS name, if it has one. A
+  printed size that differs from the POS name's is no match.
 
-The candidates are the catalogue products sold in the policy's recent window. Anything else
-leaves the run unknown. The model's own confidence is never used (D-34).
+The candidates are the catalogue products sold in the policy's recent window. Where there is a
+tag, only the tag is read: the package is read only where there is none. Anything else leaves the
+run unknown. The model's own confidence is never used (D-34).
 
 **FR-221** — Image processing finds, on the full-resolution photo and within the AI's rough box,
 the run's left and right edges and the boundaries between its facings. It finds the shelf's ends
@@ -1006,6 +1012,11 @@ field of any capability. *(FR-216, FR-217, D-33)*
 matches one candidate at a different price, or two candidates, is unknown. No step reads the
 model's confidence. *(FR-220, D-34)*
 
+**AC-211** — A run with no tag is the product whose POS words are all printed on its package,
+when exactly one product sold recently in the unit's departments has them and no printed size
+contradicts its POS name. Two such products, a different size, or a product of another department,
+leave it unknown. A run with a tag is never read from its package. *(FR-220 v0.10, D-36)*
+
 **AC-208** — A width is the run's width ÷ facings ÷ shelf span × the shelf's length. A run whose
 facing count differs from the AI's, whose facings disagree by more than 5 mm, whose product reads
 differently elsewhere by more than 5 mm, or whose shelf's runs do not fit, has no width, and says
@@ -1231,7 +1242,7 @@ products at eye level and three below.
 | INT-006 · D-33 | FR-216, FR-217 | — | AC-206 |
 | Protected behavior | NFR-078 | — | AC-206 |
 | INT-006 | FR-183 (v0.9) | SCN-161 | AC-205 |
-| INT-006 · D-34 · D-35 | FR-180 (v0.9), FR-218, FR-219, FR-220 | — | AC-207, AC-210 |
+| INT-006 · D-34 · D-35 · D-36 | FR-180 (v0.9), FR-218, FR-219, FR-220 (v0.10) | — | AC-207, AC-210, AC-211 |
 | INT-006 · D-34 · D-35 | FR-221, FR-222, FR-223 | — | AC-208, AC-209 |
 | Protected behavior | NFR-079 | — | AC-210 |
 
