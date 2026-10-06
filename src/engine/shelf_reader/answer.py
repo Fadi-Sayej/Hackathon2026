@@ -106,6 +106,10 @@ def check(raw: str, shelves: int) -> tuple:
             if tag is not None and not (isinstance(tag, dict) and all(
                     tag.get(k) is None or isinstance(tag.get(k), str) for k in ("name", "code", "price"))):
                 return None, "bad_shape"
+            package = run.get("package")
+            if package is not None and not (isinstance(package, dict) and all(
+                    package.get(k) is None or isinstance(package.get(k), str) for k in ("brand", "name", "size"))):
+                return None, "bad_shape"
     return answer, None
 
 

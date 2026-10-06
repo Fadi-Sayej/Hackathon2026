@@ -55,6 +55,9 @@ def tagged(unit, by="code"):
     for shelf in out["shelves"]:
         for run in shelf:
             p = next(c for c in CATALOGUE if c["barcode"] == run["barcode"])
+            if by == "package":                     # D-36: no tag under it, the package's print read
+                run["tag"], run["package"] = None, {"brand": "מותג", "name": p["product_name"], "size": None}
+                continue
             run["tag"] = ({"name": None, "code": p["barcode"], "price": None} if by == "code"
                           else {"name": p["product_name"], "code": None, "price": f"{p['shelf_price']:.2f}"})
     return out
@@ -154,6 +157,55 @@ def test_a_name_on_the_tag_reads_like_a_code(tmp_path):
     assert len(result["widths"]) >= 5
 
 
+def test_with_no_tag_the_package_names_the_product(tmp_path):
+    # D-36, AC-211: no tags on this unit at all; each package's printed name is read instead.
+    result, _ = run_reading(tmp_path, UNIT, by="package")
+    truth = {r["barcode"]: r["width_mm"] for shelf in UNIT["shelves"] for r in shelf}
+    assert len(result["widths"]) >= 5 and len(result["pictures"]) >= 5
+    for barcode, width in result["widths"].items():
+        assert abs(width - truth[barcode]) <= 5
+
+
+PACKAGED = [{"barcode": "1", "product_name": "קוקה קולה 1.5 ליטר", "department": "משקאות"},
+            {"barcode": "2", "product_name": "קוקה קולה 1 ליטר", "department": "משקאות"},
+            {"barcode": "3", "product_name": "במבה 80 גר", "department": "חטיפים"},
+            {"barcode": "4", "product_name": "חלב 3% תנובה", "department": "חלב"}]
+
+
+@pytest.mark.parametrize("package, departments, expected", [
+    ({"brand": "Coca-Cola", "name": "קוקה קולה", "size": "1.5 ליטר"}, ["משקאות"], ("1", None)),
+    ({"brand": None, "name": "קוקה קולה", "size": "1 ל'"}, ["משקאות"], ("2", None)),
+    # Two sizes of one brand, and no size readable: a guess between them, so unknown.
+    ({"brand": None, "name": "קוקה קולה", "size": None}, ["משקאות"], (None, "package_names_two")),
+    # A printed size the POS name contradicts is no match.
+    ({"brand": "אסם", "name": "במבה", "size": "60 גרם"}, ["חטיפים"], (None, "package_names_none")),
+    ({"brand": "אסם", "name": "במבה", "size": "80 גרם"}, ["חטיפים"], ("3", None)),
+    # Only the unit's own departments are candidates.
+    ({"brand": "אסם", "name": "במבה", "size": "80 גרם"}, ["משקאות"], (None, "package_names_none")),
+    # Every word of the POS name must be printed, apart from its size.
+    ({"brand": "תנובה", "name": "חלב 3% שומן", "size": "1 ליטר"}, ["חלב"], ("4", None)),
+    ({"brand": None, "name": "חלב", "size": "1 ליטר"}, ["חלב"], (None, "package_names_none")),
+    ({"brand": None, "name": None, "size": "1 ליטר"}, ["חלב"], (None, "unreadable_package")),
+])
+def test_a_package_names_a_product_only_by_all_its_words_and_no_other_size(package, departments, expected):
+    assert identity.identify(None, PACKAGED, package, departments) == expected
+
+
+def test_a_tag_where_there_is_one_is_the_only_thing_read():
+    # The tag names nothing; the package would name a product. The tag stands, so it is unknown.
+    package = {"brand": "אסם", "name": "במבה", "size": "80 גרם"}
+    assert identity.identify({"code": "999"}, PACKAGED, package, ["חטיפים"]) == (None, "code_unknown")
+
+
+@pytest.mark.parametrize("text, expected", [
+    ("במבה 80 גר", (80.0, "g")), ("קוקה קולה 1.5 ליטר", (1500.0, "ml")), ("מים 330 מ\"ל", (330.0, "ml")),
+    ("שמן זית 1 ק\"ג", (1000.0, "g")), ("ביסלי גריל 70ג", (70.0, "g")), ("Coca Cola 330ml", (330.0, "ml")),
+    ("لبن 1 لتر", (1000.0, "ml")), ("חלב 3% תנובה", None), ("אריזה 6 יח", None),
+])
+def test_a_printed_size_is_read_in_grams_or_millilitres(text, expected):
+    assert identity.size(text)[0] == expected
+
+
 def test_with_no_recent_sale_no_product_can_be_named():
     assert identity.candidates(CATALOGUE, [], [], date(2026, 10, 10), 90) == []
 
@@ -196,6 +248,9 @@ def test_a_malformed_answer_is_refused_and_asked_again(tmp_path):
     (json.dumps({"problem": None, "shelves": [{"y_top": 0.5, "y_bottom": 0.2, "left_x": 0, "right_x": 1, "runs": []}]}), "bad_shape"),
     (json.dumps({"problem": None, "shelves": [{"y_top": 0.1, "y_bottom": 0.2, "left_x": 0, "right_x": 1,
                                                "runs": [{"box": [0.1, 0.1, 0.2, 0.2], "facings": 0, "tag": None}]}]}), "bad_shape"),
+    (json.dumps({"problem": None, "shelves": [{"y_top": 0.1, "y_bottom": 0.2, "left_x": 0, "right_x": 1,
+                                               "runs": [{"box": [0.1, 0.1, 0.2, 0.2], "facings": 1, "tag": None,
+                                                         "package": {"name": 7}}]}]}), "bad_shape"),
 ])
 def test_the_answers_shape_is_checked(raw, why):
     assert answer_mod.check(raw, 1) == (None, why)
