@@ -19,7 +19,6 @@
     "check:store": "python3 scripts/check_store.py",
     "read:shelves": "python3 scripts/read_shelves.py",
     "preflight": "bash scripts/preflight_deploy.sh",
-    "data:velocity": "python3 scripts/build_velocity_from_snapshots.py",
     "data:lead-times": "python3 scripts/export_supplier_lead_times.py",
     "check:restocks": "python3 scripts/reconcile_restocks.py",
     "data:quality": "python3 scripts/check_import_quality.py",

@@ -117,6 +117,27 @@ describe('the gate, by path and role', () => {
     expect((await middleware(req('/data/dashboard.json', await noRole()))).status).toBe(403)
   })
 
+  // ADR-040 keeps a product's picture, cut from the store's own shelf photos, at
+  // public/store/shelf-pictures/. It is store data like /data/: any role may see it, and nobody
+  // signed out. Until 2026-10-06 the gate let /store/ through, unchecked.
+  it('refuses a store picture to a visitor who is not signed in (401, not a redirect)', async () => {
+    const res = await middleware(req('/store/shelf-pictures/7290000467511.jpg'))
+    expect(res.status).toBe(401)
+    expect(res.headers.get('cache-control')).toBe('no-store')
+  })
+
+  it('serves a store picture to the owner and the team, and refuses an account with no role', async () => {
+    const path = '/store/shelf-pictures/7290000467511.jpg'
+    expect(await middleware(req(path, await owner()))).toBeUndefined()
+    expect(await middleware(req(path, await team()))).toBeUndefined()
+    expect((await middleware(req(path, await noRole()))).status).toBe(403)
+  })
+
+  it.each(['//store/shelf-pictures/a.jpg', '/%73tore/shelf-pictures/a.jpg', '/STORE/shelf-pictures/a.jpg'])(
+    'does not let %s past a signed-out visitor', async (path) => {
+      expect((await middleware(req(path))).status).toBe(401)
+    })
+
   it.each(['/telemetry.html', '/assets/telemetry-9f8e.js', '/data/measurement.json', '/data/operational.json'])(
     'serves %s to the team and refuses it to the owner', async (path) => {
       expect(await middleware(req(path, await team()))).toBeUndefined()

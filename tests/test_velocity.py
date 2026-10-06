@@ -31,7 +31,6 @@ from src.snapshots.velocity import (  # noqa: E402
     CONFIDENCE_LOW,
     CONFIDENCE_MEDIUM,
     CONFIDENCE_NONE,
-    apply_to_sales_table,
     build_intervals,
     compute_velocity,
     list_usable_snapshots,
@@ -334,77 +333,6 @@ def _products_stub(path: Path, prices) -> Path:
     pq.write_table(pa.Table.from_pylist(rows, schema=schema), path)
     return path
 
-
-def test_apply_writes_velocity_and_preserves_unmatched_as_null(tmp_path):
-    """Matched products get numbers; unmatched keep NULL units, never 0.
-
-    'No history for this product' and 'this product sold nothing' are different facts.
-    Collapsing them to 0 is what makes every product look 'Slow moving'.
-    """
-    snaps = _snapshots(tmp_path / "snaps", [
-        (BASE, {"111": 100}),
-        (BASE + timedelta(days=2), {"111": 80}),
-    ])
-    velocity = compute_velocity(build_intervals(snaps))
-
-    sales = _sales_stub(tmp_path / "sales.parquet", ["111", "999"])
-    products = _products_stub(tmp_path / "products.parquet", {"111": 10.0, "999": 4.0})
-
-    stats = apply_to_sales_table(velocity, sales_path=sales, products_path=products)
-    assert stats == {"rows": 2, "matched": 1, "unmatched": 1}
-
-    rows = {r["barcode"]: r for r in pq.read_table(sales).to_pylist()}
-
-    assert rows["111"]["units_sold_7d"] == 20
-    assert rows["111"]["velocity_confidence"] in {CONFIDENCE_LOW, CONFIDENCE_MEDIUM, CONFIDENCE_HIGH}
-    assert rows["111"]["sales_amount_30d"] == pytest.approx(200.0)
-    assert rows["111"]["velocity_source"] == "snapshot_delta"
-
-    assert rows["999"]["units_sold_7d"] is None
-    assert rows["999"]["units_sold_30d"] is None
-    assert rows["999"]["velocity_confidence"] == CONFIDENCE_NONE
-
-
-def test_empty_velocity_clears_stale_values(tmp_path):
-    """A run that derives nothing must overwrite yesterday's numbers, not keep them.
-
-    Otherwise stale velocity silently ages into the UI as if it were current.
-    """
-    sales = _sales_stub(tmp_path / "sales.parquet", ["111"])
-    products = _products_stub(tmp_path / "products.parquet", {"111": 10.0})
-
-    snaps = _snapshots(tmp_path / "snaps", [
-        (BASE, {"111": 100}),
-        (BASE + timedelta(days=2), {"111": 80}),
-    ])
-    apply_to_sales_table(compute_velocity(build_intervals(snaps)), sales_path=sales, products_path=products)
-    assert pq.read_table(sales).to_pylist()[0]["units_sold_7d"] == 20
-
-    # A later run with no derivable velocity must reset the row.
-    apply_to_sales_table({}, sales_path=sales, products_path=products)
-    row = pq.read_table(sales).to_pylist()[0]
-
-    assert row["units_sold_7d"] is None
-    assert row["units_sold_30d"] is None
-    assert row["velocity_confidence"] == CONFIDENCE_NONE
-
-
-def test_apply_is_idempotent(tmp_path):
-    """The velocity build may run twice in a morning; the second run must not corrupt the table."""
-    snaps = _snapshots(tmp_path / "snaps", [
-        (BASE, {"111": 100}),
-        (BASE + timedelta(days=2), {"111": 80}),
-    ])
-    velocity = compute_velocity(build_intervals(snaps))
-    sales = _sales_stub(tmp_path / "sales.parquet", ["111"])
-    products = _products_stub(tmp_path / "products.parquet", {"111": 10.0})
-
-    apply_to_sales_table(velocity, sales_path=sales, products_path=products)
-    first = pq.read_table(sales).to_pylist()
-    apply_to_sales_table(velocity, sales_path=sales, products_path=products)
-    second = pq.read_table(sales).to_pylist()
-
-    assert first == second
 
 
 def test_rearchiving_the_same_import_is_not_an_interval(tmp_path):

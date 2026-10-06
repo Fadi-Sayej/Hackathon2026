@@ -7,7 +7,7 @@ Date: 2026-10-05
 Parent: [System Design](../system-design.md) §19
 Related Specs: F12-S1 (FR-216, FR-217, AC-206, NFR-078)
 Inputs: [D-13, D-22, D-23, D-33, D-34, docs/features/F12-planogram/specs/F12-S1-planogram.md, ADR-001, ADR-036, ADR-037, ADR-041]
-Updated: 2026-10-05
+Updated: 2026-10-06 (the pictures are behind the sign-in gate)
 ---
 
 # ADR-040 — A product's shelf picture is a file cut from the store's own photos
@@ -63,6 +63,12 @@ a store would send.
 5. **Store data under ADR-036.** `public/store/**` joins the files a new copy starts without, so
    one store's pictures never appear in another's copy, and updating a copy never overwrites
    them. `check:store` reports how many pictures are listed, and how many of those are present.
+6. **Behind the sign-in gate, like `/data/`.** *(Added 2026-10-06, before any picture existed.)*
+   `public/` is served to anyone, and the gate (ADR-029) refused only `/data/` and the team's
+   page, so a picture under `/store/` would have reached anyone with its address. `middleware.ts`
+   now refuses every `/store/` file to a signed-out visitor (401), and serves it to the owner and
+   the team. `vercel.json` marks it `private, no-cache`. The shelf page's `<img>` requests are
+   same-origin, so they carry the session cookie.
 
 ## Rejected options
 
