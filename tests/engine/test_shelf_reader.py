@@ -106,6 +106,27 @@ def test_the_drawn_shelves_widths_come_back_within_five_millimetres(tmp_path, se
     assert set(result["widths"]) <= set(truth)
 
 
+def test_a_phone_photo_stored_on_its_side_is_read_upright(tmp_path):
+    # A phone keeps the sensor's pixels and a tag saying how to turn them (EXIF orientation 6: a
+    # quarter turn clockwise). Read without the tag, the unit would reach the reader on its side.
+    unit = tagged(UNIT)
+    truth = photograph(tmp_path, unit)
+    path = tmp_path / "photos" / DAY / "מדף שתייה" / "unit.jpg"
+    upright = Image.open(path)
+    upright.load()
+    exif = Image.Exif()
+    exif[0x0112] = 6
+    upright.transpose(Image.Transpose.ROTATE_90).save(path, format="JPEG", quality=92, exif=exif)
+    assert answer_mod.images(path, 2)[0].size[0] > answer_mod.images(path, 2)[0].size[1]
+    layout = load_store_layout(layout_file(tmp_path), CATALOGUE)
+    ask, _ = asker(tmp_path, {"מדף שתייה": draw.answer(truth, jitter=0.03, seed=1)})
+    result = reading.read(day=DAY, photo_root=tmp_path / "photos", layout=layout, products=CATALOGUE,
+                          sales_daily=SOLD, sales_monthly=[], policy=POLICY, asker=ask)
+    widths = {r["barcode"]: r["width_mm"] for shelf in UNIT["shelves"] for r in shelf}
+    assert result["widths"], result["report"]
+    assert all(abs(w - widths[b]) <= 5 for b, w in result["widths"].items()), result["widths"]
+
+
 def test_a_miscounted_run_has_no_width_and_no_current_facings(tmp_path):
     # The model says four facings where three stand: the photo does not bear the count out.
     result, _ = run_reading(tmp_path, UNIT, facings={(0, 0): 4})
