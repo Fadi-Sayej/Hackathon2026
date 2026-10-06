@@ -57,8 +57,8 @@ nothing. It does not quietly degrade to an anonymous session.
 > (#273, approved the same day). A password belongs to the same Firebase account, so it keeps
 > its role claim. A first password is set through Firebase's password email ("Forgot your
 > password, or never set one?"). It needs the Email/Password provider's first switch on in the
-> console, and only the repository owner can turn it on. The roles, the gate and the rules are
-> unchanged.
+> console, and only the repository owner can turn it on; they did on 2026-10-06. The roles, the
+> gate and the rules are unchanged.
 
 ### 2. Roles: one custom claim, set by an admin script, emails kept out of the repository
 
