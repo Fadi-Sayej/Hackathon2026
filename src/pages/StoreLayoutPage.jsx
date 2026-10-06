@@ -3,6 +3,7 @@ import { useI18n } from '../lib/i18n/index.js'
 import { dirProps } from '../lib/utils/rtl.js'
 import { namesFrom, ruleText, useDates } from './shelfCommon.js'
 import { Names } from './ShelfNames.jsx'
+import { ReaderWaiting } from './ReaderWaiting.jsx'
 
 /**
  * Store layout: his shelf units as the team recorded them from his photographs (F12-S1 FR-190,
@@ -115,6 +116,7 @@ export function StoreLayoutPage({ artefact, catalogue }) {
 
   return (
     <section className="capability layout" data-capability="layout_facts" {...dirProps()}>
+      <ReaderWaiting reader={capability.reader} />
       <p className="reorder__line">{t('layout.shelfOrder')}</p>
       {(capability.fixture_order || Object.keys(capability.fixtures || {})).map((name) => [name, capability.fixtures[name]]).map(([name, fixture]) => (
         <Fixture key={name} name={name} fixture={fixture} withoutWidth={capability.without_width?.[name] || []}

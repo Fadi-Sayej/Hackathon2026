@@ -668,6 +668,9 @@ export const he = {
   'layout.allPictured': "לכל המוצרים יש תמונה.",
   'layout.rejected.kind.picture': "תמונת מוצר",
   'shelf.pictures.missing': "כל תמונה נחתכת מתמונות המדפים שלך. משבצת עם מספר פירושה שעדיין אין תמונה של המוצר הזה.",
+  // F12-S1 FR-223 (D-34): the reader's widths, read but waiting for their acceptance run.
+  // Approved by the repository owner on 2026-10-06 ("yes").
+  'layout.reader.waiting': "קורא המדפים קרא {n} רוחבים מהתמונות שלך ב־{date}. הם ישמשו אחרי שהבדיקה שלו תעבור: {min} מוצרים שנמדדו ביד, כל אחד בטווח של {tol} מ״מ מהרוחב שהקורא מדד. עד עכשיו: {within} מתוך {listed}.",
   'layout.rejected.teamNote': "הערה לצוות:",
   'shelf.rule.together': "לשמור יחד על מדף אחד: {names}",
   'shelf.rule.togetherDepartment': "לשמור את מחלקת {department} יחד על מדף אחד",

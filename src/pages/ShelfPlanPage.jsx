@@ -5,6 +5,7 @@ import { dirProps } from '../lib/utils/rtl.js'
 import { ExamplePreview } from './OrderExample.jsx'
 import { daysText, facingsText, namesFrom, ruleText, useDates } from './shelfCommon.js'
 import { Names } from './ShelfNames.jsx'
+import { ReaderWaiting } from './ReaderWaiting.jsx'
 
 /**
  * Shelf plan: where each product goes on each shelf unit, how many facings, and why (F12-S1
@@ -360,6 +361,7 @@ export function ShelfPlanPage({ artefact, ownerState, catalogue, onOutcome = ign
         <p className="reorder__line">{t('reorder.basis', { first: date(window.first_day), last: date(window.last_day), days: window.report_days })}</p>
       ) : null}
       <Elasticity elasticity={capability.elasticity} />
+      <ReaderWaiting reader={artefact.capabilities.layout_facts?.reader} />
       {entries.map((entry) => (
         <FixturePlan key={entry.id} entry={entry} plan={{ explanation }} explanations={explanations}
           arrangements={arrangements} outcomes={outcomes} nameOf={nameOf} onOutcome={onOutcome}

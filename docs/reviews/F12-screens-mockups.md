@@ -408,3 +408,15 @@ Every phrase the two pages add or change, as the dictionaries hold it on the bra
 - **2026-10-05**, "approve", to "You can say 'approve all', or name what to change": every item
   as drawn. The screens, A (OQ-1210), ADR-040 and ADR-041 with the reader's values (OQ-1211), the
   wording, and the team's note shown.
+
+## Added 2026-10-06: the shelf reader's waiting sentence
+
+While the reader's widths wait for their acceptance run (F12-S1 FR-223, D-34), Store layout says
+so at its top, and Shelf plan under the plan's conditions. Put to the repository owner with its
+place and the three texts below, and approved on 2026-10-06 ("yes to both", the other being D-37).
+
+| | |
+|---|---|
+| English | The shelf reader read {n} widths from your photos on {date}. They are used once its check passes: {min} products measured by hand, each within {tol} mm of the reader's width. So far: {within} of {listed}. |
+| עברית | קורא המדפים קרא {n} רוחבים מהתמונות שלך ב־{date}. הם ישמשו אחרי שהבדיקה שלו תעבור: {min} מוצרים שנמדדו ביד, כל אחד בטווח של {tol} מ״מ מהרוחב שהקורא מדד. עד עכשיו: {within} מתוך {listed}. |
+| العربية | قرأ قارئ الرفوف {n} عرضًا من صورك في {date}. تُستخدم بعد أن ينجح فحصه: {min} منتجًا قيست باليد، كل منها ضمن {tol} مم من العرض الذي قرأه. حتى الآن: {within} من {listed}. |

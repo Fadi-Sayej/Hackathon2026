@@ -669,6 +669,9 @@ export const en = {
   'layout.allPictured': "Every product has its picture.",
   'layout.rejected.kind.picture': "Product picture",
   'shelf.pictures.missing': "Each picture is cut from your own shelf photos. A numbered tile means that product's picture has not been taken yet.",
+  // F12-S1 FR-223 (D-34): the reader's widths, read but waiting for their acceptance run.
+  // Approved by the repository owner on 2026-10-06 ("yes").
+  'layout.reader.waiting': "The shelf reader read {n} widths from your photos on {date}. They are used once its check passes: {min} products measured by hand, each within {tol} mm of the reader's width. So far: {within} of {listed}.",
   'layout.rejected.teamNote': "Note for the team:",
   'shelf.rule.together': "Keep together on one shelf: {names}",
   'shelf.rule.togetherDepartment': "Keep the {department} department together on one shelf",
