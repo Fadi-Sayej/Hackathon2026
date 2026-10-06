@@ -672,6 +672,21 @@ export const en = {
   // F12-S1 FR-223 (D-34): the reader's widths, read but waiting for their acceptance run.
   // Approved by the repository owner on 2026-10-06 ("yes").
   'layout.reader.waiting': "The shelf reader read {n} widths from your photos on {date}. They are used once its check passes: {min} products measured by hand, each within {tol} mm of the reader's width. So far: {within} of {listed}.",
+  // D-37: the shelf photos' upload, drawn for the repository owner's approval (not shown until it is given).
+  'photos.title': "Send photos of your shelves",
+  'photos.how': "One photo for each shelving unit: from the front, straight on, with the whole unit in the picture and no one in it.",
+  'photos.unit': "Which unit?",
+  'photos.unit.other': "Another unit",
+  'photos.unit.name': "The unit's name, such as “Fridge 1”",
+  'photos.choose': "Take or choose a photo",
+  'photos.send': "Send",
+  'photos.sending': "Sending…",
+  'photos.sent': "Sent. It reaches the shelf reader tonight.",
+  'photos.failed': "It did not send. Check the connection and try again.",
+  'photos.list': "Sent",
+  'photos.status.sent': "sent, collected tonight",
+  'photos.status.collected': "collected {date}",
+  'photos.status.read': "read {date}",
   'layout.rejected.teamNote': "Note for the team:",
   'shelf.rule.together': "Keep together on one shelf: {names}",
   'shelf.rule.togetherDepartment': "Keep the {department} department together on one shelf",

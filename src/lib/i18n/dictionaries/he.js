@@ -671,6 +671,21 @@ export const he = {
   // F12-S1 FR-223 (D-34): the reader's widths, read but waiting for their acceptance run.
   // Approved by the repository owner on 2026-10-06 ("yes").
   'layout.reader.waiting': "קורא המדפים קרא {n} רוחבים מהתמונות שלך ב־{date}. הם ישמשו אחרי שהבדיקה שלו תעבור: {min} מוצרים שנמדדו ביד, כל אחד בטווח של {tol} מ״מ מהרוחב שהקורא מדד. עד עכשיו: {within} מתוך {listed}.",
+  // D-37: the shelf photos' upload, drawn for the repository owner's approval (not shown until it is given).
+  'photos.title': "שלח תמונות של המדפים שלך",
+  'photos.how': "תמונה אחת לכל יחידת מדפים: מלפנים, ישר, כשכל היחידה בתמונה ואין בה אנשים.",
+  'photos.unit': "איזו יחידה?",
+  'photos.unit.other': "יחידה אחרת",
+  'photos.unit.name': "שם היחידה, למשל „מקרר 1”",
+  'photos.choose': "צלם או בחר תמונה",
+  'photos.send': "שלח",
+  'photos.sending': "שולח…",
+  'photos.sent': "נשלח. התמונה מגיעה לקורא המדפים הלילה.",
+  'photos.failed': "השליחה לא הצליחה. בדוק את החיבור ונסה שוב.",
+  'photos.list': "נשלחו",
+  'photos.status.sent': "נשלחה, תיאסף הלילה",
+  'photos.status.collected': "נאספה ב־{date}",
+  'photos.status.read': "נקראה ב־{date}",
   'layout.rejected.teamNote': "הערה לצוות:",
   'shelf.rule.together': "לשמור יחד על מדף אחד: {names}",
   'shelf.rule.togetherDepartment': "לשמור את מחלקת {department} יחד על מדף אחד",

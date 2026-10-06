@@ -676,6 +676,21 @@ export const ar = {
   // F12-S1 FR-223 (D-34): the reader's widths, read but waiting for their acceptance run.
   // Approved by the repository owner on 2026-10-06 ("yes").
   'layout.reader.waiting': "قرأ قارئ الرفوف {n} عرضًا من صورك في {date}. تُستخدم بعد أن ينجح فحصه: {min} منتجًا قيست باليد، كل منها ضمن {tol} مم من العرض الذي قرأه. حتى الآن: {within} من {listed}.",
+  // D-37: the shelf photos' upload, drawn for the repository owner's approval (not shown until it is given).
+  'photos.title': "أرسل صور رفوفك",
+  'photos.how': "صورة واحدة لكل وحدة رفوف: من الأمام، بشكل مستقيم، والوحدة كلها في الصورة ولا أحد فيها.",
+  'photos.unit': "أي وحدة؟",
+  'photos.unit.other': "وحدة أخرى",
+  'photos.unit.name': "اسم الوحدة، مثل «ثلاجة 1»",
+  'photos.choose': "التقط صورة أو اخترها",
+  'photos.send': "أرسل",
+  'photos.sending': "جارٍ الإرسال…",
+  'photos.sent': "أُرسلت. تصل إلى قارئ الرفوف الليلة.",
+  'photos.failed': "لم تُرسل. تحقّق من الاتصال وحاول مرة أخرى.",
+  'photos.list': "أُرسلت",
+  'photos.status.sent': "أُرسلت، تُجمع الليلة",
+  'photos.status.collected': "جُمعت في {date}",
+  'photos.status.read': "قُرئت في {date}",
   'layout.rejected.teamNote': "ملاحظة للفريق:",
   'shelf.rule.together': "إبقاؤها معًا على رف واحد: {names}",
   'shelf.rule.togetherDepartment': "إبقاء قسم {department} معًا على رف واحد",

@@ -273,7 +273,9 @@ export default function App() {
         return <p className="spine__loading">{t('spine.loading')}</p>
       }
       return activePage === 'store-layout'
-        ? <StoreLayoutPage artefact={artefact} catalogue={catalogue.catalogue} />
+        ? <StoreLayoutPage artefact={artefact} catalogue={catalogue.catalogue}
+          // D-37, drawn for the owner's approval: sending is a stand-in until the ADR is accepted.
+          photos={{ readOnly, onSend: () => new Promise((resolve) => setTimeout(resolve, 400)) }} />
         : <ShelfPlanPage artefact={artefact} ownerState={ownerState} catalogue={catalogue.catalogue}
           onOutcome={onOutcome} onUndoOutcome={readOnly ? null : onUndoOutcome} readOnly={readOnly} />
     }

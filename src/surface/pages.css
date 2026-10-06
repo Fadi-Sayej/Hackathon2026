@@ -1034,3 +1034,33 @@
 .plan__store-figure { font-size: 16px; font-weight: 600; color: var(--ink-900); }
 .example .layout__fixture,
 .example .plan__fixture { position: relative; }
+
+/* D-37: sending the shelf photos, at the top of Store layout. */
+.photos {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius-lg);
+  background: var(--paper-100);
+}
+.photos h3 { margin: 0; font-size: 17px; color: var(--ink-900); }
+.photos h4 { margin: 0 0 4px; font-size: 14px; color: var(--ink-900); }
+.photos > p { margin: 0; }
+.photos__field { display: flex; flex-direction: column; gap: 6px; width: 100%; font-weight: 600; color: var(--ink-900); }
+.photos__field select,
+.photos__field input {
+  min-height: 40px;
+  padding: 6px 10px;
+  border: 1px solid var(--ink-line-strong);
+  border-radius: var(--radius-md);
+  background: var(--paper-100);
+  font: inherit;
+  font-weight: 400;
+}
+.photos__choose { cursor: pointer; }
+.photos__choose[data-disabled] { opacity: 0.45; cursor: not-allowed; }
+.photos__preview { max-width: 100%; max-height: 220px; border-radius: var(--radius-md); border: 1px solid var(--ink-line); }
+.photos__sent ul { margin: 0; padding-inline-start: 18px; color: var(--ink-600); line-height: 1.6; }
