@@ -16,7 +16,6 @@ from pathlib import Path
 from typing import Optional
 
 import yaml
-from PIL import Image
 
 from src.engine.shelf_reader import identity, measure
 
@@ -51,8 +50,7 @@ def read(*, day: str, photo_root: Path, layout: dict, products: list, sales_dail
             if answer is None:
                 report.append({"fixture": fixture, "photo": photo.name, "why": why})
                 continue
-            image = Image.open(photo)
-            image.load()
+            image = measure.upright(photo)
             g = measure.gray(image)
             for number, (shelf, stated) in enumerate(zip(answer["shelves"], unit["shelves"]), start=1):
                 span, measured = measure.read_shelf(g, shelf)

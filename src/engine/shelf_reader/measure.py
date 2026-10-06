@@ -16,10 +16,18 @@ import io
 from typing import Optional
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageOps
 
 PICTURE_MAX_BYTES = 150 * 1024        # ADR-040's limit, checked again by the loader
 PICTURE_HEIGHT = 360                  # pixels: a tile is 76 px tall on the page, at most 3× that on a screen
+
+
+def upright(photo) -> Image.Image:
+    """The photo as it was seen. A phone stores the sensor's pixels with a tag saying how to turn
+    them (EXIF orientation). Read without it, a photo taken upright reaches the reader on its side."""
+    image = Image.open(photo)
+    image.load()
+    return ImageOps.exif_transpose(image)
 
 
 def gray(image: Image.Image) -> np.ndarray:

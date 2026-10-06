@@ -22,6 +22,7 @@ from typing import Optional
 from PIL import Image
 
 from src.engine.model_client import ModelUnavailable, ask
+from src.engine.shelf_reader.measure import upright
 
 API_LONG_EDGE = 1568          # the API's largest image side; anything bigger is reduced to it
 SEALED = "answers.json"
@@ -40,8 +41,7 @@ def _jpeg(image: Image.Image) -> str:
 def images(photo: Path, shelves: int) -> list:
     """The whole photo reduced to the API's size, then full-resolution tiles: one row of tiles a
     shelf, each row overlapping its neighbours by a quarter, so every tag is whole in some tile."""
-    full = Image.open(photo)
-    full.load()
+    full = upright(photo)
     whole = full.copy()
     whole.thumbnail((API_LONG_EDGE, API_LONG_EDGE))
     out = [whole]
