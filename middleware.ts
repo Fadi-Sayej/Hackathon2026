@@ -16,7 +16,7 @@ function protectionNotConfigured() {
 // FIREBASE_PROJECT_ID it fails closed, with a 503 on every request.
 //
 // What is public: the app shell and its code, which hold no store data and render the
-// sign-in page themselves. What is not: every /data/ file (any role), and the team's
+// sign-in page themselves. What is not: every /data/ and /store/ file (any role), and the team's
 // telemetry page, its chunks and its data (team only). An owner who types the telemetry URL
 // is refused on the server, not hidden from in the browser.
 
@@ -30,7 +30,9 @@ const TEAM_ONLY = [
   /^\/data\/measurement\.json$/,
   /^\/data\/operational\.json$/,
 ]
-const DATA = /^\/data\//
+// Store data any role may read: the artefacts (/data/), and the product pictures ADR-040 cuts
+// from the store's own shelf photos (/store/). Signed out, both are refused.
+const DATA = /^\/(data|store)\//
 
 async function defaultKeyFetcher() {
   const res = await fetch(JWKS_URL)
@@ -146,7 +148,7 @@ export default async function middleware(request) {
   const claims = await verifyIdToken(readCookie(request, SESSION_COOKIE), projectId)
   if (!claims) {
     // A page gets the sign-in screen and comes back afterwards; a file gets a status.
-    if (!pathname.startsWith('/data/') && !pathname.startsWith('/assets/')) {
+    if (!DATA.test(pathname) && !pathname.startsWith('/assets/')) {
       return new Response(null, {
         status: 302,
         headers: { Location: `/?next=${encodeURIComponent(pathname)}`, 'Cache-Control': 'no-store' },

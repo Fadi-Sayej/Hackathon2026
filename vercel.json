@@ -31,6 +31,15 @@
           "value": "no-cache"
         }
       ]
+    },
+    {
+      "source": "/store/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "private, no-cache"
+        }
+      ]
     }
   ],
   "rewrites": [
