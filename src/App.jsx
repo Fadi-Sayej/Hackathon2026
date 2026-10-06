@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 // The daily surface's own rules. Task 2.7 shipped its class names and no stylesheet.
 import './surface/surface.css'
@@ -19,13 +19,16 @@ import { QuestionPanel } from './questions/QuestionPanel.jsx'
 import { DataPage } from './pages/DataPage.jsx'
 import { CapabilityPage } from './pages/CapabilityPage.jsx'
 import { PageAwaitingData } from './pages/PageAwaitingData.jsx'
-import { ReorderPage } from './pages/ReorderPage.jsx'
-import { ApprovedOrdersPage } from './pages/ApprovedOrdersPage.jsx'
-import { StoreLayoutPage } from './pages/StoreLayoutPage.jsx'
-import { ShelfPlanPage } from './pages/ShelfPlanPage.jsx'
 import { useI18n } from './lib/i18n/index.js'
 import { useAuth } from './auth/useAuth.js'
 import { TeamBanner } from './auth/SignInPage.jsx'
+
+// Loaded when first opened, not with the app: the owner's first screen is Today, and these four
+// (the order pages and the planogram's) added ~70 KB to it in a week. Each has its own chunk.
+const ReorderPage = lazy(() => import('./pages/ReorderPage.jsx').then((m) => ({ default: m.ReorderPage })))
+const ApprovedOrdersPage = lazy(() => import('./pages/ApprovedOrdersPage.jsx').then((m) => ({ default: m.ApprovedOrdersPage })))
+const StoreLayoutPage = lazy(() => import('./pages/StoreLayoutPage.jsx').then((m) => ({ default: m.StoreLayoutPage })))
+const ShelfPlanPage = lazy(() => import('./pages/ShelfPlanPage.jsx').then((m) => ({ default: m.ShelfPlanPage })))
 
 /**
  * What each restored page is waiting for, when the artefact cannot feed it.
@@ -332,7 +335,9 @@ export default function App() {
       onResetDemoState={null}
       onNavigate={setActivePage}
     >
-      {body()}
+      <Suspense fallback={<p className="spine__loading">{t('spine.loading')}</p>}>
+        {body()}
+      </Suspense>
     </AppShell>
   )
 }
