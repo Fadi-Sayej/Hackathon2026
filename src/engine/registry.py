@@ -40,7 +40,12 @@ CAPABILITIES = {
     "hygiene":             CapabilitySpec("hygiene",             "SPEC-002", "none",     True,  "hygiene_order",
                                           ("products", "inventory")),
     "competitor_position": CapabilitySpec("competitor_position", "SPEC-003", "none",     True,  "premium_pct",
-                                          ("products", "observations", "matches", "price_rule")),
+                                          ("products", "observations", "matches")),
+    # ADR-043: the breaches, judged against the owner's own rule (D-39). Their own capability so they
+    # can wait for it while the comparison and the purchase-cost check above go on.
+    "policy_breach":       CapabilitySpec("policy_breach",       "SPEC-003", "none",     True,  "premium_pct",
+                                          ("products", "observations", "matches", "price_rule"),
+                                          published_from="2026-10-09"),
     "catalogue_lifecycle": CapabilitySpec("catalogue_lifecycle", "SPEC-004", "none",     True,  "unit_cost",
                                           ("products", "inventory", "sales_summary", "window")),
     "owner_questions":     CapabilitySpec("owner_questions",     "SPEC-005", "none",     False, "expected_value",

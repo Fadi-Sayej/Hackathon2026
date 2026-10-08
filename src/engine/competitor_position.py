@@ -16,6 +16,12 @@ from src.engine.model import CapabilityOutput, Entry, Figure, entry_id
 from src.engine.registry import derive_status
 
 CAP, SPEC = "competitor_position", "SPEC-003"
+# ADR-043: the breaches are their own capability, which waits for the owner's rule (D-39) while the
+# comparison and the purchase-cost check go on here. One pass computes both (_evaluate), so a
+# product the cost floor stops is never a breach (FR-043a/b), and their order is one order.
+BREACH_CAP = "policy_breach"
+BREACH_COUNTS = ("breaches", "attention", "review")
+BREACH_THRESHOLDS = ("policy_pct", "attention_pct")
 SUPERMARKET_FORMATS = ("supermarket", "hypermarket", "midsize_grocery")
 
 
@@ -75,11 +81,42 @@ def _is_structurally_uncomparable(p: dict, policy) -> bool:
 
 
 def run(inputs: EngineInputs) -> CapabilityOutput:
+    """The comparison and the purchase-cost check: everything F3 publishes but the breaches."""
     status, reason = derive_status(CAP, inputs)          # never declared (ADR-014)
     if status == "unavailable":
         return CapabilityOutput.unavailable(CAP, SPEC, reason)
-    # D-39, ADR-043: the owner's own rule, which derive_status above has refused to do without.
-    rule_pct = inputs.price_rule["max_premium_pct"]
+    ev = _evaluate(inputs)
+    counts = {k: v for k, v in ev["counts"].items() if k not in BREACH_COUNTS}
+    thresholds = {k: v for k, v in ev["thresholds"].items() if k not in BREACH_THRESHOLDS}
+    entries = [e for e in ev["entries"] if e.capability == CAP]
+    figures = [Figure(k, v, "products", ["pos", "competitor"], thresholds) for k, v in counts.items()]
+    figures.append(Figure("format_allowance_pct", ev["allowance_pct"], "percent", ["competitor"],
+                          {"basis_count": ev["allowance_n"]}))
+    out = CapabilityOutput(id=CAP, spec=SPEC, status="available", thresholds=thresholds, counts=counts,
+                           entries=entries, figures=figures, notes=ev["notes"])
+    out.extras = ev["extras"]
+    return out
+
+
+def run_breaches(inputs: EngineInputs) -> CapabilityOutput:
+    """The policy breaches (FR-045a), judged against the owner's own rule (D-39, ADR-043)."""
+    status, reason = derive_status(BREACH_CAP, inputs)   # no rule stated: no_price_rule
+    if status == "unavailable":
+        return CapabilityOutput.unavailable(BREACH_CAP, SPEC, reason)
+    ev = _evaluate(inputs)
+    counts = {k: ev["counts"][k] for k in BREACH_COUNTS}
+    thresholds = {k: ev["thresholds"][k] for k in BREACH_THRESHOLDS}
+    figures = [Figure(k, v, "products", ["pos", "competitor"], thresholds) for k, v in counts.items()]
+    out = CapabilityOutput(id=BREACH_CAP, spec=SPEC, status="available", thresholds=thresholds, counts=counts,
+                           entries=[e for e in ev["entries"] if e.capability == BREACH_CAP], figures=figures)
+    out.extras = {"rule": inputs.price_rule}      # what it was judged by, and who stated it when
+    return out
+
+
+def _evaluate(inputs: EngineInputs) -> dict:
+    # D-39, ADR-043: the owner's own rule, or None until it is stated. Without it no breach is
+    # judged; a purchase-cost finding carries it as context only, and never needs it (FR-043a/b).
+    rule_pct = inputs.price_rule["max_premium_pct"] if inputs.price_rule else None
     # An empty observations list is DATA — we collected and found nothing for these
     # products — and FR-051 requires each of them to be counted "no comparison" rather
     # than nothing at all. Absence is None, and derive_status above has already refused
@@ -225,13 +262,13 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
                                  evidence=evidence, value=None, attention="review",
                                  ordering_key={"name": "premium_pct", "value": round(premium_pct, 2)}))
             continue
-        if premium_pct <= rule_pct:
+        if rule_pct is None or premium_pct <= rule_pct:
             continue
         counts["breaches"] += 1
         attention = premium_pct > policy.attention_pct
         counts["attention" if attention else "review"] += 1
         entries.append(Entry(id=entry_id("competitor.policy_breach", b), signal_family="competitor.policy_breach",
-                             capability=CAP, barcode=b, product_name=p["product_name"],
+                             capability=BREACH_CAP, barcode=b, product_name=p["product_name"],
                              department=p["department"], action="review_policy",
                              characterisation="policy_breach_attention" if attention else "policy_breach_review",
                              evidence=evidence, value=None, attention="today" if attention else "review",
@@ -246,13 +283,9 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
                   "format_allowance_basis_count": allowance_n, "freshness_days": policy.freshness_days,
                   "comparability_floor": floor}
     notes = [] if allowance_pct is not None else ["format_allowance_unmeasurable"]
-    figures = [Figure(k, v, "products", ["pos", "competitor"], thresholds) for k, v in counts.items()]
-    figures.append(Figure("format_allowance_pct", allowance_pct, "percent", ["competitor"],
-                          {"basis_count": allowance_n}))
-    out = CapabilityOutput(id=CAP, spec=SPEC, status="available", thresholds=thresholds, counts=counts,
-                           entries=entries, figures=figures, notes=notes)
-    out.extras = {"position": sorted(position.values(), key=lambda r: (-r["affinity"], r["store_id"])),
-                  # Sorted by barcode for the reason ADR-024 sorts the catalogue: the nightly
-                  # commits this file, so the bytes must repeat when the data does.
-                  "comparison": sorted(comparison, key=lambda r: str(r["barcode"] or ""))}
-    return out
+    return {"counts": counts, "thresholds": thresholds, "entries": entries, "notes": notes,
+            "allowance_pct": allowance_pct, "allowance_n": allowance_n,
+            "extras": {"position": sorted(position.values(), key=lambda r: (-r["affinity"], r["store_id"])),
+                       # Sorted by barcode for the reason ADR-024 sorts the catalogue: the nightly
+                       # commits this file, so the bytes must repeat when the data does.
+                       "comparison": sorted(comparison, key=lambda r: str(r["barcode"] or ""))}}

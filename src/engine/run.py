@@ -43,6 +43,7 @@ def _runners() -> dict:
     return {"catalogue_lifecycle": catalogue_lifecycle.run, "price_consistency": price_consistency.run,
             "reconciliation": reconciliation.run, "hygiene": reconciliation.run_hygiene,
             "competitor_position": competitor_position.run,
+            "policy_breach": competitor_position.run_breaches,
             "margin_below_cost": margin_below_cost.run, "owner_questions": owner_questions.run,
             # Registered in the same change as its registry entry: a real run whose artefact
             # lacks a registered id is refused (publish.require_complete_registry).

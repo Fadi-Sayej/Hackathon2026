@@ -7,6 +7,7 @@ import pytest
 
 from helpers import RUN_AT, make_inputs, match, observation, product
 from src.engine.competitor_position import balanced_reference, measure_format_allowance, run
+from src.engine.policy_breach import run as breach_run      # ADR-043: the breaches' own capability
 
 # NOTE: identifiers are >= policy.uncomparable_min_barcode_digits (8) characters.
 # A shorter one is structurally uncomparable under FR-052 — which is what "svc"
@@ -45,7 +46,9 @@ def test_ac_049_ac_050_cost_floor_blocks_a_losing_recommendation():
     out = run(_inputs(prods, obs, [match("cheese_01", "cheese_01", "rami-levy-pt-01"), match("cheese_01", "cheese_01", "dor-alon-kq-01")]))
     kinds = {e.barcode: e.characterisation for e in out.entries}
     assert kinds["cheese_01"] == "purchase_cost"
-    assert out.counts["purchase_cost_findings"] == 1 and out.counts["breaches"] == 0
+    assert out.counts["purchase_cost_findings"] == 1
+    breaches = breach_run(_inputs(prods, obs, [match("cheese_01", "cheese_01", "rami-levy-pt-01"), match("cheese_01", "cheese_01", "dor-alon-kq-01")]))
+    assert breaches.counts["breaches"] == 0 and breaches.entries == []     # FR-043a/b: never both
 
 
 def test_ac_051_no_cost_means_no_judgement():
@@ -61,7 +64,7 @@ def test_ac_054_a_breach_above_the_attention_threshold_is_same_day():
     prods = [product("bisli_001", shelf=13.90, cost=4.00)]
     obs = [observation("bisli_001", 6.50, "rami-levy-pt-01", **SUPER, observed_at=FRESH),
            observation("bisli_001", 7.00, "dor-alon-kq-01", **FORECOURT, observed_at=FRESH)]
-    out = run(_inputs(prods, obs, [match("bisli_001", "bisli_001", "rami-levy-pt-01"), match("bisli_001", "bisli_001", "dor-alon-kq-01")]))
+    out = breach_run(_inputs(prods, obs, [match("bisli_001", "bisli_001", "rami-levy-pt-01"), match("bisli_001", "bisli_001", "dor-alon-kq-01")]))
     e = out.entries[0]
     assert e.characterisation == "policy_breach_attention" and e.attention == "today"
     assert e.evidence["reference"]["kind"] == "midpoint" and e.evidence["premium_pct"] > 100
@@ -72,7 +75,7 @@ def test_a_breach_between_the_two_thresholds_is_unhurried_review():
     prods = [product("product_p", shelf=17.0, cost=5.0)]
     obs = [observation("product_p", 10.0, "rami-levy-pt-01", **SUPER, observed_at=FRESH),
            observation("product_p", 10.0, "dor-alon-kq-01", **FORECOURT, observed_at=FRESH)]
-    out = run(_inputs(prods, obs, [match("product_p", "product_p", "rami-levy-pt-01"), match("product_p", "product_p", "dor-alon-kq-01")]))
+    out = breach_run(_inputs(prods, obs, [match("product_p", "product_p", "rami-levy-pt-01"), match("product_p", "product_p", "dor-alon-kq-01")]))
     assert out.entries[0].characterisation == "policy_breach_review" and out.entries[0].attention == "review"
     assert out.entries[0].evidence["policy_pct"] == 60
 
@@ -88,7 +91,7 @@ def test_ac_042_every_entry_names_the_store_and_its_format():
     prods = [product("product_p", shelf=17.0, cost=5.0)]
     obs = [observation("product_p", 10.0, "rami-levy-pt-01", **SUPER, observed_at=FRESH, store_name="Rami Levy PT"),
            observation("product_p", 10.0, "dor-alon-kq-01", **FORECOURT, observed_at=FRESH, store_name="Alonit KQ")]
-    e = run(_inputs(prods, obs, [match("product_p", "product_p", "rami-levy-pt-01"), match("product_p", "product_p", "dor-alon-kq-01")])).entries[0]
+    e = breach_run(_inputs(prods, obs, [match("product_p", "product_p", "rami-levy-pt-01"), match("product_p", "product_p", "dor-alon-kq-01")])).entries[0]
     sources = e.evidence["sources"]
     assert {s["format"] for s in sources} == {"supermarket", "gas_convenience"}
     assert all(s["store_name"] for s in sources)
@@ -154,7 +157,8 @@ def test_a_store_below_the_affinity_floor_cannot_drive_a_finding():
     out = run(_inputs(prods, obs, [match("bisli_001", "bisli_001", "rami-levy-pt-01")]))
 
     assert out.entries == [], "a below-floor store produced a finding"
-    assert out.counts["breaches"] == 0 and out.counts["evaluated"] == 0
+    assert out.counts["evaluated"] == 0
+    assert breach_run(_inputs(prods, obs, [match("bisli_001", "bisli_001", "rami-levy-pt-01")])).counts["breaches"] == 0
     # it is still reported, as context — excluded is not the same as unseen
     roles = {p["store_id"]: p.get("role") for p in out.extras["position"]}
     assert roles.get("rami-levy-pt-01") != "comparable"
@@ -167,7 +171,7 @@ def test_the_same_price_from_a_comparable_store_does_produce_one():
     out = run(_inputs(prods, obs, [match("bisli_001", "bisli_001", "dor-alon-kq-01")]))
 
     assert out.counts["evaluated"] == 1
-    assert [e.characterisation for e in out.entries] == ["policy_breach_attention"]
+    assert [e.characterisation for e in breach_run(_inputs(prods, obs, [match("bisli_001", "bisli_001", "dor-alon-kq-01")])).entries] == ["policy_breach_attention"]
 
 
 # ── The comparison behind the findings (#137) ────────────────────────────────
@@ -256,7 +260,8 @@ def test_the_published_premium_matches_the_entry_it_produced():
     prods = [product("dearone1", shelf=100.0, cost=10.0)]
     obs = [observation("dearone1", 50.0, "dor-alon-kq-01", **FORECOURT, observed_at=FRESH)]
     out = run(_inputs(prods, obs, [match("dearone1", "dearone1", "dor-alon-kq-01")]))
-    entry = next(e for e in out.entries if e.barcode == "dearone1")
+    entry = next(e for e in breach_run(_inputs(prods, obs, [match("dearone1", "dearone1", "dor-alon-kq-01")])).entries
+                 if e.barcode == "dearone1")
     row = next(r for r in out.extras["comparison"] if r["barcode"] == "dearone1")
     assert row["premium_pct"] == entry.evidence["premium_pct"]
 
@@ -358,3 +363,50 @@ def test_scn_047_the_stale_row_and_its_count_reach_the_published_artefact(tmp_pa
         ("product_p", "stale", "2026-08-01")]
     assert cp["counts"]["stale_skipped"] == 1
     assert art["figures"]["competitor_position.stale_skipped"]["value"] == 1
+
+
+# ── ADR-043: the breaches are their own capability, waiting for the owner's rule (D-39) ──
+
+BREACH_KEYS = ("breaches", "attention", "review")
+
+
+def _one_breach(**kw):
+    prods = [product("product_p", shelf=17.0, cost=5.0), product("cheese_01", shelf=158.21, cost=147.11)]
+    obs = [observation("product_p", 10.0, "dor-alon-kq-01", **FORECOURT, observed_at=FRESH),
+           observation("cheese_01", 54.0, "rami-levy-pt-01", **SUPER, observed_at=FRESH),
+           observation("cheese_01", 60.0, "dor-alon-kq-01", **FORECOURT, observed_at=FRESH)]
+    return _inputs(prods, obs, [match("product_p", "product_p", "dor-alon-kq-01"),
+                                match("cheese_01", "cheese_01", "rami-levy-pt-01"),
+                                match("cheese_01", "cheese_01", "dor-alon-kq-01")], **kw)
+
+
+def test_the_comparison_and_the_purchase_cost_check_need_no_rule():
+    out = run(_one_breach(price_rule=None))
+    assert out.status == "available"
+    assert [e.characterisation for e in out.entries] == ["purchase_cost"]
+    assert not set(BREACH_KEYS) & set(out.counts)
+    assert "policy_pct" not in out.thresholds and "attention_pct" not in out.thresholds
+    assert {r["barcode"] for r in out.extras["comparison"]} == {"product_p", "cheese_01"}
+
+
+def test_without_the_owners_rule_the_breaches_wait_for_it():
+    out = breach_run(_one_breach(price_rule=None))
+    assert (out.status, out.unavailable_reason) == ("unavailable", "no_price_rule")
+
+
+def test_the_breaches_keep_their_family_ids_and_the_rule_they_were_judged_by():
+    from helpers import PRICE_RULE
+    from src.engine.model import entry_id
+    out = breach_run(_one_breach())
+    (e,) = out.entries
+    assert (e.capability, e.signal_family) == ("policy_breach", "competitor.policy_breach")
+    assert e.id == entry_id("competitor.policy_breach", "product_p")     # ADR-009: outcomes still attach
+    assert list(out.counts) == list(BREACH_KEYS) and out.counts["breaches"] == 1
+    assert out.thresholds == {"policy_pct": 60.0, "attention_pct": 100.0}
+    assert out.extras["rule"] == PRICE_RULE
+
+
+def test_the_breaches_are_judged_by_the_owners_rule_not_a_default():
+    from helpers import PRICE_RULE
+    looser = {**PRICE_RULE, "max_premium_pct": 80.0}                     # product_p is +70%
+    assert breach_run(_one_breach(price_rule=looser)).entries == []

@@ -55,7 +55,9 @@ def test_hygiene_is_a_capability_of_its_own_and_spec_002_produces_two():
                                  # Phase 8: F12's layout (Task 8.2) and plan (Task 8.3)
                                  "layout_facts", "shelf_plan", "shelf_measurement",
                                  # and the AI's explanation (Task 8.10, D-32)
-                                 "shelf_explanation"}
+                                 "shelf_explanation",
+                                 # ADR-043: F3's breaches, which wait for the owner's rule (D-39)
+                                 "policy_breach"}
     assert CAPABILITIES["hygiene"].spec == CAPABILITIES["reconciliation"].spec == "SPEC-002"
     assert "sales_summary" not in CAPABILITIES["hygiene"].requires
 
@@ -74,7 +76,7 @@ def test_status_is_derived_from_requires_not_declared():
 def test_the_unvalued_order_in_policy_covers_every_unvalued_capability():
     """A capability missing from the order would never reach a reserved place (FR-106)."""
     check_unvalued_order(load_policy().surface_unvalued_order)
-    assert set(UNVALUED_CAPABILITIES) == {"reconciliation", "competitor_position",
+    assert set(UNVALUED_CAPABILITIES) == {"reconciliation", "competitor_position", "policy_breach",
                                           "catalogue_lifecycle", "hygiene", "assortment_gap"}
     try:
         check_unvalued_order(("assortment_gap", "reconciliation", "competitor_position", "catalogue_lifecycle"))
@@ -92,3 +94,16 @@ def test_f12_reads_only_the_layout_file_and_the_existing_inputs():
     assert {"layout_facts", "shelf_plan", "shelf_measurement"} <= set(f12)
     for cid, needs in f12.items():
         assert needs <= allowed, f"{cid} reads {sorted(needs - allowed)}"
+
+
+
+def test_the_breaches_are_their_own_capability_and_only_they_need_the_rule():
+    """ADR-043, ADR-014: the smallest unit that can wait for the owner's rule on its own."""
+    from src.engine.registry import CAPABILITIES, INPUT_REASONS
+    pb = CAPABILITIES["policy_breach"]
+    assert (pb.spec, pb.value_policy, pb.admitted, pb.ordering_key) == ("SPEC-003", "none", True, "premium_pct")
+    assert pb.requires == ("products", "observations", "matches", "price_rule")
+    assert pb.published_from == "2026-10-09"
+    assert CAPABILITIES["competitor_position"].requires == ("products", "observations", "matches")
+    assert [c for c in CAPABILITIES if "price_rule" in CAPABILITIES[c].requires] == ["policy_breach"]
+    assert INPUT_REASONS["price_rule"] == "no_price_rule"
