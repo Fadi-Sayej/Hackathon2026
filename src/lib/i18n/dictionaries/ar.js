@@ -86,7 +86,7 @@ export const ar = {
   'page.store-layout.name': 'مخطط المتجر',
   'page.store-layout.hint': "رفوفك كما قيست",
   'page.store-layout.title': "مخطط المتجر",
-  'page.store-layout.description': "وحدات رفوفك كما سجّلها الفريق من صورك: طول كل رف وعرض كل منتج. منها يُبنى تخطيط الرف.",
+  'page.store-layout.description': "وحدات رفوفك: طول كل رف كما سجّله الفريق، وعرض كل منتج كما قُرئ من صورك. منها يُبنى تخطيط الرف.",
 
   'page.shelf-plan.name': 'تخطيط الرف',
   'page.shelf-plan.hint': 'ماذا يوضع على كل رف',
@@ -643,7 +643,7 @@ export const ar = {
 
   // F12 (Phase 8 Task 8.8): Store layout and Shelf plan, as drawn for the repository owner's
   // approval (docs/reviews/F12-screens-mockups.md). Not shown until he approves them.
-  'layout.waiting.next': "أرسل صورة لكل وحدة رفوف، ملتقطة من الأمام. يقيس الفريق من الصور طول كل رف وعرض كل منتج ويسجّلها، فتظهر هنا.",
+  'layout.waiting.next': "أرسل أدناه صورة لكل وحدة رفوف، ملتقطة من الأمام. يسجّل الفريق طول كل رف، ويقرأ قارئ الرفوف من الصور عرض كل منتج وواجهاته وصورته، فتظهر هنا.",
   'layout.shelfOrder': "الرف 1 هو الرف العلوي.",
   'layout.chilled': "مبرّد",
   'layout.departments': "الأقسام:",
@@ -676,7 +676,7 @@ export const ar = {
   // F12-S1 FR-223 (D-34): the reader's widths, read but waiting for their acceptance run.
   // Approved by the repository owner on 2026-10-06 ("yes").
   'layout.reader.waiting': "قرأ قارئ الرفوف {n} عرضًا من صورك في {date}. تُستخدم بعد أن ينجح فحصه: {min} منتجًا قيست باليد، كل منها ضمن {tol} مم من العرض الذي قرأه. حتى الآن: {within} من {listed}.",
-  // D-37: the shelf photos' upload, drawn for the repository owner's approval (not shown until it is given).
+  // D-37: the shelf photos' upload (F12-S1 FR-224 … FR-227), approved by the repository owner 2026-10-06.
   'photos.title': "أرسل صور رفوفك",
   'photos.how': "صورة واحدة لكل وحدة رفوف: من الأمام، بشكل مستقيم، والوحدة كلها في الصورة ولا أحد فيها.",
   'photos.unit': "أي وحدة؟",

@@ -122,6 +122,61 @@ jobs:
         # was simply the same import twice.
         run: python3 scripts/import_pos.py
 
+      # ── The shelf photos sent from the app (ADR-042, F12-S1 FR-226) ──────
+      #
+      # Before the engine, so tonight's artefact lists what was collected and uses what the reader
+      # read. None of these four steps can stop the night: no photo, no key or no layout file is a
+      # normal night, and a photo that waits in Firestore is collected the next one.
+      - name: Collect the shelf photos sent from the app
+        # Joins each photo's parts, checks them against its manifest, and writes it to
+        # data/internal/shelf_photos/<today>/<unit>/. It deletes nothing: the ledger says what
+        # the delete step below may remove, once the photos are pushed.
+        continue-on-error: true
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+        run: python3 scripts/collect_shelf_photos.py collect --ledger /tmp/shelf_photos.json
+
+      - name: Read the shelf photos not read yet
+        # ADR-042 Decision 5, amending ADR-041 Decision 2: every photo not read yet, tonight's and
+        # any that waited for the key or the layout file, within one request ceiling and one time
+        # budget (NFR-079). With no new photo it asks nothing.
+        continue-on-error: true
+        env:
+          SMARTSHELF_ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python3 scripts/read_shelves.py --unread
+
+      - name: Commit the shelf photos and what the reader read
+        # One `git add` a path: a pathspec that matches nothing makes `git add` stage nothing at
+        # all (tests/test_nightly_commit_step.py). data/external/ is ignored, so the sealed
+        # answers are forced, as the boost's picks are. A failed push does not stop the night; its
+        # outcome is still 'failure', which keeps the step below from deleting anything.
+        id: photos_commit
+        continue-on-error: true
+        run: |
+          git config user.name  "smartshelf-collector"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- data/internal/shelf_photos 2>/dev/null || true
+          git add -- configs/shelf_readings.yaml 2>/dev/null || true
+          git add -- public/store/shelf-pictures 2>/dev/null || true
+          git add -f -- ':(glob)data/external/snapshots/*/shelf_readings/*.json' 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No shelf photos or readings to commit."
+            exit 0
+          fi
+          DAY=$(date -u +%Y-%m-%d)
+          git commit -q -m "snapshot: shelf photos and readings for ${DAY}"
+          git pull --rebase --autostash origin main || true
+          git push origin HEAD:main
+
+      - name: Remove the collected photos from Firestore
+        # Only after the push above succeeded: this step is skipped when it failed, and the photos
+        # stay in Firestore for the next night. It removes exactly what the ledger names.
+        if: steps.photos_commit.outcome == 'success'
+        continue-on-error: true
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+        run: python3 scripts/collect_shelf_photos.py delete --ledger /tmp/shelf_photos.json
+
       # ── Why refresh_pipeline.py stopped running here (2026-09-13) ────────────
       #
       # It cannot be repaired honestly. Its product_recommendations step required

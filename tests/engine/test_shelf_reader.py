@@ -291,7 +291,8 @@ def test_the_request_carries_the_whole_photo_and_full_resolution_tiles(tmp_path)
 def test_the_reading_writes_pictures_and_a_file_the_loader_reads(tmp_path):
     result, _ = run_reading(tmp_path, UNIT)
     readings, pictures = tmp_path / "shelf_readings.yaml", tmp_path / "pictures"
-    reading.write(result, day=DAY, model="m", prompt="v1", readings_path=readings, pictures_dir=pictures)
+    reading.write(result, day=DAY, model="m", prompt="v1", readings_path=readings, pictures_dir=pictures,
+                  tolerance_mm=5)
     for face in pictures.glob("*.jpg"):
         data = face.read_bytes()
         assert data.startswith(b"\xff\xd8\xff") and len(data) <= 150 * 1024
@@ -357,3 +358,82 @@ def test_no_readings_file_changes_nothing(tmp_path):
                             acceptance_path=tmp_path / "absent2.yaml", tolerance_mm=5, minimum=20)
     assert merged["reader"]["status"] == "no_readings"
     assert {k: v for k, v in merged.items() if k != "reader"} == layout
+
+
+# ── Photos arriving a unit at a time (ADR-042, F12-S1 FR-226, FR-227) ─────────
+
+def _write(tmp_path, result, day, read_on=None):
+    return reading.write({"widths": {}, "current": {}, "pictures": {}, "photos": [], "units": [], **result},
+                         day=day, model="m", prompt="v1", readings_path=tmp_path / "shelf_readings.yaml",
+                         pictures_dir=tmp_path / "pictures", tolerance_mm=5, read_on=read_on)
+
+
+def _file(tmp_path):
+    return yaml.safe_load((tmp_path / "shelf_readings.yaml").read_text(encoding="utf-8"))
+
+
+def test_a_later_reading_of_another_unit_keeps_what_was_read_before(tmp_path):
+    _write(tmp_path, {"widths": {"7290001": 75}, "current": {"7290001": {"fixture": "מדף שתייה", "shelf": 1, "facings": 3}},
+                      "units": ["מדף שתייה"]}, "2026-10-10")
+    _write(tmp_path, {"widths": {"7290005": 66}, "current": {"7290005": {"fixture": "מקרר", "shelf": 2, "facings": 4}},
+                      "units": ["מקרר"]}, "2026-10-12")
+    doc = _file(tmp_path)
+    assert doc["widths"]["7290001"] == {"width_mm": 75, "measured_by": "reader", "measured_on": "2026-10-10"}
+    assert doc["widths"]["7290005"]["measured_on"] == "2026-10-12"
+    assert set(doc["current"]) == {"7290001", "7290005"} and doc["reading"]["day"] == "2026-10-12"
+
+
+def test_a_unit_read_again_replaces_what_was_read_of_it(tmp_path):
+    _write(tmp_path, {"current": {"7290001": {"fixture": "מדף שתייה", "shelf": 1, "facings": 3},
+                                  "7290002": {"fixture": "מדף שתייה", "shelf": 1, "facings": 2}},
+                      "units": ["מדף שתייה"]}, "2026-10-10")
+    _write(tmp_path, {"current": {"7290002": {"fixture": "מדף שתייה", "shelf": 2, "facings": 1}},
+                      "units": ["מדף שתייה"]}, "2026-10-12")
+    assert _file(tmp_path)["current"] == {"7290002": {"fixture": "מדף שתייה", "shelf": 2, "facings": 1,
+                                                       "measured_by": "reader", "measured_on": "2026-10-12"}}
+
+
+def test_a_unit_not_read_whole_keeps_its_earlier_facings(tmp_path):
+    _write(tmp_path, {"current": {"7290001": {"fixture": "מדף שתייה", "shelf": 1, "facings": 3}},
+                      "units": ["מדף שתייה"]}, "2026-10-10")
+    _write(tmp_path, {"units": []}, "2026-10-12")         # its photo was not answered tonight
+    assert "7290001" in _file(tmp_path)["current"]
+
+
+def test_a_width_two_photos_disagree_on_is_unknown(tmp_path):
+    _write(tmp_path, {"widths": {"7290001": 75, "7290002": 90}}, "2026-10-10")
+    contradicted = _write(tmp_path, {"widths": {"7290001": 77, "7290002": 99}}, "2026-10-12")
+    widths = _file(tmp_path)["widths"]
+    assert widths["7290001"] == {"width_mm": 77, "measured_by": "reader", "measured_on": "2026-10-12"}
+    assert "7290002" not in widths                         # FR-221: neither is trusted
+    assert contradicted == [{"barcode": "7290002", "why": "read_differently_on_2026-10-10"}]
+
+
+def test_each_photo_the_ai_answered_for_is_marked_read(tmp_path):
+    from src.engine.shelf_reader import photos as photos_mod
+    result, _ = run_reading(tmp_path, UNIT)
+    assert result["photos"] == [f"{DAY}/מדף שתייה/unit.jpg"] and result["units"] == ["מדף שתייה"]
+    readings = tmp_path / "shelf_readings.yaml"
+    root = tmp_path / "photos"
+    assert photos_mod.unread_days(root, readings) == [DAY]
+    reading.write(result, day=DAY, model="m", prompt="v1", readings_path=readings, pictures_dir=tmp_path / "pictures",
+                  tolerance_mm=5, read_on="2026-10-11")
+    assert photos_mod.listed(root, readings) == [{"id": "unit", "unit": "מדף שתייה", "collected": DAY,
+                                                  "read": "2026-10-11"}]
+    assert photos_mod.unread_days(root, readings) == []
+    later = root / "2026-10-12" / "מקרר"
+    (later / "replaced").mkdir(parents=True)
+    (later / "p2.jpg").write_bytes(b"\xff\xd8\xff")
+    (later / "replaced" / "p1.jpg").write_bytes(b"\xff\xd8\xff")   # an earlier photo, never read
+    assert photos_mod.unread_days(root, readings) == ["2026-10-12"]
+    assert [p["id"] for p in photos_mod.listed(root, readings)] == ["unit", "p2"]
+
+
+def test_a_photo_with_no_answer_is_not_marked_read(tmp_path):
+    unit = tagged(UNIT)
+    photograph(tmp_path, unit)
+    layout = load_store_layout(layout_file(tmp_path), CATALOGUE)
+    ask, _ = asker(tmp_path, {}, key=None)
+    result = reading.read(day=DAY, photo_root=tmp_path / "photos", layout=layout, products=CATALOGUE,
+                          sales_daily=SOLD, sales_monthly=[], policy=POLICY, asker=ask)
+    assert result["photos"] == [] and result["units"] == []

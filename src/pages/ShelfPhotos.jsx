@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 
 import { useI18n } from '../lib/i18n/index.js'
 import { dirProps } from '../lib/utils/rtl.js'
+import { newPhotoId, sentList } from '../owner/shelfPhotos.js'
+import { useDates } from './shelfCommon.js'
 
 /**
  * D-37: the store's shelf photos, sent from the app so they reach the shelf reader with no one
@@ -9,24 +11,36 @@ import { dirProps } from '../lib/utils/rtl.js'
  * from the units already recorded, or by name when there are none yet, because the first photos
  * come before the layout does.
  *
- * Sending is the caller's (`onSend`): this screen only chooses, shows and reports. A team account
- * sees it disabled (ADR-029), as every control is.
+ * Sending is the caller's (`onSend`, ADR-042): this screen only chooses, shows and reports. A
+ * photo's id is fixed when it is chosen, so Send pressed again rewrites the same photo. The list
+ * shows what was sent (FR-227): this visit's, those still waiting (`loadPending`), and those the
+ * artefact says were collected or read (`collected`). A team account sees it disabled (ADR-029).
  */
-export function ShelfPhotos({ units = [], sent = [], onSend, readOnly = false }) {
+export function ShelfPhotos({ units = [], collected = [], onSend, loadPending, readOnly = false }) {
   const { t } = useI18n()
+  const { date } = useDates()
   const [unit, setUnit] = useState(units[0] ?? '')
   const [other, setOther] = useState('')
   const [file, setFile] = useState(null)
+  const [photoId, setPhotoId] = useState(null)
   const [preview, setPreview] = useState(null)
   const [state, setState] = useState('idle')
   const [mine, setMine] = useState([])
+  const [pending, setPending] = useState([])
   const shown = useRef(null)
+
+  useEffect(() => {
+    let live = true
+    loadPending?.().then((list) => { if (live) setPending(list) }, () => {})
+    return () => { live = false }
+  }, [loadPending])
 
   // The preview's address is the browser's own, freed when the photo changes or the page goes.
   const choose = (next) => {
     if (shown.current) URL.revokeObjectURL(shown.current)
     shown.current = next ? URL.createObjectURL(next) : null
     setFile(next)
+    setPhotoId(next ? newPhotoId() : null)
     setPreview(shown.current)
     setState('idle')
   }
@@ -37,14 +51,16 @@ export function ShelfPhotos({ units = [], sent = [], onSend, readOnly = false })
     if (readOnly || !file || !named) return
     setState('sending')
     try {
-      await onSend?.(named, file)
-      setMine((list) => [{ unit: named, at: Date.now() }, ...list])
+      await onSend?.(named, file, photoId)
+      setMine((list) => [{ id: photoId, unit: named }, ...list])
       choose(null)
       setState('sent')
     } catch {
       setState('failed')
     }
   }
+
+  const list = sentList({ collected, pending, mine })
 
   return (
     <section className="photos" data-photos={state} {...dirProps()}>
@@ -75,12 +91,12 @@ export function ShelfPhotos({ units = [], sent = [], onSend, readOnly = false })
       </button>
       {state === 'sent' ? <p className="plan__arranged" role="status">{t('photos.sent')}</p> : null}
       {state === 'failed' ? <p className="plan__warning" role="alert">{t('photos.failed')}</p> : null}
-      {mine.length || sent.length ? (
+      {list.length ? (
         <div className="photos__sent">
           <h4>{t('photos.list')}</h4>
           <ul>
-            {[...mine.map((m) => ({ ...m, status: 'sent' })), ...sent].map((s, i) => (
-              <li key={i}><bdi>{s.unit}</bdi> · {t(`photos.status.${s.status}`, { date: s.date ?? '' })}</li>
+            {list.map((s) => (
+              <li key={s.id}><bdi>{s.unit}</bdi> · {t(`photos.status.${s.status}`, { date: date(s.date) })}</li>
             ))}
           </ul>
         </div>

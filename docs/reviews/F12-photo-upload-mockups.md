@@ -1,7 +1,7 @@
 ---
 ID: F12-S1-UPLOAD-MOCKUPS
 Title: Sending the shelf photos from the app (D-37) — mockups for the repository owner's approval
-Status: Ready for review
+Status: Approved — by the repository owner, 2026-10-06 ("approved")
 Owner: smartshelf-engineer
 Parent: [F12-S1](../features/F12-planogram/specs/F12-S1-planogram.md) v0.11, OQ-1212
 Inputs: [D-37, F12-S1 FR-218 (v0.11), FR-224 … FR-227, ADR-029, ADR-041, ADR-042 (Proposed)]
@@ -9,9 +9,12 @@ Inputs: [D-37, F12-S1 FR-218 (v0.11), FR-224 … FR-227, ADR-029, ADR-041, ADR-0
 
 # Sending the shelf photos — mockups for approval
 
+> **Approved by the repository owner on 2026-10-06** ("approved"): every item as drawn, with B.
+> Built in Phase 8 Task 8.13.
+
 D-37 (2026-10-06): the app gets an upload screen, so the store's shelf photos reach the shelf
 reader without anyone moving files. These are the screen and its words, and the two ways a photo
-could travel. Nothing here is merged or shown to the store until the owner approves it (F12-S1
+could travel. Nothing here was merged or shown to the store before the owner approved it (F12-S1
 C-75).
 
 **How they were made.** They were drawn inside the real app, in the e2e build, at phone size
@@ -143,4 +146,7 @@ Task 8.13, in one pull request:
 
 ## The owner's answer
 
-*Waiting.*
+- **2026-10-06**, "approved", to "You can say 'approve all', or name what to change", asked of
+  the five items above. Recorded as every item as drawn: the screen, its wording, **B**
+  (Firestore, the recommended option), the nightly's reading, and the two older sentences
+  changed. Built in Phase 8 Task 8.13 (F12-S1 OQ-1212, ADR-042).

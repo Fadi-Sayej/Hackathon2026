@@ -250,3 +250,77 @@ describe('The shelf reader\'s widths, waiting for their acceptance run (F12-S1 F
     }
   })
 })
+
+describe('Sending the shelf photos (F12-S1 FR-224, FR-227; D-37, ADR-042)', () => {
+  const photo = () => new File([new Uint8Array([0xff, 0xd8, 0xff, 0xe0])], 'unit.jpg', { type: 'image/jpeg' })
+  const choose = () => fireEvent.change(document.querySelector('.photos input[type=file]'), { target: { files: [photo()] } })
+  const send = () => document.querySelector('[data-action="send-photo"]')
+  globalThis.URL.createObjectURL ??= () => 'blob:preview'
+  globalThis.URL.revokeObjectURL ??= () => {}
+
+  it('is not shown where nothing could be sent', () => {
+    renderWithI18n(<StoreLayoutPage artefact={waiting('no_store_layout')} catalogue={null} />, { language: 'en' })
+    expect(document.querySelector('.photos')).toBeNull()
+  })
+
+  it('with no layout yet, the unit is typed, and Send waits for a name and a photo', async () => {
+    const onSend = vi.fn(async () => {})
+    renderWithI18n(<StoreLayoutPage artefact={waiting('no_store_layout')} catalogue={null} photos={{ onSend }} />, { language: 'en' })
+    expect(screen.getByRole('heading', { name: 'Send photos of your shelves' })).toBeTruthy()
+    expect(send().disabled).toBe(true)
+    choose()
+    expect(send().disabled).toBe(true)
+    fireEvent.change(screen.getByPlaceholderText('The unit\'s name, such as “Fridge 1”'), { target: { value: ' Fridge 1 ' } })
+    expect(send().disabled).toBe(false)
+    fireEvent.click(send())
+    await screen.findByText('Sent. It reaches the shelf reader tonight.')
+    const [unit, file, id] = onSend.mock.calls[0]
+    expect([unit, file.name, typeof id]).toEqual(['Fridge 1', 'unit.jpg', 'string'])
+    expect(document.querySelector('.photos__sent').textContent).toContain('Fridge 1 · sent, collected tonight')
+  })
+
+  it('sending the same photo again sends it under the same id', async () => {
+    const onSend = vi.fn().mockRejectedValueOnce(new Error('network')).mockResolvedValueOnce()
+    renderWithI18n(<StoreLayoutPage artefact={waiting('no_store_layout')} catalogue={null} photos={{ onSend }} />, { language: 'en' })
+    fireEvent.change(document.querySelector('.photos input[type=text]'), { target: { value: 'Fridge 1' } })
+    choose()
+    fireEvent.click(send())
+    await screen.findByText('It did not send. Check the connection and try again.')
+    fireEvent.click(send())
+    await screen.findByText('Sent. It reaches the shelf reader tonight.')
+    expect(onSend.mock.calls[1][2]).toBe(onSend.mock.calls[0][2])
+  })
+
+  it('with units recorded, the unit is chosen from them, or typed as another', () => {
+    const art = filled()
+    renderWithI18n(<StoreLayoutPage artefact={art} catalogue={null} photos={{ onSend: vi.fn() }} />, { language: 'en' })
+    const options = [...document.querySelectorAll('.photos select option')].map((o) => o.textContent)
+    expect(options).toEqual([...art.capabilities.layout_facts.fixture_order, 'Another unit'])
+    expect(document.querySelector('.photos input[type=text]')).toBeNull()
+    fireEvent.change(document.querySelector('.photos select'), { target: { value: '__other' } })
+    expect(document.querySelector('.photos input[type=text]')).not.toBeNull()
+  })
+
+  it('lists what is waiting, collected and read', async () => {
+    const art = waiting('no_store_layout')
+    art.capabilities.layout_facts.photos = [
+      { id: 'a', unit: 'מקרר 1', collected: '2026-10-10', read: '2026-10-11' },
+      { id: 'b', unit: 'מדף יבש', collected: '2026-10-12', read: null },
+    ]
+    const loadPending = async () => [{ id: 'c', unit: 'מקרר 2', sentAt: 1 }]
+    renderWithI18n(<StoreLayoutPage artefact={art} catalogue={null} photos={{ onSend: vi.fn(), loadPending }} />, { language: 'en' })
+    await waitFor(() => expect(document.querySelectorAll('.photos__sent li').length).toBe(3))
+    expect([...document.querySelectorAll('.photos__sent li')].map((li) => li.textContent)).toEqual([
+      'מקרר 2 · sent, collected tonight', 'מדף יבש · collected 12 Oct', 'מקרר 1 · read 11 Oct',
+    ])
+  })
+
+  it('a team account sees it disabled, and can send nothing', () => {
+    const onSend = vi.fn()
+    renderWithI18n(<StoreLayoutPage artefact={filled()} catalogue={null} photos={{ onSend, readOnly: true }} />, { language: 'en' })
+    expect(document.querySelector('.photos select').disabled).toBe(true)
+    expect(document.querySelector('.photos input[type=file]').disabled).toBe(true)
+    expect(send().disabled).toBe(true)
+    expect(document.querySelector('.photos__choose').dataset.disabled).toBe('true')
+  })
+})

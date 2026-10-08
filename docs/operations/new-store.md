@@ -68,7 +68,8 @@ Fill every key. None is defaulted, and every tool stops on the first empty one.
 3. In `firestore.rules`, replace `set-to-the-id-in-configs-store-yaml` with the store's `id`.
    Then deploy the rules: `firebase deploy --only firestore:rules`.
 4. Create a service account key and save its JSON as the repository's Actions secret
-   `FIREBASE_SERVICE_ACCOUNT_JSON`. The nightly pulls the owner's decisions with it.
+   `FIREBASE_SERVICE_ACCOUNT_JSON`. The nightly pulls the owner's decisions with it, and
+   collects the shelf photos sent from the app (ADR-042).
 5. Give each account its role once it has signed in, with
    `python3 scripts/set_user_role.py <email> owner` or `… team`.
 
@@ -120,8 +121,11 @@ nearest first. For each venue to collect:
 - For each department: the days it is ordered, and how many days it keeps. Record them in
   `configs/store_facts.yaml`, with the date they were said (ADR-033).
 - The shelves: fixtures, shelf lengths, departments and eye-level shelf, and the owner's
-  arrangement rules, stated; product widths and today's facings, read from shelf photographs.
-  Record them in `configs/store_layout.yaml`, which a new copy starts without (ADR-037).
+  arrangement rules, stated. Record them in `configs/store_layout.yaml`, which a new copy starts
+  without (ADR-037). Product widths, today's facings and pictures are read from the shelf photos
+  the owner sends from Store layout (ADR-041, ADR-042), once the repository has the model key
+  `ANTHROPIC_API_KEY`. Name each unit in the layout file as the owner names it when sending its
+  photo, so the reader finds it.
 - The owner's price rule: `price_policy_pct` in `configs/policy.yaml` is the pilot owner's
   +60%. Ask the new owner for theirs.
 - GAP-009 and GAP-011 ([next-store.md](../pilot/next-store.md) §3).

@@ -1,19 +1,22 @@
 ---
 ID: ADR-042
 Title: The store's shelf photos travel from the app through Firestore, and the nightly collects and reads them
-Status: Proposed
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-10-06
 Parent: [System Design](../system-design.md) §19
 Related Specs: F12-S1 (FR-218 v0.11, FR-224 … FR-227, AC-212 … AC-214, NFR-080, OQ-1212)
+Updated: 2026-10-08 (Task 8.13: photos that waited are read on a later night; each reading adds to the earlier ones)
 Inputs: [D-13, D-23, D-34, D-37, ADR-029, ADR-032, ADR-036, ADR-039, ADR-041, firestore.rules, .github/workflows/collect-daily.yml, docs/reviews/F12-photo-upload-mockups.md]
 ---
 
 # ADR-042 — The shelf photos travel from the app through Firestore
 
-**Status:** Proposed, for the repository owner's approval with the screen
-([mockups](../../reviews/F12-photo-upload-mockups.md)) and F12-S1 v0.11. If accepted, it amends
-ADR-041 Decisions 1 and 2.
+**Status:** Accepted (2026-10-06, by the repository owner: "approved", to "You can say 'approve
+all', or name what to change", asked of the screen, its wording, option A or B, the nightly's
+reading, and two older sentences; recorded as all five as drawn, with B, the recommended option).
+With the screen ([mockups](../../reviews/F12-photo-upload-mockups.md)) and F12-S1 v0.11, OQ-1212.
+It amends ADR-041 Decisions 1 and 2.
 
 ## Context
 
@@ -79,6 +82,14 @@ is on cannot be read from here.
    the reader's request ceiling (60) and time budget (600 s), and commits the readings. With no
    new photo, it asks nothing. With no key, the photos wait in their folder, and
    `npm run read:shelves` still reads any folder on demand.
+
+   *Built in Task 8.13 (2026-10-08), and put to the owner:* a photo that waited, for the key, the
+   layout file, or a request that failed, is read on a later night, once, within the same
+   bounds (`read_shelves.py --unread`). As approved, a photo sent before its unit was recorded
+   would wait for a command, and the owner cannot run one. Each reading adds to the earlier
+   ones: a unit read whole replaces what was read of it before, and a width that two photos
+   disagree on is unknown (F12-S1 FR-221). The key is not set today, so nothing is asked until
+   it is.
 6. **What the page shows.** The artefact lists each collected photo: the unit, the night it was
    collected, and the night it was read, if it was. No photo is published, only these dates
    (ADR-041 Decision 1). The screen adds the photos still waiting in Firestore, which the
@@ -97,7 +108,7 @@ The usual home for files, with no 1 MiB limit and no splitting. It needs:
 The nightly would collect from the bucket instead, with the same service account. Everything else
 above is the same.
 
-### B. Firestore as the carrier (recommended)
+### B. Firestore as the carrier (recommended, and chosen)
 It works on the project as it is: the free plan, the deployed rules, the SDK the app already
 loads, and the service account the nightly already holds. Its costs:
 - about 60 lines on each side to split and join a photo;

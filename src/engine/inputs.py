@@ -22,6 +22,7 @@ from src.engine.store_facts import DEFAULT_PATH as STORE_FACTS_PATH, load_store_
 from src.engine.store_layout import (ACCEPTANCE_PATH as SHELF_ACCEPTANCE_PATH, DEFAULT_PATH as STORE_LAYOUT_PATH,
                                      PICTURES_DIR as SHELF_PICTURES_DIR, READINGS_PATH as SHELF_READINGS_PATH,
                                      load_store_layout, merge_readings)
+from src.engine.shelf_reader.photos import PHOTOS_ROOT as SHELF_PHOTOS_ROOT, listed as listed_photos
 from src.market.presence import DELIVERY_CATALOG, load_presence
 from src.market.listed_prices import snapshot_price_reader
 from src.market.recent import recent_market
@@ -63,6 +64,8 @@ class EngineInputs:
     store_layout: Optional[dict] = None
     # ADR-039: the night's sealed explanations, {on_day, explanations, manifest}; None when none.
     shelf_explanations: Optional[dict] = None
+    # ADR-042: the store's shelf photos, [{id, unit, collected, read}]; names and dates only.
+    shelf_photos: Optional[list] = None
 
 
 def _rows(path: Path) -> Optional[list]:
@@ -319,6 +322,7 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
                 shelf_pictures_dir: Path = SHELF_PICTURES_DIR,
                 shelf_readings_path: Optional[Path] = None,
                 shelf_acceptance_path: Optional[Path] = None,
+                shelf_photos_root: Optional[Path] = None,
                 snapshots_root: Path = EXTERNAL_SNAPSHOTS_ROOT) -> EngineInputs:
     stores = stores or load_store_types()
     products_raw = _rows(silver_dir / PRODUCTS_TABLE)
@@ -338,12 +342,19 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
     # Beside the layout file they belong to, unless named: a test world's layout never reads a
     # store's readings, and a store's readings never meet another layout.
     folder = Path(store_layout_path).parent
+    readings_path = shelf_readings_path or folder / SHELF_READINGS_PATH.name
     store_layout = merge_readings(store_layout, products or [],
-                                  readings_path=shelf_readings_path or folder / SHELF_READINGS_PATH.name,
+                                  readings_path=readings_path,
                                   acceptance_path=shelf_acceptance_path or folder / SHELF_ACCEPTANCE_PATH.name,
                                   pictures_dir=shelf_pictures_dir,
                                   tolerance_mm=policy.shelf_reader_tolerance_mm,
                                   minimum=policy.shelf_reader_acceptance_min)
+    # ADR-042: the photos sent from the app, and which the reader has read. The store's own folder
+    # beside the store's own layout; a test world's beside its layout, as the readings are.
+    if shelf_photos_root is None:
+        shelf_photos_root = (SHELF_PHOTOS_ROOT if Path(store_layout_path) == Path(STORE_LAYOUT_PATH)
+                             else folder / SHELF_PHOTOS_ROOT.name)
+    shelf_photos = listed_photos(shelf_photos_root, readings_path)
     # ADR-039 Decision 5: read like the boost's picks, from the night the plan is dated (the run's).
     from src.engine.shelf_explanation import read as read_explanations   # local: it imports this module
     shelf_explanations = read_explanations(snapshots_root, run_at.date().isoformat())
@@ -421,7 +432,7 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
                          for k in ("months", "first", "last", "full_annual_cycle", "reconcile_before")}
     digest = _digest(products, summary_rows, monthly, observations, matches, policy, owner,
                      reconcile_before, sales_daily, store_facts, running_out, boost_picks, market_recent,
-                     store_layout, shelf_explanations)
+                     store_layout, shelf_explanations, shelf_photos)
     return EngineInputs(products=products, inventory=inventory or None,
                         sales_monthly=monthly, sales_daily=sales_daily, sales_summary=summary, window=window,
                         observations=observations, matches=matches, stores=stores, withdrawn=None, idle=None, conflicting=conflicting,
@@ -429,7 +440,7 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
                         inputs_digest=digest,
                         vintages=vintages, owner=owner, policy=policy, run_at=run_at,
                         market_recent=market_recent, store_layout=store_layout,
-                        shelf_explanations=shelf_explanations)
+                        shelf_explanations=shelf_explanations, shelf_photos=shelf_photos)
 
 
 # When a row was imported is not what the row says. `sales_import` rewrites its tables on
@@ -454,7 +465,8 @@ def _digest(products, summary_rows, monthly, observations, matches, policy, owne
             reconcile_before: Optional[str], sales_daily: Optional[list] = None,
             store_facts: Optional[dict] = None, running_out: Optional[dict] = None,
             boost_picks: Optional[dict] = None, market_recent: Optional[dict] = None,
-            store_layout: Optional[dict] = None, shelf_explanations: Optional[dict] = None) -> str:
+            store_layout: Optional[dict] = None, shelf_explanations: Optional[dict] = None,
+            shelf_photos: Optional[list] = None) -> str:
     """A hex digest over the CONTENT the run read, not over the files it read them from.
 
     Content, because a parquet rewritten with identical rows is the same input and must
@@ -511,6 +523,10 @@ def _digest(products, summary_rows, monthly, observations, matches, policy, owne
     # ADR-039: a sealed explanation is an input like a sealed pick, so the live run (which reloads
     # after sealing) and a reproduction digest the same text.
     feed("shelf_explanations", None if shelf_explanations is None else shelf_explanations["explanations"])
+    # ADR-042: Store layout lists them, so a photo collected or read is a different input. Fed only
+    # once there is one, so a store with none digests exactly as before the upload existed.
+    if shelf_photos:
+        feed("shelf_photos", shelf_photos)
     feed("observations", observations)
     feed("matches", matches)
     feed("policy", policy.as_dict())

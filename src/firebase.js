@@ -29,43 +29,9 @@ import {
 import { getAuth } from 'firebase/auth'
 import { authMode } from './auth/mode.js'
 
-// import.meta.env is a plain object at build time; guard so this module can also
-// be imported from Node (tests, tooling) without Vite's define step.
-const env = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env : {}
+import { STORE_ID, firebaseConfig, isFirebaseConfigured } from './firebaseConfig.js'
 
-function readEnv(key) {
-  const value = env[key]
-  return typeof value === 'string' && value.trim() !== '' ? value.trim() : ''
-}
-
-const firebaseConfig = {
-  apiKey: readEnv('VITE_FIREBASE_API_KEY'),
-  authDomain: readEnv('VITE_FIREBASE_AUTH_DOMAIN'),
-  projectId: readEnv('VITE_FIREBASE_PROJECT_ID'),
-  storageBucket: readEnv('VITE_FIREBASE_STORAGE_BUCKET'),
-  messagingSenderId: readEnv('VITE_FIREBASE_MESSAGING_SENDER_ID'),
-  appId: readEnv('VITE_FIREBASE_APP_ID'),
-}
-
-/**
- * Firestore path root: stores/{STORE_ID}/... — see firestore.rules.
- * The deployment's own VITE_STORE_ID, with no default (ADR-036): Production's is the store's
- * id in configs/store.yaml, and Preview's is `preview-sandbox` on purpose. Unset, nothing is
- * written remotely and the owner state stays on this device.
- */
-export const STORE_ID = readEnv('VITE_STORE_ID')
-
-// The three values without which nothing can connect. storageBucket / senderId
-// are not required for Firestore or sign-in, so they are not gated on.
-const REQUIRED_KEYS = ['apiKey', 'projectId', 'appId']
-
-/**
- * Is the browser Firebase config present? The owner-state writer checks it before
- * touching Firestore.
- */
-export function isFirebaseConfigured() {
-  return STORE_ID !== '' && REQUIRED_KEYS.every((key) => firebaseConfig[key] !== '')
-}
+export { STORE_ID, isFirebaseConfigured }
 
 let appInstance = null
 let dbInstance = null

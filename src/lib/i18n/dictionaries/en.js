@@ -80,7 +80,7 @@ export const en = {
   'page.store-layout.name': 'Store layout',
   'page.store-layout.hint': "Your shelves, as measured",
   'page.store-layout.title': "Store layout",
-  'page.store-layout.description': "Your shelf units as the team recorded them from your photos: each shelf’s length, and each product’s width. Shelf plan is made from these.",
+  'page.store-layout.description': "Your shelf units: each shelf’s length, as the team recorded it, and each product’s width, as read from your photos. Shelf plan is made from these.",
 
   'page.shelf-plan.name': 'Shelf plan',
   'page.shelf-plan.hint': 'What goes on each shelf',
@@ -639,7 +639,7 @@ export const en = {
 
   // F12 (Phase 8 Task 8.8): Store layout and Shelf plan, as drawn for the repository owner's
   // approval (docs/reviews/F12-screens-mockups.md). Not shown until he approves them.
-  'layout.waiting.next': "Send a photo of each shelf unit, taken from the front. The team measures each shelf and each product’s width from the photos and records them, and they appear here.",
+  'layout.waiting.next': "Send a photo of each shelf unit below, taken from the front. The team records each shelf’s length, the shelf reader reads each product’s width, facings and picture from the photos, and they appear here.",
   'layout.shelfOrder': "Shelf 1 is the top shelf.",
   'layout.chilled': "Chilled",
   'layout.departments': "Departments:",
@@ -672,7 +672,7 @@ export const en = {
   // F12-S1 FR-223 (D-34): the reader's widths, read but waiting for their acceptance run.
   // Approved by the repository owner on 2026-10-06 ("yes").
   'layout.reader.waiting': "The shelf reader read {n} widths from your photos on {date}. They are used once its check passes: {min} products measured by hand, each within {tol} mm of the reader's width. So far: {within} of {listed}.",
-  // D-37: the shelf photos' upload, drawn for the repository owner's approval (not shown until it is given).
+  // D-37: the shelf photos' upload (F12-S1 FR-224 … FR-227), approved by the repository owner 2026-10-06.
   'photos.title': "Send photos of your shelves",
   'photos.how': "One photo for each shelving unit: from the front, straight on, with the whole unit in the picture and no one in it.",
   'photos.unit': "Which unit?",
