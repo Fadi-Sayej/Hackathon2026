@@ -8,6 +8,7 @@ import { cleanup, fireEvent, waitFor } from '@testing-library/react'
 import { renderWithI18n } from '../../test/renderWithI18n.jsx'
 import App from '../../App.jsx'
 import { compose, NOT_YET_SHOWN } from '../compose.js'
+import { foldPolicyBreach } from '../../lib/dataAdapters/foldPolicyBreach.js'
 import { resetCacheForTests } from '../../owner/ownerState.js'
 import { ar } from '../../lib/i18n/dictionaries/ar.js'
 
@@ -33,7 +34,9 @@ import { ar } from '../../lib/i18n/dictionaries/ar.js'
 const ARTEFACT = resolve(process.cwd(), 'public/data/dashboard.json')
 const CATALOGUE = resolve(process.cwd(), 'public/data/catalogue.json')
 const present = existsSync(ARTEFACT)
-const artefact = present ? JSON.parse(readFileSync(ARTEFACT, 'utf8')) : null
+// As the app sees it: loadDashboard folds F3's breaches back into competitor_position (ADR-043),
+// so every check here is against what the screens are given, not the file's raw shape.
+const artefact = present ? foldPolicyBreach(JSON.parse(readFileSync(ARTEFACT, 'utf8'))) : null
 const catalogue = existsSync(CATALOGUE) ? JSON.parse(readFileSync(CATALOGUE, 'utf8')) : null
 const NOW = Date.parse('2026-09-12T12:00:00Z')
 
