@@ -9,7 +9,7 @@ Related Intents: INT-003
 Inputs: [docs/product/PRD.md, docs/features/F3-competitor-price-position/intent.md]
 Legacy ID: SPEC-003 (in the pre-migration monolithic `specs.md` v1.1)
 Answered by: [System Design](../../../architecture/system-design.md) §21
-Updated: 2026-09-29 (dated note under C-21: read with OQ-301, confirmed by the repository owner)
+Updated: 2026-10-08 (dated note under FR-045: D-39, the owner's rule); 2026-09-29 (dated note under C-21: read with OQ-301, confirmed by the repository owner)
 ---
 
 > **Identifier note.** The requirement identifiers inside this document (`FR-…`, `INV-…`,
@@ -149,6 +149,12 @@ MUST be reportable.
 **FR-045** — The policy threshold MUST be a declared maximum premium over the reference
 price, settable as a product decision, and MUST NOT be derived from the observed
 distribution.
+
+> **Added 2026-10-08, D-39.** The threshold is the store owner's own statement. A new store's
+> copy starts without one, and until its owner states it no product is recorded as a breach.
+> The breaches then say they wait for the owner's limit; the comparison and the cost floor
+> (FR-043a/b) are unaffected. YomYom's is +60%. How it is held and published is ADR-043
+> (Ready for review).
 
 **FR-045a** — Every product exceeding the policy MUST be recorded as a policy breach,
 whatever the surface it is later shown on.

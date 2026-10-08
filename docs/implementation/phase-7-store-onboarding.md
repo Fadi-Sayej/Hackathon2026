@@ -5,7 +5,7 @@ Status: Approved — by the repository owner, 2026-09-30 ("approved"), with ADR-
 Owner: smartshelf-architect
 Parent: [Implementation plan](plan.md)
 Inputs: [D-28, ADR-036 (Accepted 2026-09-30), docs/pilot/next-store.md, src/engine/inputs.py, src/engine/run.py, src/common/paths.py, src/context/weather.py, src/internal_pos/, scripts/import_yomyom_pos.py, scripts/import_yomyom_sales.py, src/matching/product_matching.py, configs/delivery_targets.yaml, configs/store_types.yaml, firestore.rules, scripts/check_firebase_config.mjs, .github/workflows/collect-daily.yml, index.html]
-Updated: 2026-10-08 (Checkpoint 7 checked on a clean copy: met after #296, #299 and #302; one question open); 2026-10-01 (Tasks 7.1–7.6 built; one pull request)
+Updated: 2026-10-08 (Tasks 7.7–7.10 for D-39 and ADR-043, ready for review); 2026-10-08 (Checkpoint 7 checked on a clean copy: met after #296, #299 and #302; one question open); 2026-10-01 (Tasks 7.1–7.6 built; one pull request)
 ---
 
 # Phase 7 — A new store without code changes
@@ -168,3 +168,51 @@ owner's +60%. F3-S1 FR-045 calls it "a declared maximum premium … settable as 
 decision". A copy carries it as code, and the loader falls back to 60 when the key is absent.
 So a second store's F3 findings would use +60% until someone changes it. The setup guide
 (step 7) says to ask the new owner; nothing checks that anyone did.
+
+
+## Added 2026-10-08: D-39, the price rule is the owner's (ADR-043)
+
+**Status:** Ready for review, with ADR-043. Nothing below starts until the repository owner
+approves ADR-043 and its wording (HANDOVER rule 1). Tasks 7.7 to 7.9 merge in one pull request,
+because the engine's split and the screens that read it must arrive together.
+
+### Task 7.7: The rule as a store fact (ADR-043 §1)
+
+- `configs/store_facts.yaml` gains `price_rule`, YomYom's entry as ADR-043 gives it, and
+  `src/engine/store_facts.py` validates it.
+- `configs/policy.yaml` loses `price_policy_pct`. `src/engine/policy.py` no longer defaults it.
+- The engine gains the input `price_rule`, and `check:store` gains its row.
+
+**Done when:** YomYom's artefact is unchanged (the print-mode proof); a fixture without the
+entry, and one with a malformed entry, both leave the input absent and say why; and
+`check:store` on a clean copy lists the rule as missing.
+
+### Task 7.8: `policy_breach`, the breaches' own capability (ADR-043 §2, §3, §5)
+
+- **The capability.** It is registered with `requires` that include `price_rule`, its
+  `published_from` set to its first nightly, and its place after `competitor_position` in
+  both order lists.
+- **One pass.** It is computed in the same pass as `competitor_position`, which keeps the
+  comparison and the purchase-cost findings.
+- **The probe** withholds the rule.
+
+**Done when:** the print-mode proof shows YomYom's 10 breaches under `policy_breach` with the
+same ids, evidence and order, and `competitor_position` otherwise unchanged. The probe passes,
+and catches each case when its guard is removed.
+
+### Task 7.9: The findings page and Today read both (ADR-043 §3, §4)
+
+- **The screens.** The F3 findings page and the composer read `policy_breach` beside
+  `competitor_position`.
+- **The words.** `unavailable.no_price_rule` is added in three languages, as approved.
+
+**Done when:** the screenshot comparison shows every YomYom screen byte-identical before and
+after (126 screens), and a fixture without the rule shows the approved sentence where the
+breaches were, with the purchase-cost findings still listed.
+
+### Task 7.10: Checkpoint 7, again, for D-39
+
+On a clean copy for a test store:
+- `check:store` lists the rule;
+- the artefact publishes `policy_breach` unavailable (`no_price_rule`) and
+  `competitor_position` available.
