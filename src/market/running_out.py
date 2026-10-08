@@ -136,7 +136,9 @@ def _assess(series: PresenceSeries, market_store_ids: Iterable[str], policy, on_
             fact = products.setdefault(barcode, {"stores_out": [], "days_absent": {}})
             fact["stores_out"].append(store)
             fact["days_absent"][store] = absent
-    return products, excluded_by_store
+    # By barcode: they were found by iterating a set, whose order follows the process's string
+    # hashing, and the nightly commits this map, so its bytes must repeat when the data does.
+    return dict(sorted(products.items())), excluded_by_store
 
 
 def running_out(series: PresenceSeries, market_store_ids: Iterable[str], policy, on_day: date) -> dict:
