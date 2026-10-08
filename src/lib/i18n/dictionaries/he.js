@@ -81,7 +81,7 @@ export const he = {
   'page.store-layout.name': 'תוכנית החנות',
   'page.store-layout.hint': "המדפים שלך, כפי שנמדדו",
   'page.store-layout.title': "תוכנית החנות",
-  'page.store-layout.description': "יחידות המדפים שלך כפי שהצוות רשם אותן מהתמונות שלך: האורך של כל מדף והרוחב של כל מוצר. תוכנית המדף נבנית מהן.",
+  'page.store-layout.description': "יחידות המדפים שלך: האורך של כל מדף, כפי שהצוות רשם אותו, והרוחב של כל מוצר, כפי שנקרא מהתמונות שלך. תוכנית המדף נבנית מהן.",
 
   'page.shelf-plan.name': 'תוכנית מדף',
   'page.shelf-plan.hint': 'מה מונח על כל מדף',
@@ -638,7 +638,7 @@ export const he = {
 
   // F12 (Phase 8 Task 8.8): Store layout and Shelf plan, as drawn for the repository owner's
   // approval (docs/reviews/F12-screens-mockups.md). Not shown until he approves them.
-  'layout.waiting.next': "שלח תמונה של כל יחידת מדפים, מצולמת מלפנים. הצוות מודד מהתמונות את האורך של כל מדף ואת הרוחב של כל מוצר ורושם אותם, והם יופיעו כאן.",
+  'layout.waiting.next': "שלח למטה תמונה של כל יחידת מדפים, מצולמת מלפנים. הצוות רושם את האורך של כל מדף, קורא המדפים קורא מהתמונות את הרוחב, החזיתות והתמונה של כל מוצר, והם יופיעו כאן.",
   'layout.shelfOrder': "מדף 1 הוא המדף העליון.",
   'layout.chilled': "בקירור",
   'layout.departments': "מחלקות:",
@@ -671,6 +671,21 @@ export const he = {
   // F12-S1 FR-223 (D-34): the reader's widths, read but waiting for their acceptance run.
   // Approved by the repository owner on 2026-10-06 ("yes").
   'layout.reader.waiting': "קורא המדפים קרא {n} רוחבים מהתמונות שלך ב־{date}. הם ישמשו אחרי שהבדיקה שלו תעבור: {min} מוצרים שנמדדו ביד, כל אחד בטווח של {tol} מ״מ מהרוחב שהקורא מדד. עד עכשיו: {within} מתוך {listed}.",
+  // D-37: the shelf photos' upload (F12-S1 FR-224 … FR-227), approved by the repository owner 2026-10-06.
+  'photos.title': "שלח תמונות של המדפים שלך",
+  'photos.how': "תמונה אחת לכל יחידת מדפים: מלפנים, ישר, כשכל היחידה בתמונה ואין בה אנשים.",
+  'photos.unit': "איזו יחידה?",
+  'photos.unit.other': "יחידה אחרת",
+  'photos.unit.name': "שם היחידה, למשל „מקרר 1”",
+  'photos.choose': "צלם או בחר תמונה",
+  'photos.send': "שלח",
+  'photos.sending': "שולח…",
+  'photos.sent': "נשלח. התמונה מגיעה לקורא המדפים הלילה.",
+  'photos.failed': "השליחה לא הצליחה. בדוק את החיבור ונסה שוב.",
+  'photos.list': "נשלחו",
+  'photos.status.sent': "נשלחה, תיאסף הלילה",
+  'photos.status.collected': "נאספה ב־{date}",
+  'photos.status.read': "נקראה ב־{date}",
   'layout.rejected.teamNote': "הערה לצוות:",
   'shelf.rule.together': "לשמור יחד על מדף אחד: {names}",
   'shelf.rule.togetherDepartment': "לשמור את מחלקת {department} יחד על מדף אחד",

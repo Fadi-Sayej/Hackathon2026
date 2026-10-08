@@ -22,6 +22,8 @@ import { PageAwaitingData } from './pages/PageAwaitingData.jsx'
 import { useI18n } from './lib/i18n/index.js'
 import { useAuth } from './auth/useAuth.js'
 import { TeamBanner } from './auth/SignInPage.jsx'
+import { authMode } from './auth/mode.js'
+import { isFirebaseConfigured } from './firebaseConfig.js'
 
 // Loaded when first opened, not with the app: the owner's first screen is Today, and these four
 // (the order pages and the planogram's) added ~70 KB to it in a week. Each has its own chunk.
@@ -29,6 +31,14 @@ const ReorderPage = lazy(() => import('./pages/ReorderPage.jsx').then((m) => ({ 
 const ApprovedOrdersPage = lazy(() => import('./pages/ApprovedOrdersPage.jsx').then((m) => ({ default: m.ApprovedOrdersPage })))
 const StoreLayoutPage = lazy(() => import('./pages/StoreLayoutPage.jsx').then((m) => ({ default: m.StoreLayoutPage })))
 const ShelfPlanPage = lazy(() => import('./pages/ShelfPlanPage.jsx').then((m) => ({ default: m.ShelfPlanPage })))
+
+// D-37, ADR-042: the shelf photos are sent to the store's Firestore subtree, so the screen is
+// shown only where a signed-in account can reach it. The SDK loads when a photo is sent.
+const shelfPhotos = () => import('./owner/firestoreShelfPhotos.js')
+const SHELF_PHOTOS = isFirebaseConfigured() && authMode() === 'firebase'
+  ? { onSend: (unit, file, id) => shelfPhotos().then((m) => m.send(unit, file, id)),
+      loadPending: () => shelfPhotos().then((m) => m.pending()) }
+  : null
 
 /**
  * What each restored page is waiting for, when the artefact cannot feed it.
@@ -273,7 +283,8 @@ export default function App() {
         return <p className="spine__loading">{t('spine.loading')}</p>
       }
       return activePage === 'store-layout'
-        ? <StoreLayoutPage artefact={artefact} catalogue={catalogue.catalogue} />
+        ? <StoreLayoutPage artefact={artefact} catalogue={catalogue.catalogue}
+          photos={SHELF_PHOTOS ? { readOnly, ...SHELF_PHOTOS } : null} />
         : <ShelfPlanPage artefact={artefact} ownerState={ownerState} catalogue={catalogue.catalogue}
           onOutcome={onOutcome} onUndoOutcome={readOnly ? null : onUndoOutcome} readOnly={readOnly} />
     }

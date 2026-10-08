@@ -18,8 +18,7 @@ from typing import Optional
 import yaml
 
 from src.engine.shelf_reader import identity, measure
-
-PHOTO_TYPES = {".jpg", ".jpeg", ".png", ".webp"}
+from src.engine.shelf_reader.photos import PHOTO_TYPES, key
 
 
 def photos(root: Path, day: str) -> dict:
@@ -33,23 +32,29 @@ def photos(root: Path, day: str) -> dict:
 
 def read(*, day: str, photo_root: Path, layout: dict, products: list, sales_daily: list, sales_monthly: list,
          policy, asker, today: Optional[date] = None) -> dict:
-    """{widths, current, pictures, report}: what was read, and why each run that was not, was not."""
+    """{widths, current, pictures, photos, units, report}: what was read, and why each run that was
+    not, was not. `photos` are the photos the AI answered for; `units` are those whose every photo
+    it answered for, so the reading describes the whole unit."""
     today = today or date.fromisoformat(day)
     pool = identity.candidates(products, sales_daily, sales_monthly, today, policy.shelf_reader_candidate_window_days)
     tolerance = policy.shelf_reader_tolerance_mm
     report: list = []
     reads: dict = defaultdict(list)          # barcode -> [(fixture, shelf, facings, width, why, picture)]
+    answered, units = [], []
 
     for fixture, files in photos(photo_root, day).items():
         unit = (layout.get("fixtures") or {}).get(fixture)
         if unit is None:
             report.append({"fixture": fixture, "photo": None, "why": "no_such_fixture_in_the_layout_file"})
             continue
+        whole = True
         for photo in files:
             answer, why = asker.read(photo, fixture, len(unit["shelves"]))
             if answer is None:
                 report.append({"fixture": fixture, "photo": photo.name, "why": why})
+                whole = False
                 continue
+            answered.append(key(day, fixture, photo.name))
             image = measure.upright(photo)
             g = measure.gray(image)
             for number, (shelf, stated) in enumerate(zip(answer["shelves"], unit["shelves"]), start=1):
@@ -75,6 +80,8 @@ def read(*, day: str, photo_root: Path, layout: dict, products: list, sales_dail
                     # The count is the AI's, confirmed by the edges found; unconfirmed, it is not recorded.
                     reads[barcode].append({**where, "facings": run["facings"], "counted": edges is not None,
                                            "width_mm": width, "width_why": width_why, "picture": face})
+        if whole and files:
+            units.append(fixture)
 
     widths, current, pictures = {}, {}, {}
     for barcode, seen in sorted(reads.items()):
@@ -93,23 +100,62 @@ def read(*, day: str, photo_root: Path, layout: dict, products: list, sales_dail
         face = next((s["picture"] for s in seen if s["picture"]), None)
         if face:
             pictures[barcode] = face
-    return {"widths": widths, "current": current, "pictures": pictures, "report": report}
+    return {"widths": widths, "current": current, "pictures": pictures, "photos": answered, "units": units,
+            "report": report}
 
 
-def write(result: dict, *, day: str, model: str, prompt: str, readings_path: Path, pictures_dir: Path) -> None:
-    """The readings file, in the layout file's format, and one picture a product (ADR-041 Decision 8)."""
+def _earlier(readings_path: Path) -> dict:
+    """The readings file as the reader last wrote it, or nothing."""
+    try:
+        raw = yaml.safe_load(Path(readings_path).read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError):
+        return {}
+    return {k: v for k, v in (raw or {}).items() if isinstance(v, dict)} if isinstance(raw, dict) else {}
+
+
+def write(result: dict, *, day: str, model: str, prompt: str, readings_path: Path, pictures_dir: Path,
+          tolerance_mm: int, read_on: Optional[str] = None) -> list:
+    """The readings file, in the layout file's format, and one picture a product (ADR-041 Decision 8).
+
+    A reading adds to the earlier ones, because photos arrive a unit at a time (ADR-042):
+    - a unit this reading saw whole replaces what was read of it before; the other units stay;
+    - a width read again stands only if it agrees with the earlier one within the tolerance. If
+      not, both are dropped and the width is unknown (F12-S1 FR-221: two photos must agree);
+    - each photo the AI answered for is listed with the day it was read.
+
+    Returns the products whose width this reading contradicted, with why.
+    """
     pictures_dir = Path(pictures_dir)
     pictures_dir.mkdir(parents=True, exist_ok=True)
     for barcode, face in result["pictures"].items():
         (pictures_dir / f"{barcode}.jpg").write_bytes(face)
+    earlier = _earlier(readings_path)
     measured = {"measured_by": "reader", "measured_on": day}
+    contradicted = []
+    widths = dict(earlier.get("widths") or {})
+    for barcode, width in result["widths"].items():
+        before = widths.get(barcode)
+        if isinstance(before, dict) and isinstance(before.get("width_mm"), (int, float)) \
+                and abs(before["width_mm"] - width) > tolerance_mm:
+            contradicted.append({"barcode": barcode, "why": f"read_differently_on_{before.get('measured_on')}"})
+            del widths[barcode]
+            continue
+        widths[barcode] = {"width_mm": width, **measured}
+    seen_whole = set(result.get("units") or ())
+    current = {b: c for b, c in (earlier.get("current") or {}).items()
+               if not (isinstance(c, dict) and c.get("fixture") in seen_whole)}
+    current.update({b: {**c, **measured} for b, c in result["current"].items()})
+    pictures = {**(earlier.get("pictures") or {}),
+                **{b: {"file": f"{b}.jpg", "cropped_by": "reader", "cropped_on": day} for b in result["pictures"]}}
+    photos = {**(earlier.get("photos") or {}), **{k: {"read_on": read_on or day} for k in result.get("photos") or ()}}
     doc = {
         "reading": {"day": day, "model": model, "prompt": prompt},
-        "widths": {b: {"width_mm": w, **measured} for b, w in sorted(result["widths"].items())},
-        "current": {b: {**c, **measured} for b, c in sorted(result["current"].items())},
-        "pictures": {b: {"file": f"{b}.jpg", "cropped_by": "reader", "cropped_on": day}
-                     for b in sorted(result["pictures"])},
+        "widths": dict(sorted(widths.items())),
+        "current": dict(sorted(current.items())),
+        "pictures": dict(sorted(pictures.items())),
+        "photos": dict(sorted(photos.items())),
     }
-    header = ("# Written by scripts/read_shelves.py, the shelf reader (F12-S1 FR-218 … FR-223, ADR-041).\n"
+    header = ("# Written by scripts/read_shelves.py, the shelf reader (F12-S1 FR-218 … FR-223, ADR-041, ADR-042).\n"
               "# Never edited by hand (D-34). The loader checks it as it checks the layout file.\n")
     Path(readings_path).write_text(header + yaml.safe_dump(doc, allow_unicode=True, sort_keys=False), encoding="utf-8")
+    return contradicted

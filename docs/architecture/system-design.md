@@ -1238,6 +1238,7 @@ own, so their rows say so rather than grade it after the fact.
 | [ADR-039](decisions/ADR-039-a-shelf-explanation-is-a-pinned-models-answer-checked-and-sealed.md) | A shelf plan's explanation is a pinned model's answer, checked and sealed as the boost's is (F12-S1, D-32). Accepted 2026-10-04 | Easy: text beside the plan; no figure depends on it |
 | [ADR-040](decisions/ADR-040-a-product-picture-is-cut-from-the-stores-own-photos.md) | A product's shelf picture is a file cut from the store's own photos, kept in the store's copy and served as it is (F12-S1, D-33). Accepted 2026-10-05 | Easy: no figure depends on a picture |
 | [ADR-041](decisions/ADR-041-a-shelf-reader-reads-the-stores-photos.md) | A shelf reader reads widths, current facings and pictures from the store's own photos; its widths wait for an acceptance run (F12-S1, D-34, D-35). Accepted 2026-10-05 | Moderate: its readings share the layout file's format |
+| [ADR-042](decisions/ADR-042-the-stores-shelf-photos-travel-from-the-app-through-firestore.md) | The store's shelf photos travel from the app through Firestore, in parts with a manifest written last; the nightly collects, checks and reads them (F12-S1 v0.11, D-37). Accepted 2026-10-06 | High: one sending function and one collect step know the carrier |
 
 ---
 
@@ -1533,7 +1534,8 @@ Nothing is built until the owner approves the spec and its mockups.
 | NFR-072, NFR-073, NFR-076 | R print mode, with the bootstrap's seed fixed; no step growing with market history; no past artefact read | ADR-002 | Checkpoint of its phase |
 | FR-183 (v0.9) | E `shelf_plan`: first facings spread over the shelves by length where every size is known, eye level first; else the first shelf with room | OQ-1210, answered A | AC-205 |
 | FR-216, FR-217, NFR-078 | I product pictures in the store's copy at `public/store/shelf-pictures/`, listed with provenance, checked by size and first bytes; E `layout_facts` and `shelf_plan` publish addresses | ADR-040, ADR-036 | AC-206 |
-| FR-180 (v0.9), FR-218 … FR-223, NFR-079 | R the shelf reader, on demand: the AI reads photos and tags (sealed), identity by exact code or unique name at the shelf price, image processing finds edges, four checks; readings in `configs/shelf_readings.yaml`; widths used only after the acceptance run | ADR-041, ADR-039's method | AC-207 … AC-210 |
+| FR-180 (v0.9), FR-218 … FR-223, NFR-079 | R the shelf reader, on demand and in the nightly when photos wait unread (ADR-042): the AI reads photos and tags (sealed), identity by exact code or unique name at the shelf price, image processing finds edges, four checks; readings in `configs/shelf_readings.yaml`; widths used only after the acceptance run | ADR-041, ADR-039's method | AC-207 … AC-210 |
+| FR-224 … FR-227, NFR-080 | I the upload on Store layout: a JPEG as taken, in parts of at most 900,000 bytes under `stores/<store>/shelfPhotos/`, the manifest last; R the nightly's collect step joins and checks them into `data/internal/shelf_photos/`, deletes only what it pushed; E `layout_facts.photos` (unit, collected, read) | ADR-042, ADR-029 | AC-212 … AC-214 |
 
 ### Cross-cutting decisions
 

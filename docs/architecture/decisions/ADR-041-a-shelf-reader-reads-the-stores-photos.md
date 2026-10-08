@@ -7,7 +7,7 @@ Date: 2026-10-05
 Parent: [System Design](../system-design.md) §19
 Related Specs: F12-S1 (FR-180, FR-205, FR-216, FR-218 … FR-223, AC-207 … AC-210, NFR-079, OQ-1211)
 Inputs: [D-3, D-13, D-23, D-33, D-34, D-35, docs/reviews/f12-barcode-sources-2026-10-05.md, ADR-032, ADR-035, ADR-036, ADR-037, ADR-039, ADR-040]
-Updated: 2026-10-06 (D-36: the package's printed name where there is no tag)
+Updated: 2026-10-06 (D-36: the package's printed name where there is no tag; ADR-042: the photos come from the app, and the nightly reads them)
 ---
 
 # ADR-041 — A shelf reader reads the store's own photos
@@ -43,9 +43,15 @@ unit stated once, like its departments.
    repository. They are never published, and nothing but the reader opens them. Only a
    product's crop leaves a photo (Decision 7). Until the app has an upload, a store's photos are
    committed to that folder by whoever receives them. That is moving files, not measuring.
+
+   *Amended 2026-10-06 by ADR-042.* The app has its upload: the nightly collects the photos sent
+   from it into this folder. A photo committed by hand is still read the same way.
 2. **When it runs.** On demand, when photos arrive: `npm run read:shelves`, or a manually started
    workflow. It never runs in the nightly. Its output is committed, and the nightly reads it like
    any other store file.
+
+   *Amended 2026-10-06 by ADR-042.* The nightly runs it when it has photos not read yet and the
+   model key is set, before the engine, within the same ceiling and time budget.
 3. **The AI step**, sealed as the explanation is (ADR-039):
    - each photo is sent whole, and each shelf again as a full-resolution strip, so the tags'
      small print can be read;
@@ -91,6 +97,10 @@ unit stated once, like its departments.
    with `measured_by: reader` (or `cropped_by: reader`) and the photo's date. The layout file keeps
    what is stated: fixtures, shelf lengths and rules. The loader reads both, and the same checks
    apply. The readings file is store data under ADR-036.
+
+   *Amended 2026-10-06 by ADR-042 (built in Task 8.13).* A fourth section, `photos`, lists each
+   photo the AI answered for, with the day it was read. Each reading adds to the earlier ones,
+   because photos arrive a unit at a time.
 9. **The acceptance run** (D-34). `configs/shelf_reader_acceptance.yaml` holds about 20 products
    measured by hand on the same store's first photos, with who measured them and when. The engine
    compares them with the reader's widths at every run. The reader's widths are used only when

@@ -50,9 +50,9 @@ widths:
 MONTHLY = [{"barcode": "1001", "month": "2026-07", "units": 60.0}]   # itemises drinks, as F8 reads it (FR-156)
 
 
-def _run(tmp_path, body=TWO_FIXTURES, daily=None, monthly=None):
+def _run(tmp_path, body=TWO_FIXTURES, daily=None, monthly=None, photos=None):
     inputs = make_inputs(products=CATALOGUE, sales_daily=daily, sales_monthly=monthly, run_at=RUN_AT,
-                         store_layout=_layout(tmp_path, body) if body is not None else None)
+                         store_layout=_layout(tmp_path, body) if body is not None else None, shelf_photos=photos)
     return layout_facts.run(inputs)
 
 
@@ -137,3 +137,15 @@ def test_every_catalogue_product_of_a_fixture_is_accounted_for(tmp_path):
 def test_it_carries_no_value_and_no_entry(tmp_path):
     out = _run(tmp_path, daily=_daily())
     assert out.entries == [] and "value" not in str(out.extras).lower()
+
+
+PHOTOS = [{"id": "p1", "unit": "F1", "collected": "2026-10-10", "read": "2026-10-11"},
+          {"id": "p2", "unit": "Fridge 9", "collected": "2026-10-12", "read": None}]
+
+
+def test_the_shelf_photos_are_listed_whatever_the_layouts_state(tmp_path):
+    # FR-227, ADR-042 Decision 6: the first photos come before the layout does.
+    for body in (None, "fixtures:\n" + _fixture("F1", "[nowhere]"), TWO_FIXTURES):
+        out = _run(tmp_path, body=body, photos=PHOTOS)
+        assert out.extras["photos"] == PHOTOS, out.unavailable_reason
+    assert _run(tmp_path, body=None).extras["photos"] == []

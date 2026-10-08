@@ -9,7 +9,10 @@ it the same before and after sales arrive (FR-191). It publishes:
   departments' catalogue products; once it exists, only the planned ones (FR-190);
 - per fixture, the catalogue products not planned, by reason (FR-197, FR-198, FR-199), from the
   one definition `shelf_plan` packs from (`shelf_population`);
-- every rejected entry, by kind, key and reason (FR-178).
+- every rejected entry, by kind, key and reason (FR-178);
+- the store's shelf photos: each one's unit, the night it was collected and the night it was read
+  (FR-227, ADR-042). Published whatever the layout's state, because the first photos come before
+  the layout does.
 
 No value and no entries (FR-192): it is a page's facts, never one of Today's places.
 """
@@ -32,13 +35,16 @@ def window_of(inputs):
 
 def run(inputs) -> CapabilityOutput:
     status, reason = derive_status(CAP, inputs)
+    photos = list(inputs.shelf_photos or [])
     if status == "unavailable":
-        return CapabilityOutput.unavailable(CAP, SPEC, reason)
+        out = CapabilityOutput.unavailable(CAP, SPEC, reason)
+        out.extras = {"photos": photos}
+        return out
     layout = inputs.store_layout
     rejected = list(layout.get("rejected") or [])
     if not layout.get("fixtures"):
         out = CapabilityOutput.unavailable(CAP, SPEC, "layout_all_rejected")
-        out.extras = {"rejected": rejected}
+        out.extras = {"rejected": rejected, "photos": photos}
         return out
 
     window = window_of(inputs)
@@ -76,7 +82,8 @@ def run(inputs) -> CapabilityOutput:
                 "widths": {b: widths[b] for b in sorted(widths) if any(b in pop[n] for n in pop)},
                 "current": dict(sorted((layout.get("current") or {}).items())),
                 "evidence_window": window.to_dict() if window else None,
-                "rejected": rejected})
+                "rejected": rejected,
+                "photos": photos})
 
 
 def _concerns(rule: dict, name: str, fixture: dict, members: dict) -> bool:

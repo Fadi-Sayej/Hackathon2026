@@ -4,6 +4,7 @@ import { dirProps } from '../lib/utils/rtl.js'
 import { namesFrom, ruleText, useDates } from './shelfCommon.js'
 import { Names } from './ShelfNames.jsx'
 import { ReaderWaiting } from './ReaderWaiting.jsx'
+import { ShelfPhotos } from './ShelfPhotos.jsx'
 
 /**
  * Store layout: his shelf units as the team recorded them from his photographs (F12-S1 FR-190,
@@ -72,7 +73,7 @@ function Fixture({ name, fixture, withoutWidth, withoutPicture, unplanned, nameO
       ) : (
         <p className="layout__dated">{t('layout.allMeasured')}</p>
       )}
-      {/* D-33, F12-S1 FR-217: the pictures the team has still to crop from his photos. */}
+      {/* D-33, F12-S1 FR-217: the pictures not yet cut from the store's photos. */}
       {withoutPicture.length ? (
         <p className="reorder__needs" data-missing="picture">
           <span className="reorder__needs-pill">{t('layout.noPicture')}</span>
@@ -91,7 +92,7 @@ function Fixture({ name, fixture, withoutWidth, withoutPicture, unplanned, nameO
   )
 }
 
-export function StoreLayoutPage({ artefact, catalogue }) {
+export function StoreLayoutPage({ artefact, catalogue, photos = null }) {
   const { t } = useI18n()
   const { date } = useDates()
   const capability = artefact?.capabilities?.layout_facts
@@ -105,6 +106,7 @@ export function StoreLayoutPage({ artefact, catalogue }) {
         {capability?.unavailable_reason === 'layout_all_rejected'
           ? <Rejected rejected={capability.rejected} nameOf={nameOf} />
           : <p className="reorder__line">{t('layout.waiting.next')}</p>}
+        {photos ? <ShelfPhotos units={[]} collected={capability?.photos || []} {...photos} /> : null}
       </section>
     )
   }
@@ -117,6 +119,8 @@ export function StoreLayoutPage({ artefact, catalogue }) {
   return (
     <section className="capability layout" data-capability="layout_facts" {...dirProps()}>
       <ReaderWaiting reader={capability.reader} />
+      {photos ? <ShelfPhotos units={capability.fixture_order || Object.keys(capability.fixtures || {})}
+        collected={capability.photos || []} {...photos} /> : null}
       <p className="reorder__line">{t('layout.shelfOrder')}</p>
       {(capability.fixture_order || Object.keys(capability.fixtures || {})).map((name) => [name, capability.fixtures[name]]).map(([name, fixture]) => (
         <Fixture key={name} name={name} fixture={fixture} withoutWidth={capability.without_width?.[name] || []}

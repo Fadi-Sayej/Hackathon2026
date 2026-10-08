@@ -436,7 +436,7 @@ def load_store_layout(path: Path | str, catalogue: Iterable[dict], pictures_dir:
 
 READINGS_PATH = ROOT / "configs" / "shelf_readings.yaml"
 ACCEPTANCE_PATH = ROOT / "configs" / "shelf_reader_acceptance.yaml"
-READING_KEYS = {"reading", "widths", "current", "pictures"}
+READING_KEYS = {"reading", "widths", "current", "pictures", "photos"}   # photos: which the AI answered for (ADR-042)
 READER = ("reader",)
 HAND = ("team", "owner")
 

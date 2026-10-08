@@ -229,6 +229,17 @@ def test_the_inputs_carry_the_layout_checked_against_the_catalogue(tmp_path):
     assert [r["key"] for r in layout["rejected"]] == ["F2"]
 
 
+def test_a_test_worlds_photos_are_its_own_never_the_stores(tmp_path):
+    # ADR-042: beside the layout file, as the readings are. The store's own folder is read only
+    # beside the store's own layout file.
+    path = _write(tmp_path, "fixtures:\n" + _fixture("F1", "[drinks]"))
+    assert _inputs(tmp_path, path).shelf_photos == []
+    unit = tmp_path / "shelf_photos" / "2026-10-10" / "F1"
+    unit.mkdir(parents=True)
+    (unit / "p1.jpg").write_bytes(b"\xff\xd8\xff")
+    assert _inputs(tmp_path, path).shelf_photos == [{"id": "p1", "unit": "F1", "collected": "2026-10-10", "read": None}]
+
+
 def test_a_missing_file_is_the_missing_input_no_store_layout(tmp_path):
     from src.engine.registry import INPUT_REASONS
     assert _inputs(tmp_path, tmp_path / "absent.yaml").store_layout is None
@@ -344,3 +355,17 @@ def test_a_picture_without_its_date_is_rejected(tmp_path):
 def test_no_pictures_section_means_no_pictures(tmp_path):
     out = _load(tmp_path, "fixtures:\n" + _fixture("F1", "[drinks]"))
     assert out["pictures"] == {} and out["rejected"] == []
+
+
+def test_a_photo_collected_or_read_is_a_different_input(tmp_path):
+    path = _write(tmp_path, "fixtures:\n" + _fixture("F1", "[drinks]"))
+    silver = _silver(tmp_path)
+    none = _inputs(tmp_path, path, silver).inputs_digest
+    unit = tmp_path / "shelf_photos" / "2026-10-10" / "F1"
+    unit.mkdir(parents=True)
+    (unit / "p1.jpg").write_bytes(b"\xff\xd8\xff")
+    collected = _inputs(tmp_path, path, silver).inputs_digest
+    (tmp_path / "shelf_readings.yaml").write_text(
+        "photos:\n  2026-10-10/F1/p1.jpg: {read_on: '2026-10-11'}\n", encoding="utf-8")
+    read = _inputs(tmp_path, path, silver).inputs_digest
+    assert len({none, collected, read}) == 3

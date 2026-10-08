@@ -1,7 +1,7 @@
 ---
 ID: PLAN-PHASE-8
 Title: Phase 8 — V4, F12 Planogram (F12-S1)
-Status: Approved — by the repository owner, 2026-10-04 ("yes"): Tasks 8.0–8.9, as shown, with their values. Task 8.10, added for D-32 in the same answer, was approved with F12-S1 OQ-1209 ("approve"), the same day. Tasks 8.11 and 8.12, added 2026-10-05 for F12-S1 v0.9: Task 8.11 merged in #288 on v0.9's approval; Task 8.12 approved 2026-10-06 ("ok", to "Shall I start building it?")
+Status: Approved — by the repository owner, 2026-10-04 ("yes"): Tasks 8.0–8.9, as shown, with their values. Task 8.10, added for D-32 in the same answer, was approved with F12-S1 OQ-1209 ("approve"), the same day. Tasks 8.11 and 8.12, added 2026-10-05 for F12-S1 v0.9: Task 8.11 merged in #288 on v0.9's approval; Task 8.12 approved 2026-10-06 ("ok", to "Shall I start building it?"). Task 8.13, D-37's photo upload, added 2026-10-08 on F12-S1 v0.11's approval of 2026-10-06 ("approved", OQ-1212)
 Owner: smartshelf-architect
 Parent: [Implementation plan](plan.md)
 Inputs: [docs/features/F12-planogram/specs/F12-S1-planogram.md (Approved 2026-10-04), ADR-037 and ADR-038 (Accepted 2026-10-04), D-32, ADR-032, ADR-035, ADR-039 (Accepted 2026-10-04), src/engine/market_boost.py, ADR-009, ADR-014, ADR-016, ADR-029, ADR-030, ADR-036, D-29, D-30, D-31, src/engine/order_evidence.py, src/engine/store_facts.py, src/engine/registry.py, src/engine/model.py, src/engine/publish.py, src/common/store.py, src/common/store_readiness.py, src/surface/compose.js, src/owner/ownerState.js, src/App.jsx, scripts/check_order_signals.py, scripts/build_order_example.py, src/lib/dataAdapters/loadOrderExample.js]
@@ -487,6 +487,46 @@ first photos.
 - no test touches the network;
 - YomYom's artefact is unchanged.
 
+### Task 8.13: Sending the shelf photos from the app (D-37; FR-218 v0.11, FR-224 … FR-227; AC-212 … AC-214; NFR-080; ADR-042)
+
+**Approved 2026-10-06** with F12-S1 v0.11 ("approved", OQ-1212): the screen and its wording as
+drawn (docs/reviews/F12-photo-upload-mockups.md), option B, the nightly's reading, and the two
+older sentences on Store layout.
+
+**Files:**
+- `src/pages/ShelfPhotos.jsx`, `src/pages/StoreLayoutPage.jsx`, `src/App.jsx`, the `photos.*`
+  words and the two revised sentences in three languages;
+- `src/owner/shelfPhotos.js` (the parts, the manifest, the list), `src/owner/firestoreShelfPhotos.js`
+  (the only module binding them to Firestore), `src/firebaseConfig.js` (whether this deployment
+  can reach Firestore, without loading Firebase);
+- `src/owner_state/shelf_photos.py` and `scripts/collect_shelf_photos.py` (the nightly's collect
+  and delete);
+- `src/engine/shelf_reader/photos.py` (the photos on disk, and which were read),
+  `src/engine/shelf_reader/reading.py` (each reading adds to the earlier ones),
+  `scripts/read_shelves.py --unread`;
+- `src/engine/inputs.py`, `src/engine/layout_facts.py` (the photo list in the artefact);
+- `.github/workflows/collect-daily.yml` (four steps before the engine);
+- tests.
+
+Steps:
+1. **Sending** (FR-225): a JPEG up to 12 MB byte for byte, anything else redrawn; parts of at
+   most 900,000 bytes, the manifest last; the photo's id fixed when it is chosen.
+2. **Collecting** (FR-226): the parts joined and checked against the manifest; the newest photo
+   of a unit stands in its folder, an earlier one goes to `replaced/`; Firestore is cleared of
+   exactly what was pushed.
+3. **Reading** (FR-226, FR-218 v0.11): every photo not read yet, once each, within one ceiling
+   and one time budget. A reading adds to the earlier ones: a unit read whole replaces what was
+   read of it, and a width two photos disagree on is unknown (FR-221).
+4. **The list** (FR-227): the artefact lists each collected photo with the night it was
+   collected and read; the screen adds those still waiting in Firestore.
+
+**Done when:**
+- AC-212 … AC-214 pass, against an in-memory Firestore for the collector;
+- the screen is shown only where Firebase is configured and sign-in is on, and a team account
+  sees it disabled;
+- the visual proof shows no change outside Store layout's two revised sentences;
+- YomYom's artefact gains only `layout_facts.photos: []`.
+
 ## Pull requests
 
 1. **Engine and record:** Tasks 8.0 … 8.5. The proof is YomYom's print-mode artefact, unchanged
@@ -498,6 +538,7 @@ first photos.
 5. **v0.9's packing and pictures, with the records:** Task 8.11, with D-33 … D-35, F12-S1 v0.9,
    ADR-040 and ADR-041. It goes before the pages, which read its fields.
 6. **The shelf reader:** Task 8.12.
+7. **The photo upload:** Task 8.13, with the records of OQ-1212's answer.
 
 ## Checkpoint 8
 

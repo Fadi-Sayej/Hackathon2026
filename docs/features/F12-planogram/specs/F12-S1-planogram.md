@@ -1,14 +1,14 @@
 ---
 ID: F12-S1
 Title: Planogram — a dated shelf plan from his own sales, waiting for them until they arrive
-Status: Approved — by the repository owner, 2026-10-04 (v0.8), 2026-10-05 (v0.9: "approve") and 2026-10-06 (v0.10: D-36, "a")
+Status: Approved — by the repository owner, 2026-10-04 (v0.8), 2026-10-05 (v0.9: "approve") and 2026-10-06 (v0.10: D-36, "a"; v0.11: D-37, "approved")
 Owner: smartshelf-architect
-Version: 0.10 (2026-10-06: FR-220 revised for D-36, the package read where there is no shelf tag; AC-211). 0.9 (2026-10-05: FR-183 revised, because the mockups showed the v0.8 rule leaving shelves empty; AC-205, OQ-1210. D-33's product pictures: FR-216, FR-217, AC-206, NFR-078, ADR-040. D-34 and D-35's shelf reader: FR-180 revised, FR-218 … FR-223, AC-207 … AC-210, NFR-079, OQ-1211, ADR-041). 0.8 (2026-10-04: D-32, the AI's explanation of each fixture's plan; FR-210 … FR-215 approved as OQ-1209)
+Version: 0.11 (2026-10-06: D-37's upload screen, FR-224 … FR-227, FR-218 revised, AC-212 … AC-214, NFR-080, OQ-1212, ADR-042). 0.10 (2026-10-06: FR-220 revised for D-36, the package read where there is no shelf tag; AC-211). 0.9 (2026-10-05: FR-183 revised, because the mockups showed the v0.8 rule leaving shelves empty; AC-205, OQ-1210. D-33's product pictures: FR-216, FR-217, AC-206, NFR-078, ADR-040. D-34 and D-35's shelf reader: FR-180 revised, FR-218 … FR-223, AC-207 … AC-210, NFR-079, OQ-1211, ADR-041). 0.8 (2026-10-04: D-32, the AI's explanation of each fixture's plan; FR-210 … FR-215 approved as OQ-1209)
 Parent: [F12 — Planogram](../intent.md)
 Related Intents: INT-006
-Inputs: [docs/features/F12-planogram/intent.md (Approved for specification, D-30), docs/product/PRD.md (§5 V4, §6 #7), docs/product/intent-register.md (D-1, D-3, D-13, D-14, D-15, D-16, D-22, D-23, D-28, D-29, D-30, D-31, D-32, D-33, D-34, D-35, D-36), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (§5 "He stocks", FR-143 … FR-146, FR-156), ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011, ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037, ADR-038, ADR-039, ADR-040, ADR-041, CLAUDE.md]
+Inputs: [docs/features/F12-planogram/intent.md (Approved for specification, D-30), docs/product/PRD.md (§5 V4, §6 #7), docs/product/intent-register.md (D-1, D-3, D-13, D-14, D-15, D-16, D-22, D-23, D-28, D-29, D-30, D-31, D-32, D-33, D-34, D-35, D-36, D-37), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (§5 "He stocks", FR-143 … FR-146, FR-156), ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011, ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037, ADR-038, ADR-039, ADR-040, ADR-041, ADR-042 (Proposed), CLAUDE.md]
 Answered by: [System Design](../../../architecture/system-design.md) §21 (F12-S1)
-Updated: 2026-10-06 (v0.10: FR-220 per D-36, as put to him). 2026-10-05 (v0.9 approved: FR-183 revised, OQ-1210 answered A; D-33's pictures, FR-216, FR-217; D-34 and D-35's shelf reader, FR-218 … FR-223, OQ-1211 answered). 2026-10-04 (D-32's explanation approved, OQ-1209; earlier the same day, approved with OQ-1208, and OQ-1204 and OQ-1207 answered with the plan)
+Updated: 2026-10-08 (Task 8.13: FR-226 reads the photos that waited, put to the owner). 2026-10-06 (v0.11 approved: D-37's upload screen, ADR-042, OQ-1212 answered "approved". v0.10: FR-220 per D-36, as put to him). 2026-10-05 (v0.9 approved: FR-183 revised, OQ-1210 answered A; D-33's pictures, FR-216, FR-217; D-34 and D-35's shelf reader, FR-218 … FR-223, OQ-1211 answered). 2026-10-04 (D-32's explanation approved, OQ-1209; earlier the same day, approved with OQ-1208, and OQ-1204 and OQ-1207 answered with the plan)
 ---
 
 # F12-S1 — Planogram
@@ -29,10 +29,15 @@ Updated: 2026-10-06 (v0.10: FR-220 per D-36, as put to him). 2026-10-05 (v0.9 ap
 > **D-34** and **D-35** (2026-10-05): a shelf reader, not people, reads the widths, the current
 > facings and the pictures from those photos: FR-180 revised, FR-218 … FR-223, AC-207 … AC-210,
 > NFR-079 and OQ-1211, on ADR-041. Everything else is as approved.
+>
+> **v0.11 was approved on 2026-10-06** ("approved"). It specifies **D-37** (2026-10-06): the app's
+> upload screen for the shelf photos, so they reach the reader with no one moving files.
+> FR-224 … FR-227, FR-218 revised, AC-212 … AC-214, NFR-080 and OQ-1212, on ADR-042. Built in
+> Phase 8 Task 8.13.
 
 > **Identifier note.** Every `FR-`, `INV-`, `NFR-`, `AC-`, `SCN-`, `C-`, `ASM-` and `OQ-` id
-> below is new and globally unique: FR-178 … FR-223, INV-084 … INV-097, NFR-072 … NFR-079,
-> AC-172 … AC-211, SCN-159 … SCN-177, C-73 … C-75, ASM-073 … ASM-083, OQ-1201 … OQ-1211.
+> below is new and globally unique: FR-178 … FR-227, INV-084 … INV-097, NFR-072 … NFR-080,
+> AC-172 … AC-214, SCN-159 … SCN-177, C-73 … C-75, ASM-073 … ASM-083, OQ-1201 … OQ-1212.
 
 Implements intent F12. Bound by ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011,
 ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037,
@@ -569,6 +574,8 @@ none. Store layout lists, per fixture, the products whose picture has not been t
 unit in frame, by hand (D-13). The photos are store data, kept in the store's copy and never
 published (ADR-041). Nothing reads them but the shelf reader, and nothing leaves them but a
 product's picture (FR-222). The reader runs when photos arrive, never in the nightly.
+**(v0.11, ADR-042)** The reader runs when photos arrive: in the nightly that collected them, when
+the model key is set (FR-226), or on demand.
 
 **FR-219** — The AI reads each photo, and each shelf again as a full-resolution strip. Per shelf it
 gives the shelf's two ends at the line of the product fronts. Per run of identical facings, left to
@@ -618,6 +625,47 @@ the policy's number are listed, and every one is within ±5 mm. Until then:
 - pictures and current facings are used from the first reading.
 
 The hand readings never enter a plan.
+
+#### Sending the photos from the app (D-37) — v0.11
+
+**FR-224** — Store layout lets the owner send the shelf photos from the app (D-37), one photo per
+shelving unit. The owner:
+- names the unit, from those the layout file records, or by typing its name when there are none
+  or it is another;
+- takes or chooses a photo, and sees it;
+- presses Send.
+
+A team account sees it disabled (ADR-029). A deployment with no Firebase project does not show it,
+because nothing could be sent from it.
+
+**FR-225** — A photo is sent as taken. A JPEG of up to 12 MB is sent byte for byte. Anything else
+is redrawn once as a JPEG at quality 0.92, its longest side at most 4,096 px. It travels to the
+store's own Firestore subtree in parts of at most 900,000 bytes. A manifest written last names the
+unit, the time, the size, the number of parts and the SHA-256 digest. Sending a photo again
+rewrites it: it never makes a second copy (ADR-042) **(decided here)**.
+
+**FR-226** — The nightly collects the photos before the engine runs. Each photo whose parts join to
+its manifest's size and digest is written to
+`data/internal/shelf_photos/<UTC date>/<unit>/<photo>.jpg` and committed. Its documents are
+deleted only after that commit is pushed. A photo that fails its check stays, and the run's
+summary names it. Parts with no manifest after two days are deleted. When photos were collected
+and the model key is set, the reader reads that night's folder before the engine runs, within
+NFR-079's bounds.
+
+*Task 8.13 (2026-10-08), put to the owner:* the nightly reads every photo not read yet, once:
+tonight's, and any that waited for the key, the layout file or a request that failed. Each
+reading adds to the earlier ones. A unit read whole replaces what was read of it before, and a
+width that two photos disagree on is unknown (FR-221). Of a unit's photos collected the same
+night, the newest stands, and the earlier ones are kept aside, unread.
+
+**FR-227** — The screen says when a photo has been sent, and when it did not send. It lists the
+photos sent, each with its state:
+- the photos still in Firestore: "sent, collected tonight";
+- from the artefact, the photos collected ("collected" and the date) and read ("read" and the
+  date).
+
+The artefact lists each collected photo's unit, the night it was collected and the night it was
+read. It never includes the photo.
 
 ## 7. Behavioral Invariants
 
@@ -860,6 +908,10 @@ policy's budget. Its cost is estimated before it is switched on: about $0.05 a p
 for a 15-unit store at ADR-041's assumptions, replaced by the first reading's measured usage. It
 counts under ADR-032's monthly limit.
 
+**NFR-080** — *(v0.11)* A shelf photo is kept only in the private repository, and, on
+its way there, in the store's own Firestore subtree. It is there at most until the next nightly,
+unless it fails its check. No photo is published (ADR-041, ADR-042).
+
 ## 14. Compatibility and External Constraints
 
 **C-73** — One store per copy (ADR-036, D-28). The layout file belongs to that copy's store.
@@ -1030,6 +1082,18 @@ current facings are used from the first reading, and no hand reading enters a pl
 model and prompt are unchanged. No photo is published, only a product's picture. *(FR-218,
 FR-219)*
 
+**AC-212** — *(v0.11)* A photo sent from the app reaches the photos' folder as the same
+bytes: the joined file has the manifest's digest, and a JPEG is unchanged. Sending it twice
+leaves one photo. *(FR-225, FR-226)*
+
+**AC-213** — *(v0.11)* A photo with a missing or altered part is neither written to the
+folder nor deleted, and the run's summary names it. A photo's documents are deleted only after
+the push. *(FR-226, NFR-080)*
+
+**AC-214** — *(v0.11)* A team account cannot send: the control is disabled, and the
+rules refuse the write. The nightly asks the model only when it collected photos that night and
+the key is set. *(FR-224, FR-226)*
+
 ## 16. Assumptions
 
 **ASM-073** — A product's facing width does not change between packs of the same barcode.
@@ -1178,6 +1242,18 @@ It also asks:
 - the example's explanation is asked once, by the team, with his key: one request for each of
   the example's fixtures, about five, which costs a few cents at ADR-039's estimate. · owner: the repository owner · blocks: nothing now.
 
+**~~OQ-1212~~** — The upload screen (D-37), for the owner's approval with v0.11
+(docs/reviews/F12-photo-upload-mockups.md). **Answered 2026-10-06: "approved", to "You can say
+'approve all', or name what to change".** Recorded as every item as drawn, with B, the
+recommended carrier, and the two older sentences changed:
+- the screen as drawn, on Store layout;
+- its wording, in Hebrew, Arabic and English;
+- how a photo travels: **B, Firestore** (recommended: it works on the project as it is), or **A,
+  Cloud Storage for Firebase**, which needs the Blaze plan with a card (ADR-042);
+- the nightly reading the photos it collected, when the model key is set (FR-218 v0.11).
+
+Built in Task 8.13.
+
 **~~OQ-1211~~** — The shelf reader's provisional values, for his approval with v0.9 (ADR-041). **Answered 2026-10-05: "approve", to "You can say 'approve all', or name what to change", asked of six items: the screens; the empty shelves, A (shown in the screens) or B; where pictures are kept (ADR-040); the shelf reader (ADR-041) with its starting values; the wording; and showing or hiding the team's note on rejected layout entries.** Approved as listed, and provisional:
 - the recent window for candidates: 90 days of sales;
 - the acceptance run: at least 20 products, every one within ±5 mm (the ±5 mm is his, D-34);
@@ -1245,6 +1321,8 @@ products at eye level and three below.
 | INT-006 · D-34 · D-35 · D-36 | FR-180 (v0.9), FR-218, FR-219, FR-220 (v0.10) | — | AC-207, AC-210, AC-211 |
 | INT-006 · D-34 · D-35 | FR-221, FR-222, FR-223 | — | AC-208, AC-209 |
 | Protected behavior | NFR-079 | — | AC-210 |
+| INT-006 · D-37 (v0.11) | FR-218 (v0.11), FR-224, FR-225, FR-226, FR-227 | — | AC-212, AC-213, AC-214 |
+| Protected behavior | NFR-080 | — | AC-213 |
 
 ---
 
