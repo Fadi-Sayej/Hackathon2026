@@ -527,7 +527,7 @@ Steps:
 - the visual proof shows no change outside Store layout's two revised sentences;
 - YomYom's artefact gains only `layout_facts.photos: []`.
 
-### Task 8.14: The owner's units and shelf heights (D-38; FR-228 … FR-234; AC-215 … AC-220; NFR-081; ADR-043)
+### Task 8.14: The owner's units and shelf heights (D-38; FR-228 … FR-234; AC-215 … AC-220; NFR-081; ADR-044)
 
 **Proposed 2026-10-08**, for the owner's approval with F12-S1 v0.12 (OQ-1213) and the mockups
 (docs/reviews/F12-unit-form-mockups.md). Built on `feat/unit-form` while it waits; not merged

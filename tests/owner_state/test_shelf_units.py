@@ -1,4 +1,4 @@
-"""The units the owner entered in the app, written into the layout file (D-38, ADR-043 Decision 3,
+"""The units the owner entered in the app, written into the layout file (D-38, ADR-044 Decision 3,
 F12-S1 FR-229, AC-216). Test units and departments, not a store's (D-23)."""
 from __future__ import annotations
 

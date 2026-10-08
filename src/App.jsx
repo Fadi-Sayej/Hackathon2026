@@ -39,7 +39,7 @@ const SHELF_PHOTOS = isFirebaseConfigured() && authMode() === 'firebase'
   ? { onSend: (unit, file, id) => shelfPhotos().then((m) => m.send(unit, file, id)),
       loadPending: () => shelfPhotos().then((m) => m.pending()) }
   : null
-// D-38, ADR-043: the owner's units, kept with the owner's state where the photos go.
+// D-38, ADR-044: the owner's units, kept with the owner's state where the photos go.
 const shelfUnits = () => import('./owner/firestoreShelfUnits.js')
 const SHELF_UNITS = SHELF_PHOTOS
   ? { onSave: (units) => shelfUnits().then((m) => m.save(units)), loadSaved: () => shelfUnits().then((m) => m.load()) }

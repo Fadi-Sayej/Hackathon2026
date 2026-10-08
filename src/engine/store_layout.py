@@ -10,7 +10,7 @@ holds four kinds of fact, and each carries who stated or measured it, and when:
         eye_level_shelf: <n>        # optional; shelves count from 1, the top
         stated_by: owner
         stated_on: 2026-10-10
-        recorded_by: team           # or app: the owner entered it on Store layout (D-38, ADR-043)
+        recorded_by: team           # or app: the owner entered it on Store layout (D-38, ADR-044)
         shelves:                    # top to bottom; height_cm on every shelf or none, the top one may be null
           - {length_cm: 100, height_cm: 35, measured_by: team, measured_on: 2026-10-10}
     widths:                         # one product's width at the front of a shelf
@@ -63,7 +63,7 @@ PICTURE_START = {"jpg": (b"\xff\xd8\xff",), "jpeg": (b"\xff\xd8\xff",), "png": (
                  "webp": (b"RIFF",)}
 
 STATED = {"stated_by": "owner"}
-RECORDERS = ("team", "app")         # app: the owner's own form on Store layout (D-38, ADR-043)
+RECORDERS = ("team", "app")         # app: the owner's own form on Store layout (D-38, ADR-044)
 MEASURERS = ("team", "owner")
 RULE_KINDS = ("together", "keep_on", "keep_off", "at_least", "at_most")
 FIXTURE_KEYS = {"departments", "chilled", "eye_level_shelf", "shelves", "stated_by", "stated_on", "recorded_by"}
@@ -329,7 +329,7 @@ def _heights(listed, products: dict, rejected: list, measurers: tuple) -> dict:
 
 
 def _hand(listed, products: dict, rejected: list) -> dict:
-    """The acceptance run's hand readings: a width, a height, or both, per product (ADR-043 Decision 6)."""
+    """The acceptance run's hand readings: a width, a height, or both, per product (ADR-044 Decision 6)."""
     hand = {}
     for code, entry in sorted(listed.items(), key=lambda kv: str(kv[0])):
         if _twice_named(listed, code, "acceptance", rejected):
@@ -504,7 +504,7 @@ def merge_readings(layout: Optional[dict], catalogue: Iterable[dict], *, reading
     Pictures and current facings are used from the first reading. Widths are used only once the
     acceptance run passes: at least `minimum` products measured by hand on the same photos, every
     one within `tolerance_mm` of the reader's width. Until then they are kept apart, unused, and
-    those products plan as "no width". Heights pass their own run the same way (D-38, ADR-043
+    those products plan as "no width". Heights pass their own run the same way (D-38, ADR-044
     Decision 6). The hand readings grade the reader and never enter a plan.
     """
     if layout is None:

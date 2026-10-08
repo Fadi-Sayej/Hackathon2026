@@ -4,7 +4,7 @@ Title: The owner's own units, with shelf heights (D-38) — mockups for the repo
 Status: Ready for review
 Owner: smartshelf-engineer
 Parent: [F12-S1](../features/F12-planogram/specs/F12-S1-planogram.md) v0.12, OQ-1213
-Inputs: [D-38, F12-S1 FR-228 … FR-234, ADR-029, ADR-037, ADR-041, ADR-043 (Proposed)]
+Inputs: [D-38, F12-S1 FR-228 … FR-234, ADR-029, ADR-037, ADR-041, ADR-044 (Proposed)]
 ---
 
 # Your own units, with shelf heights — mockups for approval
@@ -12,7 +12,7 @@ Inputs: [D-38, F12-S1 FR-228 … FR-234, ADR-029, ADR-037, ADR-041, ADR-043 (Pro
 D-38 (2026-10-08): the owner enters each shelving unit in the app, each shelf's length and height
 included, so no one edits the layout file. The reader measures each product's height, and the plan
 checks that a product fits under the shelf above. These are the screens, their words, and how it
-works ([ADR-043](../architecture/decisions/ADR-043-the-owner-enters-each-unit-and-heights-are-checked.md)).
+works ([ADR-044](../architecture/decisions/ADR-044-the-owner-enters-each-unit-and-heights-are-checked.md)).
 Nothing here is merged or shown to the store until the owner approves it (F12-S1 C-75).
 
 **How they were made.** They were drawn inside the real app, in the e2e build, at phone size
@@ -41,7 +41,7 @@ Nothing here is merged or shown to the store until the owner approves it (F12-S1
    - **the unit drawn to scale**: each shelf as tall as it really is, and each product as tall as
      it really is.
 3. **The wording**, in the three languages (table below).
-4. **How it works** (ADR-043):
+4. **How it works** (ADR-044):
    - what you save is kept with your other decisions in the app. Each night it is written into
      the layout file the engine reads, and its history is kept;
    - the reader measures each product's height from the same photo, at no extra cost. Like the

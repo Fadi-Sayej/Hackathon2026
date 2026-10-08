@@ -440,7 +440,7 @@ def test_a_photo_with_no_answer_is_not_marked_read(tmp_path):
 
 
 def test_heights_pass_their_own_acceptance_run(tmp_path):
-    # D-38, ADR-043 Decision 6: the hand readings give heights too, graded as widths are.
+    # D-38, ADR-044 Decision 6: the hand readings give heights too, graded as widths are.
     catalogue = [product(f"72{n:011d}", f"p{n}") for n in range(25)]
     layout = load_store_layout(layout_file(tmp_path), catalogue)
     readings = tmp_path / "shelf_readings.yaml"

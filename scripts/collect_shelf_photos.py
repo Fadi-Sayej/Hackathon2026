@@ -1,4 +1,4 @@
-"""collect_shelf_photos.py — bring what the owner sent from the app into the store's copy (ADR-042, ADR-043).
+"""collect_shelf_photos.py — bring what the owner sent from the app into the store's copy (ADR-042, ADR-044).
 
     python3 scripts/collect_shelf_photos.py collect --ledger /tmp/shelf_photos.json
     python3 scripts/collect_shelf_photos.py delete  --ledger /tmp/shelf_photos.json
@@ -8,7 +8,7 @@ only then runs `delete`, which removes from Firestore exactly what the ledger na
 skips `delete`, and the photos are collected again the next night.
 
 `collect` also writes the units the owner entered on Store layout into the layout file (D-38,
-ADR-043), when that save is newer than the one the file took. The owner's list stays in Firestore:
+ADR-044), when that save is newer than the one the file took. The owner's list stays in Firestore:
 it is the owner's state, not something in transit.
 
 The store and its Firebase project are configs/store.yaml's (ADR-036), and the credential is the

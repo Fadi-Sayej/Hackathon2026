@@ -325,7 +325,7 @@ describe('Sending the shelf photos (F12-S1 FR-224, FR-227; D-37, ADR-042)', () =
   })
 })
 
-describe('The owner\'s own units (F12-S1 FR-228; D-38, ADR-043)', () => {
+describe('The owner\'s own units (F12-S1 FR-228; D-38, ADR-044)', () => {
   const catalogue = { products: [{ barcode: '1', department: 'drinks', product_name: 'מים' }, { barcode: '2', department: 'snacks', product_name: 'במבה' }] }
   const form = () => document.querySelector('.units')
 

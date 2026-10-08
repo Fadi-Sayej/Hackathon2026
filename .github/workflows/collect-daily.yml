@@ -132,7 +132,7 @@ jobs:
         # data/internal/shelf_photos/<today>/<unit>/. It deletes nothing: the ledger says what
         # the delete step below may remove, once the photos are pushed. It also writes the units
         # the owner entered on Store layout into the layout file, when that save is newer than the
-        # one the file took (D-38, ADR-043).
+        # one the file took (D-38, ADR-044).
         continue-on-error: true
         env:
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}

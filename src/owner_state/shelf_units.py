@@ -1,5 +1,5 @@
 # src/owner_state/shelf_units.py
-"""Write the units the owner entered in the app into the layout file (D-38, ADR-043 Decision 3,
+"""Write the units the owner entered in the app into the layout file (D-38, ADR-044 Decision 3,
 F12-S1 FR-229).
 
 The app keeps the owner's whole list in one document, `stores/<store>/ownerState/layout`:
@@ -25,7 +25,7 @@ import yaml
 
 SCHEMA = 1
 HEADER = ("# configs/store_layout.yaml — the store's shelving units (ADR-037). Since D-38 the owner\n"
-          "# enters them on Store layout and the nightly writes them here (ADR-043); the rules and the\n"
+          "# enters them on Store layout and the nightly writes them here (ADR-044); the rules and the\n"
           "# rest are kept as recorded. Changed only by commit.\n")
 
 

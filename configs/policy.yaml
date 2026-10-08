@@ -141,7 +141,7 @@ shelf:
   # A judgement: at 0.17 a 5th facing adds under 4% to a product's sales. His "at least N"
   # rule overrides it.
   facings_cap: 4
-  # D-38 (ADR-043, F12-S1 FR-233): room between a product's top and the shelf above, to take it
+  # D-38 (ADR-044, F12-S1 FR-233): room between a product's top and the shelf above, to take it
   # out. Provisional, put to the owner with OQ-1213.
   height_clearance_mm: 20
   # F12-S1 FR-205, FR-209: measuring what an arrangement changed (OQ-1207, approved 2026-10-04

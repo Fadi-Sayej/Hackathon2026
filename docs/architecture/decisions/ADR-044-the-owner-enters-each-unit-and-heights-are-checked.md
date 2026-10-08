@@ -1,5 +1,5 @@
 ---
-ID: ADR-043
+ID: ADR-044
 Title: The owner enters each shelving unit in the app, with each shelf's length and height; the reader measures product heights, and the plan checks they fit
 Status: Proposed
 Owner: smartshelf-architect
@@ -9,7 +9,7 @@ Related Specs: F12-S1 (FR-228 … FR-234, AC-215 … AC-220, NFR-081, ASM-084, O
 Inputs: [D-3, D-13, D-23, D-34, D-38, ADR-029, ADR-036, ADR-037, ADR-041, ADR-042, docs/reviews/F12-unit-form-mockups.md]
 ---
 
-# ADR-043 — The owner enters each unit, and heights are checked
+# ADR-044 — The owner enters each unit, and heights are checked
 
 **Status:** Proposed, for the repository owner's approval with the screens
 ([mockups](../../reviews/F12-unit-form-mockups.md)) and F12-S1 v0.12. If accepted, it amends

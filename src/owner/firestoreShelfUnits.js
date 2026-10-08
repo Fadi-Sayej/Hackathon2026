@@ -1,5 +1,5 @@
 /**
- * The one module that binds the owner's units to the Firebase SDK (D-38, ADR-043 Decision 2).
+ * The one module that binds the owner's units to the Firebase SDK (D-38, ADR-044 Decision 2).
  * Imported with `import()` when the form saves or opens, by name, as firestoreShelfPhotos.js is.
  * The list is one document of the owner's state, written whole on each save; the nightly writes it
  * into the layout file (src/owner_state/shelf_units.py).
