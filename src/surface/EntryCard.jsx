@@ -31,6 +31,18 @@ const IDLE_ANSWERS = [
 // Rows a capability's card folds into another or already shows. F9 (F9-S1 FR-175): the window is
 // said inside the nights row, and the market's name is the card's own heading.
 const FOLDED = { assortment_gap: new Set(['window', 'market_name']) }
+// One signal family's own words, where the capability's shared ones do not say what is wrong.
+// F1's inverted price (the owner's request, 2026-10-08): the delivery price is below the shelf
+// price. Its line says so, its value says what each delivery order loses with the commission on
+// top (F1-S1 FR-007), and it shows the two prices only. The difference, markup, ceiling and
+// commission rows repeat that or belong to the other F1 card, a price above the ceiling.
+const FAMILY = {
+  'price.inverted': {
+    what: 'characterisation.price_inverted',
+    kind: 'value.kind.price_inverted',
+    folded: new Set(['difference', 'markup_pct', 'ceiling_pct', 'commission_compounds']),
+  },
+}
 // F9-S1 FR-173: F9's two answers, in its own words. "Not for my store" is a decline with no
 // reason: it is his judgement of his customers, not a verdict that the finding was wrong.
 const ANSWERS = {
@@ -51,6 +63,7 @@ export function EntryCard({ entry, onOutcome, formatMoney, readOnly = false }) {
   // a price in shekels, a share with its sign, a code as the sentence it stands for. An object
   // or a list is never printed as it is: `[object Object]` was waiting for the first competitor
   // card to reach this surface.
+  const family = FAMILY[entry.signal_family]
   const dayText = (iso) => new Intl.DateTimeFormat(LOCALE[language] || LOCALE.en, { day: 'numeric', month: 'long', timeZone: 'UTC' })
     .format(new Date(`${iso}T00:00:00Z`))
   const evidenceText = (key, raw) => {
@@ -92,6 +105,18 @@ export function EntryCard({ entry, onOutcome, formatMoney, readOnly = false }) {
         pct: raw.allowance_pct == null ? '' : percent(raw.allowance_pct),
       })
     }
+    // The price stays a figure; how far below the shelf it is goes on a line of its own, in the
+    // text face, or Hebrew and Arabic words are spaced apart and the two directions collide.
+    if (key === 'delivery_price' && family && Number.isFinite(entry.evidence?.markup_pct)) {
+      return (
+        <>
+          {formatMoney(raw)}
+          <span className="entry-card__note">
+            {t('evidence.delivery_price.below_shelf', { pct: percent(Math.abs(entry.evidence.markup_pct)) })}
+          </span>
+        </>
+      )
+    }
     if (typeof raw === 'number' && MONEY.has(key)) return formatMoney(raw)
     if (typeof raw === 'number' && key.endsWith('_pct')) return percent(raw)
     if (typeof raw === 'string' && ['evidence_state', 'cost_source', 'reason'].includes(key)) {
@@ -101,9 +126,9 @@ export function EntryCard({ entry, onOutcome, formatMoney, readOnly = false }) {
   }
   // A value the engine does not have is left out, never printed as "null" (D-3): the card shows
   // absence by absence, as it does for the value above.
-  const folded = FOLDED[entry.capability]
+  const folded = new Set([...(FOLDED[entry.capability] || []), ...(family?.folded || [])])
   const rows = Object.entries(entry.evidence || {})
-    .filter(([key, raw]) => raw != null && !NOT_A_ROW.has(key) && !folded?.has(key)
+    .filter(([key, raw]) => raw != null && !NOT_A_ROW.has(key) && !folded.has(key)
       && !(key === 'market_prices' && Array.isArray(raw) && raw.length === 0))
   const answers = ANSWERS[entry.capability] || DEFAULT_ANSWERS
 
@@ -114,14 +139,14 @@ export function EntryCard({ entry, onOutcome, formatMoney, readOnly = false }) {
         {entry.department ? <p className="entry-card__dept">{entry.department}</p> : null}
       </header>
 
-      <p className="entry-card__what">{t(`characterisation.${entry.characterisation}`)}</p>
+      <p className="entry-card__what">{t(family?.what ?? `characterisation.${entry.characterisation}`)}</p>
       {/* F6 AC-110c: what to do, in his words. The engine chose it; the card only says it. */}
       {entry.action ? <p className="entry-card__action">{t(`action.${entry.action}`)}</p> : null}
 
       {value ? (
         <p className="entry-card__value" data-kind={value.kind} data-certainty={value.certainty}>
           <span className="entry-card__amount">{formatMoney(value.amount)}</span>
-          <span className="entry-card__kind">{t(`value.kind.${value.kind}`)}</span>
+          <span className="entry-card__kind">{t(family?.kind ?? `value.kind.${value.kind}`)}</span>
           {/* AC-104: on the card itself. A reader who never looks at a legend must still
               know this number is an estimate. */}
           {estimated ? <span className="entry-card__estimated">{t('value.estimated')}</span> : null}

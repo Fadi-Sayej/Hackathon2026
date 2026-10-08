@@ -71,7 +71,13 @@ def test_inverted_carries_a_recurring_confirmed_value_and_evidence():
     e = next(e for e in run(_inputs()).entries if e.barcode == "inv")
     assert e.value.kind == "per_sale" and e.value.certainty == "confirmed" and e.value.amount == 16.0
     assert e.evidence["shelf_price"] == 37.9 and e.evidence["delivery_price"] == 21.9 and e.evidence["commission_compounds"] is True
-    assert e.action == "verify_price"
+    # The engine says what to do (F6 AC-110c): an inverted price is raised, not merely checked.
+    assert e.action == "raise_delivery_price"
+
+
+def test_a_price_above_the_ceiling_is_still_a_question_to_check():
+    e = next(e for e in run(_inputs()).entries if e.signal_family == "price.above_ceiling")
+    assert (e.action, e.characterisation) == ("verify_price", "question")
 
 
 def test_ac_005_undetermined_ceiling_suppresses_above_keeps_inverted():

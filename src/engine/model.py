@@ -10,7 +10,7 @@ VALUE_KINDS = ("per_sale",)
 CERTAINTIES = ("confirmed", "estimated")
 STATUSES = ("available", "unavailable")
 ACTIONS = ("verify_price", "count_product", "fix_record", "decide_idle", "review_policy", "check_purchase_cost",
-           "place_order")
+           "place_order", "try_product", "arrange_shelf", "raise_delivery_price")
 
 # Permanent identity strings (design §10.1, ADR-009). FROZEN: never rename, never reuse,
 # never delete one that has reached a run. The owner's outcomes in Firestore are keyed on
