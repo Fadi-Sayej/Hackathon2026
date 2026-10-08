@@ -107,3 +107,10 @@ else stays unknown.
 The same day the owner said yes to an upload screen in the app, so the store's photos reach the reader
 without anyone moving files: **D-37**. How the photos travel, and the screen, are proposed for the owner's
 approval.
+
+Asked on 2026-10-08 whether the form for each unit should take shelf lengths only (A) or lengths and
+heights (B), the owner chose "b": **D-38**. The owner enters each shelving unit on Store layout, each
+shelf's length and height included, so no one edits the layout file. Height is used: the reader
+measures each product's height from the photo, and the plan checks that a product fits under the
+shelf above. The form, and how its entries reach the layout file, are proposed for the owner's
+approval.

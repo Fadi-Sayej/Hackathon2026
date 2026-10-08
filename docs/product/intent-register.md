@@ -6,7 +6,7 @@ Version: 0.1 (content unchanged from `specs.md` v1.1)
 Parent: [PRD](PRD.md)
 Related Specs: every F#-S# document under `docs/features/`
 Owner: smartshelf-pm
-Updated: 2026-10-06 (D-37: an upload screen for the shelf photos; D-36: with no shelf tag, the reader reads the package's name); 2026-10-05 (D-35: no GS1 Israel, so the photo measures every width; D-34: a shelf reader reads the store's photos, not people; D-33: each product's picture from the store's own photos)
+Updated: 2026-10-08 (D-38: the owner enters each unit in the app, with shelf lengths and heights; heights are used); 2026-10-06 (D-37: an upload screen for the shelf photos; D-36: with no shelf tag, the reader reads the package's name); 2026-10-05 (D-35: no GS1 Israel, so the photo measures every width; D-34: a shelf reader reads the store's photos, not people; D-33: each product's picture from the store's own photos)
 ---
 
 > **Migration note.** This is `SPEC-000` from the pre-migration monolithic `specs.md`,
@@ -121,6 +121,7 @@ These are settled. A specification may operationalize them; it may not reopen th
 | D-35 | **GS1 Israel is not contacted, so the shelf reader has no barcode database to confirm a width: it measures every width from the store's own photos.** The half-day check D-34 asked for (docs/reviews/f12-barcode-sources-2026-10-05.md) found no source we can reach that holds a pack width: the chains' price files, Wolt's catalogue and Open Food Facts carry none, and GS1 Israel's catalogue, the one likely source, publishes neither its fields nor its terms. D-34's cross-check against "a licensed barcode database" therefore has no database. The rest of D-34 stands | Decided by the repository owner 2026-10-05: "i am not going to ask these or contact gs1", to "Should I draft the inquiry in Hebrew for you to send?", after the four questions for GS1 Israel were put to him |
 | D-36 | **When a group of products has no shelf tag, the shelf reader reads the name printed on the package.** The AI reads the brand, name and size from the package's front. It is matched only against products the store sold recently, and only in that unit's departments. It must be the single match, and any printed size must agree with the product's name in the POS. Anything else stays unknown. A shelf tag, where there is one, is read as D-34 says; the package is read only where there is none. It amends D-34's "the AI reads each shelf tag", and the rest of D-34 stands | Decided by the repository owner 2026-10-06: "a", to "Shall I make A the fallback when there's no tag?", A being "Read the name printed on the package (recommended)" as described above |
 | D-37 | **The app gets an upload screen for the store's shelf photos, so they reach the shelf reader without anyone moving files.** Not decided here: how the photos travel from the app to the reader, and the screen itself, which an ADR and mockups propose for the owner's approval (front-end changes wait for it, as on 2026-09-16) | Decided by the repository owner 2026-10-06: "yes to both", the second answering "Should I build an upload screen in the app, so the store's photos reach the reader without anyone moving files?" |
+| D-38 | **The owner enters each shelving unit in the app, on Store layout, each shelf's length and height included, so no one edits the layout file. Height is used: the shelf reader measures each product's height from the photo, and the plan checks that a product fits under the shelf above.** Not decided here: the form itself, which mockups propose for the owner's approval (front-end changes wait for it, as on 2026-09-16), and how its entries reach the layout file, which an ADR proposes | Decided by the repository owner 2026-10-08: "b", to "A or B?", where A was "length only. It's smaller and works right away" and B "length and height. It's more work, and could only be tested on drawn test shelves until a store sends photos", after "I'd add a form on Store layout where you enter each unit yourself, including its shelf lengths, so nobody edits files" |
 
 ---
 
@@ -173,7 +174,8 @@ rather than surfacing them:
   Israel is not contacted, so the reader measures every width from the photos. **D-36**
   (2026-10-06): with no shelf tag, the reader reads the name printed on the package. **D-37**,
   the same day: an upload screen in the app, so the photos reach the reader with no one moving
-  files.)*
+  files. **D-38** (2026-10-08): the owner enters each shelving unit in the app, each shelf's
+  length and height included, and the plan checks each product's height against the shelf.)*
 
 **INT-MEAS** *(2026-09-28: now specified as F13-S1, approved by the repository owner, with no
 success number, D-24; what follows is the record of why it was not.)* It was not specified here for a different reason: `intent.md` §11.1 states it is
