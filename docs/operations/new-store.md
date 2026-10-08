@@ -5,7 +5,7 @@ Status: Ready for review
 Owner: smartshelf-platform
 Parent: [ADR-036](../architecture/decisions/ADR-036-a-store-is-configuration-one-copy-per-store.md)
 Inputs: [D-28, ADR-036, ADR-029, ADR-030, ADR-033, docs/pilot/next-store.md, docs/operations/deployment.md, configs/store.yaml, scripts/new_store_copy.py, scripts/find_nearby_venues.py, scripts/check_store.py, scripts/check_firebase_config.mjs, scripts/set_user_role.py, .github/workflows/collect-daily.yml]
-Updated: 2026-10-01
+Updated: 2026-10-08 (the price rule is the owner's, D-39)
 ---
 
 # Setting up a new store's copy
@@ -126,8 +126,9 @@ nearest first. For each venue to collect:
   the owner sends from Store layout (ADR-041, ADR-042), once the repository has the model key
   `ANTHROPIC_API_KEY`. Name each unit in the layout file as the owner names it when sending its
   photo, so the reader finds it.
-- The owner's price rule: `price_policy_pct` in `configs/policy.yaml` is the pilot owner's
-  +60%. Ask the new owner for theirs.
+- The owner's price rule: the most they will charge over nearby stores for the same product.
+  Record it as `price_rule` in `configs/store_facts.yaml`, with the day it was recorded (D-39,
+  ADR-043). A new copy starts without one, and until then F3 flags no price as over it.
 - GAP-009 and GAP-011 ([next-store.md](../pilot/next-store.md) §3).
 
 ## 8. Until nothing blocks
