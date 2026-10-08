@@ -1064,3 +1064,58 @@
 .photos__choose[data-disabled] { opacity: 0.45; cursor: not-allowed; }
 .photos__preview { max-width: 100%; max-height: 220px; border-radius: var(--radius-md); border: 1px solid var(--ink-line); }
 .photos__sent ul { margin: 0; padding-inline-start: 18px; color: var(--ink-600); line-height: 1.6; }
+
+/* D-38: the owner's own description of each unit, above the photos on Store layout. */
+.units__list { display: flex; flex-direction: column; gap: 8px; width: 100%; margin: 0; padding: 0; list-style: none; }
+.units__item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius-md);
+}
+.units__item strong { color: var(--ink-900); margin-inline-end: 8px; }
+.units__item p { margin: 2px 0 0; }
+.units__sizes { display: flex; flex-wrap: wrap; gap: 2px 12px; color: var(--ink-600); font-size: 13px; }
+.units__editor { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+.units__chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; font-weight: 400; }
+.units__chips li {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px 2px 10px;
+  border: 1px solid var(--ink-line-strong);
+  border-radius: var(--radius-pill);
+}
+.units__chip-remove {
+  min-width: 28px;
+  min-height: 28px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--ink-600);
+  font-size: 16px;
+  cursor: pointer;
+}
+.units__check { display: flex; align-items: center; gap: 8px; color: var(--ink-900); }
+.units__check input { width: 20px; height: 20px; }
+.units__shelves { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.units__shelves legend { padding: 0; font-weight: 600; color: var(--ink-900); }
+.units__shelves > p { margin: 0; }
+.units__shelf { display: grid; grid-template-columns: auto 1fr 1fr; align-items: end; gap: 8px; }
+.units__shelf .layout__shelf-name { padding-bottom: 10px; }
+.units__shelf label { display: flex; flex-direction: column; gap: 4px; min-width: 0; font-size: 13px; color: var(--ink-600); }
+.units__shelf input {
+  min-height: 40px;
+  min-width: 0;
+  padding: 6px 10px;
+  border: 1px solid var(--ink-line-strong);
+  border-radius: var(--radius-md);
+  background: var(--paper-100);
+  font: inherit;
+}
+.units__shelf-actions,
+.units__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.units__remove { margin-inline-start: auto; }

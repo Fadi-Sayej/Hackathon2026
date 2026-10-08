@@ -17,7 +17,7 @@ import { ReaderWaiting } from './ReaderWaiting.jsx'
  * (FR-195). A team account sees it disabled (ADR-029), and so does the marked example (D-31).
  */
 
-const UNPLACED = ['no_width', 'too_wide', 'no_sale_in_window', 'count_zero_or_below', 'stock_unknown', 'kept_off', 'rejected']
+const UNPLACED = ['no_width', 'too_wide', 'no_height', 'too_tall', 'no_sale_in_window', 'count_zero_or_below', 'stock_unknown', 'kept_off', 'rejected']
 
 function Elasticity({ elasticity }) {
   const { t } = useI18n()
@@ -48,23 +48,44 @@ const TILE_COLOURS = 12
  * A tile shows the product's own picture, cropped by the team from the store's shelf photos (D-33,
  * F12-S1 FR-217), wherever the plan gives one, and its numbered colour until then.
  */
+// D-38: drawn to scale when the owner gave each shelf's height. A shelf open above is drawn a
+// little taller than its tallest product. The browser only scales published figures (ADR-001).
+const PX_PER_CM = 2.4
+const ROW_MIN_PX = 48
+const ROW_MAX_PX = 180
+
+function rowsToScale(shelves) {
+  const scaled = shelves.length > 0 && shelves.every((s) => s.height_cm !== undefined)
+    && shelves.every((s) => s.products.every((p) => p.height_mm))
+  if (!scaled) return null
+  return Object.fromEntries(shelves.map((s) => {
+    const room = s.height_cm ?? Math.max(...s.products.map((p) => p.height_mm / 10), 20) * 1.15
+    return [s.shelf, { px: Math.min(ROW_MAX_PX, Math.max(ROW_MIN_PX, room * PX_PER_CM)), room }]
+  }))
+}
+
 function UnitDrawing({ shelves, keyOf }) {
   const { t } = useI18n()
   const { number } = useDates()
+  const scale = rowsToScale(shelves)
   return (
-    <div className="unit" aria-hidden="true">
+    <div className="unit" aria-hidden="true" data-to-scale={scale ? 'yes' : undefined}>
       {shelves.map((shelf) => (
         <div key={shelf.shelf} className="unit__shelf" data-eye-level={shelf.eye_level || undefined}>
           <div className="unit__label" {...dirProps()}>
             <span className="layout__shelf-name">{t('layout.shelf', { n: shelf.shelf })}</span>
             <bdi>{t('layout.length', { cm: shelf.length_cm })}</bdi>
+            {'height_cm' in shelf ? (
+              <bdi>{shelf.height_cm ? t('layout.height', { cm: shelf.height_cm }) : t('layout.openAbove')}</bdi>
+            ) : null}
             {shelf.eye_level ? <span className="layout__tag layout__tag--eye">{t('layout.eyeLevel')}</span> : null}
           </div>
-          <div className="unit__row" dir="ltr">
+          <div className="unit__row" dir="ltr" style={scale ? { height: `${scale[shelf.shelf].px}px` } : undefined}>
             {shelf.products.length ? (
               <div className="unit__used" style={{ flexGrow: shelf.used_cm }}>
                 {shelf.products.flatMap((p) => Array.from({ length: p.facings }, (_, i) => (
-                  <span key={`${p.barcode}|${i}`} className="unit__tile" style={{ flexGrow: p.width_mm }}
+                  <span key={`${p.barcode}|${i}`} className="unit__tile"
+                    style={{ flexGrow: p.width_mm, ...(scale ? { height: `${Math.min(100, p.height_mm / 10 / scale[shelf.shelf].room * 100)}%`, minHeight: '26px' } : {}) }}
                     data-colour={(keyOf(p.barcode) - 1) % TILE_COLOURS} data-picture={p.picture ? 'yes' : undefined}>
                     {p.picture ? <img className="unit__picture" src={p.picture} alt="" loading="lazy" /> : null}
                     <span className="unit__number">{keyOf(p.barcode)}</span>
@@ -123,9 +144,10 @@ function Unplaced({ unplaced, nameOf }) {
       {lists.map((r) => (
         <p key={r} className="plan__unplaced-line" data-unplaced={r}>
           <span className="plan__unplaced-why">{t(`shelf.unplaced.${r}`)}</span>{' '}
-          {r === 'too_wide'
+          {r === 'too_wide' || r === 'too_tall'
             ? unplaced[r].map((p, i) => (
-              <span key={p.barcode}>{i ? ' · ' : ''}<bdi>{nameOf(p.barcode)}</bdi> (<bdi>{t('layout.widthMm', { mm: p.width_mm })}</bdi>)</span>
+              <span key={p.barcode}>{i ? ' · ' : ''}<bdi>{nameOf(p.barcode)}</bdi> (<bdi>{r === 'too_wide'
+                ? t('layout.widthMm', { mm: p.width_mm }) : t('layout.heightMm', { mm: p.height_mm })}</bdi>)</span>
             ))
             : <Names barcodes={unplaced[r]} nameOf={nameOf} />}
         </p>

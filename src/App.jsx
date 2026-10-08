@@ -284,7 +284,9 @@ export default function App() {
       }
       return activePage === 'store-layout'
         ? <StoreLayoutPage artefact={artefact} catalogue={catalogue.catalogue}
-          photos={SHELF_PHOTOS ? { readOnly, ...SHELF_PHOTOS } : null} />
+          photos={SHELF_PHOTOS ? { readOnly, ...SHELF_PHOTOS } : null}
+          // D-38, drawn for the owner's approval: saving is a stand-in until the ADR is accepted.
+          units={{ readOnly, onSave: () => new Promise((resolve) => setTimeout(resolve, 400)) }} />
         : <ShelfPlanPage artefact={artefact} ownerState={ownerState} catalogue={catalogue.catalogue}
           onOutcome={onOutcome} onUndoOutcome={readOnly ? null : onUndoOutcome} readOnly={readOnly} />
     }
