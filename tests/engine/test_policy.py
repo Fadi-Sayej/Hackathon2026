@@ -123,7 +123,7 @@ def test_policy_loads_the_boost_values():
     assert p.boost_model == "claude-sonnet-5"
     assert p.boost_max_pct == 25
     assert p.boost_request_ceiling == 200
-    assert p.boost_prompt == "configs/prompts/market_boost.v1.md"
+    assert p.boost_prompt == "configs/prompts/market_boost.v2.md"
 
 
 @pytest.mark.parametrize("group,key", [(g, k) for g, keys in F8_KEYS.items() for k in keys])
@@ -180,7 +180,7 @@ def test_policy_publishes_the_f8_values_with_every_figure():
     }
     assert t["market_boost"] == {
         "model": "claude-sonnet-5", "max_pct": 25, "request_ceiling": 200,
-        "prompt": "configs/prompts/market_boost.v1.md",
+        "prompt": "configs/prompts/market_boost.v2.md",
     }
 
 
