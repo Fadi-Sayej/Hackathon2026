@@ -227,7 +227,8 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
                store_facts_path: Optional[Path] = None, snapshots_root: Optional[Path] = None,
                boost_transport=None, store_layout_path: Optional[Path] = None,
                explanation_transport=None, shelf_pictures_dir: Optional[Path] = None,
-               shelf_readings_path: Optional[Path] = None, shelf_acceptance_path: Optional[Path] = None) -> dict:
+               shelf_readings_path: Optional[Path] = None, shelf_acceptance_path: Optional[Path] = None,
+               store_types_path: Optional[Path] = None, store_format: Optional[str] = None) -> dict:
     # Resolved here, not in the signature: a default bound at import time cannot be
     # redirected by a caller that patches the module global, which is how Task 1.9
     # runs the engine over a copy of the data with an input withheld.
@@ -267,7 +268,8 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
     # committed store facts and market snapshots exactly as the nightly does.
     sources = {"store_facts_path": store_facts_path, "snapshots_root": snapshots_root,
                "store_layout_path": store_layout_path, "shelf_pictures_dir": shelf_pictures_dir,
-               "shelf_readings_path": shelf_readings_path, "shelf_acceptance_path": shelf_acceptance_path}
+               "shelf_readings_path": shelf_readings_path, "shelf_acceptance_path": shelf_acceptance_path,
+               "store_types_path": store_types_path, "store_format": store_format}
     sources = {k: v for k, v in sources.items() if v}
     inputs = _step(steps, "load_inputs", lambda: load_inputs(policy=policy, owner=owner, run_at=now, silver_dir=silver_dir,
                                                            signals_dir=signals_dir, matches_path=matches_path,

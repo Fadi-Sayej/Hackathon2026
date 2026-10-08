@@ -274,9 +274,10 @@ def _run(paths: dict, owner=None) -> tuple:
     return art, model.calls
 
 
-def _copy(built: Path, into: Path) -> dict:
+def _copy(built: Path, into: Path, roots=None) -> dict:
+    """A copy of a built world, and its paths. The planogram world has its own `roots`."""
     shutil.copytree(built, into)
-    return world.roots(into)
+    return (roots or world.roots)(into)
 
 
 def _drop_deliveries(folder: Path) -> None:
@@ -390,12 +391,12 @@ def _shelf_cases(tmp: Path, done: list) -> list:
     done.append("every fixture arranged at once → no net change: no yardstick")
 
     # §20 row 1 over this world, where the measurement has something to lose.
-    copy = _copy(tmp / "shelf", tmp / "shelf_no_daily")
+    copy = _copy(tmp / "shelf", tmp / "shelf_no_daily", shelf_world.roots)
     for path in Path(copy["daily_sales_dir"]).glob("*.csv"):
         path.unlink()
     problems += shelf_withheld_problems(_shelf_run({**paths, **copy}, w["owner"]), "no_daily_sales")
     done.append("withholding the report days  → plan and measurement unavailable (no_daily_sales)")
-    copy = _copy(tmp / "shelf", tmp / "shelf_no_layout")
+    copy = _copy(tmp / "shelf", tmp / "shelf_no_layout", shelf_world.roots)
     Path(copy["store_layout_path"]).unlink()
     problems += shelf_withheld_problems(_shelf_run({**paths, **copy}, w["owner"]), "no_store_layout")
     done.append("withholding the layout file  → plan and measurement unavailable (no_store_layout)")

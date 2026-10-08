@@ -118,6 +118,7 @@ def build() -> dict:
         world._monthly(paths["sales_dir"])
         _facts(paths["store_facts_path"])
         world._snapshots(paths["snapshots_root"])
+        world._store_types(paths["store_types_path"])
         saved = os.environ.get(KEY_ENV)
         os.environ[KEY_ENV] = "example-key"
         try:
