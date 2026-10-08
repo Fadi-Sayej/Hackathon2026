@@ -8,7 +8,7 @@ Parent: [PRD](../../product/PRD.md)
 Intent IDs: INT-003
 Specs: [F3-S1](specs/F3-S1-competitor-price-position.md)
 Inputs: [docs/product/PRD.md, docs/product/intent-register.md, ADR-008, ADR-028]
-Updated: 2026-09-29 (dated note: the 1,970 / 144 / 97 table rests on the deleted Kaggle-era files)
+Updated: 2026-10-08 (dated note: D-39, a new store starts with no price rule); 2026-09-29 (dated note: the 1,970 / 144 / 97 table rests on the deleted Kaggle-era files)
 ---
 
 # F3 — هل أسعاري معقولة مقابل الجيران؟ · Competitor Price Position
@@ -126,6 +126,11 @@ Updated: 2026-09-29 (dated note: the 1,970 / 144 / 97 table rests on the deleted
 > 97), 2 of them over 100% (its ~15). `npm run figures` gives the current count; this table
 > is history.
 
+> **Added 2026-10-08 (not part of the migrated content).** **D-39:** the +60% above is YomYom's
+> owner's own rule, and a new store's copy does not inherit it. Until a store's owner states
+> their limit, the app flags no price as over it, and F3 says it is waiting for that limit.
+> YomYom keeps its +60%.
+
 ## Not In Scope
 
 - اقتراح السعر المصحَّح.
@@ -136,4 +141,4 @@ Updated: 2026-09-29 (dated note: the 1,970 / 144 / 97 table rests on the deleted
 ## Related
 
 - Spec: [F3-S1 — Competitor Price Position](specs/F3-S1-competitor-price-position.md)
-- Settled decisions: D-3, D-5 — [intent register §3](../../product/intent-register.md)
+- Settled decisions: D-3, D-5, D-39 — [intent register §3](../../product/intent-register.md)
