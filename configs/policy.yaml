@@ -142,7 +142,7 @@ shelf:
   # rule overrides it.
   facings_cap: 4
   # D-38 (ADR-044, F12-S1 FR-233): room between a product's top and the shelf above, to take it
-  # out. Provisional, put to the owner with OQ-1213.
+  # out. Approved 2026-10-08 with OQ-1213 as a starting value.
   height_clearance_mm: 20
   # F12-S1 FR-205, FR-209: measuring what an arrangement changed (OQ-1207, approved 2026-10-04
   # with the Phase 8 plan). The windows are F8's own, read from order.window_days and

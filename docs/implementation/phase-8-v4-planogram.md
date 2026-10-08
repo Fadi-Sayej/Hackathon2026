@@ -529,9 +529,9 @@ Steps:
 
 ### Task 8.14: The owner's units and shelf heights (D-38; FR-228 … FR-234; AC-215 … AC-220; NFR-081; ADR-044)
 
-**Proposed 2026-10-08**, for the owner's approval with F12-S1 v0.12 (OQ-1213) and the mockups
-(docs/reviews/F12-unit-form-mockups.md). Built on `feat/unit-form` while it waits; not merged
-before it.
+**Approved 2026-10-08** with F12-S1 v0.12 ("approved", OQ-1213): the form, heights on the pages
+and the plan drawn to scale, the wording, ADR-044, and the 2 cm clearance
+(docs/reviews/F12-unit-form-mockups.md).
 
 **Files:**
 - `src/pages/ShelfUnits.jsx`, `src/owner/shelfUnits.js`, `src/owner/firestoreShelfUnits.js`, the
@@ -541,7 +541,7 @@ before it.
   file); `.github/workflows/collect-daily.yml` (staging it);
 - `src/engine/store_layout.py` (`height_cm`, `recorded_by: app`, `heights`, the hand readings'
   heights, `entered_in_app`), `src/engine/layout_facts.py`, `src/engine/shelf_plan.py`,
-  `configs/policy.yaml` (`shelf.height_clearance_mm: 20`, provisional);
+  `configs/policy.yaml` (`shelf.height_clearance_mm: 20`, approved as a starting value);
 - `src/engine/shelf_reader/measure.py` (the shelf's line, each facing's top),
   `src/engine/shelf_reader/reading.py`; `tests/fixtures/shelf_photos/draw.py` (the prompt's
   `y_top`, rough boxes top and bottom);
@@ -566,7 +566,7 @@ before it.
    ADR-040 and ADR-041. It goes before the pages, which read its fields.
 6. **The shelf reader:** Task 8.12.
 7. **The photo upload:** Task 8.13, with the records of OQ-1212's answer.
-8. **The owner's units and heights:** Task 8.14, after OQ-1213's answer.
+8. **The owner's units and heights:** Task 8.14, with the records of OQ-1213's answer.
 
 ## Checkpoint 8
 

@@ -73,7 +73,7 @@ class Policy:
     # F12-S1 FR-185 (OQ-1204, answered 2026-10-04 with the Phase 8 plan). Provisional.
     shelf_elasticity: float
     shelf_facings_cap: int
-    shelf_height_clearance_mm: int   # D-38, ADR-044: OQ-1213, provisional
+    shelf_height_clearance_mm: int   # D-38, ADR-044: OQ-1213, approved 2026-10-08
     # F12-S1 FR-205, FR-209 (OQ-1207, answered 2026-10-04 with the Phase 8 plan). Provisional.
     shelf_interval_level: float
     shelf_min_arrangements: int

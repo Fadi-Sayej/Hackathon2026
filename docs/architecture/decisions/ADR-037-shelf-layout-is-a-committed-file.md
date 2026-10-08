@@ -48,6 +48,10 @@ and follow ADR-033's rules:
    the "before" only for an arrangement recorded after that date, and only until a later
    recorded arrangement of the fixture replaces them (F12-S1 FR-205).
 4. **Changed only by commit.** The history records what was measured or stated, and when.
+
+   *Amended 2026-10-08 by ADR-044 (D-38).* The owner enters the units on Store layout, and the
+   nightly writes them into this file and commits it: `recorded_by: app`, each shelf with its
+   `height_cm`. A save is written once, so a later correction by the team stands.
 5. **Store data under ADR-036.** The file is store data, so a new copy never inherits it, and
    updating a copy from the product never overwrites a store's layout. `check:store` reports
    whether it is present (F12-S1 NFR-075).

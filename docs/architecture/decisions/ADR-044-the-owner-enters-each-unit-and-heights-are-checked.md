@@ -1,7 +1,7 @@
 ---
 ID: ADR-044
 Title: The owner enters each shelving unit in the app, with each shelf's length and height; the reader measures product heights, and the plan checks they fit
-Status: Proposed
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-10-08
 Parent: [System Design](../system-design.md) §19
@@ -11,9 +11,12 @@ Inputs: [D-3, D-13, D-23, D-34, D-38, ADR-029, ADR-036, ADR-037, ADR-041, ADR-04
 
 # ADR-044 — The owner enters each unit, and heights are checked
 
-**Status:** Proposed, for the repository owner's approval with the screens
-([mockups](../../reviews/F12-unit-form-mockups.md)) and F12-S1 v0.12. If accepted, it amends
-ADR-037 (who records a unit) and ADR-041 Decisions 5, 6, 8 and 9 (the reader measures heights too).
+**Status:** Accepted (2026-10-08, by the repository owner: "approved", to "You can say 'approve
+all', or name what to change", asked of five items: the form; heights on the pages, the plan drawn
+to scale included; the wording; how it works; and the 2 cm clearance). Recorded as all five as
+drawn, with the clearance at 2 cm. With the screens ([mockups](../../reviews/F12-unit-form-mockups.md))
+and F12-S1 v0.12, OQ-1213. It amends ADR-037 (who records a unit) and ADR-041 Decisions 5, 6, 8
+and 9 (the reader measures heights too).
 
 ## Context
 
@@ -87,7 +90,7 @@ image processing already finds the shelf's edge. So a product's height needs no 
      are known. A product with no height is listed under "height not measured", as one with no
      width is today;
    - a product goes only on a shelf whose height is at least its own plus a clearance, so it can be
-     taken out. The clearance is a policy value, **2 cm, provisional** (OQ-1213). An open shelf has
+     taken out. The clearance is a policy value, **2 cm**, approved with OQ-1213 as a starting value. An open shelf has
      no limit;
    - the packing order is unchanged: eye level first, then spread by length. A shelf a product
      does not fit under is passed over for the next one in the order that it fits and has room;

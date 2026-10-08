@@ -1,13 +1,16 @@
 ---
 ID: F12-S1-UNIT-FORM-MOCKUPS
 Title: The owner's own units, with shelf heights (D-38) — mockups for the repository owner's approval
-Status: Ready for review
+Status: Approved — by the repository owner, 2026-10-08 ("approved")
 Owner: smartshelf-engineer
 Parent: [F12-S1](../features/F12-planogram/specs/F12-S1-planogram.md) v0.12, OQ-1213
-Inputs: [D-38, F12-S1 FR-228 … FR-234, ADR-029, ADR-037, ADR-041, ADR-044 (Proposed)]
+Inputs: [D-38, F12-S1 FR-228 … FR-234, ADR-029, ADR-037, ADR-041, ADR-044]
 ---
 
 # Your own units, with shelf heights — mockups for approval
+
+> **Approved by the repository owner on 2026-10-08** ("approved"), after seeing them in the app on the
+> owner's own machine: every item as drawn, the clearance at 2 cm. Built in Phase 8 Task 8.14.
 
 D-38 (2026-10-08): the owner enters each shelving unit in the app, each shelf's length and height
 included, so no one edits the layout file. The reader measures each product's height, and the plan
@@ -194,4 +197,8 @@ One pull request:
 
 ## The owner's answer
 
-*Waiting.*
+- **2026-10-08**, "can i see it ?": the screens were opened in the app itself, served on the owner's own
+  machine with the test units and heights above. Recorded as no decision.
+- **2026-10-08**, "approved", to "You can say 'approve all', or name what to change", asked of the
+  five items above. Recorded as every item as drawn, with the clearance at 2 cm (F12-S1 OQ-1213,
+  ADR-044).

@@ -83,6 +83,10 @@ unit stated once, like its departments.
    `width_mm = run width ÷ facings ÷ shelf span × the shelf's recorded length`.
    The shelf's length is the one real length the reader needs: one figure per shelf, stated once
    in the layout file. Nobody measures a product.
+
+   *Amended 2026-10-08 by ADR-044 (D-38).* The reader also measures each product's height on the
+   same photo, in the same scale, down to the shelf's line. Heights pass the same checks, go to
+   the readings file's `heights`, and are used only after their own acceptance run.
 6. **The checks.** A width is recorded only when every check passes, and otherwise stays unknown,
    with its reason (D-3):
    - the facings found by image processing equal the AI's count;
