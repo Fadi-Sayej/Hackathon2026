@@ -40,6 +40,16 @@ def test_the_committed_example_is_what_the_engine_builds_today():
         "public/examples/shelf-plan-example.json is stale: run python3 scripts/build_shelf_example.py"
 
 
+
+def test_every_stores_copy_builds_the_same_example(monkeypatch):
+    """ADR-036: every copy ships this file. Its shop names its own format and nearby store, so a
+    copy's settings, another format and none of YomYom's venues, build it byte for byte."""
+    from tests.fixtures.another_store import serve_another_store
+    serve_another_store(monkeypatch)
+    builder = _builder()
+    assert EXAMPLE.read_text(encoding="utf-8") == builder.render(builder.build())
+
+
 def test_it_says_it_is_an_example(example):
     assert "not any store's data" in example["_example"]
 

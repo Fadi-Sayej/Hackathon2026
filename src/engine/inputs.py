@@ -314,13 +314,18 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
                 signals_dir: Path = SIGNALS_ROOT / "competitor_product_signals",
                 matches_path: Path = MATCHING_ROOT / "product_matches.parquet",
                 stores: Optional[StoreTypeConfig] = None,
+                store_types_path: Optional[Path] = None,
+                store_format: Optional[str] = None,
                 store_facts_path: Path = STORE_FACTS_PATH,
                 store_layout_path: Path = STORE_LAYOUT_PATH,
                 shelf_pictures_dir: Path = SHELF_PICTURES_DIR,
                 shelf_readings_path: Optional[Path] = None,
                 shelf_acceptance_path: Optional[Path] = None,
                 snapshots_root: Path = EXTERNAL_SNAPSHOTS_ROOT) -> EngineInputs:
-    stores = stores or load_store_types()
+    # ADR-036: the store's own format and its nearby venues' formats, from its settings unless a
+    # test world names its own. A probe's world runs in every copy, whatever store it serves.
+    stores = stores or (load_store_types(store_types_path) if store_types_path else load_store_types())
+    our_fmt = store_format or our_format()
     products_raw = _rows(silver_dir / PRODUCTS_TABLE)
     inventory = _rows(silver_dir / INVENTORY_TABLE)
     products, conflicting = (_shape_products(products_raw, inventory, owner)
@@ -355,13 +360,13 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
     window = _window_from_summary(monthly, policy) if monthly else None
     latest_signal = sorted(signals_dir.glob("*.parquet")) if signals_dir.exists() else []
     signals = _rows(latest_signal[-1]) if latest_signal else None
-    observations = _shape_observations(signals, stores, our_format())
+    observations = _shape_observations(signals, stores, our_fmt)
     # ADR-031. Read from the committed delivery-catalogue snapshots, not from silver: the
     # rule needs every day's listings, and silver holds only the latest. The market is
     # D-18's, the stores at or above the floor less the client, and only days up to the run
     # are read, so a run over an earlier date sees what that night saw.
     presence = load_presence(root=snapshots_root, source_id=DELIVERY_CATALOG)
-    market_ids = market_store_ids(presence, stores, our_format())
+    market_ids = market_store_ids(presence, stores, our_fmt)
     running_out = market_signal(presence, market_ids, policy, run_at.date())
     # F9-S1: the same rule, market and night, replayed over the recent window.
     market_recent = (recent_market(presence, market_ids, policy, date.fromisoformat(running_out["on_day"]),

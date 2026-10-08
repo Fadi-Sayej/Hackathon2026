@@ -10,6 +10,9 @@ what each product is for, which a directory of binary files cannot. `build(root)
 - a shelf layout (F12, ADR-037): one fixture holding the department, two shelves, and widths for
   two of the products, so the third stocked one has none;
 - 30 days of delivery-catalogue snapshots at Wolt Market, a store above the format floor;
+- the world's own store settings: its format, a forecourt shop, and Wolt Market's. Every store's
+  copy runs this world in its nightly probes and builds its examples from it, and a copy's own
+  settings name another format and other venues (ADR-036), so the world never reads them;
 - the boost picks, sealed by the real live step with a fake model that picks 10%.
 
 The run is Thursday 2026-08-27. On it:
@@ -34,6 +37,7 @@ LAST = date(2026, 8, 26)
 COUNTED = "2026-08-24"
 DEPT = "משקאות"
 WOLT = "65daeb8779ca7f0a9bf964f3"
+FORMAT = "gas_convenience"
 BOOSTED, STEADY, SLOW, UNSTOCKED = "7290001", "7290002", "7290003", "7290004"
 # F9-S1: a product the market sells and runs out of that is not in his catalogue at all, so
 # the probe's baseline shows an assortment-gap finding and withholding the market removes it.
@@ -112,11 +116,28 @@ def _snapshots(root: Path) -> None:
             {"date": day.isoformat(), "status": "ok", "sources": {"delivery_catalog": {"status": "ok"}}}))
 
 
+
+def _store_types(path: Path) -> None:
+    """The world's format scale and its one nearby store, as configs/store_types.yaml writes them."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        "formats:\n"
+        "  gas_convenience: {typical_sku_range: [300, 1500]}\n"
+        "  urban_minimarket: {typical_sku_range: [1501, 4000]}\n"
+        "affinity:\n"
+        "  gas_convenience: {gas_convenience: 1.0, urban_minimarket: 0.7, unknown: 0.2}\n"
+        "  urban_minimarket: {gas_convenience: 0.7, urban_minimarket: 1.0, unknown: 0.2}\n"
+        "min_affinity: 0.3\n"
+        f'stores:\n  "{WOLT}": {{store_type: urban_minimarket, verified: manual, name: "Wolt Market | Lev Haaretz"}}\n',
+        encoding="utf-8")
+
+
 def roots(root: Path) -> dict:
     return {"silver_dir": root / "silver", "daily_sales_dir": root / "daily", "sales_dir": root / "monthly",
             "store_facts_path": root / "store_facts.yaml", "store_layout_path": root / "store_layout.yaml",
             "snapshots_root": root / "snapshots",
-            "signals_dir": root / "signals", "matches_path": root / "matches.parquet"}
+            "signals_dir": root / "signals", "matches_path": root / "matches.parquet",
+            "store_types_path": root / "store_types.yaml", "store_format": FORMAT}
 
 
 def owner(answered=()):
@@ -161,6 +182,7 @@ def build(root: Path) -> dict:
     _facts(paths["store_facts_path"])
     _layout(paths["store_layout_path"])
     _snapshots(paths["snapshots_root"])
+    _store_types(paths["store_types_path"])
     saved = os.environ.get(KEY_ENV)
     os.environ[KEY_ENV] = "fixture-key"
     try:

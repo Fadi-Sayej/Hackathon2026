@@ -118,6 +118,18 @@ def test_the_probe_passes_over_its_world_and_reaches_the_engine(tmp_path):
     assert done[0].startswith("baseline:") and "0 suggestions" not in done[0]
 
 
+
+def test_the_probe_passes_in_any_stores_copy(tmp_path, monkeypatch):
+    """ADR-036: every copy's nightly runs this probe, and it blocks once the copy's own data goes
+    live. Its world names its own store format and nearby store, so a copy's settings, another
+    format and none of YomYom's venues, leave every case as it is here."""
+    from tests.fixtures.another_store import serve_another_store
+    serve_another_store(monkeypatch)
+    problems, done = probe.probe(tmp_path)
+    assert problems == []
+    assert done[0].startswith("baseline:") and "0 suggestions" not in done[0]
+
+
 def test_it_blocks_once_the_real_artefact_carries_the_quantity(tmp_path, monkeypatch):
     art = tmp_path / "dashboard.json"
     monkeypatch.setattr(probe, "ARTEFACT", art)

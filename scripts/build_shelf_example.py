@@ -124,6 +124,7 @@ def _shop(shop, root: Path) -> dict:
     shop._facts(paths["store_facts_path"])
     _layout(paths["store_layout_path"])
     world._snapshots(paths["snapshots_root"])
+    world._store_types(paths["store_types_path"])
     return paths
 
 
