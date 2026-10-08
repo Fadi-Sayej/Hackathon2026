@@ -45,7 +45,14 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const CEILING_KB = 1000        // measured 997 KB on a fresh local build, 2026-10-08, against 983 KB for main
+const CEILING_KB = 1021        // measured 1018 KB on a fresh local build, 2026-10-08, against 998 KB for main
+                               // the same day (CI reads about 1 KB higher): D-38's units and heights (F12-S1
+                               // FR-228 … FR-234, ADR-044), approved by the owner on 2026-10-08. main grew
+                               // 9 KB (228 → 237), the form's 43 phrases in three languages; 11 KB load only
+                               // on demand: the form in StoreLayoutPage (7 → 14 KB), the plan's drawing to
+                               // scale (13 → 14), Firestore's getDoc (407 → 408) and the save (1 KB). The
+                               // owner's entry is 424 KB, under its 500 KB target. Before that it was 1000,
+                               // measured 997 KB on a fresh local build, 2026-10-08, against 983 KB for main
                                // the same day (CI reads about 1 KB higher): D-37's photo upload (F12-S1
                                // FR-224 … FR-227, ADR-042), approved by the owner on 2026-10-06. 11 of the
                                // 14 KB load only on demand: Firestore's reads and bytes in the firebase chunk

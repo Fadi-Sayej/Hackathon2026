@@ -19,7 +19,7 @@ PRD                     what the product is, for whom, and what is out of scope
 2. [**Feature Intents**](features/) — `features/F#-*/intent.md`
 3. [**Approved Feature Specs**](features/) — `features/F#-*/specs/F#-S#-*.md`
 4. [**System Design**](architecture/system-design.md) — the single authoritative architecture
-5. [**ADRs**](architecture/decisions/) — ADR-001 … ADR-043
+5. [**ADRs**](architecture/decisions/) — ADR-001 … ADR-044
 6. [**Implementation Plan**](implementation/plan.md)
 7. **Code** — evidence of what exists, never product authority
 
@@ -66,7 +66,7 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 
 - [**System Design**](architecture/system-design.md) — one document, system-level, answering
   all seven approved specs as one coherent system. Not owned by any feature.
-- [**ADRs**](architecture/decisions/) — ADR-001 … ADR-043, one file each.
+- [**ADRs**](architecture/decisions/) — ADR-001 … ADR-044, one file each.
 
 | ADR | Decision |
 |---|---|
@@ -113,8 +113,9 @@ Cross-feature register: [**gaps, open questions and assumptions (SPEC-GAPS)**](f
 | [ADR-041](architecture/decisions/ADR-041-a-shelf-reader-reads-the-stores-photos.md) | A shelf reader reads widths, facings and pictures from the store's own photos; people never measure them — accepted 2026-10-05 (F12-S1 v0.9, D-34, D-35) |
 | [ADR-042](architecture/decisions/ADR-042-the-stores-shelf-photos-travel-from-the-app-through-firestore.md) | The store's shelf photos travel from the app through Firestore, and the nightly collects and reads them — accepted 2026-10-06 (F12-S1 v0.11, D-37) |
 | [ADR-043](architecture/decisions/ADR-043-the-price-rule-is-the-owners-and-its-findings-wait-for-it.md) | The price rule is the store owner's statement, and the findings it drives wait for it — ready for review 2026-10-08 (D-39) |
+| [ADR-044](architecture/decisions/ADR-044-the-owner-enters-each-unit-and-heights-are-checked.md) | The owner enters each shelving unit in the app, with each shelf's length and height; the reader measures product heights, and the plan checks they fit — accepted 2026-10-08 (F12-S1 v0.12, D-38) |
 
-ADR-001 … ADR-042 are `Accepted`; ADR-042 was the last, on 2026-10-06, with F12-S1 v0.11. ADR-043 is `Ready for review` (2026-10-08, D-39). ADR-022 amends a sentence of ADR-019 and was accepted on 2026-09-13, after the defect it fixes was verified end to end: `entry_id` falls back to `product_name`, and `compose.js` skips any entry whose id carries a settled outcome, so two barcode-less rows sharing a name settled together on the owner's screen. ADR-020 was accepted on 2026-09-13 **conditional on GAP-009**:
+ADR-001 … ADR-042 and ADR-044 are `Accepted`; ADR-044 was the last, on 2026-10-08, with F12-S1 v0.12. ADR-043 is `Ready for review` (2026-10-08, D-39). ADR-022 amends a sentence of ADR-019 and was accepted on 2026-09-13, after the defect it fixes was verified end to end: `entry_id` falls back to `product_name`, and `compose.js` skips any entry whose id carries a settled outcome, so two barcode-less rows sharing a name settled together on the owner's screen. ADR-020 was accepted on 2026-09-13 **conditional on GAP-009**:
 `published_population: whole` is the right value while that question is open, and becomes
 `living` when it closes.
 

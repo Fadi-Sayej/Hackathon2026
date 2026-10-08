@@ -1,4 +1,4 @@
-"""collect_shelf_photos.py — bring the shelf photos sent from the app into the store's copy (ADR-042).
+"""collect_shelf_photos.py — bring what the owner sent from the app into the store's copy (ADR-042, ADR-044).
 
     python3 scripts/collect_shelf_photos.py collect --ledger /tmp/shelf_photos.json
     python3 scripts/collect_shelf_photos.py delete  --ledger /tmp/shelf_photos.json
@@ -6,6 +6,10 @@
 The nightly runs `collect` before the reader and the engine, commits and pushes the photos, and
 only then runs `delete`, which removes from Firestore exactly what the ledger names. A failed push
 skips `delete`, and the photos are collected again the next night.
+
+`collect` also writes the units the owner entered on Store layout into the layout file (D-38,
+ADR-044), when that save is newer than the one the file took. The owner's list stays in Firestore:
+it is the owner's state, not something in transit.
 
 The store and its Firebase project are configs/store.yaml's (ADR-036), and the credential is the
 service account the engine already pulls owner state with. Without one, or when Firestore cannot
@@ -27,6 +31,8 @@ if str(ROOT) not in sys.path:
 from src.common.store import firebase_project_for_owner_state, store_id_for_owner_state  # noqa: E402
 from src.engine.shelf_reader.photos import PHOTOS_ROOT  # noqa: E402
 from src.owner_state.pull import _admin_client  # noqa: E402
+from src.engine.store_layout import DEFAULT_PATH as LAYOUT_PATH  # noqa: E402
+from src.owner_state import shelf_units  # noqa: E402
 from src.owner_state.shelf_photos import collect, delete  # noqa: E402
 
 
@@ -38,7 +44,7 @@ def _client():
     return _admin_client(firebase_project_for_owner_state(os.environ), cred_json, cred_path)
 
 
-def main(argv=None, *, client=None, root: Path = PHOTOS_ROOT, now=None) -> int:
+def main(argv=None, *, client=None, root: Path = PHOTOS_ROOT, now=None, layout_path: Path = LAYOUT_PATH) -> int:
     parser = argparse.ArgumentParser(description="Collect the shelf photos sent from the app (ADR-042).")
     parser.add_argument("action", choices=("collect", "delete"))
     parser.add_argument("--ledger", required=True, type=Path, help="what was collected, for `delete` to remove")
@@ -74,6 +80,12 @@ def main(argv=None, *, client=None, root: Path = PHOTOS_ROOT, now=None) -> int:
         print(f"::warning::the shelf photos were not collected: {type(exc).__name__}")
         return 0
     args.ledger.write_text(json.dumps(ledger, ensure_ascii=False, indent=1), encoding="utf-8")
+    try:
+        why = shelf_units.apply(shelf_units.pull(client, store), layout_path)
+    except Exception as exc:  # noqa: BLE001 — the units wait for the next night
+        why = f"not read: {type(exc).__name__}"
+    print("The units entered in the app were written into the layout file." if why is None
+          else f"The layout file was left as it is: {why}.")
     print(f"Shelf photos for {day}: {len(ledger['collected'])} collected, {len(ledger['replaced'])} replaced "
           f"by a newer photo of the same unit, {len(ledger['abandoned'])} abandoned sends cleared.")
     for f in ledger["failed"]:

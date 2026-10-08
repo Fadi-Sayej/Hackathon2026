@@ -32,8 +32,8 @@ def photos(root: Path, day: str) -> dict:
 
 def read(*, day: str, photo_root: Path, layout: dict, products: list, sales_daily: list, sales_monthly: list,
          policy, asker, today: Optional[date] = None) -> dict:
-    """{widths, current, pictures, photos, units, report}: what was read, and why each run that was
-    not, was not. `photos` are the photos the AI answered for; `units` are those whose every photo
+    """{widths, heights, current, pictures, photos, units, report}: what was read, and why each run
+    that was not, was not. `photos` are the photos the AI answered for; `units` are those whose every photo
     it answered for, so the reading describes the whole unit."""
     today = today or date.fromisoformat(day)
     pool = identity.candidates(products, sales_daily, sales_monthly, today, policy.shelf_reader_candidate_window_days)
@@ -59,6 +59,7 @@ def read(*, day: str, photo_root: Path, layout: dict, products: list, sales_dail
             g = measure.gray(image)
             for number, (shelf, stated) in enumerate(zip(answer["shelves"], unit["shelves"]), start=1):
                 span, measured = measure.read_shelf(g, shelf)
+                line = measure.shelf_line(g, span, shelf) if span is not None else None
                 runs = [(position, run, *identity.identify(run.get("tag"), pool, run.get("package"), unit["departments"]),
                          *measured[position - 1])
                         for position, run in enumerate(shelf["runs"], start=1)]
@@ -76,14 +77,27 @@ def read(*, day: str, photo_root: Path, layout: dict, products: list, sales_dail
                         width_why = "runs_do_not_fit"
                     elif edges is not None:
                         width, width_why = measure.width_mm(edges, span, stated["length_cm"] * 10, tolerance)
+                    # D-38, FR-231: the height on the same photo, in the width's own scale, no taller
+                    # than its shelf where the owner gave the shelf's height.
+                    height, height_why = None, edge_why
+                    if span is None:
+                        height_why = "shelf_ends_not_found"
+                    elif line is None:
+                        height_why = "shelf_line_not_found"
+                    elif edges is not None:
+                        height, height_why = measure.height_mm(g, edges, run["box"], line, shelf, span,
+                                                               stated["length_cm"] * 10, tolerance)
+                        if height is not None and stated.get("height_cm") and height > stated["height_cm"] * 10:
+                            height, height_why = None, "taller_than_its_shelf"
                     face = measure.picture(image, edges, run["box"]) if edges is not None else None
                     # The count is the AI's, confirmed by the edges found; unconfirmed, it is not recorded.
                     reads[barcode].append({**where, "facings": run["facings"], "counted": edges is not None,
-                                           "width_mm": width, "width_why": width_why, "picture": face})
+                                           "width_mm": width, "width_why": width_why,
+                                           "height_mm": height, "height_why": height_why, "picture": face})
         if whole and files:
             units.append(fixture)
 
-    widths, current, pictures = {}, {}, {}
+    widths, heights, current, pictures = {}, {}, {}, {}
     for barcode, seen in sorted(reads.items()):
         measured = [s["width_mm"] for s in seen if s["width_mm"] is not None]
         if measured and len(measured) == len(seen) and max(measured) - min(measured) <= tolerance:
@@ -91,6 +105,12 @@ def read(*, day: str, photo_root: Path, layout: dict, products: list, sales_dail
         else:
             why = next((s["width_why"] for s in seen if s["width_why"]), None) or "read_twice_differs"
             report.append({"barcode": barcode, "why": why})
+        tall = [s["height_mm"] for s in seen if s["height_mm"] is not None]
+        if tall and len(tall) == len(seen) and max(tall) - min(tall) <= tolerance:
+            heights[barcode] = round(sum(tall) / len(tall))
+        else:
+            why = next((s["height_why"] for s in seen if s["height_why"]), None) or "heights_read_differ"
+            report.append({"barcode": barcode, "why": f"no_height:{why}"})
         if len(seen) > 1:
             report.append({"barcode": barcode, "why": "in_two_places"})
         elif not seen[0]["counted"]:
@@ -100,8 +120,8 @@ def read(*, day: str, photo_root: Path, layout: dict, products: list, sales_dail
         face = next((s["picture"] for s in seen if s["picture"]), None)
         if face:
             pictures[barcode] = face
-    return {"widths": widths, "current": current, "pictures": pictures, "photos": answered, "units": units,
-            "report": report}
+    return {"widths": widths, "heights": heights, "current": current, "pictures": pictures, "photos": answered,
+            "units": units, "report": report}
 
 
 def _earlier(readings_path: Path) -> dict:
@@ -132,15 +152,22 @@ def write(result: dict, *, day: str, model: str, prompt: str, readings_path: Pat
     earlier = _earlier(readings_path)
     measured = {"measured_by": "reader", "measured_on": day}
     contradicted = []
-    widths = dict(earlier.get("widths") or {})
-    for barcode, width in result["widths"].items():
-        before = widths.get(barcode)
-        if isinstance(before, dict) and isinstance(before.get("width_mm"), (int, float)) \
-                and abs(before["width_mm"] - width) > tolerance_mm:
-            contradicted.append({"barcode": barcode, "why": f"read_differently_on_{before.get('measured_on')}"})
-            del widths[barcode]
-            continue
-        widths[barcode] = {"width_mm": width, **measured}
+
+    def merged(section: str, field: str, read: dict) -> dict:
+        out = dict(earlier.get(section) or {})
+        for barcode, value in read.items():
+            before = out.get(barcode)
+            if isinstance(before, dict) and isinstance(before.get(field), (int, float)) \
+                    and abs(before[field] - value) > tolerance_mm:
+                why = f"read_differently_on_{before.get('measured_on')}"
+                contradicted.append({"barcode": barcode, "why": why if section == "widths" else f"no_height:{why}"})
+                del out[barcode]
+                continue
+            out[barcode] = {field: value, **measured}
+        return out
+
+    widths = merged("widths", "width_mm", result["widths"])
+    heights = merged("heights", "height_mm", result.get("heights") or {})
     seen_whole = set(result.get("units") or ())
     current = {b: c for b, c in (earlier.get("current") or {}).items()
                if not (isinstance(c, dict) and c.get("fixture") in seen_whole)}
@@ -151,6 +178,7 @@ def write(result: dict, *, day: str, model: str, prompt: str, readings_path: Pat
     doc = {
         "reading": {"day": day, "model": model, "prompt": prompt},
         "widths": dict(sorted(widths.items())),
+        "heights": dict(sorted(heights.items())),
         "current": dict(sorted(current.items())),
         "pictures": dict(sorted(pictures.items())),
         "photos": dict(sorted(photos.items())),

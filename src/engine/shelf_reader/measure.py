@@ -178,6 +178,75 @@ def width_mm(boundaries: list, span: tuple, length_mm: float, tolerance_mm: floa
     return int(round(sum(widths) / len(widths))), None
 
 
+def _row_edges(g: np.ndarray, x0: int, x1: int, lo: float, hi: float) -> list:
+    """The sharp horizontal edges between rows `lo` and `hi`, over columns x0 … x1: at least half
+    the sharpest, an edge a few pixels high counted once."""
+    h, w = g.shape
+    lo, hi = max(0, int(lo)), min(h - 1, int(hi))
+    x0, x1 = max(0, int(x0)), min(w, int(x1))
+    if hi - lo < 3 or x1 - x0 < 2:
+        return []
+    p = np.abs(np.diff(g[lo:hi + 1, x0:x1], axis=0)).mean(axis=1)
+    if float(p.max()) <= 0:
+        return []
+    floor = 0.5 * float(p.max())
+    peaks = [i for i in range(len(p)) if p[i] >= floor and p[i] >= p[max(0, i - 1)] and p[i] >= p[min(len(p) - 1, i + 1)]]
+    merged: list = []
+    for i in peaks:
+        if merged and i - merged[-1][-1] <= 4:
+            merged[-1].append(i)
+        else:
+            merged.append([i])
+    return [lo + max(group, key=lambda i: p[i]) + 1 for group in merged]
+
+
+HEIGHT_REACH = 0.15      # of the box's height: how far from the AI's line an edge is looked for
+HEIGHT_GUARD = 0.05      # of the shelf's height: how far above the tallest product's top the AI may be
+
+
+def shelf_line(g: np.ndarray, span: tuple, shelf: dict) -> Optional[int]:
+    """The row the products stand on: the top of the shelf's front edge, across the whole span.
+
+    One product's bottom can barely differ from the shelf's edge in front of it, but across the
+    shelf the edge is a long horizontal line, with the gaps between products above it. Its top is
+    the topmost sharp horizontal edge near the AI's line; the edge's own bottom, and the tags on it,
+    are below."""
+    h = g.shape[0]
+    y_top, y_bottom = shelf["y_top"] * h, shelf["y_bottom"] * h
+    reach = HEIGHT_REACH * (y_bottom - y_top) + 3
+    edges = _row_edges(g, span[0], span[1], y_bottom - reach, y_bottom + reach)
+    return min(edges) if edges else None
+
+
+def height_mm(g: np.ndarray, boundaries: list, box: list, line: int, shelf: dict, span: tuple,
+              length_mm: float, tolerance_mm: float) -> tuple:
+    """(height, None), or (None, why): the product's height in whole millimetres (D-38, FR-231).
+
+    Per facing, over its middle half, the product's bottom is the shelf's line and its top is the
+    topmost sharp horizontal edge near the AI's box top. A product's own print lies below its top,
+    so the topmost edge is the top. What hangs from the shelf above (its edge and its tags) lies
+    above the tallest product's top, the shelf's `y_top`, so nothing is looked for above that, or
+    above the box's own top if the AI put it higher. An edge at that limit may be cut off, and
+    leaves the height unknown. The scale is the width's own:
+    the shelf's length over its span, since a photo taken straight on has one scale both ways at
+    the product fronts (ASM-084). The facings must agree, as for the width."""
+    h = g.shape[0]
+    top0 = box[1] * h
+    reach = HEIGHT_REACH * (box[3] * h - top0) + 3
+    ceiling = min(shelf["y_top"], box[1]) * h - HEIGHT_GUARD * (shelf["y_bottom"] - shelf["y_top"]) * h - 3
+    lo, hi = max(top0 - reach, ceiling), min(top0 + reach, line - 4)
+    mm_per_px = length_mm / (span[1] - span[0])
+    heights = []
+    for a, b in zip(boundaries, boundaries[1:]):
+        tops = _row_edges(g, a + 0.25 * (b - a), b - 0.25 * (b - a), lo, hi)
+        if not tops or min(tops) <= lo + 2:
+            return None, "top_not_found"
+        heights.append((line - min(tops)) * mm_per_px)
+    if max(heights) - min(heights) > tolerance_mm:
+        return None, "facing_heights_disagree"
+    return int(round(sum(heights) / len(heights))), None
+
+
 def runs_fit(edges: list, span: tuple, length_mm: float, tolerance_mm: float) -> bool:
     """The runs stand within the shelf's span, in order, without overlapping, within the tolerance."""
     slack = tolerance_mm * (span[1] - span[0]) / length_mm

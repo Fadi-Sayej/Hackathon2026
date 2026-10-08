@@ -1,14 +1,14 @@
 ---
 ID: F12-S1
 Title: Planogram — a dated shelf plan from his own sales, waiting for them until they arrive
-Status: Approved — by the repository owner, 2026-10-04 (v0.8), 2026-10-05 (v0.9: "approve") and 2026-10-06 (v0.10: D-36, "a"; v0.11: D-37, "approved")
+Status: Approved — by the repository owner, 2026-10-04 (v0.8), 2026-10-05 (v0.9: "approve") and 2026-10-06 (v0.10: D-36, "a"; v0.11: D-37, "approved"; v0.12: D-38, "approved")
 Owner: smartshelf-architect
-Version: 0.11 (2026-10-06: D-37's upload screen, FR-224 … FR-227, FR-218 revised, AC-212 … AC-214, NFR-080, OQ-1212, ADR-042). 0.10 (2026-10-06: FR-220 revised for D-36, the package read where there is no shelf tag; AC-211). 0.9 (2026-10-05: FR-183 revised, because the mockups showed the v0.8 rule leaving shelves empty; AC-205, OQ-1210. D-33's product pictures: FR-216, FR-217, AC-206, NFR-078, ADR-040. D-34 and D-35's shelf reader: FR-180 revised, FR-218 … FR-223, AC-207 … AC-210, NFR-079, OQ-1211, ADR-041). 0.8 (2026-10-04: D-32, the AI's explanation of each fixture's plan; FR-210 … FR-215 approved as OQ-1209)
+Version: 0.12 (2026-10-08: D-38's units entered in the app, with shelf heights; FR-228 … FR-234, AC-215 … AC-220, NFR-081, ASM-084, ASM-074 revised, OQ-1213, ADR-044). 0.11 (2026-10-06: D-37's upload screen, FR-224 … FR-227, FR-218 revised, AC-212 … AC-214, NFR-080, OQ-1212, ADR-042). 0.10 (2026-10-06: FR-220 revised for D-36, the package read where there is no shelf tag; AC-211). 0.9 (2026-10-05: FR-183 revised, because the mockups showed the v0.8 rule leaving shelves empty; AC-205, OQ-1210. D-33's product pictures: FR-216, FR-217, AC-206, NFR-078, ADR-040. D-34 and D-35's shelf reader: FR-180 revised, FR-218 … FR-223, AC-207 … AC-210, NFR-079, OQ-1211, ADR-041). 0.8 (2026-10-04: D-32, the AI's explanation of each fixture's plan; FR-210 … FR-215 approved as OQ-1209)
 Parent: [F12 — Planogram](../intent.md)
 Related Intents: INT-006
-Inputs: [docs/features/F12-planogram/intent.md (Approved for specification, D-30), docs/product/PRD.md (§5 V4, §6 #7), docs/product/intent-register.md (D-1, D-3, D-13, D-14, D-15, D-16, D-22, D-23, D-28, D-29, D-30, D-31, D-32, D-33, D-34, D-35, D-36, D-37), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (§5 "He stocks", FR-143 … FR-146, FR-156), ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011, ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037, ADR-038, ADR-039, ADR-040, ADR-041, ADR-042 (Proposed), CLAUDE.md]
+Inputs: [docs/features/F12-planogram/intent.md (Approved for specification, D-30), docs/product/PRD.md (§5 V4, §6 #7), docs/product/intent-register.md (D-1, D-3, D-13, D-14, D-15, D-16, D-22, D-23, D-28, D-29, D-30, D-31, D-32, D-33, D-34, D-35, D-36, D-37, D-38), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (§5 "He stocks", FR-143 … FR-146, FR-156), ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011, ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037, ADR-038, ADR-039, ADR-040, ADR-041, ADR-042, ADR-044, CLAUDE.md]
 Answered by: [System Design](../../../architecture/system-design.md) §21 (F12-S1)
-Updated: 2026-10-08 (Task 8.13: FR-226 reads the photos that waited, confirmed by the owner the same day: "keep"). 2026-10-06 (v0.11 approved: D-37's upload screen, ADR-042, OQ-1212 answered "approved". v0.10: FR-220 per D-36, as put to him). 2026-10-05 (v0.9 approved: FR-183 revised, OQ-1210 answered A; D-33's pictures, FR-216, FR-217; D-34 and D-35's shelf reader, FR-218 … FR-223, OQ-1211 answered). 2026-10-04 (D-32's explanation approved, OQ-1209; earlier the same day, approved with OQ-1208, and OQ-1204 and OQ-1207 answered with the plan)
+Updated: 2026-10-08 (v0.12 approved: D-38, ADR-044, OQ-1213 answered "approved"). 2026-10-08 (Task 8.13: FR-226 reads the photos that waited, confirmed by the owner the same day: "keep"). 2026-10-06 (v0.11 approved: D-37's upload screen, ADR-042, OQ-1212 answered "approved". v0.10: FR-220 per D-36, as put to him). 2026-10-05 (v0.9 approved: FR-183 revised, OQ-1210 answered A; D-33's pictures, FR-216, FR-217; D-34 and D-35's shelf reader, FR-218 … FR-223, OQ-1211 answered). 2026-10-04 (D-32's explanation approved, OQ-1209; earlier the same day, approved with OQ-1208, and OQ-1204 and OQ-1207 answered with the plan)
 ---
 
 # F12-S1 — Planogram
@@ -34,10 +34,16 @@ Updated: 2026-10-08 (Task 8.13: FR-226 reads the photos that waited, confirmed b
 > upload screen for the shelf photos, so they reach the reader with no one moving files.
 > FR-224 … FR-227, FR-218 revised, AC-212 … AC-214, NFR-080 and OQ-1212, on ADR-042. Built in
 > Phase 8 Task 8.13.
+>
+> **v0.12 was approved on 2026-10-08** ("approved"). It specifies **D-38** (2026-10-08): the owner
+> enters each shelving unit in the app, each shelf's length and height included, so no one edits the
+> layout file; the reader measures each product's height, and the plan checks that it fits under
+> the shelf above. FR-228 … FR-234, AC-215 … AC-220, NFR-081, ASM-084, ASM-074 revised and
+> OQ-1213, on ADR-044. Built in Phase 8 Task 8.14.
 
 > **Identifier note.** Every `FR-`, `INV-`, `NFR-`, `AC-`, `SCN-`, `C-`, `ASM-` and `OQ-` id
-> below is new and globally unique: FR-178 … FR-227, INV-084 … INV-097, NFR-072 … NFR-080,
-> AC-172 … AC-214, SCN-159 … SCN-177, C-73 … C-75, ASM-073 … ASM-083, OQ-1201 … OQ-1212.
+> below is new and globally unique: FR-178 … FR-234, INV-084 … INV-097, NFR-072 … NFR-081,
+> AC-172 … AC-220, SCN-159 … SCN-177, C-73 … C-75, ASM-073 … ASM-084, OQ-1201 … OQ-1213.
 
 Implements intent F12. Bound by ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011,
 ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037,
@@ -667,6 +673,70 @@ photos sent, each with its state:
 The artefact lists each collected photo's unit, the night it was collected and the night it was
 read. It never includes the photo.
 
+#### Units entered in the app, and heights (D-38) — v0.12
+
+**FR-228** — Store layout lets the owner describe each shelving unit (D-38), above the photos.
+Per unit:
+- its name, which its photos use too;
+- its departments, chosen from the catalogue's own;
+- whether it is chilled;
+- its shelves from the top, each with its length and its height in whole centimetres. Height is
+  measured from the shelf up to the shelf above it, and the top shelf's may be left empty when
+  nothing is above it;
+- the eye-level shelf, or none.
+
+The form starts from the units the artefact publishes, and saves the whole list. It does not save
+a unit without a name, a department, and each shelf's length and height, or with another unit's
+name. A team account sees it disabled (ADR-029). It is shown where the upload is (FR-224).
+
+**FR-229** — The nightly writes the owner's list into the layout file before the engine runs
+(ADR-044). The list replaces the file's `fixtures`, and every other section is kept. A unit the
+owner changed carries the day of the change, `stated_by: owner` and `recorded_by: app`, and each
+shelf `measured_by: owner`. An unchanged unit keeps its dates. The file records which save it took,
+so a save is written once and a later correction by the team is not undone the next night; the
+form opens on a save the file has not taken yet. The file is committed, so its history holds
+(ADR-037). The loader checks these units as it checks any other (FR-178), and Store
+layout says "As you entered it on …" for them.
+
+**FR-230** — A shelf may carry its height, `height_cm`, or `null` for a top shelf open above.
+Store layout shows each shelf's height, and per unit the products whose height is not known yet,
+as it lists those without a width (FR-190).
+
+**FR-231** — The reader measures each product's height on the same photo, within the AI's box
+(ADR-044 Decision 5). The product's bottom is the shelf's edge, which it already finds, and its top
+is found per facing on the full-resolution photo. The height is in the width's own scale: the
+shelf's length over its span **(decided here)**. A height is recorded only when:
+- the facings' heights agree within ±5 mm;
+- a product read in two runs or two photos agrees within ±5 mm;
+- it is no taller than its shelf, where the shelf has a height.
+
+Otherwise it stays unknown, with its reason (D-3). Heights are written beside widths in the
+readings file.
+
+**FR-232** — The reader's heights are used only once the acceptance run passes for heights: at
+least the policy's number of products measured by hand on the same store's first photos, each
+within ±5 mm (FR-223). The hand readings never enter a plan.
+
+**FR-233** — On a unit whose shelves carry heights, the plan checks them **(decided here)**:
+- a product is placed only when its width and its height are known. Without a height it is
+  listed under "height not measured";
+- a product goes only on a shelf whose height is at least its own plus the policy's clearance,
+  **2 cm** (OQ-1213), a starting value. A shelf open above has no limit;
+- the order of FR-183 stands. A shelf a product does not fit under is passed over for the next one
+  in the order that it fits and has room;
+- a product taller than every shelf of its unit, with the clearance, is not placed, and is listed
+  as "taller than every shelf" with its height;
+- a "together" set goes on a shelf that every one of its products fits under. The tallest shelf
+  fits any product that fits anywhere, so there always is one, and room is decided as before;
+- an unknown height is an unknown size for FR-186: no extra facings on that unit.
+
+A unit recorded without heights is planned as before v0.12, with no height check.
+
+**FR-234** — Shelf plan draws a unit to scale when every shelf has a height or is open above, and
+every placed product has a height. Each shelf's row is drawn in proportion to its height, each tile
+to its product's height, and a shelf open above a little taller than its tallest product.
+Otherwise the drawing is as before (FR-217).
+
 ## 7. Behavioral Invariants
 
 **INV-084** — No fixed camera, sensor or continuous image feed is ever an input (D-13).
@@ -912,6 +982,9 @@ counts under ADR-032's monthly limit.
 its way there, in the store's own Firestore subtree. It is there at most until the next nightly,
 unless it fails its check. No photo is published (ADR-041, ADR-042).
 
+**NFR-081** — *(v0.12)* A product's height costs no request: it comes from the same
+photo and the same sealed answer as its width, so NFR-079's estimate stands (ADR-044).
+
 ## 14. Compatibility and External Constraints
 
 **C-73** — One store per copy (ADR-036, D-28). The layout file belongs to that copy's store.
@@ -1094,6 +1167,33 @@ the push. *(FR-226, NFR-080)*
 rules refuse the write. The nightly asks the model only when it collected photos that night and
 the key is set. *(FR-224, FR-226)*
 
+**AC-215** — *(v0.12)* The form saves the whole list of units, and nothing without a
+name, a department, and each shelf's length and height (the top shelf's may be empty), or with a
+name another unit has. A team account cannot save. *(FR-228)*
+
+**AC-216** — *(v0.12)* The nightly replaces the file's `fixtures` with the owner's
+list and keeps every other section. A changed unit carries the day of its change and
+`recorded_by: app`, and an unchanged unit keeps its dates. Nothing is committed when nothing
+changed. *(FR-229)*
+
+**AC-217** — *(v0.12)* On the drawn test shelves, the reader's heights come back
+within ±5 mm. A facing that disagrees, a product read twice differently, or a height above its
+shelf leaves the height unknown, with its reason. *(FR-231)*
+
+**AC-218** — *(v0.12)* The reader's heights are used only after at least the policy's
+number of hand readings are all within ±5 mm; until then, those products plan as "height not
+measured". *(FR-232)*
+
+**AC-219** — *(v0.12)* No product is ever placed on a shelf lower than its height
+plus the clearance. A product taller than every shelf is listed with its height, a "together" set
+stands on a shelf every one of its products fits under, and a unit without heights is planned as
+before.
+*(FR-233)*
+
+**AC-220** — *(v0.12)* A unit drawn to scale has rows in proportion to its shelves'
+heights and tiles to its products' heights; a unit missing any height is drawn as before.
+*(FR-234)*
+
 ## 16. Assumptions
 
 **ASM-073** — A product's facing width does not change between packs of the same barcode.
@@ -1101,7 +1201,8 @@ the key is set. *(FR-224, FR-226)*
 
 **ASM-074** — One measured usable length per shelf is enough. A shelf with dividers or uneven
 depth is measured as the length that can hold products. *Falsified if* a fixture's products need
-depth or height to fit.
+depth or height to fit. *(v0.12: height is checked where the owner gives each shelf's
+height, FR-233. Depth is still not.)*
 
 **ASM-075** — A day a product sold nothing in either window is a day of no demand, not a day it
 was out of stock. *Falsified if* stock-outs are common on measured fixtures: they would make a
@@ -1147,6 +1248,10 @@ gives a reason the facts do not carry, or promises a gain in words ("this will d
 sales"). No mechanical check catches either. The prompt forbids both, and the page labels the
 text as the AI's explanation of the plan: the plan, not the text, is what the product stands
 behind (INV-096).
+
+**ASM-084** — *(v0.12)* A photo taken straight on has one scale both ways at the line of
+the product fronts, so a height is read in the width's own scale (FR-231). *Falsified if* the
+acceptance run passes for widths and fails for heights.
 
 ## 17. Open Questions
 
@@ -1242,6 +1347,18 @@ It also asks:
 - the example's explanation is asked once, by the team, with his key: one request for each of
   the example's fixtures, about five, which costs a few cents at ADR-039's estimate. · owner: the repository owner · blocks: nothing now.
 
+**~~OQ-1213~~** — The units entered in the app, with heights (D-38), for the owner's approval with
+v0.12 (docs/reviews/F12-unit-form-mockups.md). **Answered 2026-10-08: "approved", to "You can say
+'approve all', or name what to change".** Recorded as every item as drawn, the clearance at 2 cm:
+- the form on Store layout, as drawn;
+- shelf heights on Store layout, and the plan drawn to scale;
+- the wording, in Hebrew, Arabic and English;
+- ADR-044: the owner's list kept in the owner's state and written into the layout file each
+  night; the reader measuring heights, graded by the acceptance run; the plan's height check;
+- the clearance between a product's top and the shelf above: **2 cm**, a starting value.
+
+Built in Task 8.14.
+
 **~~OQ-1212~~** — The upload screen (D-37), for the owner's approval with v0.11
 (docs/reviews/F12-photo-upload-mockups.md). **Answered 2026-10-06: "approved", to "You can say
 'approve all', or name what to change".** Recorded as every item as drawn, with B, the
@@ -1323,6 +1440,9 @@ products at eye level and three below.
 | Protected behavior | NFR-079 | — | AC-210 |
 | INT-006 · D-37 (v0.11) | FR-218 (v0.11), FR-224, FR-225, FR-226, FR-227 | — | AC-212, AC-213, AC-214 |
 | Protected behavior | NFR-080 | — | AC-213 |
+| INT-006 · D-38 (v0.12) | FR-228, FR-229, FR-230 | — | AC-215, AC-216 |
+| INT-006 · D-38 (v0.12) | FR-231, FR-232, FR-233, FR-234 | — | AC-217, AC-218, AC-219, AC-220 |
+| Protected behavior | NFR-081 | — | AC-217 |
 
 ---
 

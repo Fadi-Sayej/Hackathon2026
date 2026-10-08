@@ -889,7 +889,8 @@
    },
    "shelf_plan": {
     "elasticity": 0.17,
-    "facings_cap": 4
+    "facings_cap": 4,
+    "height_clearance_mm": 20
    },
    "surface": {
     "bound": 10,

@@ -527,6 +527,33 @@ Steps:
 - the visual proof shows no change outside Store layout's two revised sentences;
 - YomYom's artefact gains only `layout_facts.photos: []`.
 
+### Task 8.14: The owner's units and shelf heights (D-38; FR-228 … FR-234; AC-215 … AC-220; NFR-081; ADR-044)
+
+**Approved 2026-10-08** with F12-S1 v0.12 ("approved", OQ-1213): the form, heights on the pages
+and the plan drawn to scale, the wording, ADR-044, and the 2 cm clearance
+(docs/reviews/F12-unit-form-mockups.md).
+
+**Files:**
+- `src/pages/ShelfUnits.jsx`, `src/owner/shelfUnits.js`, `src/owner/firestoreShelfUnits.js`, the
+  `units.*` and height words in three languages; `src/pages/StoreLayoutPage.jsx` (heights, "height
+  not measured"), `src/pages/ShelfPlanPage.jsx` (too tall, the drawing to scale);
+- `src/owner_state/shelf_units.py` and `scripts/collect_shelf_photos.py` (the save into the layout
+  file); `.github/workflows/collect-daily.yml` (staging it);
+- `src/engine/store_layout.py` (`height_cm`, `recorded_by: app`, `heights`, the hand readings'
+  heights, `entered_in_app`), `src/engine/layout_facts.py`, `src/engine/shelf_plan.py`,
+  `configs/policy.yaml` (`shelf.height_clearance_mm: 20`, approved as a starting value);
+- `src/engine/shelf_reader/measure.py` (the shelf's line, each facing's top),
+  `src/engine/shelf_reader/reading.py`; `tests/fixtures/shelf_photos/draw.py` (the prompt's
+  `y_top`, rough boxes top and bottom);
+- tests.
+
+**Done when:**
+- AC-215 … AC-220 pass;
+- on the drawn shelves, heights come back within ±5 mm and none is wrong;
+- a unit without heights plans exactly as before, and YomYom's artefact changes only by the new
+  empty fields and the clearance in the policy;
+- the visual proof shows no change outside Store layout and Shelf plan's new parts.
+
 ## Pull requests
 
 1. **Engine and record:** Tasks 8.0 … 8.5. The proof is YomYom's print-mode artefact, unchanged
@@ -539,6 +566,7 @@ Steps:
    ADR-040 and ADR-041. It goes before the pages, which read its fields.
 6. **The shelf reader:** Task 8.12.
 7. **The photo upload:** Task 8.13, with the records of OQ-1212's answer.
+8. **The owner's units and heights:** Task 8.14, with the records of OQ-1213's answer.
 
 ## Checkpoint 8
 

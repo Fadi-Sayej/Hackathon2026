@@ -7,6 +7,7 @@
      "departments_on_no_fixture": 0,
      "fixtures": 3,
      "rejected": 1,
+     "without_height": 0,
      "without_picture": 10,
      "without_width": 1
     },
@@ -123,6 +124,7 @@
       "stated_on": "2026-08-01"
      }
     },
+    "heights": {},
     "id": "layout_facts",
     "notes": [],
     "photos": [],
@@ -134,6 +136,13 @@
       "tolerance_mm": 5,
       "within": 0
      },
+     "height_acceptance": {
+      "listed": 0,
+      "minimum": 20,
+      "tolerance_mm": 5,
+      "within": 0
+     },
+     "heights": 0,
      "read_on": null,
      "status": "no_readings",
      "widths": 0
@@ -153,6 +162,7 @@
     "status": "available",
     "thresholds": {},
     "unavailable_reason": null,
+    "units_saved_at": null,
     "unplanned": {
      "מדף יבש": {
       "count_zero_or_below": [],
@@ -229,6 +239,11 @@
      }
     },
     "window": null,
+    "without_height": {
+     "מדף יבש": [],
+     "מקרר": [],
+     "ניקיון": []
+    },
     "without_picture": {
      "מדף יבש": [
       "7290101",
@@ -339,6 +354,7 @@
    "shelf_plan": {
     "counts": {
      "fixtures": 3,
+     "no_height": 0,
      "no_planned_products": 0,
      "no_width": 1,
      "nothing_placeable": 0,
@@ -346,6 +362,7 @@
      "placed": 9,
      "planned": 3,
      "stopped_by_rule": 0,
+     "too_tall": 0,
      "too_wide": 0
     },
     "elasticity": {
@@ -459,6 +476,7 @@
        "unplaced": {
         "count_zero_or_below": [],
         "kept_off": [],
+        "no_height": [],
         "no_sale_in_window": [
          "7290004"
         ],
@@ -467,6 +485,7 @@
         ],
         "rejected": [],
         "stock_unknown": [],
+        "too_tall": [],
         "too_wide": []
        }
       },
@@ -627,10 +646,12 @@
        "unplaced": {
         "count_zero_or_below": [],
         "kept_off": [],
+        "no_height": [],
         "no_sale_in_window": [],
         "no_width": [],
         "rejected": [],
         "stock_unknown": [],
+        "too_tall": [],
         "too_wide": []
        }
       },
@@ -705,10 +726,12 @@
        "unplaced": {
         "count_zero_or_below": [],
         "kept_off": [],
+        "no_height": [],
         "no_sale_in_window": [],
         "no_width": [],
         "rejected": [],
         "stock_unknown": [],
+        "too_tall": [],
         "too_wide": []
        }
       },
@@ -765,7 +788,8 @@
     "status": "available",
     "thresholds": {
      "elasticity": 0.17,
-     "facings_cap": 4
+     "facings_cap": 4,
+     "height_clearance_mm": 20
     },
     "unavailable_reason": null,
     "window": null
@@ -848,7 +872,8 @@
    },
    "shelf_plan": {
     "elasticity": 0.17,
-    "facings_cap": 4
+    "facings_cap": 4,
+    "height_clearance_mm": 20
    },
    "surface": {
     "bound": 10,

@@ -5,6 +5,7 @@ import { namesFrom, ruleText, useDates } from './shelfCommon.js'
 import { Names } from './ShelfNames.jsx'
 import { ReaderWaiting } from './ReaderWaiting.jsx'
 import { ShelfPhotos } from './ShelfPhotos.jsx'
+import { ShelfUnits } from './ShelfUnits.jsx'
 
 /**
  * Store layout: his shelf units as the team recorded them from his photographs (F12-S1 FR-190,
@@ -37,7 +38,7 @@ function Rejected({ rejected, nameOf }) {
   )
 }
 
-function Fixture({ name, fixture, withoutWidth, withoutPicture, unplanned, nameOf, counting }) {
+function Fixture({ name, fixture, withoutWidth, withoutHeight = [], withoutPicture, unplanned, nameOf, counting }) {
   const { t } = useI18n()
   const { date } = useDates()
   return (
@@ -47,12 +48,17 @@ function Fixture({ name, fixture, withoutWidth, withoutPicture, unplanned, nameO
         {fixture.chilled ? <span className="layout__tag">{t('layout.chilled')}</span> : null}
       </header>
       <p className="reorder__line">{t('layout.departments')} <Names barcodes={fixture.departments} nameOf={(d) => d} /></p>
-      <p className="layout__dated">{t('layout.stated', { date: date(fixture.stated_on) })}</p>
+      {/* D-38: a unit the owner entered in the app says so, not "recorded by the team". */}
+      <p className="layout__dated">{t(fixture.recorded_by === 'app' ? 'layout.stated.app' : 'layout.stated', { date: date(fixture.stated_on) })}</p>
       <ol className="layout__shelves">
         {fixture.shelves.map((s) => (
           <li key={s.shelf} className="layout__shelf" data-eye-level={s.shelf === fixture.eye_level_shelf || undefined}>
             <span className="layout__shelf-name">{t('layout.shelf', { n: s.shelf })}</span>
             <span className="layout__shelf-length"><bdi>{t('layout.length', { cm: s.length_cm })}</bdi></span>
+            {/* D-38: the height above the shelf, where the owner gave one. */}
+            {'height_cm' in s ? (
+              <span className="layout__shelf-length"><bdi>{s.height_cm ? t('layout.height', { cm: s.height_cm }) : t('layout.openAbove')}</bdi></span>
+            ) : null}
             {s.shelf === fixture.eye_level_shelf ? <span className="layout__tag layout__tag--eye">{t('layout.eyeLevel')}</span> : null}
             <span className="layout__dated">{t('layout.measured', { date: date(s.measured_on) })}</span>
           </li>
@@ -73,6 +79,12 @@ function Fixture({ name, fixture, withoutWidth, withoutPicture, unplanned, nameO
       ) : (
         <p className="layout__dated">{t('layout.allMeasured')}</p>
       )}
+      {withoutHeight.length ? (
+        <p className="reorder__needs" data-missing="height">
+          <span className="reorder__needs-pill">{t('layout.noHeight')}</span>
+          <Names barcodes={withoutHeight} nameOf={nameOf} />
+        </p>
+      ) : null}
       {/* D-33, F12-S1 FR-217: the pictures not yet cut from the store's photos. */}
       {withoutPicture.length ? (
         <p className="reorder__needs" data-missing="picture">
@@ -92,7 +104,24 @@ function Fixture({ name, fixture, withoutWidth, withoutPicture, unplanned, nameO
   )
 }
 
-export function StoreLayoutPage({ artefact, catalogue, photos = null }) {
+/** The catalogue's departments, for the form's list: as the catalogue spells them (ADR-037). */
+function departmentsOf(catalogue) {
+  const products = catalogue?.products || []
+  return [...new Set(products.map((p) => p.department).filter(Boolean))].sort((a, b) => a.localeCompare(b))
+}
+
+/** The units as recorded, in the file's order, as the form edits them. */
+function unitsOf(capability) {
+  return (capability.fixture_order || Object.keys(capability.fixtures || {})).map((name) => {
+    const f = capability.fixtures[name]
+    return {
+      name, departments: [...f.departments], chilled: f.chilled, eye_level_shelf: f.eye_level_shelf ?? null,
+      shelves: f.shelves.map((s) => ({ length_cm: s.length_cm, height_cm: s.height_cm ?? '' })),
+    }
+  })
+}
+
+export function StoreLayoutPage({ artefact, catalogue, photos = null, units = null }) {
   const { t } = useI18n()
   const { date } = useDates()
   const capability = artefact?.capabilities?.layout_facts
@@ -106,6 +135,7 @@ export function StoreLayoutPage({ artefact, catalogue, photos = null }) {
         {capability?.unavailable_reason === 'layout_all_rejected'
           ? <Rejected rejected={capability.rejected} nameOf={nameOf} />
           : <p className="reorder__line">{t('layout.waiting.next')}</p>}
+        {units ? <ShelfUnits units={[]} departments={departmentsOf(catalogue)} takenAt={capability?.units_saved_at ?? null} {...units} /> : null}
         {photos ? <ShelfPhotos units={[]} collected={capability?.photos || []} {...photos} /> : null}
       </section>
     )
@@ -119,12 +149,14 @@ export function StoreLayoutPage({ artefact, catalogue, photos = null }) {
   return (
     <section className="capability layout" data-capability="layout_facts" {...dirProps()}>
       <ReaderWaiting reader={capability.reader} />
+      {units ? <ShelfUnits units={unitsOf(capability)} departments={departmentsOf(catalogue)}
+        takenAt={capability.units_saved_at ?? null} {...units} /> : null}
       {photos ? <ShelfPhotos units={capability.fixture_order || Object.keys(capability.fixtures || {})}
         collected={capability.photos || []} {...photos} /> : null}
       <p className="reorder__line">{t('layout.shelfOrder')}</p>
       {(capability.fixture_order || Object.keys(capability.fixtures || {})).map((name) => [name, capability.fixtures[name]]).map(([name, fixture]) => (
         <Fixture key={name} name={name} fixture={fixture} withoutWidth={capability.without_width?.[name] || []}
-          withoutPicture={capability.without_picture?.[name] || []}
+          withoutHeight={capability.without_height?.[name] || []} withoutPicture={capability.without_picture?.[name] || []}
           unplanned={capability.unplanned?.[name]} nameOf={nameOf} counting={counting} />
       ))}
       {capability.departments_on_no_fixture?.length ? (

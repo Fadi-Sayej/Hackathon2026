@@ -60,12 +60,15 @@ def draw(path: Path, unit: dict) -> dict:
                                   "tag": run.get("tag"), "package": run.get("package"),
                                   "barcode": run.get("barcode"), "width_mm": run["width_mm"]})
             x += int(run.get("gap_mm", 15) * PX_PER_MM)
+        # The prompt's y_top: the top of the tallest product standing on the shelf.
+        if shelf["runs"]:
+            shelf["y_top"] = min(r["box"][1] for r in shelf["runs"])
         truth["shelves"].append(shelf)
     image.save(path, format="JPEG", quality=92)
     return truth
 
 
-def answer(truth: dict, *, jitter: float = 0.04, seed: int = 1, facings: dict = None) -> str:
+def answer(truth: dict, *, jitter: float = 0.04, seed: int = 1, facings: dict = None, vjitter: float = 0.0) -> str:
     """A model's answer about the drawing: rough boxes, the tags as given. `facings` overrides a
     run's count by (shelf, run) index, to show what happens when the model miscounts."""
     rng = random.Random(seed)
@@ -78,9 +81,17 @@ def answer(truth: dict, *, jitter: float = 0.04, seed: int = 1, facings: dict = 
             wobble = jitter * (x1 - x0)
             box = [max(0.0, (x0 + rng.uniform(-wobble, wobble)) / width), y0 / height,
                    min(1.0, (x1 + rng.uniform(-wobble, wobble)) / width), y1 / height]
+            if vjitter:          # D-38: a model's box is rough top and bottom too
+                tall = vjitter * (y1 - y0)
+                box[1] = (y0 + rng.uniform(-tall, tall)) / height
+                box[3] = (y1 + rng.uniform(-tall, tall)) / height
             runs.append({"box": box, "facings": (facings or {}).get((s_index, r_index), run["facings"]),
                          "tag": run["tag"], "package": run.get("package")})
-        shelves.append({"y_top": shelf["y_top"] / height, "y_bottom": shelf["y_bottom"] / height,
+        y_top, y_bottom = shelf["y_top"], shelf["y_bottom"]
+        if vjitter:
+            tall = vjitter * (y_bottom - y_top)
+            y_top, y_bottom = y_top + rng.uniform(-tall, tall), y_bottom + rng.uniform(-tall, tall)
+        shelves.append({"y_top": y_top / height, "y_bottom": y_bottom / height,
                         "left_x": (shelf["left"] + rng.uniform(-8, 8)) / width,
                         "right_x": (shelf["right"] + rng.uniform(-8, 8)) / width, "runs": runs})
     return json.dumps({"problem": None, "shelves": shelves}, ensure_ascii=False)

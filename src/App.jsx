@@ -39,6 +39,11 @@ const SHELF_PHOTOS = isFirebaseConfigured() && authMode() === 'firebase'
   ? { onSend: (unit, file, id) => shelfPhotos().then((m) => m.send(unit, file, id)),
       loadPending: () => shelfPhotos().then((m) => m.pending()) }
   : null
+// D-38, ADR-044: the owner's units, kept with the owner's state where the photos go.
+const shelfUnits = () => import('./owner/firestoreShelfUnits.js')
+const SHELF_UNITS = SHELF_PHOTOS
+  ? { onSave: (units) => shelfUnits().then((m) => m.save(units)), loadSaved: () => shelfUnits().then((m) => m.load()) }
+  : null
 
 /**
  * What each restored page is waiting for, when the artefact cannot feed it.
@@ -284,7 +289,8 @@ export default function App() {
       }
       return activePage === 'store-layout'
         ? <StoreLayoutPage artefact={artefact} catalogue={catalogue.catalogue}
-          photos={SHELF_PHOTOS ? { readOnly, ...SHELF_PHOTOS } : null} />
+          photos={SHELF_PHOTOS ? { readOnly, ...SHELF_PHOTOS } : null}
+          units={SHELF_UNITS ? { readOnly, ...SHELF_UNITS } : null} />
         : <ShelfPlanPage artefact={artefact} ownerState={ownerState} catalogue={catalogue.catalogue}
           onOutcome={onOutcome} onUndoOutcome={readOnly ? null : onUndoOutcome} readOnly={readOnly} />
     }

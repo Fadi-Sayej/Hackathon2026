@@ -127,10 +127,12 @@ jobs:
       # Before the engine, so tonight's artefact lists what was collected and uses what the reader
       # read. None of these four steps can stop the night: no photo, no key or no layout file is a
       # normal night, and a photo that waits in Firestore is collected the next one.
-      - name: Collect the shelf photos sent from the app
+      - name: Collect what the owner sent from the app
         # Joins each photo's parts, checks them against its manifest, and writes it to
         # data/internal/shelf_photos/<today>/<unit>/. It deletes nothing: the ledger says what
-        # the delete step below may remove, once the photos are pushed.
+        # the delete step below may remove, once the photos are pushed. It also writes the units
+        # the owner entered on Store layout into the layout file, when that save is newer than the
+        # one the file took (D-38, ADR-044).
         continue-on-error: true
         env:
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
@@ -145,7 +147,7 @@ jobs:
           SMARTSHELF_ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python3 scripts/read_shelves.py --unread
 
-      - name: Commit the shelf photos and what the reader read
+      - name: Commit the shelf photos, the owner's units and what the reader read
         # One `git add` a path: a pathspec that matches nothing makes `git add` stage nothing at
         # all (tests/test_nightly_commit_step.py). data/external/ is ignored, so the sealed
         # answers are forced, as the boost's picks are. A failed push does not stop the night; its
@@ -157,6 +159,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -- data/internal/shelf_photos 2>/dev/null || true
           git add -- configs/shelf_readings.yaml 2>/dev/null || true
+          git add -- configs/store_layout.yaml 2>/dev/null || true
           git add -- public/store/shelf-pictures 2>/dev/null || true
           git add -f -- ':(glob)data/external/snapshots/*/shelf_readings/*.json' 2>/dev/null || true
           if git diff --cached --quiet; then
@@ -164,7 +167,7 @@ jobs:
             exit 0
           fi
           DAY=$(date -u +%Y-%m-%d)
-          git commit -q -m "snapshot: shelf photos and readings for ${DAY}"
+          git commit -q -m "snapshot: shelf photos, units and readings for ${DAY}"
           git pull --rebase --autostash origin main || true
           git push origin HEAD:main
 

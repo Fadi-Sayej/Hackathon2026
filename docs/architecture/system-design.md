@@ -1239,6 +1239,7 @@ own, so their rows say so rather than grade it after the fact.
 | [ADR-040](decisions/ADR-040-a-product-picture-is-cut-from-the-stores-own-photos.md) | A product's shelf picture is a file cut from the store's own photos, kept in the store's copy and served as it is (F12-S1, D-33). Accepted 2026-10-05 | Easy: no figure depends on a picture |
 | [ADR-041](decisions/ADR-041-a-shelf-reader-reads-the-stores-photos.md) | A shelf reader reads widths, current facings and pictures from the store's own photos; its widths wait for an acceptance run (F12-S1, D-34, D-35). Accepted 2026-10-05 | Moderate: its readings share the layout file's format |
 | [ADR-042](decisions/ADR-042-the-stores-shelf-photos-travel-from-the-app-through-firestore.md) | The store's shelf photos travel from the app through Firestore, in parts with a manifest written last; the nightly collects, checks and reads them (F12-S1 v0.11, D-37). Accepted 2026-10-06 | High: one sending function and one collect step know the carrier |
+| [ADR-044](decisions/ADR-044-the-owner-enters-each-unit-and-heights-are-checked.md) | The owner enters each unit in the app, each shelf with its length and height; the nightly writes them into the layout file once a save; the reader measures product heights; the plan places a product only under a shelf it fits, with a 2 cm clearance (F12-S1 v0.12, D-38). Accepted 2026-10-08 | High for the form, moderate for the plan: a unit without heights plans as before |
 
 ---
 
@@ -1536,6 +1537,7 @@ Nothing is built until the owner approves the spec and its mockups.
 | FR-216, FR-217, NFR-078 | I product pictures in the store's copy at `public/store/shelf-pictures/`, listed with provenance, checked by size and first bytes; E `layout_facts` and `shelf_plan` publish addresses | ADR-040, ADR-036 | AC-206 |
 | FR-180 (v0.9), FR-218 … FR-223, NFR-079 | R the shelf reader, on demand and in the nightly when photos wait unread (ADR-042): the AI reads photos and tags (sealed), identity by exact code or unique name at the shelf price, image processing finds edges, four checks; readings in `configs/shelf_readings.yaml`; widths used only after the acceptance run | ADR-041, ADR-039's method | AC-207 … AC-210 |
 | FR-224 … FR-227, NFR-080 | I the upload on Store layout: a JPEG as taken, in parts of at most 900,000 bytes under `stores/<store>/shelfPhotos/`, the manifest last; R the nightly's collect step joins and checks them into `data/internal/shelf_photos/`, deletes only what it pushed; E `layout_facts.photos` (unit, collected, read) | ADR-042, ADR-029 | AC-212 … AC-214 |
+| FR-228 … FR-234, NFR-081 | I the owner's units on Store layout, saved whole to `stores/<store>/ownerState/layout`; R the nightly writes a newer save into `configs/store_layout.yaml` (`recorded_by: app`, `height_cm`, `entered_in_app`); E the reader's `heights` beside `widths`, graded by their own acceptance run; the plan's fit with `shelf.height_clearance_mm`; `layout_facts.without_height`, `units_saved_at` | ADR-044, ADR-037, ADR-041 | AC-215 … AC-220 |
 
 ### Cross-cutting decisions
 
