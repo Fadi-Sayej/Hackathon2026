@@ -154,7 +154,7 @@ distribution.
 > copy starts without one, and until its owner states it no product is recorded as a breach.
 > The breaches then say they wait for the owner's limit; the comparison and the cost floor
 > (FR-043a/b) are unaffected. YomYom's is +60%. How it is held and published is ADR-043
-> (Ready for review).
+> (Accepted 2026-10-08).
 
 **FR-045a** — Every product exceeding the policy MUST be recorded as a policy breach,
 whatever the surface it is later shown on.

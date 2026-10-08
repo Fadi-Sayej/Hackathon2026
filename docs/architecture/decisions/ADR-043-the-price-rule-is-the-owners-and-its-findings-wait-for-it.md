@@ -1,7 +1,7 @@
 ---
 ID: ADR-043
 Title: The price rule is the store owner's statement, and the findings it drives wait for it
-Status: Ready for review
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-10-08
 Parent: [System Design](../system-design.md) §19
@@ -12,8 +12,8 @@ Inputs: [D-39, D-28, D-23, ADR-009, ADR-014, ADR-033, ADR-036, configs/policy.ya
 
 # ADR-043 — The price rule is the owner's, and its findings wait for it
 
-**Status:** Ready for review. It waits for the repository owner's approval, and so does
-every task below that changes a screen.
+**Status:** Accepted (2026-10-08, by the repository owner: "approve", to "Approve the design and
+these words? Or tell me what to change.", asked of this decision and the three sentences in §4).
 
 ## Context
 

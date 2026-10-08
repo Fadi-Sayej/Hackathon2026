@@ -172,8 +172,8 @@ So a second store's F3 findings would use +60% until someone changes it. The set
 
 ## Added 2026-10-08: D-39, the price rule is the owner's (ADR-043)
 
-**Status:** Ready for review, with ADR-043. Nothing below starts until the repository owner
-approves ADR-043 and its wording (HANDOVER rule 1). Tasks 7.7 to 7.9 merge in one pull request,
+**Status:** Approved, with ADR-043 and its wording, by the repository owner on 2026-10-08
+("approve"). Tasks 7.7 to 7.9 merge in one pull request,
 because the engine's split and the screens that read it must arrive together.
 
 ### Task 7.7: The rule as a store fact (ADR-043 §1)
