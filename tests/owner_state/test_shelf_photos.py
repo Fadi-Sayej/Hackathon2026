@@ -200,7 +200,8 @@ def test_the_nightly_command_writes_a_ledger_and_delete_reads_it(tmp_path, monke
     db = FakeFirestore()
     db.send("p1", "מקרר 1", jpeg(b"a"))
     ledger = tmp_path / "ledger.json"
-    assert cli.main(["collect", "--ledger", str(ledger)], client=db, root=tmp_path / "photos", now=NOW) == 0
+    assert cli.main(["collect", "--ledger", str(ledger)], client=db, root=tmp_path / "photos", now=NOW,
+                    layout_path=tmp_path / "store_layout.yaml") == 0
     assert json.loads(ledger.read_text(encoding="utf-8"))["collected"] == ["p1"]
     assert (tmp_path / "photos" / "2026-10-10" / "מקרר 1" / "p1.jpg").exists()
     assert cli.main(["delete", "--ledger", str(ledger)], client=db) == 0
@@ -213,5 +214,6 @@ def test_without_a_service_account_or_a_ledger_the_night_goes_on(tmp_path, monke
     monkeypatch.delenv("FIREBASE_SERVICE_ACCOUNT_JSON", raising=False)
     monkeypatch.delenv("FIREBASE_SERVICE_ACCOUNT_PATH", raising=False)
     ledger = tmp_path / "ledger.json"
-    assert cli.main(["collect", "--ledger", str(ledger)], root=tmp_path) == 0 and not ledger.exists()
+    assert cli.main(["collect", "--ledger", str(ledger)], root=tmp_path,
+                    layout_path=tmp_path / "store_layout.yaml") == 0 and not ledger.exists()
     assert cli.main(["delete", "--ledger", str(ledger)]) == 0

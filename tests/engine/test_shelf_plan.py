@@ -273,7 +273,7 @@ def test_one_shelf_plan_entry_per_fixture_with_no_value_and_no_product(tmp_path)
     # FR-206: no arrangement recorded, so the research value, saying why.
     assert out.extras["elasticity"] == {"value": 0.17, "source": "research", "why": "measurement_unavailable",
                                         "measurement_reason": "no_arrangement_recorded"}
-    assert out.thresholds == {"elasticity": 0.17, "facings_cap": 4}
+    assert out.thresholds == {"elasticity": 0.17, "facings_cap": 4, "height_clearance_mm": 20}
 
 
 def test_the_conditions_carry_every_date(tmp_path):
@@ -435,3 +435,82 @@ def test_a_pictures_address_reaches_the_plan_and_changes_nothing_else(tmp_path):
     for f in (facts_a, facts_b):
         f.pop("pictures"), f.pop("without_picture"), f["counts"].pop("without_picture")
     assert facts_b == facts_a
+
+
+# ── Heights (D-38; F12-S1 v0.12 FR-233, AC-219) ──────────────────────────────
+
+def _tall(tmp_path, catalogue, daily, *, shelves, heights, widths, eye=1, rules=""):
+    """A unit whose shelves carry heights: (length cm, height cm or None) from the top."""
+    measured = "measured_by: owner, measured_on: 2026-10-01"
+    shelf_lines = "".join(f"      - {{length_cm: {n}, height_cm: {'null' if h is None else h}, {measured}}}\n"
+                          for n, h in shelves)
+    body = (f"fixtures:\n  F1:\n    departments: [drinks]\n    chilled: false\n    eye_level_shelf: {eye}\n"
+            f"    stated_by: owner\n    stated_on: 2026-10-01\n    recorded_by: app\n    shelves:\n{shelf_lines}")
+    body += "widths:\n" + "".join(f'  "{b}": {{width_mm: {w}, measured_by: team, measured_on: 2026-10-01}}\n'
+                                  for b, w in widths.items())
+    if rules:
+        body += "rules:\n" + textwrap.dedent(rules)
+    path = tmp_path / "store_layout.yaml"
+    path.write_text(body, encoding="utf-8")
+    layout = load_store_layout(path, catalogue)
+    assert not layout["rejected"], layout["rejected"]
+    layout["heights"] = {b: {"height_mm": h, "measured_by": "reader", "measured_on": "2026-10-01"}
+                         for b, h in heights.items()}
+    return _plan(shelf_plan.run(make_inputs(products=catalogue, sales_daily=daily, run_at=RUN_AT, store_layout=layout)))
+
+
+def test_a_product_goes_only_under_a_shelf_it_fits_with_the_clearance(tmp_path):
+    # Eye level (shelf 1) is 30 cm high; a 29 cm bottle needs 31 cm with the 2 cm clearance, so it
+    # passes over eye level to the 40 cm shelf, though it earns the most.
+    cat = [P("1", shelf=10, cost=2), P("2", shelf=10, cost=6)]
+    plan = _tall(tmp_path, cat, _daily({"1": 2, "2": 2}), shelves=[(100, 30), (100, 40)],
+                 heights={"1": 290, "2": 150}, widths={"1": 100, "2": 100})
+    f = _facings(plan)
+    assert f["1"][0] == 2 and f["2"][0] == 1
+    assert plan["shelves"][0]["height_cm"] == 30 and plan["shelves"][1]["products"][0]["height_mm"] == 290
+    clearance = 20
+    for shelf in plan["shelves"]:
+        assert all(p["height_mm"] + clearance <= shelf["height_cm"] * 10 for p in shelf["products"])
+
+
+def test_a_shelf_open_above_takes_any_height(tmp_path):
+    cat = [P("1")]
+    plan = _tall(tmp_path, cat, _daily({"1": 2}), shelves=[(100, None), (100, 20)],
+                 heights={"1": 600}, widths={"1": 100})
+    assert _facings(plan)["1"][0] == 1 and plan["shelves"][0]["height_cm"] is None
+
+
+def test_a_product_taller_than_every_shelf_is_listed_with_its_height(tmp_path):
+    cat = [P("1"), P("2")]
+    plan = _tall(tmp_path, cat, _daily({"1": 2, "2": 2}), shelves=[(100, 30), (100, 35)],
+                 heights={"1": 340, "2": 100}, widths={"1": 100, "2": 100})
+    assert plan["unplaced"]["too_tall"] == [{"barcode": "1", "height_mm": 340}]
+    assert "1" not in _facings(plan) and plan["extra_facings"] == "too_tall"
+
+
+def test_with_no_height_a_product_is_not_placed_and_no_extra_facing_is_given(tmp_path):
+    cat = [P("1"), P("2")]
+    plan = _tall(tmp_path, cat, _daily({"1": 2, "2": 2}), shelves=[(100, 30)],
+                 heights={"2": 100}, widths={"1": 100, "2": 100})
+    assert plan["unplaced"]["no_height"] == ["1"] and _facings(plan) == {"2": (1, 1)}
+    assert plan["extra_facings"] == "no_height"
+
+
+def test_a_together_set_stands_on_a_shelf_every_one_of_them_fits_under(tmp_path):
+    # Product 1 earns the most and would take eye level (shelf 1, 30 cm high), but its partner is
+    # 40 cm tall: together they go on the 45 cm shelf, the one shelf both fit under.
+    cat = [P("1", shelf=10, cost=2), P("2", shelf=10, cost=8)]
+    rules = """\
+      - {together: {barcodes: ["1", "2"]}, stated_by: owner, stated_on: 2026-10-01, recorded_by: team}
+    """
+    plan = _tall(tmp_path, cat, _daily({"1": 2, "2": 2}), shelves=[(100, 30), (100, 45)],
+                 heights={"1": 150, "2": 400}, widths={"1": 100, "2": 100}, rules=rules)
+    assert _facings(plan)["1"][0] == 2 and _facings(plan)["2"][0] == 2
+
+
+def test_a_unit_recorded_without_heights_is_planned_as_before(tmp_path):
+    cat = [P("1")]
+    out = _run(tmp_path, cat, _daily({"1": 2}), widths={"1": 100})
+    plan = _plan(out)
+    assert "height_cm" not in plan["shelves"][0] and "height_mm" not in plan["shelves"][0]["products"][0]
+    assert plan["unplaced"]["no_height"] == [] and plan["unplaced"]["too_tall"] == []

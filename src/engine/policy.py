@@ -73,6 +73,7 @@ class Policy:
     # F12-S1 FR-185 (OQ-1204, answered 2026-10-04 with the Phase 8 plan). Provisional.
     shelf_elasticity: float
     shelf_facings_cap: int
+    shelf_height_clearance_mm: int   # D-38, ADR-043: OQ-1213, provisional
     # F12-S1 FR-205, FR-209 (OQ-1207, answered 2026-10-04 with the Phase 8 plan). Provisional.
     shelf_interval_level: float
     shelf_min_arrangements: int
@@ -172,6 +173,7 @@ class Policy:
             "shelf_plan": {
                 "elasticity": self.shelf_elasticity,
                 "facings_cap": self.shelf_facings_cap,
+                "height_clearance_mm": self.shelf_height_clearance_mm,
             },
             "shelf_measurement": {
                 "window_days": self.order_window_days,
@@ -272,6 +274,7 @@ def load_policy(path: Path | str | None = None) -> Policy:
         assortment_gap_window_days=_required(raw, "assortment_gap", "window_days", int),
         shelf_elasticity=_required(raw, "shelf", "elasticity", float),
         shelf_facings_cap=_required(raw, "shelf", "facings_cap", int),
+        shelf_height_clearance_mm=_required(raw, "shelf", "height_clearance_mm", int),
         shelf_interval_level=_required(raw, "shelf", "interval_level", float),
         shelf_min_arrangements=_required(raw, "shelf", "min_arrangements", int),
         shelf_min_products=_required(raw, "shelf", "min_products", int),
@@ -339,6 +342,8 @@ def load_policy(path: Path | str | None = None) -> Policy:
         raise ValueError("shelf.elasticity must be above 0 and below 1 (F12-S1 FR-185, FR-206)")
     if policy.shelf_facings_cap < 1:
         raise ValueError("shelf.facings_cap must be at least 1 (F12-S1 FR-185)")
+    if policy.shelf_height_clearance_mm < 0:
+        raise ValueError("shelf.height_clearance_mm must be 0 or more (F12-S1 FR-233)")
     if not 0 < policy.shelf_interval_level < 1:
         raise ValueError("shelf.interval_level must be above 0 and below 1 (F12-S1 FR-205)")
     if policy.shelf_min_arrangements < 2 or policy.shelf_min_products < 2 or policy.shelf_bootstrap_draws < 100:

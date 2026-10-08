@@ -437,3 +437,79 @@ def test_a_photo_with_no_answer_is_not_marked_read(tmp_path):
     result = reading.read(day=DAY, photo_root=tmp_path / "photos", layout=layout, products=CATALOGUE,
                           sales_daily=SOLD, sales_monthly=[], policy=POLICY, asker=ask)
     assert result["photos"] == [] and result["units"] == []
+
+
+def test_heights_pass_their_own_acceptance_run(tmp_path):
+    # D-38, ADR-043 Decision 6: the hand readings give heights too, graded as widths are.
+    catalogue = [product(f"72{n:011d}", f"p{n}") for n in range(25)]
+    layout = load_store_layout(layout_file(tmp_path), catalogue)
+    readings = tmp_path / "shelf_readings.yaml"
+    readings.write_text(yaml.safe_dump({"reading": {"day": DAY}, "heights": {
+        p["barcode"]: {"height_mm": 200, "measured_by": "reader", "measured_on": DAY} for p in catalogue}}),
+        encoding="utf-8")
+
+    def merged(hand: dict):
+        path = tmp_path / "shelf_reader_acceptance.yaml"
+        path.write_text(yaml.safe_dump({"products": {b: {**h, "measured_by": "team", "measured_on": DAY}
+                                                     for b, h in hand.items()}}), encoding="utf-8")
+        return merge_readings(layout, catalogue, readings_path=readings, acceptance_path=path,
+                              tolerance_mm=5, minimum=20)
+
+    twenty = {p["barcode"]: {"height_mm": 203} for p in catalogue[:20]}
+    out = merged(twenty)
+    assert len(out["heights"]) == 25 and out["widths"] == {}             # heights pass; no width was read
+    assert out["reader"]["height_acceptance"] == {"listed": 20, "within": 20, "minimum": 20, "tolerance_mm": 5}
+    assert merged({**twenty, catalogue[0]["barcode"]: {"height_mm": 207}})["heights"] == {}
+    both = {b: {"height_mm": 203, "width_mm": 80} for b in twenty}
+    assert merged(both)["reader"]["acceptance"]["listed"] == 20           # one hand reading grades both
+    assert not [r for r in merged(both)["rejected"] if r["kind"] == "acceptance"]
+
+
+# ── Heights (D-38; F12-S1 v0.12 FR-231, AC-217) ───────────────────────────────
+
+TALL = {"length_cm": 120, "shelves": [
+    [{**r, "height_mm": h} for r, h in zip(UNIT["shelves"][0], (150, 110, 95, 140))],
+    [{**r, "height_mm": h} for r, h in zip(UNIT["shelves"][1], (120, 155, 90))]]}
+
+
+def _tall_layout(tmp_path, heights_cm):
+    shelves = "".join(f"      - {{length_cm: 120, height_cm: {h}, measured_by: owner, measured_on: 2026-10-01}}\n"
+                      for h in heights_cm)
+    path = tmp_path / "store_layout.yaml"
+    path.write_text(f"fixtures:\n  מדף שתייה:\n    departments: [משקאות]\n    chilled: false\n    eye_level_shelf: 1\n"
+                    f"    stated_by: owner\n    stated_on: 2026-10-01\n    recorded_by: app\n    shelves:\n" + shelves,
+                    encoding="utf-8")
+    return path
+
+
+@pytest.mark.parametrize("seed", [1, 2, 3, 4, 5])
+def test_the_drawn_products_heights_come_back_within_five_millimetres(tmp_path, seed):
+    unit = tagged(TALL)
+    truth = photograph(tmp_path, unit)
+    layout = load_store_layout(_tall_layout(tmp_path, [20, 20]), CATALOGUE)
+    ask, _ = asker(tmp_path, {"מדף שתייה": draw.answer(truth, jitter=0.04, seed=seed, vjitter=0.05)})
+    result = reading.read(day=DAY, photo_root=tmp_path / "photos", layout=layout, products=CATALOGUE,
+                          sales_daily=SOLD, sales_monthly=[], policy=POLICY, asker=ask)
+    expected = {r["barcode"]: r["height_mm"] for shelf in TALL["shelves"] for r in shelf}
+    assert result["heights"], result["report"]
+    for barcode, height in result["heights"].items():
+        assert abs(height - expected[barcode]) <= 5, (barcode, height, expected[barcode])
+
+
+def test_a_product_read_taller_than_its_shelf_has_no_height(tmp_path):
+    unit = tagged(TALL)
+    truth = photograph(tmp_path, unit)
+    layout = load_store_layout(_tall_layout(tmp_path, [12, 20]), CATALOGUE)     # shelf 1 says 12 cm
+    ask, _ = asker(tmp_path, {"מדף שתייה": draw.answer(truth)})
+    result = reading.read(day=DAY, photo_root=tmp_path / "photos", layout=layout, products=CATALOGUE,
+                          sales_daily=SOLD, sales_monthly=[], policy=POLICY, asker=ask)
+    assert "7290001" not in result["heights"] and "7290004" not in result["heights"]     # 15 and 14 cm
+    assert {"barcode": "7290001", "why": "no_height:taller_than_its_shelf"} in result["report"]
+    assert result["heights"]["7290002"] == pytest.approx(110, abs=5)                 # 11 cm fits under 12
+
+
+def test_heights_are_written_beside_widths_and_two_photos_must_agree(tmp_path):
+    _write(tmp_path, {"heights": {"7290001": 150}}, "2026-10-10")
+    contradicted = _write(tmp_path, {"heights": {"7290001": 170}}, "2026-10-12")
+    assert "7290001" not in _file(tmp_path)["heights"]
+    assert contradicted == [{"barcode": "7290001", "why": "no_height:read_differently_on_2026-10-10"}]

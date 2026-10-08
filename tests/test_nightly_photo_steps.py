@@ -13,7 +13,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = ROOT / ".github" / "workflows" / "collect-daily.yml"
-COMMIT = "Commit the shelf photos and what the reader read"
+COMMIT = "Commit the shelf photos, the owner's units and what the reader read"
 DELETE = "Remove the collected photos from Firestore"
 
 
@@ -43,6 +43,7 @@ def _repo(tmp_path: Path, *, with_photos: bool) -> Path:
         files = {
             "data/internal/shelf_photos/2026-10-10/מקרר 1/p1.jpg": b"\xff\xd8\xff",
             "configs/shelf_readings.yaml": b"reading: {day: '2026-10-10'}\n",
+            "configs/store_layout.yaml": b"fixtures: {}\n",
             "public/store/shelf-pictures/7290001.jpg": b"\xff\xd8\xff",
             "data/external/snapshots/2026-10-10/shelf_readings/answers.json": b"{}",
         }
@@ -75,6 +76,7 @@ def test_a_night_with_photos_stages_them_with_what_was_read(tmp_path):
     assert _staged(repo) == {
         "data/internal/shelf_photos/2026-10-10/מקרר 1/p1.jpg",
         "configs/shelf_readings.yaml",
+        "configs/store_layout.yaml",
         "public/store/shelf-pictures/7290001.jpg",
         "data/external/snapshots/2026-10-10/shelf_readings/answers.json",
     }
@@ -82,7 +84,7 @@ def test_a_night_with_photos_stages_them_with_what_was_read(tmp_path):
 
 def test_the_photos_are_deleted_only_after_their_push_succeeded():
     names = [s.get("name") for s in _steps()]
-    collect, read = names.index("Collect the shelf photos sent from the app"), names.index("Read the shelf photos not read yet")
+    collect, read = names.index("Collect what the owner sent from the app"), names.index("Read the shelf photos not read yet")
     commit, delete, engine = names.index(COMMIT), names.index(DELETE), names.index("Run the engine and publish the artefact")
     assert collect < read < commit < delete < engine
     assert _step(DELETE)["if"] == "steps.photos_commit.outcome == 'success'"

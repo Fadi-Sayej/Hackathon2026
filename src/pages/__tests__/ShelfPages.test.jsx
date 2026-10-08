@@ -324,3 +324,63 @@ describe('Sending the shelf photos (F12-S1 FR-224, FR-227; D-37, ADR-042)', () =
     expect(document.querySelector('.photos__choose').dataset.disabled).toBe('true')
   })
 })
+
+describe('The owner\'s own units (F12-S1 FR-228; D-38, ADR-043)', () => {
+  const catalogue = { products: [{ barcode: '1', department: 'drinks', product_name: 'מים' }, { barcode: '2', department: 'snacks', product_name: 'במבה' }] }
+  const form = () => document.querySelector('.units')
+
+  it('is not shown where nothing could be saved', () => {
+    renderWithI18n(<StoreLayoutPage artefact={waiting('no_store_layout')} catalogue={catalogue} />, { language: 'en' })
+    expect(form()).toBeNull()
+  })
+
+  it('adds a unit and saves the whole list, once it has a name, a department and its sizes', async () => {
+    const onSave = vi.fn(async () => {})
+    renderWithI18n(<StoreLayoutPage artefact={waiting('no_store_layout')} catalogue={catalogue} units={{ onSave }} />, { language: 'en' })
+    expect(screen.getByText('No unit is described yet.')).toBeTruthy()
+    fireEvent.click(document.querySelector('[data-action="add-unit"]'))
+    const save = () => document.querySelector('[data-action="save-unit"]')
+    expect(save().disabled).toBe(true)
+    fireEvent.change(document.querySelector('.units__editor input[type=text]'), { target: { value: 'Fridge 1' } })
+    fireEvent.change(document.querySelector('.units__editor select'), { target: { value: 'drinks' } })
+    const [length] = document.querySelectorAll('.units__shelf[data-shelf="1"] input')
+    fireEvent.change(length, { target: { value: '100' } })
+    expect(save().disabled).toBe(false)
+    fireEvent.click(save())
+    await screen.findByText('Saved. The plan uses it from tonight.')
+    expect(onSave).toHaveBeenCalledWith([{ name: 'Fridge 1', departments: ['drinks'], chilled: false, eye_level_shelf: null,
+      shelves: [{ length_cm: 100, height_cm: null }] }])
+    expect(form().textContent).toContain('100 cm, open above')
+  })
+
+  it('starts from the published units, and from a newer save the file has not taken', async () => {
+    const art = filled()
+    const loadSaved = async () => ({ schema: 1, saved_at: '2099-01-01T00:00:00.000Z',
+      units: [{ name: 'Saved unit', departments: ['drinks'], chilled: false, eye_level_shelf: null, shelves: [{ length_cm: 50, height_cm: 30 }] }] })
+    renderWithI18n(<StoreLayoutPage artefact={art} catalogue={catalogue} units={{ onSave: vi.fn() }} />, { language: 'en' })
+    expect([...document.querySelectorAll('.units__item')].map((li) => li.dataset.unit)).toEqual(art.capabilities.layout_facts.fixture_order)
+    cleanup()
+    renderWithI18n(<StoreLayoutPage artefact={art} catalogue={catalogue} units={{ onSave: vi.fn(), loadSaved }} />, { language: 'en' })
+    await waitFor(() => expect([...document.querySelectorAll('.units__item')].map((li) => li.dataset.unit)).toEqual(['Saved unit']))
+  })
+
+  it('says when it did not save, and keeps the unit open', async () => {
+    const onSave = vi.fn().mockRejectedValue(new Error('network'))
+    renderWithI18n(<StoreLayoutPage artefact={filled()} catalogue={catalogue} units={{ onSave }} />, { language: 'en' })
+    fireEvent.click(document.querySelector('.units__item button'))
+    // A unit recorded before D-38 has no heights: Save waits for each shelf's below the top.
+    expect(document.querySelector('[data-action="save-unit"]').disabled).toBe(true)
+    for (const row of [...document.querySelectorAll('.units__shelf')].slice(1)) {
+      fireEvent.change(row.querySelectorAll('input')[1], { target: { value: '35' } })
+    }
+    fireEvent.click(document.querySelector('[data-action="save-unit"]'))
+    await screen.findByText('It did not save. Check the connection and try again.')
+    expect(document.querySelector('.units__editor')).not.toBeNull()
+  })
+
+  it('a team account sees it disabled', () => {
+    renderWithI18n(<StoreLayoutPage artefact={filled()} catalogue={catalogue} units={{ onSave: vi.fn(), readOnly: true }} />, { language: 'en' })
+    expect(document.querySelector('[data-action="add-unit"]').disabled).toBe(true)
+    expect([...document.querySelectorAll('.units__item button')].every((b) => b.disabled)).toBe(true)
+  })
+})

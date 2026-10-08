@@ -55,6 +55,9 @@ image processing already finds the shelf's edge. So a product's height needs no 
    - the app's list replaces the file's `fixtures` section. Everything else is kept: the rules,
      and what the reader read;
    - a unit the owner changed carries the day of the change. An unchanged unit keeps its dates;
+   - the file records which save it took (`entered_in_app`), so a save is written once, and a
+     later correction by the team is not undone the next night. The form opens on a save the file
+     has not taken yet, so a second save never undoes the first;
    - the file is committed, so ADR-037's "changed only by commit" and its history hold;
    - a unit entered in the app says `recorded_by: app`, and each shelf says `measured_by: owner`.
      Store layout then says "As you entered it on …", not "recorded by the team".
@@ -63,9 +66,11 @@ image processing already finds the shelf's edge. So a product's height needs no 
    rejects is named on Store layout, as today.
 4. **Shelf heights in the file.** Each shelf may carry `height_cm`. The top shelf may carry
    `null`: open above. Store layout shows each shelf's height.
-5. **The reader measures heights** (amends ADR-041 Decisions 5 and 6). Within the AI's box, image
-   processing finds each facing's top edge on the full-resolution photo. The product stands on the
-   shelf's edge, which the reader already finds. Then:
+5. **The reader measures heights** (amends ADR-041 Decisions 5 and 6). Image processing finds
+   the shelf's line once, across the whole shelf: the top of its front edge, which a single
+   product's bottom can barely differ from. Each facing's top is the topmost sharp edge near the
+   AI's box, never above the tallest product's top, where the shelf above hangs its edge and
+   tags. Then:
    `height_mm = (shelf edge − top edge) in pixels × the width's own millimetres per pixel`,
    the shelf's length over its span. A height is recorded only when:
    - the facings' heights agree within ±5 mm;
@@ -88,8 +93,8 @@ image processing already finds the shelf's edge. So a product's height needs no 
      does not fit under is passed over for the next one in the order that it fits and has room;
    - a product taller than every shelf of its unit is not placed, and is listed as "taller than
      every shelf", as one wider than every shelf is today;
-   - a "together" rule needs one shelf that all its products fit under, or it stops the plan and
-     is named (FR-188);
+   - a "together" set goes on a shelf every one of its products fits under. The tallest shelf fits
+     any product that fits anywhere, so there always is one;
    - a unit recorded without heights, by the team before D-38, is planned as today, with no
      height check.
 8. **The drawing to scale** (F12-S1 FR-234). Shelf plan draws a unit to scale when every shelf has

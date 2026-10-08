@@ -10,9 +10,9 @@ holds four kinds of fact, and each carries who stated or measured it, and when:
         eye_level_shelf: <n>        # optional; shelves count from 1, the top
         stated_by: owner
         stated_on: 2026-10-10
-        recorded_by: team
-        shelves:                    # top to bottom
-          - {length_cm: 100, measured_by: team, measured_on: 2026-10-10}
+        recorded_by: team           # or app: the owner entered it on Store layout (D-38, ADR-043)
+        shelves:                    # top to bottom; height_cm on every shelf or none, the top one may be null
+          - {length_cm: 100, height_cm: 35, measured_by: team, measured_on: 2026-10-10}
     widths:                         # one product's width at the front of a shelf
       "<barcode>": {width_mm: 75, measured_by: team, measured_on: 2026-10-10}
     current:                        # what stands on the shelf today: the measurement's "before"
@@ -62,15 +62,18 @@ PICTURE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*\.(jpg|jpeg|png|webp)")
 PICTURE_START = {"jpg": (b"\xff\xd8\xff",), "jpeg": (b"\xff\xd8\xff",), "png": (b"\x89PNG\r\n\x1a\n",),
                  "webp": (b"RIFF",)}
 
-STATED = {"stated_by": "owner", "recorded_by": "team"}
+STATED = {"stated_by": "owner"}
+RECORDERS = ("team", "app")         # app: the owner's own form on Store layout (D-38, ADR-043)
 MEASURERS = ("team", "owner")
 RULE_KINDS = ("together", "keep_on", "keep_off", "at_least", "at_most")
 FIXTURE_KEYS = {"departments", "chilled", "eye_level_shelf", "shelves", "stated_by", "stated_on", "recorded_by"}
-SHELF_KEYS = {"length_cm", "measured_by", "measured_on"}
+SHELF_KEYS = {"length_cm", "height_cm", "measured_by", "measured_on"}
 WIDTH_KEYS = {"width_mm", "measured_by", "measured_on"}
+HEIGHT_KEYS = {"height_mm", "measured_by", "measured_on"}
+HAND_KEYS = {"width_mm", "height_mm", "measured_by", "measured_on"}
 CURRENT_KEYS = {"fixture", "shelf", "facings", "measured_by", "measured_on"}
 PICTURE_KEYS = {"file", "cropped_by", "cropped_on"}
-TOP_KEYS = {"fixtures", "widths", "current", "pictures", "rules"}
+TOP_KEYS = {"fixtures", "widths", "current", "pictures", "rules", "entered_in_app"}   # D-38: the save it took
 
 
 class _Rejected(Exception):
@@ -141,9 +144,11 @@ def _stated(entry: dict) -> dict:
     for key, expected in STATED.items():
         if entry.get(key) != expected:
             raise _Rejected(f"{key} must be {expected!r}, not {entry.get(key)!r}")
+    if entry.get("recorded_by") not in RECORDERS:
+        raise _Rejected(f"recorded_by must be one of {list(RECORDERS)}, not {entry.get('recorded_by')!r}")
     if "stated_on" not in entry:
         raise _Rejected("stated_on is missing: every statement carries the day he made it")
-    return {"stated_by": "owner", "stated_on": _day(entry["stated_on"], "stated_on"), "recorded_by": "team"}
+    return {"stated_by": "owner", "stated_on": _day(entry["stated_on"], "stated_on"), "recorded_by": entry["recorded_by"]}
 
 
 def _measured(entry: dict, measurers: tuple = None) -> dict:
@@ -191,10 +196,18 @@ def _fixture(entry, departments: set) -> dict:
         try:
             _keys(shelf, SHELF_KEYS, "a shelf")
             _twice(shelf)
-            out_shelves.append({"shelf": number, "length_cm": _positive(shelf.get("length_cm"), "length_cm"),
-                                **_measured(shelf)})
+            out = {"shelf": number, "length_cm": _positive(shelf.get("length_cm"), "length_cm")}
+            if "height_cm" in shelf:
+                # D-38: from the shelf up to the one above it. Only the top shelf may be open above.
+                height = shelf["height_cm"]
+                out["height_cm"] = (None if height is None and number == 1
+                                    else _positive(height, "height_cm" if number == 1 else
+                                                   "height_cm (only the top shelf may be open above)"))
+            out_shelves.append({**out, **_measured(shelf)})
         except _Rejected as err:
             raise _Rejected(f"shelf {number}: {err}")
+    if len({"height_cm" in s for s in out_shelves}) > 1:
+        raise _Rejected("height_cm must be given for every shelf or for none")
     eye = entry.get("eye_level_shelf")
     if eye is not None and (not _whole(eye) or not 1 <= eye <= len(out_shelves)):
         # One shelf, by its number: a list or a second shelf is the edge case F12-S1 §12 rejects.
@@ -289,21 +302,49 @@ def _twice_named(listed, code, kind: str, rejected: list) -> bool:
     return False
 
 
-def _widths(listed, products: dict, rejected: list, measurers: tuple) -> dict:
-    widths = {}
+def _sizes(listed, products: dict, rejected: list, measurers: tuple, field: str, kind: str, keys: set) -> dict:
+    sizes = {}
     for code, entry in sorted(listed.items(), key=lambda kv: str(kv[0])):
-        if _twice_named(listed, code, "width", rejected):
+        if _twice_named(listed, code, kind, rejected):
             continue
         try:
             barcode = _barcode(code, products)
-            if barcode in widths:
-                raise _Rejected("the barcode has two widths")
-            _keys(entry, WIDTH_KEYS, "a width")
+            if barcode in sizes:
+                raise _Rejected(f"the barcode has two {kind}s")
+            _keys(entry, keys, f"a {kind}")
             _twice(entry)
-            widths[barcode] = {"width_mm": _positive(entry.get("width_mm"), "width_mm"), **_measured(entry, measurers)}
+            sizes[barcode] = {field: _positive(entry.get(field), field), **_measured(entry, measurers)}
         except _Rejected as err:
-            rejected.append({"kind": "width", "key": str(code), "reason": str(err)})
-    return widths
+            rejected.append({"kind": kind, "key": str(code), "reason": str(err)})
+    return sizes
+
+
+def _widths(listed, products: dict, rejected: list, measurers: tuple) -> dict:
+    return _sizes(listed, products, rejected, measurers, "width_mm", "width", WIDTH_KEYS)
+
+
+def _heights(listed, products: dict, rejected: list, measurers: tuple) -> dict:
+    """D-38: a product's height, read by the shelf reader only (D-34), as its width is."""
+    return _sizes(listed, products, rejected, measurers, "height_mm", "height", HEIGHT_KEYS)
+
+
+def _hand(listed, products: dict, rejected: list) -> dict:
+    """The acceptance run's hand readings: a width, a height, or both, per product (ADR-043 Decision 6)."""
+    hand = {}
+    for code, entry in sorted(listed.items(), key=lambda kv: str(kv[0])):
+        if _twice_named(listed, code, "acceptance", rejected):
+            continue
+        try:
+            barcode = _barcode(code, products)
+            _keys(entry, HAND_KEYS, "a hand reading")
+            _twice(entry)
+            if "width_mm" not in entry and "height_mm" not in entry:
+                raise _Rejected("a hand reading gives width_mm, height_mm, or both")
+            hand[barcode] = {**{f: _positive(entry[f], f) for f in ("width_mm", "height_mm") if f in entry},
+                             **_measured(entry, HAND)}
+        except _Rejected as err:
+            rejected.append({"kind": "acceptance", "key": str(code), "reason": str(err)})
+    return hand
 
 
 def _currents(listed, products: dict, fixtures: dict, rejected: list, measurers: tuple) -> dict:
@@ -428,15 +469,17 @@ def load_store_layout(path: Path | str, catalogue: Iterable[dict], pictures_dir:
     pictures = _pictures(_mapping(raw, "pictures", rejected), products, rejected,
                          Path(pictures_dir) if pictures_dir is not None else PICTURES_DIR)
 
+    taken = raw.get("entered_in_app")
+    entered = str(taken["saved_at"]) if isinstance(taken, dict) and taken.get("saved_at") else None
     return {"fixtures": fixtures, "widths": widths, "current": current, "pictures": pictures, "rules": rules,
-            "assigned": assigned, "rejected": rejected}
+            "assigned": assigned, "rejected": rejected, "entered_in_app": entered}
 
 
 # ── The shelf reader's readings (F12-S1 FR-222, FR-223; D-34; ADR-041 Decisions 8, 9) ───────────
 
 READINGS_PATH = ROOT / "configs" / "shelf_readings.yaml"
 ACCEPTANCE_PATH = ROOT / "configs" / "shelf_reader_acceptance.yaml"
-READING_KEYS = {"reading", "widths", "current", "pictures", "photos"}   # photos: which the AI answered for (ADR-042)
+READING_KEYS = {"reading", "widths", "heights", "current", "pictures", "photos"}   # photos: which the AI answered for (ADR-042)
 READER = ("reader",)
 HAND = ("team", "owner")
 
@@ -461,14 +504,16 @@ def merge_readings(layout: Optional[dict], catalogue: Iterable[dict], *, reading
     Pictures and current facings are used from the first reading. Widths are used only once the
     acceptance run passes: at least `minimum` products measured by hand on the same photos, every
     one within `tolerance_mm` of the reader's width. Until then they are kept apart, unused, and
-    those products plan as "no width". The hand readings grade the reader and never enter a plan.
+    those products plan as "no width". Heights pass their own run the same way (D-38, ADR-043
+    Decision 6). The hand readings grade the reader and never enter a plan.
     """
     if layout is None:
         return None
     products = {p["barcode"]: p for p in catalogue or () if p.get("barcode")}
     rejected = list(layout.get("rejected") or [])
-    status = {"status": "no_readings", "read_on": None, "widths": 0,
-              "acceptance": {"listed": 0, "within": 0, "minimum": minimum, "tolerance_mm": tolerance_mm}}
+    nothing = {"listed": 0, "within": 0, "minimum": minimum, "tolerance_mm": tolerance_mm}
+    status = {"status": "no_readings", "read_on": None, "widths": 0, "acceptance": dict(nothing),
+              "heights": 0, "height_acceptance": dict(nothing)}
     if not Path(readings_path).exists():
         return {**layout, "reader": status}
     raw = _read_yaml(readings_path, "readings", rejected)
@@ -485,19 +530,27 @@ def merge_readings(layout: Optional[dict], catalogue: Iterable[dict], *, reading
     pictures = _pictures(_mapping(raw, "pictures", rejected), products, rejected,
                          Path(pictures_dir) if pictures_dir is not None else PICTURES_DIR)
 
-    listed, within = 0, 0
+    heights = _heights(_mapping(raw, "heights", rejected), products, rejected, READER)
+
+    hand = {}
     if Path(acceptance_path).exists():
         accepted_raw = _read_yaml(acceptance_path, "acceptance", rejected) or {}
-        hand = _widths(_mapping(accepted_raw, "products", rejected), products, rejected, HAND)
-        listed = len(hand)
-        within = sum(1 for b, h in hand.items()
-                     if b in widths and abs(widths[b]["width_mm"] - h["width_mm"]) <= tolerance_mm)
-    passed = listed >= minimum and within == listed
+        hand = _hand(_mapping(accepted_raw, "products", rejected), products, rejected)
+
+    def graded(read: dict, field: str) -> tuple:
+        listed = [b for b, h in hand.items() if field in h]
+        within = sum(1 for b in listed if b in read and abs(read[b][field] - hand[b][field]) <= tolerance_mm)
+        return (len(listed) >= minimum and within == len(listed),
+                {"listed": len(listed), "within": within, "minimum": minimum, "tolerance_mm": tolerance_mm})
+
+    passed, acceptance = graded(widths, "width_mm")
+    heights_passed, height_acceptance = graded(heights, "height_mm")
     status = {"status": "accepted" if passed else "waiting_for_acceptance",
               "read_on": str(reading.get("day")) if reading.get("day") else None, "widths": len(widths),
-              "acceptance": {"listed": listed, "within": within, "minimum": minimum, "tolerance_mm": tolerance_mm}}
+              "acceptance": acceptance, "heights": len(heights), "height_acceptance": height_acceptance}
     return {**layout,
             "widths": {**layout.get("widths", {}), **widths} if passed else dict(layout.get("widths") or {}),
+            "heights": dict(heights) if heights_passed else {},
             "current": {**layout.get("current", {}), **current},
             "pictures": {**layout.get("pictures", {}), **pictures},
             "rejected": rejected, "reader": status}

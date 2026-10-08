@@ -3,6 +3,9 @@
  * (F12-S1 FR-228). Whole centimetres; the top shelf may have no height when nothing is above it.
  */
 
+/** MUST equal SCHEMA in src/owner_state/shelf_units.py, which leaves any other save unwritten. */
+export const UNITS_SCHEMA = 1
+
 export const blankShelf = () => ({ length_cm: '', height_cm: '' })
 export const blankUnit = () => ({ name: '', departments: [], chilled: false, eye_level_shelf: null, shelves: [blankShelf()] })
 const whole = (v) => /^\d{1,4}$/.test(String(v ?? '').trim()) && Number(v) >= 1
@@ -31,4 +34,19 @@ export function cleaned(unit) {
       height_cm: String(s.height_cm ?? '').trim() === '' ? null : Number(s.height_cm),
     })),
   }
+}
+
+/** The units to start the form from: the owner's last save when the layout file has not taken it
+ *  yet (the nightly writes it), else the units the artefact publishes. */
+export function startingUnits(published, saved, takenAt) {
+  if (saved?.schema === UNITS_SCHEMA && Array.isArray(saved.units) && (!takenAt || saved.saved_at > takenAt)) {
+    return saved.units.map((u) => ({ ...u, shelves: u.shelves.map((s) => ({ ...s, height_cm: s.height_cm ?? '' })) }))
+  }
+  return published
+}
+
+export function within(ms, promise) {
+  let timer
+  const late = new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('timeout')), ms) })
+  return Promise.race([promise, late]).finally(() => clearTimeout(timer))
 }

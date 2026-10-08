@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { useI18n } from '../lib/i18n/index.js'
 import { dirProps } from '../lib/utils/rtl.js'
-import { blankShelf, blankUnit, cleaned, unitProblem } from '../owner/shelfUnits.js'
+import { blankShelf, blankUnit, cleaned, startingUnits, unitProblem } from '../owner/shelfUnits.js'
 
 /**
  * D-38: the owner describes each shelving unit once, so no one edits the layout file (F12-S1
@@ -11,7 +11,9 @@ import { blankShelf, blankUnit, cleaned, unitProblem } from '../owner/shelfUnits
  * empty when nothing is above it.
  *
  * Saving is the caller's (`onSave`, ADR-043): this screen only edits and reports. It saves the
- * whole list, so what it shows is what is kept. A team account sees it disabled (ADR-029).
+ * whole list, so what it shows is what is kept. It opens on the owner's last save while the layout
+ * file has not taken it yet (`loadSaved`, `takenAt`), so a second save never undoes the first. A team
+ * account sees it disabled (ADR-029).
  */
 
 function Size({ shelf }) {
@@ -119,13 +121,23 @@ function Editor({ start, others, departments, onDone, onCancel, onRemove, readOn
   )
 }
 
-export function ShelfUnits({ units: given = [], departments = [], onSave, readOnly = false }) {
+export function ShelfUnits({ units: given = [], departments = [], onSave, loadSaved, takenAt = null, readOnly = false }) {
   const { t } = useI18n()
   const [units, setUnits] = useState(given)
   const [editing, setEditing] = useState(null)       // an index, 'new', or null
   const [state, setState] = useState('idle')
+  const touched = useRef(false)
+
+  useEffect(() => {
+    let live = true
+    loadSaved?.().then((saved) => {
+      if (live && !touched.current) setUnits((now) => startingUnits(now, saved, takenAt))
+    }, () => {})
+    return () => { live = false }
+  }, [loadSaved, takenAt])
 
   const save = async (next) => {
+    touched.current = true
     setState('saving')
     try {
       await onSave?.(next)
@@ -152,7 +164,7 @@ export function ShelfUnits({ units: given = [], departments = [], onSave, readOn
                 <p className="units__sizes">{u.shelves.map((s, k) => <span key={k}><Size shelf={s} /></span>)}</p>
               </div>
               <button type="button" className="btn btn-ghost" disabled={readOnly || editing !== null}
-                onClick={() => { setEditing(i); setState('idle') }}>{t('units.edit')}</button>
+                onClick={() => { touched.current = true; setEditing(i); setState('idle') }}>{t('units.edit')}</button>
             </li>
           )))}
         </ul>
@@ -166,7 +178,7 @@ export function ShelfUnits({ units: given = [], departments = [], onSave, readOn
           onDone={(unit) => save(editing === 'new' ? [...units, unit] : units.map((u, i) => (i === editing ? unit : u)))} />
       ) : (
         <button type="button" className="btn btn-ghost" data-action="add-unit" disabled={readOnly}
-          onClick={() => { setEditing('new'); setState('idle') }}>{t('units.add')}</button>
+          onClick={() => { touched.current = true; setEditing('new'); setState('idle') }}>{t('units.add')}</button>
       )}
       {state === 'saving' ? <p className="plan__muted" role="status">{t('units.saving')}</p> : null}
       {state === 'saved' ? <p className="plan__arranged" role="status">{t('units.saved')}</p> : null}

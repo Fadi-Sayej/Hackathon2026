@@ -7,6 +7,8 @@ from __future__ import annotations
 
 import textwrap
 
+import pytest
+
 from src.engine.store_layout import load_store_layout
 
 CATALOGUE = [
@@ -369,3 +371,41 @@ def test_a_photo_collected_or_read_is_a_different_input(tmp_path):
         "photos:\n  2026-10-10/F1/p1.jpg: {read_on: '2026-10-11'}\n", encoding="utf-8")
     read = _inputs(tmp_path, path, silver).inputs_digest
     assert len({none, collected, read}) == 3
+
+
+# ── Units entered in the app, and shelf heights (D-38; F12-S1 v0.12 FR-229, FR-230) ──
+
+def _tall_fixture(heights, recorded_by="app") -> str:
+    shelves = "\n".join(f"      - {{length_cm: 100, height_cm: {h}, measured_by: owner, measured_on: 2026-10-10}}"
+                        if h != "absent" else "      - {length_cm: 100, measured_by: owner, measured_on: 2026-10-10}"
+                        for h in heights)
+    return (f"  F1:\n    departments: [drinks]\n    chilled: false\n    stated_by: owner\n    stated_on: 2026-10-10\n"
+            f"    recorded_by: {recorded_by}\n    shelves:\n{shelves}\n")
+
+
+def test_a_unit_entered_in_the_app_carries_its_shelves_heights(tmp_path):
+    out = _load(tmp_path, "fixtures:\n" + _tall_fixture(["null", 35, 40]))
+    assert not out["rejected"]
+    fixture = out["fixtures"]["F1"]
+    assert fixture["recorded_by"] == "app"
+    assert [s["height_cm"] for s in fixture["shelves"]] == [None, 35, 40]
+
+
+@pytest.mark.parametrize("heights, why", [
+    ([35, "null"], "only the top shelf may be open above"),
+    ([35, "absent"], "height_cm must be given for every shelf or for none"),
+    ([0, 30], "height_cm must be a whole number, at least 1"),
+])
+def test_a_shelf_height_is_every_shelf_or_none_and_only_the_top_is_open(tmp_path, heights, why):
+    out = _load(tmp_path, "fixtures:\n" + _tall_fixture(heights))
+    assert "F1" not in out["fixtures"] and why in _reasons(out, "fixture")["F1"]
+
+
+def test_a_unit_is_recorded_by_the_team_or_the_app_and_no_one_else(tmp_path):
+    out = _load(tmp_path, "fixtures:\n" + _tall_fixture([30], recorded_by="someone"))
+    assert "recorded_by must be one of ['team', 'app']" in _reasons(out, "fixture")["F1"]
+
+
+def test_a_unit_recorded_without_heights_has_none(tmp_path):
+    out = _load(tmp_path, "fixtures:\n" + _fixture("F1", "[drinks]"))
+    assert all("height_cm" not in s for s in out["fixtures"]["F1"]["shelves"])

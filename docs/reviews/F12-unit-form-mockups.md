@@ -166,8 +166,24 @@ Every phrase the screens add, as the dictionaries hold it on the branch. `{date}
 | `shelf.unplaced.too_tall` | Taller than every shelf: | גבוה מכל מדף: | أعلى من كل رف: |
 | `layout.heightMm` | {mm} mm high | גובה {mm} מ״מ | ارتفاع {mm} مم |
 | `layout.stated.app` | As you entered it on {date} | כפי שהזנת ב־{date} | كما أدخلتها في {date} |
+| `shelf.extras.no_height` | No extra facings on this unit: a product whose height is not measured stands on it, so the spare length is not known to be free. | אין חזיתות נוספות ביחידה הזו: עומד בה מוצר שהגובה שלו לא נמדד, ולכן לא ידוע אם האורך שנשאר באמת פנוי. | لا واجهات إضافية في هذه الوحدة: يقف فيها منتج لم يُقس ارتفاعه، فلا يُعرف إن كان الطول المتبقي فارغًا فعلًا. |
+| `shelf.extras.too_tall` | No extra facings on this unit: a product taller than its shelves stands on it, so the spare length is not known to be free. | אין חזיתות נוספות ביחידה הזו: עומד בה מוצר גבוה מהמדפים שלה, ולכן לא ידוע אם האורך שנשאר באמת פנוי. | لا واجهات إضافية في هذه الوحدة: يقف فيها منتج أعلى من رفوفها، فلا يُعرف إن كان الطول المتبقي فارغًا فعلًا. |
+| `shelf.stopped.no_height` | the product’s height is not measured | הגובה של המוצר לא נמדד | ارتفاع المنتج لم يُقس |
+| `shelf.stopped.too_tall` | the product is taller than every shelf | המוצר גבוה מכל מדף | المنتج أعلى من كل رف |
+| `shelf.stopped.heights_unknown` | a product whose height is not measured stands on this unit, so no spare length is known | עומד ביחידה מוצר שהגובה שלו לא נמדד, ולכן לא ידוע כמה אורך פנוי | يقف في الوحدة منتج لم يُقس ارتفاعه، فلا يُعرف كم من الطول فارغ |
+
+The last six are not drawn above. `layout.stated.app` replaces "recorded by the team" on a unit
+you entered yourself. The five after it explain, on Shelf plan, why a unit gets no extra facings,
+or why one of your rules cannot be met, when a height is the cause; they follow the width's
+sentences word for word.
 
 ## What is built after approval
+
+Built on the branch while this waits, and not merged: the engine, the reader and the nightly step
+(the list below), with their tests. On the drawn test shelves the reader's heights came back
+within 5 mm for 1,886 of 1,890 products, 4 unknown and none wrong, across three units, 30 seeds
+and three levels of AI roughness. Widths are unchanged: 1,512 within 5 mm, 18 unknown, none
+wrong.
 
 One pull request:
 - the form's saving, and the nightly step that writes the units into the layout file;

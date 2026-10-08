@@ -693,8 +693,10 @@ name. A team account sees it disabled (ADR-029). It is shown where the upload is
 **FR-229** — The nightly writes the owner's list into the layout file before the engine runs
 (ADR-043). The list replaces the file's `fixtures`, and every other section is kept. A unit the
 owner changed carries the day of the change, `stated_by: owner` and `recorded_by: app`, and each
-shelf `measured_by: owner`. An unchanged unit keeps its dates. The file is committed, so its
-history holds (ADR-037). The loader checks these units as it checks any other (FR-178), and Store
+shelf `measured_by: owner`. An unchanged unit keeps its dates. The file records which save it took,
+so a save is written once and a later correction by the team is not undone the next night; the
+form opens on a save the file has not taken yet. The file is committed, so its history holds
+(ADR-037). The loader checks these units as it checks any other (FR-178), and Store
 layout says "As you entered it on …" for them.
 
 **FR-230** — A shelf may carry its height, `height_cm`, or `null` for a top shelf open above.
@@ -725,8 +727,8 @@ within ±5 mm (FR-223). The hand readings never enter a plan.
   in the order that it fits and has room;
 - a product taller than every shelf of its unit, with the clearance, is not placed, and is listed
   as "taller than every shelf" with its height;
-- a "together" rule needs one shelf that all its products fit under, or it stops the plan and is
-  named (FR-188);
+- a "together" set goes on a shelf that every one of its products fits under. The tallest shelf
+  fits any product that fits anywhere, so there always is one, and room is decided as before;
 - an unknown height is an unknown size for FR-186: no extra facings on that unit.
 
 A unit recorded without heights is planned as before v0.12, with no height check.
@@ -1184,8 +1186,9 @@ number of hand readings are all within ±5 mm; until then, those products plan a
 measured". *(FR-232)*
 
 **AC-219** — *(v0.12, for review)* No product is ever placed on a shelf lower than its height
-plus the clearance. A product taller than every shelf is listed with its height, a "together"
-rule with no shelf tall enough stops the plan, and a unit without heights is planned as before.
+plus the clearance. A product taller than every shelf is listed with its height, a "together" set
+stands on a shelf every one of its products fits under, and a unit without heights is planned as
+before.
 *(FR-233)*
 
 **AC-220** — *(v0.12, for review)* A unit drawn to scale has rows in proportion to its shelves'

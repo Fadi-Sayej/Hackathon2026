@@ -141,6 +141,9 @@ shelf:
   # A judgement: at 0.17 a 5th facing adds under 4% to a product's sales. His "at least N"
   # rule overrides it.
   facings_cap: 4
+  # D-38 (ADR-043, F12-S1 FR-233): room between a product's top and the shelf above, to take it
+  # out. Provisional, put to the owner with OQ-1213.
+  height_clearance_mm: 20
   # F12-S1 FR-205, FR-209: measuring what an arrangement changed (OQ-1207, approved 2026-10-04
   # with the Phase 8 plan). The windows are F8's own, read from order.window_days and
   # order.min_report_days, never copied here.
@@ -156,8 +159,9 @@ shelf:
   explanation_time_budget_s: 300    # checked before each request; the step ends within ~300 + 61 s
   explanation_max_chars: 600        # a language
   explanation_max_tokens: 1200      # three languages; the boost's 300 would cut them off
-  # F12-S1 FR-218 … FR-223 (D-34, D-35; ADR-041): the shelf reader, run when photos arrive, never
-  # in the nightly. OQ-1211's values, approved 2026-10-05 as provisional. The model is the boost's.
+  # F12-S1 FR-218 … FR-223 (D-34, D-35; ADR-041): the shelf reader, run when photos arrive, in the
+  # nightly or on demand (ADR-042). OQ-1211's values, approved 2026-10-05 as provisional. The
+  # model is the boost's.
   reader_prompt: configs/prompts/shelf_reader.v2.md   # v2 (D-36): the package where there is no tag
   reader_candidate_window_days: 90  # products sold in this window are the only ones a tag can name
   reader_tolerance_mm: 5            # D-34: the owner's ±5 mm per product
