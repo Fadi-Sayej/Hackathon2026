@@ -83,3 +83,26 @@ describe('thresholds travel with the counts', () => {
     expect(document.body.textContent).not.toMatch(/densest_density_collapse|\bderived\b/)
   })
 })
+
+describe('D-39, ADR-043 — F3 without the owner\'s price rule', () => {
+  const cost = {
+    id: 'pc1', signal_family: 'competitor.purchase_cost', capability: 'competitor_position',
+    barcode: 'bc9', product_name: 'Cheese', department: 'd', action: 'check_purchase_cost',
+    characterisation: 'purchase_cost', evidence: {}, value: null, ordering_key: { name: 'premium_pct', value: 9 },
+  }
+  const f3 = (extra) => ({ schema_version: 2, thresholds: {}, capabilities: { competitor_position: {
+    status: 'available', unavailable_reason: null, counts: { evaluated: 4 }, thresholds: {}, entries: [cost], ...extra } } })
+
+  it('says, where the breaches would be, that it waits for the owner\'s limit, and keeps the purchase-cost check', () => {
+    renderWithI18n(<CapabilityPage artefact={f3({ waiting_for: 'no_price_rule' })} capabilityId="competitor_position" />,
+      { language: 'en' })
+    expect(screen.getByText('Your price limit has not been recorded yet: the most you will charge above nearby stores for the same product.'))
+      .toBeTruthy()
+    expect(document.querySelectorAll('[data-entry-id]')).toHaveLength(1)
+  })
+
+  it('says nothing of the kind when the rule is stated', () => {
+    renderWithI18n(<CapabilityPage artefact={f3({})} capabilityId="competitor_position" />, { language: 'en' })
+    expect(document.querySelector('.capability__waiting')).toBeNull()
+  })
+})

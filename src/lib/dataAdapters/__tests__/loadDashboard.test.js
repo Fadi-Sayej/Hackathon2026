@@ -68,4 +68,25 @@ describe('loadDashboard', () => {
     const r = await loadDashboard({ fetchImpl: ok(fixture) })
     expect(r.status).toBe('ok')
   })
+
+  it('folds F3\'s breaches back into competitor_position, so no screen knows of the split (ADR-043)', async () => {
+    const breach = { id: 'b1', capability: 'policy_breach', barcode: '1', attention: 'today',
+                     ordering_key: { name: 'premium_pct', value: 120 } }
+    const body = {
+      ...fixture,
+      capabilities: {
+        ...fixture.capabilities,
+        competitor_position: { ...fixture.capabilities.competitor_position, status: 'available', entries: [],
+                               counts: { evaluated: 1 }, thresholds: {} },
+        policy_breach: { id: 'policy_breach', status: 'available', entries: [breach],
+                         counts: { breaches: 1, attention: 1, review: 0 }, thresholds: { policy_pct: 60 } },
+      },
+    }
+    const r = await loadDashboard({ fetchImpl: ok(body) })
+    expect(r.status).toBe('ok')
+    expect('policy_breach' in r.artefact.capabilities).toBe(false)
+    const cp = r.artefact.capabilities.competitor_position
+    expect(cp.entries).toEqual([{ ...breach, capability: 'competitor_position' }])
+    expect(cp.counts).toEqual({ evaluated: 1, breaches: 1, attention: 1, review: 0 })
+  })
 })
