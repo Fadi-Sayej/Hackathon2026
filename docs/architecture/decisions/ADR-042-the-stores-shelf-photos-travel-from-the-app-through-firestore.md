@@ -6,7 +6,7 @@ Owner: smartshelf-architect
 Date: 2026-10-06
 Parent: [System Design](../system-design.md) §19
 Related Specs: F12-S1 (FR-218 v0.11, FR-224 … FR-227, AC-212 … AC-214, NFR-080, OQ-1212)
-Updated: 2026-10-08 (Task 8.13: photos that waited are read on a later night; each reading adds to the earlier ones)
+Updated: 2026-10-08 (Task 8.13: photos that waited are read on a later night, confirmed by the owner: "keep"; each reading adds to the earlier ones)
 Inputs: [D-13, D-23, D-34, D-37, ADR-029, ADR-032, ADR-036, ADR-039, ADR-041, firestore.rules, .github/workflows/collect-daily.yml, docs/reviews/F12-photo-upload-mockups.md]
 ---
 
@@ -83,7 +83,7 @@ is on cannot be read from here.
    new photo, it asks nothing. With no key, the photos wait in their folder, and
    `npm run read:shelves` still reads any folder on demand.
 
-   *Built in Task 8.13 (2026-10-08), and put to the owner:* a photo that waited, for the key, the
+   *Built in Task 8.13 (2026-10-08), and confirmed by the repository owner the same day ("keep", to 'Say "keep it", or "only tonight's"'):* a photo that waited, for the key, the
    layout file, or a request that failed, is read on a later night, once, within the same
    bounds (`read_shelves.py --unread`). As approved, a photo sent before its unit was recorded
    would wait for a command, and the owner cannot run one. Each reading adds to the earlier

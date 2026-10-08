@@ -8,7 +8,7 @@ Parent: [F12 — Planogram](../intent.md)
 Related Intents: INT-006
 Inputs: [docs/features/F12-planogram/intent.md (Approved for specification, D-30), docs/product/PRD.md (§5 V4, §6 #7), docs/product/intent-register.md (D-1, D-3, D-13, D-14, D-15, D-16, D-22, D-23, D-28, D-29, D-30, D-31, D-32, D-33, D-34, D-35, D-36, D-37), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (§5 "He stocks", FR-143 … FR-146, FR-156), ADR-001, ADR-002, ADR-003, ADR-005, ADR-007, ADR-009, ADR-011, ADR-012, ADR-014, ADR-028, ADR-029, ADR-030, ADR-032, ADR-033, ADR-035, ADR-036, ADR-037, ADR-038, ADR-039, ADR-040, ADR-041, ADR-042 (Proposed), CLAUDE.md]
 Answered by: [System Design](../../../architecture/system-design.md) §21 (F12-S1)
-Updated: 2026-10-08 (Task 8.13: FR-226 reads the photos that waited, put to the owner). 2026-10-06 (v0.11 approved: D-37's upload screen, ADR-042, OQ-1212 answered "approved". v0.10: FR-220 per D-36, as put to him). 2026-10-05 (v0.9 approved: FR-183 revised, OQ-1210 answered A; D-33's pictures, FR-216, FR-217; D-34 and D-35's shelf reader, FR-218 … FR-223, OQ-1211 answered). 2026-10-04 (D-32's explanation approved, OQ-1209; earlier the same day, approved with OQ-1208, and OQ-1204 and OQ-1207 answered with the plan)
+Updated: 2026-10-08 (Task 8.13: FR-226 reads the photos that waited, confirmed by the owner the same day: "keep"). 2026-10-06 (v0.11 approved: D-37's upload screen, ADR-042, OQ-1212 answered "approved". v0.10: FR-220 per D-36, as put to him). 2026-10-05 (v0.9 approved: FR-183 revised, OQ-1210 answered A; D-33's pictures, FR-216, FR-217; D-34 and D-35's shelf reader, FR-218 … FR-223, OQ-1211 answered). 2026-10-04 (D-32's explanation approved, OQ-1209; earlier the same day, approved with OQ-1208, and OQ-1204 and OQ-1207 answered with the plan)
 ---
 
 # F12-S1 — Planogram
@@ -652,7 +652,7 @@ summary names it. Parts with no manifest after two days are deleted. When photos
 and the model key is set, the reader reads that night's folder before the engine runs, within
 NFR-079's bounds.
 
-*Task 8.13 (2026-10-08), put to the owner:* the nightly reads every photo not read yet, once:
+*Task 8.13 (2026-10-08), confirmed by the repository owner the same day ("keep", to 'Say "keep it", or "only tonight's"'):* the nightly reads every photo not read yet, once:
 tonight's, and any that waited for the key, the layout file or a request that failed. Each
 reading adds to the earlier ones. A unit read whole replaces what was read of it before, and a
 width that two photos disagree on is unknown (FR-221). Of a unit's photos collected the same
