@@ -464,7 +464,8 @@
             "check_purchase_cost",
             "place_order",
             "try_product",
-            "arrange_shelf"
+            "arrange_shelf",
+            "raise_delivery_price"
           ]
         },
         "characterisation": {

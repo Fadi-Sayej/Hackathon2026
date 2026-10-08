@@ -71,7 +71,7 @@ describe('every card says what to do (F6 AC-110c)', () => {
   })
 
   it('has words for every action the engine can publish, in all three languages', () => {
-    for (const action of ['verify_price', 'count_product', 'fix_record', 'decide_idle', 'review_policy', 'check_purchase_cost']) {
+    for (const action of ['verify_price', 'count_product', 'fix_record', 'decide_idle', 'review_policy', 'check_purchase_cost', 'raise_delivery_price']) {
       for (const dict of [en, ar, he]) expect(dict[`action.${action}`], action).toBeTruthy()
     }
   })
@@ -105,7 +105,7 @@ describe('the evidence reads as words and figures, never as code', () => {
     draw('en', [PRICE])
     const text = card('p1').textContent
     expect(text).toContain('₪9.90')
-    expect(text).toContain('18%')
+    expect(text).toContain('10.1%')                  // how far the delivery price is below the shelf
   })
 
   it('leaves out a value the engine does not have, rather than printing null (D-3)', () => {

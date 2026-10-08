@@ -180,6 +180,23 @@
   grid-column: 1 / -1;
 }
 
+/* A figure has no letters, so `plaintext` (App.css) resolves it left to right, and in Hebrew
+   and Arabic it sat at the far side of its column from its label: with two columns, the shelf
+   price stood under the delivery-price label. It lines up with its label, which is always in
+   the page's language. */
+:root[dir='rtl'] .entry-card__evidence dd:not([data-text]) {
+  text-align: right;
+}
+
+/* A short note under a figure, in the text face (F1's "% below shelf"). */
+.entry-card__note {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  color: var(--ink-600);
+  unicode-bidi: plaintext;
+}
+
 .entry-card__line {
   display: block;
   /* The card is dir="auto" and a Hebrew product name makes it right to left even in English.

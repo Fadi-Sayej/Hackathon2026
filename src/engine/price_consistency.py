@@ -134,7 +134,7 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
             loss = round(shelf - delivery, 2)
             entries.append(Entry(id=entry_id("price.inverted", b), signal_family="price.inverted",
                                  capability=CAP, barcode=b, product_name=p["product_name"],
-                                 department=p["department"], action="verify_price", characterisation="confirmed_loss",
+                                 department=p["department"], action="raise_delivery_price", characterisation="confirmed_loss",
                                  evidence={**evidence, "commission_compounds": True},
                                  value=Value(loss, "per_sale", "confirmed"),
                                  ordering_key={"name": "loss_per_sale", "value": loss}))
