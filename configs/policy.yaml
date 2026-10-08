@@ -4,7 +4,8 @@
 version: 1
 
 # SPEC-003 — declared, never derived (FR-045, FR-045b, FR-043a)
-price_policy_pct: 60          # owner's stated maximum premium over the balanced reference
+# price_policy_pct moved to configs/store_facts.yaml (price_rule) on 2026-10-08: it is the
+# store owner's own rule, and a new store's copy starts without one (D-39, ADR-043).
 attention_pct: 100            # same-day attention above this premium
 cost_floor_pct: 10            # reference must exceed our cost by this margin
 freshness_days: 14            # OQ-306 provisional: observations older than this drive nothing
@@ -22,13 +23,16 @@ surface:
   # cleanup would otherwise hold the three reserved places for weeks (design §9.2).
   # F9-S1 FR-171: the assortment gap is first, and capped at one place below, so it shows a
   # finding every day without displacing reconciliation's other two.
-  unvalued_order: [assortment_gap, reconciliation, competitor_position, catalogue_lifecycle, hygiene]
+  # ADR-043: policy_breach is F3's breaches, split from competitor_position so they can wait for the
+  # owner's rule (D-39). It is listed because every unvalued capability must be; the browser shows
+  # its entries as F3's, in competitor_position's place, so Today is unchanged by the split.
+  unvalued_order: [assortment_gap, reconciliation, competitor_position, policy_breach, catalogue_lifecycle, hygiene]
   unvalued_caps: {assortment_gap: 1}
   # F6-S1 FR-106a: every unvalued capability keeps the order the engine published, its own
   # stated key: F9's (F9-S1 FR-172), the biggest gap ratio first (F2-S1 FR-024, "the biggest
   # first", the repository owner 2026-09-29), the highest premium, the one quantity question
   # and then the highest unit cost (F4-S1 FR-069), and hygiene's own order.
-  engine_ordered: [assortment_gap, reconciliation, competitor_position, catalogue_lifecycle, hygiene]
+  engine_ordered: [assortment_gap, reconciliation, competitor_position, policy_breach, catalogue_lifecycle, hygiene]
   # D-26: the places left after F9's take turns. One place per kind per round, and the order of
   # these kinds shifts by one each day of the nightly's date, so each is on Today two days in four.
   rotate: [reconciliation, competitor_position, catalogue_lifecycle, hygiene]

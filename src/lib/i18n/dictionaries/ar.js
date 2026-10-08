@@ -250,6 +250,8 @@ export const ar = {
   'unavailable.no_daily_sales': "بانتظار تقارير المبيعات اليومية: كمية الطلب تحتاج إلى مبيعات كل يوم.",
   'unavailable.stale_daily_sales': "آخر تقرير مبيعات يومي أقدم من أن يُبنى عليه طلب الليلة.",
   'unavailable.no_store_facts': "ملف معطيات المتجر مفقود، فلا يُعرف جدول الطلبات ولا مدة الصلاحية.",
+  // D-39, ADR-043: approved by the repository owner on 2026-10-08.
+  'unavailable.no_price_rule': "لم يُسجَّل حدّ السعر الخاص بك بعد: أقصى زيادة على أسعار المتاجر القريبة للمنتج نفسه.",
   // F12-S1 (Phase 8 Task 8.0). The capability-scoped keys say what the shared sentence
   // would get wrong on Shelf plan (unavailableReason.js).
   'unavailable.no_store_layout': "لم تُسجَّل قياسات الرفوف بعد.",

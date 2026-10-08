@@ -5,7 +5,7 @@ Status: Approved — by the repository owner, 2026-09-30 ("approved"), with ADR-
 Owner: smartshelf-architect
 Parent: [Implementation plan](plan.md)
 Inputs: [D-28, ADR-036 (Accepted 2026-09-30), docs/pilot/next-store.md, src/engine/inputs.py, src/engine/run.py, src/common/paths.py, src/context/weather.py, src/internal_pos/, scripts/import_yomyom_pos.py, scripts/import_yomyom_sales.py, src/matching/product_matching.py, configs/delivery_targets.yaml, configs/store_types.yaml, firestore.rules, scripts/check_firebase_config.mjs, .github/workflows/collect-daily.yml, index.html]
-Updated: 2026-10-08 (Tasks 7.7–7.10 for D-39 and ADR-043, ready for review); 2026-10-08 (Checkpoint 7 checked on a clean copy: met after #296, #299 and #302; one question open); 2026-10-01 (Tasks 7.1–7.6 built; one pull request)
+Updated: 2026-10-08 (Tasks 7.7–7.10 for D-39 and ADR-043, approved and built); 2026-10-08 (Checkpoint 7 checked on a clean copy: met after #296, #299 and #302; one question open); 2026-10-01 (Tasks 7.1–7.6 built; one pull request)
 ---
 
 # Phase 7 — A new store without code changes
@@ -172,8 +172,9 @@ So a second store's F3 findings would use +60% until someone changes it. The set
 
 ## Added 2026-10-08: D-39, the price rule is the owner's (ADR-043)
 
-**Status:** Ready for review, with ADR-043. Nothing below starts until the repository owner
-approves ADR-043 and its wording (HANDOVER rule 1). Tasks 7.7 to 7.9 merge in one pull request,
+**Status:** Approved, with ADR-043 and its wording, by the repository owner on 2026-10-08
+("approve"). **Built 2026-10-08:** Tasks 7.7–7.10 are done, each "Done when" met; the proof is
+[docs/reviews/price-rule-2026-10-08.md](../reviews/price-rule-2026-10-08.md). Tasks 7.7 to 7.9 merge in one pull request,
 because the engine's split and the screens that read it must arrive together.
 
 ### Task 7.7: The rule as a store fact (ADR-043 §1)

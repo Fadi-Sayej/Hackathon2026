@@ -42,6 +42,7 @@ const ENGINE_REASONS = [
   'no_boost_key',
   'no_daily_sales',
   'no_store_facts',
+  'no_price_rule',
   // rule-level, raised by the capabilities themselves
   'ceiling_degenerate',
   'no_delivery_prices',

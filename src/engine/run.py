@@ -43,6 +43,7 @@ def _runners() -> dict:
     return {"catalogue_lifecycle": catalogue_lifecycle.run, "price_consistency": price_consistency.run,
             "reconciliation": reconciliation.run, "hygiene": reconciliation.run_hygiene,
             "competitor_position": competitor_position.run,
+            "policy_breach": competitor_position.run_breaches,
             "margin_below_cost": margin_below_cost.run, "owner_questions": owner_questions.run,
             # Registered in the same change as its registry entry: a real run whose artefact
             # lacks a registered id is refused (publish.require_complete_registry).
@@ -120,6 +121,12 @@ def _store_facts_verdict(store_facts) -> tuple:
         return "ok", None
     return "degraded", "rejected: " + "; ".join(
         f"{r['department'] if r['department'] is not None else 'the file'} ({r['reason']})" for r in rejected)
+
+
+def _price_rule_verdict(rejected) -> tuple:
+    """ADR-043: a malformed price rule is reported here. Like a rejected store fact, it is not the
+    run's failure: the rule is simply not stated, and F3's breaches say they wait for it."""
+    return ("ok", None) if not rejected else ("degraded", f"rejected: {rejected}")
 
 
 def _store_layout_verdict(store_layout) -> tuple:
@@ -276,6 +283,7 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
                                                            **sources))
     if inputs is not None:
         _step(steps, "store_facts", lambda: inputs.store_facts, verdict=_store_facts_verdict)
+        _step(steps, "price_rule", lambda: inputs.price_rule_rejected, verdict=_price_rule_verdict)
         _step(steps, "store_layout", lambda: inputs.store_layout, verdict=_store_layout_verdict)
     if inputs is not None and mode == "publish":
         # ADR-035 Decision 3: the one step the live run has and print mode does not. It asks the

@@ -37,6 +37,9 @@ export function CapabilityPage({ artefact, capabilityId }) {
   }
 
   const { status, unavailable_reason: reason, counts, thresholds, entries, notes, window } = capability
+  // ADR-043: F3's breaches wait for the owner's price rule (D-39) while the rest of F3 goes on. The
+  // loader folds them in (foldPolicyBreach), and says here what they wait for when they cannot run.
+  const waiting = capability.waiting_for
   // F4 AC-067: a dead count on a short window is stated with that window and its seasonal limit.
   const seasonal = (notes || []).includes('seasonal_misclassification_possible') && window?.window_id
 
@@ -77,6 +80,10 @@ export function CapabilityPage({ artefact, capabilityId }) {
                 </div>
               ))}
             </dl>
+          ) : null}
+
+          {waiting ? (
+            <p className="capability__unavailable capability__waiting">{unavailableReason(t, waiting)}</p>
           ) : null}
 
           <ol className="capability__entries">

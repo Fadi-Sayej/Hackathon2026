@@ -147,3 +147,55 @@ def load_store_facts(path: Path | str, catalogue_departments: Iterable[str]) -> 
         except _Rejected as err:
             rejected.append({"department": str(department), "reason": str(err)})
     return {"facts": facts, "rejected": rejected}
+
+
+# ── The price rule (D-39, ADR-043) ────────────────────────────────────────────
+# The most the owner will charge over the nearby stores' reference, as a premium (F3-S1 FR-045).
+# A store-level statement beside `departments`, validated as a department's facts are: rejected
+# and reported, never repaired and never defaulted. Absent, it is simply not stated yet, which is
+# where a new store's copy starts, and F3's breaches wait for it.
+RULE_KEYS = {"max_premium_pct", "stated_by", "stated_on", "recorded_by", "recorded_on"}
+NOT_RECORDED = "not_recorded"     # the day it was said is not known, and is not guessed
+
+
+def _rule(raw) -> dict:
+    if not isinstance(raw, dict):
+        raise _Rejected(f"price_rule must be a mapping of its facts: {raw!r}")
+    unknown = sorted(set(raw) - RULE_KEYS)
+    if unknown:
+        raise _Rejected(f"unknown key {', '.join(unknown)}; the keys are {sorted(RULE_KEYS)}")
+    if "max_premium_pct" not in raw:
+        raise _Rejected("max_premium_pct is missing: the most the owner will charge over nearby stores, in %")
+    pct = raw["max_premium_pct"]
+    if isinstance(pct, bool) or not isinstance(pct, (int, float)):
+        raise _Rejected(f"max_premium_pct must be a number, not {pct!r}")
+    if pct <= 0:
+        raise _Rejected(f"max_premium_pct must be above 0, not {pct!r}")
+    for key, expected in PROVENANCE.items():
+        if raw.get(key) != expected:
+            raise _Rejected(f"{key} must be {expected!r}, not {raw.get(key)!r}")
+    if "recorded_on" not in raw:
+        raise _Rejected("recorded_on is missing: the day the team wrote it down")
+    if "stated_on" not in raw:
+        raise _Rejected(f"stated_on is missing: the day the owner said it, or {NOT_RECORDED}")
+    stated_on = NOT_RECORDED if raw["stated_on"] == NOT_RECORDED else _day(raw["stated_on"], "stated_on")
+    return {"max_premium_pct": float(pct), "stated_by": "owner", "stated_on": stated_on,
+            "recorded_by": "team", "recorded_on": _day(raw["recorded_on"], "recorded_on")}
+
+
+def load_price_rule(path: Path | str) -> dict:
+    """`{rule, rejected}`, never raising. `rule` is None until the owner has stated one."""
+    path = Path(path)
+    if not path.exists():
+        return {"rule": None, "rejected": None}
+    try:
+        raw = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except (yaml.YAMLError, UnicodeDecodeError) as err:
+        return {"rule": None, "rejected": f"unreadable: {err}"}
+    stated = raw.get("price_rule") if isinstance(raw, dict) else None
+    if stated is None:
+        return {"rule": None, "rejected": None}
+    try:
+        return {"rule": _rule(stated), "rejected": None}
+    except _Rejected as err:
+        return {"rule": None, "rejected": str(err)}

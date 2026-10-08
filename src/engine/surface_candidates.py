@@ -12,6 +12,7 @@ REQUIRED_EVIDENCE = {
     "reconciliation": ("recorded_stock", "receipts", "units_sold", "unaccounted", "window_id"),
     "hygiene": ("reason",),          # the record is wrong on its own evidence; nothing else is needed
     "competitor_position": ("shelf_price", "reference", "premium_pct", "sources"),
+    "policy_breach": ("shelf_price", "reference", "premium_pct", "sources"),      # ADR-043: F3's own
     "catalogue_lifecycle": ("evidence_state", "window_id"),
     "margin_below_cost": ("shelf_price", "cost_price", "margin_pct"),
     # F9-S1 FR-168: what the market was seen doing. No value, by design (FR-169).

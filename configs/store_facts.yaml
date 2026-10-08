@@ -28,5 +28,27 @@
 # (D-22). A change is a reviewed commit, and the history is the record of when he said what.
 #
 # OQ-903 and OQ-908 are open: he has not been asked yet, so no department is listed.
+#
+# THE PRICE RULE (D-39, ADR-043): the most the owner will charge over the nearby stores'
+# reference price for the same product, as a premium in %. F3 flags a price above it. Until
+# the owner states one it is left out, and F3's flags say they wait for it; nothing is
+# defaulted, and no other store's rule is copied:
+#
+#   price_rule:
+#     max_premium_pct: 60
+#     stated_by: owner
+#     stated_on: 2026-10-01         # the day it was said, or not_recorded
+#     recorded_by: team
+#     recorded_on: 2026-10-01       # the day the team wrote it down
 
 departments: {}
+
+# YomYom's owner: "if a product's price is 5, I don't sell it for more than 8" (F3 intent
+# §3ب). First written down on 2026-09-08 (9e4160e), in configs/policy.yaml until ADR-043; the
+# day it was said is not recorded.
+price_rule:
+  max_premium_pct: 60
+  stated_by: owner
+  stated_on: not_recorded
+  recorded_by: team
+  recorded_on: 2026-09-08

@@ -52,7 +52,13 @@ MARKET_SOURCES = {
     "observations": "signals_dir",
     "matches": "matches_path",
 }
-WITHHELD = sorted(SILVER_FILES.keys() | MARKET_SOURCES.keys())
+# D-39, ADR-043: the owner's price rule is a block of configs/store_facts.yaml, so it is withheld
+# by giving the run a copy of that file without it. The departments stay, so the store facts are
+# not withheld with it. On real data the rule is stated, so withholding it proves something here.
+FACT_SOURCES = {
+    "price_rule": "store_facts_path",
+}
+WITHHELD = sorted(SILVER_FILES.keys() | MARKET_SOURCES.keys() | FACT_SOURCES.keys())
 
 # Inputs a registered capability requires that THIS probe does not withhold, each with the
 # probe that withholds it instead. An input that is required and on neither list is unprobed,
@@ -98,6 +104,14 @@ def withheld_sources(input_name: str, source_silver: Path, workdir: Path) -> dic
         sources["signals_dir"] = empty
     elif MARKET_SOURCES.get(input_name) == "matches_path":
         sources["matches_path"] = workdir / "product_matches.parquet"
+    elif FACT_SOURCES.get(input_name) == "store_facts_path":
+        import yaml
+        from src.engine.store_facts import DEFAULT_PATH as FACTS
+        raw = yaml.safe_load(FACTS.read_text(encoding="utf-8")) or {}
+        facts = workdir / "store_facts.yaml"
+        facts.write_text(yaml.safe_dump({k: v for k, v in raw.items() if k != "price_rule"}, allow_unicode=True),
+                         encoding="utf-8")
+        sources["store_facts_path"] = facts
     return sources
 
 

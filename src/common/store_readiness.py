@@ -24,6 +24,7 @@ FEEDS = {
     "sales_monthly": ("sales_summary", "window"),
     "sales_daily": ("sales_daily",),
     "store_facts": ("store_facts",),
+    "price_rule": ("price_rule",),
     "store_layout": ("store_layout",),
     "nearby_venues": ("running_out", "market_recent", "observations", "matches"),
     "boost_key": ("boost_picks", "shelf_explanations"),     # one key, two uses (ADR-039 Decision 2)
@@ -93,6 +94,20 @@ def _store_facts(path: Path) -> dict:
     if not departments:
         return _item("store_facts", label, "missing", f"no department in {_rel(path)} (ADR-033)")
     return _item("store_facts", label, "present", f"{len(departments)} departments in {_rel(path)}")
+
+
+def _price_rule(path: Path) -> dict:
+    """D-39, ADR-043: the most the owner will charge over nearby stores. Nothing defaults it."""
+    from src.engine.store_facts import load_price_rule
+    label = "The owner's price rule: the most they will charge over nearby stores"
+    read = load_price_rule(path)
+    if read["rejected"]:
+        return _item("price_rule", label, "missing", f"price_rule in {_rel(path)} is rejected: {read['rejected']}")
+    if read["rule"] is None:
+        return _item("price_rule", label, "missing", f"no price_rule in {_rel(path)}: ask the owner (D-39)")
+    rule = read["rule"]
+    return _item("price_rule", label, "present",
+                 f"+{rule['max_premium_pct']:g}%, recorded {rule['recorded_on']}, in {_rel(path)}")
 
 
 def _store_layout(path: Path, pictures_dir: Optional[Path] = None) -> dict:
@@ -192,6 +207,7 @@ def readiness(store: StoreSettings, *, today: date, facts_path: Optional[Path] =
         _sales_monthly(store),
         _sales_daily(store, today, load_policy().order_freshness_days),
         _store_facts(facts_path or FACTS_PATH),
+        _price_rule(facts_path or FACTS_PATH),
         _store_layout(layout_path or LAYOUT_PATH, pictures_dir),
         _client_venue(stores, targets),
         _nearby_venues(targets),

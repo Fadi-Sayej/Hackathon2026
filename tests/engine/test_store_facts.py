@@ -228,3 +228,63 @@ def test_the_run_reads_the_committed_file_by_default_and_rejects_nothing(tmp_pat
                                 sales_dir=tmp_path / "nosales", snapshots_root=tmp_path / "nosnap")
     step = next(s for s in result["steps"] if s["step"] == "store_facts")
     assert step == {**step, "status": "ok", "error": None}
+
+
+# ── The price rule: the owner's limit over nearby stores (D-39, ADR-043) ─────
+
+RULE = ("price_rule:\n  max_premium_pct: 45\n  stated_by: owner\n  recorded_by: team\n"
+        "  recorded_on: 2026-10-08\n  stated_on: 2026-10-07\n")
+
+
+def test_the_committed_rule_is_yomyoms_owners_sixty_percent():
+    """F3 intent §3ب: "if a product's price is 5, I don't sell it for more than 8". First written
+    down on 2026-09-08 (9e4160e); the day it was said is not recorded, and the entry says so."""
+    from src.engine.store_facts import load_price_rule
+    assert load_price_rule(DEFAULT_PATH) == {"rule": {
+        "max_premium_pct": 60.0, "stated_by": "owner", "stated_on": "not_recorded",
+        "recorded_by": "team", "recorded_on": "2026-09-08"}, "rejected": None}
+
+
+def test_a_stated_rule_is_read_with_its_provenance(tmp_path):
+    from src.engine.store_facts import load_price_rule
+    assert load_price_rule(_file(tmp_path, "departments: {}\n" + RULE))["rule"] == {
+        "max_premium_pct": 45.0, "stated_by": "owner", "stated_on": "2026-10-07",
+        "recorded_by": "team", "recorded_on": "2026-10-08"}
+
+
+@pytest.mark.parametrize("body", ["departments: {}\n", "", "price_rule:\n"])
+def test_no_rule_stated_is_no_rule_and_no_complaint(tmp_path, body):
+    """A new store's copy starts here (D-39): nothing is defaulted, and nothing is wrong."""
+    from src.engine.store_facts import load_price_rule
+    assert load_price_rule(_file(tmp_path, body)) == {"rule": None, "rejected": None}
+
+
+def test_an_absent_file_is_no_rule(tmp_path):
+    from src.engine.store_facts import load_price_rule
+    assert load_price_rule(tmp_path / "missing.yaml") == {"rule": None, "rejected": None}
+
+
+@pytest.mark.parametrize("change, said", [
+    (("max_premium_pct: 45", "max_premium_pct: 0"), "above 0"),
+    (("max_premium_pct: 45", "max_premium_pct: -10"), "above 0"),
+    (("max_premium_pct: 45", "max_premium_pct: '45'"), "a number"),
+    (("max_premium_pct: 45", "max_premium_pct: true"), "a number"),
+    (("  max_premium_pct: 45\n", ""), "max_premium_pct"),
+    (("stated_by: owner", "stated_by: team"), "stated_by"),
+    (("recorded_by: team", "recorded_by: owner"), "recorded_by"),
+    (("  recorded_on: 2026-10-08\n", ""), "recorded_on"),
+    (("stated_on: 2026-10-07", "stated_on: last week"), "stated_on"),
+    (("  stated_on: 2026-10-07\n", ""), "stated_on"),
+    (("stated_on: 2026-10-07", "stated_on: 2026-10-07\n  ceiling: 18"), "unknown key"),
+])
+def test_a_malformed_rule_is_rejected_and_never_repaired(tmp_path, change, said):
+    """ADR-033's rule for a stated fact: rejected and reported, so no figure rests on a guess."""
+    from src.engine.store_facts import load_price_rule
+    out = load_price_rule(_file(tmp_path, "departments: {}\n" + RULE.replace(*change)))
+    assert out["rule"] is None and said in out["rejected"]
+
+
+def test_an_unreadable_file_rejects_the_rule_without_raising(tmp_path):
+    from src.engine.store_facts import load_price_rule
+    out = load_price_rule(_file(tmp_path, "price_rule: [unclosed\n"))
+    assert out["rule"] is None and "unreadable" in out["rejected"]

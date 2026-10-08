@@ -245,6 +245,8 @@ export const he = {
   'unavailable.no_daily_sales': "ממתינים לדוחות המכירות היומיים: כמות הזמנה דורשת מכירות לפי יום.",
   'unavailable.stale_daily_sales': "דוח המכירות היומי האחרון ישן מדי כדי לקבוע את ההזמנות של הלילה.",
   'unavailable.no_store_facts': "קובץ נתוני החנות חסר, ולכן לא ידועים לוח ההזמנות וחיי המדף.",
+  // D-39, ADR-043: approved by the repository owner on 2026-10-08.
+  'unavailable.no_price_rule': "מגבלת המחיר שלך עדיין לא נרשמה: כמה יותר מהחנויות הסמוכות מותר לגבות על אותו מוצר.",
   // F12-S1 (Phase 8 Task 8.0). The capability-scoped keys say what the shared sentence
   // would get wrong on Shelf plan (unavailableReason.js).
   'unavailable.no_store_layout': "מידות המדפים עדיין לא נרשמו.",

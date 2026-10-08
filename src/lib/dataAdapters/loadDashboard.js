@@ -11,6 +11,8 @@
  * without — four preconditions, each with a rendering reason rather than a schema reason.
  */
 
+import { foldPolicyBreach } from './foldPolicyBreach.js'
+
 const SCHEMA_VERSION = 2
 
 const result = (status, artefact, reason) => ({ status, artefact, reason })
@@ -56,5 +58,6 @@ export async function loadDashboard({ fetchImpl = fetch, url = '/data/dashboard.
     }
   }
 
-  return result('ok', body, null)
+  // ADR-043: F3's breaches are published as their own capability; every screen shows them as F3's.
+  return result('ok', foldPolicyBreach(body), null)
 }

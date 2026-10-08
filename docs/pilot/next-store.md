@@ -5,7 +5,7 @@ Status: Ready for review
 Owner: smartshelf-pm
 Parent: [D-23](../product/intent-register.md#3-decisions-already-made-by-the-intent-layer)
 Inputs: [docs/product/intent-register.md (D-14, D-18, D-22, D-23, D-24), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (FR-143, FR-144, FR-155, ASM-065), docs/architecture/decisions/ADR-030-own-sales-arrive-as-daily-reports.md, ADR-033-store-facts-are-a-committed-file.md, configs/store_facts.yaml, configs/store_types.yaml, configs/delivery_targets.yaml, configs/pos_schema_mapping.yaml, public/data/dashboard.json and measurement.json (2026-09-29), docs/reviews/F1…F13-validation.md, issue #66]
-Updated: 2026-10-08 (the report folders are the store's settings); 2026-09-30 (the importers' new names, ADR-036)
+Updated: 2026-10-08 (the price rule, D-39; the report folders are the store's settings); 2026-09-30 (the importers' new names, ADR-036)
 ---
 
 # What the next store must send
@@ -41,6 +41,7 @@ Nothing on this list may be simulated while it is missing (D-23).
 | **The shelves: each fixture, its shelves' lengths, its departments and eye-level shelf; each product's width and today's facings, read from shelf photographs; and the owner's arrangement rules** | F12's layout, shelf plan and its measurement. Without the file all three say the measurements have not been recorded (`no_store_layout`) | `configs/store_layout.yaml`, recorded by the team with who measured or stated each fact and when (ADR-037). No store has one yet |
 | **For each department: the days it is ordered, and how many days it keeps** | F8's quantities. A department without both facts gets no quantity, and F8 says which fact is missing (FR-155) | `configs/store_facts.yaml`, recorded by the team with the date it was said (ADR-033). No department is listed today |
 | **GAP-009:** name twenty products missing from a monthly report, and confirm they sold nothing | Whether F4 may ever show the owner "no longer sold" (D-14). The same question for the daily reports is F8's ASM-065 | #66; the gaps register |
+| **The price rule:** the most they will charge over nearby stores for the same product | F3's breaches. Until it is stated, F3 flags no price as over it and says it is waiting (D-39). YomYom's owner said +60% | `price_rule` in `configs/store_facts.yaml` (ADR-043) |
 | **GAP-011:** is the ceiling the engine derives (18% at YomYom) the owner's own pricing policy? | F1 keeps everything under the ceiling silent. A stated number replaces the derived one, which stays published beside it | `policy.owner_declared_ceiling_pct`; #66 |
 | **Time for three questions a day** | F5 asks for costs from the owner's invoices, three at a time. At YomYom none were answered, so nothing F5 exists to change ever changed | The app |
 

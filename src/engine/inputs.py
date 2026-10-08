@@ -18,7 +18,7 @@ from src.engine.model import EvidenceWindow, norm_barcode
 from src.engine.policy import Policy
 from src.internal_pos.pos_importer import read_pos_vintage
 from src.engine.stock_date import usable_stock_date
-from src.engine.store_facts import DEFAULT_PATH as STORE_FACTS_PATH, load_store_facts
+from src.engine.store_facts import DEFAULT_PATH as STORE_FACTS_PATH, load_price_rule, load_store_facts
 from src.engine.store_layout import (ACCEPTANCE_PATH as SHELF_ACCEPTANCE_PATH, DEFAULT_PATH as STORE_LAYOUT_PATH,
                                      PICTURES_DIR as SHELF_PICTURES_DIR, READINGS_PATH as SHELF_READINGS_PATH,
                                      load_store_layout, merge_readings)
@@ -66,6 +66,10 @@ class EngineInputs:
     shelf_explanations: Optional[dict] = None
     # ADR-042: the store's shelf photos, [{id, unit, collected, read}]; names and dates only.
     shelf_photos: Optional[list] = None
+    # D-39, ADR-043: the owner's price rule, {max_premium_pct, stated_by, stated_on, recorded_by,
+    # recorded_on}; None until it is stated. A malformed one is None too, and says why here.
+    price_rule: Optional[dict] = None
+    price_rule_rejected: Optional[str] = None
 
 
 def _rows(path: Path) -> Optional[list]:
@@ -338,6 +342,8 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
     # fact can only ever attach to a department that exists. Absent file, absent input.
     store_facts = (load_store_facts(store_facts_path, {p["department"] for p in products or [] if p["department"]})
                    if Path(store_facts_path).exists() else None)
+    # D-39, ADR-043: the price rule is stated in the same file, beside the departments.
+    price_rule = load_price_rule(store_facts_path)
     # ADR-037. Checked against the catalogue as printed, like the facts above. A new copy starts
     # without the file (STARTS_WITHOUT), and an absent file is the missing input no_store_layout.
     store_layout = (load_store_layout(store_layout_path, products or [], shelf_pictures_dir)
@@ -437,7 +443,7 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
                          for k in ("months", "first", "last", "full_annual_cycle", "reconcile_before")}
     digest = _digest(products, summary_rows, monthly, observations, matches, policy, owner,
                      reconcile_before, sales_daily, store_facts, running_out, boost_picks, market_recent,
-                     store_layout, shelf_explanations, shelf_photos)
+                     store_layout, shelf_explanations, shelf_photos, price_rule["rule"])
     return EngineInputs(products=products, inventory=inventory or None,
                         sales_monthly=monthly, sales_daily=sales_daily, sales_summary=summary, window=window,
                         observations=observations, matches=matches, stores=stores, withdrawn=None, idle=None, conflicting=conflicting,
@@ -445,7 +451,8 @@ def load_inputs(*, policy: Policy, owner: OwnerState, run_at: datetime, silver_d
                         inputs_digest=digest,
                         vintages=vintages, owner=owner, policy=policy, run_at=run_at,
                         market_recent=market_recent, store_layout=store_layout,
-                        shelf_explanations=shelf_explanations, shelf_photos=shelf_photos)
+                        shelf_explanations=shelf_explanations, shelf_photos=shelf_photos,
+                        price_rule=price_rule["rule"], price_rule_rejected=price_rule["rejected"])
 
 
 # When a row was imported is not what the row says. `sales_import` rewrites its tables on
@@ -471,7 +478,7 @@ def _digest(products, summary_rows, monthly, observations, matches, policy, owne
             store_facts: Optional[dict] = None, running_out: Optional[dict] = None,
             boost_picks: Optional[dict] = None, market_recent: Optional[dict] = None,
             store_layout: Optional[dict] = None, shelf_explanations: Optional[dict] = None,
-            shelf_photos: Optional[list] = None) -> str:
+            shelf_photos: Optional[list] = None, price_rule: Optional[dict] = None) -> str:
     """A hex digest over the CONTENT the run read, not over the files it read them from.
 
     Content, because a parquet rewritten with identical rows is the same input and must
@@ -532,6 +539,9 @@ def _digest(products, summary_rows, monthly, observations, matches, policy, owne
     # once there is one, so a store with none digests exactly as before the upload existed.
     if shelf_photos:
         feed("shelf_photos", shelf_photos)
+    # D-39, ADR-043: the owner's rule, which was in the policy until it moved here. A breach is
+    # judged against it, so a changed rule is a different input, and an absent one hashes as absent.
+    feed("price_rule", None if price_rule is None else [price_rule])
     feed("observations", observations)
     feed("matches", matches)
     feed("policy", policy.as_dict())

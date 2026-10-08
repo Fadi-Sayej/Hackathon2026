@@ -32,17 +32,17 @@ def _write(tmp_path, raw):
 
 def test_policy_loads_declared_constants():
     p = load_policy()
-    assert p.price_policy_pct == 60
+    assert not hasattr(p, "price_policy_pct")     # the owner's, in store_facts.yaml (D-39)
     assert p.attention_pct == 100
     assert p.cost_floor_pct == 10
     assert p.surface_bound == 10
     assert p.surface_unvalued_places == 3
     # F9-S1 FR-171: the assortment gap first, capped at one place, in its published order.
-    assert p.surface_unvalued_order == ("assortment_gap", "reconciliation", "competitor_position",
+    assert p.surface_unvalued_order == ("assortment_gap", "reconciliation", "competitor_position", "policy_breach",
                                         "catalogue_lifecycle", "hygiene")
     assert p.surface_unvalued_caps == {"assortment_gap": 1}
     # F6-S1 FR-106a: every unvalued capability in the engine's order ("the biggest first", 2026-09-29).
-    assert p.surface_engine_ordered == ("assortment_gap", "reconciliation", "competitor_position",
+    assert p.surface_engine_ordered == ("assortment_gap", "reconciliation", "competitor_position", "policy_breach",
                                         "catalogue_lifecycle", "hygiene")
     # D-26: the four other kinds take turns; F9 keeps its place (F9-S1 FR-171).
     assert p.surface_rotate == ("reconciliation", "competitor_position", "catalogue_lifecycle", "hygiene")
@@ -216,7 +216,7 @@ def test_policy_refuses_a_missing_or_empty_assortment_gap_window(tmp_path):
 def test_the_surface_publishes_its_cap_and_kept_order():
     surface = load_policy().as_dict()["surface"]
     assert surface["unvalued_caps"] == {"assortment_gap": 1}
-    assert surface["engine_ordered"] == ["assortment_gap", "reconciliation", "competitor_position",
+    assert surface["engine_ordered"] == ["assortment_gap", "reconciliation", "competitor_position", "policy_breach",
                                          "catalogue_lifecycle", "hygiene"]
     assert surface["rotate"] == ["reconciliation", "competitor_position", "catalogue_lifecycle", "hygiene"]
 

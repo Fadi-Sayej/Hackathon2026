@@ -57,7 +57,7 @@ def test_the_artefact_carries_every_capability_with_its_extras_and_vintages(tmp_
     # are F8's market signal (Task 5.4), boost (Task 5.6) and quantity (Task 5.8), each
     # registered with its runner in the same change.
     assert set(caps) == {"catalogue_lifecycle", "price_consistency", "reconciliation", "hygiene",
-                         "competitor_position", "margin_below_cost", "owner_questions",
+                         "competitor_position", "policy_breach", "margin_below_cost", "owner_questions",
                          "market_running_out", "market_boost", "order_quantity", "assortment_gap",
                          "layout_facts", "shelf_plan", "shelf_measurement", "shelf_explanation"}
     assert all(c["status"] in ("available", "unavailable") for c in caps.values())
