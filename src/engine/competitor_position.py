@@ -78,6 +78,8 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
     status, reason = derive_status(CAP, inputs)          # never declared (ADR-014)
     if status == "unavailable":
         return CapabilityOutput.unavailable(CAP, SPEC, reason)
+    # D-39, ADR-043: the owner's own rule, which derive_status above has refused to do without.
+    rule_pct = inputs.price_rule["max_premium_pct"]
     # An empty observations list is DATA — we collected and found nothing for these
     # products — and FR-051 requires each of them to be counted "no comparison" rather
     # than nothing at all. Absence is None, and derive_status above has already refused
@@ -209,7 +211,7 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
                     "price": o["price"], "observed_at": o["observed_at"],
                     "role": "comparable" if o["affinity"] >= floor else "context"} for o in obs]
         evidence = {"shelf_price": p["shelf_price"], "cost_price": p["cost_price"], "reference": reference,
-                    "premium_pct": round(premium_pct, 2), "policy_pct": policy.price_policy_pct,
+                    "premium_pct": round(premium_pct, 2), "policy_pct": rule_pct,
                     "attention_pct": policy.attention_pct, "cost_floor_pct": policy.cost_floor_pct,
                     "sources": sources, "format_note": "part of any difference is attributable to store format"}
 
@@ -223,7 +225,7 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
                                  evidence=evidence, value=None, attention="review",
                                  ordering_key={"name": "premium_pct", "value": round(premium_pct, 2)}))
             continue
-        if premium_pct <= policy.price_policy_pct:
+        if premium_pct <= rule_pct:
             continue
         counts["breaches"] += 1
         attention = premium_pct > policy.attention_pct
@@ -239,7 +241,7 @@ def run(inputs: EngineInputs) -> CapabilityOutput:
     for row in position.values():
         diffs = row.pop("_diffs")
         row["median_diff_pct"] = round(statistics.median(diffs), 2) if diffs else None
-    thresholds = {"policy_pct": policy.price_policy_pct, "attention_pct": policy.attention_pct,
+    thresholds = {"policy_pct": rule_pct, "attention_pct": policy.attention_pct,
                   "cost_floor_pct": policy.cost_floor_pct, "format_allowance_pct": allowance_pct,
                   "format_allowance_basis_count": allowance_n, "freshness_days": policy.freshness_days,
                   "comparability_floor": floor}

@@ -40,7 +40,7 @@ CAPABILITIES = {
     "hygiene":             CapabilitySpec("hygiene",             "SPEC-002", "none",     True,  "hygiene_order",
                                           ("products", "inventory")),
     "competitor_position": CapabilitySpec("competitor_position", "SPEC-003", "none",     True,  "premium_pct",
-                                          ("products", "observations", "matches")),
+                                          ("products", "observations", "matches", "price_rule")),
     "catalogue_lifecycle": CapabilitySpec("catalogue_lifecycle", "SPEC-004", "none",     True,  "unit_cost",
                                           ("products", "inventory", "sales_summary", "window")),
     "owner_questions":     CapabilitySpec("owner_questions",     "SPEC-005", "none",     False, "expected_value",
@@ -105,6 +105,8 @@ INPUT_REASONS = {
     "sales_daily": "no_daily_sales",
     # ADR-033: the store facts file itself is absent (an empty one is a file with no facts).
     "store_facts": "no_store_facts",
+    # D-39, ADR-043: the owner has not stated a price rule yet. A new copy starts here.
+    "price_rule": "no_price_rule",
     # ADR-037: the layout file itself is absent. A new copy starts without it (ADR-036), so this
     # is what a store says until the team records its first fixture.
     "store_layout": "no_store_layout",

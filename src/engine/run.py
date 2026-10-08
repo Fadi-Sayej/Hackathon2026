@@ -122,6 +122,12 @@ def _store_facts_verdict(store_facts) -> tuple:
         f"{r['department'] if r['department'] is not None else 'the file'} ({r['reason']})" for r in rejected)
 
 
+def _price_rule_verdict(rejected) -> tuple:
+    """ADR-043: a malformed price rule is reported here. Like a rejected store fact, it is not the
+    run's failure: the rule is simply not stated, and F3's breaches say they wait for it."""
+    return ("ok", None) if not rejected else ("degraded", f"rejected: {rejected}")
+
+
 def _store_layout_verdict(store_layout) -> tuple:
     """F12-S1 FR-178: a rejected fixture, width, count or rule is named here, by kind, key and
     reason, and the rest are used. Like a rejected store fact, it is not the run's failure."""
@@ -276,6 +282,7 @@ def run_engine(*, mode: str = "publish", input_csv: Optional[Path] = None, skip_
                                                            **sources))
     if inputs is not None:
         _step(steps, "store_facts", lambda: inputs.store_facts, verdict=_store_facts_verdict)
+        _step(steps, "price_rule", lambda: inputs.price_rule_rejected, verdict=_price_rule_verdict)
         _step(steps, "store_layout", lambda: inputs.store_layout, verdict=_store_layout_verdict)
     if inputs is not None and mode == "publish":
         # ADR-035 Decision 3: the one step the live run has and print mode does not. It asks the

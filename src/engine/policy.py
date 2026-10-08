@@ -22,7 +22,8 @@ D21_MAX_BOOST_PCT = 25
 @dataclass(frozen=True)
 class Policy:
     version: int
-    price_policy_pct: float
+    # The price rule is not here: it is the store owner's statement, in configs/store_facts.yaml
+    # (D-39, ADR-043), so a new store's copy never inherits another owner's.
     attention_pct: float
     cost_floor_pct: float
     freshness_days: int
@@ -116,7 +117,6 @@ class Policy:
                 "max_credible_gap_pct": self.max_credible_gap_pct,
             },
             "competitor_position": {
-                "policy_pct": self.price_policy_pct,
                 "attention_pct": self.attention_pct,
                 "cost_floor_pct": self.cost_floor_pct,
                 "freshness_days": self.freshness_days,
@@ -223,11 +223,13 @@ def _required(raw: dict, group: str, key: str, kind):
 
 def load_policy(path: Path | str | None = None) -> Policy:
     raw = yaml.safe_load(Path(path or DEFAULT_PATH).read_text(encoding="utf-8")) or {}
+    if "price_policy_pct" in raw:
+        raise ValueError("price_policy_pct is the store owner's price rule, and is stated in "
+                         "configs/store_facts.yaml as price_rule (D-39, ADR-043), never in the policy")
     surface = raw.get("surface", {}) or {}
     ceiling = raw.get("ceiling_derivation", {}) or {}
     policy = Policy(
         version=int(raw.get("version", 1)),
-        price_policy_pct=float(raw.get("price_policy_pct", 60)),
         attention_pct=float(raw.get("attention_pct", 100)),
         cost_floor_pct=float(raw.get("cost_floor_pct", 10)),
         freshness_days=int(raw.get("freshness_days", 14)),

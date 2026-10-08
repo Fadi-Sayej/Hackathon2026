@@ -244,6 +244,8 @@ export const en = {
   'unavailable.no_daily_sales': "We are waiting for the daily sales reports: an order quantity needs sales per day.",
   'unavailable.stale_daily_sales': "The latest daily sales report is too old to size tonight's orders.",
   'unavailable.no_store_facts': "The store facts file is missing, so no order schedule or shelf life is known.",
+  // D-39, ADR-043: approved by the repository owner on 2026-10-08.
+  'unavailable.no_price_rule': "Your price limit has not been recorded yet: the most you will charge above nearby stores for the same product.",
   // F12-S1 (Phase 8 Task 8.0). The capability-scoped keys say what the shared sentence
   // would get wrong on Shelf plan (unavailableReason.js).
   'unavailable.no_store_layout': "The shelf measurements have not been recorded yet.",

@@ -813,7 +813,6 @@
     "attention_pct": 100.0,
     "cost_floor_pct": 10.0,
     "freshness_days": 14,
-    "policy_pct": 60.0,
     "uncomparable_min_barcode_digits": 8
    },
    "market_boost": {

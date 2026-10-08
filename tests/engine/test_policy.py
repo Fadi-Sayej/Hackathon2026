@@ -32,7 +32,7 @@ def _write(tmp_path, raw):
 
 def test_policy_loads_declared_constants():
     p = load_policy()
-    assert p.price_policy_pct == 60
+    assert not hasattr(p, "price_policy_pct")     # the owner's, in store_facts.yaml (D-39)
     assert p.attention_pct == 100
     assert p.cost_floor_pct == 10
     assert p.surface_bound == 10

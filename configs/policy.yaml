@@ -4,7 +4,8 @@
 version: 1
 
 # SPEC-003 — declared, never derived (FR-045, FR-045b, FR-043a)
-price_policy_pct: 60          # owner's stated maximum premium over the balanced reference
+# price_policy_pct moved to configs/store_facts.yaml (price_rule) on 2026-10-08: it is the
+# store owner's own rule, and a new store's copy starts without one (D-39, ADR-043).
 attention_pct: 100            # same-day attention above this premium
 cost_floor_pct: 10            # reference must exceed our cost by this margin
 freshness_days: 14            # OQ-306 provisional: observations older than this drive nothing

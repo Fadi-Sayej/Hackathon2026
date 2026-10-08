@@ -43,6 +43,12 @@ def window_of(months, full=False):
     return EvidenceWindow(months=list(months), first=months[0], last=months[-1], count=len(months), full_annual_cycle=full)
 
 
+# D-39: the owner's rule is an input now. A test says nothing about it is a test with YomYom's +60%,
+# as the policy held before ADR-043; a test about its absence passes price_rule=None.
+PRICE_RULE = {"max_premium_pct": 60.0, "stated_by": "owner", "stated_on": "not_recorded",
+              "recorded_by": "team", "recorded_on": "2026-09-08"}
+
+
 def make_inputs(**kw):
     owner = kw.get("owner") or OwnerState.from_dict({"status": "available", "pulled_at": "t"})
     sales_summary = kw.get("sales_summary")
@@ -55,7 +61,7 @@ def make_inputs(**kw):
         sales_daily=kw.get("sales_daily"),
         sales_summary={s["barcode"]: s for s in sales_summary} if sales_summary is not None else None,
         window=kw.get("window"), observations=kw.get("observations"), matches=kw.get("matches"),
-        stores=load_store_types(), withdrawn=kw.get("withdrawn"), conflicting=kw.get("conflicting", []), store_facts=kw.get("store_facts"), running_out=kw.get("running_out"), boost_picks=kw.get("boost_picks"), market_recent=kw.get("market_recent"), store_layout=kw.get("store_layout"), shelf_photos=kw.get("shelf_photos"), inputs_digest=kw.get("inputs_digest", "0" * 64), idle=kw.get("idle"),
+        stores=load_store_types(), withdrawn=kw.get("withdrawn"), conflicting=kw.get("conflicting", []), store_facts=kw.get("store_facts"), running_out=kw.get("running_out"), boost_picks=kw.get("boost_picks"), market_recent=kw.get("market_recent"), store_layout=kw.get("store_layout"), shelf_photos=kw.get("shelf_photos"), price_rule=kw.get("price_rule", PRICE_RULE), inputs_digest=kw.get("inputs_digest", "0" * 64), idle=kw.get("idle"),
         vintages={"pos": {"file": "f", "as_of": "2026-08-02"},
                   # ADR-026: reconciliation carves its window from this boundary, and load_inputs
                   # derives it from the POS date above, so it follows that date: 2026-08.

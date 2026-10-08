@@ -91,3 +91,16 @@ def test_the_market_half_is_withheld_through_run_engines_own_paths(tmp_path):
     assert probe.withheld_sources("observations", silver, tmp_path / "o2")["signals_dir"].is_dir()
     assert not any(probe.withheld_sources("observations", silver, tmp_path / "o3")["signals_dir"].iterdir())
     assert not probe.withheld_sources("matches", silver, tmp_path / "m2")["matches_path"].exists()
+
+
+def test_the_price_rule_is_withheld_from_a_copy_of_the_facts_file(tmp_path):
+    """D-39, ADR-043: withheld at source, as everything here is. The departments stay, so the
+    store facts are not withheld with it."""
+    from src.engine.store_facts import DEFAULT_PATH, load_price_rule, load_store_facts
+    silver = tmp_path / "silver"
+    silver.mkdir()
+    sources = probe.withheld_sources("price_rule", silver, tmp_path / "price_rule")
+    facts = sources["store_facts_path"]
+    assert load_price_rule(DEFAULT_PATH)["rule"] is not None
+    assert load_price_rule(facts) == {"rule": None, "rejected": None}
+    assert load_store_facts(facts, set()) == load_store_facts(DEFAULT_PATH, set())
