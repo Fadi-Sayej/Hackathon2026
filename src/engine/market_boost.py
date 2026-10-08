@@ -98,7 +98,8 @@ def candidates(inputs: EngineInputs) -> list:
         out.append((evidence["units_in_window"], {
             "barcode": barcode, "product_name": p["product_name"], "department": p["department"],
             "weekly_units": evidence["weekly_units"], "daily_mean": evidence["daily_mean"],
-            "stores_out": len(market["stores_out"]), "days_absent": sorted(market["days_absent"].values()),
+            "stores_out": len(market["stores_out"]), "stores_in_market": len(signal["stores"]),
+            "days_absent": sorted(market["days_absent"].values()),
             "shelf_life": dept["shelf_life"],
         }))
     out.sort(key=lambda pair: (-pair[0], pair[1]["barcode"]))

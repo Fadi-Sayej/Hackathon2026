@@ -30,6 +30,7 @@
        "shelf_life": {
         "days": 30
        },
+       "stores_in_market": 1,
        "stores_out": 1,
        "weekly_units": [
         21.0,
@@ -45,7 +46,7 @@
       "reason_withheld_because": null
      }
     },
-    "prompt": "configs/prompts/market_boost.v1.md",
+    "prompt": "configs/prompts/market_boost.v2.md",
     "requires": [
      "running_out",
      "boost_picks"
@@ -55,7 +56,7 @@
     "thresholds": {
      "max_pct": 25.0,
      "model": "claude-sonnet-5",
-     "prompt": "configs/prompts/market_boost.v1.md",
+     "prompt": "configs/prompts/market_boost.v2.md",
      "request_ceiling": 200
     },
     "unavailable_reason": null,
@@ -835,7 +836,7 @@
    "market_boost": {
     "max_pct": 25.0,
     "model": "claude-sonnet-5",
-    "prompt": "configs/prompts/market_boost.v1.md",
+    "prompt": "configs/prompts/market_boost.v2.md",
     "request_ceiling": 200
    },
    "market_running_out": {

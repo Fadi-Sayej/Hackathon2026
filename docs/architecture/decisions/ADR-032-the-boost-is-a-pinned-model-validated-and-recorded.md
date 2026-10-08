@@ -7,7 +7,7 @@ Date: 2026-09-25
 Parent: [System Design](../system-design.md) §19
 Related Specs: F8-S1 (FR-147, FR-154, FR-164, INV-074, INV-079, NFR-066, C-72, AC-160, AC-161)
 Inputs: [docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md, D-16, D-21, ADR-001, ADR-007, ADR-014, ADR-031, ADR-035, .github/workflows/collect-daily.yml]
-Updated: 2026-09-26
+Updated: 2026-10-08
 ---
 
 # ADR-032 — The boost is picked by a pinned Claude model (Sonnet 5) in the nightly run, and checked mechanically before it is used
@@ -61,6 +61,14 @@ How a pick is kept, so the run can be reproduced, is a separate decision: ADR-03
 
    Nothing else goes in: no competitor volume, which is not observed, and no ₪ figure. The
    prompt is a versioned file in the repository.
+
+   > **Added 2026-10-08.** The request also says how many stores the market has
+   > (`stores_in_market`), the count `stores_out` is out of. That count is published in
+   > `market_running_out.stores`. The prompt is now `market_boost.v2.md`. v1 said the shop
+   > was in Kafr Qasim and that it had three nearby stores, which is true only of the pilot's
+   > copy, and every store's copy sends this prompt (ADR-036). Nothing else in it changed: the
+   > reason is still in Arabic, as approved on 2026-09-27 (`docs/reviews/F8-screens-mockups.md`).
+   > v1 stays in the repository; the picks recorded with it name it.
 4. **What it may return, and how that is checked.** It must return JSON,
    `{"boost_pct": <number>, "reason": <text ≤ 160 chars>}`, and is checked mechanically in
    this order:

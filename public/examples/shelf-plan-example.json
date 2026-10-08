@@ -795,7 +795,7 @@
    "market_boost": {
     "max_pct": 25.0,
     "model": "claude-sonnet-5",
-    "prompt": "configs/prompts/market_boost.v1.md",
+    "prompt": "configs/prompts/market_boost.v2.md",
     "request_ceiling": 200
    },
    "market_running_out": {

@@ -125,7 +125,7 @@ boost:
   model: claude-sonnet-5
   max_pct: 25
   request_ceiling: 200
-  prompt: configs/prompts/market_boost.v1.md
+  prompt: configs/prompts/market_boost.v2.md   # v1 named the pilot's town and market size (ADR-036)
 
 # F9-S1 §5, "recent": the usable nights among the last window_days calendar days. ADR-031's
 # own fortnight: the span its signal must cover, and the history that makes a listing steady.

@@ -123,7 +123,8 @@ def test_the_request_holds_exactly_the_published_facts(tmp_path):
     (call,) = fake.calls
     assert call["facts"] == {"barcode": "a", "product_name": "מים", "department": DEPT,
                              "weekly_units": [14.0, 14.0, 14.0, 14.0], "daily_mean": 2.0,
-                             "stores_out": 1, "days_absent": [3], "shelf_life": {"days": 30}}
+                             "stores_out": 1, "stores_in_market": 2, "days_absent": [3],
+                             "shelf_life": {"days": 30}}
     request = call["request"]
     assert request["model"] == "claude-sonnet-5"
     assert not {"temperature", "top_p", "top_k"} & set(request)
@@ -209,6 +210,15 @@ def test_a_client_error_is_not_retried():
 def _sealed(tmp_path, answer='{"boost_pct": 10, "reason": "نفدت"}'):
     mb.live_step(inputs(), snapshots_root=tmp_path, key="k", transport=Fake(default=answer), now=RUN_AT)
     return mb.read_picks(tmp_path, LAST.isoformat())
+
+
+
+def test_the_prompt_says_nothing_that_belongs_to_one_store():
+    """ADR-036: every store's copy sends this prompt. It names no town and no market size: the
+    market's size goes in each request, as `stores_in_market`, beside `stores_out`."""
+    text = (Path(__file__).resolve().parents[2] / POLICY.boost_prompt).read_text(encoding="utf-8")
+    assert "Kafr Qasim" not in text and "three" not in text
+    assert "`stores_in_market`" in text and "`stores_out`" in text
 
 
 def test_a_recorded_pick_is_applied_when_its_facts_still_match(tmp_path):
