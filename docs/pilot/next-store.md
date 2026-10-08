@@ -5,7 +5,7 @@ Status: Ready for review
 Owner: smartshelf-pm
 Parent: [D-23](../product/intent-register.md#3-decisions-already-made-by-the-intent-layer)
 Inputs: [docs/product/intent-register.md (D-14, D-18, D-22, D-23, D-24), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (FR-143, FR-144, FR-155, ASM-065), docs/architecture/decisions/ADR-030-own-sales-arrive-as-daily-reports.md, ADR-033-store-facts-are-a-committed-file.md, configs/store_facts.yaml, configs/store_types.yaml, configs/delivery_targets.yaml, configs/pos_schema_mapping.yaml, public/data/dashboard.json and measurement.json (2026-09-29), docs/reviews/F1…F13-validation.md, issue #66]
-Updated: 2026-09-30 (the importers' new names, ADR-036)
+Updated: 2026-10-08 (the report folders are the store's settings); 2026-09-30 (the importers' new names, ADR-036)
 ---
 
 # What the next store must send
@@ -31,8 +31,8 @@ Nothing on this list may be simulated while it is missing (D-23).
 | What | How often | Unlocks | Where it goes |
 |---|---|---|---|
 | **The inventory export** (prices, cost, stock) | At the start, then whenever it changes | F1's price checks, F2's reconciliation, F4's catalogue, F5's questions. YomYom's only export is dated **2026-06-06**, and every finding still describes that day | `scripts/import_pos.py`, which reads `configs/store.yaml`'s `pos.export`. It was written for YomYom's export; a different POS's column names go in `configs/pos_schema_mapping.yaml`, and `scripts/inspect_pos_file.py` checks a file before it is imported |
-| **Monthly sales reports** | Monthly | F2's reconciliation window, F4's idle products, the money at stake on F5's questions. YomYom sent seven, 2026-01 … 2026-07 | `data/internal/raw_pos/yomyom/sales/`, read by `scripts/import_sales.py` |
-| **Daily sales reports, with the deliveries column** | At least weekly | F8's order quantities. F8 needs 21 report days in the last 28, with one in each week, and the latest no more than 7 days old (F8-S1 FR-144). A monthly report never counts, because it is never divided into days (FR-143). YomYom sent none, so `order_quantity` stays `unavailable (no_daily_sales)` | `data/internal/raw_pos/yomyom/sales_daily/` (ADR-030), read by `src/internal_pos/sales_daily_importer.py` |
+| **Monthly sales reports** | Monthly | F2's reconciliation window, F4's idle products, the money at stake on F5's questions. YomYom sent seven, 2026-01 … 2026-07 | The folder `sales.monthly_dir` names in `configs/store.yaml` (YomYom's was `data/internal/raw_pos/yomyom/sales/`), read by `scripts/import_sales.py` |
+| **Daily sales reports, with the deliveries column** | At least weekly | F8's order quantities. F8 needs 21 report days in the last 28, with one in each week, and the latest no more than 7 days old (F8-S1 FR-144). A monthly report never counts, because it is never divided into days (FR-143). YomYom sent none, so `order_quantity` stays `unavailable (no_daily_sales)` | The folder `sales.daily_dir` names (YomYom's was `data/internal/raw_pos/yomyom/sales_daily/`; ADR-030), read by `src/internal_pos/sales_daily_importer.py` |
 
 ## 3. From the owner, in their own words
 

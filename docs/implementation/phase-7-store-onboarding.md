@@ -5,7 +5,7 @@ Status: Approved — by the repository owner, 2026-09-30 ("approved"), with ADR-
 Owner: smartshelf-architect
 Parent: [Implementation plan](plan.md)
 Inputs: [D-28, ADR-036 (Accepted 2026-09-30), docs/pilot/next-store.md, src/engine/inputs.py, src/engine/run.py, src/common/paths.py, src/context/weather.py, src/internal_pos/, scripts/import_yomyom_pos.py, scripts/import_yomyom_sales.py, src/matching/product_matching.py, configs/delivery_targets.yaml, configs/store_types.yaml, firestore.rules, scripts/check_firebase_config.mjs, .github/workflows/collect-daily.yml, index.html]
-Updated: 2026-10-01 (Tasks 7.1–7.6 built; one pull request)
+Updated: 2026-10-08 (Checkpoint 7 checked on a clean copy: met after #296, #299 and #302; one question open); 2026-10-01 (Tasks 7.1–7.6 built; one pull request)
 ---
 
 # Phase 7 — A new store without code changes
@@ -139,3 +139,32 @@ are the six tasks, each tested locally first.
   Research scripts written against the pilot's data (the Alonit discovery, velocity,
   baselines) say so in their docstrings, and comments that record the pilot's history keep
   its name.
+
+
+### Result, 2026-10-08: met, after three fixes the run found
+
+Checked on a clean copy made from main for a test store, "Store B". It has another format
+(`urban_minimarket`), its own settings and none of YomYom's venues. The copy stayed in a
+scratch directory and was never pushed. The run found three defects, each fixed and merged
+before this result was taken:
+- **#296:** the copy told a new store to fill `store_policy.yaml` with a script that could not
+  run for any store.
+- **#299:** the probes' test world read the store's format and venue list from the copy's
+  settings. In a copy its market was empty, and `check_order_signals` would have blocked
+  every nightly once the store's own data went live.
+- **#302:** the boost prompt told the model the shop was in Kafr Qasim, with three nearby
+  stores.
+
+| Item | Result |
+|---|---|
+| YomYom's artefact unchanged | **Met.** Print-mode runs at 2026-10-08T08:00Z on main and with #299 are identical, except the `run_id`, which is random on every run. #302 changes only `thresholds.market_boost.prompt` (v1 to v2) and the `inputs_digest` that covers it; no capability figure moves. |
+| A clean copy is made and builds | **Met.** 1,411 code files and 8 empty settings, with no `store_policy.yaml`. `npm run build` passes, with Store B's title and site address. |
+| It passes the suites | **Met as ADR-036's 2026-10-01 note defines it, not literally.** Code is tested here, where CI runs; a copy carries no `ci.yml`. In the copy, Python: 1,228 pass and 44 fail. JS: 640 pass, 2 fail and 2 suites do not load. Every one reads something a new copy does not have yet: YomYom's committed venues, snapshots, monthly reports or artefact; YomYom's venue ids in its `store_types.yaml` (nine engine unit tests); the artefact the first nightly writes; or the Firebase set-up (step 3), which `check:firebase` correctly reports as not done. None tests code the copy runs. The order probe the copy's nightly runs passes there, 17 checks. |
+| `check:store` lists what `next-store.md` asks for | **Met for every file `next-store.md` names:** the store's own entries, the nearby venues and their formats, the POS export, the monthly and daily reports, the department facts and the shelf layout. It also lists the two Actions secrets. The rest of the list is not files, so it cannot be checked: the owner's sign-in (an account), GAP-009, and time for three questions a day. GAP-011 is a file value (`owner_declared_ceiling_pct`). A copy starts with it empty, which means the derived ceiling, published as derived. |
+| No hard-coded store value in the code a copy runs | **Met after #302.** The sweep covered the 312 files a copy carries from `src/`, `scripts/`, `configs/`, the nightly and the build. It looked for YomYom's name, its town, coordinates and format, its Firebase project, its site addresses and its venue id. It found docstrings and history comments, which this checkpoint allows, and one example in a hint: `check:firebase` shows "e.g. hackathon26-a6ebd" for a missing project id. |
+
+**Open, for the repository owner:** `price_policy_pct` in `configs/policy.yaml` is the pilot
+owner's +60%. F3-S1 FR-045 calls it "a declared maximum premium … settable as a product
+decision". A copy carries it as code, and the loader falls back to 60 when the key is absent.
+So a second store's F3 findings would use +60% until someone changes it. The setup guide
+(step 7) says to ask the new owner; nothing checks that anyone did.
