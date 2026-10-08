@@ -238,3 +238,17 @@ def test_the_replay_over_the_committed_snapshots():
     flagged = {d: len(set(running_out(series, ids, POLICY, d)) & his) for d in nights}
     assert len(nights) >= 20
     assert all(10 <= n <= 40 for n in flagged.values()), flagged
+
+
+def test_the_products_come_out_in_barcode_order_whatever_the_hash_seed():
+    """The nightly commits dashboard.json, so its bytes must repeat when the data does (ADR-024's
+    reason for sorting). Filled from a set of barcodes, the products came out in Python's string
+    hash order, which changes with every process: two runs over the same snapshots published the
+    same facts in a different order (found 2026-10-08, comparing main's artefact with ADR-043's)."""
+    # Eight going at each store among two hundred steady listings: 4%, under ADR-031's catalogue-
+    # change guard, which would read thirty going at once as a change of catalogue and say nothing.
+    s = build({("s1", f"7290{i:03d}"): absent_for(3) for i in range(8)}
+              | {("s2", f"7280{i:03d}"): absent_for(3) for i in range(8)}, filler=200)
+    products = running_out(s, ["s1", "s2"], POLICY, last_day(s))
+    assert len(products) == 16
+    assert list(products) == sorted(products)
