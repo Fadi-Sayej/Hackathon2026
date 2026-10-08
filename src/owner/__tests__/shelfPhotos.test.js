@@ -25,8 +25,9 @@ describe('sending a shelf photo (FR-225)', () => {
     const r = recorder()
     await sendPhoto({ id: 'p1', unit: 'מקרר 1', file: file(bytes) }, { ...r, now: () => 1_000, online: () => true })
     expect(r.writes.map((w) => w[0])).toEqual(['part', 'part', 'part', 'manifest'])
-    const joined = new Uint8Array(r.writes.slice(0, 3).flatMap((w) => [...w[3].data]))
-    expect(joined).toEqual(bytes)
+    // Compared as buffers: element by element, 1.8 MB timed out under a loaded test run.
+    const joined = Buffer.concat(r.writes.slice(0, 3).map((w) => Buffer.from(w[3].data)))
+    expect(Buffer.compare(joined, Buffer.from(bytes))).toBe(0)
     expect(r.writes.slice(0, 3).map((w) => w[3].data.length)).toEqual([PART_MAX, PART_MAX, 17])
     expect(r.writes[3][2]).toEqual({
       schema: PHOTO_SCHEMA, unit: 'מקרר 1', sentAt: 1_000, size: bytes.length, parts: 3,
