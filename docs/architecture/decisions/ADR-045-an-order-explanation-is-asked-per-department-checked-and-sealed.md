@@ -66,7 +66,8 @@ Two things make the order explanation different from the shelf's:
      Where a figure or the name belongs, it writes a named slot: `{product}`, `{quantity}`,
      `{expected}`, `{weeks}`, `{next_order}`, `{left}`, `{runs_out}` or `{capped}`. Each
      suggestion is offered only the slots its facts support, and each slot may appear once. The
-     model is told what each slot means, never its figure or its phrase.
+     model is told what each slot means, never its figure or its phrase. It is not sent the
+     product's name or the order day's date or weekday; slots carry them.
    - The page fills each slot with a phrase that carries the figure and names it, with its
      period: `{left}` becomes "about 3 left on Tuesday 1 Sept", not "3", and `{expected}` "about
      35 expected to sell in the 7 days from Tuesday 1 Sept". Figures take the card's own format,
@@ -96,17 +97,22 @@ Two things make the order explanation different from the shelf's:
      text as written nor its NFKC form may hold a character Unicode classes as a number. Checking
      both catches a numeral that NFKC turns into letters.
    - The intent asks that the figure check be mechanical, «لا بطلبٍ في التعليمات». So the check
-     also refuses number words from a fixed list in the three languages, matched as whole words
-     with one-letter prefixes after quote marks are removed and the text normalised. The list
-     covers two upward, fractions, multiples and the duals (יומיים, أسبوعين). "One" and the
-     ordinals are left to the prompt, because they serve as ordinary words too.
+     also refuses the number words of F14-S1 Appendix A in the three languages, with their listed
+     forms: two upward, fractions, multiples and the duals (יומיים, أسبوعين). Before matching, it
+     normalises the text: NFKC, invisible format characters, combining marks and the Arabic
+     stretch character removed, and Arabic alef and hamza forms folded. Words are matched whole,
+     after up to two Hebrew prefix letters or Arabic's attached ones. "One" and the ordinals are
+     left to the prompt, because they serve as ordinary words too.
+   - It also refuses a geresh or gershayim between Hebrew letters, which catches Hebrew numerals
+     written in letters (ל״ה) and abbreviations such as ש״ח. And it refuses Appendix A's relative
+     days ("tomorrow", "מחר", "غداً"), because a text can be reused on a later night.
    - The check also refuses:
      - a slot not offered, or used twice;
      - a text without `{product}` or `{expected}`, or without an offered `{left}`, `{runs_out}`
        or `{capped}`;
      - a product name of the group written out, matched as a whole word;
-     - a percentage or ₪ sign, NFKC folding its wide forms, or a word from a fixed list, matched
-       like the number words;
+     - a percentage or ₪ sign, NFKC folding its wide forms, or a percentage or currency word from
+       Appendix A, matched like the number words;
      - a text over 200 characters;
      - a language without its own letters.
    - A failing suggestion is withheld in all three languages. The rest of its group stands.
@@ -121,8 +127,10 @@ Two things make the order explanation different from the shelf's:
      The text is stored with its slots unfilled. A withheld answer's raw text is kept for audit,
      cut to 2,000 characters, and is never shown.
    - The digest is over the suggestion's sent facts with its department's name, and without its
-     id or product name. An explanation therefore follows its facts, and is never reused in
-     another department. The id stays the same until the order day (ADR-034), but the facts can
+     id. No product name is sent, so a text holds none and may serve another product of the
+     department with the same facts; it is never reused in another department. The prompt's
+     version is the prompt file's hash, as `shelf_explanation`'s is. The versions the page's
+     phrases serve are listed in one place, which the page and the example's builder both read. The id stays the same until the order day (ADR-034), but the facts can
      change in between.
    - It is committed in the nightly's existing step for sealed answers, which commits the boost's
      picks and the shelf explanations today, and grows to take it.
@@ -149,10 +157,12 @@ Two things make the order explanation different from the shelf's:
      across the night's runs as the boost's ceiling is.
    - A time budget, `order_explanation.time_budget_s`, proposed at 600, checked before each send.
      It is cut short by the nightly's deadline: a time the nightly gives the engine, by which
-     every model step stops sending. It is set so that what follows the engine in the job still
-     fits in its 60 minutes: the probes, the commits, and a deploy check of up to 12 minutes. The
-     nightly took between 24.6 and 37.2 minutes from 2026-10-03 to 2026-10-09, and its steps'
-     own times set the deadline in the implementation plan.
+     this step stops sending. It is set so that what follows the engine in the job still fits in
+     its 60 minutes: the probes, the commits, and a deploy check of up to 12 minutes. The nightly
+     took between 24.6 and 37.2 minutes from 2026-10-03 to 2026-10-09, and its steps' own times
+     set the deadline in the implementation plan. The boost, the shelf explanation and the shelf
+     reader keep their own budgets, unchanged. The plan states the nightly's combined worst case;
+     if it does not fit in 60 minutes, that is F8's and F12's to decide.
    - A request times out at `order_explanation.timeout_s`, proposed 120. Where the shared client
      retries, after a 429, a 5xx or a transport failure, it waits one second and tries once more.
      Any other failure is not retried. One request can therefore take about 241 seconds, and the

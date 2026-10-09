@@ -130,10 +130,11 @@ always reads as one (D-10).
 **FR-236** — The model is given only what each suggestion publishes (F8-S1 FR-154)
 **(decided here)**:
 - its id, which keys the answer, its quantity, and whether it is net or gross. Its product name
-  reaches the text only as the `{product}` slot;
+  is not sent: it reaches the text only as the `{product}` slot;
 - the expected sales for the days the order covers, and, when `{weeks}` is offered, the units
   sold in each of the window's weeks, oldest first;
-- the order day's weekday, and how many days the order covers;
+- how many days the order covers. The order day itself is not sent: it reaches the text only
+  through `{next_order}`, `{expected}`, `{left}` and `{runs_out}`;
 - whether the count was used. When it was, the stock at the order day when it is above 0.05,
   the card's own threshold, and otherwise that nothing will be left. When it was not, F8's
   reason (F8-S1 FR-149);
@@ -150,8 +151,8 @@ always reads as one (D-10).
 
 Figures are sent as the card shows them: to one decimal place, halves rounded up, as the page's
 own rounding does, not to the nearest even. Each request also carries the department's name.
-Nothing else goes in: no barcode, no date, no price, cost, margin or ₪ figure (D-1), no stock now,
-and no daily mean.
+Nothing else goes in: no barcode, no product name, no date or weekday, no price, cost, margin or ₪
+figure (D-1), no stock now, and no daily mean.
 
 **FR-237** — The model is asked once per group **(decided here, within OQ-1402)**:
 - one department's suggestions, in the order `order_quantity` publishes them, at most 20 to a
@@ -194,25 +195,27 @@ Each suggestion's text is checked mechanically, on its own, before anything is p
 - every slot in it is one offered for that suggestion, and each appears at most once. Every text
   uses `{product}` and `{expected}`. Every offered `{left}`, `{runs_out}` or `{capped}` is used,
   so the card keeps what the engine's sentence and shelf-life line said;
-- no product name of the group appears in the text as written, matched as a whole word. The
-  model uses `{product}`;
+- no product name of the group appears in the text as written, matched as the word lists are.
+  The model is not sent the names; this catches one it guesses;
 - **the figure check (D-16).** With the slots removed, neither the text as written nor its
   Unicode NFKC form holds a character Unicode classes as a number. That covers every script's
   digits, fractions and numerals;
-- **numbers in words (D-16).** With the slots removed, quote-like marks (`"`, `״`, `'`, `׳`, `‘`,
-  `’`, `“`, `”`) removed, the text NFKC-normalised and case-folded, it holds none of a fixed list
-  of number words. They are matched as whole words, allowing Hebrew's and Arabic's one-letter
-  prefixes and Arabic's `ال`. The list, kept with the check, holds in each of the three languages:
-  - the cardinals from two to twenty, the tens to ninety, hundred and thousand;
-  - half, quarter, third, dozen, double, twice, triple, and Hebrew's פי;
-  - the duals: יומיים, שבועיים, חודשיים, يومين, يومان, أسبوعين, أسبوعان, شهرين.
-
-  "One" and the ordinals are left to the prompt, because the words also serve as ordinary words,
-  and listing them would withhold too much ordinary text (ASM-085);
+- **Hebrew letter-numerals.** In any text, a geresh or gershayim mark (`׳`, `״`, or `'`, `"`
+  used as one) between two Hebrew letters is refused. That catches numerals written in letters
+  (ל״ה is 35) and abbreviations such as ש״ח alike;
+- **numbers in words (D-16).** The text is normalised for matching: slots removed, Unicode NFKC,
+  invisible format characters and combining marks removed (Hebrew points, Arabic vowel marks),
+  the Arabic stretch character removed, Arabic alef and hamza forms folded to plain alef, and
+  case folded. It then holds none of the number words in Appendix A. They are matched as whole
+  words, after up to two of Hebrew's prefix letters (ו, ה, ב, ל, מ, ש, כ), or Arabic's و or ف,
+  then ب, ل or ك, then ال. "One" and the ordinals are left to the prompt, because they serve as
+  ordinary words too (ASM-085);
+- **no relative days.** In the same normalised text, none of Appendix A's relative-day words:
+  today, tonight, tomorrow, yesterday and their Hebrew and Arabic forms. A text can be reused on
+  a later night (FR-239), and the model is not told the date;
 - **no percentage or ₪ amount (D-1).** In the same normalised text, none of the signs `%`, `٪`
-  or `₪`, NFKC folding their wide and small forms, and none of these words, matched the same way:
-  - percent, per cent, percentage, אחוז, אחוזים, بالمئة, بالمائة, المئة;
-  - shekel, shekels, NIS, ILS, שקל, שקלים, שח, شيكل, شيقل, شواكل;
+  or `₪`, NFKC folding their wide and small forms, and none of Appendix A's percentage and
+  currency words;
 - with the slots removed, the Hebrew text holds a Hebrew letter, the Arabic text an Arabic
   letter, and the English text a Latin letter.
 
@@ -226,12 +229,15 @@ in ASM-085.
 - the snapshot records, per suggestion, the model, the prompt's version, the facts digest, and
   the text with its slots unfilled, or why it was withheld;
 - the facts digest is over FR-236's facts for that suggestion with its department's name, and
-  without its id or product name. A text written for one department is never reused in another;
+  without its id. No product name is sent, so a text holds none, and may serve another product
+  of the same department with the same facts. A text written for one department is never reused
+  in another;
 - each request's input and output tokens and its stop reason, as the API reports them, are
   recorded in the night's manifest;
 - print mode never calls the model. It reads the night's snapshot;
 - an explanation whose digest no longer matches its suggestion's facts is not shown. The
   suggestion counts as out of date;
+- the prompt's version is the prompt file's hash, as the shelf explanation's is;
 - **reuse.** Before asking, the step reads earlier nights' snapshots, newest first. It stops at
   the first night whose step reached its end, meaning a run of that night wrote its end manifest,
   whatever stopped its asking, and never reads more than `order_explanation.reuse_nights` nights
@@ -268,10 +274,11 @@ admitted, because it fails on different days from the quantities (ADR-014) **(de
   explanation and the shelf reader. A per-night ceiling of requests sits in policy, proposed 60,
   and is counted across the night's runs;
 - a time budget, proposed 600 seconds, is checked before each request is sent. It is cut short
-  by the nightly's own deadline: a time the nightly gives the engine, by which every model step
-  stops sending, so that the steps after the engine still fit in the job's 60 minutes. Those are
-  the probes, the commits and the deploy check. The implementation plan sets the deadline from
-  the nightly's measured step times;
+  by a deadline the nightly gives the engine, by which this step stops sending, so that the steps
+  after the engine still fit in the job's 60 minutes. Those are the probes, the commits and the
+  deploy check. The implementation plan sets the deadline from the nightly's measured step times.
+  The boost, the shelf explanation and the shelf reader keep their own budgets; this spec does
+  not change them;
 - a request times out at 120 seconds. A request that fails, after the shared client's one retry
   where it retries, ends the night's asking, as the boost's does. Requests already in flight
   finish, and their answers are checked and kept.
@@ -284,7 +291,8 @@ sentence and the shelf-life line, in the page's language, after a tag saying it 
 - the page fills each slot from that suggestion's published facts, as FR-238's table says, and
   isolates each filled slot for direction, as it already isolates the product name and "40%";
 - the page fills only the slots published as offered for that suggestion, and shows only a text
-  whose prompt version is one its phrases were written for. When the text holds any other slot,
+  whose prompt version is one its phrases were written for. The versions the phrases serve are
+  listed in one place, which the page and the example's builder both read. When the text holds any other slot,
   a slot whose fact is missing, or another prompt version, the page does not show the text. The
   card shows the engine's sentence instead;
 - the quantity, the "Your stock count wasn't used" notice, the market boost box and the three
@@ -303,6 +311,9 @@ stay as the card's sentence whenever there is no explanation.
   the AI explained 28 of 30 suggestions. A card it did not explain shows the engine's
   sentence.");
 - when none do, that the AI has not explained tonight's suggestions;
+- the counts are the engine's. Between a change to the phrases and the next night, the page may
+  hide a text the counts call explained (FR-242); the card then shows the engine's sentence, as
+  the note says;
 - when `order_explanation` is unavailable, its reason in his words. Without a key, that the AI's
   explanations are off because no key for the model has been set up.
 
@@ -448,9 +459,12 @@ is counted in exactly one of FR-240's four states.
 | A product name holds digits or "%" ("קוקה קולה 1.5", "חלב 3%") | The name reaches the text only through `{product}`, which is removed before the checks and isolated for direction when filled |
 | A text writes a product's name instead of `{product}`, or names another product of its group | Withheld. Names are matched as whole words, so "מים" is not found inside "ימים" |
 | The model writes a number anyway ("35", "３５", "½", "٣٥", "Ⅻ") | Withheld. The raw text and its NFKC form are both checked against the Unicode number classes |
-| The model writes a number in words ("four weeks", "חצי", "أسبوعين") | Withheld, for every word on the list. "One" and the ordinals are not on it (ASM-085) |
+| The model writes a number in words ("four weeks", "חצי", "أسبوعين", "ובשלושת", "ثلاثةَ", "ثلاثـة") | Withheld, for every word and form in Appendix A, with its prefixes, vowel marks or stretching removed. "One" and the ordinals are not on it (ASM-085) |
+| A Hebrew numeral in letters ("ל״ה") or an abbreviation ("ת״א") | Withheld: a geresh or gershayim between Hebrew letters is refused |
+| "Tomorrow", "מחר", "غداً" | Withheld: the model is not told the date, and the text may be reused on a later night |
+| "לפי", "כפי", "על פי" | Allowed: פי is not on the list, because a multiple needs a number word that is |
 | A slot not offered (`{left}` on a gross suggestion), or used twice | Withheld |
-| "ש״ח", "ש''ח" or "％" after a slot | Withheld: quote-like marks are removed and the text NFKC-normalised before the signs and words are matched |
+| "ש״ח", "ש''ח" or "％" after a slot | Withheld: the gershayim is refused, and the text is NFKC-normalised before the signs are matched |
 | A window with a day unreported, or a week shorter than 7 days | `{weeks}` is not offered, and no weekly figures are sent (SCN-187) |
 | Stock at the order day of 0.05 or less | `{left}` is not offered; `{runs_out}` is, and must be used, as the card says it today |
 | A department whose products do not spoil | `{capped}` is never offered; the model is told they do not spoil |
@@ -465,10 +479,12 @@ is counted in exactly one of FR-240's four states.
 
 **NFR-082** — The step never holds the night's artefact up **(decided here)**. Its requests are
 bounded by the policy's ceiling, its time by its own budget and by the nightly's deadline,
-checked before each request is sent, and each request by its timeout (FR-241). On its own, it
-ends within about 600 + 241 seconds: the budget, plus a request sent just before it ran out that
-timed out and was retried. With the other model steps, it ends within about 241 seconds of the
-nightly's deadline, which leaves the job's remaining steps their measured time. Each night it
+checked before each request is sent, and each request by its timeout (FR-241). It ends
+within about 600 + 241 seconds: the budget, plus a request sent just before it ran out that timed
+out and was retried, and never later than about 241 seconds after the nightly's deadline. The
+other model steps keep their own budgets. The implementation plan states the nightly's combined
+worst case against its 60 minutes; if it does not fit, that is a decision for F8 and F12, not
+taken here. Each night it
 publishes the requests made and how many explanations were reused.
 
 **NFR-083** — Its cost is estimated before it is switched on, and counts under ADR-032's monthly
@@ -506,21 +522,26 @@ explanation, and why. *(FR-240, INV-098)*
   `{expected}` and every offered `{left}`, `{runs_out}` or `{capped}`, where the product's name
   holds digits or "%";
 - withholds a text with a numeral of any script outside its slots, Roman numerals included;
-- withholds one with a listed number word in any of the three languages, including a dual;
+- withholds one with a number word from Appendix A in any of the three languages, in each of its
+  listed forms, including a dual, with stacked prefixes ("ובשלושה", "وبالثلاثة"), with Arabic
+  vowel marks or stretching, or split by an invisible character;
+- withholds one with a geresh or gershayim between Hebrew letters ("ל״ה"), and one with a
+  relative day ("tomorrow", "מחר", "غداً");
+- passes one with "לפי", "כפי" or "על פי";
 - withholds one with a slot not offered, a slot used twice, or a required slot missing;
 - withholds one with a product's name written out, but not one whose word only contains a name
   ("ימים" against "מים");
-- withholds one with `%`, `٪`, `％`, `₪`, a percentage word, or a currency name, including "ש״ח"
-  and "ש''ח";
+- withholds one with `%`, `٪`, `％`, `₪`, a percentage word, or a currency name, including "ש״ח",
+  "ש''ח" and "שקלים";
 - withholds one over 200 characters, one missing a language, and a text without its own
   language's letters once its slots are removed.
 
 Only the failing suggestion is withheld, in all three languages. *(FR-238, INV-100)*
 
 **AC-223** — The request built for a group carries only FR-236's facts and the department's
-name, figures to one decimal with halves rounded up. It carries no barcode, date, price, cost,
-margin, ₪ figure, stock now, boost reason, boost percentage, model pick, daily mean or slot
-phrase. It carries no weekly figures when `{weeks}` is not offered, and nothing about the market
+name, figures to one decimal with halves rounded up. It carries no barcode, product name, date,
+weekday, price, cost, margin, ₪ figure, stock now, boost reason, boost percentage, model pick,
+daily mean or slot phrase. It carries no weekly figures when `{weeks}` is not offered, and nothing about the market
 for a product without a boost box. A boost applied at 0% is sent as not raising the expected
 sales. It turns thinking off. *(FR-236, FR-237)*
 
@@ -585,8 +606,9 @@ its own figure and period. *(FR-238)*
 
 **ASM-085** — The model's explanation is faithful to the facts it was given. *Falsified if* it
 gives a cause the facts do not carry ("it's hot this week"), states a number with a word the list
-leaves out ("one", "the second week"), or turns a slot around with a negation or a comparison
-("you won't have {left}"). No check catches these. A slot put in an odd place does not change
+leaves out ("one", "the second week", a misspelling), uses a relative time the list leaves out
+("this week", "next week"), or turns a slot around with a negation or a comparison ("you won't
+have {left}"). No check catches these. A slot put in an odd place does not change
 what its phrase says, because each phrase names its figure and its period, but the sentence can
 read oddly. The prompt forbids all of them, and the page labels the text as the AI's. The figures
 in the slots are always the engine's, and the quantity, not the text, is what the product stands
@@ -649,7 +671,7 @@ shows what that changes.
 | | Shown in conversation | Proposed here | Why |
 |---|---|---|---|
 | How numbers reach the card | The AI writes them, and a check keeps only numbers from the suggestion's facts | The AI writes slots, and the page fills each with a phrase that carries the card's own figure and says what it is and when ("about 3 left on Tuesday 1 Sept") | A check on values passes a true number in the wrong place: "you'll sell about 12, and 35 will be left", with the stock and the sales swapped. A slot's phrase names its figure and its period, so a slot in an odd place reads oddly, not wrongly. Every figure is the engine's, and an estimate always says "about" and "expected" (D-10) |
-| Numbers written in words | caught only by the prompt | a fixed list of number words, refused mechanically | the intent wants the figure check mechanical, «لا بطلبٍ في التعليمات». "One" and the ordinals stay with the prompt |
+| Numbers written in words | caught only by the prompt | the number words of Appendix A, in all their listed forms, and Hebrew letter-numerals, refused mechanically | the intent wants the figure check mechanical, «لا بطلبٍ في التعليمات». "One" and the ordinals stay with the prompt |
 | Stock now | allowed, as one of the numbers the sentence may state | not sent, and no slot | the engine's figure is the stock at the start of the run day, and the card never showed it. Read later in the day, "now" would be wrong |
 | Weekly figures | always, as "the weekly sales" | only when every day of the window has a report | F8 sums a week over the days it has reports for, so a week with missing reports would read as a slump (D-3) |
 | The market | "nearby stores have run out" where it applies | only for a card that shows the boost box | for any other product, the engine knows nothing about the market worth saying |
@@ -668,13 +690,17 @@ shows what that changes.
   at most once; `{product}` and `{expected}` in every text, and the card's own stock and
   shelf-life sentences whenever they apply (`{left}` or `{runs_out}`, `{capped}`);
 - a boost applied at 0% is not described as raising anything;
-- the checks for percentage and currency words and each language's own letters (FR-238);
+- the checks for percentage and currency words, relative days ("tomorrow"), Hebrew
+  abbreviations with gershayim, and each language's own letters (FR-238);
+- the model is not sent the product's name or the order day's weekday; slots carry both;
 - the daily rate is not sent: it was in the list of facts F8 publishes, not in the numbers the
   sentence may state;
 - reuse from earlier nights back to the first that reached its end, at most 7, matched by a
   digest of the facts and the department, without the suggestion's id, so a new order day with
   the same facts reuses the old text (FR-239);
 - a text is shown only under the phrases its prompt was written for (FR-242);
+- the nightly's deadline applies to this step only; the boost and the shelf keep their budgets
+  (FR-241);
 - the note's wording: "Tonight the AI explained 28 of 30 suggestions. A card it did not explain
   shows the engine's sentence." The counts include suggestions already approved or dismissed,
   which the page hides (FR-243);
@@ -738,7 +764,7 @@ change.
 | "The AI's explanation shows the quantity is right" | not measurable | The explanation puts F8's facts into words (FR-235). The quantity's grounds are F8-S1's rules |
 | "Explanations make him approve more suggestions" | not measurable | No store sends daily sales (D-23), and no comparison without explanations is planned |
 | "Every suggestion is explained" | measured each night | FR-240's counts: N of N, and the states of the rest |
-| "No explanation holds a numeral, or a listed number word, outside its slots" | measured each night | INV-100, re-checked at publish (FR-240) |
+| "No explanation holds a numeral, a Hebrew letter-numeral, or a number word from Appendix A, outside its slots" | measured each night | INV-100, re-checked at publish (FR-240). Words off the list are ASM-085's residual |
 | "Every figure in an explanation is the engine's, and says what it is" | not measurable as a whole | Each slot's phrase names its figure and period, but "one", an ordinal, a negation or a comparison around a slot is not read by any check (ASM-085) |
 | "No explanation gives a cause its facts lack" | not measurable | ASM-085. The prompt forbids it; no check reads causes |
 
@@ -759,3 +785,36 @@ None. The PRD's F14 row carries no acceptance line of its own.
   the ordinals, and a negation or comparison around a slot are left to the prompt (ASM-085).
 - **"Within a week of the owner using F8's suggestions"** cannot start until a store sends daily
   sales (D-23).
+
+## 23. Appendix A — The check's word lists
+
+FR-238 matches these after normalising: slots removed, NFKC, invisible format characters and
+combining marks removed, the Arabic stretch character removed, Arabic alef and hamza forms
+folded to plain alef, and case folded. Each is matched as a whole word, after up to two Hebrew
+prefix letters (ו, ה, ב, ל, מ, ש, כ), or Arabic's و or ف, then ب, ل or ك, then ال. The Arabic
+words are listed folded. **(decided here)**
+
+**Number words.** Two upward, fractions and multiples, with the forms listed.
+
+| | English | Hebrew | Arabic |
+|---|---|---|---|
+| 2 to 10 | two, three, four, five, six, seven, eight, nine, ten | שניים, שתיים, שני, שתי, שלושה, שלוש, שלושת, ארבעה, ארבע, ארבעת, חמישה, חמש, חמשת, שישה, שש, ששת, שבעה, שבע, שבעת, שמונה, שמונת, תשעה, תשע, תשעת, עשרה, עשר, עשרת | اثنان, اثنين, اثنتان, اثنتين, ثلاثه, ثلاثة, ثلاث, اربعه, اربعة, اربع, خمسه, خمسة, خمس, سته, ستة, ست, سبعه, سبعة, سبع, ثمانيه, ثمانية, ثماني, ثمان, تسعه, تسعة, تسع, عشره, عشرة, عشر |
+| 11 to 19 | eleven, twelve, thirteen, fourteen, fifteen, sixteen, seventeen, eighteen, nineteen | caught by עשר, עשרה | caught by عشر, عشرة |
+| Tens | twenty, thirty, forty, fifty, sixty, seventy, eighty, ninety | עשרים, שלושים, ארבעים, חמישים, שישים, שבעים, שמונים, תשעים | عشرون, عشرين, ثلاثون, ثلاثين, اربعون, اربعين, خمسون, خمسين, ستون, ستين, سبعون, سبعين, ثمانون, ثمانين, تسعون, تسعين |
+| Hundreds, thousands | hundred, hundreds, thousand, thousands | מאה, מאות, מאתיים, אלף, אלפים, אלפיים | مئه, مئة, مائه, مائة, مئات, مئتين, مئتان, الف, الاف, الفين |
+| Fractions | half, halves, halved, halving, quarter, quarters, third, thirds | חצי, מחצית, רבע, שליש | نصف, ربع, ثلث |
+| Multiples | double, doubled, doubles, doubling, twice, triple, tripled, triples, thrice, dozen, dozens, couple | כפול, כפולה, כפליים, פעמיים, הוכפל, הוכפלה, הוכפלו, הכפיל, הכפילו, תריסר, תריסרים, זוג | ضعفين, ضعفان, مضاعف, تضاعف, تضاعفت, يتضاعف, دزينه, دزينة, دسته, دستة |
+| Duals | — | יומיים, שבועיים, חודשיים, שנתיים | يومين, يومان, اسبوعين, اسبوعان, شهرين, شهران |
+
+Not listed, because they serve as ordinary words: "one", אחד, אחת, واحد, واحدة, احد (also
+"anyone", and Sunday as الاحد); the ordinals;
+Hebrew's פי (as in לפי, כפי, על פי); Arabic's bare ضعف, which also means weakness.
+
+**Relative days.** today, tonight, tomorrow, yesterday; היום, הלילה, מחר, אתמול; اليوم, الليله,
+الليلة, غدا, امس, البارحه, البارحة.
+
+**Percentages.** percent, per cent, percentage, percentages; אחוז, אחוזים; بالمئه, بالمئة,
+بالمائه, بالمائة, المئه, المئة.
+
+**Currency.** shekel, shekels, nis, ils; שקל, שקלים, שח; شيكل, شيقل, شواكل.
+
