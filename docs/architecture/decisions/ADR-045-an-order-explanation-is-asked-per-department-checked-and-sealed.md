@@ -70,9 +70,15 @@ Two things make the order explanation different from the shelf's:
      product's name, the order day's date or weekday, or the shelf life's days; slots carry them.
      The prompt forbids mentioning any other suggestion of the group.
    - The page fills each slot with a phrase that carries the figure and names it, with its
-     period: `{left}` becomes "about 3 left on Tuesday 1 Sept", not "3", and `{expected}` "about
-     35 expected to sell in the 7 days from Tuesday 1 Sept". Figures take the card's own format,
-     and estimates the card's own "about".
+     period: `{left}` becomes "about 3 left on the order day", not "3", and `{expected}` "about 35
+     expected to sell in the 7 days from the order day". Only `{next_order}` names the date ("your
+     order on Tuesday 1 Sept, which covers 7 days"), and every text uses it, so the date appears
+     once. Hebrew and Arabic say "the order day" in the construct form (יום ההזמנה, يوم الطلب),
+     since היום and اليوم also mean "today". Figures take the card's own format, and estimates
+     the card's own "about".
+   - The model is sent no product name, and a text may serve another product of the department,
+     so the prompt asks for Hebrew and Arabic wording that does not depend on the product's gender
+     or number ("המכירות של {product}", "مبيعات {product}").
    - There is no slot for the stock now. The engine's figure is the stock at the start of the run
      day, and the card never showed it; read later in the day, "now" would be wrong.
    - Where the card has its own sentence for a fact, the text must use it: `{left}` or
@@ -103,10 +109,16 @@ Two things make the order explanation different from the shelf's:
      normalises the text: NFKC; invisible format characters, combining marks and the Arabic
      stretch character removed; `أ`, `إ`, `آ` and `ٱ` folded to `ا` and nothing else; and case
      folded. Words are matched whole, after up to two Hebrew prefix letters, or Arabic's attached
-     ones, where `ل` with `ال` is written `لل`. "One", the ordinals, and words that are also
+     ones, where `ل` with `ال` is written `لل`; a word starting with `لل` is also tested with `ال`
+     put back, for listed words that carry their own article (لليوم). A closed set of pronoun
+     endings is taken off the end (חציו, نصفها). Slots are replaced by a space, not removed, so
+     two halves of a word cannot join into one. "One", the ordinals, and words that are also
      ordinary words (שני, the bare ست) are left to the prompt.
-   - It also refuses any quote-like mark between Hebrew letters, which catches Hebrew numerals
-     written in letters (ל״ה, ל”ה) and abbreviations such as ש״ח. And it refuses Appendix A's
+   - It also refuses a mark straight after a Hebrew letter, checked before NFKC, which could turn
+     a mark into a combining character and lose it. A mark is anything in the Unicode categories
+     Pi, Pf, Po, Sk or Lm, and the listed lookalikes, except ordinary punctuation. That catches
+     Hebrew numerals written in letters, of one letter or more (ז׳, ל״ה, ל”ה), and abbreviations
+     such as ש״ח. And it refuses Appendix A's
      relative days ("tomorrow", "מחר", "غداً"), because a text can be reused on a later night.
    - The lists are a mechanical net for the common forms, not a proof. A withheld text records
      the rule and word that withheld it. A form found missing is added to the lists, and since
@@ -136,10 +148,11 @@ Two things make the order explanation different from the shelf's:
      department with the same facts; it is never reused in another department. The prompt's
      version is the prompt file's hash, as `shelf_explanation`'s is. The versions the page's
      phrases serve are listed in one place, which the engine, the page and the example's builder
-     all read. The engine does not ask under a prompt the list does not serve. A test holds that
-     the prompt file's hash is on the list, and the list records a digest of the phrases each
-     version serves, so a phrase change fails the test until someone decides whether it needs a
-     new prompt version. The id stays the same until the order day (ADR-034), but the facts can
+     all read. The engine does not ask under a prompt the list does not serve, and the manifest
+     says `prompt_not_served`. A test holds that the prompt file's hash is on the list, and that
+     every listed version's phrase digest equals the current phrases'. A phrase change fails the
+     test until each listed version is confirmed or taken off the list; a version taken off is
+     asked again, for the example with `--explain`. The id stays the same until the order day (ADR-034), but the facts can
      change in between.
    - It is committed in the nightly's existing step for sealed answers, which commits the boost's
      picks and the shelf explanations today, and grows to take it.
@@ -218,9 +231,15 @@ Two things make the order explanation different from the shelf's:
    - The example's boost today is a stand-in's fixed answer, labelled as the model's. An
      explanation beside it would describe a raise no model chose. So the example's boost becomes a
      real answer too, or none: the same `--explain` run asks for the boost's pick first, then the
-     explanations. Until it is run, the example's boost box says the model was not asked tonight,
-     and its quantity is not raised. The order probe keeps its stand-in, which it needs. This
-     changes F8's example (D-29) and is put to the owner in F14-S1 OQ-1403.
+     explanations. The pick is committed as `tests/fixtures/order_example/boost_picks.json`.
+     The builder seals it into its temporary folder, or a finished boost manifest with no pick
+     while there is none, so the boost box says the model was not asked about it tonight and the
+     quantity is not raised (the example's מים order goes from 23 to 21). The order probe keeps
+     its stand-in, which it needs. This changes F8's example (D-29) and is put to the owner in
+     F14-S1 OQ-1403.
+   - The builder fails when a committed answer's or pick's facts digest no longer matches the
+     example's facts, or the answers' prompt version is not served, so an edit to the shared
+     fixture world never leaves the example quietly out of date.
    - Only its `--explain` option calls the real model, once, with the owner's key, and it reads
      the stop reason, so an answer cut off at its limit is refused, not sealed. Nothing of the
      example is written under the store's `data/external/snapshots/`, and no store's run reads

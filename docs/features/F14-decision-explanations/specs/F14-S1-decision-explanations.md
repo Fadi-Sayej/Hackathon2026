@@ -32,7 +32,7 @@ Updated: 2026-10-10
 > Reorder's marked example (D-29, FR-244).
 
 > **Identifier note.** Every id below is new and globally unique: FR-235 … FR-244, INV-098 …
-> INV-101, SCN-178 … SCN-187, NFR-082, NFR-083, C-76 … C-80, AC-221 … AC-236, ASM-085 … ASM-088,
+> INV-101, SCN-178 … SCN-188, NFR-082, NFR-083, C-76 … C-80, AC-221 … AC-237, ASM-085 … ASM-088,
 > OQ-1401 … OQ-1404. No existing id is renumbered.
 
 Implements intent F14. Bound by ADR-001, ADR-007, ADR-014, ADR-028, ADR-032, ADR-034, ADR-035,
@@ -174,18 +174,25 @@ that carries one published fact and says what it is and when **(decided here)**:
 |---|---|---|
 | `{product}` | the product's name | always |
 | `{quantity}` | "an order of 35" | always |
-| `{expected}` | "about 35 expected to sell in the 7 days from Tuesday 1 Sept" | always |
+| `{expected}` | "about 35 expected to sell in the 7 days from the order day" | always |
 | `{weeks}` | "35, 35, 35 and 35 sold in the 4 weeks to 26 Aug", oldest first, with the window's weeks and last day | every day of the window has a report with this product's units known, and every week of the window is 7 days |
-| `{next_order}` | "your order on Tuesday 1 Sept, which covers 7 days" | always |
-| `{left}` | "about 3 left on Tuesday 1 Sept" | the count was used, and the stock at the order day is above 0.05 |
-| `{runs_out}` | "what you have will be gone by Tuesday 1 Sept" | the count was used, and the stock at the order day is 0.05 or below |
+| `{next_order}` | "your order on Tuesday 1 Sept, which covers 7 days" | always, and used in every text |
+| `{left}` | "about 3 left on the order day" | the count was used, and the stock at the order day is above 0.05 |
+| `{runs_out}` | "what you have will be gone by the order day" | the count was used, and the stock at the order day is 0.05 or below |
 | `{capped}` | "only what sells in 2 days, before it spoils" | the shelf life capped the quantity |
 
 Figures in the phrases take the card's format: one decimal, halves rounded up, a whole number
 without ".0". Days counts and dates take the card's words for them ("7 days", "Tuesday 1 Sept").
-`{runs_out}` and `{capped}` are the card's own sentences today. Each phrase names its own period,
-so a reader can tell which order and which days each figure belongs to. The phrases' words are
-new, in the three languages, and are shown to the owner with the mockups (C-79). The prompt tells
+`{capped}` is the card's own shelf-life line. Only `{next_order}` names the date, and every text
+uses it, so "the order day" in the other phrases always has its date in the same text, once. In
+Hebrew and Arabic the phrases say "the order day" in the construct form, יום ההזמנה and يوم
+الطلب, never היום or اليوم, which also mean "today". Each phrase names its own period, so a
+reader can tell which order and which days each figure belongs to. The phrases' words are
+new, in the three languages, and are shown to the owner with the mockups (C-79). Because the
+model is sent no product name, and a text may serve another product of the department, the
+prompt asks for Hebrew and Arabic wording that does not depend on the product's gender or number
+("המכירות של {product}", "مبيعات {product}"). It also asks for "יום ההזמנה" and "يوم الطلب", not
+היום and اليوم, when the text itself speaks of the order day. The prompt tells
 the model what each slot means and how its phrase reads. A change to a phrase that changes how it
 reads in a sentence is a new prompt version, and the page shows a text only under the phrases its
 prompt version was written for (FR-242).
@@ -194,24 +201,31 @@ Each suggestion's text is checked mechanically, on its own, before anything is p
 - the answer parses. It holds that suggestion's id with all three languages, each non-empty and
   at most 200 characters before the slots are filled;
 - every slot in it is one offered for that suggestion, and each appears at most once. Every text
-  uses `{product}` and `{expected}`. Every offered `{left}`, `{runs_out}` or `{capped}` is used,
+  uses `{product}`, `{expected}` and `{next_order}`. Every offered `{left}`, `{runs_out}` or `{capped}` is used,
   so the card keeps what the engine's sentence and shelf-life line said;
 - no product name of the group appears in the text as written, matched as the word lists are.
   The model is not sent the names; this catches one it guesses;
 - **the figure check (D-16).** With the slots removed, neither the text as written nor its
   Unicode NFKC form holds a character Unicode classes as a number. That covers every script's
   digits, fractions and numerals;
-- **Hebrew letter-numerals.** In the normalised text (below), a run of quote-like marks between
-  two Hebrew letters is refused. The marks are any character Unicode classes as a quotation mark
-  or apostrophe, with `׳`, `״`, `'`, `"`, `′`, `″` and `ʼ`. That catches numerals written in
-  letters (ל״ה and ל”ה are 35), and abbreviations and loanwords alike (ש״ח, סה״כ, צ׳יפס). The
-  prompt forbids abbreviations and quote marks in Hebrew, so the model writes the words out;
-- **numbers in words (D-16).** The text is normalised for matching: slots removed, Unicode NFKC,
+- **Hebrew letter-numerals.** Before any other normalising, with only the slots replaced by a
+  space and invisible format characters and Hebrew points removed, a mark directly after a Hebrew
+  letter is refused. A mark is any character in the Unicode categories Pi, Pf, Po, Sk or Lm, and
+  `׳`, `״`, `'`, `"`, `′`, `″`, `ʼ`, `ʺ`, `´`, `¨`, `˝` and the backtick. That catches numerals
+  written in letters, of one letter (ז׳ is 7) or more (ל״ה and ל”ה are 35), and abbreviations
+  and loanwords alike (ש״ח, סה״כ, צ׳יפס). Ordinary punctuation after a word is not a mark here:
+  `.`, `,`, `:`, `;`, `!`, `?` and `…` are exempt. The prompt forbids abbreviations and quote
+  marks in Hebrew, so the model writes the words out;
+- **numbers in words (D-16).** The text is normalised for matching: slots replaced by a space, Unicode NFKC,
   invisible format characters and combining marks removed (Hebrew points, Arabic vowel marks),
   the Arabic stretch character removed, `أ`, `إ`, `آ` and `ٱ` folded to `ا` and nothing else, and
   case folded. It then holds none of the number words in Appendix A. They are matched as whole
   words, after up to two of Hebrew's prefix letters (ו, ה, ב, ל, מ, ש, כ), or after Arabic's
-  prefixes: `و` or `ف`, then `ب`, `ك` or `ل`, then `ال`, where `ل` with `ال` is written `لل`.
+  prefixes: `و` or `ف`, then `ب`, `ك` or `ل`, then `ال`, where `ل` with `ال` is written `لل`. A
+  word that starts with `لل` is also tested with `ال` put back (لليوم as اليوم, لليلة as الليلة),
+  for the listed words that carry their own article. A closed set of pronoun endings is also
+  taken off the end before matching: Hebrew ו, ה, ם, ן, הם, הן, נו, ך, כם, כן; Arabic ه, ها, هم,
+  هما, هن, كم, كما, كن, نا, ي, so "חציו" and "نصفها" are caught.
   The lists are loaded through the same normalisation, and a test holds that every listed word
   comes out unchanged. "One" and the ordinals are left to the prompt, because they serve as
   ordinary words too (ASM-085);
@@ -249,11 +263,14 @@ What no check catches is named in ASM-085.
 - an explanation whose digest no longer matches its suggestion's facts is not shown. The
   suggestion counts as out of date;
 - the prompt's version is the prompt file's hash, as the shelf explanation's is. The engine
-  reads the same list of served versions as the page (FR-242). It does not ask under a prompt
-  the list does not serve, and says so with a named reason. A test holds that the prompt file's
-  hash is on the list. The list records a digest of the phrases each version serves, so a
-  change to the phrases fails that test until someone decides whether it needs a new prompt
-  version;
+  reads the same list of served versions as the page and the example's builder (FR-242,
+  FR-244). It does not ask under a prompt the list does not serve: the night's manifest says
+  `prompt_not_served`, and the suggestions are not written tonight. The list records, for each
+  version, a digest of the phrases it serves. A test holds that the prompt file's hash is on the
+  list, and that every listed version's digest equals the current phrases'. So a change to the
+  phrases fails the test until someone either confirms each listed version still reads right, or
+  takes it off the list. A version taken off the list means its texts are not shown and are
+  asked again; for the example, the committed answers are asked again with `--explain`;
 - **reuse.** Before asking, the step reads earlier nights' snapshots, newest first. It stops at
   the first night whose step reached its end, meaning a run of that night wrote its end manifest,
   whatever stopped its asking, and never reads more than `order_explanation.reuse_nights` nights
@@ -308,7 +325,7 @@ sentence and the shelf-life line, in the page's language, after a tag saying it 
   isolates each filled slot for direction, as it already isolates the product name and "40%";
 - the page fills only the slots published as offered for that suggestion, and shows only a text
   whose prompt version is one its phrases were written for. The versions the phrases serve are
-  listed in one place, which the page and the example's builder both read. When the text holds any other slot,
+  listed in one place, which the engine, the page and the example's builder all read (FR-239). When the text holds any other slot,
   a slot whose fact is missing, or another prompt version, the page does not show the text. The
   card shows the engine's sentence instead;
 - the quantity, the "Your stock count wasn't used" notice, the market boost box and the three
@@ -344,14 +361,19 @@ example's test shop:
 - **the example's boost is a real answer too, or none (decided here).** Today the example's
   boost is a stand-in's fixed answer, labelled as the model's ("the model's estimate"), and an
   explanation would describe a raise no model chose. The same `--explain` run asks the model for
-  the example's boost first, and then for the explanations, which so see the real pick. Until it
-  is run, the example's boost box says the model was not asked tonight, in its existing words,
-  and its quantity is not raised. The order probe's fixture world keeps its stand-in, which its
+  the example's boost pick first, and then for the explanations, which so see the real pick. The
+  pick is committed beside the explanations as `tests/fixtures/order_example/boost_picks.json`.
+  Before it reproduces the night, the builder seals into its temporary folder the committed
+  pick, or a finished boost manifest with no pick while there is none. The boost box then says
+  the model was not asked about it tonight, in its existing words (`reorder.boostNot.no_pick`),
+  and the quantity is not raised. The order probe's fixture world keeps its stand-in, which its
   probe needs. This changes F8's example (D-29), and is put to the owner in OQ-1403;
 - before it reproduces the night, the builder seals into its own temporary snapshot folder the
   committed answers, or an empty snapshot while there are none. The example carries
   `order_explanation` with the order capabilities it already copies. The builder fails when the
-  committed answers' prompt version is not one the page's phrases serve;
+  committed answers' prompt version is not one the page's phrases serve, or when a committed
+  answer's or pick's facts digest no longer matches the example's facts, so an edit to the shared
+  fixture world never leaves the example quietly out of date;
 - only its `--explain` option asks, once, with the real key: `python3
   scripts/build_order_example.py --explain`. Its requests use the shared client's stop reason, so
   an answer cut off at its token limit is refused, not sealed. The owner runs it, because he holds the key, and the
@@ -411,9 +433,14 @@ written tonight. Their cards show the engine's sentence, and the counts say how 
 that night. Answers already in flight are checked and kept, and every suggestion not asked is not
 written tonight.
 
-**SCN-184** — Given the example before its explanations are committed, when he opens "See how
-this page looks", then every card shows the engine's sentence and the note says the AI has not
-explained them. Nothing can be approved.
+**SCN-184** — Given the example before its explanations and boost pick are committed, when he
+opens "See how this page looks", then every card shows the engine's sentence, the note says the
+AI has not explained them, and the מים card's boost box says the model was not asked about it
+tonight, with its quantity not raised. Nothing can be approved.
+
+**SCN-188** — Given a prompt edited without its hash added to the served-versions list, when the
+nightly runs, then the step asks nothing, the manifest says `prompt_not_served`, and every card
+shows the engine's sentence.
 
 **SCN-185** — Given an explanation sealed before a late report changed its suggestion's facts,
 when print mode reproduces the night, then that explanation is not shown, the suggestion counts
@@ -483,7 +510,10 @@ is counted in exactly one of FR-240's four states.
 | A text writes a product's name instead of `{product}`, or names another product of its group | Withheld. Names are matched as whole words, so "מים" is not found inside "ימים" |
 | The model writes a number anyway ("35", "３５", "½", "٣٥", "Ⅻ") | Withheld. The raw text and its NFKC form are both checked against the Unicode number classes |
 | The model writes a number in words ("four weeks", "חצי", "أسبوعين", "ובשלושת", "ثلاثةَ", "ثلاثـة") | Withheld, for every word and form in Appendix A, with its prefixes, vowel marks or stretching removed. "One" and the ordinals are not on it (ASM-085) |
-| A Hebrew numeral in letters ("ל״ה", "ל”ה") or an abbreviation ("ת״א", "סה״כ") | Withheld: any quote-like mark between Hebrew letters is refused. The prompt asks for words written out |
+| A Hebrew numeral in letters ("ז׳", "ל״ה", "ל”ה", "ל´´ה") or an abbreviation ("ת״א", "סה״כ") | Withheld: a mark straight after a Hebrew letter is refused, before NFKC can turn it into something else. The prompt asks for words written out |
+| "لليوم", "لليلة" | Withheld: a word starting with `لل` is also tested with `ال` put back |
+| "חציו", "نصفها", "שלושתם" | Withheld: pronoun endings are taken off before matching |
+| "משקל", "במשקל" (weight) | Withheld, a safe false positive: it holds שקל. The prompt asks for other words |
 | "لليومين", "للثلاثة" | Withheld: `لل` is matched as `ل` with `ال` |
 | "מצד שני", "השני", "لست بحاجة" | Allowed: שני and the bare ست are not on the list, because they serve as ordinary words |
 | A weekday the model was not sent ("Thursday", "الخميس") | Not caught: an invented fact is ASM-085's residual. The prompt forbids naming days; `{next_order}` names the order day |
@@ -551,9 +581,12 @@ explanation, and why. *(FR-240, INV-098)*
 - withholds one with a number word from Appendix A in any of the three languages, in each of its
   listed forms, including a dual, with stacked prefixes ("ובשלושה", "وبالثلاثة"), with Arabic
   vowel marks or stretching, or split by an invisible character;
-- withholds one with any quote-like mark between Hebrew letters ("ל״ה", "ל”ה", "ל’"), and one
-  with a relative day ("tomorrow", "מחר", "غداً");
-- withholds "لليومين" and "للأسبوعين", and passes "מצד שני" and "لست";
+- withholds one with a mark straight after a Hebrew letter ("ז׳ ימים", "ל״ה", "ל”ה", "ל’",
+  "ל´´ה", "לʺה"), and one with a relative day ("tomorrow", "מחר", "غداً", "لليوم", "لليلة");
+- withholds a number word with a pronoun ending ("חציו", "نصفها");
+- withholds "لليومين" and "للأسبوعين", and passes "מצד שני", "لست" and a Hebrew word followed by
+  a full stop or comma;
+- withholds one without `{next_order}`;
 - passes one with "לפי", "כפי" or "על פי";
 - withholds one with a slot not offered, a slot used twice, or a required slot missing;
 - withholds one with a product's name written out, but not one whose word only contains a name
@@ -622,19 +655,27 @@ reason as the API reported them. *(FR-239, NFR-083)*
 
 **AC-235** — In the English text on a right-to-left page, and in the Hebrew and Arabic texts, a
 filled slot holding a product name with digits ("קוקה קולה 1.5") or a figure keeps its figure in
-its own place. *(FR-242)*
+its own place, and `{weeks}` lists the weeks oldest first, read in each language's own
+direction. *(FR-242)*
 
 **AC-236** — A text using `{expected}`, `{next_order}` and `{left}` together, filled for the
 example's קולה, reads in each language with the expected sales as expected over the days from the
-order day, the order as the one on that day, and the stock left as on that day. Each phrase names
-its own figure and period. *(FR-238)*
+order day, the order as the one on that day, and the stock left as on that day. The date appears
+once, in `{next_order}`. *(FR-238)*
+
+**AC-237** — The example's builder seals the committed boost pick, or a finished boost manifest
+with no pick, into its own temporary folder. With no committed pick, the מים card's boost box
+says the model was not asked about it tonight and its quantity is not raised. The builder fails
+when a committed answer's or pick's facts digest no longer matches the example's facts, or its
+prompt version is not served. *(FR-244, SCN-184)*
 
 ## 16. Assumptions
 
 **ASM-085** — The model's explanation is faithful to the facts it was given. *Falsified if* it
 gives a cause the facts do not carry ("it's hot this week"), states a number with a word the list
 leaves out ("one", "the second week", a misspelling), uses a relative time the list leaves out
-("this week", "next week"), names a weekday it was not sent, or turns a slot around with a negation or a comparison ("you won't
+("this week", "next week"), names a weekday it was not sent, gets a Hebrew or Arabic agreement wrong around `{product}`, or
+turns a slot around with a negation or a comparison ("you won't
 have {left}"). No check catches these. A slot put in an odd place does not change
 what its phrase says, because each phrase names its figure and its period, but the sentence can
 read oddly. The prompt forbids all of them, and the page labels the text as the AI's. The figures
@@ -729,11 +770,21 @@ shows what that changes.
 - the nightly's deadline applies to this step only; the boost and the shelf keep their budgets
   (FR-241);
 - the example's boost: the same `--explain` run asks the model for one real pick. Until then the
-  example's boost box says the model was not asked tonight, and its quantity is not raised. This
-  replaces the stand-in's fixed answer the example shows today as "the model's estimate"
-  (FR-244), and changes F8's example (D-29);
+  example's boost box says the model was not asked about it tonight, and its quantity is not
+  raised: the מים order goes from 23 to 21. This replaces the stand-in's fixed answer the example
+  shows today as "the model's estimate" (FR-244), and changes F8's example (D-29):
+  - the approved example (2026-10-03) showed "a suggestion the market boost raised". It will show
+    none until a key is set (OQ-1404) and `--explain` is run, and none at all if the real pick is
+    0% or rejected. `tests/test_order_example.py`'s check for a raised suggestion changes with it;
+  - the other choice is to keep the stand-in, labelled in the example as a test answer, not the
+    model's. That needs new wording on the card;
+- only `{next_order}` names the date, once per text; the other phrases say "the order day"
+  (FR-238), as the mockups showed the date three times in one text otherwise;
 - the word lists are a net for the common forms, not a proof; a missed form is added when found
-  (FR-238);
+  (FR-238). Review rounds 4 to 7 kept finding new forms the net missed, in three languages.
+  Each was added, and more will be found. The guarantee that holds is the one for numerals in
+  any script. Numbers in words rest on the prompt, with the net behind it, as they do for the
+  Shelf plan's explanation, which you approved with the same residual (F12-S1 FR-212, OQ-1209);
 - the note's wording: "Tonight the AI explained 28 of 30 suggestions. A card it did not explain
   shows the engine's sentence." The counts include suggestions already approved or dismissed,
   which the page hides (FR-243);
@@ -770,9 +821,9 @@ first night a store's daily sales arrive, and the example's `--explain` run, not
 | Intent | Requirement | Scenario | Acceptance |
 |---|---|---|---|
 | INT-EXPL · D-40 | FR-235, FR-236, FR-237, FR-238 | SCN-178, SCN-179, SCN-186, SCN-187 | AC-222, AC-223, AC-224, AC-236 |
-| INT-EXPL · D-16 | FR-239, FR-240, FR-241 | SCN-180, SCN-181, SCN-182, SCN-183, SCN-185 | AC-221, AC-225, AC-226, AC-227, AC-231, AC-233, AC-234 |
+| INT-EXPL · D-16 | FR-239, FR-240, FR-241 | SCN-180, SCN-181, SCN-182, SCN-183, SCN-185, SCN-188 | AC-221, AC-225, AC-226, AC-227, AC-231, AC-233, AC-234 |
 | INT-EXPL · D-40 | FR-242, FR-243 | SCN-178, SCN-179, SCN-180 | AC-228, AC-229, AC-235 |
-| INT-EXPL · D-29 | FR-244 | SCN-184 | AC-230, AC-232 |
+| INT-EXPL · D-29 | FR-244 | SCN-184 | AC-230, AC-232, AC-237 |
 | Protected behavior | INV-098 | SCN-180 | AC-221 |
 | Protected behavior | INV-099 | SCN-185 | AC-225 |
 | Protected behavior | INV-100 | SCN-179, SCN-186, SCN-187 | AC-222, AC-228 |
@@ -803,7 +854,8 @@ change.
 | "The AI's explanation shows the quantity is right" | not measurable | The explanation puts F8's facts into words (FR-235). The quantity's grounds are F8-S1's rules |
 | "Explanations make him approve more suggestions" | not measurable | No store sends daily sales (D-23), and no comparison without explanations is planned |
 | "Every suggestion is explained" | measured each night | FR-240's counts: N of N, and the states of the rest |
-| "No explanation holds a numeral, a Hebrew letter-numeral, or a number word from Appendix A, outside its slots" | measured each night | INV-100, re-checked at publish (FR-240). Words off the list are ASM-085's residual |
+| "No explanation holds a numeral of any script outside its slots" | measured each night | INV-100, re-checked at publish (FR-240) |
+| "No explanation holds a Hebrew letter-numeral, or a number word from Appendix A in its listed forms" | measured each night, as a net | The net catches the listed forms; forms it misses are ASM-085's residual, added when found |
 | "Every figure in an explanation is the engine's, and says what it is" | not measurable as a whole | Each slot's phrase names its figure and period, but "one", an ordinal, a negation or a comparison around a slot is not read by any check (ASM-085) |
 | "No explanation gives a cause its facts lack" | not measurable | ASM-085. The prompt forbids it; no check reads causes |
 
@@ -830,19 +882,20 @@ None. The PRD's F14 row carries no acceptance line of its own.
 FR-238 matches these after normalising: slots removed, NFKC, invisible format characters and
 combining marks removed, the Arabic stretch character removed, Arabic alef and hamza forms
 folded to plain alef, and case folded. Each is matched as a whole word, after up to two Hebrew
-prefix letters (ו, ה, ב, ל, מ, ש, כ), or Arabic's و or ف, then ب, ل or ك, then ال. The Arabic
-words are listed folded. **(decided here)**
+prefix letters (ו, ה, ב, ל, מ, ש, כ), or Arabic's و or ف, then ب, ل or ك, then ال, where ل with
+ال is written لل, and a word starting with لل is also tested with ال put back. The pronoun endings
+of FR-238 are taken off the end. The Arabic words are listed folded. **(decided here)**
 
 **Number words.** Two upward, fractions and multiples, with the forms listed.
 
 | | English | Hebrew | Arabic |
 |---|---|---|---|
-| 2 to 10 | two, three, four, five, six, seven, eight, nine, ten | שניים, שתיים, שתי, שלושה, שלוש, שלושת, ארבעה, ארבע, ארבעת, חמישה, חמש, חמשת, שישה, שש, ששת, שבעה, שבע, שבעת, שמונה, שמונת, תשעה, תשע, תשעת, עשרה, עשר, עשרת | اثنان, اثنين, اثنتان, اثنتين, ثلاثه, ثلاثة, ثلاث, اربعه, اربعة, اربع, خمسه, خمسة, خمس, سته, ستة, سبعه, سبعة, سبع, ثمانيه, ثمانية, ثماني, ثمان, تسعه, تسعة, تسع, عشره, عشرة, عشر |
+| 2 to 10 | two, three, four, five, six, seven, eight, nine, ten | שניים, שתיים, שתים, שתי, שלש, ששה, חמשה, שלושה, שלוש, שלושת, ארבעה, ארבע, ארבעת, חמישה, חמש, חמשת, שישה, שש, ששת, שבעה, שבע, שבעת, שמונה, שמונת, תשעה, תשע, תשעת, עשרה, עשר, עשרת | اثنان, اثنين, اثنتان, اثنتين, ثلاثه, ثلاثة, ثلاث, اربعه, اربعة, اربع, خمسه, خمسة, خمس, سته, ستة, سبعه, سبعة, سبع, ثمانيه, ثمانية, ثماني, ثمان, تسعه, تسعة, تسع, عشره, عشرة, عشر |
 | 11 to 19 | eleven, twelve, thirteen, fourteen, fifteen, sixteen, seventeen, eighteen, nineteen | caught by עשר, עשרה | caught by عشر, عشرة |
 | Tens | twenty, thirty, forty, fifty, sixty, seventy, eighty, ninety | עשרים, שלושים, ארבעים, חמישים, שישים, שבעים, שמונים, תשעים | عشرون, عشرين, ثلاثون, ثلاثين, اربعون, اربعين, خمسون, خمسين, ستون, ستين, سبعون, سبعين, ثمانون, ثمانين, تسعون, تسعين |
-| Hundreds, thousands | hundred, hundreds, thousand, thousands | מאה, מאות, מאתיים, אלף, אלפים, אלפיים | مئه, مئة, مائه, مائة, مئات, مئتين, مئتان, مئتا, مئتي, ثلاثمئة, اربعمئة, خمسمئة, ستمئة, سبعمئة, ثمانمئة, تسعمئة, الف, الاف, الفين |
+| Zero, tens, hundreds, thousands, millions | zero, tens, hundred, hundreds, thousand, thousands, million, millions | אפס, עשרות, מאה, מאות, מאתיים, אלף, אלפים, אלפיים, מיליון | صفر, عشرات, مئه, مئة, مائه, مائة, مئات, مئتين, مئتان, مائتين, مائتان, مئتا, مئتي, ثلاثمئة, اربعمئة, خمسمئة, ستمئة, سبعمئة, ثمانمئة, تسعمئة, ثلاثمائة, اربعمائة, خمسمائة, ستمائة, سبعمائة, ثمانمائة, تسعمائة, الف, الاف, الفين, مليون |
 | Fractions | half, halves, halved, halving, quarter, quarters, third, thirds | חצי, מחצית, רבע, שליש | نصف, ربع, ثلث |
-| Multiples | double, doubled, doubles, doubling, twice, triple, tripled, triples, thrice, dozen, dozens, couple, pair, fortnight | כפול, כפולה, כפליים, פעמיים, הוכפל, הוכפלה, הוכפלו, הכפיל, הכפילו, תריסר, תריסרים, זוג | ضعفين, ضعفان, ضعفي, ضعفا, مضاعف, تضاعف, تضاعفت, يتضاعف, مرتين, مرتان, زوج, دزينه, دزينة, دسته, دستة |
+| Multiples | double, doubled, doubles, doubling, twice, triple, tripled, triples, thrice, dozen, dozens, couple, pair, fortnight | כפול, כפולה, כפליים, פעמיים, הוכפל, הוכפלה, הוכפלו, יוכפל, הכפיל, הכפילו, תריסר, תריסרים, זוג | ضعفين, ضعفان, ضعفي, ضعفا, مضاعف, تضاعف, تضاعفت, يتضاعف, تتضاعف, سيتضاعف, مرتين, مرتان, زوج, دزينه, دزينة, دسته, دستة |
 | Duals | — | יומיים, שבועיים, חודשיים, שנתיים | يومين, يومان, اسبوعين, اسبوعان, شهرين, شهران |
 
 Not listed, because they serve as ordinary words: "one", אחד, אחת, واحد, واحدة, احد (also
@@ -850,12 +903,13 @@ Not listed, because they serve as ordinary words: "one", אחד, אחת, واح�
 מצד שני); Arabic's bare ست (as in لست);
 Hebrew's פי (as in לפי, כפי, על פי); Arabic's bare ضعف, which also means weakness.
 
-**Relative days.** today, tonight, tomorrow, yesterday; היום, הלילה, מחר, מחרתיים, אתמול,
-שלשום; اليوم, الليله, الليلة, غدا, غد, امس, البارحه, البارحة. היום and اليوم also mean "the
+**Relative days.** today, tonight, tomorrow, yesterday; היום, הלילה, הערב, מחר, מחרתיים, אתמול,
+שלשום; اليوم, الليله, الليلة, غدا, غد, بكره, بكرة, امس, البارحه, البارحة. היום and اليوم also mean "the
 day"; the prompt asks for other words ("each day", "כל יום", "كل يوم").
 
 **Percentages.** percent, per cent, percentage, percentages; אחוז, אחוזים; بالمئه, بالمئة,
 بالمائه, بالمائة, المئه, المئة.
 
-**Currency.** shekel, shekels, nis, ils; שקל, שקלים, שח; شيكل, شيقل, شواكل.
+**Currency.** shekel, shekels, nis, ils, agora, agorot; שקל, שקלים, שח, אגורה, אגורות; شيكل,
+شيقل, شواكل, اغورة, اغورات.
 
