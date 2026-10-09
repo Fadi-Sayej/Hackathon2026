@@ -6,7 +6,7 @@ Owner: smartshelf-architect
 Version: 0.1 (2026-10-09)
 Parent: [F14 — Decision Explanations](../intent.md)
 Related Intents: INT-EXPL
-Inputs: [docs/features/F14-decision-explanations/intent.md, docs/product/PRD.md, docs/product/intent-register.md (D-1, D-3, D-10, D-15, D-16, D-17, D-28, D-29, D-40), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (FR-147, FR-154, FR-160 … FR-164), docs/features/F12-planogram/specs/F12-S1-planogram.md (FR-210 … FR-215), ADR-001, ADR-007, ADR-014, ADR-028, ADR-032, ADR-034, ADR-035, ADR-039, ADR-045, CLAUDE.md]
+Inputs: [docs/features/F14-decision-explanations/intent.md, docs/product/PRD.md, docs/product/intent-register.md (D-1, D-3, D-10, D-15, D-16, D-17, D-28, D-29, D-40), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (FR-147, FR-149, FR-154, FR-155, FR-160 … FR-164), docs/reviews/F8-screens-mockups.md, docs/features/F12-planogram/specs/F12-S1-planogram.md (FR-210 … FR-215), ADR-001, ADR-007, ADR-014, ADR-028, ADR-032, ADR-034, ADR-035, ADR-039, ADR-045, CLAUDE.md]
 Answered by: [System Design](../../../architecture/system-design.md) §21
 Updated: 2026-10-09
 ---
@@ -20,28 +20,32 @@ Updated: 2026-10-09
 > - **one request per department** (OQ-1402).
 >
 > He approved the four parts of the design in conversation: what the sentence says, how the
-> nightly makes it, what the card shows, and the example and tests. This spec writes them down.
-> Each choice it makes for him is marked **(decided here)** and put to him as OQ-1403.
+> nightly makes it, what the card shows, and the example and tests. This spec writes them down,
+> except what OQ-1403 lists as changed or new since. The largest change is in how numbers reach
+> the card: the model writes named slots, and the page fills each one from the suggestion's own
+> facts (FR-238). Each choice this spec makes for him is marked **(decided here)** and put to him
+> as OQ-1403.
 >
 > **What he will see, and when.** No store sends daily sales today (D-23), so `order_quantity`
 > publishes nothing and neither does this. Until a store does, he sees the explanation only in
 > Reorder's marked example (D-29, FR-244).
 
 > **Identifier note.** Every id below is new and globally unique: FR-235 … FR-244, INV-098 …
-> INV-100, SCN-178 … SCN-185, NFR-082, NFR-083, C-76 … C-80, AC-221 … AC-231, ASM-085 … ASM-088,
+> INV-101, SCN-178 … SCN-186, NFR-082, NFR-083, C-76 … C-80, AC-221 … AC-233, ASM-085 … ASM-088,
 > OQ-1401 … OQ-1404. No existing id is renumbered.
 
 Implements intent F14. Bound by ADR-001, ADR-007, ADR-014, ADR-028, ADR-032, ADR-034, ADR-035,
 ADR-039 and ADR-045, and by settled decisions D-1, D-3, D-10, D-15, D-16, D-17, D-28, D-29 and
-D-40.
+D-40. It amends what F8-S1 FR-149 and the F8 card mockups put on the card, by OQ-1401 (FR-242).
 
 ## 1. Purpose
 
 Every order suggestion F8 publishes carries an explanation, written by the AI in his language,
 of why that quantity (D-40). The explanation puts the suggestion's own published facts into
 words. On the Reorder card it replaces the engine's sentence, which comes back on any night the
-explanation is missing. It never changes a quantity. It adds no cause the facts do not carry,
-and it states no figure they do not carry (D-16).
+explanation is missing. Every number in it is the engine's, filled in from the suggestion's
+facts: the model writes none (FR-238). It never changes a quantity, and it adds no cause the
+facts do not carry (D-16).
 
 ## 2. Intent Traceability
 
@@ -49,6 +53,8 @@ and it states no figure they do not carry (D-16).
 - **D-40** — "yes every suggestion should have a ai explanation" (2026-10-09).
 - **D-16** — how an AI-written reason is made: once a night, from published facts, under a paid
   account, a monthly ceiling with an alert, and a mechanical figure check.
+- **D-10** — an estimated figure says it is an estimate. The slots carry the card's own "about"
+  (FR-238).
 - Serves the PRD's F14 row (V2, with F8, no due date: D-17).
 
 ## 3. Scope
@@ -58,7 +64,7 @@ Behavioural scope, not a file list. Which files change is declared by the implem
 ### In Scope
 - **`order_explanation`**, a capability of its own, published nightly beside `order_quantity`.
 - **The nightly step that writes it.** It asks the model once per department group, checks each
-  sentence, and seals the night's answers.
+  suggestion's text, and seals the night's answers.
 - **The Reorder card and one note above the suggestions** (FR-242, FR-243).
 - **The explanations in Reorder's marked example** (D-29, FR-244).
 - **The boundary probe's extension** (§20).
@@ -70,6 +76,8 @@ Behavioural scope, not a file list. Which files change is declared by the implem
   (F8-S1 FR-162), and no explanation.
 - **The market boost's own reason.** It stays in the boost box, Arabic only, as F8-S1 FR-164
   publishes it. Changing its language is the boost's prompt, and F8's.
+- **The thinking setting of the boost's and the shelf explanation's requests.** They are left as
+  they are; ADR-045 names the question.
 - **Causes F8 does not publish:** weather, busy weekdays, promotions, holidays. Adding one would
   be a new input and a new decision. The intent's own example (#54) needs two of them (§22).
 - **An assistant he can ask on screen.** D-16 rejected writing at request time.
@@ -82,7 +90,7 @@ Behavioural scope, not a file list. Which files change is declared by the implem
 | The nightly engine | Computes `order_quantity`, then asks for, checks and seals the explanations, then publishes `order_explanation` | Nightly (ADR-007) |
 | The language model | Writes one group's explanations from their published facts | Nightly, only for suggestions it has not explained before (FR-239) |
 | The owner | Opens Reorder | Any time |
-| The team | Asks once, by hand with the key, for the example's explanations, and commits them (FR-244) | When the example's inputs or the prompt change |
+| The owner, who holds the key | Runs the example's builder once with its `--explain` option, so the example's explanations are real answers (FR-244) | Once, and again when the example's inputs or the prompt change |
 | A team account | Opens Reorder | Any time; read-only (ADR-029) |
 
 ## 5. Domain Terms
@@ -92,8 +100,8 @@ Behavioural scope, not a file list. Which files change is declared by the implem
 | Suggestion | One `order_quantity` entry: a product's quantity for its department's next order day (F8-S1 FR-163). |
 | Explanation | The AI's account, in Hebrew, Arabic and English, of why one suggestion's quantity is what it is, written from that suggestion's facts (FR-235). |
 | The engine's sentence | The card's text today: "You'll sell about {expected} before your next order…", with its stock clause, and the shelf-life line "Only what sells in {days}, before it spoils." |
-| Group | The suggestions one request asks about: one department's, at most the policy's group size (FR-237). |
-| Sent figures | The numbers FR-236 sends the model for one suggestion. They are the only numbers its explanation may state (FR-238). |
+| Slot | A named place in the model's text, such as `{expected}`, that the page fills from one published fact of that suggestion, in the card's words and format (FR-238). |
+| Group | The suggestions one request asks about: one department's, at most the group size (FR-237). |
 | Facts digest | A hash of one suggestion's FR-236 facts, without its id. It says what an explanation was written from (FR-239). |
 
 ## 6. Functional Requirements
@@ -101,62 +109,81 @@ Behavioural scope, not a file list. Which files change is declared by the implem
 **FR-235** — Every suggestion carries an explanation, written by a language model, of why its
 quantity is what it is (D-40). Where its facts support them, the explanation says:
 - how steadily it has sold over the window's four weeks;
-- when the next delivery comes, by weekday, and how many days the order covers;
+- when the next delivery comes, and how many days the order covers;
 - what stock will be left by then, when the count was used;
 - where they apply: that the shelf life capped the quantity; that the count could not be used,
-  so the quantity is gross; that the nearby stores have run out of it.
+  so the quantity does not subtract stock; that the market boost raised it because the nearby
+  stores ran out.
 
 It is written once a night, from the suggestion's published facts, and published with it. It is
-never written at request time (D-16).
+never written at request time (D-16). Every number in it comes from a slot (FR-238), so an
+estimate always reads as one (D-10).
 
 **FR-236** — The model is given only what each suggestion publishes (F8-S1 FR-154)
 **(decided here)**:
 - its id, which keys the answer, its product name, its quantity, and whether it is net or gross;
 - the units sold in each of the window's four weeks, oldest first, and the expected sales;
-- the order day, as a weekday, and how many days the cycle covers;
+- the order day's weekday, and how many days the cycle covers;
 - whether the count was used. When it was, the stock now and the stock at the order day. When
   it was not, F8's reason (F8-S1 FR-149);
 - the shelf life in days when it is stated, and whether it capped the quantity;
-- whether the nearby stores are running out of it, and whether the market boost applied.
+- whether the market boost applied, and when it did not, F8's reason, such as the market not
+  running out of it or the market signal being thin (F8-S1 FR-147, FR-148);
+- the slots it may use for this suggestion (FR-238).
 
-Each request also carries the department's name. Nothing else goes in: no barcode, no date, no
-price, cost, margin or ₪ figure (D-1), no boost percentage, no boost reason and no daily mean.
-The numbers sent are the only numbers the answer may state (FR-238).
+Figures are sent as the card shows them: to one decimal place, halves rounded up. Each request
+also carries the department's name. Nothing else goes in: no barcode, no date, no price, cost,
+margin or ₪ figure (D-1), no boost percentage, no boost reason, and no daily mean.
 
-**FR-237** — The model is asked once per group **(decided here; OQ-1402)**:
-- one department's suggestions, in the order `order_quantity` publishes them, at most
-  `order_explanation.group_size` to a request (proposed 20). A larger department is asked in
-  several groups;
+**FR-237** — The model is asked once per group **(decided here, within OQ-1402)**:
+- one department's suggestions, in the order `order_quantity` publishes them, at most 20 to a
+  request, the figure he chose (OQ-1402). A larger department is asked in several groups. The
+  policy may set a smaller group; a larger one needs his decision;
 - the answer is JSON keyed by suggestion id, each with its Hebrew, Arabic and English text;
-- up to `order_explanation.concurrency` requests run at once (proposed 4);
-- the request turns the model's thinking off. The task is wording, not reasoning. The pinned
-  model thinks by default when a request does not say otherwise, and thinking is billed as
-  output and counts against the answer's token limit (ADR-045).
+- up to 4 requests are in flight at once (policy). The night's request ceiling is counted when a
+  request is sent;
+- the request turns the model's thinking off, and allows an answer of up to 8,000 tokens. The
+  task is wording, not reasoning. The pinned model thinks by default when a request does not say
+  otherwise, and thinking is billed as output and counts against the answer's token limit
+  (ADR-045).
 
-**FR-238** — Each suggestion's text is checked mechanically, on its own, before anything is
-published **(decided here)**:
+**FR-238** — The model writes no number. It writes slots, and the page fills them
+**(decided here)**:
+
+| Slot | Filled with, in the card's words and format | Offered when |
+|---|---|---|
+| `{quantity}` | the quantity | always |
+| `{expected}` | "about" and the expected sales, to one decimal | always |
+| `{week_1}` … `{week_4}` | the units sold in that week, oldest first | always |
+| `{cycle_days}` | the cycle's days, as a count of days ("7 days") | always |
+| `{order_day}` | the order day, as the card names it ("Tuesday 1 Sep") | always |
+| `{stock_now}` | "about" and the stock now, to one decimal | the count was used |
+| `{left}` | "about" and the stock at the order day, to one decimal | the count was used |
+| `{shelf_life_days}` | the shelf life, as a count of days | the shelf life is stated |
+
+Each suggestion's text is checked mechanically, on its own, before anything is published:
 - the answer parses. It holds that suggestion's id with all three languages, each non-empty and
-  within `order_explanation.max_chars` (proposed 200). The Hebrew text holds a Hebrew letter,
-  and the Arabic text an Arabic letter;
-- **the figure check (D-16).** First the suggestion's own product name is removed, exactly as
-  given. Then every number written in digits (0–9, ٠–٩ or ۰–۹, read as one number when joined by
-  `.` or `٫`) must equal one of that suggestion's sent figures, as sent or rounded to a whole
-  number. This is looser than the shelf explanation's check, which allows no digit (F12-S1
-  FR-212), because this sentence replaces the engine's, and the engine's states figures
-  (OQ-1401);
-- no text holds a percent sign (`%`, `٪`), the sign `₪`, or the currency's name from a fixed list
-  in the three languages (D-1).
+  at most 200 characters before the slots are filled. The Hebrew text holds a Hebrew letter, and
+  the Arabic text an Arabic letter;
+- every slot in it is one offered for that suggestion. Every text uses `{expected}`, and a capped
+  suggestion's texts also use `{shelf_life_days}`;
+- **the figure check (D-16).** The suggestion's own product name, exactly as given, and the slots
+  are each replaced by a space. The text is then normalised (Unicode NFKC). It may hold no
+  numeral of any script: no character Unicode classes as a number;
+- no text holds a percentage (`%`, `٪`, or a fixed list of the word in the three languages) or a
+  ₪ amount (`₪`, or a fixed list of the currency's names: ש"ח, שקל, شيكل, شيقل, NIS, ILS,
+  shekel), checked after the name and the slots are removed (D-1).
 
-A failing suggestion's three languages are withheld together, so they never disagree. The
-others in the same answer are unaffected. A suggestion missing from the answer is withheld as
-missing. An answer that does not parse withholds its whole group. Two things cannot be caught
-mechanically: a number written in words, and a cause the facts do not carry. The prompt forbids
-both, and ASM-085 states what is left.
+A failing suggestion's three languages are withheld together, so the languages never disagree.
+The rest of its group is unaffected. A suggestion missing from the answer is withheld as
+missing. An answer that does not parse withholds its whole group. What no check can catch is
+named in ASM-085: a cause the facts do not carry, a number written in words, and a slot used in
+the wrong sense.
 
 **FR-239** — Each night's explanations are sealed and reproduced as the shelf explanation's are
 (ADR-035, ADR-039, ADR-045) **(decided here)**:
 - the snapshot records, per suggestion, the model, the prompt's version, the facts digest, and
-  the text or why it was withheld;
+  the text with its slots unfilled, or why it was withheld;
 - print mode never calls the model. It reads the night's snapshot;
 - an explanation whose digest no longer matches its suggestion's facts is not shown. The
   suggestion counts as out of date;
@@ -164,37 +191,48 @@ both, and ASM-085 states what is left.
   with the same facts digest, model and prompt version. Tonight's snapshot copies it, so each
   night's snapshot is complete on its own, and unchanged facts are paid for once. A withheld
   explanation is never reused, and a new prompt or model asks again;
-- a second run the same night asks only for suggestions with no record for their current digest.
+- nothing sealed is replaced. A second run the same night asks only for suggestions with no
+  record that night. One whose facts changed since its record shows as out of date until the
+  next night;
+- the night's manifest is written when the step starts and again when it ends. A night that
+  started asking is never mistaken for a night with no key.
 
 **FR-240** — `order_explanation` is a capability of its own, `value_policy: none` and not
 admitted, because it fails on different days from the quantities (ADR-014) **(decided here)**:
+- it runs `order_quantity` first. When that is unavailable, for any reason, including its own
+  rule-level ones, so is this, with the same reason;
 - it requires `order_quantity`'s inputs and `order_explanations`, the night's sealed snapshot.
   Without a model key the live run asks nothing and seals nothing, so the reason is
   `no_model_key`;
-- whenever `order_quantity` is unavailable, so is it, with `order_quantity`'s reason;
-- it publishes, per suggestion, its text in the three languages, or why it has none: withheld
-  (with the check's reason), out of date, or not written tonight. With a text, it also publishes
-  the model, the prompt and the night it was reused from, if any;
+- it publishes, per suggestion, its text in the three languages with the slots unfilled, or why
+  it has none: withheld (with the check's reason), out of date, or not written tonight. With a
+  text, it also publishes the model, the prompt and the night it was reused from, if any;
 - it counts suggestions, explained, withheld, out of date, not written tonight, reused and
   requests made. Explained, withheld, out of date and not written tonight add up to the
   suggestions: the intent's "N of N".
 
 **FR-241** — The step is bounded **(decided here)**:
 - spending has ADR-032's two limits. The account's monthly limit and its alert are the owner's,
-  set in the provider's console (D-16). They are shared with the boost, the shelf explanation
-  and the shelf reader. A per-night ceiling of requests sits in policy, proposed 60, and is
-  counted across the night's runs;
-- a time budget, proposed 600 seconds, is checked before each request;
-- a request times out at 120 seconds and is retried once. A request that fails twice ends the
-  night's asking, as the boost's does.
+  set in the provider's console (D-16, OQ-1404). They are shared with the boost, the shelf
+  explanation and the shelf reader. A per-night ceiling of requests sits in policy, proposed 60,
+  and is counted across the night's runs;
+- a time budget, proposed 600 seconds, is checked before each request is sent;
+- a request times out at 120 seconds. A request that fails, after the shared client's one retry
+  where it retries, ends the night's asking, as the boost's does. Requests already in flight
+  finish, and their answers are checked and kept.
 
 A suggestion past any of these is not written tonight, and says so (FR-240).
 
 **FR-242** — On Reorder, a suggestion with an explanation shows it in place of the engine's
 sentence and the shelf-life line, in the page's language, after a tag saying it is the AI's
-**(OQ-1401)**. The quantity, the "Your stock count wasn't used" notice, the market boost box and
+**(OQ-1401)**. The page fills each slot from that suggestion's published facts, worded as in
+FR-238's table. The quantity, the "Your stock count wasn't used" notice, the market boost box and
 the three buttons stay as they are. A suggestion without an explanation shows the card exactly
 as F8 shows it today, with no tag and no per-card reason.
+
+This amends, for a suggestion with an explanation, the wording F8-S1 FR-149 records for a gross
+suggestion (OQ-902) and the card the owner approved in the F8 mockups. Both stay as the card's
+sentence whenever there is no explanation.
 
 **FR-243** — Above the suggestions, once, Reorder shows a note:
 - what the AI does: it writes each card's explanation from that suggestion's facts, and it
@@ -206,14 +244,23 @@ as F8 shows it today, with no tag and no per-card reason.
 - when `order_explanation` is unavailable, its reason in his words. Without a key, that the AI's
   explanations are off because no key for the model has been set up.
 
-When `order_quantity` is unavailable, Reorder shows F8's waiting text and no note (F8-S1 FR-160).
+There is no note when there are no suggestions, and none when `order_quantity` is unavailable:
+Reorder then shows F8's waiting text (F8-S1 FR-160).
 
-**FR-244** — In Reorder's marked example (D-29), the explanations are the real step's answers for
-the example's test shop. The team asks for them once, by hand with the key, and commits them with
-the example's inputs, because the example is built in print mode, which never calls the model.
-Until then, the example's builder gives the engine an empty snapshot, so the example's cards show
-the engine's sentence and the note says the AI has not explained them. The example stays
-read-only: nothing in it can be approved, changed, saved or sent.
+**FR-244** — In Reorder's marked example (D-29), the explanations are real answers for the
+example's test shop:
+- the example's builder never asks the model. It gives the explanation step no key. Before it
+  reproduces the night, it seals into its own temporary snapshot folder the committed answers, or
+  an empty snapshot while there are none. Its stand-in models for the boost and the shelf are
+  unchanged;
+- only its `--explain` option asks, once, with the real key: `python3
+  scripts/build_order_example.py --explain`. The owner runs it, because he holds the key, and the
+  answers are committed as `tests/fixtures/order_example/explanations.json`. This follows the
+  Shelf plan example's precedent (`scripts/build_shelf_example.py`);
+- until they are committed, the example's cards show the engine's sentence, and the note says the
+  AI has not explained them.
+
+The example stays read-only: nothing in it can be approved, changed, saved or sent.
 
 ## 7. Behavioral Invariants
 
@@ -225,20 +272,25 @@ the sealed explanations and one without them.
 **INV-099** — An explanation is shown only beside the facts it was written from. *Violated if*
 one is published for a suggestion whose facts digest differs from the one it recorded.
 
-**INV-100** — No published explanation states, in digits, a number its suggestion was not sent,
-a percentage or a ₪ amount (D-1, D-16). *Violated if* re-running FR-238's check on any published
-text fails it.
+**INV-100** — Every number in a shown explanation is a slot filled from its own suggestion's
+published facts. No published explanation holds a numeral outside its product name and slots, a
+slot not offered for its suggestion, a percentage or a ₪ amount (D-1, D-16). *Violated if*
+re-running FR-238's check on any published text fails it.
+
+**INV-101** — The example's explanations never reach a store's data. *Violated if* any is found
+under the store's `data/external/snapshots/`, or a store's run reads one (D-29).
 
 ## 8. Behavioral Scenarios
 
 **SCN-178** — Given a suggestion for במבה with an accepted explanation sealed for its current
 facts, when he opens Reorder in Hebrew, then its card shows the AI tag and the Hebrew text where
-the engine's sentence was. The quantity, the buttons and any boost box are unchanged.
+the engine's sentence was. Each slot shows the card's own figure, such as "בערך 35". The quantity,
+the buttons and any boost box are unchanged.
 
-**SCN-179** — Given a group of six suggestions, where the model's sentence for one says "40" and
-none of its sent figures is 40, when the step checks the answer, then that one is withheld as
-stating a figure and its card shows the engine's sentence. The other five are shown, and the
-note says the AI explained 5 of tonight's 6 suggestions.
+**SCN-179** — Given a group of six suggestions, where the model's text for one holds the digits
+"40", when the step checks the answer, then that one is withheld as stating a figure, and its
+card shows the engine's sentence. The other five are shown, and the note says the AI explained 5
+of tonight's 6 suggestions.
 
 **SCN-180** — Given no model key, when the nightly runs, then no request is made,
 `order_explanation` is unavailable with `no_model_key`, every card shows the engine's sentence,
@@ -249,11 +301,12 @@ explanation, when the step runs, then no request is made for it, and tonight's s
 the explanation, naming last night as where it came from.
 
 **SCN-182** — Given more groups than the night's request ceiling allows, or a time budget spent,
-when the step stops asking, then the remaining suggestions are not written tonight. Their cards
+when the step stops sending, then the remaining suggestions are not written tonight. Their cards
 show the engine's sentence, and the counts say how many.
 
-**SCN-183** — Given a request that fails twice, when the step continues, then it asks nothing more
-that night, and every suggestion not yet asked is not written tonight.
+**SCN-183** — Given a request that fails, when the step continues, then it sends nothing more
+that night. Answers already in flight are checked and kept, and every suggestion not asked is not
+written tonight.
 
 **SCN-184** — Given the example before its explanations are committed, when he opens "See how
 this page looks", then every card shows the engine's sentence and the note says the AI has not
@@ -262,6 +315,10 @@ explained them. Nothing can be approved.
 **SCN-185** — Given an explanation sealed before a late report changed its suggestion's facts,
 when print mode reproduces the night, then that explanation is not shown, the suggestion counts
 as out of date, and its card shows the engine's sentence.
+
+**SCN-186** — Given a capped suggestion whose texts never use `{shelf_life_days}`, when the step
+checks the answer, then it is withheld, and its card shows the engine's sentence with its
+shelf-life line.
 
 ## 9. Inputs and Observable Outputs
 
@@ -274,21 +331,23 @@ as out of date, and its card shows the engine's sentence.
 
 | Output | Where it is observable |
 |---|---|
-| `order_explanation`: per suggestion, its text in three languages or why it has none; the counts (FR-240) | `dashboard.json`; the Reorder page |
+| `order_explanation`: per suggestion, its text in three languages with the slots unfilled, or why it has none; the counts (FR-240) | `dashboard.json`; the Reorder page, slots filled |
 | The night's sealed snapshot, with the requests made and whether the step completed | `data/external/snapshots/<night>/order_explanations/` |
-| The example's explanations (FR-244) | Committed with the example's inputs; the example's preview |
+| The example's explanations (FR-244) | `tests/fixtures/order_example/explanations.json`; the example's preview |
 
 ## 10. State / Lifecycle Semantics
 
 - **The explanation is written once a night and kept.** The snapshot is committed by the
-  nightly's existing step for sealed answers (CLAUDE.md rule 9). It is never rewritten, only
-  added to the same night (FR-239).
+  nightly's existing step for sealed answers (CLAUDE.md rule 9). Nothing in it is replaced; a
+  second run that night only adds (FR-239).
 - **Recomputed each run:** which sealed explanation matches which suggestion, by digest.
+- **Filled at render:** the slots, from the suggestion's published facts. Nothing new is
+  computed; the page words the facts as the card already does (ADR-001).
 - **Never stored:** anything at request time. Nothing is written to owner state, and the
   explanation does not touch a suggestion's id or outcome key (ADR-034, INV-098).
 - **A suggestion's explanation follows its facts, not its id.** The id is the same every night
-  until the order day (ADR-034). When its facts change, a new explanation is asked for. When
-  they do not, the old one is reused (FR-239).
+  until the order day (ADR-034). When its facts change, a new explanation is asked for the next
+  night. When they do not, the old one is reused (FR-239).
 
 ## 11. Failure and Recovery Behavior
 
@@ -297,8 +356,9 @@ as out of date, and its card shows the engine's sentence.
 | No model key | Nothing is asked or sealed. `order_explanation` is unavailable (`no_model_key`). Every card shows the engine's sentence |
 | `order_quantity` unavailable | So is `order_explanation`, with the same reason. Reorder waits as F8 does |
 | An answer does not parse, or misses a suggestion | That group, or that suggestion, is withheld. Its cards show the engine's sentence. It is asked again the next night |
-| A sentence fails the check | That suggestion is withheld, with the check's reason. The rest of its group is shown |
-| Ceiling reached, time budget spent, or a request failed twice | The suggestions not asked are not written tonight (FR-241) |
+| A text fails the check | That suggestion is withheld, with the check's reason. The rest of its group is shown |
+| Ceiling reached, time budget spent, or a request failed | The suggestions not asked are not written tonight (FR-241) |
+| The job stops partway | The manifest written at the start says the step began. What was sealed stands; the rest is not written tonight |
 | A sealed explanation's digest no longer matches | Not shown; out of date (INV-099) |
 | `order_quantity` is available with no suggestions | `order_explanation` is available with every count at zero. That is a result, not a failure: there is nothing to explain. No note is shown |
 
@@ -309,27 +369,29 @@ is counted in exactly one of FR-240's four states.
 
 | Case | Behaviour |
 |---|---|
-| A product name holds digits ("קוקה קולה 1.5") | The name is removed before the figure check, exactly as given. A name changed in the copying keeps its digits, and is checked like any number |
-| A sentence names another product of its group | That name is not removed, so any digits in it are checked against this suggestion's figures |
-| A number written with a thousands comma ("1,000") | Read as two numbers, 1 and 000. Unless both are sent figures, it is withheld. Withheld is safer than misread |
-| Arabic-Indic digits in the Arabic text | Read as the same numbers (FR-238) |
-| Expected sales of 34.6 | "34.6" and "35" both pass. "34" does not |
-| A gross suggestion | No stock figure is sent, so none can be stated. The "Your stock count wasn't used" notice stays on the card (FR-242) |
+| A product name holds digits or "%" ("קוקה קולה 1.5", "חלב 3%") | The name is replaced by a space before the figure, percentage and currency checks, exactly as given. A name changed in the copying keeps its digits, and fails |
+| A text names another product of its group | That name is not removed, so any digit in it fails the check |
+| The model writes a number anyway ("35", "３５", "½", "٣٥") | Withheld. NFKC and the Unicode number classes catch every script |
+| The model writes "4 weeks" | Withheld. The prompt asks for the window in words ("the last four weeks"), which no check reads |
+| A slot not offered (`{left}` on a gross suggestion) | Withheld |
+| A gross suggestion | No stock slot is offered. The "Your stock count wasn't used" notice stays on the card (FR-242) |
+| A capped suggestion | Its texts must use `{shelf_life_days}`, or it is withheld (SCN-186) |
 | A department with 45 suggestions | Three groups: 20, 20 and 5 |
-| The boost applied | The explanation may say the nearby stores ran out. It cannot state the boost's percentage, which stays in the boost box with its "the model's estimate" label (D-10) |
+| The boost applied | The explanation may say the nearby stores ran out. It has no slot for the boost's percentage, which stays in the boost box with its "the model's estimate" label (D-10) |
 | A suggestion approved or dismissed earlier | It is not on the page (F8-S1 FR-163). The note's counts are tonight's published suggestions |
 
 ## 13. Non-Functional Requirements
 
-**NFR-082** — The step never holds the quantities up. Its requests are bounded by the policy's
-ceiling, its time by the budget checked before each request, and each request by its timeout
-(FR-241). It ends within about 600 + 241 seconds, the budget plus one request timed out twice.
-Each night it publishes the requests made and how many explanations were reused.
+**NFR-082** — The step never holds the quantities up **(decided here)**. Its requests are bounded
+by the policy's ceiling, its time by the budget checked before each request is sent, and each
+request by its timeout (FR-241). It ends within about 600 + 241 seconds: the budget, plus a
+request sent just before it ran out that timed out and was retried. Each night it publishes the
+requests made and how many explanations were reused.
 
 **NFR-083** — Its cost is estimated before it is switched on, and counts under ADR-032's monthly
-limit. ADR-045 gives the estimate: about $5 a month at about 60 suggestions a night, and about $47
-a month at about 565 if every suggestion changes nightly. These are replaced by the first nights'
-measured usage.
+limit. ADR-045 gives the estimate: about $5 a month at about 60 suggestions a night, and about $36
+a month at about 435, if every suggestion's facts change nightly. These are replaced by the first
+nights' measured usage.
 
 ## 14. Compatibility and External Constraints
 
@@ -337,10 +399,11 @@ measured usage.
 by the nightly or not at all.
 
 **C-77** — The page renders published fields and computes nothing (ADR-001). The note's counts
-are `order_explanation`'s published counts, not a count the page makes.
+are `order_explanation`'s published counts. The slots are filled from published facts, worded as
+the card already words them.
 
 **C-78** — CI commits only `data/external/snapshots/` (CLAUDE.md rule 9). The nightly's sealed
-explanations live there. The example's are committed by a person (FR-244).
+explanations live there. The example's are committed by hand (FR-244).
 
 **C-79** — Front-end work waits for the owner's approval of its mockups (2026-09-16). The card
 and the note are built only after he approves screenshots of the example in Hebrew, Arabic and
@@ -356,111 +419,147 @@ outcome key of `order_quantity` and `market_boost` unchanged. Each suggestion th
 explanation, and why. *(FR-240, INV-098)*
 
 **AC-222** — The check, run on fixed answers:
-- a sentence whose numbers are all sent figures passes, including expected sales rounded to a
-  whole number, Arabic-Indic digits, and digits inside the product's own name;
-- a sentence with a number not sent is withheld as stating a figure;
-- so is one with `%`, `٪`, `₪` or the currency's name;
-- so is one over the length limit, one missing a language, and a Hebrew text with no Hebrew
+- passes a text whose only numbers are offered slots, including when the product's own name holds
+  digits or "%";
+- withholds a text with a numeral of any script outside the name and slots;
+- withholds one with a slot not offered, one without `{expected}`, and a capped one without
+  `{shelf_life_days}`;
+- withholds one with `%`, `٪`, a percentage word, `₪` or a currency name;
+- withholds one over 200 characters, one missing a language, and a Hebrew text with no Hebrew
   letter.
 
 Only the failing suggestion is withheld, in all three languages. *(FR-238, INV-100)*
 
 **AC-223** — The request built for a group carries only FR-236's facts and the department's
-name. It carries no barcode, date, price, cost, margin, ₪ figure, boost percentage, boost reason
-or daily mean. It turns thinking off. *(FR-236, FR-237)*
+name, figures to one decimal. It carries no barcode, date, price, cost, margin, ₪ figure, boost
+percentage, boost reason or daily mean. It turns thinking off. *(FR-236, FR-237)*
 
-**AC-224** — Groups are one department's suggestions in published order, at most the group
-size. An answer missing a suggestion withholds that one. An answer that does not parse withholds
-its group only. *(FR-237, FR-238)*
+**AC-224** — Groups are one department's suggestions in published order, at most 20. An answer
+missing a suggestion withholds that one. An answer that does not parse withholds its group only.
+*(FR-237, FR-238)*
 
 **AC-225** — Print mode never calls the model, and reproduces the published explanations from the
 snapshot. An explanation whose facts digest no longer matches is not shown. *(FR-239, INV-099)*
 
 **AC-226** — A suggestion whose facts, model and prompt match an accepted explanation in the most
 recent earlier snapshot is not asked, and tonight's snapshot copies it with where it came from.
-A withheld one is asked again. *(FR-239)*
+A withheld one is asked again. A second run the same night replaces no sealed record.
+*(FR-239)*
 
-**AC-227** — Past the request ceiling or the time budget, or after a request fails twice, no
-further request is made that night. The remaining suggestions are not written tonight, and the
-counts add up to the suggestions. *(FR-240, FR-241, NFR-082)*
+**AC-227** — Past the request ceiling or the time budget, or after a request fails, no further
+request is sent that night. Answers already in flight are kept. The remaining suggestions are not
+written tonight, and the counts add up to the suggestions. *(FR-240, FR-241, NFR-082)*
 
 **AC-228** — On Reorder, in each of the three languages, a suggestion with an explanation shows
-the AI tag and its text in place of the engine's sentence and the shelf-life line. It keeps its
-quantity, its "stock count wasn't used" notice, its boost box and its buttons. A suggestion
-without one shows the card exactly as before this spec. *(FR-242)*
+the AI tag and its text in place of the engine's sentence and the shelf-life line. Each slot shows
+its fact worded and formatted as FR-238's table says, "about" included. The card keeps its quantity, its
+"stock count wasn't used" notice, its boost box and its buttons. A suggestion without an
+explanation shows the card exactly as before this spec. *(FR-238, FR-242)*
 
 **AC-229** — The note says what the AI does. With some suggestions unexplained it gives the
 published "N of M"; with none explained, that the AI has not explained them; with the capability
-unavailable, its reason. With `order_quantity` unavailable there is no note. *(FR-243)*
+unavailable, its reason. There is no note with no suggestions, or with `order_quantity`
+unavailable. *(FR-243)*
 
-**AC-230** — The example is built without calling the model. With committed explanations it shows
-them. Without them its cards show the engine's sentence and the note says so. Its buttons stay
-disabled. *(FR-244)*
+**AC-230** — The example is built without calling the model, and with no key given to the
+explanation step. With committed explanations it shows them. Without them its cards show the
+engine's sentence and the note says so. Its buttons stay disabled. *(FR-244)*
 
 **AC-231** — Without a key, nothing is asked or sealed, and `order_explanation` is unavailable
 with `no_model_key`. *(FR-240)*
 
+**AC-232** — Building the example writes nothing under the store's `data/external/snapshots/`,
+and a store's run reads nothing from `tests/fixtures/order_example/`. *(FR-244, INV-101)*
+
+**AC-233** — A run that stops after its first request still leaves a manifest saying the step
+began, so print mode does not say `no_model_key`. *(FR-239)*
+
 ## 16. Assumptions
 
 **ASM-085** — The model's explanation is faithful to the facts it was given. *Falsified if* it
-gives a cause the facts do not carry ("it's hot this week"), or states a number in words that
-they do not carry. The check catches neither. The prompt forbids both, and the page labels the
-text as the AI's. The quantity, not the text, is what the product stands behind (INV-098).
+gives a cause the facts do not carry ("it's hot this week"), states a number in words, or puts a
+slot where it means another fact ("{left}" where it means the expected sales). No check catches
+these. The prompt forbids them, each slot's name says what it is, and the page labels the text
+as the AI's. The figures in the slots are always the engine's, and the quantity, not the text, is
+what the product stands behind (INV-098).
 
-**ASM-086** — A group of 20 suggestions fits one answer of 6,000 tokens within 120 seconds, with
+**ASM-086** — A group of 20 suggestions fits one answer of 8,000 tokens within 120 seconds, with
 thinking off. *Falsified if* the first nights' manifests show answers cut off (withheld as not
-parsing) or timed out. The remedy is a smaller group size, which is policy.
+parsing) or timed out. The remedy is a smaller group, which is policy.
 
 **ASM-087** — The account's rate limits allow four requests at once. *Falsified if* the
-manifests show 429s. The remedy is lower concurrency, which is policy.
+manifests show 429s. The remedy is fewer at once, which is policy.
 
-**ASM-088** — The size of a night is estimated from the monthly reports (CLAUDE.md rule 13). In
-July 2026, 565 products sold at least 4 units. Only 59 sold in all seven months. 433 of the 565
-have a category, across 25 categories, so about 39 to 46 groups. F8's own test (sold in each of
-four weeks) needs daily reports, so the true count is not known until a store sends them.
+**ASM-088** — The size of a night is estimated from the monthly reports (CLAUDE.md rule 13).
+- In July 2026, 565 products sold at least 4 units (`sales_monthly.parquet`). Only 59 sold in all
+  seven months.
+- 435 of the 565 have a department in `public/data/catalogue.json` (barcodes matched with leading
+  zeros removed), across 26 departments. That is 40 groups of at most 20. The other 130 are not
+  in the catalogue, so F8 cannot suggest them.
+- F8's own test, sold in each of four weeks, needs daily reports, so the true count is not known
+  until a store sends them.
+
 *Falsified by* the first nights' counts, which replace it.
 
 ## 17. Open Questions
 
 **~~OQ-1401~~** — Where does the AI's explanation sit on each card? **Answered 2026-10-09:
 "Replace the engine's line"**, choosing between:
-- "Under the engine's line (Recommended)";
+- "Under the engine's line (Recommended)": "Keep today's "You'll sell about 35…" line, which is
+  always there and always exact. Add the AI's "why" beneath it, marked as AI-written. A night
+  without an answer loses nothing."
 - "Replace the engine's line": "The AI's sentence becomes the card's only explanation. The
   engine's line comes back only on a night with no AI answer. Less text, but the exact figures
-  are then in the AI's words";
-- "Behind a 'Why?' button".
+  are then in the AI's words."
+- "Behind a "Why?" button": "The card stays as it is today. A "Why this quantity?" button opens
+  the AI's sentence. Cleanest card, but you have to press to read it."
 
-FR-242 and FR-238's looser figure check follow from it.
+FR-242 and FR-238 follow from it.
 
 **~~OQ-1402~~** — How does the nightly ask? **Answered 2026-10-09: "One request per department
-(Recommended)"**, against "One request per suggestion". He was shown, at ADR-032's prices:
-- per department: about 30 requests, about $1.50 a night and $47 a month at the top of the
-  range, and about $5 a month at about 60 suggestions;
-- per suggestion: about 565 requests, about $3 a night and $95 a month.
+(Recommended)"**. The options were, verbatim:
+- "One request per department (Recommended)": "One request covers up to ~20 suggestions in a
+  department, and each sentence is checked on its own. An explanation is reused while its facts
+  don't change, and a few requests run at once. At the top of the range: about 30 requests,
+  ~$1.50 a night, ~$47 a month, around 5 minutes. At about 60 suggestions it's ~$5 a month. One
+  bad answer can cost a whole group its sentences that night (they fall back to the engine's
+  line)."
+- "One request per suggestion": "Each suggestion gets its own request, the way the market boost
+  works today. A failure only affects that one card. At the top of the range: about 565
+  requests, ~$3 a night, ~$95 a month, around 45 minutes unless many run at once, which risks
+  the model's rate limits. It would need a much higher nightly request limit."
 
-The request count was then measured as about 39 to 46 (ASM-088). The cost stands, because it is
-mostly the answers' length, not the number of requests. FR-237 follows from it.
+FR-237 follows from it. The top of the range has since been re-estimated (ASM-088), and OQ-1403
+shows what that changes.
 
-**OQ-1403** — Do you approve F14-S1 as written? The choices marked **(decided here)** are:
-- the model sees only FR-236's facts (FR-236);
-- one request per group of up to 20, four at once, with thinking off (FR-237);
-- the checks: the figure check, no percentage or ₪, length, and each language's letters (FR-238);
-- sealing and reuse as the shelf explanation's (FR-239);
-- a capability of its own (FR-240);
-- the limits (FR-241).
+**OQ-1403** — Do you approve F14-S1 as written? It asks for the choices marked
+**(decided here)**, and for the changes since the conversation below.
 
-**Four values differ from what was said while designing it**, after measuring:
+**What changed from what you were shown:**
 
-| Value | Said in conversation | Proposed here | Why it changed |
+| | Shown in conversation | Proposed here | Why |
 |---|---|---|---|
-| Requests a night | 40 | 60 | about 39 to 46 groups at the top of the range, not 30 (ASM-088) |
-| Time budget | 360 s | 600 s | at the top of the range the answers total about 113,000 tokens. At an assumed 60 tokens a second for each of four requests, that is about 8 minutes (ADR-045) |
+| How numbers reach the card | The AI writes them, and a check keeps only numbers from the suggestion's facts | The AI writes slots, and the page fills them with the card's own figures and "about" | A check on values passes a true number in the wrong place: "you'll sell about 12, and 35 will be left", with the stock and the sales swapped. With slots every figure is the engine's, and an estimate always says "about" (D-10) |
+| What is withheld when a text fails | "only that sentence" | that suggestion's text in all three languages | the languages never disagree. The rest of the group is unaffected |
+| Top of the range | about 565 suggestions, about 30 requests | about 435 suggestions, about 40 requests | 130 of the 565 are not in the catalogue (ASM-088) |
+| Cost at the top of the range | about $47 a month | about $36 a month | the same 130 |
+| Requests a night, the ceiling | 40 | 60 | about 40 groups at the top of the range, plus margin. If every group were full up to the ceiling, the most it could cost is about $95 a month at 60, against about $64 at 40. At the assumed speed the time budget stops the step before the ceiling is reached |
+| Time budget | 360 s | 600 s | the answers at the top of the range total about 87,000 tokens. At an assumed 60 tokens a second for each of four requests, that is about 6 minutes |
+| Step time at the top of the range | around 5 minutes | about 6 minutes | as above |
 | Request timeout | 90 s | 120 s | a 20-suggestion answer is about 4,000 tokens, about 67 seconds at the same assumed speed |
 | Worst-case step time | about 9 minutes | about 14 minutes | follows from the two above (NFR-082) |
 
-Two checks are new: no ₪ or currency name, and each language's own letters. Thinking off is
-also new: the conversation did not cover it. · owner: the repository owner · blocks: ADR-045's
-acceptance, the mockups and the implementation plan.
+**What is new, not covered in conversation:**
+- thinking turned off, and an answer limit of 8,000 tokens (FR-237);
+- the checks for percentage and currency words, each language's own letters, and the required
+  `{expected}`, and `{shelf_life_days}` when capped (FR-238);
+- the daily rate is not sent: it was in the list of facts F8 publishes, not in the numbers the
+  sentence may state;
+- reuse from the most recent earlier snapshot, matched by a digest of the facts without the
+  suggestion's id, so a new order day with the same facts reuses the old text (FR-239).
+
+· owner: the repository owner · blocks: ADR-045's acceptance, the mockups and the implementation
+plan.
 
 **OQ-1404** — Is the account's monthly spending limit set, with its alert, and at what? D-16
 makes it a condition of any AI-written reason, and ADR-032 leaves it with the owner, in the
@@ -482,13 +581,14 @@ build.
 
 | Intent | Requirement | Scenario | Acceptance |
 |---|---|---|---|
-| INT-EXPL · D-40 | FR-235, FR-236, FR-237, FR-238 | SCN-178, SCN-179 | AC-222, AC-223, AC-224 |
-| INT-EXPL · D-16 | FR-239, FR-240, FR-241 | SCN-180, SCN-181, SCN-182, SCN-183, SCN-185 | AC-221, AC-225, AC-226, AC-227, AC-231 |
+| INT-EXPL · D-40 | FR-235, FR-236, FR-237, FR-238 | SCN-178, SCN-179, SCN-186 | AC-222, AC-223, AC-224 |
+| INT-EXPL · D-16 | FR-239, FR-240, FR-241 | SCN-180, SCN-181, SCN-182, SCN-183, SCN-185 | AC-221, AC-225, AC-226, AC-227, AC-231, AC-233 |
 | INT-EXPL · D-40 | FR-242, FR-243 | SCN-178, SCN-179, SCN-180 | AC-228, AC-229 |
-| INT-EXPL · D-29 | FR-244 | SCN-184 | AC-230 |
+| INT-EXPL · D-29 | FR-244 | SCN-184 | AC-230, AC-232 |
 | Protected behavior | INV-098 | SCN-180 | AC-221 |
 | Protected behavior | INV-099 | SCN-185 | AC-225 |
-| Protected behavior | INV-100 | SCN-179 | AC-222 |
+| Protected behavior | INV-100 | SCN-179, SCN-186 | AC-222 |
+| Protected behavior | INV-101 | SCN-184 | AC-232 |
 | Protected behavior | NFR-082 | SCN-182, SCN-183 | AC-227 |
 
 ---
@@ -496,14 +596,16 @@ build.
 ## 20. Boundary Probe
 
 CLAUDE.md rule 12. The explanation adds no signal to any quantity, so the probe proves the
-opposite: that withholding it moves nothing else, and that it reaches the published artefact only
-from a sealed answer.
+opposite: that withholding it moves nothing else, that it reaches the published artefact only
+from a sealed answer that passes the check, and that it goes out of date when any of its facts
+change.
 
 | Probe | What it would catch | Where it runs |
 |---|---|---|
 | `npm run check:order-signals` (exists), extended over its fixture world with sealed explanations, then with them withheld | An explanation published from nothing; a quantity or figure that changes without the model's answer (INV-098) | `collect-daily.yml` |
-| The same probe, with one sealed explanation's facts changed after sealing | A stale explanation shown beside new facts (INV-099) | `collect-daily.yml` |
-| `scripts/check_v1_signals.py`'s `PROBED_ELSEWHERE` guard (exists) | Once `order_explanations` is in any capability's `requires`, `tests/test_check_v1_signals.py` fails until it is listed | CI |
+| The same probe, sealing stand-in answers that hold a typed number, a stray "%", a slot not offered, and a capped text without `{shelf_life_days}`. It reads the artefact, and re-runs FR-238's check over every published text | A failing answer published (INV-100) | `collect-daily.yml` |
+| The same probe, changing one source at a time for each FR-236 fact: a daily report, the count, the shelf life, the schedule, the boost's pick | A stale explanation shown beside new facts, or a fact left out of the digest (INV-099) | `collect-daily.yml` |
+| `scripts/check_v1_signals.py`'s `PROBED_ELSEWHERE` guard (exists) | Once `order_explanations` is in any capability's `requires`, `tests/test_check_v1_signals.py` fails until it is listed. Listing it also needs the probe's own word for it in that test | CI |
 
 ## 21. Claim Limits
 
@@ -512,7 +614,8 @@ from a sealed answer.
 | "The AI's explanation shows the quantity is right" | not measurable | The explanation puts F8's facts into words (FR-235). The quantity's grounds are F8-S1's rules |
 | "Explanations make him approve more suggestions" | not measurable | No store sends daily sales (D-23), and no comparison without explanations is planned |
 | "Every suggestion is explained" | measured each night | FR-240's counts: N of N, and the states of the rest |
-| "No explanation states a figure its facts lack" | measured each night, in digits only | INV-100 and the check. Numbers in words are ASM-085's residual |
+| "Every figure in an explanation is the engine's" | measured each night | INV-100: no numeral outside names and slots. A slot used in the wrong sense is ASM-085's residual, not measured |
+| "No explanation gives a cause its facts lack" | not measurable | ASM-085. The prompt forbids it; no check reads causes |
 
 ## 22. Unmapped PRD Acceptance Lines
 

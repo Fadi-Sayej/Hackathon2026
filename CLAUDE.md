@@ -13,7 +13,7 @@ PRD  →  Feature Intents  →  Feature Specs  →  System Design + ADRs  →  I
 |---|---|
 | PRD · settled decisions D-1 … D-40 | [`docs/product/PRD.md`](docs/product/PRD.md) · [`docs/product/intent-register.md`](docs/product/intent-register.md) |
 | Feature intents (F1 … F14) | [`docs/features/F#-*/intent.md`](docs/features/) |
-| Feature specs (F1-S1 … F9-S1, F12-S1, F13-S1) | [`docs/features/F#-*/specs/`](docs/features/) |
+| Feature specs (F1-S1 … F9-S1, F12-S1, F13-S1, F14-S1) | [`docs/features/F#-*/specs/`](docs/features/) |
 | Gaps, open questions, assumptions | [`docs/features/gaps-and-open-questions.md`](docs/features/gaps-and-open-questions.md) |
 | System Design | [`docs/architecture/system-design.md`](docs/architecture/system-design.md) |
 | ADR-001 … ADR-045 | [`docs/architecture/decisions/`](docs/architecture/decisions/) |

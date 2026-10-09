@@ -104,7 +104,7 @@ suggestion to carry an AI explanation, that would be a new capability like `shel
 plus a change to the cards. I'd write it up as a proposal for you to approve first, not just add
 it."
 
-The same day, while the design was put to him, he made two choices. F14-S1 records them:
+The same day, while the design was put to him, he made two choices. D-40 and F14-S1 record them:
 - **On the card, the AI's sentence replaces the engine's sentence.** The engine's sentence comes
   back on a night with no AI answer (F14-S1 OQ-1401).
 - **The model is asked once per department,** for up to about 20 suggestions in a request
