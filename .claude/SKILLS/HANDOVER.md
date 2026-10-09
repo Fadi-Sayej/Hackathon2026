@@ -82,7 +82,7 @@ is `Approved`.
 |---|---|---|
 | `Approved` | Settled. Intents and specs use this. | Yes |
 | `Accepted` | Settled. **ADRs use this instead of `Approved`** — ADR-001 … ADR-044 do; ADR-045 is still for review. | Yes |
-| `Registered — not specified` | The intent is settled, and writing a spec is **deliberately forbidden** until a named decision is taken. F10, F11 and F14 are in this state. | **No** — and not because it is unfinished. Point at the blocking `GAP-` id and stop. |
+| `Registered — not specified` | The intent is settled, and writing a spec is **deliberately forbidden** until a named decision is taken. F10 and F11 are in this state. F14 was unlocked by D-40 on 2026-10-09, and its spec is for review. | **No** — and not because it is unfinished. Point at the blocking `GAP-` id and stop. |
 | `Living` | Continuously updated by design; never "finished". The gaps register is one. | Yes, as a reference — never cite it as settled |
 | `Partial — <what is missing>` | Part written, part not. The implementation plan is here. | Only for the parts named as written |
 | `Proposal — <what must confirm it>` | Not yet product authority. | No |

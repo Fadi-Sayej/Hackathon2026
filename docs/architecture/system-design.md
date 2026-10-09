@@ -1540,21 +1540,23 @@ Nothing is built until the owner approves the spec and its mockups.
 | FR-224 … FR-227, NFR-080 | I the upload on Store layout: a JPEG as taken, in parts of at most 900,000 bytes under `stores/<store>/shelfPhotos/`, the manifest last; R the nightly's collect step joins and checks them into `data/internal/shelf_photos/`, deletes only what it pushed; E `layout_facts.photos` (unit, collected, read) | ADR-042, ADR-029 | AC-212 … AC-214 |
 | FR-228 … FR-234, NFR-081 | I the owner's units on Store layout, saved whole to `stores/<store>/ownerState/layout`; R the nightly writes a newer save into `configs/store_layout.yaml` (`recorded_by: app`, `height_cm`, `entered_in_app`); E the reader's `heights` beside `widths`, graded by their own acceptance run; the plan's fit with `shelf.height_clearance_mm`; `layout_facts.without_height`, `units_saved_at` | ADR-044, ADR-037, ADR-041 | AC-215 … AC-220 |
 
-### F14-S1 — Decision explanations (V2: specified, Ready for review 2026-10-09)
+### F14-S1 — Decision explanations (V2: specified, Ready for review 2026-10-10)
 
 F14-S1 builds D-40, which unlocked F14 for specification on 2026-10-09: every order suggestion
 carries the AI's explanation of its quantity, made by D-16's method. It adds one engine capability,
 `order_explanation` (ADR-014). A nightly step after `order_quantity` writes it, asking the pinned
-model once per department group and sealing the answers (ADR-045). On the Reorder card the
-explanation replaces the engine's sentence, which comes back when there is none. Nothing is built
-until the owner approves the spec and its mockups.
+model once per department group and sealing the answers (ADR-045). The model writes no number:
+it writes slots, and the page fills each with a phrase that carries the engine's figure and says
+what it is. On the Reorder card the explanation replaces the engine's sentence and the shelf-life
+line, which come back when there is none. Nothing is built until the owner approves the spec and
+its mockups.
 
 | Requirement | Design element | Flow / contract | Verification |
 |---|---|---|---|
-| FR-235 … FR-238, INV-100 | E after `order_quantity`: each department's suggestions in groups of at most 20, asked of the pinned model with thinking off, `concurrency` at once; only FR-236's facts sent, figures to one decimal; the model writes slots, never numerals; each text checked on its own: no numeral outside its product name and offered slots, `{expected}` always and `{shelf_life_days}` when capped, no percentage or ₪ sign or word, within length, each language's letters | ADR-032, ADR-039 Decision 3, ADR-045 | AC-222 … AC-224 |
-| FR-239 … FR-241, INV-098, INV-099, NFR-082, NFR-083 | E `order_explanation` (requires `products`, `sales_daily`, `store_facts`, `order_explanations`; `no_model_key`): runs `order_quantity` first and takes its reason; sealed per run date under `order_explanations/`, nothing sealed replaced, manifest written at start and end; reuse from the most recent earlier snapshot by digest, model and prompt; a per-night ceiling counted at send, a time budget, a request timeout, and a stop after a failure; counts that add up to the suggestions; never read back | ADR-035, ADR-039, ADR-045; D-16 | AC-221, AC-225 … AC-227, AC-231, AC-233 |
-| FR-242, FR-243 | U Reorder: the AI tag and text in place of the engine's sentence and the shelf-life line, each slot filled from the suggestion's published facts in the card's own words; one note above the suggestions, from the published counts | ADR-001, ADR-028 §1 | AC-228, AC-229 |
-| FR-244, INV-101 | R the example's builder gives the step no key and seals `tests/fixtures/order_example/explanations.json`, or an empty snapshot, into its own temporary folder; only `--explain` asks, with the owner's key | D-29; ADR-045 Decision 7; F12-S1 FR-215's precedent | AC-230, AC-232 |
+| FR-235 … FR-238, INV-100 | E after `order_quantity`: each department's suggestions in groups of at most 20, asked of the pinned model with thinking off, `concurrency` at once; only FR-236's facts sent, figures to one decimal, halves up, weekly figures only over a fully reported window; the model writes slots, never numerals or names; each text checked on its own: offered slots only, each once, `{product}` and `{expected}` always, `{shelf_life}` when capped, no numeral in the raw or NFKC text outside slots, no written product name, no percentage or ₪ sign or listed word, within length, each language's letters | ADR-032, ADR-039 Decision 3, ADR-045 | AC-222 … AC-224 |
+| FR-239 … FR-241, INV-098, INV-099, NFR-082, NFR-083 | E `order_explanation` (requires `products`, `sales_daily`, `store_facts`, `order_explanations`; `no_model_key`): runs `order_quantity` first and takes its reason; sealed per run date under `order_explanations/`, nothing sealed replaced, manifest written at start and end with each request's tokens; reuse from earlier snapshots back to the last completed one, by digest, model and prompt; a per-night ceiling counted at send, a time budget, a request timeout, and a stop after a failure; counts that add up to the suggestions; never read back | ADR-035, ADR-039, ADR-045; D-16 | AC-221, AC-225 … AC-227, AC-231, AC-233, AC-234 |
+| FR-242, FR-243 | U Reorder: the AI tag and text in place of the engine's sentence and the shelf-life line, each slot filled with its phrase from the suggestion's published facts and isolated for direction; a slot without a fact shows the engine's sentence instead; one note above the suggestions, from the published counts | ADR-001, ADR-028 §1 | AC-228, AC-229, AC-235 |
+| FR-244, INV-101 | R the example's builder runs the step with asking switched off (its own model connection, separate from the boost's) and seals `tests/fixtures/order_example/explanations.json`, or an empty snapshot, into its own temporary folder; the example carries `order_explanation`; only `--explain` asks, with the owner's key | D-29; ADR-045 Decision 7; F12-S1 FR-215's precedent | AC-230, AC-232 |
 
 ### Cross-cutting decisions
 

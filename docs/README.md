@@ -34,7 +34,7 @@ carries a banner saying so.
 |---|---|
 | [PRD](product/PRD.md) | Problem · user · feature register (F1–F14) · releases · not-in-scope · owner commitments · decision criterion · figures · open decisions |
 | [Release phases](product/release-phases.md) | Three customer-facing delivery phases with dates · **proposes a change to PRD §5's dates, does not take it** |
-| [Intent register (SPEC-000)](product/intent-register.md) | INT-id ↔ spec map · **settled decisions D-1 … D-40** · why F10, F11 and F14 are deliberately unspecified |
+| [Intent register (SPEC-000)](product/intent-register.md) | INT-id ↔ spec map · **settled decisions D-1 … D-40** · why F10 and F11 are deliberately unspecified, and D-40, which unlocked F14 |
 | [Open decisions](product/open-decisions/) | One brief per feature blocked on a product decision · poses the choices the data supports · **not authority** — answers land as `D-n` in the intent register §3, then the brief is `Superseded` |
 
 ## Features
