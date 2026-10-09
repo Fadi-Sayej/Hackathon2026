@@ -255,6 +255,7 @@ export const en = {
   'unavailable.no_arrangement_recorded': "No shelf has been marked as arranged yet.",
   // Task 8.10 (D-32, F12-S1 FR-214, FR-215): the explanation's key, and why a plan has none.
   'unavailable.no_model_key': "The shelf explanation is off: no key for the model has been set up.",
+  'unavailable.order_explanation.no_model_key': "The AI's explanations are off: no key for the model has been set up.",
   'shelfExplanation.none.withheld': "The AI's explanation was held back: it did not pass the check.",
   'shelfExplanation.none.out_of_date': "The AI's explanation was written for an earlier plan, so it is not shown.",
   'shelfExplanation.none.not_written_tonight': "The AI has not explained this plan yet.",
@@ -602,6 +603,18 @@ export const en = {
   'reorder.boostNot.ceiling_reached': "tonight's limit of questions to the model was reached",
   'reorder.boostWithheld': "(its reason was withheld because it stated a figure)",
   'reorder.capped': "Only what sells in {days}, before it spoils.",
+  // F14 (MOCKUP, F14-S1 FR-238, FR-243; not approved): the AI's explanation on a card. The model writes
+  // slots, and each is filled with a phrase that carries one published fact and says what it is and when.
+  'reorder.ai.slot.quantity': "an order of {n}",
+  'reorder.ai.slot.expected': "about {expected} expected to sell in the {days} from {day}",
+  'reorder.ai.slot.weeks': "{list} sold in the {weeks} to {date}",
+  'reorder.ai.slot.nextOrder': "your order on {day}, which covers {days}",
+  'reorder.ai.slot.left': "about {left} left on {day}",
+  'reorder.ai.slot.runsOut': "what you have will be gone by {day}",
+  'reorder.ai.slot.capped': "only what sells in {days}, before it spoils",
+  'reorder.ai.note.what': "An AI writes each card's explanation from that suggestion's facts. It explains the quantity and does not change it.",
+  'reorder.ai.note.some': "Tonight the AI explained {n} of {total} suggestions. A card it did not explain shows the engine's sentence.",
+  'reorder.ai.note.none': "The AI has not explained tonight's suggestions.",
   'reorder.approve': "Approve",
   'reorder.change': "Change quantity",
   'reorder.dismiss': "Dismiss",
