@@ -62,39 +62,51 @@ Two things make the order explanation different from the shelf's:
    - Requests already in flight when the step stops are allowed to finish, and their answers are
      checked and kept.
 4. **Slots that say what they are.** F14-S1 FR-236 and FR-238 give the details.
-   - The model writes no numeral, and does not write the product's name. Where a figure or the
-     name belongs, it writes a named slot: `{product}`, `{quantity}`, `{expected}`, `{weeks}`,
-     `{next_order}`, `{stock_now}`, `{left}`, `{runs_out}` or `{shelf_life}`. Each suggestion is
-     offered only the slots its facts support, and each slot may appear once. The model is told
-     what each slot means, never its figure or its phrase.
+   - The model writes no number, in digits or in words, and does not write the product's name.
+     Where a figure or the name belongs, it writes a named slot: `{product}`, `{quantity}`,
+     `{expected}`, `{weeks}`, `{next_order}`, `{left}`, `{runs_out}` or `{capped}`. Each
+     suggestion is offered only the slots its facts support, and each slot may appear once. The
+     model is told what each slot means, never its figure or its phrase.
    - The page fills each slot with a phrase that carries the figure and names it, with its
-     period: `{left}` becomes "about 12 left on Tuesday 1 Sept", not "12", and `{expected}` "about
-     34.6 sold in the 7 days from Tuesday 1 Sept". No two phrases can be read as the same order or
-     the same days. Figures take the card's own format, and estimates the card's own "about".
-   - Where the count was used, the text must keep the card's stock statement: `{left}` or
-     `{runs_out}`, whichever is offered.
+     period: `{left}` becomes "about 3 left on Tuesday 1 Sept", not "3", and `{expected}` "about
+     35 expected to sell in the 7 days from Tuesday 1 Sept". Figures take the card's own format,
+     and estimates the card's own "about".
+   - There is no slot for the stock now. The engine's figure is the stock at the start of the run
+     day, and the card never showed it; read later in the day, "now" would be wrong.
+   - Where the card has its own sentence for a fact, the text must use it: `{left}` or
+     `{runs_out}` when the count was used, and `{capped}`, the card's shelf-life line, when the
+     shelf life capped the quantity.
+   - The model hears about the market only for a product whose card shows the boost box, and
+     hears whether the boost raised the expected sales (a pick above zero), never its figure.
    - Filling is rendering a published field, which ADR-001 allows. The phrases live in the page's
      dictionaries beside the card's own words. The prompt describes how each phrase reads. A
      change to a phrase that changes how it reads in a sentence is a new prompt version, so no text
      written for the old phrase is reused.
-   - The capability publishes, per suggestion, the slots offered for it. The page fills only
-     those, and isolates each filled slot for text direction, as it already isolates the product
-     name and "40%". Any other slot, or one whose fact is missing, means the text is not shown,
-     and the card shows the engine's sentence. Before publishing, the capability runs the check
-     again on every text against tonight's offered slots.
+   - The capability publishes, per suggestion, the slots offered for it and the prompt version
+     its text was written under. The page fills only those slots, and shows only a text whose
+     prompt version its phrases serve. It isolates each filled slot for text direction, as it
+     already isolates the product name and "40%". Any other slot, a slot whose fact is missing, or
+     another prompt version means the text is not shown, and the card shows the engine's
+     sentence. Before publishing, the capability runs the check again on every text against
+     tonight's offered slots and its group's names.
    - `{weeks}` is offered only when every day of the window has a report with the product's
      units known. F8 sums a week over the days it has reports for (`order_evidence.py`), so a
      week with a missing day would read as a slump, a zero where nothing is known (D-3).
    - The check is ADR-039's no-numeral rule, made stricter. With the slots removed, neither the
      text as written nor its NFKC form may hold a character Unicode classes as a number. Checking
      both catches a numeral that NFKC turns into letters.
+   - The intent asks that the figure check be mechanical, «لا بطلبٍ في التعليمات». So the check
+     also refuses number words from a fixed list in the three languages, matched as whole words
+     with one-letter prefixes after quote marks are removed and the text normalised. The list
+     covers two upward, fractions, multiples and the duals (יומיים, أسبوعين). "One" and the
+     ordinals are left to the prompt, because they serve as ordinary words too.
    - The check also refuses:
      - a slot not offered, or used twice;
-     - a text without `{product}` or `{expected}`, without `{left}` or `{runs_out}` when one is
-       offered, or a capped one without `{shelf_life}`;
-     - a product name written out;
-     - a percentage or ₪ sign, or a word from a fixed list, matched as whole words after quote
-       marks are removed;
+     - a text without `{product}` or `{expected}`, or without an offered `{left}`, `{runs_out}`
+       or `{capped}`;
+     - a product name of the group written out, matched as a whole word;
+     - a percentage or ₪ sign, NFKC folding its wide forms, or a word from a fixed list, matched
+       like the number words;
      - a text over 200 characters;
      - a language without its own letters.
    - A failing suggestion is withheld in all three languages. The rest of its group stands.
@@ -108,8 +120,9 @@ Two things make the order explanation different from the shelf's:
      `{suggestion_id, model, prompt, prompt_sha256, requested_at, inputs_digest, accepted, text | withheld_because, reused_from}`.
      The text is stored with its slots unfilled. A withheld answer's raw text is kept for audit,
      cut to 2,000 characters, and is never shown.
-   - The digest is over the suggestion's sent facts without its id. An explanation therefore
-     follows its facts. The id stays the same until the order day (ADR-034), but the facts can
+   - The digest is over the suggestion's sent facts with its department's name, and without its
+     id or product name. An explanation therefore follows its facts, and is never reused in
+     another department. The id stays the same until the order day (ADR-034), but the facts can
      change in between.
    - It is committed in the nightly's existing step for sealed answers, which commits the boost's
      picks and the shelf explanations today, and grows to take it.
@@ -135,6 +148,11 @@ Two things make the order explanation different from the shelf's:
    - A per-night ceiling in policy, `order_explanation.request_ceiling`, proposed at 60, counted
      across the night's runs as the boost's ceiling is.
    - A time budget, `order_explanation.time_budget_s`, proposed at 600, checked before each send.
+     It is cut short by the nightly's deadline: a time the nightly gives the engine, by which
+     every model step stops sending. It is set so that what follows the engine in the job still
+     fits in its 60 minutes: the probes, the commits, and a deploy check of up to 12 minutes. The
+     nightly took between 24.6 and 37.2 minutes from 2026-10-03 to 2026-10-09, and its steps'
+     own times set the deadline in the implementation plan.
    - A request times out at `order_explanation.timeout_s`, proposed 120. Where the shared client
      retries, after a 429, a 5xx or a transport failure, it waits one second and tries once more.
      Any other failure is not retried. One request can therefore take about 241 seconds, and the
@@ -174,7 +192,8 @@ Two things make the order explanation different from the shelf's:
      asking switched off, so it asks nothing and writes nothing.
    - Before it reproduces the night, the builder seals into that folder's snapshots the committed
      answers, `tests/fixtures/order_example/explanations.json`, or an empty snapshot while there
-     are none. That is how `scripts/build_shelf_example.py` seals the shelf example's. The
+     are none. It fails when the committed answers' prompt version is not one the page's phrases
+     serve. That is how `scripts/build_shelf_example.py` seals the shelf example's. The
      example's artefact carries `order_explanation` beside the three order capabilities it copies
      today.
    - Only its `--explain` option calls the real model, once, with the owner's key. Nothing of the
@@ -231,9 +250,9 @@ sentence, which the card falls back to. But the owner asked for the AI's (D-40).
 - the slots' phrases added to the page's dictionaries in three languages, shown to the owner with
   the mockups;
 - the residual of F14-S1 ASM-085: an explanation can still be unfaithful in words. It can give a
-  cause the facts lack, write a number in words, or turn a slot around with a negation or a
-  comparison ("you won't have {left}"). A slot's figure is always the engine's, and its phrase
-  always names the figure and its period.
+  cause the facts lack, use a number word the list leaves out ("one", an ordinal), or turn a slot
+  around with a negation or a comparison ("you won't have {left}"). A slot's figure is always the
+  engine's, and its phrase always names the figure and its period.
 
 **We gain:**
 - the explanation he asked for on every card, under the rules he set for AI-written reasons;

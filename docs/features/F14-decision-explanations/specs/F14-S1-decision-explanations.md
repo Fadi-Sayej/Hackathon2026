@@ -22,9 +22,10 @@ Updated: 2026-10-10
 > He approved the four parts of the design in conversation: what the sentence says, how the
 > nightly makes it, what the card shows, and the example and tests. This spec writes them down,
 > except what OQ-1403 lists as changed or new since. The largest change is in how numbers reach
-> the card. The model writes no number. It writes named slots, and the page fills each one with a
-> phrase that carries the figure and says what it is ("about 12 left on Tuesday 1 Sept"). Each
-> choice this spec makes for him is marked **(decided here)** and put to him as OQ-1403.
+> the card. The model writes no number, in digits or in words. It writes named slots, and the page
+> fills each one with a phrase that carries the engine's figure and says what it is and when
+> ("about 3 left on Tuesday 1 Sept"). Each choice this spec makes for him is marked
+> **(decided here)** and put to him as OQ-1403.
 >
 > **What he will see, and when.** No store sends daily sales today (D-23), so `order_quantity`
 > publishes nothing and neither does this. Until a store does, he sees the explanation only in
@@ -44,17 +45,18 @@ Every order suggestion F8 publishes carries an explanation, written by the AI in
 of why that quantity (D-40). The explanation puts the suggestion's own published facts into
 words. On the Reorder card it replaces the engine's sentence, which comes back on any night the
 explanation is missing. Every figure in it is the engine's, in a phrase that says what the figure
-is: the model writes none (FR-238). It never changes a quantity, and it adds no cause the facts do
-not carry (D-16).
+is and when: the model writes none (FR-238). It never changes a quantity, and it adds no cause the
+facts do not carry (D-16).
 
 ## 2. Intent Traceability
 
 - **INT-EXPL** — «مع مساعد ذكاء اصطناعي يشرح القرار» (#54). D-15 makes "the decision" the order.
 - **D-40** — "yes every suggestion should have a ai explanation" (2026-10-09).
 - **D-16** — how an AI-written reason is made: once a night, from published facts, under a paid
-  account, a monthly ceiling with an alert, and a mechanical figure check.
-- **D-10** — an estimated figure says it is an estimate. The slots' phrases carry the card's own
-  "about" (FR-238).
+  account, a monthly ceiling with an alert, and a mechanical figure check. The intent adds that
+  the check is mechanical, «لا بطلبٍ في التعليمات».
+- **D-10** — an estimated figure says it is an estimate. The slots' phrases carry "about" and
+  "expected" (FR-238).
 - **D-3** — no figure where none can be stated. A week with missing reports offers no weekly
   figures (FR-238).
 - Serves the PRD's F14 row (V2, with F8, no due date: D-17).
@@ -105,9 +107,9 @@ Behavioural scope, not a file list. Which files change is declared by the implem
 | Suggestion | One `order_quantity` entry: a product's quantity for its department's next order day (F8-S1 FR-163). |
 | Explanation | The AI's account, in Hebrew, Arabic and English, of why one suggestion's quantity is what it is, written from that suggestion's facts (FR-235). |
 | The engine's sentence | The card's text today: "You'll sell about {expected} before your next order…", with its stock clause, and the shelf-life line "Only what sells in {days}, before it spoils." |
-| Slot | A named place in the model's text, such as `{left}`, that the page fills with a phrase carrying one published fact and saying what it is (FR-238). |
+| Slot | A named place in the model's text, such as `{left}`, that the page fills with a phrase carrying one published fact and saying what it is and when (FR-238). |
 | Group | The suggestions one request asks about: one department's, at most 20 (FR-237). |
-| Facts digest | A hash of one suggestion's FR-236 facts, without its id. It says what an explanation was written from (FR-239). |
+| Facts digest | A hash of one suggestion's FR-236 facts with its department's name, and without its id or product name. It says what an explanation was written from (FR-239). |
 
 ## 6. Functional Requirements
 
@@ -115,11 +117,11 @@ Behavioural scope, not a file list. Which files change is declared by the implem
 quantity is what it is (D-40). Where its facts support them, the explanation says:
 - how steadily it has sold over the window's weeks;
 - when the order is placed, and how many days it covers;
-- what stock there is now and what is left on the order day, or that it will be gone by then,
-  when the count was used;
+- what stock will be left on the order day, or that it will be gone by then, when the count was
+  used;
 - where they apply: that the shelf life capped the quantity; that the count could not be used,
-  so the quantity does not subtract stock; that the market boost raised it because the nearby
-  stores ran out.
+  so the quantity does not subtract stock; that the nearby stores ran out of it, and whether the
+  market boost raised the expected sales.
 
 It is written once a night, from the suggestion's published facts, and published with it. It is
 never written at request time (D-16). Every figure in it is a slot's (FR-238), so an estimate
@@ -127,26 +129,29 @@ always reads as one (D-10).
 
 **FR-236** — The model is given only what each suggestion publishes (F8-S1 FR-154)
 **(decided here)**:
-- its id, which keys the answer, and its quantity, and whether it is net or gross. Its product
-  name is given as the `{product}` slot, never as text to copy;
-- the expected sales for the days the order covers, and, when every day of the window has a
-  report with this product's units known, the units sold in each of its weeks, oldest first;
+- its id, which keys the answer, its quantity, and whether it is net or gross. Its product name
+  reaches the text only as the `{product}` slot;
+- the expected sales for the days the order covers, and, when `{weeks}` is offered, the units
+  sold in each of the window's weeks, oldest first;
 - the order day's weekday, and how many days the order covers;
-- whether the count was used. When it was, the stock now and the stock at the order day, each
-  only when above 0.05, the card's own threshold, and otherwise that there is none. When it was
-  not, F8's reason (F8-S1 FR-149);
-- the shelf life in days when it is stated in days, whether the department's products do not
-  spoil, and whether the shelf life capped the quantity;
-- whether the market boost raised the expected sales: applied, with a pick above zero. When it
-  did not, F8's `not_applied_because`, such as the market not running out of it or the market
-  signal being thin (F8-S1 FR-147, FR-148). Never its `reason`, `pct` or `model_pick_pct`;
+- whether the count was used. When it was, the stock at the order day when it is above 0.05,
+  the card's own threshold, and otherwise that nothing will be left. When it was not, F8's
+  reason (F8-S1 FR-149);
+- whether the shelf life capped the quantity, the shelf life in days when it is stated in days,
+  and whether the department's products do not spoil;
+- **the market, only when the card shows a boost box:** that is, when the product is in
+  `market_running_out`'s published products, as Reorder's boost box requires today. Then, that
+  the nearby stores ran out of it, and whether the boost raised the expected sales (applied,
+  with a pick above zero), or F8's `not_applied_because` when it did not (F8-S1 FR-147, FR-148).
+  Never the boost's `reason`, `pct` or `model_pick_pct`. Without a boost box, nothing about the
+  market is sent, and the prompt forbids any statement about it;
 - the slots offered for this suggestion, each by its name and what it means, without its figure
   or its phrase (FR-238).
 
 Figures are sent as the card shows them: to one decimal place, halves rounded up, as the page's
 own rounding does, not to the nearest even. Each request also carries the department's name.
-Nothing else goes in: no barcode, no date, no price, cost, margin or ₪ figure (D-1), and no daily
-mean.
+Nothing else goes in: no barcode, no date, no price, cost, margin or ₪ figure (D-1), no stock now,
+and no daily mean.
 
 **FR-237** — The model is asked once per group **(decided here, within OQ-1402)**:
 - one department's suggestions, in the order `order_quantity` publishes them, at most 20 to a
@@ -161,43 +166,51 @@ mean.
   (ADR-045).
 
 **FR-238** — The model writes no number. It writes slots, and the page fills each with a phrase
-that carries one published fact and says what it is **(decided here)**:
+that carries one published fact and says what it is and when **(decided here)**:
 
 | Slot | Filled with (English shown; Hebrew and Arabic say the same) | Offered when |
 |---|---|---|
 | `{product}` | the product's name | always |
 | `{quantity}` | "an order of 35" | always |
-| `{expected}` | "about 34.6 sold in the 7 days from Tuesday 1 Sept" | always |
-| `{weeks}` | "35, 35, 35 and 35 sold in the 4 weeks to 26 Aug", oldest first, with the window's weeks and last day | every day of the window has a report with this product's units known |
+| `{expected}` | "about 35 expected to sell in the 7 days from Tuesday 1 Sept" | always |
+| `{weeks}` | "35, 35, 35 and 35 sold in the 4 weeks to 26 Aug", oldest first, with the window's weeks and last day | every day of the window has a report with this product's units known, and every week of the window is 7 days |
 | `{next_order}` | "your order on Tuesday 1 Sept, which covers 7 days" | always |
-| `{stock_now}` | "about 17 in stock now" | the count was used, and the stock now is above 0.05 |
-| `{left}` | "about 12 left on Tuesday 1 Sept" | the count was used, and the stock at the order day is above 0.05 |
+| `{left}` | "about 3 left on Tuesday 1 Sept" | the count was used, and the stock at the order day is above 0.05 |
 | `{runs_out}` | "what you have will be gone by Tuesday 1 Sept" | the count was used, and the stock at the order day is 0.05 or below |
-| `{shelf_life}` | "a shelf life of 120 days" | the shelf life is stated in days |
+| `{capped}` | "only what sells in 2 days, before it spoils" | the shelf life capped the quantity |
 
 Figures in the phrases take the card's format: one decimal, halves rounded up, a whole number
 without ".0". Days counts and dates take the card's words for them ("7 days", "Tuesday 1 Sept").
-Each phrase names its own period, so no two slots can be read as the same order or the same days.
-The phrases' words are new, in the three languages, and are shown to the owner with the mockups
-(C-79). The prompt tells the model what each slot means and how its phrase reads. A change to a
-phrase's wording that changes how it reads in a sentence is a new prompt version, so no text
-written for the old phrases is reused (FR-239).
+`{runs_out}` and `{capped}` are the card's own sentences today. Each phrase names its own period,
+so a reader can tell which order and which days each figure belongs to. The phrases' words are
+new, in the three languages, and are shown to the owner with the mockups (C-79). The prompt tells
+the model what each slot means and how its phrase reads. A change to a phrase that changes how it
+reads in a sentence is a new prompt version, and the page shows a text only under the phrases its
+prompt version was written for (FR-242).
 
 Each suggestion's text is checked mechanically, on its own, before anything is published:
 - the answer parses. It holds that suggestion's id with all three languages, each non-empty and
   at most 200 characters before the slots are filled;
 - every slot in it is one offered for that suggestion, and each appears at most once. Every text
-  uses `{product}` and `{expected}`. When `{left}` or `{runs_out}` is offered, it is used, so the
-  card keeps what the engine's sentence said about the stock. A capped suggestion's texts also
-  use `{shelf_life}`;
-- no product name of the group appears in the text as written. The model uses `{product}`;
+  uses `{product}` and `{expected}`. Every offered `{left}`, `{runs_out}` or `{capped}` is used,
+  so the card keeps what the engine's sentence and shelf-life line said;
+- no product name of the group appears in the text as written, matched as a whole word. The
+  model uses `{product}`;
 - **the figure check (D-16).** With the slots removed, neither the text as written nor its
   Unicode NFKC form holds a character Unicode classes as a number. That covers every script's
   digits, fractions and numerals;
-- **no percentage or ₪ amount (D-1).** With the slots removed, quote-like marks (`"`, `״`, `'`,
-  `׳`, `‘`, `’`, `“`, `”`) removed and case folded, the text holds none of the signs `%`, `٪`
-  or `₪`. It also holds none of a fixed list of words, matched as whole words, allowing Hebrew's
-  and Arabic's one-letter prefixes and Arabic's `ال`:
+- **numbers in words (D-16).** With the slots removed, quote-like marks (`"`, `״`, `'`, `׳`, `‘`,
+  `’`, `“`, `”`) removed, the text NFKC-normalised and case-folded, it holds none of a fixed list
+  of number words. They are matched as whole words, allowing Hebrew's and Arabic's one-letter
+  prefixes and Arabic's `ال`. The list, kept with the check, holds in each of the three languages:
+  - the cardinals from two to twenty, the tens to ninety, hundred and thousand;
+  - half, quarter, third, dozen, double, twice, triple, and Hebrew's פי;
+  - the duals: יומיים, שבועיים, חודשיים, يومين, يومان, أسبوعين, أسبوعان, شهرين.
+
+  "One" and the ordinals are left to the prompt, because the words also serve as ordinary words,
+  and listing them would withhold too much ordinary text (ASM-085);
+- **no percentage or ₪ amount (D-1).** In the same normalised text, none of the signs `%`, `٪`
+  or `₪`, NFKC folding their wide and small forms, and none of these words, matched the same way:
   - percent, per cent, percentage, אחוז, אחוזים, بالمئة, بالمائة, المئة;
   - shekel, shekels, NIS, ILS, שקל, שקלים, שח, شيكل, شيقل, شواكل;
 - with the slots removed, the Hebrew text holds a Hebrew letter, the Arabic text an Arabic
@@ -205,15 +218,15 @@ Each suggestion's text is checked mechanically, on its own, before anything is p
 
 A failing suggestion's three languages are withheld together, so the languages never disagree.
 The rest of its group is unaffected. A suggestion missing from the answer is withheld as
-missing. An answer that does not parse withholds its whole group. What no check can catch is
-named in ASM-085: a cause the facts do not carry, a number written in words, a negation or
-comparison around a slot ("you won't have {left}"), and a slot placed so that the sentence reads
-oddly.
+missing. An answer that does not parse withholds its whole group. What no check catches is named
+in ASM-085.
 
 **FR-239** — Each night's explanations are sealed and reproduced as the shelf explanation's are
 (ADR-035, ADR-039, ADR-045) **(decided here)**:
 - the snapshot records, per suggestion, the model, the prompt's version, the facts digest, and
   the text with its slots unfilled, or why it was withheld;
+- the facts digest is over FR-236's facts for that suggestion with its department's name, and
+  without its id or product name. A text written for one department is never reused in another;
 - each request's input and output tokens and its stop reason, as the API reports them, are
   recorded in the night's manifest;
 - print mode never calls the model. It reads the night's snapshot;
@@ -239,12 +252,12 @@ admitted, because it fails on different days from the quantities (ADR-014) **(de
 - it requires `order_quantity`'s inputs and `order_explanations`, the night's sealed snapshot.
   Without a model key the live run asks nothing and seals nothing, so the reason is
   `no_model_key`;
-- it publishes, per suggestion, its text in the three languages with the slots unfilled, and the
-  slots offered for it, or why it has none: withheld (with the check's reason), out of date, or
-  not written tonight. With a text, it also publishes the model, the prompt and the night it was
-  reused from, if any;
-- before publishing, it runs FR-238's check again on every text against tonight's offered slots.
-  A text that fails it is published as withheld;
+- it publishes, per suggestion, its text in the three languages with the slots unfilled, the
+  slots offered for it and the prompt version it was written under, or why it has none: withheld
+  (with the check's reason), out of date, or not written tonight. With a text, it also publishes
+  the model and the night it was reused from, if any;
+- before publishing, it runs FR-238's check again on every text against tonight's offered slots
+  and its department group's names. A text that fails it is published as withheld;
 - it counts suggestions, explained, withheld, out of date, not written tonight, reused and
   requests made. Explained, withheld, out of date and not written tonight add up to the
   suggestions: the intent's "N of N".
@@ -254,7 +267,11 @@ admitted, because it fails on different days from the quantities (ADR-014) **(de
   set in the provider's console (D-16, OQ-1404). They are shared with the boost, the shelf
   explanation and the shelf reader. A per-night ceiling of requests sits in policy, proposed 60,
   and is counted across the night's runs;
-- a time budget, proposed 600 seconds, is checked before each request is sent;
+- a time budget, proposed 600 seconds, is checked before each request is sent. It is cut short
+  by the nightly's own deadline: a time the nightly gives the engine, by which every model step
+  stops sending, so that the steps after the engine still fit in the job's 60 minutes. Those are
+  the probes, the commits and the deploy check. The implementation plan sets the deadline from
+  the nightly's measured step times;
 - a request times out at 120 seconds. A request that fails, after the shared client's one retry
   where it retries, ends the night's asking, as the boost's does. Requests already in flight
   finish, and their answers are checked and kept.
@@ -266,9 +283,10 @@ sentence and the shelf-life line, in the page's language, after a tag saying it 
 **(OQ-1401)**:
 - the page fills each slot from that suggestion's published facts, as FR-238's table says, and
   isolates each filled slot for direction, as it already isolates the product name and "40%";
-- the page fills only the slots published as offered for that suggestion. When the text holds any
-  other slot, or one whose fact is missing, the page does not show the text. The card shows the
-  engine's sentence instead;
+- the page fills only the slots published as offered for that suggestion, and shows only a text
+  whose prompt version is one its phrases were written for. When the text holds any other slot,
+  a slot whose fact is missing, or another prompt version, the page does not show the text. The
+  card shows the engine's sentence instead;
 - the quantity, the "Your stock count wasn't used" notice, the market boost box and the three
   buttons stay as they are.
 
@@ -299,7 +317,8 @@ example's test shop:
   shelf keep their stand-in models;
 - before it reproduces the night, the builder seals into its own temporary snapshot folder the
   committed answers, or an empty snapshot while there are none. The example carries
-  `order_explanation` with the order capabilities it already copies;
+  `order_explanation` with the order capabilities it already copies. The builder fails when the
+  committed answers' prompt version is not one the page's phrases serve;
 - only its `--explain` option asks, once, with the real key: `python3
   scripts/build_order_example.py --explain`. The owner runs it, because he holds the key, and the
   answers are committed as `tests/fixtures/order_example/explanations.json`. This follows the
@@ -320,10 +339,11 @@ the sealed explanations and one without them.
 one is published for a suggestion whose facts digest differs from the one it recorded.
 
 **INV-100** — Every figure in a shown explanation is a slot's phrase, filled from its own
-suggestion's published facts. No published explanation holds a numeral outside its slots, a slot
-not offered for its suggestion, a percentage or a ₪ amount (D-1, D-16), and no shown one has a
-slot without a published fact behind it (D-3). *Violated if* re-running FR-238's check on any
-published text fails it, or the page shows a slot it could not fill.
+suggestion's published facts. No published explanation holds a numeral or a listed number word
+outside its slots, a slot not offered for its suggestion, a percentage or a ₪ amount (D-1, D-16).
+No shown one has a slot without a published fact behind it (D-3), or a prompt version its phrases
+do not serve. *Violated if* re-running FR-238's check on any published text fails it, or the page
+shows a slot it could not fill.
 
 **INV-101** — The example's explanations never reach a store's data. *Violated if* any is found
 under the store's `data/external/snapshots/`, or a store's run reads one (D-29).
@@ -332,13 +352,14 @@ under the store's `data/external/snapshots/`, or a store's run reads one (D-29).
 
 **SCN-178** — Given a suggestion for במבה with an accepted explanation sealed for its current
 facts, when he opens Reorder in Hebrew, then its card shows the AI tag and the Hebrew text where
-the engine's sentence was. Each slot shows its phrase, such as the Hebrew for "about 34.6 sold
-in the 7 days from Tuesday 1 Sept". The quantity, the buttons and any boost box are unchanged.
+the engine's sentence was. Each slot shows its phrase, such as the Hebrew for "about 35 expected
+to sell in the 7 days from Tuesday 1 Sept". The quantity, the buttons and any boost box are
+unchanged.
 
 **SCN-179** — Given a group of six suggestions, where the model's text for one holds the digits
-"40", when the step checks the answer, then that one is withheld as stating a figure, and its
-card shows the engine's sentence. The other five are shown, and the note says the AI explained 5
-of tonight's 6 suggestions.
+"40" or the word "forty", when the step checks the answer, then that one is withheld as stating a
+figure, and its card shows the engine's sentence. The other five are shown, and the note says the
+AI explained 5 of tonight's 6 suggestions.
 
 **SCN-180** — Given no model key, when the nightly runs, then no request is made,
 `order_explanation` is unavailable with `no_model_key`, every card shows the engine's sentence,
@@ -348,9 +369,9 @@ and the note says the AI's explanations are off. Every quantity equals a run wit
 explanation, when the step runs, then no request is made for it, and tonight's snapshot copies
 the explanation, naming last night as where it came from.
 
-**SCN-182** — Given more groups than the night's request ceiling allows, or a time budget spent,
-when the step stops sending, then the remaining suggestions are not written tonight. Their cards
-show the engine's sentence, and the counts say how many.
+**SCN-182** — Given more groups than the night's request ceiling allows, or a time budget or the
+nightly's deadline spent, when the step stops sending, then the remaining suggestions are not
+written tonight. Their cards show the engine's sentence, and the counts say how many.
 
 **SCN-183** — Given a request that fails, when the step continues, then it sends nothing more
 that night. Answers already in flight are checked and kept, and every suggestion not asked is not
@@ -364,9 +385,9 @@ explained them. Nothing can be approved.
 when print mode reproduces the night, then that explanation is not shown, the suggestion counts
 as out of date, and its card shows the engine's sentence.
 
-**SCN-186** — Given a capped suggestion whose texts never use `{shelf_life}`, when the step
-checks the answer, then it is withheld, and its card shows the engine's sentence with its
-shelf-life line.
+**SCN-186** — Given a capped suggestion whose texts never use `{capped}`, when the step checks
+the answer, then it is withheld, and its card shows the engine's sentence with its shelf-life
+line.
 
 **SCN-187** — Given a window in which three days have no report, when the step asks, then no
 suggestion is sent weekly figures or offered `{weeks}`, and a text using `{weeks}` is withheld.
@@ -376,14 +397,16 @@ suggestion is sent weekly figures or offered `{weeks}`, and a text using `{weeks
 | Input | Source | Required? |
 |---|---|---|
 | `order_quantity`'s published suggestions and their facts | The night's run (F8-S1 FR-154) | Yes. Without them, so is this unavailable, with their reason |
+| `market_running_out`'s published products | The night's run | No. Without it, nothing about the market is sent (FR-236) |
 | The night's explanations | The model's answers, checked and sealed under `data/external/snapshots/` (ADR-045) | Yes. Without them, `no_model_key` |
 | The prompt | A versioned file under `configs/prompts/` (ADR-045) | Yes |
 | The policy's values | `order_explanation` in `configs/policy.yaml` (FR-237, FR-238, FR-241) | Yes |
+| The nightly's deadline | Given to the engine by the nightly (FR-241) | No. Without it, the step's own budget applies |
 
 | Output | Where it is observable |
 |---|---|
-| `order_explanation`: per suggestion, its text in three languages with the slots unfilled, or why it has none; the counts (FR-240) | `dashboard.json`; the Reorder page, slots filled |
-| The night's sealed snapshot, with the requests made, their tokens, and whether the step completed | `data/external/snapshots/<night>/order_explanations/` |
+| `order_explanation`: per suggestion, its text in three languages with the slots unfilled, its offered slots and prompt version, or why it has none; the counts (FR-240) | `dashboard.json`; the Reorder page, slots filled |
+| The night's sealed snapshot, with the requests made, their tokens and stop reasons, and whether the step reached its end | `data/external/snapshots/<night>/order_explanations/` |
 | The example's explanations (FR-244) | `tests/fixtures/order_example/explanations.json`; the example's preview |
 
 ## 10. State / Lifecycle Semantics
@@ -391,7 +414,8 @@ suggestion is sent weekly figures or offered `{weeks}`, and a text using `{weeks
 - **The explanation is written once a night and kept.** The snapshot is committed by the
   nightly's existing step for sealed answers (CLAUDE.md rule 9). Nothing in it is replaced; a
   second run that night only adds (FR-239).
-- **Recomputed each run:** which sealed explanation matches which suggestion, by digest.
+- **Recomputed each run:** which sealed explanation matches which suggestion, by digest, and the
+  check, again, before publishing (FR-240).
 - **Filled at render:** the slots, from the suggestion's published facts. Nothing new is
   computed; the page formats published fields in phrases (ADR-001).
 - **Never stored:** anything at request time. Nothing is written to owner state, and the
@@ -408,10 +432,10 @@ suggestion is sent weekly figures or offered `{weeks}`, and a text using `{weeks
 | `order_quantity` unavailable | So is `order_explanation`, with the same reason. Reorder waits as F8 does |
 | An answer does not parse, or misses a suggestion | That group, or that suggestion, is withheld. Its cards show the engine's sentence. It is asked again the next night |
 | A text fails the check | That suggestion is withheld, with the check's reason. The rest of its group is shown |
-| Ceiling reached, time budget spent, or a request failed | The suggestions not asked are not written tonight (FR-241) |
-| The job stops partway | The manifest written at the start says the step began. What was sealed stands; the rest is not written tonight. The next night reuses from the last completed night as well (FR-239) |
+| Ceiling reached, time budget or the nightly's deadline spent, or a request failed | The suggestions not asked are not written tonight (FR-241) |
+| The job stops partway | The manifest written at the start says the step began. What was sealed stands; the rest is not written tonight. The next night reuses from what was sealed (FR-239) |
 | A sealed explanation's digest no longer matches | Not shown; out of date (INV-099) |
-| A shown text has a slot the page cannot fill | The card shows the engine's sentence (FR-242) |
+| A shown text has a slot the page cannot fill, or a prompt version its phrases do not serve | The card shows the engine's sentence (FR-242) |
 | `order_quantity` is available with no suggestions | `order_explanation` is available with every count at zero. That is a result, not a failure: there is nothing to explain. No note is shown |
 
 Nothing here is an empty result standing in for a failure (CLAUDE.md rule 10): every suggestion
@@ -422,29 +446,30 @@ is counted in exactly one of FR-240's four states.
 | Case | Behaviour |
 |---|---|
 | A product name holds digits or "%" ("קוקה קולה 1.5", "חלב 3%") | The name reaches the text only through `{product}`, which is removed before the checks and isolated for direction when filled |
-| A text writes a product's name instead of `{product}`, or names another product of its group | Withheld |
+| A text writes a product's name instead of `{product}`, or names another product of its group | Withheld. Names are matched as whole words, so "מים" is not found inside "ימים" |
 | The model writes a number anyway ("35", "３５", "½", "٣٥", "Ⅻ") | Withheld. The raw text and its NFKC form are both checked against the Unicode number classes |
-| The model writes "4 weeks" | Withheld. The period is in `{weeks}`'s own phrase |
-| The model writes "four weeks" or "half" | Not caught: a number in words is ASM-085's residual. The prompt forbids it |
+| The model writes a number in words ("four weeks", "חצי", "أسبوعين") | Withheld, for every word on the list. "One" and the ordinals are not on it (ASM-085) |
 | A slot not offered (`{left}` on a gross suggestion), or used twice | Withheld |
-| "ש״ח" or "ש''ח" after a slot | Withheld: quote-like marks are removed before the word list is matched |
-| A window with a day unreported | No weekly figures are sent and `{weeks}` is not offered (SCN-187) |
+| "ש״ח", "ש''ח" or "％" after a slot | Withheld: quote-like marks are removed and the text NFKC-normalised before the signs and words are matched |
+| A window with a day unreported, or a week shorter than 7 days | `{weeks}` is not offered, and no weekly figures are sent (SCN-187) |
 | Stock at the order day of 0.05 or less | `{left}` is not offered; `{runs_out}` is, and must be used, as the card says it today |
-| Stock now of 0.05 or less | `{stock_now}` is not offered. The model is told there is none |
+| A department whose products do not spoil | `{capped}` is never offered; the model is told they do not spoil |
+| A capped suggestion | Its texts must use `{capped}`, the card's own line, or it is withheld (SCN-186) |
+| A product that no nearby store has run out of | No boost box on the card, and nothing about the market is sent; the prompt forbids market statements |
 | A boost applied with a pick of 0% | The model is told the boost did not raise the expected sales, so the text does not say it did |
-| A department whose products do not spoil | No shelf-life days are sent and `{shelf_life}` is not offered; the model is told they do not spoil |
-| A capped suggestion | Its texts must use `{shelf_life}`, or it is withheld (SCN-186) |
 | A department with 45 suggestions | Three groups: 20, 20 and 5 |
 | The boost applied | The explanation may say the nearby stores ran out. It has no slot for the boost's percentage, which stays in the boost box with its "the model's estimate" label (D-10) |
 | A suggestion approved or dismissed earlier | It is not on the page (F8-S1 FR-163). The note's counts are tonight's published suggestions |
 
 ## 13. Non-Functional Requirements
 
-**NFR-082** — The step never holds the quantities up **(decided here)**. Its requests are bounded
-by the policy's ceiling, its time by the budget checked before each request is sent, and each
-request by its timeout (FR-241). It ends within about 600 + 241 seconds: the budget, plus a
-request sent just before it ran out that timed out and was retried. Each night it publishes the
-requests made and how many explanations were reused.
+**NFR-082** — The step never holds the night's artefact up **(decided here)**. Its requests are
+bounded by the policy's ceiling, its time by its own budget and by the nightly's deadline,
+checked before each request is sent, and each request by its timeout (FR-241). On its own, it
+ends within about 600 + 241 seconds: the budget, plus a request sent just before it ran out that
+timed out and was retried. With the other model steps, it ends within about 241 seconds of the
+nightly's deadline, which leaves the job's remaining steps their measured time. Each night it
+publishes the requests made and how many explanations were reused.
 
 **NFR-083** — Its cost is estimated before it is switched on, and counts under ADR-032's monthly
 limit. ADR-045 gives the estimate: about $5 a month at about 60 suggestions a night, and about $36
@@ -477,14 +502,16 @@ outcome key of `order_quantity` and `market_boost` unchanged. Each suggestion th
 explanation, and why. *(FR-240, INV-098)*
 
 **AC-222** — The check, run on fixed answers:
-- passes a text whose only figures are offered slots, each used once, with `{product}` and
-  `{expected}`, where the product's name holds digits or "%";
+- passes a text whose only figures are offered slots, each used once, with `{product}`,
+  `{expected}` and every offered `{left}`, `{runs_out}` or `{capped}`, where the product's name
+  holds digits or "%";
 - withholds a text with a numeral of any script outside its slots, Roman numerals included;
-- withholds one with a slot not offered, a slot used twice, no `{product}` or `{expected}`, no
-  `{left}` or `{runs_out}` when one is offered, or a capped one without `{shelf_life}`;
-- withholds one with a product's name written out;
-- withholds one with `%`, `٪`, `₪`, a percentage word, or a currency name, including "ש״ח" and
-  "ש''ח";
+- withholds one with a listed number word in any of the three languages, including a dual;
+- withholds one with a slot not offered, a slot used twice, or a required slot missing;
+- withholds one with a product's name written out, but not one whose word only contains a name
+  ("ימים" against "מים");
+- withholds one with `%`, `٪`, `％`, `₪`, a percentage word, or a currency name, including "ש״ח"
+  and "ש''ח";
 - withholds one over 200 characters, one missing a language, and a text without its own
   language's letters once its slots are removed.
 
@@ -492,9 +519,10 @@ Only the failing suggestion is withheld, in all three languages. *(FR-238, INV-1
 
 **AC-223** — The request built for a group carries only FR-236's facts and the department's
 name, figures to one decimal with halves rounded up. It carries no barcode, date, price, cost,
-margin, ₪ figure, boost reason, boost percentage, model pick, daily mean or slot phrase, and no
-weekly figures for a window with a day unreported. A boost applied at 0% is sent as not raising
-the expected sales. It turns thinking off. *(FR-236, FR-237)*
+margin, ₪ figure, stock now, boost reason, boost percentage, model pick, daily mean or slot
+phrase. It carries no weekly figures when `{weeks}` is not offered, and nothing about the market
+for a product without a boost box. A boost applied at 0% is sent as not raising the expected
+sales. It turns thinking off. *(FR-236, FR-237)*
 
 **AC-224** — Groups are one department's suggestions in published order, at most 20. An answer
 missing a suggestion withholds that one. An answer that does not parse withholds its group only.
@@ -503,21 +531,24 @@ missing a suggestion withholds that one. An answer that does not parse withholds
 **AC-225** — Print mode never calls the model, and reproduces the published explanations from the
 snapshot. An explanation whose facts digest no longer matches is not shown. *(FR-239, INV-099)*
 
-**AC-226** — A suggestion whose facts, model and prompt match an accepted explanation from the
-nights read back is not asked, and tonight's snapshot copies it with where it came from. The step
-reads back to the first night that reached its end, and never more than `reuse_nights`. A withheld
-one is asked again. A second run the same night replaces no sealed record. *(FR-239)*
+**AC-226** — A suggestion whose facts, department, model and prompt match an accepted explanation
+from the nights read back is not asked, and tonight's snapshot copies it with where it came from.
+The step reads back to the first night that reached its end, and never more than `reuse_nights`.
+A text written for one department is not reused in another. A withheld one is asked again. A
+second run the same night replaces no sealed record. *(FR-239)*
 
-**AC-227** — Past the request ceiling or the time budget, or after a request fails, no further
-request is sent that night. Answers already in flight are kept. The remaining suggestions are not
-written tonight, and the counts add up to the suggestions. *(FR-240, FR-241, NFR-082)*
+**AC-227** — Past the request ceiling, the time budget or the nightly's deadline, or after a
+request fails, no further request is sent that night. Answers already in flight are kept. The
+remaining suggestions are not written tonight, and the counts add up to the suggestions.
+*(FR-240, FR-241, NFR-082)*
 
 **AC-228** — On Reorder, in each of the three languages, a suggestion with an explanation shows
 the AI tag and its text in place of the engine's sentence and the shelf-life line, each slot
 filled with its phrase as FR-238's table says. The card keeps its quantity, its "stock count
 wasn't used" notice, its boost box and its buttons. A suggestion without an explanation, or whose
-text has a slot not published as offered or without its fact, shows the card exactly as before
-this spec. *(FR-238, FR-240, FR-242, INV-100)*
+text has a slot not published as offered, a slot without its fact, or a prompt version the
+page's phrases do not serve, shows the card exactly as before this spec.
+*(FR-238, FR-240, FR-242, INV-100)*
 
 **AC-229** — The note says what the AI does. With some suggestions unexplained it gives the
 published "N of M"; with none explained, that the AI has not explained them; with the capability
@@ -526,7 +557,8 @@ unavailable. *(FR-243)*
 
 **AC-230** — The example is built with the step's asking switched off and no model called. With
 committed explanations it shows them. Without them its cards show the engine's sentence and the
-note says so. Its buttons stay disabled. *(FR-244)*
+note says so. Its buttons stay disabled. The build fails on committed explanations whose prompt
+version the page's phrases do not serve. *(FR-244)*
 
 **AC-231** — Without a key, nothing is asked or sealed, and `order_explanation` is unavailable
 with `no_model_key`. *(FR-240)*
@@ -535,8 +567,7 @@ with `no_model_key`. *(FR-240)*
 and a store's run reads nothing from `tests/fixtures/order_example/`. *(FR-244, INV-101)*
 
 **AC-233** — A run that stops after its first request still leaves a manifest saying the step
-began, so print mode does not say `no_model_key`, and the next night still reuses from the last
-completed night. *(FR-239)*
+began, so print mode does not say `no_model_key`. *(FR-239)*
 
 **AC-234** — Each night's manifest records every request's input and output tokens and its stop
 reason as the API reported them. *(FR-239, NFR-083)*
@@ -546,20 +577,20 @@ filled slot holding a product name with digits ("קוקה קולה 1.5") or a fi
 its own place. *(FR-242)*
 
 **AC-236** — A text using `{expected}`, `{next_order}` and `{left}` together, filled for the
-example's במבה, reads in each language with the expected sales as the days from the order day,
-the order as the one on that day, and the stock left as on that day. No two phrases name the same
-figure, and none names a period the fact does not cover. *(FR-238)*
+example's קולה, reads in each language with the expected sales as expected over the days from the
+order day, the order as the one on that day, and the stock left as on that day. Each phrase names
+its own figure and period. *(FR-238)*
 
 ## 16. Assumptions
 
 **ASM-085** — The model's explanation is faithful to the facts it was given. *Falsified if* it
-gives a cause the facts do not carry ("it's hot this week"), states a number in words ("about
-thirty a week"), or turns a slot around with a negation or a comparison ("you won't have
-{left}"). No check catches these. A slot put in an odd place does not change what its phrase
-says, because each phrase names its figure and its period, but the sentence can read oddly. The
-prompt forbids all four, and the page labels the text as the AI's. The figures in the slots are
-always the engine's, and the quantity, not the text, is what the product stands behind
-(INV-098).
+gives a cause the facts do not carry ("it's hot this week"), states a number with a word the list
+leaves out ("one", "the second week"), or turns a slot around with a negation or a comparison
+("you won't have {left}"). No check catches these. A slot put in an odd place does not change
+what its phrase says, because each phrase names its figure and its period, but the sentence can
+read oddly. The prompt forbids all of them, and the page labels the text as the AI's. The figures
+in the slots are always the engine's, and the quantity, not the text, is what the product stands
+behind (INV-098).
 
 **ASM-086** — A group of 20 suggestions fits one answer of 8,000 tokens within 120 seconds, with
 thinking off. *Falsified if* the first nights' manifests show answers cut off (a `max_tokens`
@@ -617,29 +648,33 @@ shows what that changes.
 
 | | Shown in conversation | Proposed here | Why |
 |---|---|---|---|
-| How numbers reach the card | The AI writes them, and a check keeps only numbers from the suggestion's facts | The AI writes slots, and the page fills each with a phrase that carries the card's own figure and says what it is and when ("about 12 left on Tuesday 1 Sept") | A check on values passes a true number in the wrong place: "you'll sell about 12, and 35 will be left", with the stock and the sales swapped. A slot's phrase names its figure and its period, so a slot in an odd place reads oddly, not wrongly. Every figure is the engine's, and an estimate always says "about" (D-10). A negation or a number written in words can still mislead; no check reads them (ASM-085) |
+| How numbers reach the card | The AI writes them, and a check keeps only numbers from the suggestion's facts | The AI writes slots, and the page fills each with a phrase that carries the card's own figure and says what it is and when ("about 3 left on Tuesday 1 Sept") | A check on values passes a true number in the wrong place: "you'll sell about 12, and 35 will be left", with the stock and the sales swapped. A slot's phrase names its figure and its period, so a slot in an odd place reads oddly, not wrongly. Every figure is the engine's, and an estimate always says "about" and "expected" (D-10) |
+| Numbers written in words | caught only by the prompt | a fixed list of number words, refused mechanically | the intent wants the figure check mechanical, «لا بطلبٍ في التعليمات». "One" and the ordinals stay with the prompt |
+| Stock now | allowed, as one of the numbers the sentence may state | not sent, and no slot | the engine's figure is the stock at the start of the run day, and the card never showed it. Read later in the day, "now" would be wrong |
 | Weekly figures | always, as "the weekly sales" | only when every day of the window has a report | F8 sums a week over the days it has reports for, so a week with missing reports would read as a slump (D-3) |
+| The market | "nearby stores have run out" where it applies | only for a card that shows the boost box | for any other product, the engine knows nothing about the market worth saying |
 | What is withheld when a text fails | "only that sentence" | that suggestion's text in all three languages | the languages never disagree. The rest of the group is unaffected |
 | Top of the range | about 565 suggestions, about 30 requests | about 435 suggestions, about 39 requests | 130 of the 565 are not in the catalogue (ASM-088) |
 | Cost at the top of the range | about $47 a month | about $36 a month | the same 130 |
 | Requests a night, the ceiling | 40 | 60 | about 39 groups at the top of the range, plus margin. If every group were full up to the ceiling, the most it could cost is about $95 a month at 60, against about $64 at 40. At the assumed speed the time budget stops the step before the ceiling is reached |
-| Time budget | 360 s | 600 s | the answers at the top of the range total about 87,000 tokens. At an assumed 60 tokens a second for each of four requests, that is about 6 minutes |
+| Time budget | 360 s | 600 s, cut short by the nightly's deadline | the answers at the top of the range total about 87,000 tokens. At an assumed 60 tokens a second for each of four requests, that is about 6 minutes. The deadline keeps the nightly's later steps inside its 60 minutes |
 | Step time at the top of the range | around 5 minutes | about 6 minutes | as above |
 | Request timeout | 90 s | 120 s | a 20-suggestion answer is about 4,000 tokens, about 67 seconds at the same assumed speed |
-| Worst-case step time | about 9 minutes | about 14 minutes | follows from the two above (NFR-082) |
+| Worst-case step time | about 9 minutes | about 14 minutes, or less by the deadline | follows from the two above (NFR-082) |
 
 **What is new, not covered in conversation:**
 - thinking turned off, and an answer limit of 8,000 tokens (FR-237);
 - the slots' phrases, which you will see in the mockups; the product's name as a slot; each slot
-  at most once; `{product}` and `{expected}` in every text, the stock left or "gone by" whenever
-  the count was used, and `{shelf_life}` when capped;
+  at most once; `{product}` and `{expected}` in every text, and the card's own stock and
+  shelf-life sentences whenever they apply (`{left}` or `{runs_out}`, `{capped}`);
 - a boost applied at 0% is not described as raising anything;
 - the checks for percentage and currency words and each language's own letters (FR-238);
 - the daily rate is not sent: it was in the list of facts F8 publishes, not in the numbers the
   sentence may state;
 - reuse from earlier nights back to the first that reached its end, at most 7, matched by a
-  digest of the facts without the suggestion's id, so a new order day with the same facts reuses
-  the old text (FR-239);
+  digest of the facts and the department, without the suggestion's id, so a new order day with
+  the same facts reuses the old text (FR-239);
+- a text is shown only under the phrases its prompt was written for (FR-242);
 - the note's wording: "Tonight the AI explained 28 of 30 suggestions. A card it did not explain
   shows the engine's sentence." The counts include suggestions already approved or dismissed,
   which the page hides (FR-243);
@@ -692,8 +727,8 @@ change.
 | Probe | What it would catch | Where it runs |
 |---|---|---|
 | `npm run check:order-signals` (exists), extended over its fixture world with sealed explanations, then with them withheld | An explanation published from nothing; a quantity or figure that changes without the model's answer (INV-098) | `collect-daily.yml` |
-| The same probe, sealing stand-in answers that hold a typed number, a Roman numeral, a stray "%", "ש״ח", a slot not offered, a product name written out, and a capped text without `{shelf_life}`. It reads the artefact, and scans every published text with a check written apart from FR-238's: any character classed as a number outside a `{…}` slot fails | A failing answer published, or a hole in the check itself (INV-100) | `collect-daily.yml` |
-| The same probe, changing one source at a time for each FR-236 fact: a daily report, a day's report removed, the count, the shelf life, the schedule, the boost's pick, the market snapshots, the product's name | A stale explanation shown beside new facts, or a fact left out of the digest (INV-099) | `collect-daily.yml` |
+| The same probe, sealing stand-in answers that hold a typed number, a Roman numeral, a number word, a stray "%", "ש״ח", a slot not offered, a product name written out, and a capped text without `{capped}`. It reads the artefact, and scans every published text with a check written apart from FR-238's: any character classed as a number outside a `{…}` slot fails | A failing answer published, or a hole in the check itself (INV-100) | `collect-daily.yml` |
+| The same probe, changing one source at a time for each FR-236 fact: a daily report, a day's report removed, the count, the shelf life, the schedule, the boost's pick, the market snapshots, the product's department | A stale explanation shown beside new facts, or a fact left out of the digest (INV-099) | `collect-daily.yml` |
 | `scripts/check_v1_signals.py`'s `PROBED_ELSEWHERE` guard (exists) | Once `order_explanations` is in any capability's `requires`, `tests/test_check_v1_signals.py` fails until it is listed. Listing it also needs the probe's own word for it in that test | CI |
 
 ## 21. Claim Limits
@@ -703,8 +738,8 @@ change.
 | "The AI's explanation shows the quantity is right" | not measurable | The explanation puts F8's facts into words (FR-235). The quantity's grounds are F8-S1's rules |
 | "Explanations make him approve more suggestions" | not measurable | No store sends daily sales (D-23), and no comparison without explanations is planned |
 | "Every suggestion is explained" | measured each night | FR-240's counts: N of N, and the states of the rest |
-| "No explanation holds a numeral outside its slots" | measured each night | INV-100, re-checked at publish (FR-240) |
-| "Every figure in an explanation is the engine's, and says what it is" | not measurable as a whole | Each slot's phrase names its figure and period, but a number in words, a negation or a comparison around a slot is not read by any check (ASM-085) |
+| "No explanation holds a numeral, or a listed number word, outside its slots" | measured each night | INV-100, re-checked at publish (FR-240) |
+| "Every figure in an explanation is the engine's, and says what it is" | not measurable as a whole | Each slot's phrase names its figure and period, but "one", an ordinal, a negation or a comparison around a slot is not read by any check (ASM-085) |
 | "No explanation gives a cause its facts lack" | not measurable | ASM-085. The prompt forbids it; no check reads causes |
 
 ## 22. Unmapped PRD Acceptance Lines
@@ -720,5 +755,7 @@ None. The PRD's F14 row carries no acceptance line of its own.
 - **Success item 1, "N of N on screen", counts the AI's sentences.** On a night with a withheld
   or unasked suggestion, its card still carries a reason, the engine's sentence, but the count
   says it is not the AI's (FR-240, FR-243).
+- **Success item 2's mechanical check reads digits, numerals and listed number words.** "One",
+  the ordinals, and a negation or comparison around a slot are left to the prompt (ASM-085).
 - **"Within a week of the owner using F8's suggestions"** cannot start until a store sends daily
   sales (D-23).
