@@ -1240,6 +1240,7 @@ own, so their rows say so rather than grade it after the fact.
 | [ADR-041](decisions/ADR-041-a-shelf-reader-reads-the-stores-photos.md) | A shelf reader reads widths, current facings and pictures from the store's own photos; its widths wait for an acceptance run (F12-S1, D-34, D-35). Accepted 2026-10-05 | Moderate: its readings share the layout file's format |
 | [ADR-042](decisions/ADR-042-the-stores-shelf-photos-travel-from-the-app-through-firestore.md) | The store's shelf photos travel from the app through Firestore, in parts with a manifest written last; the nightly collects, checks and reads them (F12-S1 v0.11, D-37). Accepted 2026-10-06 | High: one sending function and one collect step know the carrier |
 | [ADR-044](decisions/ADR-044-the-owner-enters-each-unit-and-heights-are-checked.md) | The owner enters each unit in the app, each shelf with its length and height; the nightly writes them into the layout file once a save; the reader measures product heights; the plan places a product only under a shelf it fits, with a 2 cm clearance (F12-S1 v0.12, D-38). Accepted 2026-10-08 | High for the form, moderate for the plan: a unit without heights plans as before |
+| [ADR-045](decisions/ADR-045-an-order-explanation-is-asked-per-department-checked-and-sealed.md) | An order suggestion's explanation is asked per department, checked against its own figures, and sealed as the shelf explanation's is (F14-S1, D-40). Ready for review 2026-10-09 | Easy: text in place of a sentence the engine still computes; no figure depends on it |
 
 ---
 
@@ -1538,6 +1539,22 @@ Nothing is built until the owner approves the spec and its mockups.
 | FR-180 (v0.9), FR-218 … FR-223, NFR-079 | R the shelf reader, on demand and in the nightly when photos wait unread (ADR-042): the AI reads photos and tags (sealed), identity by exact code or unique name at the shelf price, image processing finds edges, four checks; readings in `configs/shelf_readings.yaml`; widths used only after the acceptance run | ADR-041, ADR-039's method | AC-207 … AC-210 |
 | FR-224 … FR-227, NFR-080 | I the upload on Store layout: a JPEG as taken, in parts of at most 900,000 bytes under `stores/<store>/shelfPhotos/`, the manifest last; R the nightly's collect step joins and checks them into `data/internal/shelf_photos/`, deletes only what it pushed; E `layout_facts.photos` (unit, collected, read) | ADR-042, ADR-029 | AC-212 … AC-214 |
 | FR-228 … FR-234, NFR-081 | I the owner's units on Store layout, saved whole to `stores/<store>/ownerState/layout`; R the nightly writes a newer save into `configs/store_layout.yaml` (`recorded_by: app`, `height_cm`, `entered_in_app`); E the reader's `heights` beside `widths`, graded by their own acceptance run; the plan's fit with `shelf.height_clearance_mm`; `layout_facts.without_height`, `units_saved_at` | ADR-044, ADR-037, ADR-041 | AC-215 … AC-220 |
+
+### F14-S1 — Decision explanations (V2: specified, Ready for review 2026-10-09)
+
+F14-S1 builds D-40, which unlocked F14 for specification on 2026-10-09: every order suggestion
+carries the AI's explanation of its quantity, made by D-16's method. It adds one engine capability,
+`order_explanation` (ADR-014). A nightly step after `order_quantity` writes it, asking the pinned
+model once per department group and sealing the answers (ADR-045). On the Reorder card the
+explanation replaces the engine's sentence, which comes back when there is none. Nothing is built
+until the owner approves the spec and its mockups.
+
+| Requirement | Design element | Flow / contract | Verification |
+|---|---|---|---|
+| FR-235 … FR-238, INV-100 | E after `order_quantity`: each department's suggestions in groups of at most `group_size`, asked of the pinned model with thinking off, `concurrency` at once; only FR-236's facts sent; each text checked on its own: only sent figures (as sent or rounded to a whole number), no `%`, `₪` or currency name, within length, each language's letters | ADR-032, ADR-039 Decision 3, ADR-045 | AC-222 … AC-224 |
+| FR-239 … FR-241, INV-098, INV-099, NFR-082, NFR-083 | E `order_explanation` (requires `products`, `sales_daily`, `store_facts`, `order_explanations`; `no_model_key`): sealed per run date under `order_explanations/`, merge never replace; reuse from the most recent earlier snapshot by digest, model and prompt; a per-night ceiling, a time budget, a request timeout, and a stop after a double failure; counts that add up to the suggestions; never read back | ADR-035, ADR-039, ADR-045; D-16 | AC-221, AC-225 … AC-227, AC-231 |
+| FR-242, FR-243 | U Reorder: the AI tag and text in place of the engine's sentence and the shelf-life line; one note above the suggestions, from the published counts | ADR-001, ADR-028 §1 | AC-228, AC-229 |
+| FR-244 | R the example's explanations committed with its inputs, asked for once by hand; until then the builder seals an empty snapshot | D-29; F12-S1 FR-215's precedent | AC-230 |
 
 ### Cross-cutting decisions
 
