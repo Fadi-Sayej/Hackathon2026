@@ -41,8 +41,9 @@ Two things make the order explanation different from the shelf's:
    - The prompt is a versioned file, `configs/prompts/order_explanation.v1.md`. The model id and
      the prompt's version are recorded with every explanation.
    - Its requests go through the shared client of ADR-039 Decision 3. The client gains one
-     optional parameter, the request's thinking setting. Left unset, the request is sent as
-     today, so the boost and the shelf explanation are unchanged by this ADR.
+     optional parameter, the request's thinking setting, and a way to return, beside the text,
+     the token usage and stop reason the API reports. Left unset and unread, the request is sent
+     and answered as today, so the boost and the shelf explanation are unchanged by this ADR.
    - The explanation sets thinking off. Anthropic's model documentation (read 2026-10-09) says
      Sonnet 5 thinks by default when a request does not say otherwise, and that thinking is billed
      as output and counts against the answer's token limit. Writing sentences from given facts
@@ -63,17 +64,24 @@ Two things make the order explanation different from the shelf's:
 4. **Slots that say what they are.** F14-S1 FR-236 and FR-238 give the details.
    - The model writes no numeral, and does not write the product's name. Where a figure or the
      name belongs, it writes a named slot: `{product}`, `{quantity}`, `{expected}`, `{weeks}`,
-     `{next_order}`, `{stock_now}`, `{left}` or `{shelf_life}`. Each suggestion is offered only
-     the slots its facts support, and each slot may appear once.
-   - The page fills each slot with a phrase that carries the figure and names it: `{left}`
-     becomes "about 12 left on Tuesday 1 Sept", not "12". Figures take the card's own format, and
-     estimates the card's own "about". A slot in an odd place can make the sentence read oddly,
-     but it cannot make a figure mean something else.
+     `{next_order}`, `{stock_now}`, `{left}`, `{runs_out}` or `{shelf_life}`. Each suggestion is
+     offered only the slots its facts support, and each slot may appear once. The model is told
+     what each slot means, never its figure or its phrase.
+   - The page fills each slot with a phrase that carries the figure and names it, with its
+     period: `{left}` becomes "about 12 left on Tuesday 1 Sept", not "12", and `{expected}` "about
+     34.6 sold in the 7 days from Tuesday 1 Sept". No two phrases can be read as the same order or
+     the same days. Figures take the card's own format, and estimates the card's own "about".
+   - Where the count was used, the text must keep the card's stock statement: `{left}` or
+     `{runs_out}`, whichever is offered.
    - Filling is rendering a published field, which ADR-001 allows. The phrases live in the page's
-     dictionaries beside the card's own words.
-   - Each filled slot is isolated for text direction, as the page already isolates the product
-     name and "40%". A slot with no published fact behind it means the text is not shown, and the
-     card shows the engine's sentence.
+     dictionaries beside the card's own words. The prompt describes how each phrase reads. A
+     change to a phrase that changes how it reads in a sentence is a new prompt version, so no text
+     written for the old phrase is reused.
+   - The capability publishes, per suggestion, the slots offered for it. The page fills only
+     those, and isolates each filled slot for text direction, as it already isolates the product
+     name and "40%". Any other slot, or one whose fact is missing, means the text is not shown,
+     and the card shows the engine's sentence. Before publishing, the capability runs the check
+     again on every text against tonight's offered slots.
    - `{weeks}` is offered only when every day of the window has a report with the product's
      units known. F8 sums a week over the days it has reports for (`order_evidence.py`), so a
      week with a missing day would read as a slump, a zero where nothing is known (D-3).
@@ -82,7 +90,8 @@ Two things make the order explanation different from the shelf's:
      both catches a numeral that NFKC turns into letters.
    - The check also refuses:
      - a slot not offered, or used twice;
-     - a text without `{product}` or `{expected}`, or a capped one without `{shelf_life}`;
+     - a text without `{product}` or `{expected}`, without `{left}` or `{runs_out}` when one is
+       offered, or a capped one without `{shelf_life}`;
      - a product name written out;
      - a percentage or ₪ sign, or a word from a fixed list, matched as whole words after quote
        marks are removed;
@@ -93,7 +102,8 @@ Two things make the order explanation different from the shelf's:
    - The snapshot lives under `data/external/snapshots/<run date>/order_explanations/`, the date
      the engine reads it by. It holds `explanations.json`, keyed by suggestion id, and a
      `_manifest.json`. The manifest holds the night's runs, the requests made with the input and
-     output tokens the API reported for each, the ceiling, and whether the step completed.
+     output tokens and the stop reason the API reported for each, the ceiling, and whether each
+     run reached its end.
    - Per suggestion it records
      `{suggestion_id, model, prompt, prompt_sha256, requested_at, inputs_digest, accepted, text | withheld_because, reused_from}`.
      The text is stored with its slots unfilled. A withheld answer's raw text is kept for audit,
@@ -110,12 +120,14 @@ Two things make the order explanation different from the shelf's:
      partway is never mistaken for a night with no key.
    - **Print mode never calls the model.** It reads the night's snapshot. Without one, the
      capability is unavailable with `no_model_key`, and every quantity is unchanged.
-   - **Reuse.** Before asking, the step reads earlier nights' snapshots, newest first, back to
-     the most recent one whose step completed. ADR-039 reads only the one before. This step reads
-     back further, so that a night that died partway does not make the next night pay again for
+   - **Reuse.** Before asking, the step reads earlier nights' snapshots, newest first. It stops at
+     the first night whose step reached its end: a run of that night wrote its end manifest,
+     whatever stopped its asking. It never reads more than `order_explanation.reuse_nights`
+     nights (proposed 7), so the step's time does not grow with the history. With none of them
+     ended, it uses what it read. ADR-039 reads only the night before. This step reads back
+     further, so that a night that died partway does not make the next night pay again for
      everything. The newest accepted explanation with the same digest, model and prompt version
-     is copied into tonight's, with `reused_from`, and no request is made. The look-back ends at
-     the last completed night, so the step's time does not grow with the history.
+     is copied into tonight's, with `reused_from`, and no request is made.
 6. **Spending, ADR-032's two limits, and a time budget.**
    - The account's monthly spend limit and its alert are the owner's to set where the account is
      managed (D-16, F14-S1 OQ-1404). They are shared with the boost, the shelf explanation and
@@ -214,12 +226,14 @@ sentence, which the card falls back to. But the owner asked for the AI's (D-40).
 
 **We accept:**
 - one more snapshot directory, and a bigger commit step in the nightly;
-- one optional parameter on the shared client, a thread pool in one step, and a separate model
-  connection for this step in the engine;
+- one optional parameter and a usage return on the shared client, a thread pool in one step, and
+  a separate model connection for this step in the engine;
 - the slots' phrases added to the page's dictionaries in three languages, shown to the owner with
   the mockups;
-- the residual of F14-S1 ASM-085: an explanation can still be unfaithful in words, or put a slot
-  where the sentence reads oddly. A slot's figure is always right and always says what it is.
+- the residual of F14-S1 ASM-085: an explanation can still be unfaithful in words. It can give a
+  cause the facts lack, write a number in words, or turn a slot around with a negation or a
+  comparison ("you won't have {left}"). A slot's figure is always the engine's, and its phrase
+  always names the figure and its period.
 
 **We gain:**
 - the explanation he asked for on every card, under the rules he set for AI-written reasons;

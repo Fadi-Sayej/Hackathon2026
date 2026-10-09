@@ -6,7 +6,7 @@ Owner: smartshelf-pm
 Release: V2, with F8 — no due date (D-17)
 Parent: [PRD](../../product/PRD.md)
 Intent IDs: INT-EXPL
-Specs: [F14-S1](specs/F14-S1-decision-explanations.md) (Ready for review 2026-10-09)
+Specs: [F14-S1](specs/F14-S1-decision-explanations.md) (Ready for review 2026-10-10)
 Inputs: [docs/product/PRD.md, docs/product/intent-register.md (D-15 … D-20), issue #54, PR #178, tag v1-attic-2026-09-24, docs/features/F8-order-quantity/intent.md, docs/product/open-decisions/F14-decision-explanations.md, ADR-007]
 Updated: 2026-10-09 (D-40: unlocked for specification). 2026-09-25 (F8-S1 approved; F14's gate met)
 ---
