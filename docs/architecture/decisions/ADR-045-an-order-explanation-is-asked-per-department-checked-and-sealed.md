@@ -72,7 +72,7 @@ Two things make the order explanation different from the shelf's:
    - The page fills each slot with a phrase that carries the figure and names it, with its
      period: `{left}` becomes "about 3 left on the order day", not "3", and `{expected}` "about 35
      expected to sell in the 7 days from the order day". Only `{next_order}` names the date ("your
-     order on Tuesday 1 Sept, which covers 7 days"), and every text uses it, so the date appears
+     order on Tuesday 1 Sept, for the 7 days until the next one"), and every text uses it, so the date appears
      once. Hebrew and Arabic say "the order day" in the construct form (יום ההזמנה, يوم الطلب),
      since היום and اليوم also mean "today". Figures take the card's own format, and estimates
      the card's own "about".
@@ -125,11 +125,11 @@ Two things make the order explanation different from the shelf's:
      the check runs again before every publish, it applies from the next night.
    - The check also refuses:
      - a slot not offered, or used twice;
-     - a text without `{product}` or `{expected}`, or without an offered `{left}`, `{runs_out}`
-       or `{capped}`;
+     - a text without `{product}`, `{expected}` or `{next_order}`, or without an offered `{left}`,
+       `{runs_out}` or `{capped}`;
      - a product name of the group written out, matched as a whole word;
-     - a percentage or ₪ sign, NFKC folding its wide forms, or a percentage or currency word from
-       Appendix A, matched like the number words;
+     - a percentage sign, any currency symbol (Unicode category Sc), NFKC folding wide forms, or a
+       percentage or currency word from Appendix A, matched like the number words;
      - a text over 200 characters;
      - a language without its own letters.
    - A failing suggestion is withheld in all three languages. The rest of its group stands.
@@ -215,13 +215,13 @@ Two things make the order explanation different from the shelf's:
    minutes on 2026-10-05 (run 37258885696), and between 24.9 and 37.2 minutes on the other nights
    from 2026-10-03 to 2026-10-09.
 7. **The example (D-29).**
-   - `scripts/build_order_example.py` runs the engine in a temporary folder of its own, with
-     stand-in models for the boost and the shelf.
-   - One key variable, `SMARTSHELF_ANTHROPIC_API_KEY`, serves every model step today (`run.py`).
-     The builder sets it for the boost's stand-in, so the key alone cannot keep this step from
-     asking. The engine therefore takes this step's model connection separately from the boost's
-     and the shelf explanation's, as it already takes theirs. The builder runs the step with
-     asking switched off, so it asks nothing and writes nothing.
+   - `scripts/build_order_example.py` runs the engine in a temporary folder of its own. Today it
+     gives the boost a stand-in model, under a key variable set for it.
+   - One key variable, `SMARTSHELF_ANTHROPIC_API_KEY`, serves every model step today (`run.py`),
+     so the key alone cannot keep one step from asking. The engine therefore takes this step's
+     model connection separately from the boost's and the shelf explanation's, as it already
+     takes theirs. In the example's publish pass, the builder gives neither this step nor the
+     boost a connection, so neither asks nor writes anything; it seals what they read instead.
    - Before it reproduces the night, the builder seals into that folder's snapshots the committed
      answers, `tests/fixtures/order_example/explanations.json`, or an empty snapshot while there
      are none. It fails when the committed answers' prompt version is not one the page's phrases
