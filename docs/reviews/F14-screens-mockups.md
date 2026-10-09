@@ -3,7 +3,7 @@ ID: F14-S1-SCREENS-MOCKUPS
 Title: The AI's explanation on every order suggestion (D-40) — mockups for the repository owner's approval
 Status: Proposal — for the repository owner's approval; nothing here is approved or merged
 Owner: smartshelf-engineer
-Parent: [F14-S1](../features/F14-decision-explanations/specs/F14-S1-decision-explanations.md) v0.1 (Ready for review, branch `docs/f14-spec`), C-79, OQ-1403
+Parent: [F14-S1](../features/F14-decision-explanations/specs/F14-S1-decision-explanations.md) v0.1 at b4a1285 (Ready for review, branch `docs/f14-spec`), C-79, OQ-1403
 Inputs: [D-29, D-40, F14-S1 FR-238, FR-242, FR-243, FR-244, Appendix A, docs/reviews/F8-screens-mockups.md, docs/reviews/F12-screens-mockups.md]
 Updated: 2026-10-10
 ---
@@ -19,7 +19,8 @@ you are asked to decide. Nothing here is merged or shown to a store until you ap
 - **the shop is Reorder's marked example** (D-29), the test shop, not any store's data;
 - **every explanation is HAND-WRITTEN SAMPLE WORDING, not the model's.** The model has never been
   asked: no store sends daily sales (D-23), and the model key is not set up. Each sample was written
-  around the slots only, and each passes F14-S1's mechanical check (FR-238, Appendix A): no number
+  around the slots only, and each passes F14-S1's mechanical check as the spec states it at b4a1285
+  (FR-238, Appendix A), run by a scratch re-implementation of it: no number
   of any kind outside the slots, in digits or in words, no "tomorrow", no %, no ₪, no product name.
   The samples were given to the page only while these pictures were taken. They are not in the
   app's data, and not in the example file;
@@ -46,8 +47,10 @@ you are asked to decide. Nothing here is merged or shown to a store until you ap
    There is no note when there are no suggestions, or while Reorder waits for daily sales.
 3. **The phrases that carry the figures** (FR-238, C-79), in the three languages (table below).
    The AI writes no number. It writes a slot such as `{left}`, and the page puts in a phrase like
-   "about 3 left on Sunday 30 Aug". The Hebrew and Arabic phrases are new, proposed here.
-4. **Three things the pictures show that you may want changed** (see "What the pictures show").
+   "about 3 left on the order day". Only `{next_order}` carries the date ("your order on Sunday
+   30 Aug, for the 7 days until the next one"), and every explanation names it once. The Hebrew and Arabic
+   phrases are new, proposed here.
+4. **What the pictures showed, and what changed because of it** (see "What the pictures show").
 
 ## The screens
 
@@ -98,19 +101,26 @@ tonight. Both show the engine's sentence, as the note says.
 
 ## What the pictures show
 
-1. **A text that uses several slots repeats the date.** Each phrase names its own period, so that
-   no figure is read against the wrong days (FR-238). On מים, `{next_order}`, `{expected}` and
-   `{runs_out}` each say "Sunday 30 Aug", so the date appears three times. The prompt could steer the
-   model away from `{next_order}` when `{expected}` already names the days, or the phrases could be
-   shortened. That is a change to F14-S1, if you want it.
+1. **The date repeated (changed).** In the first drawing each phrase named its own date, so a text
+   using `{next_order}`, `{expected}` and `{runs_out}` said "Sunday 30 Aug" three times. Now only
+   `{next_order}` carries the date, every text names it once, and the other phrases say "the order
+   day", in Hebrew and Arabic in the construct form (יום ההזמנה, يوم الطلب), never היום or اليوم,
+   which the check refuses as "today". F14-S1 takes this change.
 2. **Hebrew and Arabic cannot agree with the product.** The model is never sent the product's name
    (FR-236), and one text may serve another product of the same department (FR-239), so it cannot
    know whether the name is masculine, feminine or plural. The samples are written around that,
-   with "the sales of {product}" (המכירות של / مبيعات) rather than "{product} sells". The prompt
-   would have to ask the model for the same.
-3. **The weeks' figures in Hebrew and Arabic.** `{weeks}` lists each week's units, oldest first. In
-   this test shop every week sold the same, so the pictures cannot show whether a list of different
-   figures reads in the right order from right to left. That is checked when the page is built.
+   with "the sales of {product}" (המכירות של / مبيعات) or "{product} has" (ל… יש / لدى) rather than
+   "{product} sells". F14-S1's prompt asks the model for the same.
+3. **Arabic "لـ" before a Hebrew name (changed).** The first samples wrote لـ{product}, which
+   leaves the Arabic letter hanging before a Hebrew name ("لـלחם אחיד"). The samples now use
+   لدى or مبيعات before the name, and never join a letter to it.
+4. **"Your order on …" says "for the 7 days until the next one" (changed).** It said "which covers
+   7 days", which read as untrue beside a capped order (bread covers 2 days, not 7). The English
+   samples open with "Ahead of" or "In" before it, never "For", so it never reads "for … for".
+5. **The weeks' figures in Hebrew and Arabic.** `{weeks}` lists each week's units, oldest first. In
+   this test shop every week sold the same, so the pictures cannot show a list of different figures.
+   Each card's words were measured on screen and read in the right order from right to left; a list
+   of different figures is checked when the page is built.
 
 ## The words
 
@@ -132,11 +142,11 @@ days, and its date format. `{runs_out}` and `{capped}` are the card's own senten
 | Slot | English | עברית | العربية |
 |---|---|---|---|
 | `{quantity}` | an order of {n} | הזמנה של {n} | طلبية من {n} |
-| `{expected}` | about {expected} expected to sell in the {days} from {day} | צפי מכירות של בערך {expected} במשך {days} החל מ{day} | مبيعات متوقَّعة بنحو {expected} خلال {days} ابتداءً من يوم {day} |
+| `{expected}` | about {expected} expected to sell in the {days} from the order day | צפי מכירות של בערך {expected} במשך {days} החל מיום ההזמנה | مبيعات متوقَّعة بنحو {expected} خلال {days} ابتداءً من يوم الطلب |
 | `{weeks}` | {list} sold in the {weeks} to {date} | {list} נמכרו במשך {weeks} עד {date} | {list} بيعت خلال {weeks} حتى {date} |
-| `{next_order}` | your order on {day}, which covers {days} | ההזמנה שלך ב{day}, שמכסה {days} | طلبك يوم {day}، الذي يغطي {days} |
-| `{left}` | about {left} left on {day} | בערך {left} שעוד יהיו על המדף ב{day} | نحو {left} ستبقى على الرف يوم {day} |
-| `{runs_out}` | what you have will be gone by {day} | מה שיש לך ייגמר עד {day} | سينفد ما لديك قبل يوم {day} |
+| `{next_order}` | your order on {day}, for the {days} until the next one | ההזמנה שלך ב{day}, למשך {days} עד ההזמנה הבאה | طلبك يوم {day}، لمدة {days} حتى الطلب التالي |
+| `{left}` | about {left} left on the order day | בערך {left} שעוד יהיו על המדף ביום ההזמנה | نحو {left} ستبقى على الرف يوم الطلب |
+| `{runs_out}` | what you have will be gone by the order day | מה שיש לך ייגמר עד יום ההזמנה | سينفد ما لديك قبل يوم الطلب |
 | `{capped}` | only what sells in {days}, before it spoils | רק מה שנמכר תוך {days}, לפני שהוא מתקלקל | فقط ما يُباع خلال {days}، قبل أن يتلف |
 | `{product}` | the product's name | שם המוצר | اسم المنتج |
 
@@ -146,9 +156,9 @@ Written only to draw the cards. The model's own texts will differ. Each passes F
 
 | Card | English | עברית | العربية |
 |---|---|---|---|
-| במבה | Sales of {product} have held steady: {weeks}. There are {expected}, and {runs_out}, so {quantity} replaces what will sell. | המכירות של {product} יציבות: {weeks}. יש {expected}, ו{runs_out}, ולכן {quantity} מחליפה את מה שיימכר. | مبيعات {product} ثابتة: {weeks}. هناك {expected}، و{runs_out}، لذلك {quantity} تعوّض ما سيُباع. |
-| ביסלי גריל | Sales of {product} are the same every week: {weeks}. Your stock count could not be used, so {quantity} rests on sales alone, with {expected}. | המכירות של {product} זהות בכל שבוע: {weeks}. לא ניתן היה להשתמש בספירת המלאי, ולכן {quantity} נשענת על המכירות בלבד, עם {expected}. | مبيعات {product} متساوية كل أسبوع: {weeks}. لم يكن ممكنًا استخدام جرد مخزونك، لذلك تعتمد {quantity} على المبيعات وحدها، مع {expected}. |
-| לחם אחיד | There are {expected} for {product}, but the shelf life is short, so {quantity} is {capped}, and {runs_out}. | יש {expected} עבור {product}, אבל חיי המדף קצרים, ולכן {quantity} היא {capped}, ו{runs_out}. | هناك {expected} لـ{product}، لكن مدة الصلاحية قصيرة، لذلك {quantity} هي {capped}، و{runs_out}. |
-| פיתות | Sales of {product} outpace the shelf life: there are {expected}. So {quantity} is {capped}, and {runs_out}. | המכירות של {product} מהירות יותר מחיי המדף: יש {expected}. לכן {quantity} היא {capped}, ו{runs_out}. | مبيعات {product} أسرع من مدة الصلاحية: هناك {expected}. لذلك {quantity} هي {capped}، و{runs_out}. |
-| מים | For {next_order}, {product} has {expected}, and {runs_out}. So {quantity} is what will sell. | עבור {next_order}, ל{product} יש {expected}, ו{runs_out}. לכן {quantity} היא מה שיימכר. | لـ{next_order}، لدى {product} {expected}، و{runs_out}. لذلك {quantity} هي ما سيُباع. |
-| קולה | There are {expected} for {product}, and {left}. So {quantity} adds only what the shelf will lack. | יש {expected} עבור {product}, ו{left}. לכן {quantity} משלימה רק את מה שיחסר על המדף. | هناك {expected} لـ{product}، و{left}. لذلك {quantity} تكمل فقط ما سينقص على الرف. |
+| במבה | Sales of {product} have held steady: {weeks}. Ahead of {next_order}, that means {expected}. Since {runs_out}, the suggestion orders all of it. | המכירות של {product} יציבות: {weeks}. עבור {next_order}, המשמעות היא {expected}. מכיוון ש{runs_out}, ההצעה מזמינה את כל הכמות הזאת. | مبيعات {product} ثابتة: {weeks}. وبالنسبة إلى {next_order}، يعني ذلك {expected}. وبما أنه {runs_out}، يطلب الاقتراح الكمية كلها. |
+| ביסלי גריל | Sales of {product} are the same every week: {weeks}. Your stock count could not be used, so in {next_order}, the suggestion rests on sales alone: {expected}. | המכירות של {product} זהות בכל שבוע: {weeks}. לא ניתן היה להשתמש בספירת המלאי, ולכן עבור {next_order}, ההצעה נשענת על המכירות בלבד: {expected}. | مبيعات {product} متساوية كل أسبوع: {weeks}. لم يكن ممكنًا استخدام جرد مخزونك، لذلك بالنسبة إلى {next_order}، يعتمد الاقتراح على المبيعات وحدها: {expected}. |
+| לחם אחיד | {product} has {expected}, but the shelf life is short. So in {next_order}, the suggestion is {capped}. And {runs_out}. | ל{product} יש {expected}, אבל חיי המדף קצרים. לכן עבור {next_order}, ההצעה היא {capped}. ו{runs_out}. | لدى {product} {expected}، لكن مدة الصلاحية قصيرة. لذلك بالنسبة إلى {next_order}، الاقتراح هو {capped}. و{runs_out}. |
+| פיתות | Sales of {product} outpace the shelf life: there are {expected}. In {next_order}, the suggestion is {capped}, and {runs_out}. | המכירות של {product} מהירות יותר מחיי המדף: יש {expected}. עבור {next_order}, ההצעה היא {capped}, ו{runs_out}. | مبيعات {product} أسرع من مدة الصلاحية: هناك {expected}. وبالنسبة إلى {next_order}، الاقتراح هو {capped}، و{runs_out}. |
+| מים | Ahead of {next_order}, {product} has {expected}. Since {runs_out}, the suggestion replaces all of it. | עבור {next_order}, ל{product} יש {expected}. מכיוון ש{runs_out}, ההצעה מחליפה את כל הכמות הזאת. | بالنسبة إلى {next_order}، لدى {product} {expected}. وبما أنه {runs_out}، يعوّض الاقتراح الكمية كلها. |
+| קולה | Ahead of {next_order}, {product} has {expected}, and {left}. So the suggestion orders only what the shelf will lack. | עבור {next_order}, ל{product} יש {expected}, ו{left}. לכן ההצעה מזמינה רק את מה שיחסר על המדף. | بالنسبة إلى {next_order}، لدى {product} {expected}، و{left}. لذلك يطلب الاقتراح فقط ما سينقص على الرف. |

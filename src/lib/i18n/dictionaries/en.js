@@ -606,11 +606,11 @@ export const en = {
   // F14 (MOCKUP, F14-S1 FR-238, FR-243; not approved): the AI's explanation on a card. The model writes
   // slots, and each is filled with a phrase that carries one published fact and says what it is and when.
   'reorder.ai.slot.quantity': "an order of {n}",
-  'reorder.ai.slot.expected': "about {expected} expected to sell in the {days} from {day}",
+  'reorder.ai.slot.expected': "about {expected} expected to sell in the {days} from the order day",
   'reorder.ai.slot.weeks': "{list} sold in the {weeks} to {date}",
-  'reorder.ai.slot.nextOrder': "your order on {day}, which covers {days}",
-  'reorder.ai.slot.left': "about {left} left on {day}",
-  'reorder.ai.slot.runsOut': "what you have will be gone by {day}",
+  'reorder.ai.slot.nextOrder': "your order on {day}, for the {days} until the next one",
+  'reorder.ai.slot.left': "about {left} left on the order day",
+  'reorder.ai.slot.runsOut': "what you have will be gone by the order day",
   'reorder.ai.slot.capped': "only what sells in {days}, before it spoils",
   'reorder.ai.note.what': "An AI writes each card's explanation from that suggestion's facts. It explains the quantity and does not change it.",
   'reorder.ai.note.some': "Tonight the AI explained {n} of {total} suggestions. A card it did not explain shows the engine's sentence.",

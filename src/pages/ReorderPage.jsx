@@ -56,7 +56,8 @@ function slotPhrases(entry, window, t, language, dates) {
   const out = {
     product: entry.product_name || entry.barcode,
     quantity: t('reorder.ai.slot.quantity', { n: ev.quantity }),
-    expected: t('reorder.ai.slot.expected', { expected: one(ev.expected_sales), days: daysText(ev.cycle.days, language), day: dates.day(ev.cycle.first_day) }),
+    // Only {next_order} carries the date; the others say "the order day", so no text repeats it.
+    expected: t('reorder.ai.slot.expected', { expected: one(ev.expected_sales), days: daysText(ev.cycle.days, language) }),
     next_order: t('reorder.ai.slot.nextOrder', { day: dates.day(ev.order_day), days: daysText(ev.cycle.days, language) }),
   }
   if (ev.weekly_units?.length && window?.last_day) {
@@ -64,8 +65,8 @@ function slotPhrases(entry, window, t, language, dates) {
     out.weeks = t('reorder.ai.slot.weeks', { list, weeks: weeksText(ev.weekly_units.length, language), date: dates.short(window.last_day) })
   }
   if (ev.kind === 'net' && ev.stock_at_order_day != null) {
-    if (ev.stock_at_order_day > 0.05) out.left = t('reorder.ai.slot.left', { left: one(ev.stock_at_order_day), day: dates.day(ev.order_day) })
-    else out.runs_out = t('reorder.ai.slot.runsOut', { day: dates.day(ev.order_day) })
+    if (ev.stock_at_order_day > 0.05) out.left = t('reorder.ai.slot.left', { left: one(ev.stock_at_order_day) })
+    else out.runs_out = t('reorder.ai.slot.runsOut')
   }
   if (ev.capped && ev.shelf_life?.days) out.capped = t('reorder.ai.slot.capped', { days: daysText(ev.shelf_life.days, language) })
   return out
