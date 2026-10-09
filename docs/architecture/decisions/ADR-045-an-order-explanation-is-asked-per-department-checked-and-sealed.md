@@ -67,7 +67,8 @@ Two things make the order explanation different from the shelf's:
      `{expected}`, `{weeks}`, `{next_order}`, `{left}`, `{runs_out}` or `{capped}`. Each
      suggestion is offered only the slots its facts support, and each slot may appear once. The
      model is told what each slot means, never its figure or its phrase. It is not sent the
-     product's name or the order day's date or weekday; slots carry them.
+     product's name, the order day's date or weekday, or the shelf life's days; slots carry them.
+     The prompt forbids mentioning any other suggestion of the group.
    - The page fills each slot with a phrase that carries the figure and names it, with its
      period: `{left}` becomes "about 3 left on Tuesday 1 Sept", not "3", and `{expected}` "about
      35 expected to sell in the 7 days from Tuesday 1 Sept". Figures take the card's own format,
@@ -99,13 +100,17 @@ Two things make the order explanation different from the shelf's:
    - The intent asks that the figure check be mechanical, «لا بطلبٍ في التعليمات». So the check
      also refuses the number words of F14-S1 Appendix A in the three languages, with their listed
      forms: two upward, fractions, multiples and the duals (יומיים, أسبوعين). Before matching, it
-     normalises the text: NFKC, invisible format characters, combining marks and the Arabic
-     stretch character removed, and Arabic alef and hamza forms folded. Words are matched whole,
-     after up to two Hebrew prefix letters or Arabic's attached ones. "One" and the ordinals are
-     left to the prompt, because they serve as ordinary words too.
-   - It also refuses a geresh or gershayim between Hebrew letters, which catches Hebrew numerals
-     written in letters (ל״ה) and abbreviations such as ש״ח. And it refuses Appendix A's relative
-     days ("tomorrow", "מחר", "غداً"), because a text can be reused on a later night.
+     normalises the text: NFKC; invisible format characters, combining marks and the Arabic
+     stretch character removed; `أ`, `إ`, `آ` and `ٱ` folded to `ا` and nothing else; and case
+     folded. Words are matched whole, after up to two Hebrew prefix letters, or Arabic's attached
+     ones, where `ل` with `ال` is written `لل`. "One", the ordinals, and words that are also
+     ordinary words (שני, the bare ست) are left to the prompt.
+   - It also refuses any quote-like mark between Hebrew letters, which catches Hebrew numerals
+     written in letters (ל״ה, ל”ה) and abbreviations such as ש״ח. And it refuses Appendix A's
+     relative days ("tomorrow", "מחר", "غداً"), because a text can be reused on a later night.
+   - The lists are a mechanical net for the common forms, not a proof. A withheld text records
+     the rule and word that withheld it. A form found missing is added to the lists, and since
+     the check runs again before every publish, it applies from the next night.
    - The check also refuses:
      - a slot not offered, or used twice;
      - a text without `{product}` or `{expected}`, or without an offered `{left}`, `{runs_out}`
@@ -130,7 +135,11 @@ Two things make the order explanation different from the shelf's:
      id. No product name is sent, so a text holds none and may serve another product of the
      department with the same facts; it is never reused in another department. The prompt's
      version is the prompt file's hash, as `shelf_explanation`'s is. The versions the page's
-     phrases serve are listed in one place, which the page and the example's builder both read. The id stays the same until the order day (ADR-034), but the facts can
+     phrases serve are listed in one place, which the engine, the page and the example's builder
+     all read. The engine does not ask under a prompt the list does not serve. A test holds that
+     the prompt file's hash is on the list, and the list records a digest of the phrases each
+     version serves, so a phrase change fails the test until someone decides whether it needs a
+     new prompt version. The id stays the same until the order day (ADR-034), but the facts can
      change in between.
    - It is committed in the nightly's existing step for sealed answers, which commits the boost's
      picks and the shelf explanations today, and grows to take it.
@@ -206,7 +215,14 @@ Two things make the order explanation different from the shelf's:
      serve. That is how `scripts/build_shelf_example.py` seals the shelf example's. The
      example's artefact carries `order_explanation` beside the three order capabilities it copies
      today.
-   - Only its `--explain` option calls the real model, once, with the owner's key. Nothing of the
+   - The example's boost today is a stand-in's fixed answer, labelled as the model's. An
+     explanation beside it would describe a raise no model chose. So the example's boost becomes a
+     real answer too, or none: the same `--explain` run asks for the boost's pick first, then the
+     explanations. Until it is run, the example's boost box says the model was not asked tonight,
+     and its quantity is not raised. The order probe keeps its stand-in, which it needs. This
+     changes F8's example (D-29) and is put to the owner in F14-S1 OQ-1403.
+   - Only its `--explain` option calls the real model, once, with the owner's key, and it reads
+     the stop reason, so an answer cut off at its limit is refused, not sealed. Nothing of the
      example is written under the store's `data/external/snapshots/`, and no store's run reads
      the fixture (F14-S1 INV-101).
 8. **The explanation is never read back.** No engine step, figure or probe reads its text (F14-S1
@@ -242,6 +258,12 @@ It costs half as much per token. But a batch may take up to 24 hours to finish, 
 publishes the same night. It would also need state across runs to collect a batch the next night,
 which no other step has. Re-evaluate if the nightly's cost, not its time, becomes the constraint.
 
+### Adaptive thinking at low effort
+Anthropic's general advice for Sonnet 5 prefers it to thinking off, for quality. It still spends
+output tokens against the 8,000-token limit, in amounts no one has measured on this prompt. With
+thinking off, the limit was sized for the sentences alone. Revisit with the first nights' recorded
+tokens and stop reasons.
+
 ### Thinking left at the model's default
 It needs no client change. But thinking is billed as output and counts against the token limit,
 so a 20-suggestion answer would cost more. It could also be cut off before its JSON closes, which
@@ -269,14 +291,23 @@ sentence, which the card falls back to. But the owner asked for the AI's (D-40).
 - every figure on the card is still the engine's;
 - it is reproducible from committed inputs, and paid for once per distinct set of facts.
 
-**Left open, and not decided here.** The boost's requests (300 tokens) and the shelf
-explanation's (1,200) also leave thinking at the model's default. By this ADR's own reasoning,
-that spends output tokens and could cut an answer off. Whether they should turn it off is their
-own question, F8's and F12's. Neither has run against the real model yet, since no store sends
-daily sales.
+**Left open, and not decided here.**
+- The three other callers of the shared client also leave thinking at the model's default:
+  - the boost, with a 300-token limit;
+  - the shelf explanation, with 1,200;
+  - the shelf reader, with 4,000 and up to a dozen images.
+- By this ADR's own reasoning, that spends output tokens and could cut an answer off. The client
+  does not read the stop reason today, so a cut-off answer passes as a bad one. A review on
+  2026-10-10 traced what each caller then does: the boost stops the night's asking, and the
+  reader asks again, and pays again, every night.
+- Whether they should turn thinking off, and how the client should name a cut-off, is F8's and
+  F12's to decide. The boost and the explanation wait for daily sales. The reader waits only for
+  a photo and the key, so it is likely the first to meet the real model.
+- No caller has met it yet: the repository has no model key secret (F14-S1 OQ-1404).
 
 **We will know it was wrong if:**
-- the published counts show many suggestions withheld or not written tonight;
+- the published counts show many suggestions withheld or not written tonight, or the recorded
+  words show the lists withholding ordinary text;
 - the manifests show answers cut off, timeouts, or 429s (F14-S1 ASM-086, ASM-087);
 - he reports an explanation that does not match its card.
 
