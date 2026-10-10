@@ -11,12 +11,12 @@ PRD  →  Feature Intents  →  Feature Specs  →  System Design + ADRs  →  I
 
 | Layer | Canonical location |
 |---|---|
-| PRD · settled decisions D-1 … D-39 | [`docs/product/PRD.md`](docs/product/PRD.md) · [`docs/product/intent-register.md`](docs/product/intent-register.md) |
+| PRD · settled decisions D-1 … D-40 | [`docs/product/PRD.md`](docs/product/PRD.md) · [`docs/product/intent-register.md`](docs/product/intent-register.md) |
 | Feature intents (F1 … F14) | [`docs/features/F#-*/intent.md`](docs/features/) |
-| Feature specs (F1-S1 … F9-S1, F12-S1, F13-S1) | [`docs/features/F#-*/specs/`](docs/features/) |
+| Feature specs (F1-S1 … F9-S1, F12-S1, F13-S1, F14-S1) | [`docs/features/F#-*/specs/`](docs/features/) |
 | Gaps, open questions, assumptions | [`docs/features/gaps-and-open-questions.md`](docs/features/gaps-and-open-questions.md) |
 | System Design | [`docs/architecture/system-design.md`](docs/architecture/system-design.md) |
-| ADR-001 … ADR-044 | [`docs/architecture/decisions/`](docs/architecture/decisions/) |
+| ADR-001 … ADR-045 | [`docs/architecture/decisions/`](docs/architecture/decisions/) |
 | Quality gates | [`docs/reviews/`](docs/reviews/) |
 | Implementation plan | [`docs/implementation/plan.md`](docs/implementation/plan.md) |
 | Deploy / run / data durability | [`docs/operations/`](docs/operations/) |
@@ -283,7 +283,7 @@ Anything without a traceable id does not belong in this repository.
 When two documents disagree, the one **higher** in this list wins. It is reproduced from
 [`docs/README.md`](../docs/README.md), which is the canonical copy.
 
-1. PRD, and the settled decisions `D-1 … D-39` in the intent register §3
+1. PRD, and the settled decisions `D-1 … D-40` in the intent register §3
 2. Feature intents
 3. Approved feature specs
 4. System Design
@@ -324,8 +324,8 @@ is `Approved`.
 | Status | Means | May a downstream role start? |
 |---|---|---|
 | `Approved` | Settled. Intents and specs use this. | Yes |
-| `Accepted` | Settled. **ADRs use this instead of `Approved`** — ADR-001 … ADR-042 and ADR-044 do; ADR-043 is still for review. | Yes |
-| `Registered — not specified` | The intent is settled, and writing a spec is **deliberately forbidden** until a named decision is taken. F10, F11 and F14 are in this state. | **No** — and not because it is unfinished. Point at the blocking `GAP-` id and stop. |
+| `Accepted` | Settled. **ADRs use this instead of `Approved`** — ADR-001 … ADR-044 do; ADR-045 is still for review. | Yes |
+| `Registered — not specified` | The intent is settled, and writing a spec is **deliberately forbidden** until a named decision is taken. F10 and F11 are in this state. F14 was unlocked by D-40 on 2026-10-09, and its spec is for review. | **No** — and not because it is unfinished. Point at the blocking `GAP-` id and stop. |
 | `Living` | Continuously updated by design; never "finished". The gaps register is one. | Yes, as a reference — never cite it as settled |
 | `Partial — <what is missing>` | Part written, part not. The implementation plan is here. | Only for the parts named as written |
 | `Proposal — <what must confirm it>` | Not yet product authority. | No |

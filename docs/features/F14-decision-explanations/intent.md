@@ -6,9 +6,9 @@ Owner: smartshelf-pm
 Release: V2, with F8 — no due date (D-17)
 Parent: [PRD](../../product/PRD.md)
 Intent IDs: INT-EXPL
-Specs: none
+Specs: [F14-S1](specs/F14-S1-decision-explanations.md) (Ready for review 2026-10-10)
 Inputs: [docs/product/PRD.md, docs/product/intent-register.md (D-15 … D-20), issue #54, PR #178, tag v1-attic-2026-09-24, docs/features/F8-order-quantity/intent.md, docs/product/open-decisions/F14-decision-explanations.md, ADR-007]
-Updated: 2026-09-25 (F8-S1 approved; F14's gate met)
+Updated: 2026-10-09 (D-40: unlocked for specification). 2026-09-25 (F8-S1 approved; F14's gate met)
 ---
 
 # F14 — لماذا هذا القرار؟ · Decision Explanations
@@ -95,3 +95,23 @@ blocks a spec now except the owner asking for one.
 ## Open questions
 
 None. GAP-008, F8's three decisions, was resolved on 2026-09-24 as D-18 … D-20.
+
+## Added 2026-10-09 (not part of the migrated content)
+
+The repository owner asked for this feature on 2026-10-09, and it is unlocked for specification as
+**D-40**. He answered "yes every suggestion should have a ai explanation" to "If you want every
+suggestion to carry an AI explanation, that would be a new capability like `shelf_explanation`
+plus a change to the cards. I'd write it up as a proposal for you to approve first, not just add
+it."
+
+The same day, while the design was put to him, he made two choices. D-40 and F14-S1 record them:
+- **On the card, the AI's sentence replaces the engine's sentence.** The engine's sentence comes
+  back on a night with no AI answer (F14-S1 OQ-1401).
+- **The model is asked once per department,** for up to about 20 suggestions in a request
+  (OQ-1402).
+
+The intent's own example («غداً 36 درجة، والخميس ذروة») cannot be said. F8 publishes no weather
+and no busy weekday, and the explanation adds no cause its suggestion's facts do not carry, as
+this intent requires. He was told so before he chose.
+
+The status stays `Registered — not specified` until a spec is approved, as F12's did under D-30.
