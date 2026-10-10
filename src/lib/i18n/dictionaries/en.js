@@ -603,7 +603,7 @@ export const en = {
   'reorder.boostNot.ceiling_reached': "tonight's limit of questions to the model was reached",
   'reorder.boostWithheld': "(its reason was withheld because it stated a figure)",
   'reorder.capped': "Only what sells in {days}, before it spoils.",
-  // F14 (MOCKUP, F14-S1 FR-238, FR-243; not approved): the AI's explanation on a card. The model writes
+  // F14 (F14-S1 FR-238, FR-243; mockups approved 2026-10-10): the AI's explanation on a card. The model writes
   // slots, and each is filled with a phrase that carries one published fact and says what it is and when.
   'reorder.ai.slot.quantity': "an order of {n}",
   'reorder.ai.slot.expected': "about {expected} expected to sell in the {days} from the order day",

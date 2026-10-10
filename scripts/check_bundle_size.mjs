@@ -45,7 +45,13 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const CEILING_KB = 1021        // measured 1018 KB on a fresh local build, 2026-10-08, against 998 KB for main
+const CEILING_KB = 1029        // measured 1026 KB on a fresh local build, 2026-10-10, against 1019 KB for main
+                               // the same day (CI reads about 1 KB higher): F14's explanation on the Reorder
+                               // card and the note above it (F14-S1 FR-238, FR-242, FR-243), mockups approved
+                               // by the owner on 2026-10-10. main grew 4 KB (238 → 242), the slot phrases and
+                               // the note in three languages; 3 KB load only on demand, in ReorderPage (6 → 9).
+                               // The owner's entry is 429 KB, under its 500 KB target. Before that it was 1021,
+                               // measured 1018 KB on a fresh local build, 2026-10-08, against 998 KB for main
                                // the same day (CI reads about 1 KB higher): D-38's units and heights (F12-S1
                                // FR-228 … FR-234, ADR-044), approved by the owner on 2026-10-08. main grew
                                // 9 KB (228 → 237), the form's 43 phrases in three languages; 11 KB load only

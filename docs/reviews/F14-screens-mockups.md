@@ -1,7 +1,7 @@
 ---
 ID: F14-S1-SCREENS-MOCKUPS
 Title: The AI's explanation on every order suggestion (D-40) — mockups for the repository owner's approval
-Status: Proposal — for the repository owner's approval; nothing here is approved or merged
+Status: Approved — by the repository owner, 2026-10-10 ("it is good merge and push")
 Owner: smartshelf-engineer
 Parent: [F14-S1](../features/F14-decision-explanations/specs/F14-S1-decision-explanations.md) v0.1 at b4a1285 (Ready for review, branch `docs/f14-spec`), C-79, OQ-1403
 Inputs: [D-29, D-40, F14-S1 FR-238, FR-242, FR-243, FR-244, Appendix A, docs/reviews/F8-screens-mockups.md, docs/reviews/F12-screens-mockups.md]
@@ -9,6 +9,13 @@ Updated: 2026-10-10
 ---
 
 # The AI's explanation on each Reorder card — mockups for approval
+
+> **Approved by the repository owner on 2026-10-10** ("it is good merge and push"), after seeing
+> the redraw on F14-S1's final phrases: the card, the note and the phrases as drawn. He asked why
+> the same figure appears several times on the במבה and ביסלי גריל cards. The answer was the test
+> shop: it sells the same amount every day, so each week's figure, the expected sales and the
+> order collapse into one number. He kept the drawing as it is. The engine half, `order_explanation`,
+> is not built yet, so nothing on the owner's screens changes until it publishes.
 
 D-40 (2026-10-09): every order suggestion carries the AI's explanation of why that quantity. These
 are the Reorder screens that F14-S1 proposes for it, their words in the three languages, and what

@@ -602,7 +602,7 @@ export const he = {
   'reorder.boostNot.ceiling_reached': "הגענו למכסת השאלות למודל הלילה",
   'reorder.boostWithheld': "(הנימוק שלו הוסתר כי נקב במספר)",
   'reorder.capped': "רק מה שנמכר תוך {days}, לפני שהוא מתקלקל.",
-  // F14 (MOCKUP, F14-S1 FR-238, FR-243; not approved). See en.js.
+  // F14 (F14-S1 FR-238, FR-243; mockups approved 2026-10-10). See en.js.
   'reorder.ai.slot.quantity': "הזמנה של {n}",
   'reorder.ai.slot.expected': "צפי מכירות של בערך {expected} במשך {days} החל מיום ההזמנה",
   'reorder.ai.slot.weeks': "{list} נמכרו במשך {weeks} עד {date}",

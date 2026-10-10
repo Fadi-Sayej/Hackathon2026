@@ -44,10 +44,12 @@ function weeksText(n, language) {
 
 const one = (x) => String(Math.round(x * 10) / 10)
 
-// F14 (MOCKUP, docs/reviews/F14-screens-mockups.md; not approved, not merged). The AI writes no
-// number: it writes slots, and the page fills each from the suggestion's own published facts
-// (F14-S1 FR-238, FR-242). A text is shown only under a prompt version these phrases were
-// written for; the list lives in one place, read by the page and the example's builder.
+// F14 (F14-S1 FR-238, FR-242), as the repository owner approved the mockups on 2026-10-10
+// (docs/reviews/F14-screens-mockups.md). The AI writes no number: it writes slots, and the page
+// fills each from the suggestion's own published facts. A text is shown only under a prompt
+// version these phrases were written for. Until the engine publishes `order_explanation`,
+// nothing here shows; 'mockup-sample' is the mockups' hand-written samples, and the engine's
+// build adds its prompt's version here, in the one list the example's builder also reads.
 const PHRASES_SERVE = new Set(['mockup-sample'])
 const SLOT = /\{([a-z_]+)\}/g
 

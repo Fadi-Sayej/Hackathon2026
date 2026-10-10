@@ -607,7 +607,7 @@ export const ar = {
   'reorder.boostNot.ceiling_reached': "بلغنا حد أسئلة النموذج لهذه الليلة",
   'reorder.boostWithheld': "(حُجب تعليله لأنه ذكر رقمًا)",
   'reorder.capped': "فقط ما يُباع خلال {days}، قبل أن يتلف.",
-  // F14 (MOCKUP, F14-S1 FR-238, FR-243; not approved). See en.js.
+  // F14 (F14-S1 FR-238, FR-243; mockups approved 2026-10-10). See en.js.
   'reorder.ai.slot.quantity': "طلبية من {n}",
   'reorder.ai.slot.expected': "مبيعات متوقَّعة بنحو {expected} خلال {days} ابتداءً من يوم الطلب",
   'reorder.ai.slot.weeks': "{list} بيعت خلال {weeks} حتى {date}",
