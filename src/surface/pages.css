@@ -461,6 +461,24 @@
   margin-top: 4px;
 }
 
+/* F14 (mockups approved 2026-10-10): the AI's explanation on a card, after Shelf plan's AI tag, and the
+   note above the suggestions in Shelf plan's AI box (F14-S1 FR-242, FR-243). */
+.reorder__ai {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--ink-900);
+}
+
+.reorder__ai .plan__ai-tag {
+  flex: none;
+  margin-top: 2px;
+}
+
+.reorder__ai-note .reorder__ai {
+  margin: 0;
+}
+
 /* The approved mockup draws these as rounded rectangles, not the Today card's pills. */
 .reorder__card .entry-card__actions {
   display: flex;
