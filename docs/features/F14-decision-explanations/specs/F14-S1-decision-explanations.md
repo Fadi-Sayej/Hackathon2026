@@ -8,7 +8,7 @@ Parent: [F14 — Decision Explanations](../intent.md)
 Related Intents: INT-EXPL
 Inputs: [docs/features/F14-decision-explanations/intent.md, docs/product/PRD.md, docs/product/intent-register.md (D-1, D-3, D-10, D-15, D-16, D-17, D-28, D-29, D-40), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (FR-144, FR-147, FR-148, FR-149, FR-154, FR-155, FR-160 … FR-164), docs/reviews/F8-screens-mockups.md, docs/features/F12-planogram/specs/F12-S1-planogram.md (FR-210 … FR-215), ADR-001, ADR-007, ADR-014, ADR-028, ADR-032, ADR-034, ADR-035, ADR-039, ADR-045, CLAUDE.md]
 Answered by: [System Design](../../../architecture/system-design.md) §21
-Updated: 2026-10-10
+Updated: 2026-10-10 (C-79 met: the mockups approved, and the card and note merged as #313)
 ---
 
 # F14-S1 — Decision Explanations
@@ -567,7 +567,13 @@ explanations live there. The example's are committed by hand (FR-244).
 
 **C-79** — Front-end work waits for the owner's approval of its mockups (2026-09-16). The card,
 the slots' phrases and the note are built only after he approves screenshots of the example in
-Hebrew, Arabic and English, on desktop and phone.
+Hebrew, Arabic and English, on desktop and phone. *(Met 2026-10-10: he approved the mockups drawn on this spec's phrases, "it
+is good merge and push" ([docs/reviews/F14-screens-mockups.md](../../../reviews/F14-screens-mockups.md)),
+and the card and the note were merged as #313, before this spec's own approval (OQ-1403). They
+show nothing until the engine publishes `order_explanation`. The merged page keeps the list of
+served prompt versions as a constant holding only the mockups' sample version; the one shared
+list of FR-239 and FR-242 replaces it when the engine's side is built. A change he makes to this
+spec through OQ-1403 changes the merged card with it.)*
 
 **C-80** — One store per copy (D-28). The prompt is product text: it names no store, and nothing
 in it is a store's setting.
