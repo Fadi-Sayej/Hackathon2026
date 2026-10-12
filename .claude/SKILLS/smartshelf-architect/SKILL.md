@@ -47,8 +47,8 @@ without one cannot be built.
 
 1. Confirm the named intent is `Approved`. **`Registered — not specified` is not
    approval** — it means a spec is deliberately forbidden until a named decision is
-   taken. Stop, name the `GAP-` id blocking it, and say who must answer it. F10, F11 and F14
-   are in this state today.
+   taken. Stop, name the `GAP-` id blocking it, and say who must answer it. F10 and F11
+   are in this state today. F14 was unlocked by D-40 on 2026-10-09.
 2. Read that intent, the PRD rows sharing its `F#`, `CLAUDE.md`, the settled decisions,
    and every ADR that binds this work. List those ADRs by number in the spec's `Inputs`.
 3. Write the spec from `references/spec-template.md`. **Sections 1–19 are the house

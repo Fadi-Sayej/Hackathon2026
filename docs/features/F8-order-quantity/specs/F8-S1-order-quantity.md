@@ -8,7 +8,7 @@ Parent: [F8 — Order Quantity](../intent.md)
 Related Intents: INT-004, INT-010
 Inputs: [docs/features/F8-order-quantity/intent.md, docs/product/PRD.md §5 §6 §7 §10, docs/product/intent-register.md (D-1, D-3, D-7, D-8, D-10, D-16, D-18, D-19, D-20, D-21), docs/features/gaps-and-open-questions.md (GAP-008, GAP-009), F2-S1, F5-S1, F7-S1, F10 intent, ADR-001, ADR-002, ADR-003, ADR-004, ADR-005, ADR-007, ADR-008, ADR-009, ADR-011, ADR-012, ADR-014, ADR-016, ADR-017, ADR-024, ADR-027, ADR-028, CLAUDE.md, the repository owner's answers of 2026-09-25 (§17), public/data/dashboard.json and catalogue.json (generated 2026-09-24T02:46Z), data/internal/silver_pos/*.parquet]
 Answered by: [System Design](../../../architecture/system-design.md) §21 — a placeholder until V2's first design round
-Updated: 2026-09-25
+Updated: 2026-10-09 (a dated note under FR-149: F14-S1 FR-242 shows the AI's explanation in place of the card's sentence). 2026-09-25
 ---
 
 # F8-S1 — Order Quantity
@@ -198,6 +198,11 @@ deducts what will sell before the order day and never falls below zero.
 Without a usable count, the suggestion is gross. It reads as he chose: "you'll sell about X
 before your next order" (OQ-902). It then says why the count was not used, for example its
 date.
+
+*(2026-10-09: when a suggestion carries the AI's explanation, the card shows that text in place of
+this sentence and the shelf-life line, by the owner's choice OQ-1401 (F14-S1 FR-242, proposed for
+his approval). This sentence stays the card's whenever there is no explanation. Nothing in F8's
+requirements changes.)*
 
 **FR-150** — A product whose net quantity is zero is not suggested. The Reorder entry states
 how many moving products the stock already covers.
