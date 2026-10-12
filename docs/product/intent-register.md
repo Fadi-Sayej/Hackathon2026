@@ -207,7 +207,7 @@ carry (D-1, D-3, D-10, D-16). The brief that posed the questions is kept,
 *(2026-10-09: unlocked for specification by **D-40**: every order suggestion carries the AI's
 explanation. He chose the same day that it replaces the engine's sentence on the card, and that
 the model is asked once per department. F14-S1 proposes the rest of how it is written, checked,
-paid for and shown.)*
+paid for and shown. F14-S1 was approved on 2026-10-12, OQ-1403.)*
 
 **The pilot store (D-23, 2026-09-27).** The pilot with the YomYom store has ended. Everything
 that waited on the store owner now waits on another store's owner, and nothing is filled in

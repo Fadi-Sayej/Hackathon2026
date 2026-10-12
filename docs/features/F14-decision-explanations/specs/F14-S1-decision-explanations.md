@@ -1,17 +1,20 @@
 ---
 ID: F14-S1
 Title: Decision Explanations — the AI's reason beside every order suggestion
-Status: Ready for review
+Status: Approved — by the repository owner, 2026-10-12
 Owner: smartshelf-architect
 Version: 0.1 (2026-10-10)
 Parent: [F14 — Decision Explanations](../intent.md)
 Related Intents: INT-EXPL
 Inputs: [docs/features/F14-decision-explanations/intent.md, docs/product/PRD.md, docs/product/intent-register.md (D-1, D-3, D-10, D-15, D-16, D-17, D-28, D-29, D-40), docs/features/F8-order-quantity/specs/F8-S1-order-quantity.md (FR-144, FR-147, FR-148, FR-149, FR-154, FR-155, FR-160 … FR-164), docs/reviews/F8-screens-mockups.md, docs/features/F12-planogram/specs/F12-S1-planogram.md (FR-210 … FR-215), ADR-001, ADR-007, ADR-014, ADR-028, ADR-032, ADR-034, ADR-035, ADR-039, ADR-045, CLAUDE.md]
 Answered by: [System Design](../../../architecture/system-design.md) §21
-Updated: 2026-10-10 (C-79 met: the mockups approved, and the card and note merged as #313)
+Updated: 2026-10-12 (approved: OQ-1403 answered "approve"). 2026-10-10 (C-79 met: the mockups approved, and the card and note merged as #313)
 ---
 
 # F14-S1 — Decision Explanations
+
+> **Approved by the repository owner on 2026-10-12** ("approve", answering "Approve the spec, or tell me what to change. The table in OQ-1403 lists every change from our conversation.": OQ-1403).
+> His approval covers the choices marked **(decided here)** and every change listed in OQ-1403.
 
 > **Why this spec exists now.** The repository owner asked for it on 2026-10-09: "yes every
 > suggestion should have a ai explanation" (D-40). How the explanation is made was settled on
@@ -743,8 +746,8 @@ FR-242 and FR-238 follow from it.
 FR-237 follows from it. The top of the range has since been re-estimated (ASM-088), and OQ-1403
 shows what that changes.
 
-**OQ-1403** — Do you approve F14-S1 as written? It asks for the choices marked
-**(decided here)**, and for the changes since the conversation below.
+**~~OQ-1403~~** — Do you approve F14-S1 as written? **Answered 2026-10-12: "approve"**, to "Approve the spec, or tell me what to change. The table in OQ-1403 lists every change from our conversation."
+It asked for the choices marked **(decided here)**, and for the changes since the conversation below.
 
 **What changed from what you were shown:**
 

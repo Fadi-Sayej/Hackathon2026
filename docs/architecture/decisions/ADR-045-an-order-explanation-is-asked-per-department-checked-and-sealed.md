@@ -1,18 +1,18 @@
 ---
 ID: ADR-045
 Title: An order suggestion's explanation is asked per department, written with slots the page fills, and sealed as the shelf explanation's is
-Status: Ready for review
+Status: Accepted
 Owner: smartshelf-architect
 Date: 2026-10-10
 Parent: [System Design](../system-design.md) §19
 Related Specs: F14-S1 (FR-235 … FR-244, INV-098 … INV-101, NFR-082, NFR-083)
 Inputs: [docs/features/F14-decision-explanations/specs/F14-S1-decision-explanations.md, D-1, D-3, D-10, D-16, D-29, D-40, ADR-001, ADR-014, ADR-032, ADR-035, ADR-039, src/engine/model_client.py, src/engine/shelf_explanation.py, src/engine/order_evidence.py, src/engine/run.py, scripts/build_order_example.py, scripts/build_shelf_example.py]
-Updated: 2026-10-10
+Updated: 2026-10-12 (accepted with F14-S1, OQ-1403)
 ---
 
 # ADR-045 — An order suggestion's explanation is asked per department, written with slots the page fills, and sealed as the shelf explanation's is
 
-**Status:** Ready for review · **Recorded in:** [System Design](../system-design.md) §19
+**Status:** Accepted (2026-10-12, by the repository owner: "approve", answering "Approve the spec, or tell me what to change. The table in OQ-1403 lists every change from our conversation.", F14-S1 OQ-1403) · **Recorded in:** [System Design](../system-design.md) §19
 
 ## Context
 
