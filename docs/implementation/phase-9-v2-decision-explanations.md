@@ -1,11 +1,11 @@
 ---
 ID: PLAN-PHASE-9
 Title: Phase 9 — V2, F14 Decision Explanations (F14-S1)
-Status: Ready for review
+Status: Approved — by the repository owner, 2026-10-12 ("yes do subagent", answering "Does the plan cover what you want, and how should it be built?"): Tasks 9.0–9.9, as shown, with their values; to be built subagent-driven
 Owner: smartshelf-architect
 Parent: [Implementation plan](plan.md)
 Inputs: [docs/features/F14-decision-explanations/specs/F14-S1-decision-explanations.md (Approved 2026-10-12), ADR-045 (Accepted 2026-10-12), ADR-001, ADR-014, ADR-032, ADR-034, ADR-035, ADR-039, docs/reviews/F14-screens-mockups.md (Approved 2026-10-10), src/engine/model_client.py, src/engine/shelf_explanation.py, src/engine/market_boost.py, src/engine/run.py, scripts/build_order_example.py, src/pages/ReorderPage.jsx (the card and note, merged as #313)]
-Updated: 2026-10-12
+Updated: 2026-10-12 (approved)
 ---
 
 # Phase 9 — V2, F14 Decision Explanations
