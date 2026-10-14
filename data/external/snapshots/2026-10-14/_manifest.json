@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-14",
+  "collected_at": "2026-10-14T03:10:59.273053+00:00",
+  "collector_version": "smartshelf@1.0.0",
+  "status": "partial",
+  "sources": {
+    "price_transparency": {
+      "status": "ok",
+      "files": 2,
+      "bytes": 8185904,
+      "sha256": "3e998e374f11560180bb01486f3f052f56282fb6ab926d0627aa00838c767e26",
+      "rows": 526807,
+      "stores": 156
+    },
+    "delivery_catalog": {
+      "status": "partial",
+      "files": 16,
+      "bytes": 1641991,
+      "sha256": "2d22c86bb2e3cd0788775fdfbba860a7b5a83aaeef10675b81a5824d559d1a8f",
+      "rows": 4136,
+      "venues": 8,
+      "expected": 9,
+      "note": "reached 8 of 9 declared venues",
+      "errors": [
+        "shufersal_rosh_haayin: HTTPStatusError: Client error '429 Too Many Requests' for url 'https://wolt.com/en/isr/petah-tikva/venue/shufersal-rosh-haayin/items/menucategory-93'",
+        "For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429"
+      ]
+    }
+  }
+}
