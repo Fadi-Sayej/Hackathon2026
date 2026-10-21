@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-21",
+  "collected_at": "2026-10-21T03:02:34.766594+00:00",
+  "collector_version": "smartshelf@1.0.0",
+  "status": "ok",
+  "sources": {
+    "price_transparency": {
+      "status": "ok",
+      "files": 2,
+      "bytes": 8129160,
+      "sha256": "d9e35c996d60262eb8d8d27f446fc189c60145ef31989e80a67458f2b8da11a4",
+      "rows": 523412,
+      "stores": 156
+    },
+    "delivery_catalog": {
+      "status": "ok",
+      "files": 18,
+      "bytes": 1944701,
+      "sha256": "717dddd8a3d1d3c3819803c88cec6307dde4e8c91c377cac8f15ef6433743c30",
+      "rows": 4913,
+      "venues": 9,
+      "expected": 9
+    }
+  }
+}
