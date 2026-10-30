@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-30",
+  "collected_at": "2026-10-30T04:01:47.831201+00:00",
+  "collector_version": "smartshelf@1.0.0",
+  "status": "partial",
+  "sources": {
+    "price_transparency": {
+      "status": "ok",
+      "files": 2,
+      "bytes": 8199769,
+      "sha256": "c581b01610dcf18f2e99f807530b72905bc7c0c361b0a75dfdfd15eac819ca71",
+      "rows": 529031,
+      "stores": 157
+    },
+    "delivery_catalog": {
+      "status": "partial",
+      "files": 16,
+      "bytes": 1750778,
+      "sha256": "fa0015989501698067a3ce7141d96eef956eb4cd2fb5e4e34949e3dce359dd38",
+      "rows": 4506,
+      "venues": 8,
+      "expected": 9,
+      "note": "reached 8 of 9 declared venues",
+      "errors": [
+        "rami_levy_rosh_haayin: HTTPStatusError: Server error '503 Service Unavailable' for url 'https://wolt.com/en/isr/petah-tikva/venue/rami-levy-in-the-neighborhood-rosh-haayin/items/menucategory-114'",
+        "For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/503"
+      ]
+    }
+  }
+}
