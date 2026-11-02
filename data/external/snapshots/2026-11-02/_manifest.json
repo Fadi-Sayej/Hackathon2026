@@ -1,0 +1,44 @@
+{
+  "date": "2026-11-02",
+  "collected_at": "2026-11-02T03:56:29.391984+00:00",
+  "collector_version": "smartshelf@1.0.0",
+  "status": "partial",
+  "sources": {
+    "price_transparency": {
+      "status": "ok",
+      "files": 2,
+      "bytes": 8134262,
+      "sha256": "e88879c73505f38b447b51845935ca7291d42bab55a944cb9508771545a70d46",
+      "rows": 522639,
+      "stores": 154
+    },
+    "delivery_catalog": {
+      "status": "partial",
+      "files": 2,
+      "bytes": 124991,
+      "sha256": "541b131232393f5c3cdc2a2febcf90ab0c9c08ed4027a155a41bac13483aa489",
+      "rows": 178,
+      "venues": 1,
+      "expected": 9,
+      "note": "short run: 1 venues against a 9-venue median — files arrived but the collection is incomplete",
+      "errors": [
+        "super_alonit_einat: HTTPStatusError: Client error '429 Too Many Requests' for url 'https://wolt.com/en/isr/petah-tikva/venue/super-alonit-kibbutz-einat/items/menucategory-97'",
+        "For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
+        "victory_park_afek: HTTPStatusError: Client error '429 Too Many Requests' for url 'https://wolt.com/en/isr/petah-tikva/venue/victory-rosh-haayin-park-afek/items/menucategory-12'",
+        "For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
+        "wolt_market_lev_haaretz: HTTPStatusError: Client error '429 Too Many Requests' for url 'https://wolt.com/en/isr/petah-tikva/venue/wolt-market-lev-haaretz/items/menucategory-10'",
+        "For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
+        "bingo_rosh_haayin: HTTPStatusError: Client error '429 Too Many Requests' for url 'https://wolt.com/en/isr/petah-tikva/venue/bingo1/items/menucategory-13'",
+        "For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
+        "king_store_kafr_qasim: HTTPStatusError: Client error '429 Too Many Requests' for url 'https://wolt.com/en/isr/petah-tikva/venue/king-store-rosh-haayin'",
+        "For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
+        "rami_levy_rosh_haayin: HTTPStatusError: Client error '429 Too Many Requests' for url 'https://wolt.com/en/isr/petah-tikva/venue/rami-levy-in-the-neighborhood-rosh-haayin'",
+        "For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
+        "victory_shabazi: HTTPStatusError: Client error '429 Too Many Requests' for url 'https://wolt.com/en/isr/petah-tikva/venue/victory-rosh-haayin/items/menucategory-29'",
+        "For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
+        "shufersal_rosh_haayin: HTTPStatusError: Client error '429 Too Many Requests' for url 'https://wolt.com/en/isr/petah-tikva/venue/shufersal-rosh-haayin/items/menucategory-19'",
+        "For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429"
+      ]
+    }
+  }
+}
