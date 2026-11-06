@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-05T04:47:11.634161+00:00",
-  "date": "2026-11-05",
+  "generatedAt": "2026-11-06T04:44:14.808980+00:00",
+  "date": "2026-11-06",
   "status": "ok",
   "sources": {
     "weather": "open-meteo",
@@ -9,22 +9,22 @@
     "islamic": "computed_hijri"
   },
   "weather": {
-    "temperatureC": 15.4,
+    "temperatureC": 17.0,
     "precipitation": 0.0,
-    "windSpeed": 5.8,
-    "weatherCode": 1,
+    "windSpeed": 3.6,
+    "weatherCode": 2,
     "label": "mild",
-    "observedAt": "2026-11-05T06:45",
+    "observedAt": "2026-11-06T06:30",
     "lat": 32.1091501,
     "lon": 34.9624392,
     "source": "open-meteo"
   },
   "hebrew": {
-    "date": "2026-11-05",
+    "date": "2026-11-06",
     "holidays": [],
     "isErevChag": false,
     "isFastDay": false,
-    "isShabbatEve": false,
+    "isShabbatEve": true,
     "chametz": null,
     "pesachStart": "2027-04-22",
     "windows": {
@@ -35,11 +35,11 @@
     "source": "hebcal"
   },
   "islamic": {
-    "date": "2026-11-05",
+    "date": "2026-11-06",
     "hijri": {
       "year": 1448,
       "month": 5,
-      "day": 24
+      "day": 25
     },
     "isRamadan": false,
     "ramadanDay": null,
@@ -47,8 +47,8 @@
     "isEidAlFitr": false,
     "isEidAlAdha": false,
     "ramadanStart": "2027-02-08",
-    "daysToRamadan": 95,
-    "daysToEidAlFitr": 125,
+    "daysToRamadan": 94,
+    "daysToEidAlFitr": 124,
     "phase": null,
     "windows": {
       "ramadan_build_up_days": 21,
@@ -58,9 +58,21 @@
     },
     "source": "computed_hijri"
   },
-  "demandSignals": {},
-  "demandBasis": {},
-  "activeReasons": [],
+  "demandSignals": {
+    "מוצרי מכולת": 1.1,
+    "מוצרי מקרר": 1.1
+  },
+  "demandBasis": {
+    "מוצרי מכולת": [
+      "shabbat_eve"
+    ],
+    "מוצרי מקרר": [
+      "shabbat_eve"
+    ]
+  },
+  "activeReasons": [
+    "shabbat_eve"
+  ],
   "shelfLife": {
     "categories": {
       "מחלקת -barista": 2,
