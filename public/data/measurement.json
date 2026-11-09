@@ -6,7 +6,7 @@
    "declined": 0,
    "deferred": 0,
    "not_in_this_run": 0,
-   "shown": 69
+   "shown": 75
   },
   "catalogue.idle": {
    "acted": 0,
@@ -38,7 +38,7 @@
    "declined": 0,
    "deferred": 0,
    "not_in_this_run": 0,
-   "shown": 6
+   "shown": 5
   },
   "hygiene.absent_price": {
    "acted": 0,
@@ -117,10 +117,10 @@
   "reason": null,
   "status": "available"
  },
- "generated_at": "2026-11-08T03:55:36.321994+00:00",
- "inputs_digest": "28c34e420ab908ac7b22c035ef6eb547a88899ee6e33181e6115dbb279fb9a81",
+ "generated_at": "2026-11-09T04:11:48.463359+00:00",
+ "inputs_digest": "b40607c6341663f8c2c5a557b8040d88bf0b87b8dc7e3dd6a14642b18d2ad3e9",
  "money": [],
- "run_id": "8e07fc0f63fe",
+ "run_id": "5a6d09609d18",
  "schema_version": 1,
  "status": "available",
  "totals": {
@@ -129,12 +129,12 @@
   "declined": 0,
   "deferred": 1,
   "not_in_this_run": 0,
-  "shown": 3459
+  "shown": 3464
  },
  "unavailable_reason": null,
  "window": {
   "first": "2026-09-17T09:47:26Z",
   "last": "2026-09-17T09:47:26Z",
-  "pulled_at": "2026-11-08T03:55:37.467136+00:00"
+  "pulled_at": "2026-11-09T04:11:49.549426+00:00"
  }
 }
