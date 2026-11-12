@@ -117,10 +117,10 @@
   "reason": null,
   "status": "available"
  },
- "generated_at": "2026-11-11T04:22:10.228537+00:00",
- "inputs_digest": "40add273a2d325f1f03548eb1cb8601c541a095c816806b1b6d3c66062297db3",
+ "generated_at": "2026-11-12T05:22:42.674124+00:00",
+ "inputs_digest": "304d0968e6ae6345423e0c58238a1df960e8d1c230ee4bdd1cdc1c487a979182",
  "money": [],
- "run_id": "abc7c4b07197",
+ "run_id": "aec2899e7731",
  "schema_version": 1,
  "status": "available",
  "totals": {
@@ -135,6 +135,6 @@
  "window": {
   "first": "2026-09-17T09:47:26Z",
   "last": "2026-09-17T09:47:26Z",
-  "pulled_at": "2026-11-11T04:22:10.941818+00:00"
+  "pulled_at": "2026-11-12T05:22:43.696540+00:00"
  }
 }
