@@ -1,30 +1,30 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-13T04:39:00.654325+00:00",
-  "date": "2026-11-13",
-  "status": "ok",
+  "generatedAt": "2026-11-14T04:38:38.334761+00:00",
+  "date": "2026-11-14",
+  "status": "partial",
   "sources": {
-    "weather": "open-meteo",
+    "weather": null,
     "hebrew": "hebcal",
     "islamic": "computed_hijri"
   },
   "weather": {
-    "temperatureC": 12.3,
-    "precipitation": 0.0,
-    "windSpeed": 5.9,
-    "weatherCode": 0,
-    "label": "mild",
-    "observedAt": "2026-11-13T06:30",
+    "temperatureC": null,
+    "precipitation": null,
+    "windSpeed": null,
+    "weatherCode": null,
+    "label": "unknown",
+    "observedAt": null,
     "lat": 32.1091501,
     "lon": 34.9624392,
-    "source": "open-meteo"
+    "source": null
   },
   "hebrew": {
-    "date": "2026-11-13",
+    "date": "2026-11-14",
     "holidays": [],
     "isErevChag": false,
     "isFastDay": false,
-    "isShabbatEve": true,
+    "isShabbatEve": false,
     "chametz": null,
     "pesachStart": "2027-04-22",
     "windows": {
@@ -35,11 +35,11 @@
     "source": "hebcal"
   },
   "islamic": {
-    "date": "2026-11-13",
+    "date": "2026-11-14",
     "hijri": {
       "year": 1448,
       "month": 6,
-      "day": 2
+      "day": 3
     },
     "isRamadan": false,
     "ramadanDay": null,
@@ -47,8 +47,8 @@
     "isEidAlFitr": false,
     "isEidAlAdha": false,
     "ramadanStart": "2027-02-08",
-    "daysToRamadan": 87,
-    "daysToEidAlFitr": 117,
+    "daysToRamadan": 86,
+    "daysToEidAlFitr": 116,
     "phase": null,
     "windows": {
       "ramadan_build_up_days": 21,
@@ -58,21 +58,9 @@
     },
     "source": "computed_hijri"
   },
-  "demandSignals": {
-    "מוצרי מכולת": 1.1,
-    "מוצרי מקרר": 1.1
-  },
-  "demandBasis": {
-    "מוצרי מכולת": [
-      "shabbat_eve"
-    ],
-    "מוצרי מקרר": [
-      "shabbat_eve"
-    ]
-  },
-  "activeReasons": [
-    "shabbat_eve"
-  ],
+  "demandSignals": {},
+  "demandBasis": {},
+  "activeReasons": [],
   "shelfLife": {
     "categories": {
       "מחלקת -barista": 2,
