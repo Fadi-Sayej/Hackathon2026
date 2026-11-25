@@ -6,7 +6,7 @@
    "declined": 0,
    "deferred": 0,
    "not_in_this_run": 0,
-   "shown": 82
+   "shown": 86
   },
   "catalogue.idle": {
    "acted": 0,
@@ -30,7 +30,7 @@
    "declined": 0,
    "deferred": 0,
    "not_in_this_run": 0,
-   "shown": 11
+   "shown": 10
   },
   "competitor.purchase_cost": {
    "acted": 0,
@@ -117,10 +117,10 @@
   "reason": null,
   "status": "available"
  },
- "generated_at": "2026-11-24T08:07:44.447111+00:00",
- "inputs_digest": "1f42d06e9d86708e8282086469eff365fcdc212144bbdf07ee697157fe7f9bfe",
+ "generated_at": "2026-11-25T06:38:38.976385+00:00",
+ "inputs_digest": "bc2595dfc16e3198d2c80e68da0d1c5d6d86ff1b64ae1b3862c3377ffa9de331",
  "money": [],
- "run_id": "553990a7bfa7",
+ "run_id": "5470ef812f76",
  "schema_version": 1,
  "status": "available",
  "totals": {
@@ -129,12 +129,12 @@
   "declined": 0,
   "deferred": 1,
   "not_in_this_run": 0,
-  "shown": 3473
+  "shown": 3476
  },
  "unavailable_reason": null,
  "window": {
   "first": "2026-09-17T09:47:26Z",
   "last": "2026-09-17T09:47:26Z",
-  "pulled_at": "2026-11-24T08:07:45.551356+00:00"
+  "pulled_at": "2026-11-25T06:38:40.060884+00:00"
  }
 }
