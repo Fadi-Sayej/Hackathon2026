@@ -1,13 +1,5 @@
 {
  "by_family": {
-  "assortment.market_ran_out": {
-   "acted": 0,
-   "decided": 0,
-   "declined": 0,
-   "deferred": 0,
-   "not_in_this_run": 0,
-   "shown": 86
-  },
   "catalogue.idle": {
    "acted": 0,
    "decided": 0,
@@ -117,10 +109,10 @@
   "reason": null,
   "status": "available"
  },
- "generated_at": "2026-11-25T06:38:38.976385+00:00",
- "inputs_digest": "bc2595dfc16e3198d2c80e68da0d1c5d6d86ff1b64ae1b3862c3377ffa9de331",
+ "generated_at": "2026-11-27T06:20:42.847130+00:00",
+ "inputs_digest": "b130a1c0a8dab2d3b5f28426951b492130d0d2514efc505f4c2afa489b3da026",
  "money": [],
- "run_id": "5470ef812f76",
+ "run_id": "2a157e8d9639",
  "schema_version": 1,
  "status": "available",
  "totals": {
@@ -129,12 +121,12 @@
   "declined": 0,
   "deferred": 1,
   "not_in_this_run": 0,
-  "shown": 3476
+  "shown": 3390
  },
  "unavailable_reason": null,
  "window": {
   "first": "2026-09-17T09:47:26Z",
   "last": "2026-09-17T09:47:26Z",
-  "pulled_at": "2026-11-25T06:38:40.060884+00:00"
+  "pulled_at": "2026-11-27T06:20:43.717827+00:00"
  }
 }
