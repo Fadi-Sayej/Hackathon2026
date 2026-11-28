@@ -1,30 +1,30 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-27T06:20:44.380632+00:00",
-  "date": "2026-11-27",
-  "status": "ok",
+  "generatedAt": "2026-11-28T06:03:36.878204+00:00",
+  "date": "2026-11-28",
+  "status": "partial",
   "sources": {
-    "weather": "open-meteo",
+    "weather": null,
     "hebrew": "hebcal",
     "islamic": "computed_hijri"
   },
   "weather": {
-    "temperatureC": 17.2,
-    "precipitation": 0.0,
-    "windSpeed": 2.2,
-    "weatherCode": 1,
-    "label": "mild",
-    "observedAt": "2026-11-27T08:15",
+    "temperatureC": null,
+    "precipitation": null,
+    "windSpeed": null,
+    "weatherCode": null,
+    "label": "unknown",
+    "observedAt": null,
     "lat": 32.1091501,
     "lon": 34.9624392,
-    "source": "open-meteo"
+    "source": null
   },
   "hebrew": {
-    "date": "2026-11-27",
+    "date": "2026-11-28",
     "holidays": [],
     "isErevChag": false,
     "isFastDay": false,
-    "isShabbatEve": true,
+    "isShabbatEve": false,
     "chametz": null,
     "pesachStart": "2027-04-22",
     "windows": {
@@ -35,11 +35,11 @@
     "source": "hebcal"
   },
   "islamic": {
-    "date": "2026-11-27",
+    "date": "2026-11-28",
     "hijri": {
       "year": 1448,
       "month": 6,
-      "day": 16
+      "day": 17
     },
     "isRamadan": false,
     "ramadanDay": null,
@@ -47,8 +47,8 @@
     "isEidAlFitr": false,
     "isEidAlAdha": false,
     "ramadanStart": "2027-02-08",
-    "daysToRamadan": 73,
-    "daysToEidAlFitr": 103,
+    "daysToRamadan": 72,
+    "daysToEidAlFitr": 102,
     "phase": null,
     "windows": {
       "ramadan_build_up_days": 21,
@@ -58,21 +58,9 @@
     },
     "source": "computed_hijri"
   },
-  "demandSignals": {
-    "מוצרי מכולת": 1.1,
-    "מוצרי מקרר": 1.1
-  },
-  "demandBasis": {
-    "מוצרי מכולת": [
-      "shabbat_eve"
-    ],
-    "מוצרי מקרר": [
-      "shabbat_eve"
-    ]
-  },
-  "activeReasons": [
-    "shabbat_eve"
-  ],
+  "demandSignals": {},
+  "demandBasis": {},
+  "activeReasons": [],
   "shelfLife": {
     "categories": {
       "מחלקת -barista": 2,
